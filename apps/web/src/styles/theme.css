@@ -1,0 +1,86 @@
+/*
+ * Tailwind v4 entry point. `@theme inline` aliases the Quiet tokens defined
+ * in packages/ui/src/styles/tokens.css onto Tailwind's utility namespaces,
+ * so `bg-canvas`, `text-muted`, `border-control`, `rounded-lg` etc. resolve
+ * to the same --ae-* custom properties as the rest of the app, the two
+ * systems can never disagree. `inline` (not a plain @theme block) because
+ * these values reference custom properties defined in a different file,
+ * not literals Tailwind can bake in at build time.
+ *
+ * Raw values stay inside this block; a hex code or bare --ae-* reference in
+ * a component is a bug (docs/design/IDENTITY.md ch. "Utility naming").
+ */
+@import 'tailwindcss';
+
+@theme inline {
+  /* Surfaces */
+  --color-canvas: var(--ae-bg);
+  --color-surface: var(--ae-surface);
+  --color-raised: var(--ae-surface-raised);
+  --color-overlay: var(--ae-surface-overlay);
+  --color-rail: var(--ae-rail);
+
+  /* Ink */
+  --color-ink: var(--ae-fg);
+  --color-ink-strong: var(--ae-fg-strong);
+  --color-ink-soft: var(--ae-fg-soft);
+  --color-muted: var(--ae-muted);
+  --color-faint: var(--ae-faint);
+
+  /* Borders */
+  --color-hairline: var(--ae-border);
+  --color-strong: var(--ae-border-strong);
+  --color-control: var(--ae-border-control);
+
+  /* Accent, one token, every color-utility prefix (bg-accent, text-accent,
+     ring-accent, ...) comes free from Tailwind's namespace model. */
+  --color-accent: var(--ae-accent);
+  --color-accent-ink: var(--ae-accent-ink);
+  --color-accent-bg: var(--ae-accent-bg);
+
+  /* Semantic */
+  --color-success: var(--ae-success);
+  --color-warning: var(--ae-warning);
+  --color-danger: var(--ae-danger);
+  --color-ember: var(--ae-ember);
+  --color-info: var(--ae-info);
+
+  /* Categorical viz, fixed slot order, never cycled */
+  --color-viz-1: var(--ae-viz-1);
+  --color-viz-2: var(--ae-viz-2);
+  --color-viz-3: var(--ae-viz-3);
+  --color-viz-4: var(--ae-viz-4);
+  --color-viz-5: var(--ae-viz-5);
+  --color-viz-6: var(--ae-viz-6);
+  --color-viz-7: var(--ae-viz-7);
+  --color-viz-8: var(--ae-viz-8);
+
+  /* Radius, not in the spec's own utility table (that one's color-only),
+     but without this a future `rounded-lg` silently pulls Tailwind's
+     default radius scale instead of ours. */
+  --radius-sm: var(--ae-radius-sm);
+  --radius: var(--ae-radius);
+  --radius-lg: var(--ae-radius-lg);
+  --radius-full: var(--ae-radius-full);
+
+  /* Fonts */
+  --font-sans: var(--ae-font-sans);
+  --font-mono: var(--ae-font-mono);
+  --font-display: var(--ae-font-display);
+
+  /* Type scale. Without these, `text-sm` silently resolves to Tailwind's own
+     0.875rem instead of Quiet's 12px, and the only way to hit a token size
+     from a utility is a hardcoded px value, which the identity forbids. */
+  --text-xs: var(--ae-text-xs);
+  --text-sm: var(--ae-text-sm);
+  --text-base: var(--ae-text-base);
+  --text-md: var(--ae-text-md);
+  --text-lg: var(--ae-text-lg);
+  --text-xl: var(--ae-text-xl);
+  --text-2xl: var(--ae-text-2xl);
+  --text-3xl: var(--ae-text-3xl);
+  --text-4xl: var(--ae-text-4xl);
+
+  --leading-tight: var(--ae-leading-tight);
+  --leading-normal: var(--ae-leading-normal);
+}

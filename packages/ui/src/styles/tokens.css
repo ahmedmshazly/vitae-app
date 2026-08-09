@@ -1,0 +1,149 @@
+/*
+ * Vitae design tokens: the single authoritative palette (SRS INT-3).
+ * "Quiet" identity (2026-08 rebrand): achromatic dark, no accent hue,
+ * paper-white as the only signal. Emphasis by weight, not by colour.
+ * colour is left free to mean something (semantic states, categorical
+ * data), not spent on chrome. Full rationale: docs/design/brand-book.html.
+ *
+ * Standing bans (brand-book.html ch.02/07): no gradients on chrome, no
+ * glow/halo shadows, no glassmorphism, no shimmer, no ambient washes, no
+ * decorative illustration in empty states. Each was tried in a previous
+ * identity and removed on purpose, do not reintroduce any of them here.
+ */
+:root {
+  /* ── Surfaces ── */
+  --ae-rail: #0a0a0a; /* one step below canvas, the app reads as content on a frame */
+  --ae-bg: #0f0f0f;
+  --ae-surface: #151515;
+  --ae-surface-raised: #1c1c1c;
+  --ae-surface-overlay: #232323;
+  --ae-border: #2b2b2b; /* decorative hairlines only: 1.35:1 vs canvas */
+  --ae-border-strong: #3f3f3f; /* emphasis, chip outlines, scrollbars: 1.82:1 */
+  /* Any border that is the ONLY thing defining a control needs WCAG 1.4.11's
+     3:1 non-text contrast, which border-strong doesn't clear. This is the
+     fix, not a third arbitrary shade. */
+  --ae-border-control: #727271; /* 3.98:1 canvas / 3.26:1 overlay */
+
+  /* ── Ink (contrast measured against the lightest surface a value can
+     appear on, not merely against canvas) ── */
+  --ae-fg-strong: #fafaf8; /* 18.3:1 canvas / 15.0:1 overlay */
+  --ae-fg: #e8e8e6; /* 15.6:1 / 12.8:1, body text, default */
+  --ae-fg-soft: #c9c9c6; /* 11.6:1 / 9.5:1, secondary prose */
+  --ae-muted: #a3a3a0; /* 7.6:1 / 6.2:1, labels, inactive nav, metadata */
+  /* Floor of the system, held above 4.5:1 against the lightest surface,
+     not merely the canvas. Do not darken. Nothing may go below this. */
+  --ae-faint: #8c8c89; /* 5.7:1 / 4.7:1 */
+
+  /* ── Accent, paper white. There is no accent hue; do not introduce a
+     coloured accent "for just this one screen." ── */
+  --ae-accent: #fafaf8; /* primary fill, active marker, focus ring, selection */
+  --ae-accent-ink: #0f0f0f; /* text on accent fills: 18.3:1 */
+  --ae-accent-bg: #262626; /* selected row / active tab ground */
+  --ae-accent-2: #a3a3a0; /* "live": provenance, sync, edges. Never an action. */
+
+  /* ── Semantic (≥4.5:1 on all four surfaces; always shipped with an icon +
+     label, never colour alone; never used as a chart series) ── */
+  --ae-success: #7eb795; /* 6.8:1 overlay */
+  --ae-warning: #c8a344; /* 6.6:1 */
+  --ae-danger: #e17263; /* 5.1:1, fills nothing; a destructive button is an
+    outline, only the final confirm inside a dialog may be filled */
+  --ae-ember: #c98a3d; /* 5.4:1, streaks/celebration only, never a second
+    accent, never an error or warning */
+  --ae-info: #9a9484; /* 5.2:1 */
+
+  /* ── Typography ──
+     'Instrument Sans Variable' / 'IBM Plex Mono' are the family names the
+     installed @fontsource packages actually register (verified against
+     node_modules, the brand book's own 'InstrumentSans'/'PlexMono' are
+     private names for its self-embedded specimen fonts and won't match
+     anything loaded here; using them literally would silently fall through
+     to the system fallback for every piece of text in the app). */
+  --ae-font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --ae-font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+  --ae-font-display: var(--ae-font-mono); /* page/section titles only, never
+    a clickable control, never below 15px. Weight 500, caps, 0.2em tracking
+    applied via the .u-display utility (base.css), not encodable in a single
+    font-family value. */
+
+  --ae-text-xs: 11px; /* nothing renders below this, ever */
+  --ae-text-sm: 12px;
+  --ae-text-base: 14px; /* default */
+  --ae-text-md: 15px;
+  --ae-text-lg: 17px;
+  --ae-text-xl: 21px;
+  --ae-text-2xl: 30px;
+  --ae-text-3xl: 44px;
+  --ae-text-4xl: 64px;
+
+  --ae-leading-tight: 1.2; /* headings, single-line rows */
+  --ae-leading-normal: 1.55; /* everything else */
+
+  /* ── Geometry, deliberately tight. Large radii are the strongest signal
+     of a generated card grid; 3px reads as a cut edge, not a pill. ── */
+  --ae-radius-sm: 2px;
+  --ae-radius: 3px;
+  --ae-radius-lg: 5px;
+  --ae-radius-full: 999px;
+
+  /* Seven steps, no others. Gaps come from flex/grid gap, never per-element
+     margins that collapse or double. */
+  --ae-space-1: 4px;
+  --ae-space-2: 8px;
+  --ae-space-3: 12px;
+  --ae-space-4: 16px;
+  --ae-space-5: 24px;
+  --ae-space-6: 32px;
+  --ae-space-8: 48px;
+
+  --ae-row-h: 36px;
+
+  /* ── Elevation, dialogs and popovers may carry exactly one soft shadow;
+     nothing else may. No colour tint, no glow. ── */
+  --ae-shadow-overlay: 0 16px 40px -12px rgba(0, 0, 0, 0.55);
+  --ae-focus-ring: 0 0 0 2px var(--ae-bg), 0 0 0 4px var(--ae-accent);
+
+  /* ── Motion, there is one easing. Exits use literal `linear`, not a
+     token: a leaving element should not decelerate, it should just go. ── */
+  --ae-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --ae-dur-fast: 90ms; /* exits, hover, anything leaving */
+  --ae-dur: 130ms; /* default, entrances, emphasis, route swaps */
+  --ae-dur-slow: 220ms; /* reorder and layout shifts only */
+
+  /* ── Layers ── */
+  --ae-z-overlay: 1000;
+  --ae-z-popover: 1050;
+  --ae-z-toast: 1100;
+
+  /* ── Overlay backdrop, dimmed, never blurred. No backdrop-filter. ── */
+  --ae-overlay: rgba(0, 0, 0, 0.66);
+
+  /* ── Categorical viz hues (graph node types, series). Fixed slot order,
+     never cycled, a ninth series folds into "Other" or gets a second
+     encoding, it is never a generated hue. Validated (lightness band,
+     chroma floor, adjacent-pair CVD separation, ≥3:1 contrast) against both
+     #0F0F0F and #232323. Identity is never colour-alone: every type also
+     carries its glyph shape and a direct label. ── */
+  --ae-viz-1: #1f9c86;
+  --ae-viz-2: #b08a18;
+  --ae-viz-3: #6e8fd0;
+  --ae-viz-4: #c8503f;
+  --ae-viz-5: #a87bc0;
+  --ae-viz-6: #7e9b3a;
+  --ae-viz-7: #d4649b;
+  --ae-viz-8: #c56a2a;
+
+  /* ── Legacy aliases, real consumers exist in screens not yet rebuilt
+     under Quiet. Remove each alias once its last consumer lands. ── */
+  --ae-muted-strong: var(--ae-muted);
+  --ae-accent-strong: var(--ae-accent);
+  --ae-accent-soft: var(--ae-fg-soft);
+  --ae-accent-bg-soft: var(--ae-surface-raised);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ae-dur-fast: 0ms;
+    --ae-dur: 0ms;
+    --ae-dur-slow: 0ms;
+  }
+}

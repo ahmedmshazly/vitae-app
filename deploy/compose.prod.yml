@@ -1,0 +1,96 @@
+# Vitae backend on a single cheap VM (the "cheapest path" topology in
+# docs/DEPLOYMENT.md). Three containers:
+#
+#   caddy    - public :80/:443, automatic HTTPS, reverse-proxies to the API
+#   api      - Express API (apps/api), private network only
+#   buildsvc - LaTeX compiler, private network only, reachable as buildsvc:8787
+#
+# Usage (from the repo root on the VM):
+#   cp deploy/.env.example deploy/.env   # then fill it in
+#   docker compose -f deploy/compose.prod.yml up -d --build
+#
+# The web SPA is NOT here; it deploys to Vercel (docs/DEPLOYMENT.md §3).
+
+name: vitae
+
+services:
+  caddy:
+    image: caddy:2-alpine@sha256:5f5c8640aae01df9654968d946d8f1a56c497f1dd5c5cda4cf95ab7c14d58648
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      - API_DOMAIN=${API_DOMAIN:?set API_DOMAIN in deploy/.env, e.g. api.vitae.example.com}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [edge]
+    depends_on:
+      api:
+        condition: service_healthy
+
+  api:
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+    image: vitae/api:prod
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - NODE_ENV=production
+      - API_PORT=4000
+      - BUILDSVC_URL=http://buildsvc:8787
+    volumes:
+      # RDS presents a certificate signed by an Amazon CA that Node does not
+      # trust by default. Mounted rather than baked into the image so rotating
+      # it is a file copy, not a rebuild, and read-only because nothing should
+      # ever write to a trust store.
+      #   curl -o deploy/rds-ca.pem \
+      #     https://truststore.pki.rds.amazonaws.com/eu-central-1/eu-central-1-bundle.pem
+      - ./rds-ca.pem:/app/deploy/rds-ca.pem:ro
+    networks: [edge, internal]
+    depends_on:
+      buildsvc:
+        condition: service_healthy
+
+  buildsvc:
+    build:
+      # Repo root: the image bakes in templates/ and warms + offline-verifies
+      # the Tectonic cache against the real templates at build time.
+      context: ..
+      dockerfile: services/buildsvc/Dockerfile
+    image: vitae/buildsvc:prod
+    restart: unless-stopped
+    environment:
+      - PORT=8787
+      - BUILDSVC_HOST=0.0.0.0
+      - BUILDSVC_HMAC_SECRET=${BUILDSVC_HMAC_SECRET:?set BUILDSVC_HMAC_SECRET in deploy/.env}
+    healthcheck:
+      test: ['CMD', 'curl', '-fsS', 'http://localhost:8787/healthz']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    # Hardening (SRS T3): no new privileges, read-only root, writable /tmp only.
+    # The warmed Tectonic cache is baked into the image; the entrypoint copies
+    # it onto tmpfs at startup (Tectonic needs a writable cache), so rebuilds
+    # can never be shadowed by a stale volume. That staleness plus the sealed
+    # internal network is exactly how the phvr8t/DNS compile failure happened.
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    networks: [internal]
+
+networks:
+  edge: {}
+  # internal is not exposed through caddy; buildsvc is API-only.
+  internal:
+    internal: true
+
+volumes:
+  caddy_data: {}
+  caddy_config: {}

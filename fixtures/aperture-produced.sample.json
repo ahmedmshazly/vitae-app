@@ -1,0 +1,604 @@
+{
+  "format": "vitae.graph.bundle",
+  "schema_version": 1,
+  "source": {
+    "system": "aperture",
+    "run_id": "00000000-0000-4000-8000-000000000002",
+    "exported_at": "2026-07-28T12:00:00Z"
+  },
+  "nodes": [
+    {
+      "ref": "linkedin:person:jane-smith",
+      "type": "person",
+      "title": "Jane Smith",
+      "subtitle": "Staff Engineer at Acme Corp",
+      "identity_keys": [
+        "linkedin:person:jane-smith"
+      ],
+      "props": {
+        "given_name": "Jane",
+        "family_name": "Smith",
+        "headline": "Staff Engineer at Acme Corp",
+        "city": "Cairo",
+        "emails": [
+          "jane@example.com"
+        ],
+        "phones": [
+          "+201234"
+        ],
+        "socials": {
+          "linkedin": "https://www.linkedin.com/in/jane-smith"
+        }
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.9
+    },
+    {
+      "ref": "linkedin:role:jane-smith:acme-corp:2021-03-01",
+      "type": "role",
+      "title": "Staff Engineer",
+      "subtitle": "Acme Corp",
+      "identity_keys": [
+        "linkedin:role:jane-smith:acme-corp:2021-03-01"
+      ],
+      "props": {
+        "employment_type": "full_time"
+      },
+      "start_date": "2021-03-01",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "ref": "linkedin:company:acme-corp",
+      "type": "organization",
+      "title": "Acme Corp",
+      "subtitle": "We make things",
+      "identity_keys": [
+        "linkedin:company:acme-corp"
+      ],
+      "props": {
+        "kind": "company",
+        "website": "https://acme.test",
+        "industry": "Software Development",
+        "follower_count": 5000
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "ref": "linkedin:role:jane-smith:code-club:2020-01-01",
+      "type": "role",
+      "title": "Mentor",
+      "subtitle": "Code Club",
+      "identity_keys": [
+        "linkedin:role:jane-smith:code-club:2020-01-01"
+      ],
+      "props": {
+        "employment_type": "volunteer"
+      },
+      "start_date": "2020-01-01",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "ref": "linkedin:company:code-club",
+      "type": "organization",
+      "title": "Code Club",
+      "identity_keys": [
+        "linkedin:company:code-club"
+      ],
+      "props": {
+        "kind": "company"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "ref": "linkedin:education:jane-smith:cairo-university:2017-09-01",
+      "type": "education",
+      "title": "MSc",
+      "subtitle": "Cairo University",
+      "identity_keys": [
+        "linkedin:education:jane-smith:cairo-university:2017-09-01"
+      ],
+      "props": {
+        "degree": "MSc"
+      },
+      "start_date": "2017-09-01",
+      "end_date": "2019-06-01",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "ref": "linkedin:company:cairo-university",
+      "type": "organization",
+      "title": "Cairo University",
+      "identity_keys": [
+        "linkedin:company:cairo-university"
+      ],
+      "props": {
+        "kind": "university"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "ref": "canonical:skill:rust",
+      "type": "skill",
+      "title": "Rust",
+      "identity_keys": [
+        "canonical:skill:rust"
+      ],
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.7
+    },
+    {
+      "ref": "canonical:skill:arabic",
+      "type": "skill",
+      "title": "Arabic",
+      "identity_keys": [
+        "canonical:skill:arabic"
+      ],
+      "props": {
+        "category": "spoken_language"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.7
+    },
+    {
+      "ref": "linkedin:certification:jane-smith:aws-sa",
+      "type": "certification",
+      "title": "AWS SA",
+      "subtitle": "Amazon",
+      "identity_keys": [
+        "linkedin:certification:jane-smith:aws-sa"
+      ],
+      "props": {
+        "credential_id": "ABC"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "ref": "linkedin:publication:jane-smith:on-caches",
+      "type": "publication",
+      "title": "On caches",
+      "subtitle": "JOSS",
+      "identity_keys": [
+        "linkedin:publication:jane-smith:on-caches"
+      ],
+      "props": {
+        "venue": "JOSS",
+        "url": "https://example.com/p"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "ref": "linkedin:publication:jane-smith:adaptive-eviction",
+      "type": "publication",
+      "title": "Adaptive eviction",
+      "identity_keys": [
+        "linkedin:publication:jane-smith:adaptive-eviction"
+      ],
+      "props": {
+        "pub_type": "patent",
+        "published_on": "2024-11-05"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "ref": "linkedin:project:jane-smith:vitae",
+      "type": "project",
+      "title": "Vitae",
+      "identity_keys": [
+        "linkedin:project:jane-smith:vitae"
+      ],
+      "props": {
+        "outcome": "a graph"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "ref": "linkedin:award:jane-smith:best-paper",
+      "type": "award",
+      "title": "Best Paper",
+      "identity_keys": [
+        "linkedin:award:jane-smith:best-paper"
+      ],
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "ref": "linkedin:course:jane-smith:deep-learning",
+      "type": "course",
+      "title": "Deep Learning",
+      "subtitle": "Coursera",
+      "identity_keys": [
+        "linkedin:course:jane-smith:deep-learning"
+      ],
+      "props": {
+        "provider": "Coursera"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "ref": "linkedin:post:urn-li-activity-7012",
+      "type": "post",
+      "title": "We shipped a cache",
+      "identity_keys": [
+        "linkedin:post:urn-li-activity-7012"
+      ],
+      "props": {
+        "post_kind": "post",
+        "text": "We shipped a cache",
+        "url": "https://linkedin.com/feed/update/urn:li:activity:7012",
+        "engagement": {
+          "likes": 214,
+          "comments": 18
+        }
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.7
+    },
+    {
+      "ref": "linkedin:post:7013",
+      "type": "post",
+      "title": "Nice work",
+      "identity_keys": [
+        "linkedin:post:7013"
+      ],
+      "props": {
+        "post_kind": "comment",
+        "text": "Nice work",
+        "url": "https://linkedin.com/x/7013"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.7
+    },
+    {
+      "ref": "linkedin:post:7014",
+      "type": "post",
+      "title": "Someone else's post",
+      "identity_keys": [
+        "linkedin:post:7014"
+      ],
+      "props": {
+        "post_kind": "post",
+        "url": "https://linkedin.com/y/7014",
+        "text": "Someone else's post"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.5
+    },
+    {
+      "ref": "linkedin:company:ieee",
+      "type": "organization",
+      "title": "IEEE",
+      "identity_keys": [
+        "linkedin:company:ieee"
+      ],
+      "props": {
+        "kind": "community"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "ref": "linkedin:company:cedar-data-lab",
+      "type": "organization",
+      "title": "Cedar Data Lab",
+      "identity_keys": [
+        "linkedin:company:cedar-data-lab"
+      ],
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "ref": "linkedin:reference:jane-smith:omar-hassan",
+      "type": "reference",
+      "title": "Reference from Omar Hassan",
+      "identity_keys": [
+        "linkedin:reference:jane-smith:omar-hassan"
+      ],
+      "props": {
+        "blurb": "Great engineer"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.7
+    },
+    {
+      "ref": "linkedin:person:omar-hassan",
+      "type": "person",
+      "title": "Omar Hassan",
+      "identity_keys": [
+        "linkedin:person:omar-hassan"
+      ],
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.4
+    },
+    {
+      "ref": "linkedin:job:3812004421",
+      "type": "job_posting",
+      "title": "Staff Engineer",
+      "subtitle": "Acme Corp",
+      "identity_keys": [
+        "linkedin:job:3812004421"
+      ],
+      "props": {
+        "company": "Acme Corp",
+        "role_title": "Staff Engineer",
+        "location": "Cairo, Egypt",
+        "employment_type": "full_time",
+        "location_mode": "hybrid",
+        "url": "https://www.linkedin.com/jobs/view/3812004421",
+        "jd_text": "Build resilient systems.",
+        "posting_status": "watching"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.9
+    },
+    {
+      "ref": "linkedin:post:c1",
+      "type": "post",
+      "title": "Did you try a bloom filter?",
+      "identity_keys": [
+        "linkedin:post:c1"
+      ],
+      "props": {
+        "post_kind": "comment",
+        "text": "Did you try a bloom filter?"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.7
+    }
+  ],
+  "edges": [
+    {
+      "type": "HELD",
+      "src": "linkedin:person:jane-smith",
+      "dst": "linkedin:role:jane-smith:acme-corp:2021-03-01",
+      "start_date": "2021-03-01",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "type": "ROLE_AT",
+      "src": "linkedin:role:jane-smith:acme-corp:2021-03-01",
+      "dst": "linkedin:company:acme-corp",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "type": "HELD",
+      "src": "linkedin:person:jane-smith",
+      "dst": "linkedin:role:jane-smith:code-club:2020-01-01",
+      "start_date": "2020-01-01",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "type": "ROLE_AT",
+      "src": "linkedin:role:jane-smith:code-club:2020-01-01",
+      "dst": "linkedin:company:code-club",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "type": "ATTENDED",
+      "src": "linkedin:person:jane-smith",
+      "dst": "linkedin:education:jane-smith:cairo-university:2017-09-01",
+      "start_date": "2017-09-01",
+      "end_date": "2019-06-01",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "type": "PART_OF",
+      "src": "linkedin:education:jane-smith:cairo-university:2017-09-01",
+      "dst": "linkedin:company:cairo-university",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "type": "USES_SKILL",
+      "src": "linkedin:person:jane-smith",
+      "dst": "canonical:skill:rust",
+      "props": {
+        "evidence_note": "12 endorsements"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.7
+    },
+    {
+      "type": "USES_SKILL",
+      "src": "linkedin:person:jane-smith",
+      "dst": "canonical:skill:arabic",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.7
+    },
+    {
+      "type": "EARNED",
+      "src": "linkedin:person:jane-smith",
+      "dst": "linkedin:certification:jane-smith:aws-sa",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "type": "AUTHORED",
+      "src": "linkedin:person:jane-smith",
+      "dst": "linkedin:publication:jane-smith:on-caches",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "type": "AUTHORED",
+      "src": "linkedin:person:jane-smith",
+      "dst": "linkedin:publication:jane-smith:adaptive-eviction",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "type": "WORKED_ON",
+      "src": "linkedin:person:jane-smith",
+      "dst": "linkedin:project:jane-smith:vitae",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "type": "EARNED",
+      "src": "linkedin:person:jane-smith",
+      "dst": "linkedin:award:jane-smith:best-paper",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "type": "COMPLETED",
+      "src": "linkedin:person:jane-smith",
+      "dst": "linkedin:course:jane-smith:deep-learning",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "type": "AUTHORED",
+      "src": "linkedin:person:jane-smith",
+      "dst": "linkedin:post:urn-li-activity-7012",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.7
+    },
+    {
+      "type": "AUTHORED",
+      "src": "linkedin:person:jane-smith",
+      "dst": "linkedin:post:7013",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.7
+    },
+    {
+      "type": "REACTED_TO",
+      "src": "linkedin:person:jane-smith",
+      "dst": "linkedin:post:7014",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.5
+    },
+    {
+      "type": "MEMBER_OF",
+      "src": "linkedin:person:jane-smith",
+      "dst": "linkedin:company:ieee",
+      "props": {
+        "role": "Senior Member"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "type": "FOLLOWS",
+      "src": "linkedin:person:jane-smith",
+      "dst": "linkedin:company:cedar-data-lab",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.6
+    },
+    {
+      "type": "RECOMMENDS",
+      "src": "linkedin:person:jane-smith",
+      "dst": "linkedin:reference:jane-smith:omar-hassan",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.7
+    },
+    {
+      "type": "RELATES_TO",
+      "src": "linkedin:person:jane-smith",
+      "dst": "linkedin:person:omar-hassan",
+      "props": {
+        "label": "similar profile"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.4
+    },
+    {
+      "type": "APPLIED_TO",
+      "src": "linkedin:job:3812004421",
+      "dst": "linkedin:company:acme-corp",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.8
+    },
+    {
+      "type": "RELATES_TO",
+      "src": "linkedin:job:3812004421",
+      "dst": "linkedin:person:omar-hassan",
+      "props": {
+        "label": "hiring team"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.6
+    },
+    {
+      "type": "ABOUT",
+      "src": "linkedin:post:c1",
+      "dst": "linkedin:post:urn-li-activity-7012",
+      "props": {
+        "relevance": "primary"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.7
+    },
+    {
+      "type": "AUTHORED",
+      "src": "linkedin:person:omar-hassan",
+      "dst": "linkedin:post:c1",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000002",
+      "confidence": 0.7
+    }
+  ]
+}

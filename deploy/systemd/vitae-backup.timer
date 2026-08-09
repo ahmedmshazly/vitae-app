@@ -1,0 +1,18 @@
+[Unit]
+Description=Daily Vitae S3 backup timer
+Documentation=file:///home/ubuntu/vitae/docs/runbooks/restore-drill.md
+
+[Timer]
+# 08:20 UTC. While the store is Firestore this is deliberate, not arbitrary: the
+# free-tier read quota resets at midnight Pacific (07:00/08:00 UTC depending on
+# DST), and a full export reads every document. The nightly GitHub Action runs at
+# 02:17 UTC (roughly 19 hours into the quota day), after ordinary app usage has
+# spent it, which is why every scheduled backup since the real graph landed has
+# died with RESOURCE_EXHAUSTED. Run at the START of the quota window instead.
+OnCalendar=*-*-* 08:20:00 UTC
+Persistent=true
+RandomizedDelaySec=10m
+Unit=vitae-backup.service
+
+[Install]
+WantedBy=timers.target

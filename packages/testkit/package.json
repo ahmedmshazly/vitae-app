@@ -1,0 +1,25 @@
+{
+  "name": "@vitae/testkit",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared deterministic factories, clocks, and fixtures for Vitae tests.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./clock": "./src/clock.ts",
+    "./ids": "./src/ids.ts",
+    "./factories": "./src/factories.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@vitae/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "3.2.7",
+    "typescript": "^5.7.3",
+    "vitest": "^3.2.7"
+  }
+}

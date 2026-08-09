@@ -1,0 +1,93 @@
+# Vitae local orchestration.
+#
+# The LaTeX build service (SRS §8.4) is the only component that needs a
+# container locally. It bakes in Tectonic, poppler-utils, and fonts, warms its
+# package cache at build time, and runs with NO network at request time.
+#
+#   docker compose up -d buildsvc     # start the compiler
+#   curl localhost:8787/healthz       # verify it is warmed
+#
+# Postgres is the data plane (ADR 0005). Locally it runs here; in production it
+# is RDS, so this container is a development convenience, never a deployment
+# target. deploy/compose.prod.yml deliberately has no database service.
+#
+#   docker compose up -d postgres
+#   pnpm --filter @vitae/api migrate
+#
+# Firebase Auth emulator still runs via `pnpm dev:emulators`. Sign-in stayed on
+# Firebase when the data plane moved, so the two are independent.
+
+services:
+  postgres:
+    # Pinned by digest for the same reason production images are: a moving tag
+    # can change the server version under a data directory that cannot go back.
+    image: postgres:17-alpine@sha256:742f40ea20b9ff2ff31db5458d127452988a2164df9e17441e191f3b72252193
+    container_name: vitae-postgres
+    ports:
+      # 5433, not 5432: another project already owns the default port on this
+      # machine. Loopback only (same exposure rule as buildsvc below).
+      - '127.0.0.1:5433:5432'
+    environment:
+      - POSTGRES_USER=vitae
+      - POSTGRES_DB=vitae
+      # Local-only credential. Production supplies DATABASE_URL from the RDS
+      # secret; nothing reads this value outside a developer's machine.
+      - POSTGRES_PASSWORD=vitae
+      # Deterministic collation, so ORDER BY does not depend on the host locale.
+      - POSTGRES_INITDB_ARGS=--locale-provider=icu --icu-locale=und-x-icu
+    volumes:
+      - vitae_pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U vitae -d vitae']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+
+  buildsvc:
+    build:
+      # Repo root: the image bakes in templates/ and warms + offline-verifies
+      # the Tectonic cache against the real templates at build time.
+      context: .
+      dockerfile: services/buildsvc/Dockerfile
+    image: vitae/buildsvc:local
+    container_name: vitae-buildsvc
+    ports:
+      # Loopback only (FR-027): the HMAC secret is the compiler's authentication,
+      # so the port must not be reachable from the LAN even while it is a local
+      # development secret.
+      - '127.0.0.1:8787:8787'
+    environment:
+      - PORT=8787
+      # Inside the container the service must accept the published port's
+      # forwarded traffic; the host binding above is what limits exposure.
+      - BUILDSVC_HOST=0.0.0.0
+      # Local image is built FROM a production Dockerfile (NODE_ENV=production).
+      # Override so the known development HMAC secret is allowed on the laptop.
+      - NODE_ENV=development
+      # No fallback: the service refuses to start without a secret. Generate one
+      #   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+      # and put it in .env as BUILDSVC_HMAC_SECRET (git-ignored).
+      - BUILDSVC_HMAC_SECRET=${BUILDSVC_HMAC_SECRET:?set BUILDSVC_HMAC_SECRET in .env (see .env.example)}
+    # Hardening (SRS T3): no new privileges, read-only root, writable /tmp only.
+    # The warmed Tectonic cache is baked into the image; the entrypoint copies
+    # it onto tmpfs at startup (Tectonic needs a writable cache), so rebuilds
+    # can never be shadowed by a stale volume.
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'node', '-e', "require('http').get('http://localhost:8787/healthz',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  # Survives `docker compose down`; remove explicitly with `-v` to reset the
+  # local graph. Migrations are re-runnable, so losing it costs only a reseed.
+  vitae_pgdata: {}

@@ -1,0 +1,18 @@
+# Keep the Docker build context lean, dependency layers are installed inside
+# the image from the lockfile, never copied from the host.
+node_modules
+**/node_modules
+**/dist
+.git
+.vercel
+.env
+**/.env
+e2e/test-results
+e2e/playwright-report
+docs
+*.md
+**/*.test.ts
+**/__tests__
+firebase-export*
+.emulator-data
+*.log

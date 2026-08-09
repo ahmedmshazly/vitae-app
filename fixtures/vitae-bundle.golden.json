@@ -1,0 +1,342 @@
+{
+  "format": "vitae.graph.bundle",
+  "schema_version": 1,
+  "source": {
+    "system": "aperture",
+    "run_id": "00000000-0000-4000-8000-000000000001",
+    "exported_at": "2026-07-28T12:00:00Z"
+  },
+  "nodes": [
+    {
+      "ref": "person:jane-smith",
+      "type": "person",
+      "identity_keys": [
+        "linkedin:person:jane-smith"
+      ],
+      "title": "Jane Smith",
+      "subtitle": "Staff Engineer at Acme Corp",
+      "props": {
+        "given_name": "Jane",
+        "family_name": "Smith",
+        "headline": "Staff Engineer at Acme Corp",
+        "city": "Cairo",
+        "socials": {
+          "linkedin": "https://www.linkedin.com/in/jane-smith"
+        }
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.9
+    },
+    {
+      "ref": "person:omar-hassan",
+      "type": "person",
+      "identity_keys": [
+        "linkedin:person:omar-hassan"
+      ],
+      "title": "Omar Hassan",
+      "props": {
+        "given_name": "Omar",
+        "family_name": "Hassan",
+        "socials": {
+          "linkedin": "https://www.linkedin.com/in/omar-hassan"
+        }
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.6
+    },
+    {
+      "ref": "org:acme-corp",
+      "type": "organization",
+      "identity_keys": [
+        "linkedin:company:acme-corp"
+      ],
+      "title": "Acme Corp",
+      "props": {
+        "kind": "company",
+        "industry": "Software Development"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.9
+    },
+    {
+      "ref": "org:cairo-university",
+      "type": "organization",
+      "identity_keys": [
+        "linkedin:company:cairo-university"
+      ],
+      "title": "Cairo University",
+      "props": {
+        "kind": "university"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.8
+    },
+    {
+      "ref": "org:ieee",
+      "type": "organization",
+      "identity_keys": [
+        "linkedin:company:ieee"
+      ],
+      "title": "IEEE",
+      "props": {
+        "kind": "nonprofit"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.7
+    },
+    {
+      "ref": "role:acme-staff-engineer",
+      "type": "role",
+      "identity_keys": [
+        "linkedin:role:jane-smith:acme-corp:2021-03-01"
+      ],
+      "title": "Staff Engineer",
+      "subtitle": "Acme Corp",
+      "props": {
+        "employment_type": "full_time",
+        "city": "Cairo"
+      },
+      "start_date": "2021-03-01",
+      "date_precision": "month",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.8
+    },
+    {
+      "ref": "education:cairo-msc",
+      "type": "education",
+      "identity_keys": [
+        "linkedin:education:jane-smith:cairo-university:2017-09-01"
+      ],
+      "title": "MSc, Computer Science",
+      "subtitle": "Cairo University",
+      "props": {
+        "degree": "MSc",
+        "field_of_study": "Computer Science"
+      },
+      "start_date": "2017-09-01",
+      "end_date": "2019-06-01",
+      "date_precision": "month",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.8
+    },
+    {
+      "ref": "skill:rust",
+      "type": "skill",
+      "identity_keys": [
+        "canonical:skill:rust"
+      ],
+      "title": "Rust",
+      "props": {
+        "category": "language"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.7
+    },
+    {
+      "ref": "skill:arabic",
+      "type": "skill",
+      "identity_keys": [
+        "canonical:skill:arabic"
+      ],
+      "title": "Arabic",
+      "props": {
+        "category": "spoken_language",
+        "proficiency": "expert"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.7
+    },
+    {
+      "ref": "post:7012",
+      "type": "post",
+      "identity_keys": [
+        "linkedin:post:urn-li-activity-7012"
+      ],
+      "title": "Shipping our new inference cache",
+      "props": {
+        "post_kind": "post",
+        "text": "We cut p99 latency by 40% this quarter. Write-up below.",
+        "url": "https://www.linkedin.com/feed/update/urn:li:activity:7012",
+        "posted_at": "2026-06-14T09:30:00Z",
+        "engagement": {
+          "likes": 214,
+          "comments": 18,
+          "reposts": 7
+        }
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.9
+    },
+    {
+      "ref": "post:7013",
+      "type": "post",
+      "identity_keys": [
+        "linkedin:post:urn-li-comment-7013"
+      ],
+      "title": "Comment on \"Shipping our new inference cache\"",
+      "props": {
+        "post_kind": "comment",
+        "text": "Did you try a bloom filter in front of it?",
+        "posted_at": "2026-06-14T11:02:00Z",
+        "engagement": {
+          "likes": 3
+        }
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.7
+    },
+    {
+      "ref": "publication:patent-us-11-000-000",
+      "type": "publication",
+      "identity_keys": [
+        "patent:us:11000000b2"
+      ],
+      "title": "Adaptive cache eviction for inference workloads",
+      "props": {
+        "pub_type": "patent",
+        "authors": [
+          "Jane Smith"
+        ],
+        "published_on": "2024-11-05",
+        "patent_number": "US11000000B2"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.8
+    }
+  ],
+  "edges": [
+    {
+      "type": "HELD",
+      "src": "person:jane-smith",
+      "dst": "role:acme-staff-engineer",
+      "start_date": "2021-03-01",
+      "is_current": true,
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.8
+    },
+    {
+      "type": "ROLE_AT",
+      "src": "role:acme-staff-engineer",
+      "dst": "org:acme-corp",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.8
+    },
+    {
+      "type": "ATTENDED",
+      "src": "person:jane-smith",
+      "dst": "education:cairo-msc",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.8
+    },
+    {
+      "type": "PART_OF",
+      "src": "education:cairo-msc",
+      "dst": "org:cairo-university",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.8
+    },
+    {
+      "type": "USES_SKILL",
+      "src": "person:jane-smith",
+      "dst": "skill:rust",
+      "props": {
+        "centrality": "core"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.7
+    },
+    {
+      "type": "USES_SKILL",
+      "src": "person:jane-smith",
+      "dst": "skill:arabic",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.7
+    },
+    {
+      "type": "AUTHORED",
+      "src": "person:jane-smith",
+      "dst": "post:7012",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.9
+    },
+    {
+      "type": "AUTHORED",
+      "src": "person:jane-smith",
+      "dst": "post:7013",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.7
+    },
+    {
+      "type": "ABOUT",
+      "src": "post:7013",
+      "dst": "post:7012",
+      "props": {
+        "relevance": "primary"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.7
+    },
+    {
+      "type": "AUTHORED",
+      "src": "person:jane-smith",
+      "dst": "publication:patent-us-11-000-000",
+      "props": {
+        "weight": "lead"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.8
+    },
+    {
+      "type": "REACTED_TO",
+      "src": "person:omar-hassan",
+      "dst": "post:7012",
+      "props": {
+        "reaction_kind": "like"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.6
+    },
+    {
+      "type": "MEMBER_OF",
+      "src": "person:jane-smith",
+      "dst": "org:ieee",
+      "props": {
+        "role": "Senior Member"
+      },
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.7
+    },
+    {
+      "type": "FOLLOWS",
+      "src": "person:jane-smith",
+      "dst": "org:acme-corp",
+      "source": "import_aperture",
+      "source_ref": "aperture:run:00000000-0000-4000-8000-000000000001",
+      "confidence": 0.6
+    }
+  ]
+}

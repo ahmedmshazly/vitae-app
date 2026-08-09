@@ -1,0 +1,20 @@
+% Onyx v1.0.0: classic serif, tasteful. Values are guillemet-delimited tokens
+% filled by the TypeScript renderer (SRS D10) AFTER escaping every value (SRS 8.4).
+% line-model.json: {"chars_per_line":96,"lines_per_page":54,"entry_overhead":2,"section_overhead":2}
+\documentclass[10.5pt]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.5in,bottom=0.5in]{geometry}
+\usepackage{enumitem,titlesec,microtype,xcolor}
+\definecolor{accent}{HTML}{«ACCENT_HEX»}
+\usepackage[hidelinks]{hyperref}
+\setlist[itemize]{leftmargin=1.1em,itemsep=1.5pt,topsep=2pt,parsep=0pt,label=\textbullet}
+\titleformat{\section}{\bfseries\small\scshape\color{accent}}{}{0pt}{}[\vspace{1pt}{\color{accent}\hrule}]
+\titlespacing{\section}{0pt}{7pt}{4pt}
+\pagestyle{empty}
+\setlength\parindent{0pt}
+\begin{document}
+{\bfseries\LARGE\color{accent} «NAME»}\hfill{\small «CONTACT_LINE»}\par
+\vspace{1pt}
+{\itshape «HEADLINE»}\par\vspace{3pt}
+«SUMMARY_BLOCK»
+«SECTIONS»
+\end{document}

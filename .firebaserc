@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "vitae-local",
+    "production": "vitae-production"
+  }
+}

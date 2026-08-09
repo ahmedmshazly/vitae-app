@@ -1,0 +1,6 @@
+# Public entry point. Caddy provisions and renews Let's Encrypt certificates
+# automatically for API_DOMAIN (set in deploy/.env). No certbot, no cron.
+{$API_DOMAIN} {
+	encode gzip
+	reverse_proxy api:4000
+}

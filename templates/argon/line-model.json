@@ -1,0 +1,17 @@
+{
+  "key": "argon",
+  "version": "1.0.0",
+  "name": "Argon",
+  "engine": "tectonic",
+  "ats_strict": true,
+  "description": "Strict monochrome single-column layout optimized for parsers and conservative employers.",
+  "traits": ["ATS-first", "minimal", "single-column"],
+  "page_size": "Letter",
+  "accent_options": ["#111827"],
+  "line_model": {
+    "chars_per_line": 88,
+    "lines_per_page": 40,
+    "entry_overhead": 2,
+    "section_overhead": 2
+  }
+}

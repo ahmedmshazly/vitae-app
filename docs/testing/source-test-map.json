@@ -1,0 +1,2406 @@
+{
+  "$schema_note": "Machine-checked source-to-test ownership. Every production module under packages/core, apps/api/src (non-scripts), and apps/web/src must appear here with layers and tests, or an explicit exclude reason.",
+  "exclude_globs": [
+    "**/index.ts",
+    "**/index.tsx",
+    "**/*.d.ts",
+    "**/test/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "apps/api/src/scripts/**",
+    "apps/web/src/main.tsx",
+    "apps/web/src/vite-env.d.ts"
+  ],
+  "modules": {
+    "apps/api/src/app.ts": {
+      "risk": "critical",
+      "layers": [
+        "integration",
+        "security"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/__tests__/security/http-hardening.integration.test.ts",
+        "apps/api/src/__tests__/contracts/error-envelope.contract.test.ts"
+      ]
+    },
+    "apps/api/src/db/migrations/001-initial-schema.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/db/migrations/002-retention-columns.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/retention.integration.test.ts"
+      ]
+    },
+    "apps/api/src/db/migrations/003-meta-run-id.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/db/migrations/004-child-table-keys.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/db/migrations/005-resume-workspace-indexes.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts",
+        "apps/api/src/__tests__/resume-render.test.ts"
+      ]
+    },
+    "apps/api/src/db/migrations/006-letters.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/db/pg.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/db/repository.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/db/schema.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/api/src/db/schema.test.ts"
+      ]
+    },
+    "apps/api/src/db/search-index.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/db/space.ts": {
+      "risk": "high",
+      "layers": [
+        "integration",
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/db/space.integration.test.ts"
+      ]
+    },
+    "apps/api/src/db/timezone.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/db/util.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/db/write-signal.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/env.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/firebase.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/lib/create-zip-archive.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/middleware/auth.ts": {
+      "risk": "critical",
+      "layers": [
+        "unit",
+        "integration",
+        "security"
+      ],
+      "tests": [
+        "apps/api/src/middleware/auth.test.ts",
+        "apps/api/src/routes/v1/auth.integration.test.ts",
+        "apps/api/src/__tests__/contracts/error-envelope.contract.test.ts"
+      ],
+      "status": "covered"
+    },
+    "apps/api/src/middleware/error.ts": {
+      "risk": "high",
+      "layers": [
+        "unit",
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/middleware/error.test.ts",
+        "apps/api/src/__tests__/contracts/error-envelope.contract.test.ts"
+      ]
+    },
+    "apps/api/src/middleware/health.ts": {
+      "risk": "high",
+      "layers": [
+        "integration",
+        "resilience"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/__tests__/resilience/database-unavailable.integration.test.ts"
+      ]
+    },
+    "apps/api/src/middleware/request-context.ts": {
+      "risk": "high",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/middleware/request-context.test.ts"
+      ]
+    },
+    "apps/api/src/middleware/security.ts": {
+      "risk": "critical",
+      "layers": [
+        "unit",
+        "security"
+      ],
+      "tests": [
+        "apps/api/src/middleware/security.test.ts"
+      ],
+      "status": "covered"
+    },
+    "apps/api/src/openapi/generate.ts": {
+      "risk": "medium",
+      "layers": [
+        "contract"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/__tests__/contracts/openapi.contract.test.ts"
+      ],
+      "note": "CLI writer for docs/api/openapi.json; drift asserted by the OpenAPI contract suite."
+    },
+    "apps/api/src/openapi/mounts.ts": {
+      "risk": "high",
+      "layers": [
+        "contract"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/__tests__/contracts/openapi.contract.test.ts"
+      ],
+      "note": "V1_MOUNT_PREFIXES must stay in sync with routes/v1/index.ts mounts."
+    },
+    "apps/api/src/openapi/spec.ts": {
+      "risk": "high",
+      "layers": [
+        "contract"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/__tests__/contracts/openapi.contract.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/ask.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/ask.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/atoms.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/atoms.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/auth.ts": {
+      "risk": "critical",
+      "layers": [
+        "integration",
+        "unit"
+      ],
+      "tests": [
+        "apps/api/src/routes/v1/auth.integration.test.ts",
+        "apps/api/src/middleware/auth.test.ts"
+      ],
+      "status": "covered"
+    },
+    "apps/api/src/routes/v1/capture.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "tests": [
+        "apps/api/src/routes/v1/capture.integration.test.ts"
+      ],
+      "status": "covered"
+    },
+    "apps/api/src/routes/v1/composer.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/composer.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/dashboard.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/dashboard.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/duplicates.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/duplicates.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/edges.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "tests": [
+        "apps/api/src/routes/v1/edges.integration.test.ts"
+      ],
+      "status": "covered"
+    },
+    "apps/api/src/routes/v1/explore.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/explore.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/export.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/export.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/favors.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/favors.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/habits.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/habits.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/imports.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/imports.integration.test.ts",
+        "apps/api/src/__tests__/aperture-import.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/interactions.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/interactions.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/intros.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/intros.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/letters.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/letters.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/nodes.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "tests": [
+        "apps/api/src/routes/v1/nodes.integration.test.ts",
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "status": "covered"
+    },
+    "apps/api/src/routes/v1/orgs.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/orgs.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/people.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/people.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/places.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/places.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/reminders.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/reminders.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/resumes.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts",
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/retention.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/retention.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/search.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "tests": [
+        "apps/api/src/routes/v1/search.integration.test.ts"
+      ],
+      "status": "covered"
+    },
+    "apps/api/src/routes/v1/settings.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/settings.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/status.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/status.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/suggest.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/suggest.integration.test.ts",
+        "apps/api/src/services/suggest.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/targets.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/targets.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/views.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/views.integration.test.ts"
+      ]
+    },
+    "apps/api/src/services/buildsvc-client.ts": {
+      "risk": "critical",
+      "layers": [
+        "unit",
+        "resilience"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/services/buildsvc-client.test.ts"
+      ]
+    },
+    "apps/api/src/services/capture.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/services/crm.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/api/src/services/crm.test.ts"
+      ]
+    },
+    "apps/api/src/services/duplicates.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/duplicates.integration.test.ts"
+      ]
+    },
+    "apps/api/src/services/explore.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/explore.integration.test.ts"
+      ]
+    },
+    "apps/api/src/services/export.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/export.integration.test.ts"
+      ]
+    },
+    "apps/api/src/services/http.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/services/imports.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/imports.integration.test.ts",
+        "apps/api/src/__tests__/aperture-import.integration.test.ts"
+      ]
+    },
+    "apps/api/src/services/letters.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/letters.integration.test.ts"
+      ]
+    },
+    "apps/api/src/services/places.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/services/profile.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/services/restore.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/services/restore.integration.test.ts",
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ]
+    },
+    "apps/api/src/services/resume-model.ts": {
+      "risk": "high",
+      "layers": [
+        "integration",
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts",
+        "apps/api/src/__tests__/resume-render.test.ts",
+        "apps/api/src/__tests__/resume-scope.test.ts"
+      ]
+    },
+    "apps/api/src/services/resume.ts": {
+      "risk": "high",
+      "layers": [
+        "integration",
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts",
+        "apps/api/src/__tests__/resume-render.test.ts"
+      ]
+    },
+    "apps/api/src/services/retention.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/retention.integration.test.ts"
+      ]
+    },
+    "apps/api/src/services/secrets.ts": {
+      "risk": "high",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/services/secrets.test.ts"
+      ]
+    },
+    "apps/api/src/services/self.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/services/settings.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/settings.integration.test.ts"
+      ]
+    },
+    "apps/api/src/services/storage/adapter.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/services/storage/cloudinary.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/services/subjects.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/api/src/services/subjects.test.ts"
+      ]
+    },
+    "apps/api/src/services/suggest.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/api/src/services/suggest.test.ts"
+      ]
+    },
+    "apps/api/src/services/template-renderers.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/web/src/App.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/App.test.tsx"
+      ]
+    },
+    "apps/web/src/app/Breadcrumb.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/app/Breadcrumb.test.tsx"
+      ]
+    },
+    "apps/web/src/app/Shell.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/app/Shell.test.tsx"
+      ]
+    },
+    "apps/web/src/app/commands.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit",
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/app/commands.test.ts"
+      ]
+    },
+    "apps/web/src/app/routes.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/components/EntityPicker.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/components/EntityPicker.test.tsx"
+      ]
+    },
+    "apps/web/src/components/ErrorBoundary.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/components/ErrorBoundary.test.tsx"
+      ]
+    },
+    "apps/web/src/components/PdfPreview.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/BulkEdgeDelete.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/BulkNodeDelete.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/Composer.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/Composer.test.tsx"
+      ]
+    },
+    "apps/web/src/features/FirstRun.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/FirstRun.test.tsx"
+      ]
+    },
+    "apps/web/src/features/GettingStarted.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/GettingStarted.test.tsx"
+      ]
+    },
+    "apps/web/src/features/InteractionLogger.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/InteractionLogger.test.tsx"
+      ]
+    },
+    "apps/web/src/features/QuickAdd.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/QuickAdd.test.tsx"
+      ]
+    },
+    "apps/web/src/features/QuickSwitcher.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "a11y"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/QuickSwitcher.test.tsx"
+      ]
+    },
+    "apps/web/src/features/RemindersDrawer.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/RemindersDrawer.test.tsx"
+      ]
+    },
+    "apps/web/src/features/Toast.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/features/Toast.test.tsx"
+      ]
+    },
+    "apps/web/src/features/forms/AddConnection.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/forms/AddConnection.test.tsx"
+      ]
+    },
+    "apps/web/src/features/forms/ConnectionComposer.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/features/forms/ConnectionComposer.test.ts"
+      ]
+    },
+    "apps/web/src/features/forms/ConnectionRow.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/forms/ConnectionRow.test.tsx"
+      ]
+    },
+    "apps/web/src/features/forms/EdgeSubEditorRow.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/forms/EdgeSubEditorRow.test.tsx"
+      ]
+    },
+    "apps/web/src/features/forms/EntityForm.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/features/forms/EntityForm.test.tsx"
+      ]
+    },
+    "apps/web/src/features/forms/FieldRenderer.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/forms/FieldRenderer.test.tsx"
+      ]
+    },
+    "apps/web/src/features/forms/KnowsEditor.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/forms/KnowsEditor.test.tsx"
+      ]
+    },
+    "apps/web/src/features/forms/NewEntityMenu.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/features/forms/NewEntityMenu.test.ts"
+      ]
+    },
+    "apps/web/src/features/forms/NewNodeButton.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/forms/NewNodeButton.test.tsx"
+      ]
+    },
+    "apps/web/src/features/forms/NodeFormDialog.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/features/forms/NodeFormDialog.test.tsx"
+      ]
+    },
+    "apps/web/src/features/forms/SubjectPicker.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/forms/SubjectPicker.test.tsx"
+      ]
+    },
+    "apps/web/src/features/forms/SuggestTagInput.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/forms/SuggestTagInput.test.tsx"
+      ]
+    },
+    "apps/web/src/features/forms/SuggestTextInput.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/forms/SuggestTextInput.test.tsx"
+      ]
+    },
+    "apps/web/src/features/graph/GraphCanvas.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "WebGL/canvas or view orchestrator: covered by Playwright explore specs (graph/atlas/timeline/exploration); component mount deferred in jsdom."
+    },
+    "apps/web/src/features/graph/GraphDisplayPrefs.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/graph/GraphDisplayPrefs.test.tsx"
+      ]
+    },
+    "apps/web/src/features/graph/GraphPathfinder.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/graph/GraphPathfinder.test.tsx"
+      ]
+    },
+    "apps/web/src/features/graph/GraphPeek.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/graph/GraphPeek.test.tsx"
+      ]
+    },
+    "apps/web/src/features/graph/GraphSearch.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/graph/GraphSearch.test.tsx"
+      ]
+    },
+    "apps/web/src/features/graph/GraphToolbar.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/graph/GraphToolbar.test.tsx"
+      ]
+    },
+    "apps/web/src/features/graph/GraphView.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "WebGL/canvas or view orchestrator: covered by Playwright explore specs (graph/atlas/timeline/exploration); component mount deferred in jsdom."
+    },
+    "apps/web/src/features/graph/constants.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/graph/constants.test.ts"
+      ]
+    },
+    "apps/web/src/features/graph/displayPrefs.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/graph/displayPrefs.test.ts"
+      ]
+    },
+    "apps/web/src/features/graph/types.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/graph/types.test.ts"
+      ]
+    },
+    "apps/web/src/features/graph/useGraphKeyboard.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/map/AtlasCanvas.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/features/map/AtlasCanvas.test.ts"
+      ]
+    },
+    "apps/web/src/features/map/AtlasCompareDock.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/map/AtlasCorridorDock.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/map/AtlasDossier.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/map/AtlasList.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/map/AtlasToolbar.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/map/AtlasView.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "WebGL/canvas or view orchestrator: covered by Playwright explore specs (graph/atlas/timeline/exploration); component mount deferred in jsdom."
+    },
+    "apps/web/src/features/map/PlaceResolvePanel.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/map/UnmappedDock.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/map/corridors.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/map/displayPrefs.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/map/geo.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/features/map/geo.test.ts"
+      ]
+    },
+    "apps/web/src/features/map/types.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/timeline/TimelineCanvas.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/features/timeline/TimelineCanvas.test.ts"
+      ]
+    },
+    "apps/web/src/features/timeline/TimelineList.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/timeline/TimelineList.test.tsx"
+      ]
+    },
+    "apps/web/src/features/timeline/TimelineReview.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/timeline/TimelineReview.test.tsx"
+      ]
+    },
+    "apps/web/src/features/timeline/TimelineToolbar.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/timeline/TimelineToolbar.test.tsx"
+      ]
+    },
+    "apps/web/src/features/timeline/TimelineView.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "WebGL/canvas or view orchestrator: covered by Playwright explore specs (graph/atlas/timeline/exploration); component mount deferred in jsdom."
+    },
+    "apps/web/src/features/timeline/displayPrefs.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/timeline/displayPrefs.test.ts"
+      ]
+    },
+    "apps/web/src/features/timeline/types.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/lib/api.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/lib/auth.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/lib/burst.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/lib/cities.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/lib/dates.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/lib/entity-href.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/lib/entity-href.test.ts"
+      ]
+    },
+    "apps/web/src/lib/firebase.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/lib/graph-palette.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/lib/graph-palette.test.ts"
+      ]
+    },
+    "apps/web/src/lib/motion.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/lib/runtime.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/lib/runtime.test.ts"
+      ]
+    },
+    "apps/web/src/routes/Ask.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/Ask.test.ts"
+      ]
+    },
+    "apps/web/src/routes/Atoms.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/Browse.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/Collections.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/Collections.test.ts"
+      ]
+    },
+    "apps/web/src/routes/Dashboard.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/Dashboard.test.tsx",
+        "apps/web/src/routes/Dashboard.queue.test.ts"
+      ]
+    },
+    "apps/web/src/routes/Duplicates.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/Duplicates.test.ts"
+      ]
+    },
+    "apps/web/src/routes/ExportPage.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/ExportPage.test.ts"
+      ]
+    },
+    "apps/web/src/routes/GraphView.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/ImportHub.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/ImportHub.test.ts"
+      ]
+    },
+    "apps/web/src/routes/Intros.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/Intros.test.ts"
+      ]
+    },
+    "apps/web/src/routes/Letters.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/MapView.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/Org.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/Orgs.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "a11y"
+      ],
+      "tests": [
+        "apps/web/src/routes/Orgs.test.tsx",
+        "apps/web/src/routes/Orgs.a11y.test.tsx"
+      ],
+      "status": "covered"
+    },
+    "apps/web/src/routes/Outputs.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/People.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "a11y"
+      ],
+      "tests": [
+        "apps/web/src/routes/People.test.tsx",
+        "apps/web/src/routes/People.a11y.test.tsx"
+      ],
+      "status": "covered"
+    },
+    "apps/web/src/routes/Person.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/Record.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/Record.test.ts"
+      ]
+    },
+    "apps/web/src/routes/Repositories.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/Repositories.test.ts"
+      ]
+    },
+    "apps/web/src/routes/ResumeHub.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/SearchResults.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit",
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/SearchResults.test.ts",
+        "apps/web/src/routes/SearchResults.states.test.tsx"
+      ]
+    },
+    "apps/web/src/routes/Settings.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/Settings.test.ts"
+      ]
+    },
+    "apps/web/src/routes/SignIn.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/SignIn.test.tsx"
+      ]
+    },
+    "apps/web/src/routes/Templates.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/Templates.test.ts"
+      ]
+    },
+    "apps/web/src/routes/Timeline.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/Trash.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit",
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/Trash.test.ts",
+        "apps/web/src/routes/Trash.states.test.tsx"
+      ]
+    },
+    "apps/web/src/routes/marketing/Chrome.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/marketing/Landing.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/marketing/Landing.test.ts"
+      ]
+    },
+    "apps/web/src/routes/marketing/Manifesto.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/marketing/Manifesto.test.ts"
+      ]
+    },
+    "apps/web/src/routes/marketing/Tour.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/marketing/Tour.test.ts"
+      ]
+    },
+    "apps/web/src/routes/reference/EntityCatalog.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/reference/EntityCatalog.test.tsx"
+      ]
+    },
+    "apps/web/src/routes/reference/EntityCatalogAtlas.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/reference/EntityCatalogDetails.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/reference/EntityCatalogOverview.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/reference/EntityObservatoryCommandPalette.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/reference/EntityObservatoryControls.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/reference/EntityObservatoryGraph.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/reference/EntityObservatoryMatrix.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/reference/EntityObservatorySnapshot.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/reference/entityCatalogModel.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/reference/entityCatalogModel.test.ts"
+      ]
+    },
+    "apps/web/src/routes/reference/entityObservatoryModel.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/reference/entityObservatoryModel.test.ts"
+      ]
+    },
+    "apps/web/src/routes/tailor/DocumentPane.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/tailor/PreviewPane.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/tailor/ScoreBreakdown.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/tailor/SelectionPane.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/tailor/Tailor.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/tailor/TargetRail.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/tailor/types.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "packages/core/src/algorithms/aho-corasick.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/aho-corasick.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/atom-scoring.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/atom-scoring.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/capture-grammar.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/capture-grammar.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/composer.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/composer.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/constants.ts": {
+      "risk": "low",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/atom-scoring.test.ts",
+        "packages/core/src/algorithms/selection.test.ts"
+      ],
+      "note": "Numeric constants exercised through scoring and selection suites."
+    },
+    "packages/core/src/algorithms/dedup.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/dedup.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/filter-grammar.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/filter-grammar.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/fit-loop.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/fit-loop.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/graph-paths.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/graph-paths.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/jd-parser.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/jd-parser.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/latex-escape.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/latex-escape.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/line-model.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/line-model.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/pagerank.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/pagerank.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/reconnect.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/reconnect.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/selection.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/selection.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/streaks.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/streaks.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/text.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/text.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/tie-strength.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/tie-strength.test.ts"
+      ]
+    },
+    "packages/core/src/algorithms/who-to-call.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/who-to-call.test.ts"
+      ]
+    },
+    "packages/core/src/forms/connection-options.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/forms/connection-options.test.ts"
+      ]
+    },
+    "packages/core/src/forms/edge-forms.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/forms/descriptors.test.ts"
+      ]
+    },
+    "packages/core/src/forms/node-forms.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/forms/descriptors.test.ts"
+      ]
+    },
+    "packages/core/src/forms/subjects.ts": {
+      "risk": "high",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/forms/subjects.test.ts"
+      ]
+    },
+    "packages/core/src/forms/suggests.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/forms/descriptors.test.ts"
+      ]
+    },
+    "packages/core/src/forms/types.ts": {
+      "risk": "low",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/forms/descriptors.test.ts"
+      ],
+      "note": "Shared form types exercised by descriptor suites."
+    },
+    "packages/core/src/importers/csv.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/importers/csv.test.ts"
+      ]
+    },
+    "packages/core/src/importers/ics.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/importers/ics.test.ts"
+      ]
+    },
+    "packages/core/src/importers/linkedin.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/importers/linkedin.test.ts"
+      ]
+    },
+    "packages/core/src/importers/netscape-bookmarks.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/importers/netscape-bookmarks.test.ts"
+      ]
+    },
+    "packages/core/src/importers/vcard.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/importers/vcard.test.ts"
+      ]
+    },
+    "packages/core/src/schema/bundle.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/schema/bundle.test.ts"
+      ]
+    },
+    "packages/core/src/schema/edge-props.ts": {
+      "risk": "high",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/schema/edge-props.relations.test.ts",
+        "packages/core/src/schema/validate.test.ts"
+      ]
+    },
+    "packages/core/src/schema/envelope.ts": {
+      "risk": "high",
+      "layers": [
+        "unit",
+        "property"
+      ],
+      "tests": [
+        "packages/core/src/schema/envelope.test.ts",
+        "packages/core/src/schema/validate.test.ts"
+      ]
+    },
+    "packages/core/src/schema/node-props.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/schema/node-props.test.ts"
+      ]
+    },
+    "packages/core/src/schema/resume.ts": {
+      "risk": "high",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/schema/resume-workspace.test.ts",
+        "packages/core/src/schema/template-gallery.test.ts",
+        "packages/core/src/schema/template-wording.test.ts"
+      ]
+    },
+    "packages/core/src/schema/validate.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/schema/validate.test.ts"
+      ]
+    },
+    "packages/core/src/types.ts": {
+      "risk": "low",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "packages/core/src/forms/descriptors.test.ts",
+        "packages/core/src/schema/validate.test.ts"
+      ],
+      "note": "Type catalogs covered by descriptor and validation loops."
+    },
+    "apps/web/src/test/render.tsx": {
+      "risk": "low",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/test/render.test.tsx"
+      ],
+      "status": "covered"
+    }
+  }
+}

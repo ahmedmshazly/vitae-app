@@ -1,0 +1,20 @@
+{
+  "name": "@vitae/buildsvc",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Vitae LaTeX build service: Tectonic + poppler, HMAC-gated, no egress.",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "calibrate": "node dist/calibrate.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.3"
+  }
+}

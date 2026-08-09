@@ -1,0 +1,17 @@
+{
+  "key": "onyx",
+  "version": "1.0.0",
+  "name": "Onyx",
+  "engine": "tectonic",
+  "ats_strict": false,
+  "description": "Classic editorial layout with restrained typography and a clear reading rhythm.",
+  "traits": ["classic", "editorial", "readable"],
+  "page_size": "Letter",
+  "accent_options": ["#2563eb", "#0f766e", "#7c3aed", "#b45309", "#be123c", "#111827"],
+  "line_model": {
+    "chars_per_line": 96,
+    "lines_per_page": 49,
+    "entry_overhead": 2,
+    "section_overhead": 2
+  }
+}

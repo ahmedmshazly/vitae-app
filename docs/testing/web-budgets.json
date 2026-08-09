@@ -1,0 +1,5 @@
+{
+  "totalJsKb": 5200,
+  "largestChunkKb": 1500,
+  "notes": "Baseline after route-level code splitting for v1.0.0. The schema observatory is intentionally lazy; VITAE_REQUIRE_BUDGETS=true fails when dist is missing."
+}

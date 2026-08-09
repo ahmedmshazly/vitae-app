@@ -1,0 +1,1448 @@
+/* Vitae primitive components, global classes (prefix vt-) on the token system. */
+
+/* ── Button ── */
+.vt-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  height: 32px;
+  padding: 0 var(--ae-space-3);
+  border-radius: var(--ae-radius-sm);
+  border: 1px solid var(--ae-border-strong);
+  background: var(--ae-surface-raised);
+  color: var(--ae-fg);
+  font-size: var(--ae-text-base);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--ae-dur) var(--ae-ease), border-color var(--ae-dur) var(--ae-ease),
+    transform var(--ae-dur-fast) var(--ae-ease);
+  white-space: nowrap;
+}
+.vt-btn:hover {
+  background: var(--ae-surface-overlay);
+  border-color: var(--ae-muted);
+}
+.vt-btn:active {
+  transform: scale(0.97);
+}
+.vt-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.vt-btn--primary {
+  background: var(--ae-accent);
+  border-color: transparent;
+  color: var(--ae-accent-ink);
+  font-weight: 600;
+}
+.vt-btn--primary:hover {
+  background: var(--ae-accent);
+  border-color: transparent;
+  filter: brightness(0.92); /* accent is paper white, can't brighten further */
+}
+.vt-btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+/* `box-shadow: none` above is what paints a ghost button as flat, and it also
+   silently cancelled the global :focus-visible ring, same specificity, later
+   in the file. axe cannot see a missing focus indicator, so this went unnoticed
+   on every ghost button in the app. */
+.vt-btn--ghost:focus-visible {
+  box-shadow: var(--ae-focus-ring);
+}
+.vt-btn--ghost:hover {
+  background: var(--ae-surface-raised);
+  border-color: var(--ae-border);
+}
+/* Danger fills nothing, a destructive button is an outline; only the final
+   confirm inside a dialog may be filled (see .vt-btn--danger-fill below). */
+.vt-btn--danger {
+  border-color: var(--ae-danger);
+  color: var(--ae-danger);
+}
+/* ConfirmDialog only, applied via Button's className passthrough, never a
+   Button `variant`, so the 11 other outline-only danger call sites are
+   untouched. */
+.vt-btn--danger-fill {
+  background: var(--ae-danger);
+  border-color: var(--ae-danger);
+  color: var(--ae-accent-ink);
+}
+.vt-btn--sm {
+  height: 26px;
+  padding: 0 var(--ae-space-2);
+  font-size: var(--ae-text-sm);
+}
+/* The painted box stays 26px, the identity's control minimum is 32x32 for the
+   *target*, not the ink. Expanding the hit area with a pseudo-element meets it
+   without relaying out the 43 screens that use a small button. */
+.vt-btn--sm::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+}
+.vt-btn--lg {
+  height: 44px;
+  padding: 0 var(--ae-space-4);
+}
+
+/* ── Chip ── */
+.vt-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 var(--ae-space-2);
+  border-radius: var(--ae-radius-sm);
+  border: 1px solid var(--ae-border);
+  background: var(--ae-surface);
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-sm);
+  line-height: 1;
+  white-space: nowrap;
+}
+.vt-chip--accent {
+  border-color: var(--ae-accent-bg);
+  background: var(--ae-accent-bg-soft);
+  color: var(--ae-accent-soft);
+}
+.vt-chip--success {
+  border-color: color-mix(in srgb, var(--ae-success) 35%, transparent);
+  background: color-mix(in srgb, var(--ae-success) 8%, transparent);
+  color: var(--ae-success);
+}
+.vt-chip--warning {
+  border-color: color-mix(in srgb, var(--ae-warning) 35%, transparent);
+  background: color-mix(in srgb, var(--ae-warning) 8%, transparent);
+  color: var(--ae-warning);
+}
+.vt-chip--danger {
+  border-color: color-mix(in srgb, var(--ae-danger) 35%, transparent);
+  background: color-mix(in srgb, var(--ae-danger) 8%, transparent);
+  color: var(--ae-danger);
+}
+.vt-chip--mono {
+  font-family: var(--ae-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.vt-chip--removable {
+  padding-right: 4px;
+}
+.vt-chip__x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: transparent;
+  color: var(--ae-muted);
+  border-radius: var(--ae-radius-sm);
+  cursor: pointer;
+}
+.vt-chip__x:hover {
+  color: var(--ae-fg);
+  background: var(--ae-surface-overlay);
+}
+
+/* ── FilterGroup ── */
+.vt-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ae-space-1);
+}
+.vt-filters__opt {
+  position: relative;
+  min-height: 26px;
+  padding: 0 var(--ae-space-3);
+  border-radius: var(--ae-radius-sm);
+  border: 1px solid var(--ae-border-control);
+  background: transparent;
+  color: var(--ae-muted);
+  font-size: var(--ae-text-sm);
+  cursor: pointer;
+}
+/* The target is the identity's 32px minimum even though the ink is 26px. */
+.vt-filters__opt::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+}
+.vt-filters__opt:hover {
+  color: var(--ae-fg-soft);
+  border-color: var(--ae-muted);
+}
+/* Ground plus weight, not a border colour, the active filter has to survive
+   being read without colour, and aria-pressed carries it for everyone else. */
+.vt-filters__opt--on {
+  background: var(--ae-accent-bg);
+  border-color: var(--ae-accent);
+  color: var(--ae-fg-strong);
+  font-weight: 600;
+}
+
+/* ── Provenance chip (source + confidence dot) ── */
+.vt-prov {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  color: var(--ae-faint);
+}
+.vt-prov__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--ae-radius-full);
+  border: 1px solid var(--ae-muted);
+}
+.vt-prov__dot--full {
+  background: var(--ae-success);
+  border-color: var(--ae-success);
+}
+.vt-prov__dot--half {
+  background: linear-gradient(90deg, var(--ae-warning) 50%, transparent 50%);
+  border-color: var(--ae-warning);
+}
+.vt-prov__dot--low {
+  background: transparent;
+  border-color: var(--ae-danger);
+}
+
+/* ── Factor chip (score decomposition) ── */
+.vt-factor {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 var(--ae-space-2);
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-surface-overlay);
+  border: 1px solid var(--ae-border);
+  font-size: var(--ae-text-xs);
+}
+.vt-factor__label {
+  color: var(--ae-muted-strong);
+}
+.vt-factor__value {
+  font-family: var(--ae-font-mono);
+  color: var(--ae-fg);
+  font-variant-numeric: tabular-nums;
+}
+.vt-factor--pos .vt-factor__value {
+  color: var(--ae-success);
+}
+.vt-factor--neg .vt-factor__value {
+  color: var(--ae-danger);
+}
+
+/* ── Kbd (keycap) ── */
+.vt-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: var(--ae-radius-sm);
+  border: 1px solid var(--ae-border-strong);
+  border-bottom-width: 2px;
+  background: linear-gradient(180deg, var(--ae-surface-overlay), var(--ae-surface-raised));
+  color: var(--ae-muted-strong);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  line-height: 1;
+}
+
+/* ── Entity glyph tile ── */
+.vt-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-surface-overlay);
+  border: 1px solid var(--ae-border);
+  color: var(--ae-muted-strong);
+  flex: none;
+}
+.vt-glyph--accent {
+  color: var(--ae-accent-soft);
+  border-color: var(--ae-accent-bg);
+}
+.vt-glyph--sm {
+  width: 20px;
+  height: 20px;
+}
+
+/* ── StrengthBar ── */
+.vt-strength {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  flex: none;
+}
+.vt-strength__track {
+  width: 64px;
+  height: 4px;
+  border-radius: var(--ae-radius-full);
+  background: var(--ae-surface-raised);
+  overflow: hidden;
+}
+.vt-strength__fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--ae-radius-full);
+  background: var(--ae-accent);
+}
+.vt-strength__value {
+  font-size: var(--ae-text-xs);
+  color: var(--ae-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Factor bar (what a score is made of) ── */
+.vt-factorbar {
+  display: flex;
+  gap: 1px;
+  width: 100%;
+  height: 6px;
+  border-radius: var(--ae-radius-full);
+  background: var(--ae-surface-raised);
+  overflow: hidden;
+}
+.vt-factorbar__seg {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  background: var(--ae-accent);
+}
+
+/* ── Meter (page-fill bar for the résumé line budget) ── */
+.vt-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.vt-meter__track {
+  position: relative;
+  height: 8px;
+  border-radius: var(--ae-radius-full);
+  background: var(--ae-surface-overlay);
+  overflow: hidden;
+}
+.vt-meter__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--ae-success);
+  transition: width var(--ae-dur) var(--ae-ease);
+}
+.vt-meter__fill--warn {
+  background: var(--ae-warning);
+}
+.vt-meter__fill--over {
+  background: var(--ae-danger);
+}
+.vt-meter__label {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  color: var(--ae-muted);
+}
+
+/* ── Spinner ── */
+.vt-spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--ae-border-strong);
+  border-top-color: var(--ae-accent);
+  animation: vt-spin 0.7s linear infinite;
+}
+@keyframes vt-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vt-spinner {
+    animation-duration: 1.5s;
+  }
+}
+
+/* ── ChargeRing ── */
+.vt-charge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.vt-charge svg {
+  position: absolute;
+  inset: 0;
+}
+.vt-charge__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--ae-text-sm);
+  font-weight: 600;
+  color: var(--ae-fg-soft);
+}
+
+/* ── StrengthDonut ── */
+.vt-donut {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.vt-donut svg {
+  position: absolute;
+  inset: 0;
+}
+.vt-donut__center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+.vt-donut__value {
+  font-size: var(--ae-text-xl);
+  font-weight: 600;
+  color: var(--ae-fg-strong);
+}
+.vt-donut__label {
+  font-size: var(--ae-text-xs);
+  color: var(--ae-muted);
+}
+
+/* ── DotGrid ── */
+.vt-dotgrid {
+  display: inline-grid;
+  grid-template-columns: repeat(15, 8px);
+  gap: 3px;
+}
+.vt-dotgrid__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+/* ── ClosenessDots ── */
+.vt-closeness {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+.vt-closeness__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* ═══ Form primitives (FR-CAP-002) ═══ */
+
+/* ── Field wrapper ── */
+.vt-fld {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.vt-fld__label {
+  font-size: var(--ae-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ae-muted-strong);
+  display: inline-flex;
+  gap: 3px;
+}
+.vt-fld__req {
+  color: var(--ae-warning);
+}
+.vt-fld__help {
+  font-size: var(--ae-text-xs);
+  color: var(--ae-faint);
+  line-height: var(--ae-leading-normal);
+}
+.vt-fld__error {
+  font-size: var(--ae-text-xs);
+  color: var(--ae-danger);
+}
+
+/* ── Input / Textarea ── */
+.vt-inp {
+  width: 100%;
+  height: 32px;
+  padding: 0 var(--ae-space-3);
+  border-radius: var(--ae-radius-sm);
+  border: 1px solid var(--ae-border-control);
+  background: var(--ae-bg);
+  color: var(--ae-fg);
+  font-size: var(--ae-text-base);
+  font-family: inherit;
+  transition: border-color var(--ae-dur) var(--ae-ease), box-shadow var(--ae-dur) var(--ae-ease);
+}
+.vt-inp::placeholder {
+  color: var(--ae-faint);
+}
+.vt-inp:hover {
+  border-color: var(--ae-muted);
+}
+.vt-inp:focus {
+  outline: none;
+  border-color: var(--ae-accent);
+  box-shadow: var(--ae-focus-ring);
+}
+.vt-inp--area {
+  height: auto;
+  padding: var(--ae-space-2) var(--ae-space-3);
+  resize: vertical;
+  line-height: var(--ae-leading-normal);
+}
+.vt-inp--invalid,
+.vt-inp--invalid:hover {
+  border-color: var(--ae-danger);
+}
+
+/* ── Select (Radix) ── */
+.vt-sel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ae-space-2);
+  width: 100%;
+  height: 32px;
+  padding: 0 var(--ae-space-3);
+  border-radius: var(--ae-radius-sm);
+  border: 1px solid var(--ae-border-control);
+  background: var(--ae-bg);
+  color: var(--ae-fg);
+  font-size: var(--ae-text-base);
+  cursor: pointer;
+  transition: border-color var(--ae-dur) var(--ae-ease);
+}
+.vt-sel:hover {
+  border-color: var(--ae-muted);
+}
+.vt-sel:focus-visible {
+  outline: none;
+  border-color: var(--ae-accent);
+  box-shadow: var(--ae-focus-ring);
+}
+.vt-sel[data-placeholder] {
+  color: var(--ae-faint);
+}
+.vt-sel__chev {
+  color: var(--ae-muted);
+  display: inline-flex;
+}
+.vt-sel__content {
+  z-index: var(--ae-z-popover);
+  min-width: var(--radix-select-trigger-width);
+  max-height: var(--radix-select-content-available-height, 320px);
+  border-radius: var(--ae-radius);
+  border: 1px solid var(--ae-border-strong);
+  background: var(--ae-surface-overlay);
+  box-shadow: var(--ae-shadow-overlay);
+  overflow: hidden;
+  animation: vt-rise-in var(--ae-dur) var(--ae-ease);
+}
+.vt-sel__viewport {
+  padding: 4px;
+  max-height: inherit;
+  overflow-y: auto;
+}
+.vt-sel__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ae-space-3);
+  height: 28px;
+  padding: 0 var(--ae-space-2);
+  border-radius: var(--ae-radius-sm);
+  font-size: var(--ae-text-base);
+  color: var(--ae-fg-soft);
+  cursor: pointer;
+  outline: none;
+}
+.vt-sel__item[data-highlighted] {
+  background: var(--ae-accent-bg);
+  color: var(--ae-fg-strong);
+}
+.vt-sel__item--clear {
+  color: var(--ae-muted);
+  font-style: italic;
+}
+.vt-sel__check {
+  color: var(--ae-accent-soft);
+  display: inline-flex;
+}
+
+/* ── Checkbox ── */
+.vt-check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  cursor: pointer;
+  user-select: none;
+}
+.vt-check__box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex: none;
+  border-radius: var(--ae-radius-sm);
+  border: 1px solid var(--ae-border-control);
+  background: var(--ae-bg);
+  color: var(--ae-accent-ink);
+  cursor: pointer;
+  transition: background var(--ae-dur) var(--ae-ease), border-color var(--ae-dur) var(--ae-ease);
+}
+.vt-check__box:hover {
+  border-color: var(--ae-muted);
+}
+.vt-check__box:focus-visible {
+  outline: none;
+  box-shadow: var(--ae-focus-ring);
+}
+.vt-check__box[data-state='checked'] {
+  background: var(--ae-accent);
+  border-color: var(--ae-accent);
+}
+.vt-check__mark {
+  display: inline-flex;
+}
+.vt-check__label {
+  font-size: var(--ae-text-base);
+  color: var(--ae-fg);
+}
+
+/* ── TagInput ── */
+.vt-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  min-height: 32px;
+  padding: 4px var(--ae-space-2);
+  border-radius: var(--ae-radius-sm);
+  border: 1px solid var(--ae-border-control);
+  background: var(--ae-bg);
+  cursor: text;
+  transition: border-color var(--ae-dur) var(--ae-ease);
+}
+.vt-tags:hover {
+  border-color: var(--ae-muted);
+}
+.vt-tags:focus-within {
+  border-color: var(--ae-accent);
+  box-shadow: var(--ae-focus-ring);
+}
+.vt-tags__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 4px 0 var(--ae-space-2);
+  border-radius: var(--ae-radius-sm);
+  border: 1px solid var(--ae-border);
+  background: var(--ae-surface-raised);
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-sm);
+  animation: vt-rise-in var(--ae-dur) var(--ae-ease);
+}
+.vt-tags__x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border: none;
+  background: transparent;
+  color: var(--ae-muted);
+  border-radius: var(--ae-radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+}
+.vt-tags__x:hover {
+  color: var(--ae-danger);
+  background: var(--ae-surface-overlay);
+}
+.vt-tags__input {
+  flex: 1;
+  min-width: 80px;
+  height: 22px;
+  border: none;
+  background: transparent;
+  color: var(--ae-fg);
+  font-size: var(--ae-text-base);
+  font-family: inherit;
+  outline: none;
+}
+.vt-tags__input::placeholder {
+  color: var(--ae-faint);
+}
+
+/* ── Rating (interactive closeness dots) ── */
+.vt-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.vt-rating__dot {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--ae-border-strong);
+  background: var(--ae-surface);
+  cursor: pointer;
+  transition: background var(--ae-dur) var(--ae-ease), transform var(--ae-dur) var(--ae-ease),
+    border-color var(--ae-dur) var(--ae-ease);
+}
+.vt-rating__dot:hover {
+  transform: scale(1.2);
+}
+.vt-rating__dot:focus-visible {
+  outline: none;
+  box-shadow: var(--ae-focus-ring);
+}
+.vt-rating__dot--on {
+  background: var(--ae-accent);
+  border-color: var(--ae-accent);
+}
+.vt-rating__dot--hover {
+  background: var(--ae-accent-strong);
+  border-color: var(--ae-accent-strong);
+}
+.vt-rating__value {
+  margin-left: 4px;
+  font-size: var(--ae-text-xs);
+  color: var(--ae-muted);
+}
+
+/* ── StringListField ── */
+.vt-strlist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.vt-strlist__row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  animation: vt-rise-in var(--ae-dur) var(--ae-ease);
+}
+.vt-strlist__x {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--ae-radius-sm);
+  border: 1px solid var(--ae-border);
+  background: transparent;
+  color: var(--ae-muted);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+.vt-strlist__x:hover {
+  color: var(--ae-danger);
+  border-color: var(--ae-danger);
+}
+.vt-strlist__add {
+  align-self: flex-start;
+  height: 24px;
+  padding: 0 var(--ae-space-2);
+  border-radius: var(--ae-radius-sm);
+  border: 1px dashed var(--ae-border-strong);
+  background: transparent;
+  color: var(--ae-muted-strong);
+  font-size: var(--ae-text-sm);
+  cursor: pointer;
+  transition: color var(--ae-dur) var(--ae-ease), border-color var(--ae-dur) var(--ae-ease);
+}
+.vt-strlist__add:hover {
+  color: var(--ae-accent-soft);
+  border-color: var(--ae-accent);
+}
+
+/* ── MoneyField ── */
+.vt-money {
+  display: flex;
+  gap: 6px;
+}
+.vt-money > .vt-inp:first-child {
+  flex: 1;
+}
+.vt-money__ccy {
+  width: 64px;
+  flex: none;
+  text-transform: uppercase;
+}
+
+/* ═══ Overlays ═══ */
+.vt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--ae-z-overlay);
+  background: var(--ae-overlay);
+  animation: vt-fade-in var(--ae-dur) var(--ae-ease);
+}
+.vt-overlay[data-state='closed'] {
+  animation: vt-fade-out var(--ae-dur-fast) linear;
+}
+.vt-modal {
+  position: fixed;
+  z-index: var(--ae-z-overlay);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(560px, calc(100vw - 32px));
+  max-height: min(82vh, 860px);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--ae-radius-lg);
+  border: 1px solid var(--ae-border-strong);
+  background: var(--ae-surface-overlay);
+  box-shadow: var(--ae-shadow-overlay);
+  animation: vt-rise-in var(--ae-dur) var(--ae-ease);
+}
+.vt-modal[data-state='closed'] {
+  animation: vt-fade-out var(--ae-dur-fast) linear;
+}
+.vt-modal--sm {
+  width: min(420px, calc(100vw - 32px));
+}
+.vt-modal--lg {
+  width: min(760px, calc(100vw - 32px));
+}
+.vt-modal__head {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-3);
+  padding: var(--ae-space-4) var(--ae-space-5) 0;
+}
+.vt-modal__title {
+  flex: 1;
+  margin: 0;
+  font-family: var(--ae-font-display);
+  font-size: var(--ae-text-lg);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--ae-fg-strong);
+}
+.vt-modal__x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--ae-radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--ae-muted);
+  cursor: pointer;
+  transition: color var(--ae-dur) var(--ae-ease), background var(--ae-dur) var(--ae-ease);
+}
+.vt-modal__x:hover {
+  color: var(--ae-fg);
+  background: var(--ae-surface-raised);
+}
+.vt-modal__desc {
+  margin: 4px 0 0;
+  padding: 0 var(--ae-space-5);
+  font-size: var(--ae-text-sm);
+  color: var(--ae-muted);
+}
+.vt-modal__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--ae-space-4) var(--ae-space-5);
+}
+.vt-modal__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ae-space-2);
+  padding: var(--ae-space-3) var(--ae-space-5);
+  border-top: 1px solid var(--ae-border);
+}
+.vt-modal__confirm-body {
+  font-size: var(--ae-text-base);
+  color: var(--ae-fg-soft);
+  line-height: var(--ae-leading-normal);
+}
+.vt-sheet {
+  position: fixed;
+  z-index: var(--ae-z-overlay);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(440px, 92vw);
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--ae-border-strong);
+  background: var(--ae-surface-overlay);
+  box-shadow: var(--ae-shadow-overlay);
+  animation: vt-rise-in var(--ae-dur) var(--ae-ease);
+}
+.vt-sheet[data-state='closed'] {
+  animation: vt-fade-out var(--ae-dur-fast) linear;
+}
+.vt-sheet--wide {
+  width: min(620px, 96vw);
+}
+.vt-sheet__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--ae-space-4) var(--ae-space-5);
+}
+
+/* ── Tooltip / Popover ── */
+.vt-tooltip {
+  z-index: var(--ae-z-popover);
+  max-width: 320px;
+  padding: 6px var(--ae-space-2);
+  border-radius: var(--ae-radius-sm);
+  border: 1px solid var(--ae-border-strong);
+  background: var(--ae-surface-overlay);
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-sm);
+  line-height: var(--ae-leading-normal);
+  box-shadow: var(--ae-shadow-overlay);
+  animation: vt-rise-in var(--ae-dur) var(--ae-ease);
+}
+.vt-tooltip__arrow {
+  fill: var(--ae-border-strong);
+}
+.vt-popover {
+  z-index: var(--ae-z-popover);
+  width: 300px;
+  padding: var(--ae-space-3);
+  border-radius: var(--ae-radius);
+  border: 1px solid var(--ae-border-strong);
+  background: var(--ae-surface-overlay);
+  box-shadow: var(--ae-shadow-overlay);
+  animation: vt-rise-in var(--ae-dur) var(--ae-ease);
+}
+.vt-popover--wide {
+  width: 380px;
+}
+
+/* ── CommandOverlay palette (⌘K capture, ⌘P switcher, composer, logger) ── */
+.vt-palette {
+  position: fixed;
+  z-index: var(--ae-z-overlay);
+  top: 12vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(640px, calc(100vw - 32px));
+  max-height: 76vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--ae-radius-lg);
+  border: 1px solid var(--ae-border-strong);
+  /* The overlay surface, like every other dialog, the legacy panel sat on
+     --ae-surface-raised, which is also what its active row used, so the
+     highlight was painted in exactly the panel's own colour. */
+  background: var(--ae-surface-overlay);
+  box-shadow: var(--ae-shadow-overlay);
+  animation: vt-rise-in var(--ae-dur) var(--ae-ease);
+}
+.vt-palette[data-state='closed'] {
+  animation: vt-fade-out var(--ae-dur-fast) linear;
+}
+.vt-palette--wide {
+  width: min(760px, calc(100vw - 32px));
+}
+.vt-palette__input {
+  width: 100%;
+  padding: var(--ae-space-4);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--ae-border);
+  color: var(--ae-fg-strong);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-lg);
+}
+/* An empty field has to read as empty. The browser default rendered the
+   placeholder near enough to real input to be mistaken for typed text. */
+.vt-palette__input::placeholder {
+  color: var(--ae-faint);
+}
+.vt-palette__input:focus {
+  outline: none;
+  box-shadow: none;
+}
+.vt-palette__list {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+.vt-palette__group {
+  padding: var(--ae-space-3) var(--ae-space-4) var(--ae-space-1);
+  font-family: var(--ae-font-display);
+  font-size: var(--ae-text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ae-faint);
+}
+.vt-palette__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-3);
+  width: 100%;
+  min-height: 36px;
+  padding: var(--ae-space-2) var(--ae-space-4);
+  border: none;
+  background: transparent;
+  color: var(--ae-fg);
+  text-align: left;
+  cursor: pointer;
+}
+/* The active row carries a marker bar as well as a ground: --ae-accent-bg is
+   one step off the panel, which is not enough on its own, and an arrowed-to
+   row must never be signalled by colour alone. */
+.vt-palette__row--on {
+  background: var(--ae-accent-bg);
+  color: var(--ae-fg-strong);
+}
+.vt-palette__row--on::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--ae-accent);
+}
+.vt-palette__foot {
+  border-top: 1px solid var(--ae-border);
+  padding: var(--ae-space-3) var(--ae-space-4);
+}
+
+/* ── HelpTip ── */
+.vt-helptip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--ae-border-strong);
+  background: transparent;
+  color: var(--ae-faint);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: help;
+  vertical-align: middle;
+  transition: color var(--ae-dur) var(--ae-ease), border-color var(--ae-dur) var(--ae-ease);
+}
+.vt-helptip:hover,
+.vt-helptip:focus-visible {
+  color: var(--ae-accent);
+  border-color: var(--ae-accent);
+  outline: none;
+}
+
+/* ── InfoPopover ── */
+.vt-info-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--ae-border);
+  background: var(--ae-surface-raised);
+  color: var(--ae-muted);
+  font-size: var(--ae-text-xs);
+  cursor: pointer;
+  transition: color var(--ae-dur) var(--ae-ease), border-color var(--ae-dur) var(--ae-ease);
+}
+.vt-info-trigger > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font-weight: 700;
+  font-size: 9px;
+}
+.vt-info-trigger:hover,
+.vt-info-trigger:focus-visible {
+  color: var(--ae-accent);
+  border-color: var(--ae-accent);
+  outline: none;
+}
+.vt-info__title {
+  font-family: var(--ae-font-display, inherit);
+  font-size: var(--ae-text-base);
+  font-weight: 600;
+  color: var(--ae-fg-strong);
+  margin-bottom: 6px;
+}
+.vt-info__body {
+  font-size: var(--ae-text-sm);
+  line-height: var(--ae-leading-normal);
+  color: var(--ae-fg-soft);
+}
+.vt-info__body p {
+  margin: 0 0 var(--ae-space-2);
+}
+.vt-info__body p:last-child {
+  margin-bottom: 0;
+}
+.vt-info__shortcuts {
+  margin-top: var(--ae-space-3);
+  padding-top: var(--ae-space-3);
+  border-top: 1px solid var(--ae-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.vt-info__shortcut {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  font-size: var(--ae-text-sm);
+  color: var(--ae-muted);
+}
+
+/* ── PageHeader ── */
+.vt-pagehead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ae-space-4);
+  margin-bottom: var(--ae-space-4);
+}
+.vt-pagehead__titlerow {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-3);
+  flex-wrap: wrap;
+}
+/* The display treatment in full, caps and 0.2em tracking are as much a part
+   of it as the family, and a 30px sans title was neither. Sized above the
+   section headings (--ae-text-md) so h1 and h2 stay distinguishable while
+   both wear the same face. */
+.vt-pagehead__title {
+  font-family: var(--ae-font-display);
+  font-size: var(--ae-text-xl);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--ae-fg-strong);
+  margin: 0;
+}
+.vt-pagehead__sub {
+  margin: 6px 0 0;
+  font-size: var(--ae-text-sm);
+  color: var(--ae-muted);
+  max-width: 68ch;
+}
+.vt-pagehead__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  flex-shrink: 0;
+}
+@media (max-width: 640px) {
+  .vt-pagehead {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ── Section ── */
+.vt-section {
+  margin-bottom: var(--ae-space-6);
+}
+.vt-section__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ae-space-3);
+  margin-bottom: var(--ae-space-2);
+}
+.vt-section__title {
+  display: flex;
+  align-items: baseline;
+  /* An explicit gap, because a flex container drops the whitespace text node
+     between the title and its count: "Connections 5" rendered "Connections5". */
+  gap: var(--ae-space-2);
+  margin: 0;
+  font-size: var(--ae-text-md);
+  color: var(--ae-fg-strong);
+}
+.vt-section__meta {
+  font-size: var(--ae-text-xs);
+  color: var(--ae-faint);
+  letter-spacing: normal;
+}
+.vt-section__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  margin-left: auto;
+}
+
+/* ── RegisterRule ── */
+.vt-register {
+  position: relative;
+  height: 1px;
+  background: var(--ae-border);
+  margin-bottom: var(--ae-space-5);
+}
+.vt-register__tick {
+  position: absolute;
+  top: -3px;
+  width: 1px;
+  height: 7px;
+  background: var(--ae-border-strong);
+}
+/* Only the active tick takes the accent, and it is taller as well as brighter:
+   the rule has to survive being read without colour. */
+.vt-register__tick--on {
+  top: -5px;
+  height: 11px;
+  background: var(--ae-accent);
+}
+
+/* ═══ Feedback ═══ */
+.vt-skel {
+  display: inline-block;
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-surface-raised);
+  animation: vt-skel-pulse 1.4s var(--ae-ease) infinite;
+}
+.vt-skel--round {
+  border-radius: 50%;
+}
+.vt-skel-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.vt-skel-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-3);
+  padding: var(--ae-space-3) 0;
+}
+.vt-skel-rows__row {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-3);
+  animation: vt-rise-in 300ms var(--ae-ease) backwards;
+}
+.vt-skel-rows__lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+@keyframes vt-skel-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+.vt-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ae-space-2);
+  padding: var(--ae-space-8) var(--ae-space-5);
+  text-align: center;
+}
+.vt-empty__glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--ae-radius);
+  border: 1px dashed var(--ae-border-strong);
+  color: var(--ae-faint);
+}
+.vt-empty__title {
+  font-size: var(--ae-text-md);
+  font-weight: 600;
+  color: var(--ae-fg-soft);
+}
+.vt-empty__hint {
+  font-size: var(--ae-text-sm);
+  color: var(--ae-muted);
+  max-width: 420px;
+  line-height: var(--ae-leading-normal);
+}
+.vt-empty__action {
+  margin-top: var(--ae-space-2);
+}
+.vt-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ae-space-2);
+  padding: var(--ae-space-6) var(--ae-space-5);
+  text-align: center;
+  border: 1px solid color-mix(in srgb, var(--ae-danger) 35%, transparent);
+  border-radius: var(--ae-radius);
+  background: color-mix(in srgb, var(--ae-danger) 5%, transparent);
+}
+.vt-error__title {
+  font-size: var(--ae-text-md);
+  font-weight: 600;
+  color: var(--ae-danger);
+}
+.vt-error__detail {
+  font-size: var(--ae-text-xs);
+  color: var(--ae-muted);
+}
+
+/* ═══ Shared motion + utilities ═══ */
+.u-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+.vt-hoverable {
+  transition: border-color var(--ae-dur) var(--ae-ease);
+}
+.vt-hoverable:hover {
+  border-color: var(--ae-border-strong);
+}
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+/* Celebration burst, a radial spark ring popped on gamified confirmations
+   (habit check, favor settled, reminder done). Pure CSS: toggle the class,
+   remove on animationend. */
+.vt-burst {
+  position: relative;
+}
+.vt-burst::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 2px solid var(--ae-accent);
+  opacity: 0;
+  pointer-events: none;
+  animation: vt-burst-ring 480ms var(--ae-ease);
+}
+.vt-burst--ember::after {
+  border-color: var(--ae-ember);
+}
+@keyframes vt-burst-ring {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vt-skel,
+  .vt-skel-rows__row {
+    animation: none;
+  }
+  .vt-hoverable:hover {
+    transform: none;
+  }
+  .vt-burst::after {
+    animation: none;
+    opacity: 0;
+  }
+  .vt-btn:active {
+    transform: none;
+  }
+}
+
+/* ── Menu (dropdown) ── */
+.vt-menu {
+  z-index: var(--ae-z-popover);
+  min-width: 200px;
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  padding: 6px;
+  border-radius: var(--ae-radius);
+  border: 1px solid var(--ae-border-strong);
+  background: var(--ae-surface-overlay);
+  box-shadow: var(--ae-shadow-overlay);
+  animation: vt-rise-in var(--ae-dur) var(--ae-ease);
+}
+.vt-menu--columns {
+  display: flex;
+  gap: var(--ae-space-2);
+  max-height: none;
+}
+.vt-menu--columns .vt-menu__group {
+  min-width: 168px;
+}
+.vt-menu__label {
+  padding: 6px 8px 4px;
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ae-faint);
+}
+.vt-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  height: 28px;
+  padding: 0 var(--ae-space-2);
+  border-radius: var(--ae-radius-sm);
+  font-size: var(--ae-text-base);
+  color: var(--ae-fg-soft);
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+}
+.vt-menu__item[data-highlighted] {
+  background: var(--ae-accent-bg);
+  color: var(--ae-fg-strong);
+}

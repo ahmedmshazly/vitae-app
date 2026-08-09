@@ -1,0 +1,18 @@
+{
+  "as_of": "2026-08-09",
+  "counts": {
+    "core_prod": 37,
+    "core_tests": 35,
+    "api_prod": 77,
+    "api_tests": 14,
+    "web_prod": 122,
+    "web_tests": 37,
+    "e2e_specs": 43,
+    "mapped_modules": 232
+  },
+  "notes": [
+    "Authoritative ownership lives in source-test-map.json; this file is a snapshot of counts.",
+    "API/web modules may be status=deferred until route-focused and component suites land.",
+    "Core coverage with all:false reports ~96% lines on exercised modules; ratchet thresholds in vitest configs."
+  ]
+}

@@ -1,0 +1,82 @@
+%==============================================================================
+% Cobalt v1.0.0: elegant charter/helvet serif design with a deep-navy accent.
+% Values are guillemet-delimited tokens filled by the TypeScript renderer
+% (SRS D10) AFTER escaping every value (SRS 8.4).
+% Self-contained: compiles with standard TeX Live packages only.
+%==============================================================================
+\documentclass[9pt,a4paper]{extarticle}
+
+% ---- Encoding & fonts ----------------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{charter}                 % elegant, readable serif body
+\usepackage[scaled=0.92]{helvet}     % Helvetica-like sans for headings/name
+\usepackage{microtype}               % subtle typographic polish
+
+% ---- Layout --------------------------------------------------------------
+\usepackage[a4paper,left=1.35cm,right=1.35cm,top=0.9cm,bottom=0.85cm,footskip=0.2cm]{geometry}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{tabularx}
+\usepackage{etoolbox}
+\usepackage[hidelinks]{hyperref}
+
+% ---- Palette -------------------------------------------------------------
+\definecolor{accent}{HTML}{«ACCENT_HEX»}
+\definecolor{textmain}{HTML}{1E1E1E}
+\definecolor{textmuted}{HTML}{565656}
+\definecolor{rulecol}{HTML}{C7CCD1}
+
+\color{textmain}
+\hypersetup{colorlinks=true,urlcolor=accent,linkcolor=accent}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\linespread{1.0}
+
+% ---- Section headings ----------------------------------------------------
+\titleformat{\section}
+  {\sffamily\bfseries\large\color{accent}}{}{0em}{}
+  [\vspace{1.5pt}{\color{rulecol}\titlerule[1pt]}]
+\titlespacing*{\section}{0pt}{3.5pt}{2.5pt}
+
+% ---- Helpers -------------------------------------------------------------
+\newcommand{\dotsep}{{\color{textmuted}\,\textbullet\,}}
+
+% experience / education entry: {role/title}{subtitle line (org | location)}{dates}
+\newcommand{\cventry}[3]{%
+  \noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X@{}r@{}}
+    \textbf{#1} & {\small\color{textmuted}#3}
+  \end{tabularx}\par
+  \ifblank{#2}{}{\noindent{\itshape\color{textmuted}#2}\par}%
+  \vspace{1pt}%
+}
+
+% skills row: {label}{content}
+\newcommand{\skillrow}[2]{%
+  \noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.55cm}@{\hspace{0.4em}}X@{}}
+    \textbf{\small #1} & {\small #2}
+  \end{tabularx}\par\vspace{1.6pt}%
+}
+
+% tight bullet list
+\newlist{pts}{itemize}{1}
+\setlist[pts]{leftmargin=1.25em,itemsep=1.2pt,topsep=1.5pt,parsep=0pt,
+  label={\color{accent}\small\textbullet}}
+
+%==============================================================================
+\begin{document}
+
+% ---- Header --------------------------------------------------------------
+\begin{center}
+  {\sffamily\bfseries\Huge\color{accent} «NAME»}\\[3pt]
+  {\sffamily\large\color{textmuted} «HEADLINE»}\\[3pt]
+  «TAGLINE_BLOCK»{\small «CONTACT_LINE»}
+\end{center}
+\vspace{2pt}
+
+«SUMMARY_BLOCK»
+«SECTIONS»
+
+\end{document}

@@ -1,0 +1,37 @@
+{
+  "description": "Reviewed entity pairs for compareEntities / scorePair semantics.",
+  "pairs": [
+    {
+      "id": "same-email-probable",
+      "a": { "type": "person", "title": "Sarah Chen", "props": { "emails": ["sarah@nile.com"] } },
+      "b": { "type": "person", "title": "Sara Chen", "props": { "emails": ["sarah@nile.com"] } },
+      "expectVerdict": "probable"
+    },
+    {
+      "id": "unrelated-non-match",
+      "a": { "type": "person", "title": "Sarah Chen", "props": { "emails": ["sarah@a.com"] } },
+      "b": { "type": "person", "title": "Omar Khaled", "props": { "emails": ["omar@b.com"] } },
+      "expectVerdict": "non_match"
+    },
+    {
+      "id": "cross-type-non-match",
+      "a": { "type": "person", "title": "Nile Robotics" },
+      "b": { "type": "organization", "title": "Nile Robotics" },
+      "expectVerdict": "non_match"
+    },
+    {
+      "id": "org-domain-probable",
+      "a": {
+        "type": "organization",
+        "title": "Nile Robotics, LLC",
+        "props": { "domain": ["nile.com"] }
+      },
+      "b": {
+        "type": "organization",
+        "title": "Nile Robotics",
+        "props": { "domain": ["nile.com"] }
+      },
+      "expectVerdict": "probable"
+    }
+  ]
+}

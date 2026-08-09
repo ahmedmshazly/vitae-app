@@ -1,0 +1,10 @@
+{
+  "files": [],
+  "substrings": [
+    "—",
+    "–",
+    "empty-value glyph",
+    "LaTeX escape"
+  ],
+  "note": "Substrings that may appear in titles/comments when discussing intentional typographic dashes or product fixtures. Prefer documenting the invariant rather than pasting the glyph into every title."
+}

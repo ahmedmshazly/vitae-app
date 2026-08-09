@@ -1,0 +1,63 @@
+{
+  "description": "Reviewed golden ranking for whoToCall. Scores are checked for order and chip factors, not absolute floats.",
+  "intent": {
+    "need": "referral",
+    "terms": ["reinforcement learning", "RL"],
+    "city": "Cairo",
+    "country": "Egypt"
+  },
+  "candidates": [
+    {
+      "id": "sarah",
+      "title": "Sarah Chen",
+      "affiliation": "current",
+      "strength": 0.74,
+      "graphScore": 0.6,
+      "city": "Cairo",
+      "country": "Egypt",
+      "pinned": true,
+      "evidence": [
+        { "label": "PerceptionBench", "text": "reinforcement learning perception robotics" },
+        { "label": "coffee 2026-03", "text": "RL hiring at Nile" }
+      ],
+      "favors": [{ "direction": "owed_to_me", "settled": false }],
+      "lastInteractionAt": "2026-06-01T00:00:00Z"
+    },
+    {
+      "id": "omar",
+      "title": "Omar Khaled",
+      "affiliation": null,
+      "strength": 0.4,
+      "graphScore": 0.2,
+      "city": "Berlin",
+      "country": "Germany",
+      "evidence": [{ "label": "notes", "text": "frontend design systems" }],
+      "lastInteractionAt": "2026-05-01T00:00:00Z"
+    },
+    {
+      "id": "lina",
+      "title": "Lina Farouk",
+      "affiliation": "past",
+      "strength": 0.5,
+      "graphScore": 0.3,
+      "city": "Giza",
+      "country": "Egypt",
+      "evidence": [{ "label": "talk", "text": "reinforcement learning at DevFest" }],
+      "askedRecentlyDays": 3,
+      "lastInteractionAt": "2026-07-01T00:00:00Z"
+    },
+    {
+      "id": "dnc",
+      "title": "Do Not Contact",
+      "affiliation": "current",
+      "strength": 0.99,
+      "doNotContact": true,
+      "evidence": [{ "label": "x", "text": "reinforcement learning" }]
+    }
+  ],
+  "expect": {
+    "orderPrefix": ["sarah"],
+    "excludedIds": ["dnc"],
+    "sarahFactors": ["affiliation", "topic", "strength", "graph", "reciprocity", "geo", "pinned"]
+  }
+}

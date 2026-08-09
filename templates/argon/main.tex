@@ -1,0 +1,20 @@
+% Argon v1.0.0: ATS-strict: single column, no tables/graphics/color, standard
+% section names (EXPERIENCE/EDUCATION/SKILLS). Same token contract as Onyx.
+% line-model.json: {"chars_per_line":88,"lines_per_page":52,"entry_overhead":2,"section_overhead":2}
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.7in]{geometry}
+\usepackage{enumitem,titlesec}
+\usepackage[hidelinks]{hyperref}
+\setlist[itemize]{leftmargin=1.2em,itemsep=2pt,topsep=2pt,parsep=0pt,label=-}
+\titleformat{\section}{\bfseries\normalsize}{}{0pt}{}
+\titlespacing{\section}{0pt}{8pt}{4pt}
+\pagestyle{empty}
+\setlength\parindent{0pt}
+% «ACCENT_HEX» is accepted for a shared template contract; Argon stays monochrome.
+\begin{document}
+{\bfseries\Large «NAME»}\par
+{«CONTACT_LINE»}\par\vspace{2pt}
+«HEADLINE»\par\vspace{4pt}
+«SUMMARY_BLOCK»
+«SECTIONS»
+\end{document}

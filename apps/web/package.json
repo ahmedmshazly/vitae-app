@@ -1,0 +1,53 @@
+{
+  "name": "@vitae/web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Vitae web app: React 18 + Vite SPA.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@antv/g6": "5.1.1",
+    "@fontsource-variable/instrument-sans": "^5.2.8",
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "@fontsource/ibm-plex-sans": "^5.2.8",
+    "@fontsource/source-serif-4": "^5.2.9",
+    "@fontsource/space-grotesk": "^5.2.10",
+    "@hookform/resolvers": "^5.4.0",
+    "@tanstack/react-query": "^5.62.11",
+    "@vitae/core": "workspace:*",
+    "@vitae/ui": "workspace:*",
+    "firebase": "^12.16.0",
+    "maplibre-gl": "^6.0.0",
+    "motion": "^12.42.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-force-graph-2d": "^1.29.1",
+    "react-hook-form": "^7.81.0",
+    "react-router-dom": "^6.28.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.11",
+    "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^16",
+    "@testing-library/user-event": "^14",
+    "@types/geojson": "^7946.0.16",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-v8": "^3.2.7",
+    "axe-core": "^4.13.0",
+    "jsdom": "^25",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7",
+    "vitest": "^3.2.7",
+    "vitest-axe": "^0.1.0"
+  }
+}

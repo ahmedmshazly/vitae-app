@@ -1,0 +1,48 @@
+[Unit]
+Description=Vitae full-export backup to S3
+Documentation=file:///home/ubuntu/vitae/docs/runbooks/restore-drill.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# Run as the checkout's owner, not root. Two reasons, one of them load-bearing:
+# the job needs no privilege beyond Docker (ubuntu is in the docker group), and
+# the export is written by a container running as `node` (uid 1000) into a
+# host temp dir (mktemp creates 0700, so a root-owned one is unwritable).
+# `ubuntu` is also uid 1000, so the ownership lines up and the directory holding
+# a full sensitive export stays 0700 instead of being widened to compensate.
+User=ubuntu
+Group=ubuntu
+# The checkout path on the API host. This is the real path on the current VM.
+# The units previously shipped /opt/vitae, which does not exist there, so the
+# service would have failed to start had it ever been enabled.
+#
+# For a different layout, override with a drop-in rather than editing this file:
+#   systemctl edit vitae-backup.service
+# systemd does not expand variables in WorkingDirectory, so the path is literal.
+WorkingDirectory=/home/ubuntu/vitae
+EnvironmentFile=-/home/ubuntu/vitae/.env
+EnvironmentFile=-/home/ubuntu/vitae/deploy/.env
+EnvironmentFile=-/etc/vitae/backup.env
+# backup.env must set BACKUP_S3_URI; the EC2 instance role supplies AWS creds.
+#
+# The VM has Docker but no node or pnpm, so the exporter runs as a one-off
+# container rather than through pnpm. `-e EXPORT_OUT` forwards the path the
+# script chose, and /tmp is shared so the container writes the ZIP where the
+# host can pick it up and hash it.
+#
+# Quoted: systemd splits Environment= on whitespace, so an unquoted multi-word
+# value is parsed as several broken assignments and silently discarded. The
+# job would then have fallen back to pnpm and failed on a host that has none.
+Environment="BACKUP_EXPORT_CMD=docker compose -f deploy/compose.prod.yml run --rm --no-deps -e EXPORT_OUT -v /tmp:/tmp api ./node_modules/.bin/tsx src/scripts/export-bundle.ts"
+# /snap/bin is not on systemd's default PATH, and the AWS CLI lives there.
+# Ubuntu 24.04 dropped the awscli apt package, so snap is the supported install.
+Environment=PATH=/snap/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=/home/ubuntu/vitae/scripts/backup-to-s3.sh
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+
+[Install]
+WantedBy=multi-user.target

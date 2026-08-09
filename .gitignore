@@ -1,0 +1,73 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+build/
+*.tsbuildinfo
+apps/web/dist/
+apps/api/dist/
+
+# env & secrets: NEVER commit real values
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+# file-backed secret store for third-party credentials (FR-004)
+.secrets/
+# local dry-run / KEEP_LOCAL backup artifacts
+.vitae-backup/
+
+# firebase emulator state
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+firebase-export/
+emulator-data/
+.emulator-data/
+
+# test / coverage
+coverage/
+playwright-report/
+test-results/
+.playwright/
+.stryker-tmp/
+packages/*/reports/
+packages/*/.stryker-tmp/
+
+# latex build artifacts
+*.aux
+*.log
+*.out
+templates/**/*.pdf
+*.synctex.gz
+
+# logs & os
+*.log
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode/
+.idea/
+*.swp
+
+.vercel
+
+# Local session transcripts and one-off helpers
+2026-*.txt
+e2e/2026-*.txt
+
+# Machine-generated local review output.
+/reviews/
+
+# Local graph bundles may contain personal records. `docs/` is otherwise
+# tracked, so keep private bundles outside the repository.
+docs/seeds/
+
+# Local one-off dumps (merged PDFs, ad-hoc export zips), never ship
+/*.pdf
+/snapshots/

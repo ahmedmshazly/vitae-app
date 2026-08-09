@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+coverage
+pnpm-lock.yaml
+*.tex
+docs/design/brand/
+docs/design/brand-assets/
+# Self-contained: carries base64 font data that Prettier would try to reflow.
+docs/design/brand-book.html

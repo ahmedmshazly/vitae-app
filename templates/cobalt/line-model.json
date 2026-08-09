@@ -1,0 +1,17 @@
+{
+  "key": "cobalt",
+  "version": "1.0.0",
+  "name": "Cobalt",
+  "engine": "tectonic",
+  "ats_strict": false,
+  "description": "Polished serif body with a modern colored hierarchy and compact one-page density.",
+  "traits": ["balanced", "compact", "modern"],
+  "page_size": "A4",
+  "accent_options": ["#2563eb", "#0f766e", "#7c3aed", "#b45309", "#be123c", "#111827"],
+  "line_model": {
+    "chars_per_line": 108,
+    "lines_per_page": 58,
+    "entry_overhead": 2,
+    "section_overhead": 2
+  }
+}
