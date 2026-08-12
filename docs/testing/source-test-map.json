@@ -1500,16 +1500,6 @@
       "tests": [],
       "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
     },
-    "apps/web/src/lib/burst.ts": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "e2e"
-      ],
-      "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
-    },
     "apps/web/src/lib/cities.ts": {
       "risk": "medium",
       "layers": [

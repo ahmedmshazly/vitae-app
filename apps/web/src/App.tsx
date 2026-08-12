@@ -1,13 +1,10 @@
-import { lazy, Suspense, type ComponentType } from 'react';
+import { lazy, Suspense, type ComponentType, type ReactNode } from 'react';
 import { Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { AuthProvider, useAuth } from './lib/auth.js';
 import { Shell } from './app/Shell.js';
 import { ToastProvider } from './features/Toast.js';
 import { ErrorBoundary, ShellErrorFallback } from './components/ErrorBoundary.js';
 import { SignIn, SignInSplash } from './routes/SignIn.js';
-import { Landing } from './routes/marketing/Landing.js';
-import { Tour } from './routes/marketing/Tour.js';
-import { Manifesto } from './routes/marketing/Manifesto.js';
 function lazyNamed(loader: () => Promise<unknown>, exportName: string) {
   return lazy(async () => {
     const module = (await loader()) as Record<string, ComponentType<Record<never, never>>>;
@@ -42,7 +39,24 @@ const ImportHub = lazyNamed(() => import('./routes/ImportHub.js'), 'ImportHub');
 const Repositories = lazyNamed(() => import('./routes/Repositories.js'), 'Repositories');
 const Duplicates = lazyNamed(() => import('./routes/Duplicates.js'), 'Duplicates');
 const ExportPage = lazyNamed(() => import('./routes/ExportPage.js'), 'ExportPage');
+// Marketing is lazy for the same reason every other route is: eager imports
+// put all three pages, their motion code and the primitives they pull in
+// inside the entry chunk, so the app shell paid for the landing page and the
+// landing page paid for the app shell.
+const Landing = lazyNamed(() => import('./routes/marketing/Landing.js'), 'Landing');
+const Tour = lazyNamed(() => import('./routes/marketing/Tour.js'), 'Tour');
+const Manifesto = lazyNamed(() => import('./routes/marketing/Manifesto.js'), 'Manifesto');
 import { Spinner } from '@vitae/ui';
+
+/**
+ * Marketing chunks are small and same-origin, so they resolve in well under
+ * the time a spinner needs to stop reading as a hang. A spinner that appears
+ * and leaves inside 100ms is worse than no spinner, and this is the first
+ * paint a signed-out visitor gets, so it holds the previous frame instead.
+ */
+function PublicPage({ children }: { children: ReactNode }) {
+  return <Suspense fallback={null}>{children}</Suspense>;
+}
 
 /** People/orgs keep CRM hubs; generic browse covers every other type. */
 function BrowseRedirect() {
@@ -56,8 +70,8 @@ export function App() {
   return (
     <Routes>
       {/* These routes are fully public and must never wait on Firebase or the API. */}
-      <Route path="/tour" element={<Tour />} />
-      <Route path="/manifesto" element={<Manifesto />} />
+      <Route path="/tour" element={<PublicPage><Tour /></PublicPage>} />
+      <Route path="/manifesto" element={<PublicPage><Manifesto /></PublicPage>} />
       <Route
         path="/reference/entities"
         element={
@@ -91,7 +105,7 @@ function AuthGateContent() {
   if (!user) {
     return (
       <Routes>
-        <Route path="/welcome" element={<Landing />} />
+        <Route path="/welcome" element={<PublicPage><Landing /></PublicPage>} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="*" element={<Navigate to="/welcome" replace />} />
       </Routes>

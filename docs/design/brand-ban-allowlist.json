@@ -1,0 +1,43 @@
+{
+  "$schema_note": "Deliberate exceptions to scripts/check-brand-bans.mjs. Every entry needs a reason a reviewer can argue with. An entry with only `file` exempts the whole file for that rule; add `line` or `match` to narrow it. Prefer fixing over allowlisting: this file is the record of what the codebase knowingly owes.",
+  "rules": {
+    "gradient": [
+      {
+        "file": "packages/ui/src/styles/components.css",
+        "match": "var(--ae-warning) 50%, transparent 50%",
+        "reason": "A hard-stop two-colour gradient used as a half-filled dot shape on ProvenanceChip, not a wash. The ban is on gradients as surface decoration; this one draws geometry that would otherwise need an SVG or a pseudo-element. Worth normalising if a shape primitive ever lands."
+      }
+    ],
+    "duration": [
+      {
+        "file": "packages/ui/src/styles/components.css",
+        "match": "vt-spin 0.7s linear infinite",
+        "reason": "The spinner. ch.08 permits it as an indeterminate progress indicator; a spinner locked to a 130ms token would not read as continuous."
+      },
+      {
+        "file": "packages/ui/src/styles/components.css",
+        "match": "animation-duration: 1.5s",
+        "reason": "The spinner slowed under prefers-reduced-motion rather than stopped. A stopped spinner reads as a hang, which is a worse outcome than a slow one."
+      },
+      {
+        "file": "packages/ui/src/styles/components.css",
+        "match": "vt-skel-pulse 1.4s",
+        "reason": "The skeleton pulse. ch.08 names it explicitly as the only repeating animation in the product, and it stops the moment content arrives."
+      }
+    ],
+    "raw-hex": [
+      {
+        "file": "apps/web/src/styles/app.css",
+        "reason": "The .template-preview block simulates résumé paper: a light surface inside a dark-only app, so the --ae-* ramp (calibrated for dark) cannot express it. Scheduled for formalisation as --paper-* tokens alongside the Tailor work, which has the same problem at larger scale."
+      },
+      {
+        "file": "apps/web/src/styles/entity-catalog-print.css",
+        "reason": "The A4 schema atlas renders simulated paper on screen and on paper. Same light-surface problem as .template-preview and the same planned --paper-* fix."
+      },
+      {
+        "file": "apps/web/src/styles/entity-observatory.css",
+        "reason": "Two hexes on .ec-workspace-print__sheet, the print and export mirror of the observatory. Same paper simulation."
+      }
+    ]
+  }
+}

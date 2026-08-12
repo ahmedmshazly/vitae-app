@@ -475,9 +475,13 @@
   opacity: 0;
   pointer-events: none;
   transform: translateX(calc(-100% - 36px));
+  /* One easing, token durations. This drawer had its own curve (a softer
+     ease-out) and its own 260ms/200ms pair, which is a second motion system
+     living on one screen. The slide is a layout shift, so it takes --ae-dur-slow;
+     the fade rides along with it. */
   transition:
-    transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    opacity 200ms ease;
+    transform var(--ae-dur-slow) var(--ae-ease),
+    opacity var(--ae-dur-slow) var(--ae-ease);
   scrollbar-color: var(--ae-border-strong) transparent;
 }
 

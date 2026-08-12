@@ -669,8 +669,6 @@
   margin-top: var(--ae-space-6);
 }
 
-/* ── Reveal-on-scroll (motion/react drives transform; this is fallback-safe) ── */
-
 /* ── Responsive ── */
 @media (max-width: 960px) {
   .mk-feature,
@@ -702,12 +700,5 @@
   }
   .mk-nav__links .mk-nav__link {
     display: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mk-card:hover,
-  .mk-plan:hover {
-    transform: none;
   }
 }

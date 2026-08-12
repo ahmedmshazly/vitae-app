@@ -1,3 +1,9 @@
+// Both sheets belong to this route and nothing else uses their .ec-* scope,
+// so they ride the lazy chunk rather than the global bundle. Print rules
+// first, observatory second: that is the order main.tsx used, and the two
+// still share four selectors.
+import '../../styles/entity-catalog-print.css';
+import '../../styles/entity-observatory.css';
 import {
   lazy,
   Suspense,

@@ -19,6 +19,12 @@ export default tseslint.config(
       '**/.vercel/**',
       '**/playwright-report/**',
       '**/test-results/**',
+      // Design-system export artifacts: `.ds-sync` is the vendored converter
+      // and `ds-bundle` is its generated upload tree (compiled bundles and
+      // emitted .d.ts). Same reason as .vercel above: generated, gitignored,
+      // and eslint does not read .gitignore.
+      '**/.ds-sync/**',
+      '**/ds-bundle/**',
       // Stryker mutates into a temp sandbox; lint must not scan instrumented copies.
       '**/.stryker-tmp/**',
       '**/reports/mutation/**',

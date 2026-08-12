@@ -27,8 +27,13 @@ import '@vitae/ui/styles/components.css';
 import './styles/app.css';
 import './styles/dedup.css';
 import './styles/marketing.css';
-import './styles/entity-catalog-print.css';
-import './styles/entity-observatory.css';
+// entity-catalog-print.css and entity-observatory.css are imported by
+// routes/reference/EntityCatalog.tsx instead of here: 47 kB of CSS for one
+// lazy public route was shipping to every user on every screen. Importing
+// them at the route also stops them racing, they used to be two global
+// sheets sharing four selectors (.ec-atlas, .ec-atlas__header,
+// .ec-header__actions, .ec-header__brand) where load order alone decided
+// the winner.
 
 import { App } from './App.js';
 import { flashToast } from './features/Toast.js';

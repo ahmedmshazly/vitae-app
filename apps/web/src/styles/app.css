@@ -451,15 +451,12 @@ button.row {
 .row:last-child {
   border-bottom: none;
 }
+/* Tone only. Hover is not a state change, so it gets no travel: the 2px
+   translateX that used to live here was decorative movement, which ch.08's
+   own test ("name the state change it reports") rules out. */
 .row:hover {
   background: var(--ae-surface-raised);
   text-decoration: none;
-  transform: translateX(2px);
-}
-@media (prefers-reduced-motion: reduce) {
-  .row:hover {
-    transform: none;
-  }
 }
 .row__main {
   flex: 1;
@@ -2320,7 +2317,11 @@ button.row {
   border: 1px solid var(--ae-border-strong);
   background: var(--ae-surface-overlay);
   box-shadow: var(--ae-shadow-overlay);
-  animation: vt-pop-in var(--ae-dur) var(--ae-ease);
+  /* `vt-pop-in` was never defined anywhere, so this surface silently had no
+     entrance at all. `vt-rise-in` is the real keyframe (@vitae/ui), and it is
+     the right one: opacity plus a 4px rise, no scale. A "pop" would have been
+     a scale, which ch.08 bans for anything opening. */
+  animation: vt-rise-in var(--ae-dur) var(--ae-ease);
 }
 .entity-picker__opt {
   display: flex;
@@ -2522,7 +2523,11 @@ button.row {
   border: 1px solid var(--ae-border-strong);
   background: var(--ae-surface-overlay);
   box-shadow: var(--ae-shadow-overlay);
-  animation: vt-pop-in var(--ae-dur) var(--ae-ease);
+  /* `vt-pop-in` was never defined anywhere, so this surface silently had no
+     entrance at all. `vt-rise-in` is the real keyframe (@vitae/ui), and it is
+     the right one: opacity plus a 4px rise, no scale. A "pop" would have been
+     a scale, which ch.08 bans for anything opening. */
+  animation: vt-rise-in var(--ae-dur) var(--ae-ease);
   z-index: 4;
   display: flex;
   flex-direction: column;
@@ -2589,22 +2594,22 @@ button.row {
   gap: 6px;
 }
 
-/* ── Staggered list entrances (rows cascade in as pages load) ── */
+/* ── Staggered list entrances (rows cascade in as pages load) ──
+   The cap is the point: 25ms step, at most 5 children, 125ms total
+   (brand-book ch.08 choreography). The sixth row onward arrives with the
+   fifth rather than trickling in for the length of the list, which is what
+   this used to do, running an eleven-step cascade out to 250ms at a 240ms
+   duration that is not on the token scale either. `lib/motion.ts` has always
+   had this right (STAGGER_CAP = 5); this is the CSS half agreeing with it. */
 .card > .row,
 .card > a.row {
-  animation: vt-rise-in 240ms var(--ae-ease) backwards;
+  animation: vt-rise-in var(--ae-dur) var(--ae-ease) backwards;
 }
 .card > .row:nth-child(1) { animation-delay: 0ms; }
 .card > .row:nth-child(2) { animation-delay: 25ms; }
 .card > .row:nth-child(3) { animation-delay: 50ms; }
 .card > .row:nth-child(4) { animation-delay: 75ms; }
-.card > .row:nth-child(5) { animation-delay: 100ms; }
-.card > .row:nth-child(6) { animation-delay: 125ms; }
-.card > .row:nth-child(7) { animation-delay: 150ms; }
-.card > .row:nth-child(8) { animation-delay: 175ms; }
-.card > .row:nth-child(9) { animation-delay: 200ms; }
-.card > .row:nth-child(10) { animation-delay: 225ms; }
-.card > .row:nth-child(n + 11) { animation-delay: 250ms; }
+.card > .row:nth-child(n + 5) { animation-delay: 100ms; }
 @media (prefers-reduced-motion: reduce) {
   .card > .row,
   .card > a.row {
@@ -2617,12 +2622,16 @@ button.row {
   max-width: 1480px;
 }
 
+/* Paper simulation, so the light surface and its two literals are deliberate.
+   The drop shadow is not: tokens.css reserves the single shadow token for
+   dialogs and popovers and says nothing else may carry one. A hairline in the
+   paper's own ink separates it from the canvas without inventing elevation. */
 .template-preview {
   aspect-ratio: 8.5 / 5.3;
   overflow: hidden;
   background: #fff;
   color: #172033;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--ae-border-strong);
 }
 .template-preview--onyx {
   font-family: Georgia, serif;
@@ -2939,6 +2948,8 @@ button.row {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
+/* Border tone only on hover. The card used to lift 1px, which is decorative
+   travel and was not even guarded for reduced motion. */
 .atom-card {
   width: 100%;
   padding: 16px;
@@ -2948,13 +2959,10 @@ button.row {
   color: inherit;
   text-align: left;
   cursor: pointer;
-  transition:
-    border-color var(--ae-dur) var(--ae-ease),
-    transform var(--ae-dur) var(--ae-ease);
+  transition: border-color var(--ae-dur) var(--ae-ease);
 }
 .atom-card:hover {
   border-color: var(--ae-accent);
-  transform: translateY(-1px);
 }
 .atom-card__edit {
   color: var(--ae-accent-soft);

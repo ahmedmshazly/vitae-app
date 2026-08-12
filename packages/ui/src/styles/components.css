@@ -249,8 +249,12 @@
   padding: 0 5px;
   border-radius: var(--ae-radius-sm);
   border: 1px solid var(--ae-border-strong);
+  /* The thicker bottom edge is what reads as a keycap. It used to be a
+     180deg linear-gradient, which is the standing ban on gradients in chrome
+     (IDENTITY.md ch. "Standing bans"): a flat raised surface plus the heavier
+     bottom border carries the same affordance without the wash. */
   border-bottom-width: 2px;
-  background: linear-gradient(180deg, var(--ae-surface-overlay), var(--ae-surface-raised));
+  background: var(--ae-surface-raised);
   color: var(--ae-muted-strong);
   font-family: var(--ae-font-mono);
   font-size: var(--ae-text-xs);
@@ -710,11 +714,14 @@
   border: 1px solid var(--ae-border-strong);
   background: var(--ae-surface);
   cursor: pointer;
-  transition: background var(--ae-dur) var(--ae-ease), transform var(--ae-dur) var(--ae-ease),
+  transition: background var(--ae-dur) var(--ae-ease),
     border-color var(--ae-dur) var(--ae-ease);
 }
+/* Tone, not scale. The dot used to grow 20% under the cursor, which is travel
+   on hover and reports nothing; brightening the rim says "this is the one
+   you would pick" without moving the row's other dots in the eye. */
 .vt-rating__dot:hover {
-  transform: scale(1.2);
+  border-color: var(--ae-accent);
 }
 .vt-rating__dot:focus-visible {
   outline: none;
@@ -965,9 +972,6 @@
 .vt-palette[data-state='closed'] {
   animation: vt-fade-out var(--ae-dur-fast) linear;
 }
-.vt-palette--wide {
-  width: min(760px, calc(100vw - 32px));
-}
 .vt-palette__input {
   width: 100%;
   padding: var(--ae-space-4);
@@ -1133,6 +1137,15 @@
   gap: var(--ae-space-4);
   margin-bottom: var(--ae-space-4);
 }
+/* PageHeader renders this wrapper around the title row and subtitle, and it
+   had no rule at all: as a bare flex item it sized to its content, so a long
+   title or subtitle competed with the actions slot for width instead of
+   taking the space actions did not want. `min-width: 0` is what lets the
+   subtitle's own max-width and any truncation inside actually apply. */
+.vt-pagehead__main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
 .vt-pagehead__titlerow {
   display: flex;
   align-items: center;
@@ -1250,7 +1263,7 @@
   display: flex;
   align-items: center;
   gap: var(--ae-space-3);
-  animation: vt-rise-in 300ms var(--ae-ease) backwards;
+  animation: vt-rise-in var(--ae-dur) var(--ae-ease) backwards;
 }
 .vt-skel-rows__lines {
   flex: 1;
@@ -1332,12 +1345,6 @@
   white-space: nowrap;
   border: 0;
 }
-.vt-hoverable {
-  transition: border-color var(--ae-dur) var(--ae-ease);
-}
-.vt-hoverable:hover {
-  border-color: var(--ae-border-strong);
-}
 @keyframes vt-fade-in {
   from {
     opacity: 0;
@@ -1354,46 +1361,10 @@
     transform: translateY(4px);
   }
 }
-/* Celebration burst, a radial spark ring popped on gamified confirmations
-   (habit check, favor settled, reminder done). Pure CSS: toggle the class,
-   remove on animationend. */
-.vt-burst {
-  position: relative;
-}
-.vt-burst::after {
-  content: '';
-  position: absolute;
-  inset: -6px;
-  border-radius: inherit;
-  border: 2px solid var(--ae-accent);
-  opacity: 0;
-  pointer-events: none;
-  animation: vt-burst-ring 480ms var(--ae-ease);
-}
-.vt-burst--ember::after {
-  border-color: var(--ae-ember);
-}
-@keyframes vt-burst-ring {
-  0% {
-    opacity: 0.9;
-    transform: scale(0.6);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.7);
-  }
-}
 @media (prefers-reduced-motion: reduce) {
   .vt-skel,
   .vt-skel-rows__row {
     animation: none;
-  }
-  .vt-hoverable:hover {
-    transform: none;
-  }
-  .vt-burst::after {
-    animation: none;
-    opacity: 0;
   }
   .vt-btn:active {
     transform: none;
