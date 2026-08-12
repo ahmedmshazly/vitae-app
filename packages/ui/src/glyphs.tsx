@@ -13,7 +13,7 @@ export type GlyphName =
   | 'document' | 'location' | 'trip' | 'media' | 'capture' | 'search' | 'graph'
   | 'timeline' | 'map' | 'calendar' | 'export' | 'filter' | 'tag' | 'merge'
   | 'adjust' | 'trash' | 'today' | 'ask' | 'resume' | 'bell' | 'pin' | 'dot'
-  | 'check' | 'chevron-down' | 'plus' | 'close' | 'edit' | 'signout';
+  | 'check' | 'chevron-down' | 'plus' | 'close' | 'edit' | 'signout' | 'alert';
 
 /**
  * Official brand icons, geometry copied verbatim from
@@ -161,6 +161,14 @@ const P: Partial<Record<GlyphName, string>> = {
   close: 'M6 6l12 12M18 6L6 18',
   edit: 'M4 20l1-4L16 5l3 3L8 19zM13 8l3 3',
   signout: 'M9 21H6a2 2 0 01-2-2V5a2 2 0 012-2h3M16 17l5-5-5-5M21 12H9',
+  // The danger mark. The set had none, so every error surface reached for
+  // `close`, which is the dismiss control's own glyph: a danger banner drew
+  // two identical X marks one gap apart and left colour as the only thing
+  // telling the state from the button, the exact failure non-negotiable 6
+  // exists to prevent. Same ring as `ask` and `today` with a bar and a dot,
+  // so the three read as one family. The bar is a mark, not punctuation; the
+  // ban on exclamation marks is a rule about copy.
+  alert: 'M12 3a9 9 0 100 18 9 9 0 000-18zM12 8v5M12 16h.01',
 };
 
 export interface GlyphProps {

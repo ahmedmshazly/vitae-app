@@ -1551,12 +1551,12 @@
     "apps/web/src/lib/motion.ts": {
       "risk": "medium",
       "layers": [
-        "component",
-        "e2e"
+        "unit"
       ],
-      "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "status": "covered",
+      "tests": [
+        "apps/web/src/lib/motion.test.ts"
+      ]
     },
     "apps/web/src/lib/runtime.ts": {
       "risk": "medium",

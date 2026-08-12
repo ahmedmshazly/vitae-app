@@ -1,7 +1,7 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { Button, Glyph, Kbd, LogoHorizontal, LogoMark, type GlyphName } from '@vitae/ui';
 import { api, getSpace, setSpace } from '../lib/api.js';
 import { useAuth } from '../lib/auth.js';
@@ -10,7 +10,7 @@ import { QuickAdd } from '../features/QuickAdd.js';
 import { QuickSwitcher } from '../features/QuickSwitcher.js';
 import { RemindersDrawer } from '../features/RemindersDrawer.js';
 import { NewEntityMenu } from '../features/forms/NewEntityMenu.js';
-import { enter as enterVariants, exit as exitVariants, route as routeVariants } from '../lib/motion.js';
+import { useEnter, useExit, useRoute } from '../lib/motion.js';
 import { ROUTES, routesBySection, type RouteEntry } from './routes.js';
 import { buildCommands } from './commands.js';
 import { Breadcrumb } from './Breadcrumb.js';
@@ -111,7 +111,6 @@ function NavGroup({
   active,
   expanded,
   onToggle,
-  reducedMotion,
 }: {
   id: string;
   label: string;
@@ -119,8 +118,13 @@ function NavGroup({
   active: boolean;
   expanded: boolean;
   onToggle: () => void;
-  reducedMotion: boolean;
 }) {
+  // The panel both opens and closes under AnimatePresence, so it needs both
+  // halves. Merged once per preference change rather than per render: Framer
+  // re-reads a variants object whose identity changed.
+  const entering = useEnter();
+  const leaving = useExit();
+  const variants = useMemo(() => ({ ...entering, ...leaving }), [entering, leaving]);
   return (
     <div className="rail__group">
       <button
@@ -150,7 +154,7 @@ function NavGroup({
           <motion.div
             id={`rail-group-${id}`}
             className="rail__children"
-            variants={{ ...enterVariants(reducedMotion), ...exitVariants(reducedMotion) }}
+            variants={variants}
             initial="initial"
             animate="animate"
             exit="exit"
@@ -182,7 +186,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { signOut } = useAuth();
-  const reducedMotion = useReducedMotion();
+  const routeMotion = useRoute();
   const queryClient = useQueryClient();
 
   function toggleSpace() {
@@ -319,7 +323,6 @@ export function Shell({ children }: { children: ReactNode }) {
                 active={activeGroup === 'people'}
                 expanded={expandedGroups.has('people')}
                 onToggle={() => toggleGroup('people')}
-                reducedMotion={!!reducedMotion}
               />
             )}
 
@@ -359,7 +362,6 @@ export function Shell({ children }: { children: ReactNode }) {
                 active={activeGroup === 'library'}
                 expanded={expandedGroups.has('library')}
                 onToggle={() => toggleGroup('library')}
-                reducedMotion={!!reducedMotion}
               />
             )}
         </div>
@@ -378,7 +380,6 @@ export function Shell({ children }: { children: ReactNode }) {
             active={false}
             expanded={expandedGroups.has('views')}
             onToggle={() => toggleGroup('views')}
-            reducedMotion={!!reducedMotion}
           />
         )}
 
@@ -472,7 +473,7 @@ export function Shell({ children }: { children: ReactNode }) {
           id="main-content"
           tabIndex={-1}
           className="content"
-          variants={routeVariants(!!reducedMotion)}
+          variants={routeMotion}
           initial="initial"
           animate="animate"
         >

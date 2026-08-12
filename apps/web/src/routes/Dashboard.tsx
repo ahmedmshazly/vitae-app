@@ -11,7 +11,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { motion, useAnimationControls, useReducedMotion } from 'motion/react';
+import { motion, useAnimationControls } from 'motion/react';
 import {
   Button,
   ChargeRing,
@@ -32,7 +32,7 @@ import {
 } from '@vitae/ui';
 import { api } from '../lib/api.js';
 import { daysUntil, parseIsoDate, todayIso } from '../lib/dates.js';
-import { emphasis, enterItem } from '../lib/motion.js';
+import { staggered, useEmphasis, useEnterItem } from '../lib/motion.js';
 import { useToast } from '../features/Toast.js';
 import { InteractionLogger } from '../features/InteractionLogger.js';
 import { GettingStarted, useGettingStartedDismissed, type SetupState } from '../features/GettingStarted.js';
@@ -198,7 +198,6 @@ export function Dashboard() {
   };
   const qc = useQueryClient();
   const { flash } = useToast();
-  const reduced = !!useReducedMotion();
   const today = todayIso();
   const week = useMemo(() => weekTicks(today), [today]);
 
@@ -302,30 +301,14 @@ export function Dashboard() {
           />
         ) : (
           <ul className="flex list-none flex-col p-0">
-            {queue.map((item, i) => (
-              <motion.li
+            {staggered(queue).map(({ item, index }) => (
+              <QueueRow
                 key={item.key}
-                {...enterItem(reduced, i)}
-                className="flex items-center gap-3 border-b border-hairline last:border-b-0"
-              >
-                <Link to={item.href} className={`${ROW_LINK} flex-1 border-b-0`}>
-                  <EntityGlyph type={item.type} glyph={item.glyph} title={item.kind} size="sm" />
-                  <span className="min-w-0 flex-1 truncate">{item.title}</span>
-                  <Mono className={item.overdueBy > 0 ? 'text-sm text-warning' : 'text-sm text-muted'}>
-                    {item.when}
-                  </Mono>
-                </Link>
-                {item.reminderId && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    disabled={completeReminder.isPending}
-                    onClick={() => completeReminder.mutate(item.reminderId!)}
-                  >
-                    Done
-                  </Button>
-                )}
-              </motion.li>
+                item={item}
+                index={index}
+                pending={completeReminder.isPending}
+                onDone={() => completeReminder.mutate(item.reminderId!)}
+              />
             ))}
           </ul>
         )}
@@ -344,7 +327,6 @@ export function Dashboard() {
               <HabitRow
                 key={h.id}
                 habit={h}
-                reduced={reduced}
                 onToggle={() => {
                   const wasChecked = h.checkedToday;
                   toggleHabit.mutate(h.id, {
@@ -389,6 +371,44 @@ export function Dashboard() {
 }
 
 // ── Pieces ───────────────────────────────────────────────────────────────────
+
+/**
+ * One row of the queue. Its own component rather than JSX inside `.map()`,
+ * because `useEnterItem` is a hook and a hook cannot be called from a loop
+ * body. `staggered()` hands it the already-capped index, so the sixth row
+ * onward arrives with the fifth.
+ */
+function QueueRow({
+  item,
+  index,
+  pending,
+  onDone,
+}: {
+  item: QueueItem;
+  index: number;
+  pending: boolean;
+  onDone: () => void;
+}) {
+  return (
+    <motion.li
+      {...useEnterItem(index)}
+      className="flex items-center gap-3 border-b border-hairline last:border-b-0"
+    >
+      <Link to={item.href} className={`${ROW_LINK} flex-1 border-b-0`}>
+        <EntityGlyph type={item.type} glyph={item.glyph} title={item.kind} size="sm" />
+        <span className="min-w-0 flex-1 truncate">{item.title}</span>
+        <Mono className={item.overdueBy > 0 ? 'text-sm text-warning' : 'text-sm text-muted'}>
+          {item.when}
+        </Mono>
+      </Link>
+      {item.reminderId && (
+        <Button size="sm" variant="ghost" disabled={pending} onClick={onDone}>
+          Done
+        </Button>
+      )}
+    </motion.li>
+  );
+}
 
 /**
  * A 0-1 bar. Achromatic: magnitude is length, and the number is always printed
@@ -450,22 +470,21 @@ function Momentum({ momentum }: { momentum: Dashboard['insights']['momentum'] })
 
 function HabitRow({
   habit,
-  reduced,
   onToggle,
 }: {
   habit: Dashboard['habits'][number];
-  reduced: boolean;
   onToggle: () => void;
 }) {
   // Driven imperatively rather than by a key change: remounting the row to
   // replay the animation would drop keyboard focus off the button that was
   // just pressed.
   const controls = useAnimationControls();
+  const pulse = useEmphasis();
   const grid = habit.grid.slice(-14);
   return (
     <motion.div
       className={ROW}
-      variants={emphasis(reduced)}
+      variants={pulse}
       animate={controls}
     >
       <button

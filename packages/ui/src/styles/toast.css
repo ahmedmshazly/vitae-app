@@ -1,0 +1,189 @@
+/* ═══ Toast ═══════════════════════════════════════════════════════════════
+   The transient feedback channel. Same CSS-only motion contract as .vt-modal
+   and .vt-sheet: Radix flips [data-state] and the stylesheet does the rest,
+   so the design system carries no animation runtime.
+
+   enter: 130ms, opacity + 4px rise.  exit: 90ms, opacity only, linear.
+   Nothing scales, nothing overshoots, nothing loops. (brand-book ch.08)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* The viewport is mounted for the life of the app, empty or not, so its live
+   region is already in the accessibility tree when the first toast lands. */
+.vt-toast-viewport {
+  position: fixed;
+  right: var(--ae-space-5);
+  bottom: var(--ae-space-5);
+  z-index: var(--ae-z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-2);
+  width: min(380px, calc(100vw - 32px));
+  /* Bounded and scrollable, together. The stack grows upward from the bottom
+     edge, so without both a burst walks off the top of the window and takes
+     its Undo buttons with it. The queue is capped in toast.tsx as well; this
+     is what holds when the viewport is short. */
+  max-height: calc(100vh - var(--ae-space-6));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vt-toast {
+  padding: var(--ae-space-3) var(--ae-space-3) var(--ae-space-3) var(--ae-space-4);
+  border: 1px solid var(--ae-border-strong);
+  /* The rail. Two pixels of state on the leading edge, never the only
+     carrier of it: every coloured variant also ships a glyph and a word. */
+  border-left: 2px solid var(--ae-border-strong);
+  border-radius: var(--ae-radius);
+  background: var(--ae-surface-overlay);
+  box-shadow: var(--ae-shadow-overlay);
+  animation: vt-toast-in var(--ae-dur) var(--ae-ease);
+}
+.vt-toast[data-state='closed'] {
+  animation: vt-toast-out var(--ae-dur-fast) linear;
+}
+/* The li is focusable (Radix gives it tabIndex 0 so the hotkey lands
+   somewhere). Its own box-shadow would otherwise cancel the global
+   :focus-visible ring, the ghost-button bug in components.css. */
+.vt-toast:focus-visible {
+  outline: none;
+  box-shadow: var(--ae-focus-ring), var(--ae-shadow-overlay);
+}
+
+/* Swipe to dismiss. Following the pointer is direct manipulation, not
+   animation: the offset is applied flat, and only the cancel snap-back gets a
+   duration (220ms, transform only, the reorder variant). */
+.vt-toast[data-swipe-axis='x'][data-swipe='move'] {
+  transform: translateX(var(--radix-toast-swipe-move-x));
+}
+.vt-toast[data-swipe-axis='y'][data-swipe='move'] {
+  transform: translateY(var(--radix-toast-swipe-move-y));
+}
+.vt-toast[data-swipe='cancel'] {
+  transform: translate(0, 0);
+  transition: transform var(--ae-dur-slow) var(--ae-ease);
+}
+/* Held where the finger left it while the exit fade plays. */
+.vt-toast[data-swipe-axis='x'][data-swipe='end'] {
+  transform: translateX(var(--radix-toast-swipe-end-x));
+}
+.vt-toast[data-swipe-axis='y'][data-swipe='end'] {
+  transform: translateY(var(--radix-toast-swipe-end-y));
+}
+
+/* The row is one element in from the <li> because it also carries the string
+   Radix announces (see toast.tsx). Layout lives here; the box, the rail and
+   the motion stay on the item itself. */
+.vt-toast__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ae-space-3);
+}
+
+.vt-toast__glyph {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  color: var(--ae-muted);
+}
+.vt-toast__body {
+  flex: 1;
+  min-width: 0;
+}
+.vt-toast__word {
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ae-muted);
+}
+.vt-toast__msg {
+  font-size: var(--ae-text-base);
+  line-height: var(--ae-leading-normal);
+  color: var(--ae-fg);
+  overflow-wrap: anywhere;
+}
+
+/* Colour is the third signal, after the glyph and the word. */
+.vt-toast--error {
+  border-left-color: var(--ae-danger);
+}
+.vt-toast--error .vt-toast__glyph,
+.vt-toast--error .vt-toast__word {
+  color: var(--ae-danger);
+}
+.vt-toast--success {
+  border-left-color: var(--ae-success);
+}
+.vt-toast--success .vt-toast__glyph,
+.vt-toast--success .vt-toast__word {
+  color: var(--ae-success);
+}
+
+/* The action sits inside the toast, one Tab from it and one hotkey from
+   anywhere, rather than in a corner of the screen with no route to it. */
+.vt-toast__action {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 var(--ae-space-3);
+  border: 1px solid var(--ae-border-control);
+  border-radius: var(--ae-radius-sm);
+  background: transparent;
+  color: var(--ae-fg-strong);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--ae-dur) var(--ae-ease), border-color var(--ae-dur) var(--ae-ease);
+}
+.vt-toast__action:hover {
+  background: var(--ae-surface-raised);
+  border-color: var(--ae-accent);
+}
+.vt-toast__x {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: var(--ae-radius-sm);
+  background: transparent;
+  color: var(--ae-faint);
+  cursor: pointer;
+  transition: color var(--ae-dur) var(--ae-ease), background var(--ae-dur) var(--ae-ease);
+}
+.vt-toast__x:hover {
+  color: var(--ae-fg);
+  background: var(--ae-surface-raised);
+}
+
+@keyframes vt-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--ae-motion-rise));
+  }
+}
+@keyframes vt-toast-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Narrow viewports: the stack spans the width so a long message does not
+   push the action off screen. */
+@media (max-width: 560px) {
+  .vt-toast-viewport {
+    right: var(--ae-space-3);
+    bottom: var(--ae-space-3);
+    left: var(--ae-space-3);
+    width: auto;
+  }
+}

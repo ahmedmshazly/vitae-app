@@ -108,6 +108,12 @@
   --ae-dur-fast: 90ms; /* exits, hover, anything leaving */
   --ae-dur: 130ms; /* default, entrances, emphasis, route swaps */
   --ae-dur-slow: 220ms; /* reorder and layout shifts only */
+  /* The two numbers the choreography rules are made of. Both were literals
+     in three places each (motion.ts, @keyframes vt-rise-in, and a hand-rolled
+     copy in the app's CSS that got the cap wrong), which is exactly how the
+     CSS stagger drifted to eleven steps while the JS one stayed at five. */
+  --ae-motion-rise: 4px; /* entrance travel; nothing moves further */
+  --ae-motion-stagger: 25ms; /* step between children, capped at 5 (125ms) */
 
   /* ── Layers ── */
   --ae-z-overlay: 1000;

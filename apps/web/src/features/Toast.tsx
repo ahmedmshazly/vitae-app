@@ -8,8 +8,8 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { enter, exit } from '../lib/motion.js';
+import { AnimatePresence, motion } from 'motion/react';
+import { useEnter, useExit } from '../lib/motion.js';
 
 type ToastVariant = 'status' | 'error';
 
@@ -53,7 +53,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const deadline = useRef(0);
   const remaining = useRef(DEFAULT_MS);
-  const reducedMotion = useReducedMotion();
+  // A toast arrives and leaves, so it needs both halves. The merge is memoised
+  // because Framer re-reads a variants object whose identity changed, and this
+  // provider re-renders on every timer tick it schedules.
+  const entering = useEnter();
+  const leaving = useExit();
+  const variants = useMemo(() => ({ ...entering, ...leaving }), [entering, leaving]);
 
   const clearTimer = useCallback(() => {
     if (timer.current) clearTimeout(timer.current);
@@ -118,7 +123,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <motion.div
             className="toast"
             role={toast.variant === 'error' ? 'alert' : 'status'}
-            variants={{ ...enter(!!reducedMotion), ...exit(!!reducedMotion) }}
+            variants={variants}
             initial="initial"
             animate="animate"
             exit="exit"

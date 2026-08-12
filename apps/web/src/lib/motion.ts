@@ -7,7 +7,22 @@
  * collapses to an instant, zero-duration state change when true. State
  * changes still happen, they just happen immediately, nothing is left
  * mid-transition.
+ *
+ * Two layers live here. The six functions are the primitive: pure, testable,
+ * and explicit about the reduced-motion flag. The `use*` hooks below wrap each
+ * one and read `useReducedMotion()` themselves, which is the layer components
+ * should reach for, because a flag you have to remember to pass is a flag that
+ * gets forgotten. Reach past the hooks only where the value has to come from
+ * somewhere other than the media query.
+ *
+ * The preference has one source in this repo, `useReducedMotion` from
+ * `@vitae/ui`. Framer ships a hook of the same name; running both inside one
+ * component means two subscriptions to one media query that can disagree for a
+ * render, so only the `Transition` and `Variants` types are taken from
+ * `motion/react` here, and those are erased at compile time.
  */
+import { useMemo } from 'react';
+import { useReducedMotion } from '@vitae/ui';
 import type { Transition, Variants } from 'motion/react';
 
 const EASE = [0.32, 0.72, 0, 1] as const; // --ae-ease, the only easing
@@ -97,4 +112,104 @@ export function route(reduced: boolean): Variants {
       transition: { duration: reduced ? 0 : DUR_FAST, ease: 'linear' },
     },
   };
+}
+
+/* ------------------------------------------------------------------------- *
+ * Hooks. One per variant, each reading the reduced-motion preference itself.
+ * They return exactly what the function of the same name returns, so a
+ * component can swap `enter(reduced)` for `useEnter()` and change nothing
+ * else. The memo is for referential stability: Framer re-reads a `variants`
+ * object whose identity changed, and a fresh object every render is a
+ * re-render that looks like a state change when it isn't.
+ * ------------------------------------------------------------------------- */
+
+/**
+ * The one reduced-motion subscription for the whole app: the design system's
+ * native `matchMedia` hook, so the app layer and `packages/ui` never run two
+ * different subscriptions inside a single component. It returns a plain
+ * boolean, there is no "not resolved yet" third state to narrow away.
+ */
+function useReducedFlag(): boolean {
+  return useReducedMotion();
+}
+
+/** `enter` for the current reduced-motion preference. */
+export function useEnter(): Variants {
+  const reduced = useReducedFlag();
+  return useMemo(() => enter(reduced), [reduced]);
+}
+
+/** `enterItem` for the current reduced-motion preference. Pass the item's
+ * index, or the capped index from `staggered()`, the cap applies either way. */
+export function useEnterItem(index: number): ReturnType<typeof enterItem> {
+  const reduced = useReducedFlag();
+  return useMemo(() => enterItem(reduced, index), [reduced, index]);
+}
+
+/** `exit` for the current reduced-motion preference. */
+export function useExit(): Variants {
+  const reduced = useReducedFlag();
+  return useMemo(() => exit(reduced), [reduced]);
+}
+
+/** `emphasis` for the current reduced-motion preference. */
+export function useEmphasis(): Variants {
+  const reduced = useReducedFlag();
+  return useMemo(() => emphasis(reduced), [reduced]);
+}
+
+/** `reorder` for the current reduced-motion preference. */
+export function useReorder(): Transition {
+  const reduced = useReducedFlag();
+  return useMemo(() => reorder(reduced), [reduced]);
+}
+
+/** `route` for the current reduced-motion preference. */
+export function useRoute(): Variants {
+  const reduced = useReducedFlag();
+  return useMemo(() => route(reduced), [reduced]);
+}
+
+/** One list item paired with the stagger index it should animate on. */
+export interface StaggeredItem<T> {
+  item: T;
+  /** Position in the stagger sequence, never above `STAGGER_CAP - 1`. */
+  index: number;
+}
+
+/**
+ * Pairs each item of a list with its stagger index, capped at STAGGER_CAP so
+ * the sixth item onward arrives with the fifth instead of trickling in for the
+ * length of the list. This is the cap `enter`'s `staggerChildren` cannot
+ * express, and the reason every list was hand-rolling the same `Math.min`.
+ *
+ * ```tsx
+ * interface Row {
+ *   id: string;
+ *   label: string;
+ * }
+ *
+ * function RowItem({ index, row }: { index: number; row: Row }) {
+ *   return <motion.li {...useEnterItem(index)}>{row.label}</motion.li>;
+ * }
+ *
+ * function RowList({ rows }: { rows: Row[] }) {
+ *   return (
+ *     <ul>
+ *       {staggered(rows).map(({ item, index }) => (
+ *         <RowItem key={item.id} index={index} row={item} />
+ *       ))}
+ *     </ul>
+ *   );
+ * }
+ * ```
+ *
+ * A hook cannot be called from inside `.map()`, so the row is its own
+ * component, and it is a component rather than a value called `Row`, which
+ * would shadow the data type in its own signature. Where that is too much
+ * ceremony, call the `enterItem` primitive in the loop and read the preference
+ * once in the parent.
+ */
+export function staggered<T>(items: readonly T[]): StaggeredItem<T>[] {
+  return items.map((item, i) => ({ item, index: Math.min(i, STAGGER_CAP - 1) }));
 }

@@ -11,11 +11,14 @@ import { flashToast, ToastProvider, useToast } from './Toast.js';
 // third-party), so AnimatePresence is mocked to a passthrough, when
 // `toast` becomes null the motion.div just unmounts immediately, like any
 // normal conditional render.
+// Note there is no `useReducedMotion` override here any more. Toast reads the
+// preference through lib/motion's hooks, which source it from @vitae/ui rather
+// than from Framer, so overriding Framer's hook stopped doing anything and
+// only advertised a reduced-motion run that was not happening.
 vi.mock('motion/react', async (importOriginal) => {
   const actual = await importOriginal<typeof MotionReact>();
   return {
     ...actual,
-    useReducedMotion: () => true,
     AnimatePresence: ({ children }: { children: ReactNode }) => children,
   };
 });

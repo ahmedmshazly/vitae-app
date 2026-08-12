@@ -47,9 +47,21 @@ const RULES = {
         return false;
       }
       if (/\bnone\b|\binherit\b|\bunset\b/.test(value)) return false;
-      const lengths = value.match(/-?\d*\.?\d+px/g) ?? [];
-      // offset-x offset-y blur [spread]: index 2 is the blur radius.
-      return lengths.length >= 3 && parseFloat(lengths[2]) !== 0;
+      // One declaration may hold several comma-separated shadows, and any one
+      // of them blurring is enough. Commas inside rgba()/color-mix() are not
+      // separators, so blank the parenthesised runs before splitting.
+      const masked = value.replace(/\([^()]*\)/g, (run) => run.replace(/,/g, ';'));
+      return masked.split(',').some((shadow) => {
+        // A length may be written unitless when it is zero, which is the usual
+        // spelling of a glow: `0 0 10px`. Matching only `\d+px` saw one length
+        // there, decided the shadow had no blur slot, and let every halo
+        // through. Accept a bare number as a length too.
+        const lengths = shadow.match(/(?<![\w.#-])-?\d*\.?\d+(?:px|rem|em)?(?![\w.%])/g) ?? [];
+        // offset-x offset-y blur [spread]: index 2 is the blur radius, and a
+        // zero-blur shadow is a ring (a border drawn outside the box), which
+        // is permitted. Only a blurred shadow not naming a token is the ban.
+        return lengths.length >= 3 && parseFloat(lengths[2]) !== 0;
+      });
     },
   },
   easing: {

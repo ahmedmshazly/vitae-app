@@ -24,6 +24,8 @@ import './styles/theme.css';
 import '@vitae/ui/styles/tokens.css';
 import '@vitae/ui/styles/base.css';
 import '@vitae/ui/styles/components.css';
+import '@vitae/ui/styles/layout.css';
+import '@vitae/ui/styles/toast.css';
 import './styles/app.css';
 import './styles/dedup.css';
 import './styles/marketing.css';

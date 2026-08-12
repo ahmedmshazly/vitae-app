@@ -1,0 +1,493 @@
+/* Vitae layout composites, global classes (prefix vt-) on the token system.
+   The app's five most-used shapes (.row, .card, .stack, .hstack, .spread)
+   lived in apps/web/src/styles/app.css; these are those shapes, once. */
+
+/* ── Row ── */
+/* The one place --ae-row-h is spent. 36px is the identity's row height, and a
+   list of rows is the app's densest surface: the padding is deliberately
+   smaller than the min-height so a two-line row grows rather than a one-line
+   row looking loose. */
+.vt-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-3);
+  min-height: var(--ae-row-h);
+  padding: var(--ae-space-2) var(--ae-space-3);
+  border-bottom: 1px solid var(--ae-border);
+  color: var(--ae-fg);
+  transition: background var(--ae-dur) var(--ae-ease);
+}
+/* Rows render on <li> as well as <div>; the caller owns the list, but no list
+   of rows ever wants the UA marker or its indent. */
+li.vt-row {
+  list-style: none;
+}
+.vt-row:last-child {
+  border-bottom: none;
+}
+/* Tone only. Hover is not a state change, so it gets no travel: the 2px
+   translateX the app's .row carried was decorative movement, which ch.08's own
+   test ("name the state change it reports") rules out.
+   The :not() is load-bearing, not decoration. Written as .vt-row--interactive
+   :hover this rule scored (0,2,0) against the selected rule's (0,1,0), so
+   hovering a selected row swapped --ae-accent-bg back out for
+   --ae-surface-raised and the row visibly de-selected under the cursor.
+   Excluding the selected row from the hover rule is the fix that needs no
+   !important and no arms race: selection is the stronger state, and it holds
+   its ground while the pointer is over it. */
+.vt-row--interactive:not(.vt-row--selected):hover {
+  background: var(--ae-surface-raised);
+}
+/* Selection is a ground *and* a marker bar, and in layout.tsx a check glyph
+   plus the word for the state. --ae-accent-bg is one step off the canvas,
+   which is not enough on its own, and a selected row must survive being read
+   without colour. */
+.vt-row--selected {
+  background: var(--ae-accent-bg);
+}
+.vt-row--selected::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--ae-accent);
+}
+.vt-row__leading {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+}
+/* The non-colour half of selection: a check beside the marker bar, carrying a
+   visually hidden word for anyone reading the row as text. */
+.vt-row__flag {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  color: var(--ae-accent);
+}
+/* The click target, when the row has one. It stretches the full height of the
+   row so the target is a band and not a line of text, and it carries the
+   button/anchor reset because callers hand it a <button>, an <a> or a router
+   Link interchangeably. */
+.vt-row__main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-self: stretch;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+}
+a.vt-row__main,
+button.vt-row__main {
+  cursor: pointer;
+}
+/* base.css underlines links on hover, which on a row would underline the title
+   and the subtitle together and read as damage. The row's own hover tone is
+   the feedback. */
+.vt-row__main:hover {
+  text-decoration: none;
+}
+.vt-row__title {
+  color: var(--ae-fg-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vt-row__sub {
+  font-size: var(--ae-text-sm);
+  color: var(--ae-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vt-row__meta {
+  flex: none;
+  font-size: var(--ae-text-sm);
+  color: var(--ae-muted);
+  text-align: right;
+}
+/* Outside .vt-row__main on purpose: these are controls, and a control nested
+   inside the row's link is both invalid and unreachable by keyboard in the
+   order a person expects. */
+.vt-row__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  flex: none;
+}
+
+/* ── Card ── */
+.vt-card {
+  border: 1px solid var(--ae-border);
+  border-radius: var(--ae-radius);
+  background: var(--ae-surface);
+  padding: var(--ae-space-4);
+}
+/* There is no a.vt-card rule. Card always renders a div and exposes no `as`
+   prop, so the anchor selector that used to sit here could never match: it was
+   dead weight that read as a promise of a polymorphic Card the component does
+   not make. If a card needs to be clickable, the control goes inside it. */
+/* Hover tone is gated on --interactive, and the transition is defined here
+   rather than on .vt-card so a static panel does not even carry the machinery.
+   The modifier is presentational: it reports that the control inside the card
+   is under the cursor, and grants no role, no tab stop and no key handling.
+   The app's .card:hover had no gate: every bordered panel brightened under the
+   cursor while responding to nothing. */
+.vt-card--interactive {
+  transition: border-color var(--ae-dur) var(--ae-ease);
+}
+.vt-card--interactive:hover {
+  border-color: var(--ae-border-strong);
+}
+.vt-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ae-space-3);
+  margin-bottom: var(--ae-space-3);
+}
+.vt-card__title {
+  min-width: 0;
+  font-size: var(--ae-text-md);
+  font-weight: 600;
+  color: var(--ae-fg-strong);
+}
+.vt-card__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  flex: none;
+}
+
+/* ── Stack / Inline / Spread / ChipGroup ── */
+.vt-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-3);
+  min-width: 0;
+}
+.vt-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  min-width: 0;
+}
+.vt-inline--wrap {
+  flex-wrap: wrap;
+}
+.vt-spread {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ae-space-2);
+  min-width: 0;
+}
+.vt-chipgroup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ae-space-2);
+}
+
+/* The gap and align modifiers are shared by all four, grouped so the mapping
+   from prop to token is one line per step and cannot drift between them.
+   They follow the base rules deliberately: same specificity, later wins.
+   The scale has no 7; 6 is followed by 8. */
+.vt-stack--gap-1,
+.vt-inline--gap-1,
+.vt-spread--gap-1,
+.vt-chipgroup--gap-1 {
+  gap: var(--ae-space-1);
+}
+.vt-stack--gap-2,
+.vt-inline--gap-2,
+.vt-spread--gap-2,
+.vt-chipgroup--gap-2 {
+  gap: var(--ae-space-2);
+}
+.vt-stack--gap-3,
+.vt-inline--gap-3,
+.vt-spread--gap-3,
+.vt-chipgroup--gap-3 {
+  gap: var(--ae-space-3);
+}
+.vt-stack--gap-4,
+.vt-inline--gap-4,
+.vt-spread--gap-4,
+.vt-chipgroup--gap-4 {
+  gap: var(--ae-space-4);
+}
+.vt-stack--gap-5,
+.vt-inline--gap-5,
+.vt-spread--gap-5,
+.vt-chipgroup--gap-5 {
+  gap: var(--ae-space-5);
+}
+.vt-stack--gap-6,
+.vt-inline--gap-6,
+.vt-spread--gap-6,
+.vt-chipgroup--gap-6 {
+  gap: var(--ae-space-6);
+}
+.vt-stack--gap-8,
+.vt-inline--gap-8,
+.vt-spread--gap-8,
+.vt-chipgroup--gap-8 {
+  gap: var(--ae-space-8);
+}
+.vt-stack--align-start,
+.vt-inline--align-start,
+.vt-spread--align-start {
+  align-items: flex-start;
+}
+.vt-stack--align-center,
+.vt-inline--align-center,
+.vt-spread--align-center {
+  align-items: center;
+}
+.vt-stack--align-end,
+.vt-inline--align-end,
+.vt-spread--align-end {
+  align-items: flex-end;
+}
+.vt-stack--align-stretch,
+.vt-inline--align-stretch,
+.vt-spread--align-stretch {
+  align-items: stretch;
+}
+.vt-stack--align-baseline,
+.vt-inline--align-baseline,
+.vt-spread--align-baseline {
+  align-items: baseline;
+}
+
+/* ── Banner ── */
+/* An inline message block, flat like every other surface: the tone lives on
+   the left edge and the glyph, never in a wash behind the text. Body text
+   stays on the ink ramp so it keeps its contrast whichever surface the banner
+   is dropped onto. */
+.vt-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ae-space-3);
+  padding: var(--ae-space-3) var(--ae-space-4);
+  border: 1px solid var(--ae-border);
+  border-left-width: 2px;
+  border-radius: var(--ae-radius);
+  background: var(--ae-surface);
+  font-size: var(--ae-text-base);
+  color: var(--ae-fg-soft);
+}
+.vt-banner__glyph {
+  display: inline-flex;
+  flex: none;
+  /* Optical: the glyph box is 16px against a 14px cap line. */
+  margin-top: 2px;
+  color: var(--ae-muted);
+}
+.vt-banner__body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.vt-banner__title {
+  font-weight: 600;
+  color: var(--ae-fg-strong);
+}
+.vt-banner__text {
+  line-height: var(--ae-leading-normal);
+}
+.vt-banner__action {
+  flex: none;
+  align-self: center;
+}
+.vt-banner__x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border: none;
+  border-radius: var(--ae-radius-sm);
+  background: transparent;
+  color: var(--ae-muted);
+  cursor: pointer;
+  transition: color var(--ae-dur) var(--ae-ease), background var(--ae-dur) var(--ae-ease);
+}
+.vt-banner__x:hover {
+  color: var(--ae-fg);
+  background: var(--ae-surface-raised);
+}
+.vt-banner--info {
+  border-left-color: var(--ae-info);
+}
+.vt-banner--info .vt-banner__glyph {
+  color: var(--ae-info);
+}
+.vt-banner--success {
+  border-left-color: var(--ae-success);
+}
+.vt-banner--success .vt-banner__glyph {
+  color: var(--ae-success);
+}
+.vt-banner--warning {
+  border-left-color: var(--ae-warning);
+}
+.vt-banner--warning .vt-banner__glyph {
+  color: var(--ae-warning);
+}
+.vt-banner--danger {
+  border-left-color: var(--ae-danger);
+}
+.vt-banner--danger .vt-banner__glyph {
+  color: var(--ae-danger);
+}
+
+/* ── Disclosure ── */
+.vt-disclosure {
+  display: flex;
+  flex-direction: column;
+}
+/* The meta sits beside the trigger, not inside it, so the count cannot land in
+   the button's accessible name. The head is what puts the two back on one
+   line. */
+.vt-disclosure__head {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+}
+.vt-disclosure__trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: var(--ae-row-h);
+  padding: var(--ae-space-2) 0;
+  border: none;
+  background: transparent;
+  color: var(--ae-fg-soft);
+  font: inherit;
+  font-size: var(--ae-text-base);
+  text-align: left;
+  cursor: pointer;
+  transition: color var(--ae-dur) var(--ae-ease);
+}
+.vt-disclosure__trigger:hover {
+  color: var(--ae-fg-strong);
+}
+.vt-disclosure__label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.vt-disclosure__meta {
+  flex: none;
+  font-size: var(--ae-text-xs);
+  color: var(--ae-faint);
+}
+.vt-disclosure__chev {
+  display: inline-flex;
+  flex: none;
+  color: var(--ae-muted);
+  /* --ae-dur-slow is the transform duration (ch.08's reorder variant); the
+     rotation is the only thing in the component that moves. */
+  transition: transform var(--ae-dur-slow) var(--ae-ease);
+}
+/* Bound to aria-expanded, never to :hover. The chevron turns because the
+   section opened, which is a state change it is reporting. */
+.vt-disclosure__trigger[aria-expanded='true'] .vt-disclosure__chev {
+  transform: rotate(180deg);
+}
+.vt-disclosure__panel {
+  padding-bottom: var(--ae-space-3);
+  animation: vt-panel-in var(--ae-dur) var(--ae-ease);
+}
+/* Explicit, because the rule above would otherwise be the only thing the
+   panel matches and a future `display` there would defeat the attribute. */
+.vt-disclosure__panel[hidden] {
+  display: none;
+}
+
+/* ── Tabs ── */
+.vt-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-4);
+}
+.vt-tabs__list {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-1);
+  border-bottom: 1px solid var(--ae-border);
+}
+.vt-tabs__tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  height: 32px;
+  padding: 0 var(--ae-space-3);
+  border: none;
+  background: transparent;
+  color: var(--ae-muted);
+  font: inherit;
+  font-size: var(--ae-text-base);
+  cursor: pointer;
+  transition: color var(--ae-dur) var(--ae-ease);
+}
+.vt-tabs__tab:hover {
+  color: var(--ae-fg-soft);
+}
+/* Weight and a marker bar as well as ink: which tab is open must survive being
+   read without colour, and aria-selected carries it for everyone else. */
+.vt-tabs__tab[aria-selected='true'] {
+  color: var(--ae-fg-strong);
+  font-weight: 600;
+}
+.vt-tabs__tab[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Sits on the list's own hairline rather than under it. */
+  bottom: -1px;
+  height: 2px;
+  background: var(--ae-accent);
+}
+.vt-tabs__count {
+  font-size: var(--ae-text-xs);
+  color: var(--ae-faint);
+}
+.vt-tabs__panel {
+  min-width: 0;
+}
+.vt-tabs__panel:focus-visible {
+  border-radius: var(--ae-radius);
+}
+
+/* ── Motion ── */
+/* The enter variant in full: 130ms, opacity plus a 4px rise, nothing else.
+   Named separately from components.css's vt-rise-in so this stylesheet stands
+   on its own if it is ever loaded without that one. */
+@keyframes vt-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--ae-motion-rise));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vt-disclosure__panel {
+    animation: none;
+  }
+}

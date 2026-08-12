@@ -1358,7 +1358,7 @@
 @keyframes vt-rise-in {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(var(--ae-motion-rise));
   }
 }
 @media (prefers-reduced-motion: reduce) {
