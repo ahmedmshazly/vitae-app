@@ -34,10 +34,32 @@ export default tseslint.config(
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
+  // The React Compiler's own lint rules. The plugin was registered here but no
+  // rule from it was ever enabled, so rules-of-hooks has never run on this
+  // codebase. `recommended-latest` in v7 carries the compiler diagnostics too,
+  // which is what keeps every component compilable as the code changes.
+  reactHooks.configs.flat['recommended-latest'],
   {
-    plugins: {
-      'react-hooks': reactHooks,
+    // Three of the compiler's diagnostics fire on code that predates it, so
+    // they run as warnings rather than blocking every later branch on a sweep
+    // of screens that are already scheduled for rework. As of this commit:
+    //
+    //   25  set-state-in-effect   across 22 files
+    //    4  refs                  (a ref read during render)
+    //    1  immutability          (tailor/Tailor.tsx)
+    //
+    // They are real: setState inside an effect is the cascading-render pattern
+    // the audit found in 16 files that pair an effect with await. Each one gets
+    // fixed with the screen that owns it, and the rule goes back to error once
+    // its last site is gone. Do not add new ones; the count above only moves
+    // down.
+    rules: {
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/refs': 'warn',
+      'react-hooks/immutability': 'warn',
     },
+  },
+  {
     rules: {
       '@typescript-eslint/no-unused-vars': [
         'warn',

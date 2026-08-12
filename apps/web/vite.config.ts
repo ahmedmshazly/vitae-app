@@ -45,7 +45,16 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      // The React Compiler memoises for us. The app hand-wrote 118 useMemo and
+      // 56 useCallback calls to do the same job; those stay correct and are now
+      // mostly redundant, so they can come out screen by screen rather than in
+      // one sweep. eslint-plugin-react-hooks v7 carries the compiler's own lint
+      // rules, so anything it cannot safely compile is reported rather than
+      // silently skipped.
+      react({ babel: { plugins: [['babel-plugin-react-compiler', {}]] } }),
+      tailwindcss(),
+    ],
     // The monorepo keeps a single .env at the repo root (see .env.example); without
     // this Vite would look only in apps/web and every VITE_* var would be undefined.
     envDir: ENV_DIRECTORY,
