@@ -1,0 +1,167 @@
+/* Vitae combobox, global classes (prefix vt-) on the token system.
+
+   The panel is a Radix Popover content node, so it animates exactly the way
+   .vt-popover and .vt-palette in components.css do: rise in on open, fade out
+   on [data-state='closed'], one easing, token durations, no scale. The
+   vt-rise-in / vt-fade-out keyframes are declared once in components.css;
+   this file names them rather than redeclaring them, so a second copy can
+   never drift from the first. */
+
+/* ── Combobox ── */
+.vt-cbx {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+.vt-cbx__anchor {
+  display: block;
+  width: 100%;
+}
+
+/* ── Panel ── */
+/* Width tracks the input via the Radix anchor-width custom property, so the
+   list lines up with the field it belongs to instead of floating at some
+   width of its own. It is portalled, which is the whole point: inside a Sheet
+   or a table cell the old picker clipped against the nearest overflow. */
+.vt-cbx__panel {
+  z-index: var(--ae-z-popover);
+  display: flex;
+  flex-direction: column;
+  width: var(--radix-popover-trigger-width);
+  min-width: 200px;
+  max-height: 288px;
+  overflow: hidden;
+  border-radius: var(--ae-radius);
+  border: 1px solid var(--ae-border-strong);
+  background: var(--ae-surface-overlay);
+  box-shadow: var(--ae-shadow-overlay);
+  animation: vt-rise-in var(--ae-dur) var(--ae-ease);
+}
+.vt-cbx__panel[data-state='closed'] {
+  animation: vt-fade-out var(--ae-dur-fast) linear;
+}
+
+/* ── List ── */
+.vt-cbx__list {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--ae-space-1);
+}
+.vt-cbx__list:empty {
+  padding: 0;
+}
+
+/* ── Option ── */
+/* 32px, the control height, not --ae-row-h: a dropdown is a transient list
+   read in one pass, and 36px rows put fewer of them above the fold. */
+.vt-cbx__opt {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  min-height: 32px;
+  padding: var(--ae-space-1) var(--ae-space-2);
+  border-radius: var(--ae-radius-sm);
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-base);
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--ae-dur-fast) var(--ae-ease), color var(--ae-dur-fast) var(--ae-ease);
+}
+.vt-cbx__opt-text {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+.vt-cbx__opt-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Two records can share a title; without the second line the list offers a
+   choice it gives no way to make. */
+.vt-cbx__opt-desc {
+  overflow: hidden;
+  color: var(--ae-muted);
+  font-size: var(--ae-text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vt-cbx__opt-meta {
+  flex: none;
+  color: var(--ae-muted);
+  font-size: var(--ae-text-sm);
+}
+
+/* The active option. Tone carries it for a sighted user, the 2px marker
+   carries it without relying on tone at all, and aria-selected plus
+   aria-activedescendant carry it for assistive tech (IDENTITY 6). */
+.vt-cbx__opt--on {
+  background: var(--ae-accent-bg);
+  color: var(--ae-fg-strong);
+}
+.vt-cbx__opt--on::before {
+  content: '';
+  position: absolute;
+  top: var(--ae-space-1);
+  bottom: var(--ae-space-1);
+  left: 0;
+  width: 2px;
+  border-radius: var(--ae-radius-full);
+  background: var(--ae-accent);
+}
+/* Hover gets tone, never travel: hover is not a state change. A row that
+   cannot be chosen does not light up under the pointer either. */
+.vt-cbx__opt:not(.vt-cbx__opt--disabled):hover {
+  color: var(--ae-fg-strong);
+}
+.vt-cbx__opt--create {
+  color: var(--ae-fg);
+}
+/* Unselectable. The tone is the quiet half; the glyph and the word beside it
+   are what actually say so, to a sighted user and to assistive tech alike
+   (IDENTITY 6, and aria-disabled on the option). */
+.vt-cbx__opt--disabled {
+  color: var(--ae-faint);
+  cursor: default;
+}
+.vt-cbx__opt-flag {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--ae-space-1);
+  color: var(--ae-faint);
+  font-size: var(--ae-text-sm);
+}
+
+/* ── Messages: loading, error, empty ── */
+/* Every one of the four states this list can be in gets a glyph and words.
+   An error that renders as an empty list tells the user their record does not
+   exist, which is a different, and wrong, answer. */
+.vt-cbx__msg {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  padding: var(--ae-space-2) var(--ae-space-3);
+  color: var(--ae-muted);
+  font-size: var(--ae-text-sm);
+  line-height: var(--ae-leading-normal);
+}
+.vt-cbx__msg > svg {
+  flex: none;
+}
+.vt-cbx__msg--error {
+  color: var(--ae-danger);
+}
+.vt-cbx__msg-word {
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The duration tokens are already zeroed at the root, this drops the 4px of
+     travel that a zero duration cannot switch off. */
+  .vt-cbx__panel {
+    animation: none;
+  }
+}
