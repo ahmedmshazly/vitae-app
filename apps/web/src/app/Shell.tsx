@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'motion/react';
@@ -13,7 +13,7 @@ import { NewEntityMenu } from '../features/forms/NewEntityMenu.js';
 import { useEnter, useExit, useRoute } from '../lib/motion.js';
 import { ROUTES, routesBySection, type RouteEntry } from './routes.js';
 import { buildCommands } from './commands.js';
-import { Breadcrumb } from './Breadcrumb.js';
+import { Breadcrumb, crumbFor } from './Breadcrumb.js';
 import { entityHref } from '../lib/entity-href.js';
 
 const TODAY = ROUTES.today;
@@ -188,6 +188,35 @@ export function Shell({ children }: { children: ReactNode }) {
   const { signOut } = useAuth();
   const routeMotion = useRoute();
   const queryClient = useQueryClient();
+
+  // Derived, not stored. Putting this in state would mean setting state from an
+  // effect on every navigation, which is the cascading-render pattern the
+  // compiler's lint flags, and it would buy nothing: the region is mounted for
+  // the life of the shell and only its text changes.
+  const crumb = crumbFor(pathname);
+  const routeAnnouncement = crumb.parent ? `${crumb.parent}, ${crumb.leaf}` : crumb.leaf;
+
+  // Focus moves to the content region on navigation. Nothing did this before:
+  // #main-content carried tabIndex={-1} and was never focused, so a keyboard or
+  // screen-reader user stayed parked on the nav link they had just clicked and
+  // had to tab back through the whole rail to reach the new page.
+  //
+  // A callback ref rather than an effect, because AnimatePresence mode="wait"
+  // mounts the incoming node only after the outgoing one has finished leaving:
+  // an effect keyed on pathname would fire while the ref still pointed at the
+  // old node. useCallback is for identity here, not speed, so a stable ref is
+  // not detached and reattached on every render.
+  const isFirstRoute = useRef(true);
+  const mainRef = useCallback((node: HTMLDivElement | null) => {
+    if (!node) return;
+    // Not on first paint: arriving at the app should leave focus at the
+    // document start, where the skip link is.
+    if (isFirstRoute.current) {
+      isFirstRoute.current = false;
+      return;
+    }
+    node.focus();
+  }, []);
 
   function toggleSpace() {
     const next = space === 'demo' ? 'real' : 'demo';
@@ -468,17 +497,33 @@ export function Shell({ children }: { children: ReactNode }) {
             </button>
           </div>
         )}
-        <motion.div
-          key={pathname}
-          id="main-content"
-          tabIndex={-1}
-          className="content"
-          variants={routeMotion}
-          initial="initial"
-          animate="animate"
-        >
-          {children}
-        </motion.div>
+        {/* mode="wait" so the outgoing page finishes leaving before the next
+            one enters. Without an AnimatePresence at all, the `exit` half of
+            the route variant was unreachable: the old content was destroyed
+            instantly and the new content faded up from nothing, which is a
+            flash rather than the clean swap ch.08 asks for. */}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={pathname}
+            id="main-content"
+            ref={mainRef}
+            tabIndex={-1}
+            className="content"
+            variants={routeMotion}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+      {/* A persistent region, created once and filled later. A live region
+          inserted at the same moment as its text is routinely missed, which
+          is the same defect the toast had. Navigation is otherwise silent for
+          a screen reader: the URL changes and nothing is announced. */}
+      <div aria-live="polite" aria-atomic="true" className="u-visually-hidden">
+        {routeAnnouncement}
       </div>
 
       {firstRun && <FirstRun onDone={dismissFirstRun} />}

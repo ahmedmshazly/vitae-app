@@ -36,6 +36,10 @@ function crumbFor(pathname: string): Crumb {
     '/search': { parent: '', leaf: 'Search', glyph: 'search' },
     [ROUTES.trash.path]: { parent: '', leaf: 'Trash', glyph: 'trash' },
     [ROUTES.settings.path]: { parent: '', leaf: 'Settings', glyph: 'adjust' },
+    // Reachable routes that had no crumb and so fell through to "Today".
+    '/resume': { parent: '', leaf: 'Résumé', glyph: 'resume' },
+    '/repositories': { parent: '', leaf: 'Repositories', glyph: 'repository' },
+    '/reference/entities': { parent: 'Reference', leaf: 'Entity catalog', glyph: 'graph' },
   };
   if (exact[pathname]) return exact[pathname];
   if (pathname.startsWith(`${ROUTES.people.path}/`)) return { parent: 'People', leaf: 'Profile', glyph: 'person' };
@@ -45,8 +49,16 @@ function crumbFor(pathname: string): Crumb {
     const type = pathname.split('/')[2] ?? '';
     return { parent: 'Collections', leaf: type.replace(/_/g, ' '), glyph: 'filter' };
   }
-  return { parent: '', leaf: 'Today', glyph: 'today' };
+  // Anything left is a URL that matches no route. It used to report "Today",
+  // which paired with the catch-all rendering the Dashboard to make a broken
+  // link indistinguishable from a successful navigation home. Both halves of
+  // that now say the same true thing.
+  return { parent: '', leaf: 'Not found', glyph: 'search' };
 }
+
+/** Exported so the shell can announce the same page name it displays, rather
+ *  than deriving a second, drifting vocabulary for the same routes. */
+export { crumbFor };
 
 export function Breadcrumb() {
   const { pathname } = useLocation();

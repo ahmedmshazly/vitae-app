@@ -39,6 +39,7 @@ const ImportHub = lazyNamed(() => import('./routes/ImportHub.js'), 'ImportHub');
 const Repositories = lazyNamed(() => import('./routes/Repositories.js'), 'Repositories');
 const Duplicates = lazyNamed(() => import('./routes/Duplicates.js'), 'Duplicates');
 const ExportPage = lazyNamed(() => import('./routes/ExportPage.js'), 'ExportPage');
+const NotFound = lazyNamed(() => import('./routes/NotFound.js'), 'NotFound');
 // Marketing is lazy for the same reason every other route is: eager imports
 // put all three pages, their motion code and the primitives they pull in
 // inside the entry chunk, so the app shell paid for the landing page and the
@@ -154,7 +155,9 @@ function AuthedApp() {
                 <Route path="/resume/templates" element={<Templates />} />
                 <Route path="/trash" element={<Trash />} />
                 <Route path="/settings" element={<Settings />} />
-                <Route path="*" element={<Dashboard />} />
+                {/* A dead URL used to render the Dashboard, so a broken link
+                    looked exactly like a successful navigation home. */}
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>
