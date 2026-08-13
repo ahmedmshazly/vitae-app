@@ -16,7 +16,15 @@ test('Today: queue, habits, reconnect, and the reference tier', async ({ page })
   await expect(page.getByRole('heading', { name: /^Reconnect/ })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'How things stand' })).toBeVisible();
   await expect(page.getByText('Applications')).toBeVisible();
-  await expect(page.getByRole('button', { name: /^Check Deep work 2h/ })).toBeVisible();
+  // Either verb. The toggle is named after the habit it toggles, and which
+  // verb it carries depends on whether today is already ticked — `seed.ts`
+  // checks "Deep work 2h" on `daysAgo(0)`, so on a freshly seeded database it
+  // reads "Uncheck". This line asserted "Check" and so failed on exactly the
+  // fresh seed CI runs, while passing locally against a database whose habit
+  // an earlier `today.spec.ts` run had toggled off. Whether the toggle flips
+  // is today.spec.ts:54's job; this journey only needs the habit to be there
+  // and to be addressable by name.
+  await expect(page.getByRole('button', { name: /^(Check|Uncheck) Deep work 2h/ })).toBeVisible();
 });
 
 test('Log an interaction from a person page: strength recomputes', async ({ page }) => {

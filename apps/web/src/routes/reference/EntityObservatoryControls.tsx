@@ -215,7 +215,13 @@ export function EntityObservatoryControls({
         style={{ '--cockpit-width': `${state.display.panelWidth}px` } as CSSProperties}
         aria-label="Advanced observatory controls"
         aria-hidden={!drawerOpen}
-        {...(!drawerOpen ? ({ inert: '' } as Record<string, string>) : {})}
+        // `inert` as a real boolean, not `{...{ inert: '' }}`. The string form
+        // was how React 18 took it; React 19 reads `inert` as a boolean and
+        // treats the empty string as false, so the attribute never reached the
+        // DOM. The drawer was left `aria-hidden` with 62 focusable controls
+        // still in the tab order — axe's `aria-hidden-focus`, serious, and the
+        // one violation failing this page.
+        inert={!drawerOpen}
       >
         <div className="ec-cockpit__header">
           <div>
