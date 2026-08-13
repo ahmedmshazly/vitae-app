@@ -24,7 +24,14 @@ env:
 jobs:
   dependency-review:
     name: Dependency review
-    if: github.event_name == 'pull_request'
+    # The action calls the dependency-graph compare API. That API is free on a
+    # public repo, but on a PRIVATE one it needs a GitHub Advanced Security /
+    # Code Security licence, which is sold only through Enterprise. This repo
+    # is private under a personal account, so the job cannot succeed on any
+    # commit on any branch. Gating on visibility arms it the moment the repo
+    # goes public and, unlike continue-on-error, never swallows a real finding.
+    # `pnpm audit --audit-level=high` in `quality` covers this tree meanwhile.
+    if: github.event_name == 'pull_request' && github.event.repository.private == false
     runs-on: codebuild-vitae-ci-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 10
     permissions:
@@ -32,6 +39,11 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          # The action defaults to fail-on-severity: low. Match the floor
+          # `pnpm audit --audit-level=high` already enforces, so the job
+          # does not go red on day one over advisories the tree accepts.
+          fail-on-severity: high
 
   quality:
     name: Typecheck · Lint · Unit · A11y · Security
@@ -61,10 +73,6 @@ jobs:
         run: pnpm test:web
       - name: Web accessibility (axe) contracts
         run: pnpm test:a11y
-      - name: Security unit contracts (auth + headers)
-        run: pnpm --filter @vitae/api exec vitest run src/middleware/security.test.ts src/middleware/auth.test.ts
-      - name: Resilience unit (buildsvc offline / HMAC shape)
-        run: pnpm --filter @vitae/api exec vitest run src/services/buildsvc-client.test.ts
 
   build:
     name: Production build
@@ -119,7 +127,9 @@ jobs:
         run: >-
           docker run --rm -v /var/run/docker.sock:/var/run/docker.sock
           aquasec/trivy:0.64.1@sha256:a8ca29078522f30393bdb34225e4c0994d38f37083be81a42da3a2a7e1488e9e
-          image --exit-code 1 --ignore-unfixed --severity CRITICAL vitae/api:ci
+          image --exit-code 1 --ignore-unfixed --severity CRITICAL
+          --db-repository ghcr.io/aquasecurity/trivy-db:2
+          vitae/api:ci
       - name: Generate SPDX software bill of materials
         uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0
         with:
@@ -166,6 +176,16 @@ jobs:
 
       - name: OpenAPI + error-envelope contracts
         run: pnpm test:contract
+      # These two live here rather than in `quality` because apps/api's vitest
+      # config declares a globalSetup that creates and migrates its own
+      # database, and vitest runs globalSetup before it resolves which files to
+      # execute. Narrowing the invocation to two middleware unit tests does not
+      # skip it, so in a job with no postgres service they died in setup having
+      # run nothing at all.
+      - name: Security unit contracts (auth + headers)
+        run: pnpm test:security
+      - name: Resilience unit (buildsvc offline / HMAC shape)
+        run: pnpm test:resilience
 
       - name: Run API tests against Postgres
         # --passWithNoTests=false: a suite that skips itself must fail the build,
@@ -187,7 +207,9 @@ jobs:
         run: >-
           docker run --rm -v /var/run/docker.sock:/var/run/docker.sock
           aquasec/trivy:0.64.1@sha256:a8ca29078522f30393bdb34225e4c0994d38f37083be81a42da3a2a7e1488e9e
-          image --exit-code 1 --ignore-unfixed --severity CRITICAL vitae/buildsvc:ci
+          image --exit-code 1 --ignore-unfixed --severity CRITICAL
+          --db-repository ghcr.io/aquasecurity/trivy-db:2
+          vitae/buildsvc:ci
       - name: Compile calibration fixtures (guards FR-RES-009 line-model drift)
         run: >-
           docker run --rm --network none --tmpfs /tmp

@@ -6,6 +6,49 @@ import type { Express } from 'express';
 
 let cached: { app: Express; token: string } | null = null;
 
+/**
+ * The session token, as the route actually returns it.
+ *
+ * `POST /auth/dev-login` echoes the token in the JSON body **only** under
+ * emulators; otherwise it sends it as the httpOnly `vitae_session` cookie and
+ * the body carries just the user (routes/v1/auth.ts: "The token is the
+ * session; it goes out as an httpOnly cookie… The exception is an emulator
+ * run, where supertest has no cookie jar"). Supertest keeps no cookie jar, so
+ * the cookie is read off the header here.
+ *
+ * Reading the body first keeps emulator runs on exactly the path they already
+ * take. The cookie branch is what makes the suite work in CI, where no
+ * emulator variable is set, and it has the side benefit of exercising the
+ * cookie path production actually uses instead of an emulator-only echo.
+ */
+export function sessionToken(res: request.Response): string | undefined {
+  if (typeof res.body?.token === 'string') return res.body.token;
+  const raw = res.headers['set-cookie'];
+  const cookies = Array.isArray(raw) ? raw : raw ? [raw] : [];
+  for (const cookie of cookies) {
+    // Anchored to the name, so a second cookie on the response is skipped
+    // rather than mis-parsed. If auth.ts renames the cookie, rename it here.
+    const match = /^vitae_session=([^;]*)/.exec(cookie);
+    if (match?.[1]) return decodeURIComponent(match[1]);
+  }
+  return undefined;
+}
+
+/**
+ * The same, but loud. Three suites bootstrapped their own token straight off
+ * `res.body.token` and got `undefined`, which turned into unexplained 401s on
+ * every later assertion rather than one readable failure at the source.
+ */
+export function requireSessionToken(res: request.Response): string {
+  const token = sessionToken(res);
+  if (!token) {
+    throw new Error(
+      `dev-login returned no session token: ${res.status} ${JSON.stringify(res.body)}`,
+    );
+  }
+  return token;
+}
+
 /** Boot createApp once per worker and mint a dev-login bearer token. */
 export async function getAuthedApp(): Promise<{ app: Express; token: string }> {
   if (cached) return cached;
@@ -13,10 +56,7 @@ export async function getAuthedApp(): Promise<{ app: Express; token: string }> {
   const { createApp } = await import('../../app.js');
   const app = createApp();
   const res = await request(app).post('/api/v1/auth/dev-login');
-  if (!res.body?.token) {
-    throw new Error(`dev-login failed: ${res.status} ${JSON.stringify(res.body)}`);
-  }
-  cached = { app, token: res.body.token as string };
+  cached = { app, token: requireSessionToken(res) };
   return cached;
 }
 

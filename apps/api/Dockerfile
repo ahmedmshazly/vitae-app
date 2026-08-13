@@ -34,7 +34,16 @@ COPY apps/api apps/api
 # the image doesn't depend on that directory-depth coupling.
 COPY templates templates
 ENV TEMPLATES_DIR=/app/templates
-RUN chmod -R a+rX /app
+# The npm CLI ships inside the Node base image and vendors its own copy of
+# `tar`. CVE-2026-59873 (tar < 7.5.19) is reported against that copy, and
+# --ignore-unfixed does not suppress it because upstream HAS fixed it: the
+# first npm carrying a patched tar (10.9.9) was published one day after the
+# last Node 22 release, so no node:22 digest exists to move to. Nothing in
+# this image runs npm — CMD is tsx, HEALTHCHECK is node — so the CLI comes out
+# rather than being chased version to version. The `deps` stage keeps its own
+# npm and corepack and is discarded.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx \
+ && chmod -R a+rX /app
 
 USER node
 WORKDIR /app/apps/api

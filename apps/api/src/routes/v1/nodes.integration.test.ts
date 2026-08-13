@@ -5,6 +5,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import type { Express } from 'express';
+import { requireSessionToken } from '../../__tests__/helpers/app.js';
 import { buildNodeCreate, resetIdSequence } from '@vitae/testkit';
 
 let app: Express;
@@ -16,7 +17,7 @@ describe('POST/GET /api/v1/nodes', () => {
     const { createApp } = await import('../../app.js');
     app = createApp();
     const res = await request(app).post('/api/v1/auth/dev-login');
-    token = res.body.token as string;
+    token = requireSessionToken(res);
   });
 
   beforeEach(() => {
