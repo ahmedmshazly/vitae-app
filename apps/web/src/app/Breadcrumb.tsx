@@ -70,7 +70,8 @@ function crumbFor(pathname: string): Crumb {
     // Reachable routes that had no crumb and so fell through to "Today".
     '/resume': { parent: '', leaf: 'Résumé', glyph: 'resume' },
     '/repositories': { parent: '', leaf: 'Repositories', glyph: 'repository' },
-    '/reference/entities': { parent: 'Reference', leaf: 'Entity catalog', glyph: 'graph' },
+    // No '/reference/entities' crumb: that route mounts outside Shell on
+    // purpose, so a crumb for it could never render. See DESIGN.md.
   };
   if (exact[pathname]) return exact[pathname];
   if (pathname.startsWith(`${ROUTES.people.path}/`))

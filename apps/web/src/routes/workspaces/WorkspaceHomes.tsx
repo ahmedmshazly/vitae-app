@@ -345,6 +345,15 @@ export function Help() {
               <span>reshape the same graph without creating a second source of truth.</span>
             </li>
           </ol>
+          {/* The entity catalog is generated from the same type constants the
+              API validates against, and it reads nothing of yours, so it sits
+              outside the six workspaces. Reachable from nothing is still a
+              defect, and this is the one honest way in. */}
+          <p>
+            Every record type, connection type, and relation kind the system knows is listed in the{' '}
+            <Link to="/reference/entities">entity catalog</Link>. It describes the schema, not your
+            data, and needs no account.
+          </p>
         </section>
       </div>
     </div>

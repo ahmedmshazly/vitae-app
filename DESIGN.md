@@ -121,6 +121,14 @@ Public `/welcome`, `/tour`, `/manifesto`, and `/reference/entities` routes do no
 the API. The marketing shell is editorial and uses real product captures labelled “Real interface
 · fictional demo data”; do not fabricate screenshots, endorsements, or commercial claims.
 
+`/reference/entities` is deliberately standalone and stays that way. The entity catalog and its
+observatory are generated from the same type constants the API validates against: they describe the
+schema, not a person’s records, and they read no user data. Giving them a workspace hub would claim
+they operate on your graph, which they do not, and would put a documentation surface behind an
+account it does not need. They are reached from Help, the app’s other standalone reference surface,
+and from a direct link. Because the route mounts outside `Shell` it carries no breadcrumb, no
+workspace strip and no rail, so it must supply its own heading and its own way back into the app.
+
 ## Workspace and screen composition
 
 Network, Explore, Data, and Settings share `WorkspaceHome`: eyebrow, `PageHeader`, a ruled workflow
