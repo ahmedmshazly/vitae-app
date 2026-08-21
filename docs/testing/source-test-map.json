@@ -1779,10 +1779,14 @@
     "apps/web/src/routes/Settings.tsx": {
       "risk": "medium",
       "layers": [
-        "unit"
+        "unit",
+        "component",
+        "a11y"
       ],
       "tests": [
-        "apps/web/src/routes/Settings.test.ts"
+        "apps/web/src/routes/Settings.test.ts",
+        "apps/web/src/routes/Settings.states.test.tsx",
+        "apps/web/src/routes/Settings.a11y.test.tsx"
       ]
     },
     "apps/web/src/routes/SignIn.tsx": {

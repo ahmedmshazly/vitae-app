@@ -2796,7 +2796,9 @@ button.row {
   gap: 6px;
 }
 /* The swatch is 25px of colour inside a hit target that meets the floor, so a
-   coarse pointer has something to land on without the row turning into discs. */
+   coarse pointer has something to land on without the row turning into discs.
+   The colour arrives as --swatch rather than as the button's own background: an
+   inline background would beat this rule and paint the whole hit target. */
 .accent-picker button {
   display: grid;
   place-items: center;
@@ -2812,7 +2814,7 @@ button.row {
   width: 25px;
   height: 25px;
   border-radius: 50%;
-  background: inherit;
+  background: var(--swatch);
   box-shadow: inset 0 0 0 1px var(--ae-border-strong);
 }
 .accent-picker button[aria-pressed='true']::before {

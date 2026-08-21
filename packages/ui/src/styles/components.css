@@ -689,6 +689,72 @@ button.vt-chip:focus-visible {
   color: var(--ae-fg);
 }
 
+/* ── Range ──
+ * A continuous control on the ledger: a hairline track and a solid thumb, no
+ * gloss and no gradient. Two screens were hand-rolling `input[type=range]` with
+ * an inline accent-color, which left the thumb, the track and the focus ring to
+ * whichever browser the person happened to open. The control is one hit target
+ * tall so the thumb can be grabbed with a thumb.
+ *
+ * The vendor pseudo-elements are written as separate rules on purpose: a
+ * browser drops an entire selector list when one selector in it is unknown, so
+ * grouping the WebKit and Gecko pseudos would silently unstyle both.
+ */
+.vt-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: var(--ae-hit-target);
+  margin: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+.vt-range::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--ae-border-strong);
+}
+.vt-range::-moz-range-track {
+  height: 2px;
+  background: var(--ae-border-strong);
+}
+.vt-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -5px;
+  border: 0;
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-accent);
+}
+.vt-range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-accent);
+}
+.vt-range:focus-visible {
+  outline: none;
+}
+.vt-range:focus-visible::-webkit-slider-thumb {
+  box-shadow: var(--ae-focus-ring);
+}
+.vt-range:focus-visible::-moz-range-thumb {
+  box-shadow: var(--ae-focus-ring);
+}
+.vt-range:disabled {
+  cursor: not-allowed;
+  color: var(--ae-muted);
+}
+.vt-range:disabled::-webkit-slider-thumb {
+  background: var(--ae-border-strong);
+}
+.vt-range:disabled::-moz-range-thumb {
+  background: var(--ae-border-strong);
+}
+
 /* ── TagInput ── */
 .vt-tags {
   display: flex;

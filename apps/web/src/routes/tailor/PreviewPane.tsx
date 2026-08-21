@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -13,6 +13,7 @@ import {
   StatusTrace,
   Textarea,
 } from '@vitae/ui';
+import { accentLabel, RESUME_ACCENTS } from '../../lib/accent-palette.js';
 import { api } from '../../lib/api.js';
 import { PdfPreview } from '../../components/PdfPreview.js';
 import type { CompileResult, Draft, FinalizeResult } from './types.js';
@@ -34,7 +35,7 @@ const EMPHASIS_OPTIONS = [
 ];
 
 /** Fallback swatches for a template that declares no palette of its own. */
-const DEFAULT_ACCENTS = ['#2563eb', '#0f766e', '#7c3aed', '#b45309', '#be123c', '#111827'];
+const DEFAULT_ACCENTS = RESUME_ACCENTS.map((a) => a.value);
 
 /** A .tex download, offered whenever the PDF itself could not be produced. */
 function TexDownload({ tex }: { tex: string }) {
@@ -146,9 +147,9 @@ export function PreviewPane({
               <button
                 key={accent}
                 type="button"
-                aria-label={`Use ${accent} accent`}
+                aria-label={accentLabel(accent)}
                 aria-pressed={draft.accent === accent}
-                style={{ background: accent }}
+                style={{ '--swatch': accent } as CSSProperties}
                 onClick={() => onDraft({ accent })}
               />
             ))}

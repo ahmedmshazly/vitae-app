@@ -1,19 +1,27 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Button,
   Chip,
+  EmptyState,
   ErrorState,
+  Field,
   InfoPopover,
+  Input,
   Mono,
   PageHeader,
   RegisterRule,
   Section,
+  Select,
   SkeletonRows,
+  StatusTrace,
+  Textarea,
 } from '@vitae/ui';
+import { accentLabel, accentName, DEFAULT_ACCENT, RESUME_ACCENTS } from '../lib/accent-palette.js';
 import { api } from '../lib/api.js';
 import { useAuth } from '../lib/auth.js';
+import { useServerDraft } from '../lib/use-server-draft.js';
 import { useToast } from '../features/Toast.js';
 
 interface Status {
@@ -40,6 +48,19 @@ const WEIGHT_LABELS: Record<string, string> = {
   pinned: 'Pinned bonus',
 };
 
+const TEMPLATE_OPTIONS = [
+  { value: 'cobalt', label: 'Cobalt' },
+  { value: 'onyx', label: 'Onyx' },
+  { value: 'argon', label: 'Argon' },
+];
+
+const EMPHASIS_OPTIONS = [
+  { value: 'technical', label: 'Technical' },
+  { value: 'leadership', label: 'Leadership' },
+  { value: 'concise', label: 'Concise' },
+  { value: 'detailed', label: 'Detailed' },
+];
+
 /** Human detail for a health check, never colour alone. */
 export function statusCheckDetail(check: { ok: boolean; detail?: unknown }): string {
   if (check.detail != null && String(check.detail).length > 0) return String(check.detail);
@@ -50,6 +71,32 @@ export function statusCheckDetail(check: { ok: boolean; detail?: unknown }): str
 export function formatGithubSync(lastSyncAt: string | null | undefined): string {
   if (!lastSyncAt) return 'never';
   return lastSyncAt.slice(0, 16).replace('T', ' ');
+}
+
+/**
+ * A ruled register of stated facts: term on the left, value on the right, a
+ * hairline between. Settings had three of these built out of `.spread` rows and
+ * none of them were marked up as the definition lists they are.
+ */
+function Facts({ children }: { children: ReactNode }) {
+  return (
+    <dl className="m-0 grid grid-cols-[minmax(0,auto)_minmax(0,1fr)] gap-x-6">{children}</dl>
+  );
+}
+function Fact({ term, children }: { term: ReactNode; children: ReactNode }) {
+  return (
+    <div className="col-span-2 grid grid-cols-subgrid items-center border-b border-hairline py-2 last:border-b-0">
+      <dt className="text-sm text-muted">{term}</dt>
+      <dd className="m-0 flex min-w-0 justify-end text-right text-sm text-ink">{children}</dd>
+    </div>
+  );
+}
+
+/** Marks a form whose draft has moved away from what the server holds. */
+function DirtyChip({ dirty, saving }: { dirty: boolean; saving: boolean }) {
+  if (saving && dirty) return <Chip tone="accent" mono>saving</Chip>;
+  if (!dirty) return <Chip mono>saved</Chip>;
+  return <Chip tone="warning" mono>unsaved</Chip>;
 }
 
 /** Settings (SRS P22): profile, ranking constants, taxonomy, GitHub, health. */
@@ -74,10 +121,14 @@ export function Settings() {
           ? 'Preferences'
           : 'System';
 
+  const showProfile = view === 'all' || view === 'profile';
+  const showPreferences = view === 'all' || view === 'preferences';
+  const showSystem = view === 'all' || view === 'system';
+
   const status = useQuery({
     queryKey: ['status'],
     queryFn: () => api.get<Status>('/status'),
-    enabled: view === 'all' || view === 'system',
+    enabled: showSystem,
   });
   const settings = useQuery({
     queryKey: ['settings'],
@@ -101,6 +152,22 @@ export function Settings() {
 
   const checkEntries = status.data ? Object.entries(status.data.checks) : [];
   const failing = checkEntries.filter(([, c]) => !c.ok).length;
+
+  const systemStatus = showSystem ? (
+    <SystemStatusSection
+      isError={status.isError}
+      error={status.error as Error | null}
+      isLoading={status.isLoading || !status.data}
+      refetching={status.isFetching}
+      onRetry={() => void status.refetch()}
+      data={status.data}
+      failing={failing}
+      healthy={status.isSuccess}
+    />
+  ) : null;
+
+  const identity =
+    view !== 'preferences' ? <IdentitySection email={user?.email} via={user?.via} /> : null;
 
   return (
     <div className="page">
@@ -146,48 +213,52 @@ export function Settings() {
           title="Couldn’t load settings"
           detail={(settings.error as Error | null)?.message}
           onRetry={() => void settings.refetch()}
+          retrying={settings.isFetching}
         />
       ) : settings.isLoading || !settings.data ? (
-        <div role="status" aria-label="Loading settings">
-          <SkeletonRows rows={8} />
-        </div>
+        <SkeletonRows rows={8} label="Loading settings" />
       ) : (
-        <div className={`grid-2 settings-grid settings-grid--${view}`}>
-          {(view === 'all' || view === 'profile') && (
-            <ProfileCard
-              profile={settings.data.profile}
-              email={user?.email ?? ''}
-              saving={patch.isPending}
-              onSave={(profile) => patch.mutate({ profile })}
-            />
-          )}
-          {(view === 'all' || view === 'preferences') && (
-            <>
-              <ResumeDefaultsCard
-                defaults={
-                  settings.data.resumeDefaults ?? {
-                    templateKey: 'cobalt',
-                    accent: '#2563eb',
-                    emphasis: 'technical',
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.8fr)]">
+          <div className="min-w-0">
+            {showProfile && (
+              <ProfileCard
+                profile={settings.data.profile}
+                email={user?.email ?? ''}
+                saving={patch.isPending}
+                onSave={(profile) => patch.mutate({ profile })}
+              />
+            )}
+            {showPreferences && (
+              <>
+                <ResumeDefaultsCard
+                  defaults={
+                    settings.data.resumeDefaults ?? {
+                      templateKey: 'cobalt',
+                      accent: DEFAULT_ACCENT,
+                      emphasis: 'technical',
+                    }
                   }
-                }
-                saving={patch.isPending}
-                onSave={(resumeDefaults) => patch.mutate({ resumeDefaults })}
-              />
-              <WeightsCard
-                weights={settings.data.askWeights}
-                onChange={(askWeights) => patch.mutate({ askWeights })}
-              />
-              <AliasesCard
-                aliases={settings.data.skillAliases}
-                saving={patch.isPending}
-                onSave={(skillAliases) => patch.mutate({ skillAliases })}
-              />
-            </>
-          )}
+                  saving={patch.isPending}
+                  onSave={(resumeDefaults) => patch.mutate({ resumeDefaults })}
+                />
+                <WeightsCard
+                  weights={settings.data.askWeights}
+                  saving={patch.isPending}
+                  onChange={(askWeights) => patch.mutate({ askWeights })}
+                />
+                <AliasesCard
+                  aliases={settings.data.skillAliases}
+                  saving={patch.isPending}
+                  onSave={(skillAliases) => patch.mutate({ skillAliases })}
+                />
+              </>
+            )}
+            {view === 'system' && systemStatus}
+          </div>
 
-          {(view === 'all' || view === 'system') && (
-            <Section title="GitHub">
+          <aside className="min-w-0">
+            {view !== 'system' && systemStatus}
+            {showSystem && (
               <GithubCard
                 configured={settings.data.github.configured}
                 lastSyncAt={settings.data.github.lastSyncAt}
@@ -196,88 +267,110 @@ export function Settings() {
                   flash(message);
                 }}
               />
-            </Section>
-          )}
-
-          {(view === 'all' || view === 'system') && (
-            <Section
-              title="System status"
-              actions={
-                status.isSuccess ? (
-                  <Chip tone={failing > 0 ? 'danger' : 'success'} mono>
-                    {failing > 0 ? `${failing} down` : 'healthy'}
-                  </Chip>
-                ) : undefined
-              }
-            >
-              {status.isError ? (
-                <ErrorState
-                  title="Couldn’t load system status"
-                  detail={(status.error as Error | null)?.message}
-                  onRetry={() => void status.refetch()}
-                />
-              ) : status.isLoading || !status.data ? (
-                <div role="status" aria-label="Loading system status">
-                  <SkeletonRows rows={4} />
-                </div>
-              ) : (
-                <div className="stack" style={{ gap: 8 }}>
-                  {Object.entries(status.data.checks).map(([name, c]) => (
-                    <div key={name} className="spread">
-                      <span className="hstack">
-                        <Chip tone={c.ok ? 'success' : 'danger'} mono>
-                          {c.ok ? 'ok' : 'down'}
-                        </Chip>
-                        {name}
-                      </span>
-                      <Mono className="u-faint">{statusCheckDetail(c)}</Mono>
-                    </div>
-                  ))}
-                  <div className="spread">
-                    <span className="u-muted">Records</span>
-                    <Mono>
-                      {status.data.counts.nodes} nodes · {status.data.counts.edges} edges
-                    </Mono>
-                  </div>
-                  <div className="spread">
-                    <span className="u-muted">Environment</span>
-                    <Chip mono>{status.data.env.emulators ? 'emulators' : 'cloud'}</Chip>
-                  </div>
-                  <Link
-                    to="/data/identity"
-                    className="vt-btn vt-btn--sm"
-                    style={{ alignSelf: 'flex-start' }}
-                  >
-                    Open duplicates queue
-                  </Link>
-                </div>
-              )}
-            </Section>
-          )}
-
-          {(view === 'all' || view === 'profile' || view === 'system') && (
-            <Section title="Identity">
-              <div className="stack" style={{ gap: 8 }}>
-                <div className="spread">
-                  <span className="u-muted">Signed in as</span>
-                  <Mono>{user?.email}</Mono>
-                </div>
-                <div className="spread">
-                  <span className="u-muted">Method</span>
-                  <Chip mono>{user?.via}</Chip>
-                </div>
-                <div className="spread">
-                  <span className="u-muted">Backups</span>
-                  <Link to="/data/exports" className="vt-btn vt-btn--sm">
-                    Export &amp; backups
-                  </Link>
-                </div>
-              </div>
-            </Section>
-          )}
+            )}
+            {identity}
+          </aside>
         </div>
       )}
     </div>
+  );
+}
+
+function SystemStatusSection({
+  isError,
+  error,
+  isLoading,
+  refetching,
+  onRetry,
+  data,
+  failing,
+  healthy,
+}: {
+  isError: boolean;
+  error: Error | null;
+  isLoading: boolean;
+  refetching: boolean;
+  onRetry: () => void;
+  data: Status | undefined;
+  failing: number;
+  healthy: boolean;
+}) {
+  return (
+    <Section
+      title="System status"
+      actions={
+        healthy ? (
+          <Chip tone={failing > 0 ? 'danger' : 'success'} mono>
+            {failing > 0 ? `${failing} down` : 'healthy'}
+          </Chip>
+        ) : undefined
+      }
+    >
+      {isError ? (
+        <ErrorState
+          title="Couldn’t load system status"
+          detail={error?.message}
+          onRetry={onRetry}
+          retrying={refetching}
+          retryLabel="Check again"
+        />
+      ) : isLoading || !data ? (
+        <SkeletonRows rows={4} label="Loading system status" />
+      ) : (
+        <>
+          <Facts>
+            {Object.entries(data.checks).map(([name, c]) => (
+              <Fact
+                key={name}
+                term={
+                  <span className="flex items-center gap-2">
+                    <Chip tone={c.ok ? 'success' : 'danger'} mono>
+                      {c.ok ? 'ok' : 'down'}
+                    </Chip>
+                    {name}
+                  </span>
+                }
+              >
+                <Mono className="text-sm text-faint">{statusCheckDetail(c)}</Mono>
+              </Fact>
+            ))}
+            <Fact term="Records">
+              <Mono className="text-sm">
+                {data.counts.nodes} nodes · {data.counts.edges} edges
+              </Mono>
+            </Fact>
+            <Fact term="Environment">
+              <Chip mono>{data.env.emulators ? 'emulators' : 'cloud'}</Chip>
+            </Fact>
+          </Facts>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Link to="/data/identity" className="vt-btn vt-btn--sm">
+              Open duplicates queue
+            </Link>
+          </div>
+        </>
+      )}
+    </Section>
+  );
+}
+
+function IdentitySection({ email, via }: { email?: string; via?: string }) {
+  return (
+    <Section title="Identity">
+      <Facts>
+        <Fact term="Signed in as">
+          <Mono className="text-sm">{email}</Mono>
+        </Fact>
+        <Fact term="Method">
+          <Chip mono>{via}</Chip>
+        </Fact>
+      </Facts>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Link to="/data/exports" className="vt-btn vt-btn--sm">
+          Export &amp; backups
+        </Link>
+      </div>
+    </Section>
   );
 }
 
@@ -290,81 +383,56 @@ function ResumeDefaultsCard({
   onSave: (defaults: { templateKey: string; accent: string; emphasis: string }) => void;
   saving: boolean;
 }) {
-  const [draft, setDraft] = useState(defaults);
-  const dirty = JSON.stringify(draft) !== JSON.stringify(defaults);
+  const { draft, setDraft, dirty } = useServerDraft(defaults);
   const ids = useId();
-  const accents = ['#2563eb', '#0f766e', '#7c3aed', '#b45309', '#be123c', '#111827'];
-
-  useEffect(() => {
-    setDraft(defaults);
-  }, [defaults]);
 
   return (
-    <Section title="Résumé defaults">
+    <Section title="Résumé defaults" actions={<DirtyChip dirty={dirty} saving={saving} />}>
       <p className="m-0 mb-3 text-sm text-ink-soft">
         Starting template, accent, and wording emphasis for new Tailor sessions.
       </p>
-      <div className="field">
-        <label className="label" htmlFor={`${ids}-template`}>
-          Default template
-        </label>
-        <select
-          id={`${ids}-template`}
-          className="input"
-          value={draft.templateKey}
-          onChange={(e) => setDraft({ ...draft, templateKey: e.target.value })}
-        >
-          <option value="cobalt">Cobalt</option>
-          <option value="onyx">Onyx</option>
-          <option value="argon">Argon</option>
-        </select>
+      <div className="mb-3 grid gap-3 sm:grid-cols-2">
+        <Field label="Default template" htmlFor={`${ids}-template`}>
+          <Select
+            id={`${ids}-template`}
+            label="Default template"
+            value={draft.templateKey}
+            clearable={false}
+            options={TEMPLATE_OPTIONS}
+            onChange={(value) => value && setDraft({ ...draft, templateKey: value })}
+          />
+        </Field>
+        <Field label="Default wording" htmlFor={`${ids}-emphasis`}>
+          <Select
+            id={`${ids}-emphasis`}
+            label="Default wording"
+            value={draft.emphasis}
+            clearable={false}
+            options={EMPHASIS_OPTIONS}
+            onChange={(value) => value && setDraft({ ...draft, emphasis: value })}
+          />
+        </Field>
       </div>
-      <div className="field">
-        <label className="label" htmlFor={`${ids}-emphasis`}>
-          Default wording
-        </label>
-        <select
-          id={`${ids}-emphasis`}
-          className="input"
-          value={draft.emphasis}
-          onChange={(e) => setDraft({ ...draft, emphasis: e.target.value })}
-        >
-          <option value="technical">Technical</option>
-          <option value="leadership">Leadership</option>
-          <option value="concise">Concise</option>
-          <option value="detailed">Detailed</option>
-        </select>
-      </div>
-      <div className="field">
-        <span className="label" id={`${ids}-accent`}>
+      <div className="mb-4">
+        <span className="vt-fld__label" id={`${ids}-accent`}>
           Default accent
         </span>
-        <div
-          className="hstack"
-          style={{ flexWrap: 'wrap', gap: 8 }}
-          role="group"
-          aria-labelledby={`${ids}-accent`}
-        >
-          {accents.map((accent) => (
+        <div className="accent-picker" role="group" aria-labelledby={`${ids}-accent`}>
+          {RESUME_ACCENTS.map((accent) => (
             <button
-              key={accent}
+              key={accent.value}
               type="button"
-              aria-label={`Use ${accent} accent`}
-              aria-pressed={draft.accent === accent}
-              title={accent}
-              onClick={() => setDraft({ ...draft, accent })}
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: 999,
-                border:
-                  draft.accent === accent ? '2px solid var(--ae-fg)' : '1px solid var(--ae-border)',
-                background: accent,
-                cursor: 'pointer',
-              }}
+              aria-label={accentLabel(accent.value)}
+              aria-pressed={draft.accent === accent.value}
+              title={`${accent.name} · ${accent.value}`}
+              onClick={() => setDraft({ ...draft, accent: accent.value })}
+              style={{ '--swatch': accent.value } as CSSProperties}
             />
           ))}
         </div>
+        <p className="m-0 mt-1 text-xs text-faint">
+          Selected: <Mono>{accentName(draft.accent)}</Mono>
+        </p>
       </div>
       <Button variant="primary" disabled={!dirty || saving} onClick={() => onSave(draft)}>
         {saving && dirty ? 'Saving…' : 'Save résumé defaults'}
@@ -384,94 +452,87 @@ function ProfileCard({
   onSave: (p: SettingsResp['profile']) => void;
   saving: boolean;
 }) {
-  const [draft, setDraft] = useState(profile);
-  const dirty = JSON.stringify(draft) !== JSON.stringify(profile);
+  const { draft, setDraft, dirty } = useServerDraft(profile);
   // FR-023: every visual label is associated with its control via htmlFor/id, so
   // clicking the label focuses the field and screen readers announce the name.
   const ids = useId();
+
   return (
-    <Section title="Profile of me">
+    <Section title="Profile of me" actions={<DirtyChip dirty={dirty} saving={saving} />}>
       <p className="m-0 mb-3 text-sm text-ink-soft">The résumé contact block used by templates.</p>
-      <div className="field">
-        <label className="label" htmlFor={`${ids}-name`}>
-          Name
-        </label>
-        <input
-          id={`${ids}-name`}
-          className="input"
-          value={draft.name}
-          onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-        />
-      </div>
-      <div className="field">
-        <label className="label" htmlFor={`${ids}-headline`}>
-          Headline
-        </label>
-        <input
-          id={`${ids}-headline`}
-          className="input"
-          value={draft.headline}
-          onChange={(e) => setDraft({ ...draft, headline: e.target.value })}
-        />
-      </div>
-      <div className="field">
-        <label className="label" htmlFor={`${ids}-email`}>
-          Contact email
-        </label>
-        <input
-          id={`${ids}-email`}
-          type="email"
-          className="input"
-          placeholder={email}
-          value={draft.email}
-          onChange={(e) => setDraft({ ...draft, email: e.target.value })}
-        />
-      </div>
-      <div className="field">
-        <label className="label" htmlFor={`${ids}-links`}>
-          Links (one per line)
-        </label>
-        <textarea
-          id={`${ids}-links`}
-          className="textarea"
-          rows={2}
-          value={draft.links.join('\n')}
-          onChange={(e) =>
-            setDraft({
-              ...draft,
-              links: e.target.value
-                .split('\n')
-                .map((l) => l.trim())
-                .filter(Boolean),
-            })
-          }
-        />
-      </div>
-      <Button
-        size="sm"
-        variant="primary"
-        disabled={!dirty || saving}
-        onClick={() => onSave(draft)}
-        style={{ marginTop: 10 }}
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (dirty && !saving) onSave(draft);
+        }}
       >
-        {saving && dirty ? 'Saving…' : 'Save profile'}
-      </Button>
+        <div className="mb-3 grid gap-3 sm:grid-cols-2">
+          <Field label="Name" htmlFor={`${ids}-name`}>
+            <Input
+              id={`${ids}-name`}
+              value={draft.name}
+              onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+            />
+          </Field>
+          <Field label="Headline" htmlFor={`${ids}-headline`}>
+            <Input
+              id={`${ids}-headline`}
+              value={draft.headline}
+              onChange={(e) => setDraft({ ...draft, headline: e.target.value })}
+            />
+          </Field>
+        </div>
+        <Field
+          label="Contact email"
+          htmlFor={`${ids}-email`}
+          help="Left blank, documents fall back to the address you signed in with."
+        >
+          <Input
+            id={`${ids}-email`}
+            type="email"
+            placeholder={email}
+            value={draft.email}
+            onChange={(e) => setDraft({ ...draft, email: e.target.value })}
+          />
+        </Field>
+        <Field label="Links (one per line)" htmlFor={`${ids}-links`}>
+          <Textarea
+            id={`${ids}-links`}
+            rows={2}
+            value={draft.links.join('\n')}
+            onChange={(e) =>
+              setDraft({
+                ...draft,
+                links: e.target.value
+                  .split('\n')
+                  .map((l) => l.trim())
+                  .filter(Boolean),
+              })
+            }
+          />
+        </Field>
+        <Button type="submit" variant="primary" disabled={!dirty || saving}>
+          {saving && dirty ? 'Saving…' : 'Save profile'}
+        </Button>
+      </form>
     </Section>
   );
 }
 
 function WeightsCard({
   weights,
+  saving,
   onChange,
 }: {
   weights: Record<string, number>;
+  saving: boolean;
   onChange: (w: Record<string, number>) => void;
 }) {
-  const [draft, setDraft] = useState(weights);
+  const { draft, setDraft } = useServerDraft(weights);
+  const [pending, setPending] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const ids = useId();
 
-  useEffect(() => setDraft(weights), [weights]);
   useEffect(
     () => () => {
       if (timer.current) clearTimeout(timer.current);
@@ -482,29 +543,34 @@ function WeightsCard({
   function update(key: string, value: number) {
     const next = { ...draft, [key]: value };
     setDraft(next);
+    setPending(true);
     // Debounced live save: Ask reranks deterministically on next query.
     if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => onChange(next), 500);
+    timer.current = setTimeout(() => {
+      setPending(false);
+      onChange(next);
+    }, 500);
   }
 
   return (
-    <Section title="Ranking constants">
+    <Section title="Ranking constants" actions={<Chip mono>auto-saves</Chip>}>
       <p className="m-0 mb-3 text-sm text-ink-soft">
         Explainability includes tunability: Ask reranks live with these weights.
       </p>
-      <div className="stack" style={{ gap: 12 }}>
+      <div className="flex flex-col gap-2">
         {Object.entries(draft).map(([key, value]) => {
           const label = WEIGHT_LABELS[key] ?? key;
           return (
             <div key={key}>
-              <div className="spread" style={{ fontSize: 'var(--ae-text-sm)', marginBottom: 4 }}>
-                <label htmlFor={`${ids}-${key}`} style={{ color: 'var(--ae-fg-soft)' }}>
+              <div className="flex items-baseline justify-between gap-3">
+                <label htmlFor={`${ids}-${key}`} className="text-sm text-ink-soft">
                   {label}
                 </label>
-                <Mono style={{ color: 'var(--ae-muted)' }}>{value.toFixed(2)}</Mono>
+                <Mono className="text-sm text-muted">{value.toFixed(2)}</Mono>
               </div>
               <input
                 id={`${ids}-${key}`}
+                className="vt-range"
                 type="range"
                 min={0}
                 max={key === 'pinned' ? 1 : 3}
@@ -512,12 +578,19 @@ function WeightsCard({
                 value={value}
                 aria-valuetext={`${label}: ${value.toFixed(2)}`}
                 onChange={(e) => update(key, Number(e.target.value))}
-                style={{ width: '100%', accentColor: 'var(--ae-accent)' }}
               />
             </div>
           );
         })}
       </div>
+      {pending || saving ? (
+        <StatusTrace
+          className="mt-2"
+          tone="live"
+          label={pending ? 'Holding your change' : 'Saving ranking constants'}
+          detail={pending ? 'Saves once you stop moving' : undefined}
+        />
+      ) : null}
     </Section>
   );
 }
@@ -531,82 +604,91 @@ function AliasesCard({
   onSave: (a: Array<{ alias: string; canonical: string }>) => void;
   saving: boolean;
 }) {
-  const [rows, setRows] = useState(aliases);
+  const { draft: rows, setDraft: setRows, dirty } = useServerDraft(aliases);
   const [newAlias, setNewAlias] = useState('');
   const [newCanonical, setNewCanonical] = useState('');
-  const dirty = JSON.stringify(rows) !== JSON.stringify(aliases);
-  const ids = useId();
 
-  useEffect(() => setRows(aliases), [aliases]);
+  const canAdd = Boolean(newAlias.trim() && newCanonical.trim());
+  function add() {
+    if (!canAdd) return;
+    setRows([...rows, { alias: newAlias.trim(), canonical: newCanonical.trim() }]);
+    setNewAlias('');
+    setNewCanonical('');
+  }
 
   return (
-    <Section title="Taxonomy · skills & aliases" meta={rows.length}>
+    <Section
+      title="Taxonomy · skills & aliases"
+      meta={rows.length}
+      actions={<DirtyChip dirty={dirty} saving={saving} />}
+    >
       <p className="m-0 mb-3 text-sm text-ink-soft">
         The JD-parser dictionary: aliases resolve to canonical skills during capture and tailoring.
       </p>
-      <div className="stack" style={{ gap: 6 }}>
-        {rows.map((r, i) => (
-          <div
-            key={`${r.alias}-${i}`}
-            className="hstack"
-            style={{ fontFamily: 'var(--ae-font-mono)', fontSize: 'var(--ae-text-sm)' }}
-          >
-            <span style={{ color: 'var(--ae-muted)' }}>{r.alias}</span>
-            <span className="u-faint">→</span>
-            <span style={{ color: 'var(--ae-fg-soft)', flex: 1 }}>{r.canonical}</span>
-            <button
-              type="button"
-              className="coll__chipx"
-              aria-label={`Remove alias ${r.alias}`}
-              onClick={() => setRows(rows.filter((_, j) => j !== i))}
+      {rows.length === 0 ? (
+        <EmptyState
+          glyph="tag"
+          title="No aliases yet"
+          hint="Teach the parser that k8s means Kubernetes, and every future import agrees."
+        />
+      ) : (
+        <ul className="m-0 list-none p-0" aria-label="Skill aliases">
+          {rows.map((r, i) => (
+            <li
+              key={`${r.alias}-${i}`}
+              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-hairline py-1 last:border-b-0"
             >
-              ×
-            </button>
-          </div>
-        ))}
-        <div className="hstack">
-          <label className="sr-only" htmlFor={`${ids}-alias`}>
-            Alias
-          </label>
-          <input
-            id={`${ids}-alias`}
-            className="input"
-            style={{ width: 110 }}
-            placeholder="alias"
-            value={newAlias}
-            onChange={(e) => setNewAlias(e.target.value)}
-          />
-          <span className="u-faint">→</span>
-          <label className="sr-only" htmlFor={`${ids}-canonical`}>
-            Canonical skill
-          </label>
-          <input
-            id={`${ids}-canonical`}
-            className="input"
-            style={{ flex: 1 }}
-            placeholder="canonical skill"
-            value={newCanonical}
-            onChange={(e) => setNewCanonical(e.target.value)}
-          />
-          <Button
-            size="sm"
-            disabled={!newAlias.trim() || !newCanonical.trim()}
-            onClick={() => {
-              setRows([...rows, { alias: newAlias.trim(), canonical: newCanonical.trim() }]);
-              setNewAlias('');
-              setNewCanonical('');
-            }}
-          >
-            Add
-          </Button>
-        </div>
-      </div>
+              <span className="flex min-w-0 flex-wrap items-baseline gap-2 font-mono text-sm">
+                <span className="text-muted">{r.alias}</span>
+                <span className="text-faint" aria-hidden>
+                  →
+                </span>
+                <span className="sr-only">resolves to</span>
+                <span className="break-words text-ink-soft">{r.canonical}</span>
+              </span>
+              <Button
+                size="sm"
+                variant="ghost"
+                aria-label={`Remove alias ${r.alias}`}
+                onClick={() => setRows(rows.filter((_, j) => j !== i))}
+              >
+                Remove
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <form
+        className="mt-3 grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)_auto] items-center gap-2"
+        onSubmit={(event) => {
+          event.preventDefault();
+          add();
+        }}
+      >
+        <Input
+          aria-label="New alias"
+          mono
+          placeholder="alias"
+          value={newAlias}
+          onChange={(e) => setNewAlias(e.target.value)}
+        />
+        <Input
+          aria-label="Canonical skill for the new alias"
+          mono
+          placeholder="canonical skill"
+          value={newCanonical}
+          onChange={(e) => setNewCanonical(e.target.value)}
+        />
+        <Button type="submit" size="sm" disabled={!canAdd}>
+          Add
+        </Button>
+      </form>
       <Button
+        className="mt-3"
         size="sm"
         variant="primary"
         disabled={!dirty || saving}
         onClick={() => onSave(rows)}
-        style={{ marginTop: 10 }}
       >
         {saving && dirty ? 'Saving…' : 'Save aliases'}
       </Button>
@@ -638,43 +720,47 @@ function GithubCard({
   });
 
   return (
-    <div className="stack" style={{ gap: 10 }}>
-      <div className="spread">
-        <span className="u-muted">Token</span>
-        <Chip tone={configured ? 'success' : 'warning'} mono>
-          {configured ? 'configured' : 'not set'}
-        </Chip>
-      </div>
-      <div className="spread">
-        <span className="u-muted">Last sync</span>
-        <Mono>{formatGithubSync(lastSyncAt)}</Mono>
-      </div>
-      <div className="field" style={{ margin: 0 }}>
-        <label className="label" htmlFor={tokenId}>
-          Personal access token
-        </label>
-        <div className="hstack">
-          <input
+    <Section title="GitHub">
+      <Facts>
+        <Fact term="Token">
+          <Chip tone={configured ? 'success' : 'warning'} mono>
+            {configured ? 'configured' : 'not set'}
+          </Chip>
+        </Fact>
+        <Fact term="Last sync">
+          <Mono className="text-sm">{formatGithubSync(lastSyncAt)}</Mono>
+        </Fact>
+      </Facts>
+      <form
+        className="mt-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (token.trim() && !saveToken.isPending) saveToken.mutate(token.trim());
+        }}
+      >
+        <Field label="Personal access token" htmlFor={tokenId}>
+          <Input
             id={tokenId}
-            className="input"
             type="password"
             autoComplete="off"
             spellCheck={false}
-            style={{ flex: 1 }}
             placeholder="ghp_… (repo read scope)"
             value={token}
             onChange={(e) => setToken(e.target.value)}
           />
+        </Field>
+        <div className="flex flex-wrap gap-2">
           <Button
+            type="submit"
             size="sm"
             variant="primary"
             disabled={!token.trim() || saveToken.isPending}
-            onClick={() => saveToken.mutate(token.trim())}
           >
             {saveToken.isPending ? 'Saving…' : configured ? 'Replace' : 'Save'}
           </Button>
           {configured && (
             <Button
+              type="button"
               size="sm"
               disabled={disconnect.isPending}
               onClick={() => disconnect.mutate()}
@@ -684,11 +770,21 @@ function GithubCard({
             </Button>
           )}
         </div>
-      </div>
-      <p className="u-muted" style={{ fontSize: 'var(--ae-text-xs)', margin: 0 }}>
+      </form>
+      {saveToken.isError || disconnect.isError ? (
+        <StatusTrace
+          className="mt-2"
+          tone="warning"
+          label={saveToken.isError ? 'Couldn’t store the token' : 'Couldn’t disconnect GitHub'}
+          detail={
+            ((saveToken.error ?? disconnect.error) as Error | null)?.message ?? 'Try again.'
+          }
+        />
+      ) : null}
+      <p className="m-0 mt-2 text-xs text-muted">
         Stored server-side only, never echoed back. Sync and the repository list live on{' '}
-        <Link to="/data/sources/github">GitHub source</Link>.
+        <Link to="/data/sources/github">Repositories</Link>.
       </p>
-    </div>
+    </Section>
   );
 }
