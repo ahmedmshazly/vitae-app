@@ -49,22 +49,25 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
 /** Shell-level fallback: nav/chrome itself may be broken, so this offers a
  * hard reload alongside the in-place retry rather than assuming a state
- * reset alone can recover. */
+ * reset alone can recover.
+ *
+ * It used to rebuild `vt-error`'s markup by hand to fit the second button in,
+ * which forked the alert role and the spacing with it. `ErrorState` takes the
+ * extra control now. */
 export function ShellErrorFallback({ retry }: { retry: () => void }): ReactNode {
   return (
     <div className="app-splash">
-      <div className="vt-error" role="alert">
-        <span className="vt-error__title">Vitae hit an error</span>
-        <span className="vt-error__detail u-mono">Reloading usually clears this.</span>
-        <div style={{ display: 'flex', gap: 'var(--ae-space-2)' }}>
-          <Button size="sm" onClick={retry}>
-            Try again
-          </Button>
+      <ErrorState
+        title="Vitae hit an error"
+        detail="Reloading usually clears this."
+        onRetry={retry}
+        retryLabel="Try again"
+        action={
           <Button size="sm" variant="primary" onClick={() => window.location.reload()}>
             Reload page
           </Button>
-        </div>
-      </div>
+        }
+      />
     </div>
   );
 }

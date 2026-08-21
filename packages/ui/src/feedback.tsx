@@ -108,6 +108,13 @@ export interface ErrorStateProps {
   onRetry?: () => void;
   retryLabel?: string;
   retrying?: boolean;
+  /**
+   * A second way out, beside Retry: reload the page, go somewhere that still
+   * works, open the readable twin of a canvas that failed. Callers were
+   * rebuilding `vt-error` by hand to get one, which forks the role, the
+   * heading and the spacing along with it.
+   */
+  action?: ReactNode;
   className?: string;
 }
 export function ErrorState({
@@ -116,16 +123,22 @@ export function ErrorState({
   onRetry,
   retryLabel = 'Retry',
   retrying = false,
+  action,
   className,
 }: ErrorStateProps) {
   return (
     <div className={cn('vt-error', className)} role="alert">
       <span className="vt-error__title">{title}</span>
       {detail && <span className="vt-error__detail u-mono">{detail}</span>}
-      {onRetry && (
-        <button type="button" className="vt-btn vt-btn--sm" onClick={onRetry} disabled={retrying}>
-          {retrying ? 'Retrying…' : retryLabel}
-        </button>
+      {(onRetry || action) && (
+        <span className="vt-error__actions">
+          {onRetry && (
+            <button type="button" className="vt-btn vt-btn--sm" onClick={onRetry} disabled={retrying}>
+              {retrying ? 'Retrying…' : retryLabel}
+            </button>
+          )}
+          {action}
+        </span>
       )}
     </div>
   );

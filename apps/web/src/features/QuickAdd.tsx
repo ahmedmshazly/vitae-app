@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Chip, CommandOverlay, Glyph, Kbd } from '@vitae/ui';
+import { Chip, CommandOverlay, Glyph, Kbd, StatusTrace } from '@vitae/ui';
 import { isNodeType, type CapturePlan, type NodeType } from '@vitae/core';
 import { api } from '../lib/api.js';
 import { useToast } from './Toast.js';
@@ -112,6 +112,10 @@ export function QuickAdd({ onClose }: { onClose: () => void }) {
           // both, and reads as text the user already typed.
           placeholder="Capture anything, start with a leading key"
           value={value}
+          // The line is the only copy of what was typed, so it stays readable
+          // and stays editable while the save is in flight. What it must not
+          // do is take a second Enter: `commit` guards on `busy` for that.
+          aria-busy={busy}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') void commit();
@@ -122,6 +126,17 @@ export function QuickAdd({ onClose }: { onClose: () => void }) {
             // Escape is handled by the dialog.
           }}
         />
+        {/* Saving used to be silent: Enter did nothing visible until the
+            overlay closed, so a slow save read as a dropped keystroke and got
+            pressed again. */}
+        {busy && (
+          <StatusTrace
+            className="border-t border-hairline px-4 py-3"
+            tone="live"
+            label="Saving capture"
+            detail={plan?.primaryType && plan.primaryType !== 'unknown' ? `as ${plan.primaryType}` : undefined}
+          />
+        )}
         {error && (
           <p role="alert" className="flex items-start gap-2 border-t border-hairline px-4 py-3 text-sm text-danger">
             <Glyph name="close" size={14} className="mt-0.5 shrink-0" />

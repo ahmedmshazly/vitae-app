@@ -7,7 +7,7 @@
  * implemented. It is a Popover now, so Radix owns all of that.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Glyph, Mono, Popover, SkeletonRows } from '@vitae/ui';
+import { Button, ErrorState, Glyph, Mono, Popover, SkeletonRows } from '@vitae/ui';
 import { api } from '../lib/api.js';
 import { todayIso } from '../lib/dates.js';
 import { useToast } from './Toast.js';
@@ -47,7 +47,7 @@ export function RemindersDrawer({
   const qc = useQueryClient();
   const { flash } = useToast();
 
-  const { data, isLoading, isError, error, refetch } = useQuery({
+  const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: ['reminders'],
     queryFn: () => api.get<{ reminders: Reminder[] }>('/reminders?due=all'),
     enabled: open,
@@ -80,6 +80,12 @@ export function RemindersDrawer({
   });
 
   const reminders = data?.reminders ?? [];
+  // One row at a time: both actions refetch the whole list, so letting a
+  // second start would settle a reminder whose row is about to move.
+  const pendingId =
+    (done.isPending ? done.variables : undefined) ??
+    (snooze.isPending ? snooze.variables : undefined) ??
+    null;
 
   return (
     <Popover open={open} onOpenChange={onOpenChange} trigger={trigger} align="end" wide>
@@ -92,14 +98,15 @@ export function RemindersDrawer({
         </div>
 
         {isError ? (
-          <div role="alert" className="flex flex-col items-start gap-3 px-4 py-4">
-            <p className="text-sm text-danger">
-              <strong className="font-semibold">Couldn’t load reminders.</strong>{' '}
-              <span className="font-mono text-xs text-muted">{(error as Error | null)?.message}</span>
-            </p>
-            <Button size="sm" onClick={() => void refetch()}>
-              Retry
-            </Button>
+          // The shared error panel, not a second dialect of one: the drawer
+          // was writing its own alert markup for the same job.
+          <div className="p-4">
+            <ErrorState
+              title="Couldn’t load reminders"
+              detail={(error as Error | null)?.message}
+              onRetry={() => void refetch()}
+              retrying={isFetching}
+            />
           </div>
         ) : isLoading ? (
           <div className="px-4 py-3">
@@ -115,16 +122,32 @@ export function RemindersDrawer({
             {reminders.map((r) => {
               const d = due(r.due_on);
               return (
-                <li key={r.id} className="flex items-center gap-3 border-b border-hairline px-4 py-2 last:border-b-0">
+                <li
+                  key={r.id}
+                  className="flex items-center gap-3 border-b border-hairline px-4 py-2 last:border-b-0"
+                  // Both writes go to the server and both invalidate this
+                  // list, so a slow one used to look like a click that missed.
+                  aria-busy={pendingId === r.id}
+                >
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-ink">{r.note}</span>
                     <Mono className={`text-xs ${d.tone}`}>{d.label}</Mono>
                   </span>
-                  <Button size="sm" variant="ghost" onClick={() => snooze.mutate(r.id)}>
-                    Snooze
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={pendingId != null}
+                    onClick={() => snooze.mutate(r.id)}
+                  >
+                    {snooze.isPending && snooze.variables === r.id ? 'Snoozing…' : 'Snooze'}
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => done.mutate(r.id)}>
-                    Done
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={pendingId != null}
+                    onClick={() => done.mutate(r.id)}
+                  >
+                    {done.isPending && done.variables === r.id ? 'Marking…' : 'Done'}
                   </Button>
                 </li>
               );

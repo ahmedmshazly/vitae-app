@@ -1474,6 +1474,14 @@ button.vt-chip:focus-visible {
   font-size: var(--ae-text-xs);
   color: var(--ae-muted);
 }
+/* Retry plus one alternative. They wrap rather than shrink, so a long second
+   label does not squeeze Retry below the target floor on a narrow panel. */
+.vt-error__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--ae-space-2);
+}
 
 /* ── Status trace ── */
 .vt-status-trace {

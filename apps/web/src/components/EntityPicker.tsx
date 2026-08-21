@@ -3,9 +3,24 @@
  * nav and inline "Create '<typed text>'" stub rows, so linking never forces a
  * context switch. Self-contained dropdown (no portal) so it nests cleanly
  * inside dialogs.
+ *
+ * Three things it used to get wrong, all of them things the design system had
+ * already solved somewhere else:
+ *
+ * - the type chips were `<button className="vt-chip">` with an inline border
+ *   colour on the active one, so which type you had narrowed to was said in
+ *   colour and nothing else, and not said to a screen reader at all. That is
+ *   the exact defect `FilterGroup` exists to prevent, so it uses `FilterGroup`.
+ * - the search ran in an effect and ended `.catch(() => undefined)`. A dead
+ *   search looked identical to a search with no matches, and there was no way
+ *   to tell it was still running. It is a query now, with both states in words.
+ * - creating a stub was `void createStub(type)` around a promise with no
+ *   catch, so a failed create was an unhandled rejection and the row simply
+ *   did nothing. The failure is reported where the action was taken.
  */
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { EntityGlyph, useDebounced } from '@vitae/ui';
+import { useQuery } from '@tanstack/react-query';
+import { EntityGlyph, FilterGroup, Mono, StatusTrace, useDebounced } from '@vitae/ui';
 import type { NodeType } from '@vitae/core';
 import { api } from '../lib/api.js';
 import { typeLabel } from '../lib/entity-href.js';
@@ -41,56 +56,57 @@ function humanTypeList(types: NodeType[]): string {
   return `${labels.slice(0, -1).join(', ')}, or ${labels[labels.length - 1]}`;
 }
 
+/** The pseudo-key for "no type narrowing", kept out of the NodeType space. */
+const ALL = '__all__';
+
 export function EntityPicker({ types, onPick, placeholder, excludeIds = [], autoFocus }: EntityPickerProps) {
   const [value, setValue] = useState('');
-  const [hits, setHits] = useState<SwitchHit[]>([]);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
-  const [creating, setCreating] = useState(false);
+  const [creating, setCreating] = useState<NodeType | null>(null);
+  const [createError, setCreateError] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<NodeType | null>(null);
   const debounced = useDebounced(value, 120);
   const rootRef = useRef<HTMLDivElement>(null);
   const ids = useId();
 
+  const typesKey = types.join(',');
+  // A different set of offered types is a different picker: clear the narrowing
+  // and the typed text rather than searching the new types with the old query.
+  // Adjusted during render, which is what React recommends for reset-on-prop.
+  const [seenTypes, setSeenTypes] = useState(typesKey);
+  if (seenTypes !== typesKey) {
+    setSeenTypes(typesKey);
+    setTypeFilter(null);
+    setValue('');
+    setCreateError(null);
+  }
+
   const effectiveTypes = useMemo(
     () => (typeFilter ? ([typeFilter] as NodeType[]) : types),
     [typeFilter, types],
   );
-  const typesKey = types.join(',');
-  const excludeKey = excludeIds.join(',');
+  const effectiveKey = effectiveTypes.join(',');
+  const q = debounced.trim();
 
-  useEffect(() => {
-    setTypeFilter(null);
-    setValue('');
-    setHits([]);
-  }, [typesKey]);
+  const search = useQuery({
+    queryKey: ['entity-picker', effectiveKey, q],
+    queryFn: () => {
+      const qs = new URLSearchParams({ q });
+      if (effectiveKey) qs.set('types', effectiveKey);
+      return api.get<{ results: SwitchHit[] }>(`/search/switch?${qs.toString()}`);
+    },
+    enabled: q.length > 0,
+  });
 
-  useEffect(() => {
-    if (!debounced.trim()) {
-      setHits([]);
-      return;
-    }
-    let alive = true;
-    const qs = new URLSearchParams({ q: debounced });
-    if (effectiveTypes.length > 0) qs.set('types', effectiveTypes.join(','));
-    void api
-      .get<{ results: SwitchHit[] }>(`/search/switch?${qs.toString()}`)
-      .then((res) => {
-        if (!alive) return;
-        setHits(
-          res.results
-            .filter((h) => (effectiveTypes as string[]).includes(h.type))
-            .filter((h) => !excludeIds.includes(h.id))
-            .slice(0, 8),
-        );
-        setActive(0);
-      })
-      .catch(() => undefined);
-    return () => {
-      alive = false;
-    };
-     
-  }, [debounced, typesKey, excludeKey, typeFilter]);
+  // Excluding here rather than in the query key: a record linked a second ago
+  // should leave the list at once, without discarding the cached search.
+  const hits = !q
+    ? []
+    : (search.data?.results ?? [])
+        .filter((h) => (effectiveTypes as string[]).includes(h.type))
+        .filter((h) => !excludeIds.includes(h.id))
+        .slice(0, 8);
 
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
@@ -111,9 +127,18 @@ export function EntityPicker({ types, onPick, placeholder, excludeIds = [], auto
   const optionCount = hits.length + createOptions.length;
   const defaultPlaceholder = `Search ${humanTypeList(types)}…`;
 
+  // Only a new query sends the selection home. Keying this on the option count
+  // as well would re-home the row somebody had just arrowed to whenever a
+  // late result arrived.
+  useEffect(() => setActive(0), [q, effectiveKey]);
+  useEffect(() => {
+    setActive((a) => (optionCount === 0 ? 0 : Math.min(a, optionCount - 1)));
+  }, [optionCount]);
+
   async function createStub(type: NodeType) {
     if (creating) return;
-    setCreating(true);
+    setCreating(type);
+    setCreateError(null);
     try {
       const res = await api.post<{ node: { id: string; type: string; title: string } }>('/nodes', {
         type,
@@ -122,16 +147,18 @@ export function EntityPicker({ types, onPick, placeholder, excludeIds = [], auto
         confidence: 0.7,
       });
       choose({ id: res.node.id, type: res.node.type, title: res.node.title });
+    } catch (err) {
+      setCreateError(err instanceof Error ? err.message : `The ${typeLabel(type)} could not be created.`);
     } finally {
-      setCreating(false);
+      setCreating(null);
     }
   }
 
   function choose(entity: PickedEntity) {
     onPick(entity);
     setValue('');
-    setHits([]);
     setOpen(false);
+    setCreateError(null);
   }
 
   function pickActive() {
@@ -146,38 +173,22 @@ export function EntityPicker({ types, onPick, placeholder, excludeIds = [], auto
 
   const listboxId = `${ids}-listbox`;
   const optionId = (i: number) => `${ids}-opt-${i}`;
+  const searching = search.isFetching && hits.length === 0;
+  const noMatch = Boolean(q) && !search.isFetching && !search.isError && hits.length === 0;
 
   return (
     <div ref={rootRef} className="entity-picker">
       {types.length > 1 && (
-        <div className="chips" style={{ marginBottom: 8, flexWrap: 'wrap' }}>
-          <button
-            type="button"
-            className="vt-chip"
-            style={
-              typeFilter == null
-                ? { borderColor: 'var(--ae-accent)', color: 'var(--ae-accent-soft)', background: 'var(--ae-accent-bg-soft)' }
-                : undefined
-            }
-            onClick={() => setTypeFilter(null)}
-          >
-            All
-          </button>
-          {types.map((t) => (
-            <button
-              key={t}
-              type="button"
-              className="vt-chip"
-              style={
-                typeFilter === t
-                  ? { borderColor: 'var(--ae-accent)', color: 'var(--ae-accent-soft)', background: 'var(--ae-accent-bg-soft)' }
-                  : undefined
-              }
-              onClick={() => setTypeFilter(t)}
-            >
-              {typeLabel(t)}
-            </button>
-          ))}
+        <div className="mb-2">
+          <FilterGroup
+            label="Narrow to one type"
+            value={typeFilter ?? ALL}
+            options={[
+              { key: ALL, label: 'All' },
+              ...types.map((t) => ({ key: t as string, label: typeLabel(t) })),
+            ]}
+            onChange={(key) => setTypeFilter(key === ALL ? null : (key as NodeType))}
+          />
         </div>
       )}
       <input
@@ -188,6 +199,7 @@ export function EntityPicker({ types, onPick, placeholder, excludeIds = [], auto
         aria-activedescendant={open && optionCount > 0 ? optionId(active) : undefined}
         aria-autocomplete="list"
         aria-label={placeholder ?? defaultPlaceholder}
+        aria-busy={searching}
         placeholder={placeholder ?? defaultPlaceholder}
         value={value}
         autoFocus={autoFocus}
@@ -211,6 +223,30 @@ export function EntityPicker({ types, onPick, placeholder, excludeIds = [], auto
           }
         }}
       />
+
+      {/* Below the field, not inside the listbox: a listbox whose children are
+          not options is a listbox screen readers cannot count. */}
+      {open && searching && (
+        <StatusTrace className="mt-2" tone="live" label="Searching records" announce={false} />
+      )}
+      {open && search.isError && (
+        <StatusTrace
+          className="mt-2"
+          tone="danger"
+          label="Search is unavailable"
+          detail={(search.error as Error | null)?.message ?? 'You can still create a new record below.'}
+        />
+      )}
+      {createError && (
+        <StatusTrace className="mt-2" tone="danger" label="Nothing was created" detail={createError} />
+      )}
+      {open && noMatch && (
+        <p className="mt-2 text-sm text-muted">
+          No match for <span className="font-mono text-ink-soft">{q}</span>. Create one below, or
+          widen the type.
+        </p>
+      )}
+
       {open && optionCount > 0 && (
         <div className="entity-picker__list" role="listbox" id={listboxId} aria-label="Matching records">
           {hits.map((h, i) => (
@@ -227,11 +263,12 @@ export function EntityPicker({ types, onPick, placeholder, excludeIds = [], auto
               <EntityGlyph type={h.type} size="sm" />
               <span className="entity-picker__title">{h.title}</span>
               {h.subtitle && <span className="entity-picker__sub">{h.subtitle}</span>}
-              <span className="u-faint u-mono entity-picker__type">{h.type}</span>
+              <Mono className="entity-picker__type text-muted">{h.type}</Mono>
             </button>
           ))}
           {createOptions.map((type, j) => {
             const i = hits.length + j;
+            const busy = creating === type;
             return (
               <button
                 key={`create-${type}`}
@@ -239,25 +276,23 @@ export function EntityPicker({ types, onPick, placeholder, excludeIds = [], auto
                 type="button"
                 role="option"
                 aria-selected={i === active}
+                // aria-disabled rather than disabled: an option removed from
+                // the tree mid-list renumbers everything under it while the
+                // user is arrowing through.
+                aria-disabled={creating != null}
                 className={`entity-picker__opt entity-picker__opt--create${i === active ? ' entity-picker__opt--active' : ''}`}
                 onMouseEnter={() => setActive(i)}
                 onClick={() => void createStub(type)}
-                disabled={creating}
               >
                 <EntityGlyph type={type} size="sm" />
                 <span className="entity-picker__title">
-                  Create {typeLabel(type)} “{value.trim()}”, refine later
+                  {busy
+                    ? `Creating ${typeLabel(type)} “${value.trim()}”…`
+                    : `Create ${typeLabel(type)} “${value.trim()}”, refine later`}
                 </span>
               </button>
             );
           })}
-        </div>
-      )}
-      {open && value.trim() && optionCount === 0 && (
-        <div className="entity-picker__list" role="listbox" id={listboxId}>
-          <div className="u-muted" style={{ padding: '8px 12px', fontSize: 'var(--ae-text-sm)' }}>
-            No matches, pick a type chip above to create a new record.
-          </div>
         </div>
       )}
     </div>
