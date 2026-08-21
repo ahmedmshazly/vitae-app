@@ -1,16 +1,20 @@
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  Banner,
   Button,
   Chip,
   ConfirmDialog,
   EmptyState,
+  Field,
   Input,
   Mono,
   PageHeader,
   Select,
   Sheet,
+  StatusTrace,
+  Textarea,
   ErrorState,
   RegisterRule,
   SkeletonRows,
@@ -75,7 +79,15 @@ function targetLabel(target: Target): string {
   return [target.company, target.role_title].filter(Boolean).join(' - ') || target.role_title;
 }
 
+/** "Targets", "targets and atoms", "targets, outputs, and atoms". */
+function listSources(names: string[]): string {
+  if (names.length <= 1) return names[0] ?? '';
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
+}
+
 export function Letters() {
+  const ids = useId();
   const qc = useQueryClient();
   const { flash } = useToast();
   const [statusFilter, setStatusFilter] = useState('');
@@ -103,18 +115,28 @@ export function Letters() {
   /** Everything the server returned, before this screen's own filters. */
   const totalLetters = lettersData?.letters.length ?? 0;
 
-  const { data: targetsData } = useQuery({
+  const targetsQuery = useQuery({
     queryKey: ['targets'],
     queryFn: () => api.get<{ targets: Target[] }>('/targets'),
   });
-  const { data: resumesData } = useQuery({
+  const resumesQuery = useQuery({
     queryKey: ['resumes'],
     queryFn: () => api.get<{ resumes: ResumeRow[] }>('/resumes'),
   });
-  const { data: atomsData } = useQuery({
+  const atomsQuery = useQuery({
     queryKey: ['atoms'],
     queryFn: () => api.get<{ atoms: AtomRow[] }>('/atoms'),
   });
+  const targetsData = targetsQuery.data;
+  const resumesData = resumesQuery.data;
+  const atomsData = atomsQuery.data;
+  // Named, because "something failed" leaves the user guessing which picker
+  // they are looking at an empty list in.
+  const sourcesUnavailable = [
+    targetsQuery.isError ? 'Targets' : null,
+    resumesQuery.isError ? 'linked outputs' : null,
+    atomsQuery.isError ? 'atoms' : null,
+  ].filter((n): n is string => n !== null);
 
   const targets = useMemo(
     () => (targetsData?.targets ?? []).filter((t) => !t.deleted_at),
@@ -256,14 +278,53 @@ export function Letters() {
         title="Cover letters"
         subtitle="Deterministic hook / body / closer drafts linked to a job target. No generative text."
         actions={
-          <Button variant="primary" onClick={startCreate} disabled={targets.length === 0}>
+          <Button
+            variant="primary"
+            glyph="plus"
+            onClick={startCreate}
+            disabled={targets.length === 0}
+          >
             New letter
           </Button>
         }
       />
       <RegisterRule />
 
-      <div className="hstack" style={{ gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
+      {/* A greyed-out control with no stated reason is a dead end, and a
+          `title` on a disabled button is reachable by neither keyboard nor
+          screen reader. The two reasons it can be greyed out are different,
+          so both are said, in text, before you reach for it. */}
+      {targets.length === 0 &&
+        (targetsQuery.isError ? (
+          <Banner
+            tone="warning"
+            title="Job targets could not be loaded"
+            action={
+              <Button size="sm" onClick={() => void targetsQuery.refetch()}>
+                Try again
+              </Button>
+            }
+          >
+            A letter is always written to one, so there is nothing to write to until this load
+            succeeds.
+          </Banner>
+        ) : (
+          !targetsQuery.isLoading && (
+            <Banner
+              tone="info"
+              title="Add a job target first"
+              action={
+                <Link className="vt-btn vt-btn--sm" to="/career/resume/tailor">
+                  Open Tailor
+                </Link>
+              }
+            >
+              A letter is always written to one, and you have no targets yet.
+            </Banner>
+          )
+        ))}
+
+      <div className="mb-4 flex flex-wrap items-center gap-3">
         <Input
           aria-label="Search letters"
           placeholder="Search by company or role…"
@@ -284,7 +345,7 @@ export function Letters() {
         />
         {/* The count changes as you type with nothing moving focus, so it has
             to be announced rather than merely redrawn. */}
-        <Mono className="u-faint" role="status" aria-label="Letters shown">
+        <Mono className="text-xs text-muted" role="status" aria-label="Letters shown">
           {lettersQuery.data
             ? letters.length === totalLetters
               ? `${totalLetters}`
@@ -340,18 +401,21 @@ export function Letters() {
           }
         />
       ) : (
-        <div className="output-list">
+        // A list of records is a list: it was a div of articles, so nothing
+        // announced how many letters there were or which one of them this was.
+        <ul className="output-list m-0 list-none p-0" aria-label="Cover letters">
           {letters.map((letter) => {
             const target = targetsById.get(letter.target_id);
+            const name = target ? targetLabel(target) : letter.target_id;
             return (
-              <article className="output-row" key={letter.id}>
+              <li className="output-row" key={letter.id}>
                 <button
                   className="output-row__main"
                   type="button"
                   onClick={() => setSelectedId(letter.id)}
                 >
                   <div className="output-row__identity">
-                    <strong>{target ? targetLabel(target) : letter.target_id}</strong>
+                    <strong>{name}</strong>
                     <span>
                       {letter.blocks.length} blocks · updated {letter.updated_at.slice(0, 10)}
                     </span>
@@ -368,19 +432,27 @@ export function Letters() {
                   <Button
                     size="sm"
                     variant="ghost"
+                    // Three rows, three buttons called "Edit". The name has to
+                    // say which letter it edits.
+                    aria-label={`Edit the letter to ${name}`}
                     onClick={() => startEdit(letter)}
                     disabled={Boolean(letter.deleted_at)}
                   >
                     Edit
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => setSelectedId(letter.id)}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    aria-label={`Details of the letter to ${name}`}
+                    onClick={() => setSelectedId(letter.id)}
+                  >
                     Details
                   </Button>
                 </div>
-              </article>
+              </li>
             );
           })}
-        </div>
+        </ul>
       )}
 
       <Sheet
@@ -404,7 +476,7 @@ export function Letters() {
                   Archive
                 </Button>
               )}
-              <span style={{ flex: 1 }} />
+              <span className="flex-1" />
               {!selected.deleted_at && (
                 <Button variant="primary" onClick={() => startEdit(selected)}>
                   Edit
@@ -415,17 +487,23 @@ export function Letters() {
         }
       >
         {selected && (
-          <div className="stack" style={{ gap: 16 }}>
-            <div className="chips">
+          <div className="flex flex-col gap-5">
+            <div className="flex flex-wrap gap-2">
               <Chip mono>{selected.status}</Chip>
               <Chip mono>rev {selected.rev}</Chip>
               {selected.resume_id && <Chip mono>resume linked</Chip>}
             </div>
+            {mutate.isPending && (
+              <StatusTrace
+                tone="live"
+                label={mutate.variables?.action === 'restore' ? 'Restoring letter' : 'Archiving letter'}
+              />
+            )}
             {selected.blocks.map((block, i) => (
               <div key={`${block.kind}-${i}`} className="letter-block-preview">
-                <Mono className="u-faint">{block.kind}</Mono>
+                <Mono className="text-xs text-muted">{block.kind}</Mono>
                 {block.atom_id && <Chip mono>atom</Chip>}
-                <p>{block.text || <span className="u-muted">Atom-only block</span>}</p>
+                <p>{block.text || <span className="text-muted">Atom-only block</span>}</p>
               </div>
             ))}
           </div>
@@ -442,41 +520,60 @@ export function Letters() {
             <Button variant="ghost" onClick={closeEditor}>
               Cancel
             </Button>
-            <span style={{ flex: 1 }} />
+            <span className="flex-1" />
             <Button variant="primary" disabled={save.isPending} onClick={() => save.mutate()}>
               {save.isPending ? 'Saving…' : 'Save letter'}
             </Button>
           </>
         }
       >
-        <div className="stack" style={{ gap: 14 }}>
+        <div className="flex flex-col gap-4">
+          {/* This was a `.card` with an inline colour standing in for an error
+              panel. A card is a container, not a state, and the colour it
+              carried was the only thing saying the save had failed. */}
           {formError && (
-            <div className="card" style={{ color: 'var(--ae-danger, #b91c1c)' }} role="alert">
+            <Banner tone="danger" title="This letter was not saved">
               {formError}
-            </div>
+            </Banner>
           )}
-          <label className="stack" style={{ gap: 4 }}>
-            <span className="u-faint">Target</span>
+          {/* Every option in the three pickers below comes from a query of its
+              own. When one of those fails the picker is simply empty, which
+              reads as "you have no targets" rather than "we could not ask". */}
+          {sourcesUnavailable.length > 0 && (
+            <Banner tone="warning" title="Some choices could not be loaded">
+              {`${listSources(sourcesUnavailable)} could not be listed, so those pickers are empty. The rest of the letter still saves.`}
+            </Banner>
+          )}
+
+          {/* Each of these was a `<label>` wrapped around a Radix Select. A
+              label does not name a button, so all four comboboxes reached the
+              browser with no accessible name at all. */}
+          <Field label="Target" htmlFor={`${ids}-target`}>
             <Select
+              id={`${ids}-target`}
+              label="Target"
               value={draft.target_id || undefined}
               onChange={(value) => setDraft((d) => ({ ...d, target_id: value ?? '' }))}
               placeholder="Select target"
               options={targets.map((t) => ({ value: t.id, label: targetLabel(t) }))}
             />
-          </label>
-          <label className="stack" style={{ gap: 4 }}>
-            <span className="u-faint">Linked output (optional)</span>
+          </Field>
+          <Field label="Linked output" htmlFor={`${ids}-resume`} help="Optional. Ties the letter to the résumé you sent with it.">
             <Select
+              id={`${ids}-resume`}
+              label="Linked output"
               value={draft.resume_id || undefined}
               onChange={(value) => setDraft((d) => ({ ...d, resume_id: value ?? '' }))}
               placeholder="None"
               options={resumes.map((r) => ({ value: r.id, label: r.name }))}
             />
-          </label>
-          <label className="stack" style={{ gap: 4 }}>
-            <span className="u-faint">Status</span>
+          </Field>
+          <Field label="Status" htmlFor={`${ids}-status`}>
             <Select
+              id={`${ids}-status`}
+              label="Status"
               value={draft.status}
+              clearable={false}
               onChange={(value) =>
                 setDraft((d) => ({ ...d, status: (value as LetterStatus) || 'draft' }))
               }
@@ -486,29 +583,40 @@ export function Letters() {
                 { value: 'sent', label: 'Sent' },
               ]}
             />
-          </label>
+          </Field>
 
-          <div className="spread">
-            <h3 style={{ margin: 0, fontSize: 'var(--ae-text-sm)' }}>Blocks</h3>
+          <div className="flex items-center justify-between gap-3 border-b border-hairline pb-2">
+            <h3 className="m-0 text-sm font-semibold text-ink-strong">Blocks</h3>
             <Button
               size="sm"
               variant="ghost"
+              glyph="plus"
               onClick={addBodyBlock}
               disabled={draft.blocks.length >= 24}
             >
-              + Body block
+              Body block
             </Button>
           </div>
 
-          {draft.blocks.map((block, index) => (
-            <div key={`${block.kind}-${index}`} className="letter-block-editor">
-              <div className="spread" style={{ marginBottom: 6 }}>
-                <Mono className="u-faint">{block.kind}</Mono>
-                {block.kind === 'body' &&
-                  draft.blocks.filter((b) => b.kind === 'body').length > 1 && (
+          {draft.blocks.map((block, index) => {
+            const textId = `${ids}-block-${index}-text`;
+            const atomId = `${ids}-block-${index}-atom`;
+            // "body 2 of 3" rather than three controls all called "body": the
+            // kind alone does not tell two body blocks apart by name.
+            const bodies = draft.blocks.filter((b) => b.kind === 'body');
+            const ordinal =
+              block.kind === 'body' && bodies.length > 1
+                ? `body ${bodies.indexOf(block) + 1} of ${bodies.length}`
+                : block.kind;
+            return (
+              <div key={`${block.kind}-${index}`} className="letter-block-editor">
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <Mono className="text-xs text-muted">{ordinal}</Mono>
+                  {block.kind === 'body' && bodies.length > 1 && (
                     <Button
                       size="sm"
                       variant="ghost"
+                      aria-label={`Remove ${ordinal} block`}
                       onClick={() =>
                         setDraft((d) => ({
                           ...d,
@@ -519,25 +627,29 @@ export function Letters() {
                       Remove
                     </Button>
                   )}
+                </div>
+                <Field label={`${ordinal} text`} htmlFor={textId}>
+                  <Textarea
+                    id={textId}
+                    rows={4}
+                    placeholder={`${block.kind} text…`}
+                    value={block.text ?? ''}
+                    onChange={(e) => updateBlock(index, { text: e.target.value })}
+                  />
+                </Field>
+                <Field label="Or pull from an atom" htmlFor={atomId}>
+                  <Select
+                    id={atomId}
+                    label={`Atom for the ${ordinal} block`}
+                    value={block.atom_id || undefined}
+                    onChange={(value) => updateBlock(index, { atom_id: value || undefined })}
+                    placeholder="No atom"
+                    options={atoms.map((a) => ({ value: a.id, label: atomLabel(a) }))}
+                  />
+                </Field>
               </div>
-              <textarea
-                className="letter-block-editor__text"
-                rows={4}
-                placeholder={`${block.kind} text…`}
-                value={block.text ?? ''}
-                onChange={(e) => updateBlock(index, { text: e.target.value })}
-              />
-              <label className="stack" style={{ gap: 4, marginTop: 6 }}>
-                <span className="u-faint">Or pull from an atom</span>
-                <Select
-                  value={block.atom_id || undefined}
-                  onChange={(value) => updateBlock(index, { atom_id: value || undefined })}
-                  placeholder="No atom"
-                  options={atoms.map((a) => ({ value: a.id, label: atomLabel(a) }))}
-                />
-              </label>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </Sheet>
 

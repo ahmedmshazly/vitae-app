@@ -1666,11 +1666,11 @@
       "risk": "medium",
       "layers": [
         "component",
-        "e2e"
+        "a11y"
       ],
-      "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/routes/Letters.states.test.tsx"
+      ]
     },
     "apps/web/src/routes/MapView.tsx": {
       "risk": "medium",
