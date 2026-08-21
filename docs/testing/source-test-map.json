@@ -2004,12 +2004,12 @@
     "apps/web/src/routes/tailor/SelectionPane.tsx": {
       "risk": "medium",
       "layers": [
-        "component",
-        "e2e"
+        "component"
       ],
-      "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/tailor/SelectionPane.test.tsx"
+      ]
     },
     "apps/web/src/routes/tailor/Tailor.tsx": {
       "risk": "medium",
@@ -2024,12 +2024,12 @@
     "apps/web/src/routes/tailor/TargetRail.tsx": {
       "risk": "medium",
       "layers": [
-        "component",
-        "e2e"
+        "component"
       ],
-      "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/tailor/TargetRail.test.tsx"
+      ]
     },
     "apps/web/src/routes/tailor/types.ts": {
       "risk": "medium",

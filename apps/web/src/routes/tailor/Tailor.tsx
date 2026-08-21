@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { InfoPopover, Mono, PageHeader, RegisterRule } from '@vitae/ui';
+import { EmptyState, InfoPopover, Mono, PageHeader, RegisterRule } from '@vitae/ui';
 import { api } from '../../lib/api.js';
 import { TargetRail } from './TargetRail.js';
 import { SelectionPane } from './SelectionPane.js';
@@ -9,6 +9,11 @@ import { DocumentPane } from './DocumentPane.js';
 import { PreviewPane } from './PreviewPane.js';
 import type { AtomScore, AtomView, Draft, TailorResult, Target } from './types.js';
 import { defaultDraft } from './types.js';
+
+const MODES = [
+  { value: 'auto' as const, label: 'Auto' },
+  { value: 'manual' as const, label: 'Manual' },
+];
 
 function scoresMap(scores: AtomScore[] | undefined): Map<string, AtomScore> {
   return new Map((scores ?? []).map((score) => [score.atomId, score]));
@@ -192,7 +197,7 @@ export function Tailor() {
   }, [manualDeps, draft.mode]);
 
   return (
-    <div className="page" style={{ maxWidth: 1500 }}>
+    <div className="page max-w-[1500px]">
       <PageHeader
         title="Tailor a résumé"
         subtitle="Job description → weighted keywords → your atoms, your order → compiled PDF."
@@ -262,39 +267,43 @@ export function Tailor() {
         ) : (
           <div className="card">
             <h2 className="card__title">Live document</h2>
-            <div className="u-muted">Pick a target to assemble and edit the visual résumé.</div>
+            <EmptyState
+              glyph="resume"
+              title="No target selected"
+              hint="Pick a job target on the left, or paste a new description, and the résumé assembles here."
+            />
           </div>
         )}
 
-        <div className="stack" style={{ gap: 12 }}>
-          <div className="card" style={{ maxHeight: '72vh', overflowY: 'auto' }}>
-            <div className="spread" style={{ marginBottom: 10 }}>
+        <div className="flex flex-col gap-3">
+          <div className="card max-h-[72vh] overflow-y-auto">
+            <div className="mb-3 flex items-baseline justify-between gap-3">
               <h2 className="card__title">Content controls</h2>
-              <div className="hstack" style={{ gap: 4 }}>
-                {(['auto', 'manual'] as const).map((m) => (
+              <div role="group" aria-label="Selection mode" className="flex gap-1">
+                {MODES.map((m) => (
                   <button
-                    key={m}
-                    className="vt-chip"
-                    style={{
-                      cursor: 'pointer',
-                      textTransform: 'capitalize',
-                      ...(draft.mode === m
-                        ? {
-                            borderColor: 'var(--ae-accent)',
-                            color: 'var(--ae-accent-soft)',
-                            fontWeight: 600,
-                          }
-                        : {}),
-                    }}
-                    onClick={() => onDraft({ mode: m })}
+                    key={m.value}
+                    type="button"
+                    className="vt-chip cursor-pointer"
+                    aria-pressed={draft.mode === m.value}
+                    onClick={() => onDraft({ mode: m.value })}
                   >
-                    {m}
+                    {m.label}
                   </button>
                 ))}
               </div>
             </div>
+            <p className="mb-3 text-xs text-faint">
+              {draft.mode === 'auto'
+                ? 'Scored and packed for you. Pin or exclude to steer it.'
+                : 'You choose every bullet and its order.'}
+            </p>
             {!target ? (
-              <div className="u-muted">Pick a target to select details.</div>
+              <EmptyState
+                glyph="filter"
+                title="No target selected"
+                hint="Selection is scored against a job description, so pick a target first."
+              />
             ) : (
               <SelectionPane
                 atoms={atoms}

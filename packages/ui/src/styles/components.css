@@ -616,6 +616,12 @@
   cursor: pointer;
   user-select: none;
 }
+.vt-check--start {
+  align-items: flex-start;
+}
+.vt-check--start .vt-check__box {
+  margin-top: 1px;
+}
 .vt-check__box {
   display: inline-flex;
   align-items: center;

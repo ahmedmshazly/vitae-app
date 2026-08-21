@@ -190,13 +190,19 @@ export function Select({
 export interface CheckboxProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
-  label?: string;
+  label?: ReactNode;
   id?: string;
   disabled?: boolean;
+  /**
+   * Where the box sits against the label. Default centres it, which reads well
+   * for a one-line label and badly for a wrapped paragraph, so multi-line
+   * labels pass 'start' to keep the box on the first line.
+   */
+  align?: 'center' | 'start';
 }
-export function Checkbox({ checked, onChange, label, id, disabled }: CheckboxProps) {
+export function Checkbox({ checked, onChange, label, id, disabled, align }: CheckboxProps) {
   return (
-    <label className="vt-check">
+    <label className={cn('vt-check', align === 'start' && 'vt-check--start')}>
       <RadixCheckbox.Root
         id={id}
         checked={checked}

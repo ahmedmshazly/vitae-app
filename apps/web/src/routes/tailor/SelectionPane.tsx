@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Reorder } from 'motion/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button, Chip, Meter, Mono } from '@vitae/ui';
+import { Button, Checkbox, Chip, EmptyState, Meter, Mono, Select, StatusTrace } from '@vitae/ui';
 import { api } from '../../lib/api.js';
 import { ScoreBreakdown } from './ScoreBreakdown.js';
 import type { AtomScore, AtomView, Draft, TailorResult } from './types.js';
@@ -17,8 +17,43 @@ interface Props {
   onRunAuto: () => void;
 }
 
+const ROW = 'flex items-start gap-2 border-b border-hairline bg-surface px-2 py-2';
+const HANDLE = 'mt-0.5 shrink-0 cursor-grab text-faint select-none';
+
+/** Bullet text at the size the pane reads it, one place to change it. */
+const BULLET = 'text-sm text-ink-soft';
+
+function VariantSelect({
+  atom,
+  value,
+  onChange,
+}: {
+  atom: AtomView;
+  value: string;
+  onChange: (emphasis: Draft['preferredEmphasis']) => void;
+}) {
+  if (atom.variants.length <= 1) return null;
+  return (
+    // The row is drag-orderable, so a pointer down on the trigger has to stop
+    // short of starting a drag or the menu never opens.
+    <span className="mt-1 inline-flex" onPointerDown={(event) => event.stopPropagation()}>
+      <Select
+        label={`Wording variant for ${atom.owner_title}`}
+        value={value}
+        clearable={false}
+        mono
+        options={atom.variants.map((variant) => ({
+          value: variant.emphasis,
+          label: variant.emphasis,
+        }))}
+        onChange={(next) => next && onChange(next as Draft['preferredEmphasis'])}
+      />
+    </span>
+  );
+}
+
 /**
- * Middle pane: choose atoms. Auto mode runs the knapsack (pin 📌 / block 🚫
+ * Middle pane: choose atoms. Auto mode runs the knapsack (pin and exclude
  * rows, drag to reorder the result); Manual mode is checkboxes over every atom
  * grouped by role/project, with the included set fully drag-orderable.
  */
@@ -39,7 +74,8 @@ export function SelectionPane({
   };
 
   const alwaysPin = useMutation({
-    mutationFn: ({ id, pinned }: { id: string; pinned: boolean }) => api.patch(`/atoms/${id}`, { pinned }),
+    mutationFn: ({ id, pinned }: { id: string; pinned: boolean }) =>
+      api.patch(`/atoms/${id}`, { pinned }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['atoms'] }),
   });
 
@@ -55,6 +91,18 @@ export function SelectionPane({
   const toggleList = (list: string[], id: string): string[] =>
     list.includes(id) ? list.filter((x) => x !== id) : [...list, id];
 
+  const pinFailed = alwaysPin.isError;
+
+  if (atoms.length === 0) {
+    return (
+      <EmptyState
+        glyph="resume"
+        title="No evidence to select from"
+        hint="Atoms are the bullet-level record of what you did. Add a few in the Evidence library and they become selectable here."
+      />
+    );
+  }
+
   // ── Auto mode ───────────────────────────────────────────────────────────────
   if (draft.mode === 'auto') {
     const selectedSet = new Set(orderedIds);
@@ -62,75 +110,95 @@ export function SelectionPane({
     return (
       <>
         {!tailorResult ? (
-          <div className="stack" style={{ gap: 10 }}>
-            <div className="u-muted">Auto mode scores every atom against the JD keywords and packs the best set to one page.</div>
+          <div className="flex flex-col items-start gap-3">
+            <p className="m-0 text-sm text-muted">
+              Auto mode scores every atom against the job description keywords and packs the best
+              set onto one page.
+            </p>
             <Button variant="primary" disabled={tailorPending} onClick={onRunAuto}>
               {tailorPending ? 'Selecting…' : 'Auto-select atoms'}
             </Button>
+            {tailorPending && (
+              <StatusTrace tone="live" label="Scoring and packing" detail="One moment" />
+            )}
           </div>
         ) : (
           <>
-            <Meter used={tailorResult.pageEstimate.lines} budget={tailorResult.pageEstimate.budget} />
-            <div className="chips" style={{ margin: '10px 0' }}>
+            <Meter
+              used={tailorResult.pageEstimate.lines}
+              budget={tailorResult.pageEstimate.budget}
+            />
+            <div className="chips my-3">
               <Chip mono>{entries.length} bullets</Chip>
-              <Chip mono tone="accent">{Math.round(tailorResult.selection.weightedCoverage * 100)}% coverage</Chip>
-              <Button variant="ghost" disabled={tailorPending} onClick={onRunAuto}>
-                {tailorPending ? 'Re-selecting…' : '↻ Re-run'}
+              <Chip mono tone="accent">
+                {Math.round(tailorResult.selection.weightedCoverage * 100)}% coverage
+              </Chip>
+              <Button variant="ghost" size="sm" disabled={tailorPending} onClick={onRunAuto}>
+                {tailorPending ? 'Re-selecting…' : 'Re-run'}
               </Button>
             </div>
-            <div className="u-faint" style={{ fontSize: 'var(--ae-text-xs)', marginBottom: 6 }}>
-              Selected, drag to reorder, 📌 pin, ✕ exclude
-            </div>
-            <Reorder.Group axis="y" values={orderedIds} onReorder={(ids) => onDraft({ atomOrder: ids as string[] })} style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+            <p className="mb-2 text-xs text-faint">Selected. Drag to reorder, pin, or exclude.</p>
+            <Reorder.Group
+              axis="y"
+              values={orderedIds}
+              onReorder={(ids) => onDraft({ atomOrder: ids as string[] })}
+              className="m-0 list-none p-0"
+            >
               {orderedIds.map((id) => {
                 const e = entries.find((x) => x.atomId === id);
                 const a = atomsById.get(id);
                 if (!e) return null;
                 const pinnedHere = draft.pins.includes(id) || a?.pinned;
                 return (
-                  <Reorder.Item key={id} value={id} style={{ listStyle: 'none' }}>
-                    <div
-                      className="row"
-                      style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '6px 8px', borderBottom: '1px solid var(--ae-border)', background: 'var(--ae-surface)', cursor: 'grab' }}
-                    >
-                      <span className="u-faint" style={{ userSelect: 'none' }}>⋮⋮</span>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 'var(--ae-text-sm)', color: 'var(--ae-fg-soft)' }}>{e.text}</div>
-                        <div className="chips" style={{ marginTop: 4 }}>
+                  <Reorder.Item key={id} value={id} className="list-none">
+                    <div className={ROW}>
+                      <span className={HANDLE} aria-hidden>
+                        ⋮⋮
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className={BULLET}>{e.text}</div>
+                        <div className="chips mt-1">
                           <Chip mono>{a?.owner_title ?? e.ownerId}</Chip>
-                          <Mono className="u-faint">{e.lines} ln</Mono>
+                          <Mono className="text-xs text-faint">{e.lines} ln</Mono>
                           {scoreChip(id)}
-                          {pinnedHere && <Chip mono tone="accent">pinned</Chip>}
+                          {pinnedHere && (
+                            <Chip mono tone="accent">
+                              pinned
+                            </Chip>
+                          )}
                         </div>
-                        {a && a.variants.length > 1 && (
-                          <select
-                            className="atom-variant-select"
-                            aria-label="Wording variant"
+                        {a && (
+                          <VariantSelect
+                            atom={a}
                             value={draft.variantByAtom[id] ?? e.emphasis}
-                            onPointerDown={(event) => event.stopPropagation()}
-                            onChange={(event) =>
+                            onChange={(emphasis) =>
                               onDraft({
-                                variantByAtom: {
-                                  ...draft.variantByAtom,
-                                  [id]: event.target.value as Draft['preferredEmphasis'],
-                                },
+                                variantByAtom: { ...draft.variantByAtom, [id]: emphasis },
                               })
                             }
-                          >
-                            {a.variants.map((variant) => (
-                              <option key={variant.id} value={variant.emphasis}>
-                                {variant.emphasis}
-                              </option>
-                            ))}
-                          </select>
+                          />
                         )}
                       </div>
-                      <button title={pinnedHere ? 'Unpin for this target' : 'Pin for this target'} className="vt-chip" style={{ cursor: 'pointer' }} onClick={() => onDraft({ pins: toggleList(draft.pins, id) })}>
-                          📌
-                        </button>
-                      <button title="Exclude for this target" className="vt-chip" style={{ cursor: 'pointer' }} onClick={() => onDraft({ blocks: [...draft.blocks, id], pins: draft.pins.filter((p) => p !== id) })}>
-                          ✕
-                        </button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        aria-pressed={Boolean(pinnedHere)}
+                        onClick={() => onDraft({ pins: toggleList(draft.pins, id) })}
+                      >
+                        {pinnedHere ? 'Unpin' : 'Pin'}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() =>
+                          onDraft({
+                            blocks: [...draft.blocks, id],
+                            pins: draft.pins.filter((p) => p !== id),
+                          })
+                        }
+                      >
+                        Exclude
+                      </Button>
                     </div>
                   </Reorder.Item>
                 );
@@ -138,29 +206,44 @@ export function SelectionPane({
             </Reorder.Group>
 
             {(unselected.length > 0 || draft.blocks.length > 0) && (
-              <details style={{ marginTop: 10 }}>
-                <summary className="u-muted" style={{ cursor: 'pointer', fontSize: 'var(--ae-text-xs)' }}>
-                  Not selected ({unselected.length}), pin to force in
+              <details className="mt-3">
+                <summary className="cursor-pointer text-xs text-muted">
+                  Not selected ({unselected.length}). Pin to force one in.
                 </summary>
-                <div className="stack" style={{ gap: 4, marginTop: 6 }}>
+                <div className="mt-2 border-t border-hairline">
                   {unselected.map((a) => {
                     const blockedHere = draft.blocks.includes(a.id) || a.blocked;
                     return (
-                      <div key={a.id} className="row" style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '4px 8px', opacity: blockedHere ? 0.55 : 1 }}>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 'var(--ae-text-xs)', color: 'var(--ae-fg-soft)' }}>{defaultVariantText(a)}</div>
-                          <div className="chips" style={{ marginTop: 2 }}>
+                      <div key={a.id} className={ROW}>
+                        <div className="min-w-0 flex-1">
+                          <div className={`${BULLET} ${blockedHere ? 'text-muted' : ''}`}>
+                            {defaultVariantText(a)}
+                          </div>
+                          <div className="chips mt-1">
                             <Chip mono>{a.owner_title}</Chip>
                             {scoreChip(a.id)}
                             {blockedHere && <Chip mono>excluded</Chip>}
                           </div>
                         </div>
-                        <button title="Pin for this target (forces selection)" className="vt-chip" style={{ cursor: 'pointer' }} onClick={() => onDraft({ pins: toggleList(draft.pins, a.id), blocks: draft.blocks.filter((b) => b !== a.id) })}>
-                            📌
-                          </button>
-                        <button title={blockedHere ? 'Allow again' : 'Exclude for this target'} className="vt-chip" style={{ cursor: 'pointer' }} onClick={() => onDraft({ blocks: toggleList(draft.blocks, a.id) })}>
-                            {blockedHere ? '↺' : '✕'}
-                          </button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() =>
+                            onDraft({
+                              pins: toggleList(draft.pins, a.id),
+                              blocks: draft.blocks.filter((b) => b !== a.id),
+                            })
+                          }
+                        >
+                          Pin
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => onDraft({ blocks: toggleList(draft.blocks, a.id) })}
+                        >
+                          {blockedHere ? 'Allow' : 'Exclude'}
+                        </Button>
                       </div>
                     );
                   })}
@@ -185,65 +268,64 @@ export function SelectionPane({
       {tailorResult && (
         <>
           <Meter used={tailorResult.pageEstimate.lines} budget={tailorResult.pageEstimate.budget} />
-          <div className="chips" style={{ margin: '8px 0' }}>
+          <div className="chips my-2">
             <Chip mono>{included.length} bullets</Chip>
             <Chip mono>{tailorResult.pageEstimate.pages}p est.</Chip>
-            <Chip mono tone="accent">{Math.round(tailorResult.selection.weightedCoverage * 100)}% coverage</Chip>
+            <Chip mono tone="accent">
+              {Math.round(tailorResult.selection.weightedCoverage * 100)}% coverage
+            </Chip>
           </div>
         </>
       )}
 
       {included.length > 0 && (
         <>
-          <div className="u-faint" style={{ fontSize: 'var(--ae-text-xs)', margin: '6px 0' }}>
-            Included, drag to set the order on the page
-          </div>
-          <Reorder.Group axis="y" values={included} onReorder={(ids) => onDraft({ include: ids as string[] })} style={{ listStyle: 'none', margin: '0 0 10px', padding: 0 }}>
+          <p className="my-2 text-xs text-faint">Included. Drag to set the order on the page.</p>
+          <Reorder.Group
+            axis="y"
+            values={included}
+            onReorder={(ids) => onDraft({ include: ids as string[] })}
+            className="m-0 mb-3 list-none p-0"
+          >
             {included.map((id) => {
               const a = atomsById.get(id)!;
               return (
-                <Reorder.Item key={id} value={id} style={{ listStyle: 'none' }}>
-                  <div className="row" style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '6px 8px', borderBottom: '1px solid var(--ae-border)', background: 'var(--ae-surface)', cursor: 'grab' }}>
-                    <span className="u-faint" style={{ userSelect: 'none' }}>⋮⋮</span>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 'var(--ae-text-sm)', color: 'var(--ae-fg-soft)' }}>
-                        {tailorResult?.selection.entries.find((entry) => entry.atomId === id)?.text ??
-                          defaultVariantText(a)}
+                <Reorder.Item key={id} value={id} className="list-none">
+                  <div className={ROW}>
+                    <span className={HANDLE} aria-hidden>
+                      ⋮⋮
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className={BULLET}>
+                        {tailorResult?.selection.entries.find((entry) => entry.atomId === id)
+                          ?.text ?? defaultVariantText(a)}
                       </div>
-                      <div className="chips" style={{ marginTop: 4 }}>
+                      <div className="chips mt-1">
                         <Chip mono>{a.owner_title}</Chip>
                         {scoreChip(id)}
                       </div>
-                      {a.variants.length > 1 && (
-                        <select
-                          className="atom-variant-select"
-                          aria-label="Wording variant"
-                          value={
-                            draft.variantByAtom[id] ??
-                            a.variants.find((variant) => variant.is_default)?.emphasis ??
-                            a.variants[0]!.emphasis
-                          }
-                          onPointerDown={(event) => event.stopPropagation()}
-                          onChange={(event) =>
-                            onDraft({
-                              variantByAtom: {
-                                ...draft.variantByAtom,
-                                [id]: event.target.value as Draft['preferredEmphasis'],
-                              },
-                            })
-                          }
-                        >
-                          {a.variants.map((variant) => (
-                            <option key={variant.id} value={variant.emphasis}>
-                              {variant.emphasis}
-                            </option>
-                          ))}
-                        </select>
-                      )}
+                      <VariantSelect
+                        atom={a}
+                        value={
+                          draft.variantByAtom[id] ??
+                          a.variants.find((variant) => variant.is_default)?.emphasis ??
+                          a.variants[0]!.emphasis
+                        }
+                        onChange={(emphasis) =>
+                          onDraft({ variantByAtom: { ...draft.variantByAtom, [id]: emphasis } })
+                        }
+                      />
                     </div>
-                    <button className="vt-chip" style={{ cursor: 'pointer' }} onClick={() => onDraft({ include: draft.include.filter((x) => x !== id) })}>
-                      ✕
-                    </button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      aria-label={`Remove ${a.owner_title} bullet from this résumé`}
+                      onClick={() =>
+                        onDraft({ include: draft.include.filter((x) => x !== id) })
+                      }
+                    >
+                      Remove
+                    </Button>
                   </div>
                 </Reorder.Item>
               );
@@ -252,37 +334,55 @@ export function SelectionPane({
         </>
       )}
 
-      <div className="u-faint" style={{ fontSize: 'var(--ae-text-xs)', marginBottom: 6 }}>
-        All atoms, check to include
-      </div>
-      <div className="stack" style={{ gap: 10 }}>
+      {pinFailed && (
+        <StatusTrace
+          className="mb-2"
+          tone="danger"
+          label="Couldn’t change that pin"
+          detail="The atom is unchanged. Try again."
+        />
+      )}
+
+      <p className="mb-2 text-xs text-faint">All atoms. Check one to include it.</p>
+      <div className="flex flex-col gap-4">
         {[...byOwner.entries()].map(([owner, list]) => (
           <div key={owner}>
-            <div style={{ fontWeight: 600, fontSize: 'var(--ae-text-xs)', marginBottom: 4 }}>{owner}</div>
-            <div className="stack" style={{ gap: 2 }}>
+            <h3 className="m-0 mb-1 text-xs font-medium text-ink">{owner}</h3>
+            <div className="border-t border-hairline">
               {list.map((a) => {
                 const checked = draft.include.includes(a.id);
                 return (
-                  <label key={a.id} className="row" style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '4px 6px', cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => onDraft({ include: checked ? draft.include.filter((x) => x !== a.id) : [...draft.include, a.id] })}
-                      style={{ marginTop: 3 }}
-                    />
-                    <span style={{ flex: 1, fontSize: 'var(--ae-text-xs)', color: 'var(--ae-fg-soft)' }}>{defaultVariantText(a)}</span>
+                  <div key={a.id} className={ROW}>
+                    <span className="min-w-0 flex-1">
+                      <Checkbox
+                        align="start"
+                        checked={checked}
+                        label={<span className={BULLET}>{defaultVariantText(a)}</span>}
+                        onChange={(next) =>
+                          onDraft({
+                            include: next
+                              ? [...draft.include, a.id]
+                              : draft.include.filter((x) => x !== a.id),
+                          })
+                        }
+                      />
+                    </span>
                     {scoreChip(a.id)}
-                    <button title={a.pinned ? 'Always pinned, click to clear' : 'Always pin (persists on the atom)'}
-                        className="vt-chip"
-                        style={{ cursor: 'pointer', opacity: a.pinned ? 1 : 0.45 }}
-                        onClick={(ev) => {
-                          ev.preventDefault();
-                          alwaysPin.mutate({ id: a.id, pinned: !a.pinned });
-                        }}
-                      >
-                        ★
-                      </button>
-                  </label>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      aria-pressed={Boolean(a.pinned)}
+                      title={
+                        a.pinned
+                          ? 'Always pinned across every target. Click to clear.'
+                          : 'Always pin this atom across every target.'
+                      }
+                      disabled={alwaysPin.isPending}
+                      onClick={() => alwaysPin.mutate({ id: a.id, pinned: !a.pinned })}
+                    >
+                      {a.pinned ? 'Always on' : 'Always'}
+                    </Button>
+                  </div>
                 );
               })}
             </div>

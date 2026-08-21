@@ -49,11 +49,9 @@ export function ScoreBreakdown({ score }: Props) {
         <div className="atom-score-pop__section">
           <div className="atom-score-pop__label">Keyword hits → relevance {fmt(score.relevance)}</div>
           {score.hits.length === 0 ? (
-            <div className="u-faint" style={{ fontSize: 'var(--ae-text-xs)' }}>
-              No keyword matches
-            </div>
+            <div className="text-xs text-faint">No keyword matches</div>
           ) : (
-            <div className="stack" style={{ gap: 4 }}>
+            <div className="flex flex-col gap-1">
               {score.hits.map((hit) => (
                 <div key={`${hit.term}-${hit.via}`} className="atom-score-pop__row">
                   <span className="atom-score-pop__term">{hit.term}</span>

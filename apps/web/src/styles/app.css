@@ -2775,16 +2775,6 @@ button.row {
   border-top: 1px solid var(--ae-border);
 }
 
-.atom-variant-select {
-  margin-top: 6px;
-  padding: 3px 7px;
-  border: 1px solid var(--ae-border);
-  border-radius: 6px;
-  color: var(--ae-muted);
-  background: var(--ae-surface-raised);
-  font-size: var(--ae-text-xs);
-}
-
 .tailor-style-controls {
   display: grid;
   grid-template-columns: 1fr 1fr;
