@@ -469,21 +469,39 @@ export function DotGrid({
 }
 
 // ── ClosenessDots (1-5 declared closeness) ───────────────────────────────────
-export function ClosenessDots({ value, max = 5 }: { value: number | null; max?: number }) {
+/**
+ * Closeness as a row of dots.
+ *
+ * The dots used to carry the whole reading in one colour channel, with the
+ * number itself only in a `title` on a span, which is not a reliable place to
+ * put anything. The dots are decoration now and the value is stated in text:
+ * visible where there is room for it, and spoken either way.
+ */
+export function ClosenessDots({
+  value,
+  max = 5,
+  showValue = false,
+}: {
+  value: number | null;
+  max?: number;
+  /** Print the count beside the dots as well as announcing it. */
+  showValue?: boolean;
+}) {
+  const said = value != null ? `Closeness ${value} of ${max}` : 'Closeness not set';
   return (
-    <span
-      className="vt-closeness"
-      title={value != null ? `closeness ${value}/${max}` : 'closeness unset'}
-    >
-      {Array.from({ length: max }, (_, i) => (
-        <span
-          key={i}
-          className="vt-closeness__dot"
-          style={{
-            background: value != null && i < value ? 'var(--ae-accent)' : 'var(--ae-border)',
-          }}
-        />
-      ))}
+    <span className="vt-closeness">
+      <span className="vt-closeness__dots" aria-hidden>
+        {Array.from({ length: max }, (_, i) => (
+          <span
+            key={i}
+            className={cn(
+              'vt-closeness__dot',
+              value != null && i < value && 'vt-closeness__dot--on',
+            )}
+          />
+        ))}
+      </span>
+      <span className={showValue ? 'vt-closeness__value' : 'u-visually-hidden'}>{said}</span>
     </span>
   );
 }

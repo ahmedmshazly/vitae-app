@@ -2,7 +2,15 @@ import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { Button, DotGrid, EntityGlyph, FactorBar, FilterGroup, StrengthBar } from './components.js';
+import {
+  Button,
+  ClosenessDots,
+  DotGrid,
+  EntityGlyph,
+  FactorBar,
+  FilterGroup,
+  StrengthBar,
+} from './components.js';
 
 describe('Button', () => {
   it('renders the base vt-btn class with no modifier for default/md', () => {
@@ -213,5 +221,33 @@ describe('FactorBar', () => {
   it('never overflows the track when a part exceeds the scale', () => {
     const { container } = render(<FactorBar parts={[{ label: 'a', value: 5 }]} scale={1} label="Score 5.00" />);
     expect(container.querySelector<HTMLElement>('.vt-factorbar__seg')!.style.width).toBe('100%');
+  });
+});
+
+describe('ClosenessDots', () => {
+  it('states the value in text, not only in a title on a span', () => {
+    render(<ClosenessDots value={3} />);
+    expect(screen.getByText('Closeness 3 of 5')).toBeInTheDocument();
+  });
+
+  it('says so when closeness was never set', () => {
+    render(<ClosenessDots value={null} />);
+    expect(screen.getByText('Closeness not set')).toBeInTheDocument();
+  });
+
+  it('marks a set dot with a class, so fill and not only hue separates them', () => {
+    const { container } = render(<ClosenessDots value={2} max={4} />);
+    expect(container.querySelectorAll('.vt-closeness__dot')).toHaveLength(4);
+    expect(container.querySelectorAll('.vt-closeness__dot--on')).toHaveLength(2);
+  });
+
+  it('keeps the dots out of the accessibility tree', () => {
+    const { container } = render(<ClosenessDots value={1} />);
+    expect(container.querySelector('.vt-closeness__dots')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('prints the value beside the dots when asked to', () => {
+    const { container } = render(<ClosenessDots value={4} showValue />);
+    expect(container.querySelector('.vt-closeness__value')).toHaveTextContent('Closeness 4 of 5');
   });
 });

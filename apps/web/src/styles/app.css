@@ -2707,7 +2707,15 @@ button.row {
   width: 61%;
 }
 
+/*
+ * The score trigger sat at roughly 21px with no focus ring at all: its
+ * `outline: none` was paid for with a border tint, which is the one thing a
+ * focus indicator may not be. It keeps its small print and gains both the
+ * ring and, through the pseudo-element, the target floor.
+ */
 .atom-score-trigger {
+  --atom-score-trigger-h: 21px;
+  position: relative;
   display: inline-flex;
   align-items: center;
   padding: 1px 6px;
@@ -2719,11 +2727,21 @@ button.row {
   cursor: pointer;
   flex-shrink: 0;
 }
-.atom-score-trigger:hover,
+.atom-score-trigger::after {
+  content: '';
+  position: absolute;
+  inset-block: calc((var(--ae-hit-target) - var(--atom-score-trigger-h)) / -2);
+  inset-inline: 0;
+}
+.atom-score-trigger:hover {
+  border-color: var(--ae-accent);
+  color: var(--ae-accent-soft);
+}
 .atom-score-trigger:focus-visible {
   border-color: var(--ae-accent);
   color: var(--ae-accent-soft);
   outline: none;
+  box-shadow: var(--ae-focus-ring);
 }
 .atom-score-pop__head {
   display: flex;

@@ -93,10 +93,11 @@
 
 /* ── Chip ── */
 .vt-chip {
+  --vt-chip-h: 22px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 22px;
+  height: var(--vt-chip-h);
   padding: 0 var(--ae-space-2);
   border-radius: var(--ae-radius-sm);
   border: 1px solid var(--ae-border);
@@ -113,12 +114,26 @@
  * chip and a mode chip reading the same way across screens.
  */
 button.vt-chip {
+  position: relative;
   cursor: pointer;
   border-left-width: 2px;
   padding-left: calc(var(--ae-space-2) - 1px);
   transition:
     border-color var(--ae-dur) var(--ae-ease),
     color var(--ae-dur) var(--ae-ease);
+}
+/*
+ * A chip is 22px of ink, under the 32px floor DESIGN.md sets for a precise
+ * pointer and well under the 44px coarse one. Growing the box would loosen
+ * every dense filter row in the app, so the box stays and the target grows
+ * past it, the way `.vt-rating__dot` does. `--ae-hit-target` already changes
+ * on a coarse pointer, so this follows it without a second media query.
+ */
+button.vt-chip::after {
+  content: '';
+  position: absolute;
+  inset-block: calc((var(--ae-hit-target) - var(--vt-chip-h)) / -2);
+  inset-inline: 0;
 }
 button.vt-chip[aria-pressed='false'] {
   border-left-color: transparent;
@@ -489,13 +504,34 @@ button.vt-chip:focus-visible {
 /* ── ClosenessDots ── */
 .vt-closeness {
   display: inline-flex;
+  gap: var(--ae-space-2);
+  align-items: center;
+}
+.vt-closeness__dots {
+  display: inline-flex;
   gap: 4px;
   align-items: center;
 }
+.vt-closeness__value {
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-xs);
+}
+/*
+ * Filled and empty differ by ink as well as by hue: a set dot is solid, an
+ * unset one is an open ring. Colour alone would put the whole reading out of
+ * reach of anyone who cannot separate accent from border, which DESIGN.md
+ * forbids outright. The count itself is spoken by the sibling label.
+ */
 .vt-closeness__dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
+  border: 1px solid var(--ae-border-strong);
+  background: transparent;
+}
+.vt-closeness__dot--on {
+  border-color: var(--ae-accent);
+  background: var(--ae-accent);
 }
 
 /* ═══ Form primitives (FR-CAP-002) ═══ */
