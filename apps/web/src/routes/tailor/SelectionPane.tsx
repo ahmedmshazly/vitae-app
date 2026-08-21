@@ -79,7 +79,10 @@ export function SelectionPane({
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['atoms'] }),
   });
 
-  const entries = tailorResult?.selection.entries ?? [];
+  const entries = useMemo(
+    () => tailorResult?.selection.entries ?? [],
+    [tailorResult],
+  );
   const orderedIds = useMemo(() => {
     // Apply the draft's atomOrder to the auto selection (listed first, in order).
     const ids = entries.map((e) => e.atomId);

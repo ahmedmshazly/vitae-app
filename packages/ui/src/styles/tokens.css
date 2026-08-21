@@ -177,6 +177,32 @@
   --ae-data-media: var(--ae-viz-7);
   --ae-data-other: var(--ae-viz-8);
 
+  /* ── Simulated paper ──────────────────────────────────────────────────
+     The one light surface the product owns. Résumé previews, the live
+     document editor and the schema atlas all draw a printed page inside a
+     dark-only app, and the --ae-* ramp cannot express that: --ae-fg on white
+     is invisible and --ae-border on white is not there. These are the page's
+     own ink, not a second theme, and nothing outside a document preview may
+     use them.
+
+     --paper-affordance carries the editor's own controls sitting on the page
+     (drag grips, empty hints, field stubs). Those are app chrome that happens
+     to land on the document, so they answer to the app's contrast standard:
+     6.0:1 on white. Its predecessor was 3.21:1 and axe caught it. ── */
+  --paper-bg: #ffffff;
+  --paper-ink: #1e1e1e;
+  --paper-ink-strong: #111111;
+  --paper-ink-soft: #565656;
+  --paper-ink-muted: #687386;
+  --paper-rule: #c7ccd1;
+  --paper-rule-soft: #cdd5df;
+  --paper-edge: #d9dde1;
+  --paper-heading: #1f3a5f;
+  --paper-affordance: #5a6472;
+  --paper-affordance-border: #9aa2ad;
+  --paper-struck: #9ba0a6;
+  --paper-fill: #d8dee8;
+
   /* ── Legacy aliases, real consumers exist in screens not yet rebuilt
      under Quiet. Remove each alias once its last consumer lands. ── */
   --ae-muted-strong: var(--ae-muted);

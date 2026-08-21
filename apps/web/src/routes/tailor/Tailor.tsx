@@ -284,7 +284,7 @@ export function Tailor() {
                   <button
                     key={m.value}
                     type="button"
-                    className="vt-chip cursor-pointer"
+                    className="vt-chip"
                     aria-pressed={draft.mode === m.value}
                     onClick={() => onDraft({ mode: m.value })}
                   >

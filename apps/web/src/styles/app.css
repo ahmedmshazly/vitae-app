@@ -2642,15 +2642,16 @@ button.row {
   max-width: 1480px;
 }
 
-/* Paper simulation, so the light surface and its two literals are deliberate.
-   The drop shadow is not: tokens.css reserves the single shadow token for
-   dialogs and popovers and says nothing else may carry one. A hairline in the
-   paper's own ink separates it from the canvas without inventing elevation. */
+/* Paper simulation on the --paper-* ramp, the product's one light surface.
+   The drop shadow a preview like this usually carries is not here: tokens.css
+   reserves the single shadow token for dialogs and popovers and says nothing
+   else may carry one. A hairline separates the page from the canvas without
+   inventing elevation. */
 .template-preview {
   aspect-ratio: 8.5 / 5.3;
   overflow: hidden;
-  background: #fff;
-  color: #172033;
+  background: var(--paper-bg);
+  color: var(--paper-ink);
   border: 1px solid var(--ae-border-strong);
 }
 .template-preview--onyx {
@@ -2658,7 +2659,7 @@ button.row {
 }
 .template-preview--argon {
   font-family: var(--ae-font-sans);
-  color: #111;
+  color: var(--paper-ink-strong);
 }
 .template-preview__name {
   color: var(--template-accent);
@@ -2667,21 +2668,21 @@ button.row {
   letter-spacing: 0.04em;
 }
 .template-preview--argon .template-preview__name {
-  color: #111;
+  color: var(--paper-ink-strong);
 }
 .template-preview__contact {
   float: right;
   margin-top: -14px;
-  color: #687386;
+  color: var(--paper-ink-muted);
   font-size: 6px;
 }
 .template-preview__headline {
   margin: 3px 0 10px;
-  color: #687386;
+  color: var(--paper-ink-muted);
   font-size: 7px;
 }
 .template-preview__rule {
-  border-top: 1px solid #cdd5df;
+  border-top: 1px solid var(--paper-rule-soft);
 }
 .template-preview__section {
   margin: 8px 0 5px;
@@ -2690,14 +2691,14 @@ button.row {
   font-weight: 800;
 }
 .template-preview--argon .template-preview__section {
-  color: #111;
+  color: var(--paper-ink-strong);
 }
 .template-preview__line {
   width: 82%;
   height: 3px;
   margin: 4px 0;
   border-radius: 3px;
-  background: #d8dee8;
+  background: var(--paper-fill);
 }
 .template-preview__line.wide {
   width: 96%;
@@ -2791,18 +2792,38 @@ button.row {
 }
 .accent-picker {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
+/* The swatch is 25px of colour inside a hit target that meets the floor, so a
+   coarse pointer has something to land on without the row turning into discs. */
 .accent-picker button {
-  width: 25px;
-  height: 25px;
-  border: 2px solid transparent;
-  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  width: var(--ae-hit-target);
+  height: var(--ae-hit-target);
+  padding: 0;
+  border: 0;
+  background: none;
   cursor: pointer;
 }
-.accent-picker button.active {
+.accent-picker button::before {
+  content: '';
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: inherit;
+  box-shadow: inset 0 0 0 1px var(--ae-border-strong);
+}
+.accent-picker button[aria-pressed='true']::before {
   outline: 2px solid var(--ae-fg-strong);
   outline-offset: 2px;
+}
+.accent-picker button:focus-visible {
+  outline: none;
+}
+.accent-picker button:focus-visible::before {
+  box-shadow: var(--ae-focus-ring);
 }
 
 @media (max-width: 720px) {

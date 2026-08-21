@@ -1974,22 +1974,22 @@
     "apps/web/src/routes/tailor/DocumentPane.tsx": {
       "risk": "medium",
       "layers": [
-        "component",
-        "e2e"
+        "component"
       ],
-      "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/tailor/DocumentPane.test.tsx"
+      ]
     },
     "apps/web/src/routes/tailor/PreviewPane.tsx": {
       "risk": "medium",
       "layers": [
-        "component",
-        "e2e"
+        "component"
       ],
-      "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/tailor/PreviewPane.test.tsx"
+      ]
     },
     "apps/web/src/routes/tailor/ScoreBreakdown.tsx": {
       "risk": "medium",

@@ -31,6 +31,7 @@ import './styles/network.css';
 import './styles/dedup.css';
 import './styles/data-workspace.css';
 import './styles/explore-workspace.css';
+import './styles/resume-paper.css';
 import './styles/marketing.css';
 // entity-catalog-print.css and entity-observatory.css are imported by
 // routes/reference/EntityCatalog.tsx instead of here: 47 kB of CSS for one

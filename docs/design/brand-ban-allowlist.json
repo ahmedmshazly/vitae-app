@@ -27,16 +27,12 @@
     ],
     "raw-hex": [
       {
-        "file": "apps/web/src/styles/app.css",
-        "reason": "The .template-preview block simulates résumé paper: a light surface inside a dark-only app, so the --ae-* ramp (calibrated for dark) cannot express it. Scheduled for formalisation as --paper-* tokens alongside the Tailor work, which has the same problem at larger scale."
-      },
-      {
         "file": "apps/web/src/styles/entity-catalog-print.css",
-        "reason": "The A4 schema atlas renders simulated paper on screen and on paper. Same light-surface problem as .template-preview and the same planned --paper-* fix."
+        "reason": "The A4 schema atlas renders simulated paper on screen and on paper. The screen half now has --paper-* tokens to move to; the @media print half is deliberately literal black on white, because a print rule that resolves through a custom property is at the mercy of whatever the browser decided the property was."
       },
       {
         "file": "apps/web/src/styles/entity-observatory.css",
-        "reason": "Two hexes on .ec-workspace-print__sheet, the print and export mirror of the observatory. Same paper simulation."
+        "reason": "Two hexes on .ec-workspace-print__sheet, the print and export mirror of the observatory. Same print-literal argument as entity-catalog-print.css."
       }
     ]
   }

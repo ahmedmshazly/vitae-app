@@ -1,0 +1,261 @@
+/*
+ * The résumé paper replica in the Tailor workspace.
+ *
+ * Colour comes from the --paper-* ramp in tokens.css, the product's one light
+ * surface. Type sizes here are the document's own, matching what the LaTeX
+ * renderer will typeset, so they answer to the page rather than to the app's
+ * 11px chrome floor, and the same goes for the stub pill's radius.
+ */
+.paper {
+  width: 100%;
+  min-height: 760px;
+  padding: 28px 32px;
+  border: 1px solid var(--paper-edge);
+  background: var(--paper-bg);
+  color: var(--paper-ink);
+  font-family: Charter, Georgia, serif;
+}
+
+/*
+ * The shared skeleton fills with a dark-canvas token, which lands as a near
+ * black bar on white. On the page it takes the paper's own fill.
+ */
+.paper .vt-skel {
+  background: var(--paper-fill);
+}
+
+/* ── Editor affordances on the paper ─────────────────────────────────────── */
+.paper__grip {
+  color: var(--paper-affordance);
+  cursor: grab;
+  user-select: none;
+}
+.paper__grip--sm {
+  font-size: 11px;
+}
+.paper__hint {
+  color: var(--paper-affordance);
+  font-size: 11px;
+}
+.paper__eye {
+  padding: 2px 6px;
+}
+.paper__eye--off {
+  opacity: 0.55;
+}
+/*
+ * The shared chip toggle marks its pressed edge in the app accent, which does
+ * not belong on the page. These buttons say what they do in their own name,
+ * so the page keeps a plain chip.
+ */
+.paper button.vt-chip {
+  border-left-width: 1px;
+  border-left-color: var(--ae-border);
+  padding-left: var(--ae-space-2);
+}
+.paper__row {
+  list-style: none;
+}
+
+/* ── Masthead ────────────────────────────────────────────────────────────── */
+.paper__head {
+  margin-bottom: 8px;
+  text-align: center;
+}
+.paper__name {
+  color: var(--paper-heading);
+  font-family: Arial, sans-serif;
+  font-size: 27px;
+  font-weight: 800;
+}
+.paper__headline {
+  color: var(--paper-ink-soft);
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+.paper__tagline {
+  margin-top: 3px;
+  color: var(--paper-ink-soft);
+  font-size: 10.5px;
+}
+.paper__contacts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.paper__contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  cursor: grab;
+}
+.paper__contact--off {
+  opacity: 0.4;
+}
+.paper__stubs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 5px;
+}
+.paper__stub {
+  padding: 1px 5px;
+  border: 1px dashed var(--paper-affordance-border);
+  border-radius: 10px;
+  color: var(--paper-affordance);
+  font-size: 11px;
+}
+
+/* ── Sections ────────────────────────────────────────────────────────────── */
+.paper__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.paper__section {
+  margin-top: 6px;
+}
+.paper__section--off {
+  opacity: 0.38;
+}
+.paper__sectionhead {
+  display: grid;
+  grid-template-columns: 16px 1fr auto;
+  align-items: center;
+  gap: 4px;
+  color: var(--paper-heading);
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+.paper__sectiontitle {
+  padding-bottom: 1px;
+  border-bottom: 1px solid var(--paper-rule);
+}
+.paper__sectionbody {
+  margin-top: 4px;
+  margin-left: 20px;
+}
+.paper__summary {
+  font-size: 10.5px;
+  line-height: 1.32;
+}
+
+/* ── Entries ─────────────────────────────────────────────────────────────── */
+.paper__entry {
+  position: relative;
+  margin-bottom: 7px;
+  padding-left: 6px;
+  border-left: 2px solid transparent;
+}
+.paper__entry--off {
+  border-left-style: dashed;
+  border-left-color: var(--paper-rule);
+  opacity: 0.42;
+}
+.paper__entryhead {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.paper__role {
+  flex: 1;
+  font-size: 12.5px;
+}
+.paper__dates {
+  color: var(--paper-ink-soft);
+  font-size: 10.5px;
+}
+.paper__org {
+  margin-left: 19px;
+  color: var(--paper-ink-soft);
+  font-size: 10.5px;
+  font-style: italic;
+}
+.paper__bullets {
+  margin: 3px 0 0 22px;
+  padding: 0;
+  list-style: none;
+}
+.paper__bullet {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  align-items: start;
+  gap: 5px;
+  /*
+   * The document's own bullet size, matching the dates and subtitles beside
+   * it. The app's 11px floor governs the editor affordances on the paper, not
+   * the paper's contents.
+   */
+  font-size: 10.5px;
+  line-height: 1.28;
+  cursor: grab;
+}
+.paper__bullet--off {
+  opacity: 0.4;
+}
+.paper__mark {
+  color: var(--paper-heading);
+}
+.paper__drop {
+  padding: 0 4px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.paper__empty {
+  margin-left: 19px;
+  color: var(--paper-affordance);
+  font-size: 11px;
+}
+
+/* ── Skill rows and plain lines ──────────────────────────────────────────── */
+.paper__skillrow {
+  display: grid;
+  grid-template-columns: 16px 105px 1fr auto;
+  align-items: start;
+  gap: 4px;
+  margin-bottom: 3px;
+}
+.paper__skillrow--off {
+  opacity: 0.42;
+}
+.paper__skilllabel {
+  font-size: 10.5px;
+}
+.paper__skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px 4px;
+}
+.paper__skill {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--paper-ink);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.paper__skill--off {
+  color: var(--paper-struck);
+  text-decoration: line-through;
+}
+.paper__line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+  font-size: 10.5px;
+}
+.paper__line--off {
+  opacity: 0.42;
+}
+.paper__linetext {
+  flex: 1;
+}

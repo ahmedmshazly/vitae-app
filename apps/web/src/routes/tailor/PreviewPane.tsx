@@ -1,7 +1,18 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Chip, Spinner } from '@vitae/ui';
+import {
+  Button,
+  Chip,
+  ErrorState,
+  Field,
+  Input,
+  Select,
+  Skeleton,
+  SkeletonRows,
+  StatusTrace,
+  Textarea,
+} from '@vitae/ui';
 import { api } from '../../lib/api.js';
 import { PdfPreview } from '../../components/PdfPreview.js';
 import type { CompileResult, Draft, FinalizeResult } from './types.js';
@@ -13,6 +24,29 @@ interface Template {
   version: string;
   description?: string;
   accent_options?: string[];
+}
+
+const EMPHASIS_OPTIONS = [
+  { value: 'technical', label: 'Technical' },
+  { value: 'leadership', label: 'Leadership' },
+  { value: 'concise', label: 'Concise' },
+  { value: 'detailed', label: 'Detailed' },
+];
+
+/** Fallback swatches for a template that declares no palette of its own. */
+const DEFAULT_ACCENTS = ['#2563eb', '#0f766e', '#7c3aed', '#b45309', '#be123c', '#111827'];
+
+/** A .tex download, offered whenever the PDF itself could not be produced. */
+function TexDownload({ tex }: { tex: string }) {
+  return (
+    <a
+      className="vt-btn vt-btn--sm"
+      download="resume.tex"
+      href={`data:application/x-tex;charset=utf-8,${encodeURIComponent(tex)}`}
+    >
+      Download .tex
+    </a>
+  );
 }
 
 /**
@@ -38,12 +72,11 @@ export function PreviewPane({
         '/resumes/templates',
       ),
   });
-  const tpl = tplQuery.data;
-  const templates = tpl?.templates ?? [];
+  const templates = tplQuery.data?.templates ?? [];
   const activeTemplate = templates.find((t) => t.key === draft.templateKey);
   const accentOptions = activeTemplate?.accent_options?.length
     ? activeTemplate.accent_options
-    : ['#2563eb', '#0f766e', '#7c3aed', '#b45309', '#be123c', '#111827'];
+    : DEFAULT_ACCENTS;
 
   const compile = useMutation({
     mutationFn: () => api.post<CompileResult>('/resumes/compile', compileBody(targetId, draft)),
@@ -62,44 +95,52 @@ export function PreviewPane({
     <div className="card">
       <h2 className="card__title">Preview &amp; output</h2>
 
-      <div className="chips" style={{ marginBottom: 8 }}>
-        {templates.map((t) => (
-          <button
-            key={t.key}
-            className="vt-chip"
-            style={{
-              cursor: 'pointer',
-              textTransform: 'capitalize',
-              ...(t.key === draft.templateKey
-                ? { borderColor: 'var(--ae-accent)', color: 'var(--ae-accent-soft)' }
-                : {}),
-            }}
-            onClick={() => onDraft({ templateKey: t.key })}
-          >
-            {t.name ?? t.key}
-          </button>
-        ))}
-      </div>
+      {tplQuery.isError ? (
+        <ErrorState
+          className="mb-3"
+          title="Couldn’t load the templates"
+          detail={(tplQuery.error as Error | null)?.message}
+          onRetry={() => void tplQuery.refetch()}
+          retrying={tplQuery.isFetching}
+        />
+      ) : tplQuery.isLoading ? (
+        <div className="chips mb-2" aria-hidden>
+          <Skeleton width={72} height={22} />
+          <Skeleton width={64} height={22} />
+          <Skeleton width={80} height={22} />
+        </div>
+      ) : (
+        <div className="chips mb-2" role="group" aria-label="Résumé template">
+          {templates.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              className="vt-chip capitalize"
+              aria-pressed={t.key === draft.templateKey}
+              title={t.description}
+              onClick={() => onDraft({ templateKey: t.key })}
+            >
+              {t.name ?? t.key}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="tailor-style-controls">
-        <label>
-          <span>Wording emphasis</span>
-          <select
-            className="input"
-            aria-label="Wording emphasis"
+        <Field label="Wording emphasis" htmlFor="tailor-emphasis">
+          <Select
+            id="tailor-emphasis"
+            label="Wording emphasis"
             value={draft.preferredEmphasis}
-            onChange={(event) =>
-              onDraft({ preferredEmphasis: event.target.value as Draft['preferredEmphasis'] })
+            clearable={false}
+            options={EMPHASIS_OPTIONS}
+            onChange={(value) =>
+              value && onDraft({ preferredEmphasis: value as Draft['preferredEmphasis'] })
             }
-          >
-            <option value="technical">Technical</option>
-            <option value="leadership">Leadership</option>
-            <option value="concise">Concise</option>
-            <option value="detailed">Detailed</option>
-          </select>
-        </label>
+          />
+        </Field>
         <div>
-          <span>Accent</span>
+          <span className="vt-fld__label">Accent</span>
           <div className="accent-picker" role="group" aria-label="Template accent">
             {accentOptions.map((accent) => (
               <button
@@ -107,7 +148,6 @@ export function PreviewPane({
                 type="button"
                 aria-label={`Use ${accent} accent`}
                 aria-pressed={draft.accent === accent}
-                className={draft.accent === accent ? 'active' : ''}
                 style={{ background: accent }}
                 onClick={() => onDraft({ accent })}
               />
@@ -116,15 +156,15 @@ export function PreviewPane({
         </div>
       </div>
 
-      <div className="stack" style={{ gap: 8, marginBottom: 10 }}>
-        <input
-          className="input"
+      <div className="mb-3 flex flex-col gap-2">
+        <Input
+          aria-label="Headline"
           placeholder="Headline (defaults to the role title)"
           value={draft.headline}
           onChange={(e) => onDraft({ headline: e.target.value })}
         />
-        <textarea
-          className="textarea"
+        <Textarea
+          aria-label="Summary paragraph"
           rows={3}
           placeholder="Summary paragraph (optional, appears under the header)"
           value={draft.summary}
@@ -132,7 +172,7 @@ export function PreviewPane({
         />
       </div>
 
-      <div className="hstack" style={{ gap: 8, marginBottom: 12 }}>
+      <div className="mb-3 flex flex-wrap gap-2">
         <Button
           variant="primary"
           glyph="resume"
@@ -153,17 +193,28 @@ export function PreviewPane({
         </Button>
       </div>
 
+      {finalize.isError && (
+        <StatusTrace
+          className="mb-3"
+          tone="danger"
+          label="Couldn’t finalize this résumé"
+          detail={(finalize.error as Error | null)?.message ?? 'Nothing was saved. Try again.'}
+        />
+      )}
+
       {finalized && (
-        <div className="card" style={{ background: 'var(--ae-surface-overlay)', marginBottom: 10 }}>
+        <div className="mb-3 border border-hairline bg-overlay p-3">
           <div className="chips">
             <Chip tone={finalized.status === 'final' ? 'accent' : 'default'}>
-              {finalized.status === 'final' ? '✓ finalized' : 'saved as draft'}
+              {finalized.status === 'final' ? 'Finalized' : 'Saved as draft'}
             </Chip>
-            <Chip mono>
-              {finalized.onePage ? '✓ one page' : `✗ ${finalized.pages ?? '?'} pages`}
+            <Chip mono tone={finalized.onePage ? 'success' : 'warning'}>
+              {finalized.onePage ? 'One page' : `${finalized.pages ?? '?'} pages`}
             </Chip>
-            <Chip mono>{finalized.gatePassed ? '✓ coverage gate' : '✗ below 95% coverage'}</Chip>
-            {finalized.needsManualTrim && <Chip>needs manual trim</Chip>}
+            <Chip mono tone={finalized.gatePassed ? 'success' : 'warning'}>
+              {finalized.gatePassed ? 'Coverage gate passed' : 'Below 95% coverage'}
+            </Chip>
+            {finalized.needsManualTrim && <Chip tone="warning">Needs manual trim</Chip>}
             {(finalized.fitDecisions?.length ?? 0) > 0 && (
               <Chip mono>
                 {finalized.fitDecisions!.length} fit step
@@ -172,13 +223,13 @@ export function PreviewPane({
             )}
           </div>
           {finalized.needsManualTrim && (
-            <p className="u-muted" style={{ marginTop: 8, fontSize: 'var(--ae-text-sm)' }}>
+            <p className="mt-2 mb-0 text-sm text-muted">
               Still over one page after auto trim. Drop or reword bullets in Selection, then
               finalize again.
             </p>
           )}
           {(finalized.fitDecisions?.length ?? 0) > 0 && (
-            <div className="chips" style={{ marginTop: 8 }}>
+            <div className="chips mt-2">
               {finalized.fitDecisions!.map((decision) => (
                 <Chip key={`${decision.iteration}-${decision.atomId}`} mono>
                   #{decision.iteration}{' '}
@@ -188,7 +239,7 @@ export function PreviewPane({
               ))}
             </div>
           )}
-          <div style={{ marginTop: 8 }}>
+          <div className="mt-2">
             <Link to="/career/resume/outputs" className="vt-btn vt-btn--sm">
               Open Outputs →
             </Link>
@@ -197,25 +248,41 @@ export function PreviewPane({
       )}
 
       {compile.isPending ? (
-        <Spinner />
+        <>
+          <StatusTrace
+            className="mb-2"
+            tone="live"
+            label="Typesetting the PDF"
+            detail="This runs LaTeX, so it takes a moment"
+          />
+          <SkeletonRows rows={5} label="Compiling the résumé" />
+        </>
+      ) : compile.isError ? (
+        <ErrorState
+          title="Couldn’t reach the build service"
+          detail={(compile.error as Error | null)?.message}
+          onRetry={() => compile.mutate()}
+          retryLabel="Compile again"
+          retrying={compile.isPending}
+        />
       ) : !r ? (
-        <div className="u-muted">Compile to preview the PDF and its ATS keyword coverage.</div>
+        <p className="m-0 text-sm text-muted">
+          Compile to preview the PDF and its ATS keyword coverage.
+        </p>
       ) : (
         <>
           {r.coverage && (
-            <div style={{ marginBottom: 10 }}>
-              <div className="spread">
-                <span className="u-muted">Weighted coverage</span>
-                <Chip mono tone={r.coverage.passesGate ? 'accent' : 'default'}>
+            <div className="mb-3">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm text-muted">Weighted coverage</span>
+                <Chip mono tone={r.coverage.passesGate ? 'success' : 'warning'}>
                   {Math.round(r.coverage.weightedPct * 100)}%{' '}
-                  {r.coverage.passesGate ? '✓ gate' : '· below 95%'}
+                  {r.coverage.passesGate ? 'gate passed' : 'below 95%'}
                 </Chip>
               </div>
               {r.coverage.gaps.length > 0 && (
-                <div className="chips" style={{ marginTop: 6 }}>
-                  <span className="u-faint" style={{ fontSize: 'var(--ae-text-xs)' }}>
-                    gaps:
-                  </span>
+                <div className="chips mt-2">
+                  <span className="text-xs text-faint">Not covered:</span>
                   {r.coverage.gaps.slice(0, 12).map((g) => (
                     <Chip key={g.term}>{g.term}</Chip>
                   ))}
@@ -224,7 +291,7 @@ export function PreviewPane({
             </div>
           )}
           {r.pages != null && (
-            <div className="chips" style={{ marginBottom: 8 }}>
+            <div className="chips mb-2">
               <Chip mono tone={r.pages === 1 ? 'accent' : 'default'}>
                 {r.pages} page{r.pages === 1 ? '' : 's'}
               </Chip>
@@ -234,57 +301,34 @@ export function PreviewPane({
           {r.pdfBase64 ? (
             <PdfPreview base64={r.pdfBase64} />
           ) : r.offline ? (
-            <div className="card" style={{ background: 'var(--ae-surface-overlay)' }}>
-              <div className="spread" style={{ marginBottom: 8 }}>
-                <Chip tone="accent">build service offline</Chip>
-                <a
-                  className="vt-btn vt-btn--sm"
-                  download="resume.tex"
-                  href={`data:application/x-tex;charset=utf-8,${encodeURIComponent(r.tex)}`}
-                >
-                  Download .tex
-                </a>
+            <div className="border border-hairline bg-overlay p-3">
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <Chip tone="warning">Build service offline</Chip>
+                <TexDownload tex={r.tex} />
               </div>
-              <div className="u-muted" style={{ fontSize: 'var(--ae-text-sm)' }}>
-                Start it with <code>docker compose up -d buildsvc</code>, then compile again.
-              </div>
+              <p className="m-0 text-sm text-muted">
+                Start it with <code>docker compose up -d buildsvc</code>, then compile again. The
+                LaTeX source is complete either way.
+              </p>
             </div>
           ) : (
-            <div
-              className="card"
-              style={{
-                background: 'var(--ae-surface-overlay)',
-                borderColor: 'var(--ae-danger, #b3462e)',
-              }}
-            >
-              <div className="spread" style={{ marginBottom: 8 }}>
-                <Chip>compile failed</Chip>
-                <a
-                  className="vt-btn vt-btn--sm"
-                  download="resume.tex"
-                  href={`data:application/x-tex;charset=utf-8,${encodeURIComponent(r.tex)}`}
-                >
-                  Download .tex
-                </a>
+            <div className="border border-danger bg-overlay p-3" role="alert">
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <Chip tone="danger">Compile failed</Chip>
+                <TexDownload tex={r.tex} />
               </div>
-              <div style={{ fontSize: 'var(--ae-text-sm)', marginBottom: 6 }}>
+              <p className="mb-2 text-sm text-ink">
                 <strong>{r.error?.code ?? 'COMPILE_ERROR'}</strong>:{' '}
-                {r.error?.message ?? 'compilation failed'}
+                {r.error?.message ?? 'The document did not typeset.'}
                 {r.error?.section ? ` (near section: ${r.error.section})` : ''}
-              </div>
+              </p>
               {r.logTail && (
-                <pre
-                  style={{
-                    fontFamily: 'var(--ae-font-mono)',
-                    fontSize: 11,
-                    color: 'var(--ae-muted)',
-                    maxHeight: 220,
-                    overflow: 'auto',
-                    whiteSpace: 'pre-wrap',
-                  }}
-                >
-                  {r.logTail}
-                </pre>
+                <details>
+                  <summary className="cursor-pointer text-xs text-faint">LaTeX log</summary>
+                  <pre className="mt-2 max-h-[220px] overflow-auto font-mono text-xs whitespace-pre-wrap text-muted">
+                    {r.logTail}
+                  </pre>
+                </details>
               )}
             </div>
           )}

@@ -106,6 +106,38 @@
   line-height: 1;
   white-space: nowrap;
 }
+/*
+ * A chip used as a toggle. The pressed state has to carry in more than colour,
+ * so the border thickens on the leading edge as well as taking the accent.
+ * Any button.vt-chip with aria-pressed gets this, which is what keeps a filter
+ * chip and a mode chip reading the same way across screens.
+ */
+button.vt-chip {
+  cursor: pointer;
+  border-left-width: 2px;
+  padding-left: calc(var(--ae-space-2) - 1px);
+  transition:
+    border-color var(--ae-dur) var(--ae-ease),
+    color var(--ae-dur) var(--ae-ease);
+}
+button.vt-chip[aria-pressed='false'] {
+  border-left-color: transparent;
+}
+button.vt-chip[aria-pressed='true'] {
+  border-left-color: var(--ae-accent);
+  color: var(--ae-fg-strong);
+}
+button.vt-chip:hover {
+  border-color: var(--ae-border-strong);
+}
+button.vt-chip[aria-pressed='true']:hover {
+  border-left-color: var(--ae-accent);
+}
+button.vt-chip:focus-visible {
+  outline: none;
+  box-shadow: var(--ae-focus-ring);
+}
+
 .vt-chip--accent {
   border-color: var(--ae-accent-bg);
   background: var(--ae-accent-bg-soft);
