@@ -541,6 +541,7 @@ export function AtlasView() {
               reducedMotion={reducedMotion}
               pickMode={pickMode}
               onMapPick={(lat, lng) => void onMapPickCoords(lat, lng)}
+              onShowList={() => setMode('list')}
             />
           )}
 

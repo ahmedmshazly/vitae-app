@@ -3,6 +3,7 @@ import { LngLatBounds, Map as MapLibreMapCtor, Marker, setWorkerUrl } from 'mapl
 import type { GeoJSONSource, Map as MapLibreMap, Marker as MapLibreMarker } from 'maplibre-gl';
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { ErrorState, StatusTrace } from '@vitae/ui';
 import { project } from '../../lib/cities.js';
 import { colorForType, type GraphPalette } from '../../lib/graph-palette.js';
 import type { AtlasDisplayPrefs } from './displayPrefs.js';
@@ -23,6 +24,12 @@ import { NAMED_TYPES, TYPE_FILTERS } from './types.js';
 setWorkerUrl(maplibreWorkerUrl);
 
 const STYLE_URL = 'https://tiles.openfreemap.org/styles/dark';
+/**
+ * A hung request produces no error event, only silence, so readiness needs a
+ * deadline as well as a listener. Generous enough for a cold cache on a slow
+ * link; short enough that nobody watches a blank panel wondering.
+ */
+const BOOT_TIMEOUT_MS = 15_000;
 const ARC_SOURCE = 'atlas-arcs';
 const ARC_LAYER = 'atlas-arcs-line';
 const STEM_SOURCE = 'atlas-stems';
@@ -54,6 +61,19 @@ export interface AtlasCanvasProps {
   /** When set, map clicks reverse-geocode instead of selecting pins. */
   pickMode?: boolean;
   onMapPick?: (lat: number, lng: number) => void;
+  /** Offered when tiles fail: the List view is the same data without tiles. */
+  onShowList?: () => void;
+}
+
+/** Plain language for the panel; the raw message goes in the detail line. */
+function describeMapFailure(err: unknown): string {
+  const message =
+    err && typeof err === 'object' && 'message' in err && typeof err.message === 'string'
+      ? err.message
+      : '';
+  if (/webgl/i.test(message)) return 'This browser could not start WebGL, which the map needs.';
+  if (message) return message;
+  return 'The tile service did not answer.';
 }
 
 function countFor(entry: MapCity, active: Set<string>): number {
@@ -109,6 +129,7 @@ export const AtlasCanvas = forwardRef<AtlasMapHandle, AtlasCanvasProps>(function
     reducedMotion,
     pickMode = false,
     onMapPick,
+    onShowList,
   },
   ref,
 ) {
@@ -123,6 +144,9 @@ export const AtlasCanvas = forwardRef<AtlasMapHandle, AtlasCanvasProps>(function
   onSelectCorridorRef.current = onSelectCorridor;
   const [mapReady, setMapReady] = useState(false);
   const [mapZoom, setMapZoom] = useState(1.6);
+  const [mapError, setMapError] = useState<string | null>(null);
+  const [tilesDegraded, setTilesDegraded] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   const pins = useMemo(() => {
     const out: PinBase[] = [];
@@ -229,21 +253,48 @@ export const AtlasCanvas = forwardRef<AtlasMapHandle, AtlasCanvasProps>(function
     [pins, reducedMotion],
   );
 
-  // Init map once.
+  // Init map. `attempt` re-runs this after a retry from the failure state.
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
-    const map = new MapLibreMapCtor({
-      container: el,
-      style: STYLE_URL,
-      center: [10, 20],
-      zoom: 1.6,
-      attributionControl: { compact: true },
-      pitchWithRotate: false,
-      dragRotate: false,
-    });
+    let map: MapLibreMap;
+    try {
+      map = new MapLibreMapCtor({
+        container: el,
+        style: STYLE_URL,
+        center: [10, 20],
+        zoom: 1.6,
+        attributionControl: { compact: true },
+        pitchWithRotate: false,
+        dragRotate: false,
+      });
+    } catch (err) {
+      // The constructor throws outright when there is no WebGL context. Left
+      // uncaught it takes down the whole route instead of one panel.
+      setMapError(describeMapFailure(err));
+      return;
+    }
     mapRef.current = map;
+
+    let loaded = false;
+    const bootTimer = window.setTimeout(() => {
+      if (!loaded) setMapError('The tile service did not respond.');
+    }, BOOT_TIMEOUT_MS);
+
+    // Style and tiles come from a third-party host, and a style that fails
+    // leaves `load` unfired forever. Before load, an error is fatal: nothing
+    // will paint. After load it is one tile of many, so the map stays usable
+    // and says which parts are missing rather than silently showing gaps.
+    const onError = (e: { error?: unknown }) => {
+      if (loaded) {
+        setTilesDegraded(true);
+        return;
+      }
+      window.clearTimeout(bootTimer);
+      setMapError(describeMapFailure(e?.error));
+    };
+    map.on('error', onError);
 
     const onZoom = () => setMapZoom(map.getZoom());
     const onMapClick = (e: { lngLat: { lat: number; lng: number } }) => {
@@ -271,6 +322,9 @@ export const AtlasCanvas = forwardRef<AtlasMapHandle, AtlasCanvasProps>(function
     map.on('zoom', onZoom);
     map.on('click', onMapClick);
     map.on('load', () => {
+      loaded = true;
+      window.clearTimeout(bootTimer);
+      setMapError(null);
       setMapReady(true);
       setMapZoom(map.getZoom());
       if (!map.getSource(CORRIDOR_SOURCE)) {
@@ -358,6 +412,8 @@ export const AtlasCanvas = forwardRef<AtlasMapHandle, AtlasCanvasProps>(function
     });
 
     return () => {
+      window.clearTimeout(bootTimer);
+      map.off('error', onError);
       map.off('zoom', onZoom);
       map.off('click', onMapClick);
       if (map.getLayer(CORRIDOR_HIT)) {
@@ -371,7 +427,7 @@ export const AtlasCanvas = forwardRef<AtlasMapHandle, AtlasCanvasProps>(function
       mapRef.current = null;
       setMapReady(false);
     };
-  }, []);
+  }, [attempt]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -381,6 +437,13 @@ export const AtlasCanvas = forwardRef<AtlasMapHandle, AtlasCanvasProps>(function
 
   // Fit once when pins first available after map ready.
   const didFitRef = useRef(false);
+  const retryMap = () => {
+    didFitRef.current = false;
+    setTilesDegraded(false);
+    setMapError(null);
+    setMapReady(false);
+    setAttempt((n) => n + 1);
+  };
   useEffect(() => {
     if (!mapReady || didFitRef.current || pins.length === 0) return;
     didFitRef.current = true;
@@ -553,16 +616,55 @@ export const AtlasCanvas = forwardRef<AtlasMapHandle, AtlasCanvasProps>(function
     reducedMotion,
   ]);
 
+  // The failure panel carries its own alert, so the polite region goes quiet
+  // rather than announcing the same thing twice or reading a stale "loading".
+  const liveStatus = mapError
+    ? ''
+    : mapReady
+      ? tilesDegraded
+        ? `Atlas ready with ${pins.length} mapped places. Some map tiles are missing.`
+        : `Atlas ready with ${pins.length} mapped places`
+      : 'Loading map tiles';
+
   return (
     <div
-      className={`atlas__panel${pickMode ? ' atlas__panel--pick' : ''}`}
+      className={`atlas__panel${pickMode ? ' atlas__panel--pick' : ''}${mapError ? ' atlas__panel--failed' : ''}`}
       role="region"
       aria-label={`Atlas map with ${pins.length} mapped ${pins.length === 1 ? 'place' : 'places'}. Use List view for the complete keyboard-readable equivalent.`}
-      aria-busy={!mapReady}
+      aria-busy={!mapReady && !mapError}
     >
       <div className="atlas__map" ref={containerRef} role="presentation" />
+      {mapError && (
+        <div className="atlas__failure">
+          <ErrorState
+            className="atlas__failurestate"
+            title="Map tiles did not load"
+            detail={mapError}
+            onRetry={retryMap}
+            retryLabel="Try again"
+          />
+          <p className="atlas__failurehint">
+            List view holds the same {pins.length} mapped {pins.length === 1 ? 'place' : 'places'}{' '}
+            and needs no tiles.
+          </p>
+          {onShowList && (
+            <button type="button" className="vt-btn vt-btn--sm" onClick={onShowList}>
+              Show list instead
+            </button>
+          )}
+        </div>
+      )}
+      {mapReady && tilesDegraded && (
+        <StatusTrace
+          className="atlas__degraded"
+          tone="warning"
+          announce={false}
+          label="Some map tiles are missing"
+          detail="List view is complete"
+        />
+      )}
       <span className="u-visually-hidden" role="status" aria-live="polite">
-        {mapReady ? `Atlas ready with ${pins.length} mapped places` : 'Loading map tiles'}
+        {liveStatus}
       </span>
       <span className="atlas__attr">OpenFreeMap · MapLibre</span>
     </div>
