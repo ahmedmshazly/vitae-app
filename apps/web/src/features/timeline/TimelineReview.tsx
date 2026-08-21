@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Button, Chip, Mono, Spinner } from '@vitae/ui';
+import { Button, Chip, ErrorState, Mono, StatusTrace } from '@vitae/ui';
 import { entityHref } from '../../lib/entity-href.js';
 import type { TimelineReviewResult } from './types.js';
 
@@ -10,9 +10,17 @@ export interface TimelineReviewProps {
   onExportMarkdown: () => void;
   /** The digest lookup failed, distinct from an empty window. */
   failed?: boolean;
+  onRetry?: () => void;
 }
 
-export function TimelineReviewDock({ review, loading, onClear, onExportMarkdown, failed }: TimelineReviewProps) {
+export function TimelineReviewDock({
+  review,
+  loading,
+  onClear,
+  onExportMarkdown,
+  failed,
+  onRetry,
+}: TimelineReviewProps) {
   return (
     <aside className="tl__review" aria-label="Season review">
       <div className="tl__reviewhead">
@@ -28,18 +36,20 @@ export function TimelineReviewDock({ review, loading, onClear, onExportMarkdown,
       </div>
 
       {loading && (
-        <div style={{ display: 'grid', placeItems: 'center', padding: 24 }}>
-          <Spinner />
+        <div className="tl__reviewstate">
+          <StatusTrace label="Reading this season" detail="Grouping dated evidence" tone="live" />
         </div>
       )}
 
       {/* `isError` was never read, so a failed digest fell back to the default
           header and looked exactly like not having brushed anything yet. */}
       {!loading && failed && (
-        <p role="alert" className="text-sm text-danger">
-          <strong className="font-semibold">Couldn’t summarise that range.</strong> The chronograph itself is
-          unaffected, brush again to retry.
-        </p>
+        <ErrorState
+          title="Couldn’t summarise that range"
+          detail="The chronograph is unaffected. Retry this range or clear the brush to choose another."
+          onRetry={onRetry}
+          retryLabel="Retry review"
+        />
       )}
 
       {!loading && !failed && review && (
@@ -83,7 +93,8 @@ export function TimelineReviewDock({ review, loading, onClear, onExportMarkdown,
                     // The badge counts every match; the list stops at 40. It
                     // said "57" over 40 rows and nothing about the other 17.
                     <p className="u-faint text-xs">
-                      Showing the first {sec.items.length} of {sec.count}. Narrow the window to see the rest.
+                      Showing the first {sec.items.length} of {sec.count}. Narrow the window to see
+                      the rest.
                     </p>
                   )}
                 </details>
@@ -92,7 +103,12 @@ export function TimelineReviewDock({ review, loading, onClear, onExportMarkdown,
           )}
 
           <div className="tl__reviewfoot">
-            <Button size="sm" variant="primary" onClick={onExportMarkdown} disabled={!review.sections.length}>
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={onExportMarkdown}
+              disabled={!review.sections.length}
+            >
               Export Markdown
             </Button>
             <Button size="sm" onClick={onClear}>

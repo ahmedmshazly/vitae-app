@@ -12,7 +12,7 @@
 .vt-toast-viewport {
   position: fixed;
   right: var(--ae-space-5);
-  bottom: var(--ae-space-5);
+  bottom: max(var(--ae-space-5), env(safe-area-inset-bottom));
   z-index: var(--ae-z-toast);
   display: flex;
   flex-direction: column;
@@ -33,13 +33,21 @@
 .vt-toast {
   padding: var(--ae-space-3) var(--ae-space-3) var(--ae-space-3) var(--ae-space-4);
   border: 1px solid var(--ae-border-strong);
-  /* The rail. Two pixels of state on the leading edge, never the only
-     carrier of it: every coloured variant also ships a glyph and a word. */
-  border-left: 2px solid var(--ae-border-strong);
   border-radius: var(--ae-radius);
   background: var(--ae-surface-overlay);
   box-shadow: var(--ae-shadow-overlay);
   animation: vt-toast-in var(--ae-dur) var(--ae-ease);
+}
+/* Host applications can carry a legacy `.toast` selector during migration.
+   Its old rule positioned every item against the viewport; the design-system
+   viewport owns placement now, so this higher-specificity reset keeps queued
+   items in normal stack flow without requiring a breaking E2E-selector edit. */
+.vt-toast.toast {
+  position: relative;
+  inset: auto;
+  display: block;
+  align-items: initial;
+  gap: initial;
 }
 .vt-toast[data-state='closed'] {
   animation: vt-toast-out var(--ae-dur-fast) linear;
@@ -74,7 +82,7 @@
 }
 
 /* The row is one element in from the <li> because it also carries the string
-   Radix announces (see toast.tsx). Layout lives here; the box, the rail and
+   Radix announces (see toast.tsx). Layout lives here; the box and
    the motion stay on the item itself. */
 .vt-toast__row {
   display: flex;
@@ -108,16 +116,16 @@
   overflow-wrap: anywhere;
 }
 
-/* Colour is the third signal, after the glyph and the word. */
+/* Colour is a redundant signal after the glyph shape and status word. */
 .vt-toast--error {
-  border-left-color: var(--ae-danger);
+  border-color: color-mix(in srgb, var(--ae-danger) 42%, var(--ae-border-strong));
 }
 .vt-toast--error .vt-toast__glyph,
 .vt-toast--error .vt-toast__word {
   color: var(--ae-danger);
 }
 .vt-toast--success {
-  border-left-color: var(--ae-success);
+  border-color: color-mix(in srgb, var(--ae-success) 34%, var(--ae-border-strong));
 }
 .vt-toast--success .vt-toast__glyph,
 .vt-toast--success .vt-toast__word {
@@ -130,7 +138,7 @@
   flex: none;
   display: inline-flex;
   align-items: center;
-  height: 28px;
+  min-height: var(--ae-control-h);
   padding: 0 var(--ae-space-3);
   border: 1px solid var(--ae-border-control);
   border-radius: var(--ae-radius-sm);
@@ -140,7 +148,9 @@
   font-size: var(--ae-text-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--ae-dur) var(--ae-ease), border-color var(--ae-dur) var(--ae-ease);
+  transition:
+    background var(--ae-dur) var(--ae-ease),
+    border-color var(--ae-dur) var(--ae-ease);
 }
 .vt-toast__action:hover {
   background: var(--ae-surface-raised);
@@ -151,14 +161,16 @@
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: var(--ae-hit-target);
+  height: var(--ae-hit-target);
   border: none;
   border-radius: var(--ae-radius-sm);
   background: transparent;
   color: var(--ae-faint);
   cursor: pointer;
-  transition: color var(--ae-dur) var(--ae-ease), background var(--ae-dur) var(--ae-ease);
+  transition:
+    color var(--ae-dur) var(--ae-ease),
+    background var(--ae-dur) var(--ae-ease);
 }
 .vt-toast__x:hover {
   color: var(--ae-fg);
@@ -182,8 +194,31 @@
 @media (max-width: 560px) {
   .vt-toast-viewport {
     right: var(--ae-space-3);
-    bottom: var(--ae-space-3);
+    bottom: max(var(--ae-space-3), env(safe-area-inset-bottom));
     left: var(--ae-space-3);
     width: auto;
+  }
+  .vt-toast {
+    padding-left: var(--ae-space-3);
+  }
+}
+
+@media (pointer: coarse) {
+  .vt-toast__action,
+  .vt-toast__x {
+    min-height: var(--ae-hit-target);
+  }
+  .vt-toast__x {
+    min-width: var(--ae-hit-target);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vt-toast,
+  .vt-toast[data-state='closed'] {
+    animation: none;
+  }
+  .vt-toast[data-swipe='cancel'] {
+    transition: none;
   }
 }

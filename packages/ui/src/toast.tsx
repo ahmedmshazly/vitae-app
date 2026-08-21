@@ -36,6 +36,7 @@ import { cn } from './lib/cn.js';
 
 export type ToastVariant = 'status' | 'success' | 'error';
 export type ToastSwipeDirection = 'up' | 'down' | 'left' | 'right';
+export type ToastAnnouncementMode = 'radix' | 'item';
 
 export interface ToastActionSpec {
   /** Button text. Keep it a verb: "Undo", "Retry", "Open". */
@@ -126,11 +127,7 @@ function sentence(text: string): string {
  * "Notification Role deletedUndo: press F8". Sighted users get the whitespace
  * from the layout; the live region got none of it.
  */
-function announcement(
-  message: string,
-  variant: ToastVariant,
-  action?: ToastActionSpec,
-): string {
+function announcement(message: string, variant: ToastVariant, action?: ToastActionSpec): string {
   const parts = [VARIANT[variant].word, message, action && actionAltText(action)];
   return parts
     .filter((part): part is string => Boolean(part && part.trim()))
@@ -167,6 +164,10 @@ export interface ToastProps {
   onOpenChange?: (open: boolean) => void;
   /** Which axis the swipe offset follows; set by the provider. */
   swipeAxis?: 'x' | 'y';
+  /** Compatibility hook for an application migrating an existing selector. */
+  className?: string;
+  /** Provider-controlled compatibility mode; prefer the default Radix announcer. */
+  announcementMode?: ToastAnnouncementMode;
 }
 export function Toast({
   message,
@@ -176,11 +177,13 @@ export function Toast({
   open,
   onOpenChange,
   swipeAxis = 'x',
+  className,
+  announcementMode = 'radix',
 }: ToastProps) {
   const meta = VARIANT[variant];
   return (
     <RadixToast.Root
-      className={cn('vt-toast', variant !== 'status' && `vt-toast--${variant}`)}
+      className={cn('vt-toast', variant !== 'status' && `vt-toast--${variant}`, className)}
       data-variant={variant}
       data-swipe-axis={swipeAxis}
       type={meta.live}
@@ -195,6 +198,21 @@ export function Toast({
           and nothing else. Visually it is only the flex row. */}
       <div
         className="vt-toast__row"
+        role={
+          announcementMode === 'item'
+            ? meta.live === 'foreground'
+              ? 'alert'
+              : 'status'
+            : undefined
+        }
+        aria-live={
+          announcementMode === 'item'
+            ? meta.live === 'foreground'
+              ? 'assertive'
+              : 'polite'
+            : undefined
+        }
+        aria-atomic={announcementMode === 'item' || undefined}
         data-radix-toast-announce-exclude=""
         data-radix-toast-announce-alt={announcement(message, variant, action)}
       >
@@ -229,11 +247,33 @@ export interface ToastProviderProps {
   children: ReactNode;
   /** Direction a pointer swipe dismisses in. Defaults to the viewport corner. */
   swipeDirection?: ToastSwipeDirection;
+  /** Applied to every toast while a host app migrates legacy selectors. */
+  itemClassName?: string;
+  /**
+   * `radix` uses Radix's delayed, portalled announcer. `item` keeps legacy
+   * role=status/alert selectors on the visible item while preserving the
+   * queue, focus pause, hotkey, and swipe behavior.
+   */
+  announcementMode?: ToastAnnouncementMode;
 }
-export function ToastProvider({ children, swipeDirection = 'right' }: ToastProviderProps) {
+export function ToastProvider({
+  children,
+  swipeDirection = 'right',
+  itemClassName,
+  announcementMode = 'radix',
+}: ToastProviderProps) {
   const [items, setItems] = useState<QueueItem[]>([]);
   const seq = useRef(0);
   const removals = useRef(new Map<string, ReturnType<typeof setTimeout>>());
+  // In item mode the visible toast is the live region. Keep Radix's own
+  // announcer out of the document so the same sentence is not spoken twice.
+  const detachedAnnouncer = useMemo(
+    () =>
+      announcementMode === 'item' && typeof document !== 'undefined'
+        ? document.createDocumentFragment()
+        : undefined,
+    [announcementMode],
+  );
 
   const close = useCallback((id: string) => {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, open: false } : i)));
@@ -288,7 +328,11 @@ export function ToastProvider({ children, swipeDirection = 'right' }: ToastProvi
 
   return (
     <ToastApiContext.Provider value={api}>
-      <RadixToast.Provider swipeDirection={swipeDirection} label="Notification">
+      <RadixToast.Provider
+        swipeDirection={swipeDirection}
+        label="Notification"
+        announcerContainer={detachedAnnouncer}
+      >
         {children}
         {items.map((item) => (
           <Toast
@@ -297,6 +341,8 @@ export function ToastProvider({ children, swipeDirection = 'right' }: ToastProvi
             variant={item.variant}
             action={item.action}
             duration={item.duration}
+            className={itemClassName}
+            announcementMode={announcementMode}
             open={item.open}
             onOpenChange={(next) => {
               if (!next) close(item.id);
@@ -306,7 +352,12 @@ export function ToastProvider({ children, swipeDirection = 'right' }: ToastProvi
         ))}
         {/* Mounted once, always, empty or not: a live region that appears at
             the same moment as its first message is routinely missed. */}
-        <RadixToast.Viewport className="vt-toast-viewport" hotkey={HOTKEY} />
+        <RadixToast.Viewport
+          className="vt-toast-viewport"
+          hotkey={HOTKEY}
+          aria-live={announcementMode === 'item' ? 'polite' : undefined}
+          aria-relevant={announcementMode === 'item' ? 'additions text' : undefined}
+        />
       </RadixToast.Provider>
     </ToastApiContext.Provider>
   );

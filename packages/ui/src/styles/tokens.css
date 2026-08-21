@@ -17,6 +17,10 @@
   --ae-surface: #151515;
   --ae-surface-raised: #1c1c1c;
   --ae-surface-overlay: #232323;
+  /* A recessed register/canvas well. It is deliberately only two points off
+     the canvas: depth in Living Ledger comes from containment and trace
+     geometry, never a glow or a card shadow. */
+  --ae-surface-sunken: #0d0d0d;
   --ae-border: #2b2b2b; /* decorative hairlines only: 1.35:1 vs canvas */
   --ae-border-strong: #3f3f3f; /* emphasis, chip outlines, scrollbars: 1.82:1 */
   /* Any border that is the ONLY thing defining a control needs WCAG 1.4.11's
@@ -41,6 +45,15 @@
   --ae-accent-bg: #262626; /* selected row / active tab ground */
   --ae-accent-2: #a3a3a0; /* "live": provenance, sync, edges. Never an action. */
 
+  /* ── Ledger traces ──
+     These are roles, not a second palette. A trace is the connective tissue
+     between records, stages, and background work. Neutral/live stay on the
+     achromatic ramp; outcome roles alias the semantic colours below. Every
+     rendered trace also carries a node shape and text, never colour alone. */
+  --ae-trace-idle: #3f3f3f;
+  --ae-trace-live: #a3a3a0;
+  --ae-trace-current: #fafaf8;
+
   /* ── Semantic (≥4.5:1 on all four surfaces; always shipped with an icon +
      label, never colour alone; never used as a chart series) ── */
   --ae-success: #7eb795; /* 6.8:1 overlay */
@@ -50,6 +63,9 @@
   --ae-ember: #c98a3d; /* 5.4:1, streaks/celebration only, never a second
     accent, never an error or warning */
   --ae-info: #9a9484; /* 5.2:1 */
+  --ae-trace-success: var(--ae-success);
+  --ae-trace-warning: var(--ae-warning);
+  --ae-trace-danger: var(--ae-danger);
 
   /* ── Typography ──
      'Instrument Sans Variable' / 'IBM Plex Mono' are the family names the
@@ -60,7 +76,9 @@
      to the system fallback for every piece of text in the app). */
   --ae-font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --ae-font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
-  --ae-font-display: var(--ae-font-mono); /* page/section titles only, never
+  --ae-font-display: var(
+    --ae-font-mono
+  ); /* page/section titles only, never
     a clickable control, never below 15px. Weight 500, caps, 0.2em tracking
     applied via the .u-display utility (base.css), not encodable in a single
     font-family value. */
@@ -96,6 +114,14 @@
   --ae-space-8: 48px;
 
   --ae-row-h: 36px;
+  /* Painted controls may stay compact on precise pointers, but their target
+     never drops below 32px. Coarse pointers promote the same token to 44px in
+     the media query below, without requiring every component to invent a
+     phone-only size. */
+  --ae-control-h-sm: 26px;
+  --ae-control-h: 32px;
+  --ae-control-h-lg: 44px;
+  --ae-hit-target: 32px;
 
   /* ── Elevation, dialogs and popovers may carry exactly one soft shadow;
      nothing else may. No colour tint, no glow. ── */
@@ -138,12 +164,31 @@
   --ae-viz-7: #d4649b;
   --ae-viz-8: #c56a2a;
 
+  /* Stable, named data roles for screens that know the meaning of a series.
+     Generic charts continue to use --ae-viz-1..8 in fixed slot order. These
+     aliases prevent "person happened to be series 1 here, series 4 there"
+     when a Living Ledger view renders several record families. */
+  --ae-data-person: var(--ae-viz-1);
+  --ae-data-work: var(--ae-viz-2);
+  --ae-data-place: var(--ae-viz-3);
+  --ae-data-event: var(--ae-viz-4);
+  --ae-data-idea: var(--ae-viz-5);
+  --ae-data-practice: var(--ae-viz-6);
+  --ae-data-media: var(--ae-viz-7);
+  --ae-data-other: var(--ae-viz-8);
+
   /* ── Legacy aliases, real consumers exist in screens not yet rebuilt
      under Quiet. Remove each alias once its last consumer lands. ── */
   --ae-muted-strong: var(--ae-muted);
   --ae-accent-strong: var(--ae-accent);
   --ae-accent-soft: var(--ae-fg-soft);
   --ae-accent-bg-soft: var(--ae-surface-raised);
+}
+
+@media (pointer: coarse) {
+  :root {
+    --ae-hit-target: 44px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

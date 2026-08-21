@@ -32,7 +32,7 @@ describe('NewNodeButton', () => {
   });
 
   it('renders nothing for an unknown type', () => {
-    const { container } = renderWithApp(<NewNodeButton type="not_a_type" />);
-    expect(container).toBeEmptyDOMElement();
+    renderWithApp(<NewNodeButton type="not_a_type" />);
+    expect(screen.queryByRole('button', { name: /new/i })).not.toBeInTheDocument();
   });
 });

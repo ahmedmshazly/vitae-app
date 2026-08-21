@@ -126,7 +126,7 @@ export function Record() {
     queryFn: () => api.get<{ revisions: Revision[] }>(`/nodes/${id}/revisions`),
   });
 
-  const edges = data?.edges ?? [];
+  const edges = useMemo(() => data?.edges ?? [], [data?.edges]);
   const edgeIds = useMemo(() => edges.map((e) => e.id), [edges]);
   const { allVisibleSelected } = useVisibleSelection(edgeIds, bulk.selected);
   const revisions = useMemo(() => revs.data?.revisions ?? [], [revs.data]);
@@ -162,13 +162,14 @@ export function Record() {
   async function del() {
     await api.del(`/nodes/${id}`);
     await qc.invalidateQueries();
-    navigate('/trash');
+    navigate('/data/trash');
   }
 
   async function togglePin() {
     const prev = qc.getQueryData<RecordResp>(['node', id]);
     const next = !prev?.node.pinned;
-    if (prev) qc.setQueryData<RecordResp>(['node', id], { ...prev, node: { ...prev.node, pinned: next } });
+    if (prev)
+      qc.setQueryData<RecordResp>(['node', id], { ...prev, node: { ...prev.node, pinned: next } });
     try {
       await api.patch(`/nodes/${id}`, { pinned: next });
       // The control says Pin; the confirmation says Pinned.
@@ -202,10 +203,20 @@ export function Record() {
                     Edit
                   </Button>
                 )}
-                <Button size="sm" glyph="pin" aria-pressed={node.pinned} onClick={() => void togglePin()}>
+                <Button
+                  size="sm"
+                  glyph="pin"
+                  aria-pressed={node.pinned}
+                  onClick={() => void togglePin()}
+                >
                   {node.pinned ? 'Unpin' : 'Pin'}
                 </Button>
-                <Button variant="danger" size="sm" glyph="trash" onClick={() => setConfirmDelete(true)}>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  glyph="trash"
+                  onClick={() => setConfirmDelete(true)}
+                >
                   Delete
                 </Button>
               </>
@@ -263,7 +274,8 @@ export function Record() {
           <Section title="Properties" meta={props.length || undefined}>
             {props.length === 0 ? (
               <p className="text-sm text-muted">
-                Nothing recorded yet. Use Edit to fill in what this {node.type.replace(/_/g, ' ')} is.
+                Nothing recorded yet. Use Edit to fill in what this {node.type.replace(/_/g, ' ')}{' '}
+                is.
               </p>
             ) : (
               <dl className="m-0 grid grid-cols-[minmax(0,auto)_minmax(0,1fr)] gap-x-6 gap-y-2">
@@ -284,7 +296,9 @@ export function Record() {
             {node.notes_md ? (
               <p className="whitespace-pre-wrap text-ink-soft">{node.notes_md}</p>
             ) : (
-              <p className="text-sm text-muted">No notes. Use Edit to add context you want to keep.</p>
+              <p className="text-sm text-muted">
+                No notes. Use Edit to add context you want to keep.
+              </p>
             )}
           </Section>
         </div>
@@ -339,7 +353,8 @@ export function Record() {
           <Section title="History" meta={revisions.length || undefined}>
             {revs.isError ? (
               <p role="alert" className="text-sm text-danger">
-                <strong className="font-semibold">Couldn’t load the history.</strong> The record itself is fine.
+                <strong className="font-semibold">Couldn’t load the history.</strong> The record
+                itself is fine.
               </p>
             ) : revs.isLoading ? (
               <SkeletonRows rows={2} />
@@ -356,7 +371,9 @@ export function Record() {
                   >
                     <Chip mono>{r.op}</Chip>
                     {r.source && <span className="text-sm text-muted">{r.source}</span>}
-                    <Mono className="ml-auto text-xs text-faint">{r.at.slice(0, 19).replace('T', ' ')}</Mono>
+                    <Mono className="ml-auto text-xs text-faint">
+                      {r.at.slice(0, 19).replace('T', ' ')}
+                    </Mono>
                   </li>
                 ))}
               </ul>
@@ -369,7 +386,8 @@ export function Record() {
 }
 
 function formatVal(v: unknown): string {
-  if (Array.isArray(v)) return v.map((x) => (typeof x === 'object' ? JSON.stringify(x) : String(x))).join(', ');
+  if (Array.isArray(v))
+    return v.map((x) => (typeof x === 'object' ? JSON.stringify(x) : String(x))).join(', ');
   if (typeof v === 'object') return JSON.stringify(v);
   return String(v);
 }

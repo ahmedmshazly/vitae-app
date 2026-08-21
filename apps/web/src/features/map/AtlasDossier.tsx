@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Button, Chip, EntityGlyph, Mono } from '@vitae/ui';
+import { Button, Chip, EntityGlyph, Mono, StatusTrace } from '@vitae/ui';
 import { entityHref } from '../../lib/entity-href.js';
 import type { MapCity, MapRecord, MapTrip } from './types.js';
 
@@ -12,6 +12,12 @@ export interface AtlasDossierProps {
   onSelectTrip: (trip: MapTrip | null) => void;
   onCopyLink: () => void;
   onCompare?: () => void;
+}
+
+function recordLinkLabel(link: MapRecord['link']): string {
+  if (link === 'LOCATED_IN') return 'Located in relationship';
+  if (link === 'VISITED') return 'Visited relationship';
+  return 'City field';
 }
 
 export function AtlasDossier({
@@ -40,11 +46,16 @@ export function AtlasDossier({
             ×
           </button>
         </div>
+        <StatusTrace
+          label="Route reconstructed from trip stops"
+          detail={`${trip.stops.length} ${trip.stops.length === 1 ? 'stop' : 'stops'}${trip.companionIds.length ? ` · ${trip.companionIds.length} ${trip.companionIds.length === 1 ? 'companion' : 'companions'}` : ''}`}
+          announce={false}
+        />
         <ol className="atlas__stoplist">
           {trip.stops.map((s, i) => (
             <li key={`${s.city}-${i}`}>
               <span className="atlas__stopcity">{s.city}</span>
-              <Mono className="u-faint" style={{ fontSize: 10 }}>
+              <Mono className="u-faint" style={{ fontSize: 'var(--ae-text-xs)' }}>
                 {s.nights != null ? `${s.nights}n` : ''}
                 {s.date ? ` · ${s.date}` : ''}
               </Mono>
@@ -79,8 +90,17 @@ export function AtlasDossier({
 
   const chronographHref =
     city.records.find((r) => r.date)?.date != null
-      ? `/timeline?from=${city.records.map((r) => r.date).filter(Boolean).sort()[0]}&to=${[...city.records].map((r) => r.date).filter(Boolean).sort().at(-1)}`
-      : '/timeline';
+      ? `/explore/timeline?from=${
+          city.records
+            .map((r) => r.date)
+            .filter(Boolean)
+            .sort()[0]
+        }&to=${[...city.records]
+          .map((r) => r.date)
+          .filter(Boolean)
+          .sort()
+          .at(-1)}`
+      : '/explore/timeline';
 
   return (
     <aside className="atlas__dossier" aria-label={`${city.city} dossier`}>
@@ -100,15 +120,21 @@ export function AtlasDossier({
         </button>
       </div>
 
+      <StatusTrace
+        label="Place dossier linked from your records"
+        detail={`${city.records.length} ${city.records.length === 1 ? 'record' : 'records'} · relationships remain inspectable`}
+        announce={false}
+      />
+
       <div className="atlas__dossierlist">
         {city.records.map((r: MapRecord) => (
           <Link key={r.id} to={entityHref(r.type, r.id)} className="atlas__dossierrow">
             <EntityGlyph type={r.type} size="sm" />
             <div className="atlas__dossierrowmain">
               <div className="atlas__dossierrowtitle">{r.title}</div>
-              <div className="u-faint" style={{ fontSize: 11 }}>
+              <div className="u-faint" style={{ fontSize: 'var(--ae-text-xs)' }}>
                 {r.type}
-                {r.link !== 'city' ? ` · ${r.link}` : ''}
+                {` · ${recordLinkLabel(r.link)}`}
                 {r.date ? ` · ${r.date}` : ''}
               </div>
             </div>
@@ -143,7 +169,11 @@ export function AtlasDossier({
         </Button>
         <Link
           className="graph__tool"
-          to={city.records[0] ? `/graph?focus=${encodeURIComponent(city.records[0].id)}` : '/graph'}
+          to={
+            city.records[0]
+              ? `/explore/graph?focus=${encodeURIComponent(city.records[0].id)}`
+              : '/explore/graph'
+          }
         >
           Life map
         </Link>

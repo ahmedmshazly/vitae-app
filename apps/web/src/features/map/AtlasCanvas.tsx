@@ -1,17 +1,5 @@
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import {
-  LngLatBounds,
-  Map as MapLibreMapCtor,
-  Marker,
-  setWorkerUrl,
-} from 'maplibre-gl';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { LngLatBounds, Map as MapLibreMapCtor, Marker, setWorkerUrl } from 'maplibre-gl';
 import type { GeoJSONSource, Map as MapLibreMap, Marker as MapLibreMarker } from 'maplibre-gl';
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -566,8 +554,16 @@ export const AtlasCanvas = forwardRef<AtlasMapHandle, AtlasCanvasProps>(function
   ]);
 
   return (
-    <div className={`atlas__panel${pickMode ? ' atlas__panel--pick' : ''}`}>
+    <div
+      className={`atlas__panel${pickMode ? ' atlas__panel--pick' : ''}`}
+      role="region"
+      aria-label={`Atlas map with ${pins.length} mapped ${pins.length === 1 ? 'place' : 'places'}. Use List view for the complete keyboard-readable equivalent.`}
+      aria-busy={!mapReady}
+    >
       <div className="atlas__map" ref={containerRef} role="presentation" />
+      <span className="u-visually-hidden" role="status" aria-live="polite">
+        {mapReady ? `Atlas ready with ${pins.length} mapped places` : 'Loading map tiles'}
+      </span>
       <span className="atlas__attr">OpenFreeMap · MapLibre</span>
     </div>
   );

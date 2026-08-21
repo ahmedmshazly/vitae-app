@@ -65,10 +65,7 @@ export function GraphView() {
   const [size, setSize] = useState({ w: 960, h: 560 });
   const palette = useMemo<GraphPalette>(() => readGraphPalette(), []);
 
-  const typesKey = useMemo(
-    () => [...activeTypes].sort().join(','),
-    [activeTypes],
-  );
+  const typesKey = useMemo(() => [...activeTypes].sort().join(','), [activeTypes]);
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['graph', focusParam ?? null, depth, typesKey],
@@ -81,10 +78,15 @@ export function GraphView() {
   });
 
   const selfNode = useMemo(() => data?.nodes.find((n) => n.isSelf) ?? null, [data]);
+  const focusTitle = useMemo(() => data?.nodes.find((n) => n.id === data.focus)?.title, [data]);
   const pathFromId = selfNode?.id ?? data?.focus ?? null;
   const pathFromTitle = selfNode?.title ?? trail[0]?.title ?? 'Self';
 
-  const { data: pathData, isFetching: pathLoading, isError: pathFailed } = useQuery({
+  const {
+    data: pathData,
+    isFetching: pathLoading,
+    isError: pathFailed,
+  } = useQuery({
     queryKey: ['graph-path', pathFromId, pathTo?.id],
     queryFn: () =>
       api.get<GraphPathResult>(
@@ -234,7 +236,10 @@ export function GraphView() {
         }
       }
     }
-    out.sort((a, b) => a.edgeType.localeCompare(b.edgeType) || a.neighbor.title.localeCompare(b.neighbor.title));
+    out.sort(
+      (a, b) =>
+        a.edgeType.localeCompare(b.edgeType) || a.neighbor.title.localeCompare(b.neighbor.title),
+    );
     return out.slice(0, 40);
   }, [selected, view, data]);
 
@@ -254,7 +259,7 @@ export function GraphView() {
     (node: GNode) => {
       setTrail((prev) => trailAfterJump(prev, { id: node.id, title: node.title }));
       setSelected(null);
-      navigate(`/graph?focus=${encodeURIComponent(node.id)}`);
+      navigate(`/explore/graph?focus=${encodeURIComponent(node.id)}`);
     },
     [navigate],
   );
@@ -324,16 +329,16 @@ export function GraphView() {
 
   const modeHint =
     mode === 'path'
-      ? 'Pick A (self) and B, path highlights with a readable story'
+      ? 'Choose a destination to reveal the evidence path from self'
       : lens === 'hubs'
-        ? 'Hubs sized by degree · hover lights neighbors'
+        ? 'High-connectivity records carry more visual weight'
         : lens === 'career'
-          ? 'Career spine emphasized · hover lights neighbors'
+          ? 'Roles, organizations, projects, and evidence form the career spine'
           : lens === 'strength'
-            ? 'Tie strength on KNOWS · hover lights neighbors'
+            ? 'Known relationships reflect their recorded tie strength'
             : lens === 'edgeKinds'
-              ? 'Filter by relationship · hover lights neighbors'
-              : 'Drag, zoom, hover neighbors · click to peek · double-click to open';
+              ? 'Relationship kinds become the active filter'
+              : 'Explore the neighborhood, select to inspect, or open the underlying record';
 
   return (
     <div className="page page--lifemap">
@@ -371,14 +376,18 @@ export function GraphView() {
         truncated={Boolean(data?.truncated)}
         palette={palette}
         modeHint={modeHint}
+        nodeCount={view?.nodes.length}
+        connectionCount={view?.links.length}
+        focusTitle={focusTitle}
+        busy={isLoading}
       />
 
       <FocusBreadcrumb
         trail={trail}
-        onHop={(id) => navigate(`/graph?focus=${encodeURIComponent(id)}`)}
+        onHop={(id) => navigate(`/explore/graph?focus=${encodeURIComponent(id)}`)}
         onReset={() => {
           setTrail([]);
-          navigate('/graph');
+          navigate('/explore/graph');
         }}
       />
 
@@ -416,6 +425,7 @@ export function GraphView() {
             ? `Life map: ${view.nodes.length} records and ${view.links.length} connections. Press Command F to find a record, then use the left and right arrow keys to walk its connections and Enter to open one.`
             : 'Life map'
         }
+        aria-busy={isLoading}
       >
         {isError ? (
           // `isError` was never destructured, so a failed load left `data`
@@ -430,7 +440,7 @@ export function GraphView() {
           </div>
         ) : isLoading || !view ? (
           <div className="p-8">
-            <SkeletonRows rows={5} />
+            <SkeletonRows rows={5} label="Connecting records on the life map" />
           </div>
         ) : view.nodes.length === 0 ? (
           <div className="grid h-full place-items-center p-8">
@@ -439,7 +449,7 @@ export function GraphView() {
               title="Nothing to explore yet"
               hint="Capture people, organizations and projects, the map draws itself from the ties between them."
               action={
-                <Link className="vt-btn vt-btn--sm" to="/people">
+                <Link className="vt-btn vt-btn--sm" to="/network/people">
                   Open People
                 </Link>
               }
@@ -511,7 +521,7 @@ export function GraphView() {
               if (!selected.isSelf) setPathTo({ id: selected.id, title: selected.title });
             }}
             onCopyLink={() => {
-              const url = `${window.location.origin}/graph?focus=${encodeURIComponent(selected.id)}`;
+              const url = `${window.location.origin}/explore/graph?focus=${encodeURIComponent(selected.id)}`;
               // Reported nothing whatsoever, not success, not failure. You
               // pressed it and had to go and check.
               void navigator.clipboard
@@ -554,7 +564,7 @@ export function GraphView() {
             disabled={depth >= 4}
             onClick={() => setDepth((d) => Math.min(d + 1, 4))}
           >
-            expand more +
+            Expand more +
           </button>
           <button
             type="button"
@@ -562,21 +572,27 @@ export function GraphView() {
             disabled={depth <= 1}
             onClick={() => setDepth((d) => Math.max(d - 1, 1))}
           >
-            shallower −
+            Shallower −
           </button>
           <button
             type="button"
             className="graph__tool"
             onClick={() => fgRef.current?.zoomToFit(reducedMotion ? 0 : 400, 60)}
           >
-            fit
-          </button>
-          <button type="button" className="graph__tool" onClick={focusSelection} disabled={!selected}>
-            focus selection
+            Fit map
           </button>
           <button
             type="button"
             className="graph__tool"
+            onClick={focusSelection}
+            disabled={!selected}
+          >
+            Focus selection
+          </button>
+          <button
+            type="button"
+            className="graph__tool"
+            aria-pressed={paused}
             onClick={() => {
               setPaused((p) => {
                 const next = !p;
@@ -586,17 +602,17 @@ export function GraphView() {
               });
             }}
           >
-            {paused ? 'resume physics' : 'pause physics'}
+            {paused ? 'Resume layout' : 'Pause layout'}
           </button>
           <button type="button" className="graph__tool" onClick={exportPng}>
-            export PNG
+            Export PNG
           </button>
           <button type="button" className="graph__tool" onClick={() => setSearchOpen(true)}>
-            find ⌘F
+            Find · ⌘F
           </button>
           {focusParam && (
-            <Link className="graph__tool" to="/graph">
-              reset focus
+            <Link className="graph__tool" to="/explore/graph">
+              Reset focus
             </Link>
           )}
         </div>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  Banner,
   Button,
   Chip,
   ConfirmDialog,
@@ -13,6 +14,7 @@ import {
   RegisterRule,
   Section,
   SkeletonRows,
+  StatusTrace,
   StrengthBar,
 } from '@vitae/ui';
 import { orgRelationKindLabel } from '@vitae/core';
@@ -49,6 +51,16 @@ interface OrgProfile {
   }>;
 }
 
+export function contactLensHrefForOrg(title: string): string {
+  const params = new URLSearchParams({ lens: 'contact', need: 'intro', org: title, run: '1' });
+  return `/network/intelligence?${params.toString()}`;
+}
+
+export function reachLensHrefForOrg(id: string): string {
+  const params = new URLSearchParams({ lens: 'reach', org: id });
+  return `/network/intelligence?${params.toString()}`;
+}
+
 export function Org() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
@@ -57,7 +69,7 @@ export function Org() {
   const [editing, setEditing] = useState(false);
   const [addingConn, setAddingConn] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const { data, isLoading, isError, error, refetch } = useQuery({
+  const { data, isLoading, isError, isFetching, error, refetch } = useQuery({
     queryKey: ['org', id],
     queryFn: () => api.get<{ org: OrgProfile }>(`/orgs/${id}`),
   });
@@ -70,7 +82,7 @@ export function Org() {
     onSuccess: async () => {
       await qc.invalidateQueries();
       flash('Moved to trash');
-      navigate('/trash');
+      navigate('/data/trash');
     },
     onError: (err) =>
       flash(err instanceof Error ? err.message : 'The organization could not be moved to trash.', {
@@ -78,9 +90,9 @@ export function Org() {
       }),
   });
 
-  if (isError) {
+  if (isError && !data) {
     return (
-      <div className="page">
+      <div className="page page--network page--organization-dossier">
         <PageHeader title="Organization" />
         <RegisterRule />
         <ErrorState
@@ -93,7 +105,7 @@ export function Org() {
   }
   if (isLoading || !data) {
     return (
-      <div className="page">
+      <div className="page page--network page--organization-dossier">
         <PageHeader title="Organization" subtitle="Loading…" />
         <RegisterRule />
         <SkeletonRows rows={5} />
@@ -103,43 +115,97 @@ export function Org() {
   const org = data.org;
 
   return (
-    <div className="page">
-      <PageHeader
-        title={org.title}
-        subtitle={
-          <>
-            {[org.kind, org.domain, org.city].filter(Boolean).join(' · ') || 'Organization'}
-            {' · '}
-            <Mono className="text-faint">{org.peopleCount}</Mono> known
-            {' · affinity '}
-            <Mono className="text-faint">{org.affinity.toFixed(2)}</Mono>
-          </>
-        }
-        actions={
-          <>
-            {/* Open roles are computed by the API and shown on the Orgs list,
-                but the profile never rendered them, so the one fact that makes
-                an org worth acting on vanished the moment you opened it. */}
-            {org.openRoles > 0 && (
-              <Chip tone="accent" mono glyph="role">
-                {org.openRoles} open {org.openRoles === 1 ? 'role' : 'roles'}
-              </Chip>
-            )}
-            <Button size="sm" glyph="edit" onClick={() => setEditing(true)}>
-              Edit
-            </Button>
-            <Button size="sm" glyph="plus" onClick={() => setAddingConn(true)}>
-              Add connection
-            </Button>
-            <Button variant="danger" size="sm" glyph="trash" onClick={() => setConfirmDelete(true)}>
-              Delete
-            </Button>
-          </>
-        }
-      />
+    <div className="page page--network page--organization-dossier">
+      <div className="network-dossier network-dossier--organization">
+        <PageHeader
+          title={org.title}
+          subtitle={[org.kind, org.domain, org.city].filter(Boolean).join(' · ') || 'Organization'}
+          actions={
+            <>
+              <Button size="sm" glyph="edit" onClick={() => setEditing(true)}>
+                Edit record
+              </Button>
+              <Button size="sm" variant="primary" glyph="plus" onClick={() => setAddingConn(true)}>
+                Add connection
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                glyph="trash"
+                disabled={remove.isPending}
+                onClick={() => setConfirmDelete(true)}
+              >
+                Delete
+              </Button>
+            </>
+          }
+        />
+        <dl className="network-dossier__facts" aria-label="Organization relationship facts">
+          <div>
+            <dt>Known people</dt>
+            <dd>
+              <Mono>{org.peopleCount}</Mono>
+            </dd>
+          </div>
+          <div>
+            <dt>Affinity</dt>
+            <dd>
+              <Mono>{org.affinity.toFixed(2)}</Mono>
+            </dd>
+          </div>
+          <div>
+            <dt>Open roles</dt>
+            <dd>
+              <Mono>{org.openRoles}</Mono>
+              {org.openRoles > 0 && <span> worth reviewing</span>}
+            </dd>
+          </div>
+          <div>
+            <dt>Location</dt>
+            <dd>{org.city || 'Not recorded'}</dd>
+          </div>
+        </dl>
+        <div className="network-dossier__decision">
+          <p>
+            Affinity summarizes recorded people and relationships on a 0–1 scale. Use the evidence
+            below before acting on the number.
+          </p>
+          <nav aria-label={`Ways to reach ${org.title}`}>
+            <Link className="vt-btn vt-btn--sm" to={contactLensHrefForOrg(org.title)}>
+              Rank contacts
+            </Link>
+            <Link className="vt-btn vt-btn--sm" to={reachLensHrefForOrg(org.id)}>
+              Trace warm paths
+            </Link>
+          </nav>
+        </div>
+      </div>
       {/* An organization has no revision-like scale to encode, so the rule
           carries no ticks rather than faked ones. */}
       <RegisterRule />
+
+      {isFetching && (
+        <StatusTrace
+          className="network-trace"
+          tone="live"
+          label="Refreshing this organization"
+          detail="Keeping verified relationship facts in view"
+        />
+      )}
+      {isError && data && (
+        <Banner
+          className="network-secondary-state"
+          tone="danger"
+          title="This organization could not be refreshed"
+          action={
+            <Button size="sm" onClick={() => void refetch()}>
+              Retry record
+            </Button>
+          }
+        >
+          Showing the last verified organization dossier.
+        </Banner>
+      )}
 
       {editing && <NodeFormDialog open onOpenChange={setEditing} type="organization" nodeId={id} />}
       <ConfirmDialog
@@ -147,13 +213,10 @@ export function Org() {
         onOpenChange={setConfirmDelete}
         title={`Move “${org.title}” to trash?`}
         body="It stays recoverable from Trash for 30 days; connections are preserved."
-        confirmLabel="Move to trash"
+        confirmLabel={remove.isPending ? 'Moving…' : 'Move to trash'}
         destructive
         busy={remove.isPending}
-        onConfirm={() => {
-          setConfirmDelete(false);
-          remove.mutate();
-        }}
+        onConfirm={() => remove.mutate()}
       />
       <AddConnection
         open={addingConn}
@@ -180,7 +243,9 @@ export function Org() {
                   {/* Direction as a word: a bare arrow made the reader work out
                       which way a parent/subsidiary link pointed. */}
                   {[
-                    r.direction === 'in' ? `${orgRelationKindLabel(r.kind)} of this org` : orgRelationKindLabel(r.kind),
+                    r.direction === 'in'
+                      ? `${orgRelationKindLabel(r.kind)} of this org`
+                      : orgRelationKindLabel(r.kind),
                     r.note,
                   ]
                     .filter(Boolean)
@@ -193,7 +258,7 @@ export function Org() {
         )}
       </Section>
 
-      <div className="grid gap-x-8 lg:grid-cols-2">
+      <div className="grid gap-x-8 lg:grid-cols-2 network-org-grid">
         <Section title="Inroads" meta={org.inroads.length}>
           {org.inroads.length === 0 ? (
             <EmptyState
@@ -203,12 +268,19 @@ export function Org() {
             />
           ) : (
             org.inroads.map((i) => (
-              <Link key={i.person.id} to={entityHref('person', i.person.id)} className="row">
-                <Mono className="w-5 text-faint">{i.rank}</Mono>
+              <Link
+                key={i.person.id}
+                to={entityHref('person', i.person.id)}
+                className="row network-inroad"
+              >
+                <Mono className="w-5 text-faint" aria-label={`Rank ${i.rank}`}>
+                  #{i.rank}
+                </Mono>
                 <EntityGlyph type="person" size="sm" />
                 <div className="row__main">
                   <div className="row__title">{i.person.title}</div>
-                  <div className="row__sub">{i.person.headline ?? i.reason}</div>
+                  {i.person.headline && <div className="row__sub">{i.person.headline}</div>}
+                  <div className="network-inroad__reason">Why this inroad · {i.reason}</div>
                 </div>
                 {/* Was accent above 0.6 and muted below, two colours banding a
                     continuous value. One hue, and the number is always there. */}

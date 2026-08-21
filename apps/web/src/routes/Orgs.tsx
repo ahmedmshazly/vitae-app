@@ -5,14 +5,13 @@ import {
   Chip,
   EmptyState,
   EntityGlyph,
-  ErrorState,
   Mono,
   PageHeader,
   RegisterRule,
   Section,
-  SkeletonRows,
   StrengthBar,
 } from '@vitae/ui';
+import { QueryBoundary } from '../components/QueryBoundary.js';
 import { api } from '../lib/api.js';
 import { NewNodeButton } from '../features/forms/NewNodeButton.js';
 import {
@@ -39,38 +38,18 @@ interface OrgItem {
 
 export function Orgs() {
   const bulk = useBulkNodeDelete({ noun: 'organization' });
-  const { data, isLoading, isError, error, refetch } = useQuery({
+  const orgsQuery = useQuery({
     queryKey: ['orgs'],
     queryFn: () => api.get<{ orgs: OrgItem[] }>('/orgs'),
   });
 
-  const orgs = data?.orgs ?? [];
+  const orgs = useMemo(() => orgsQuery.data?.orgs ?? [], [orgsQuery.data?.orgs]);
   const visibleIds = useMemo(() => orgs.map((o) => o.id), [orgs]);
   const { allVisibleSelected } = useVisibleSelection(visibleIds, bulk.selected);
-  const selectedTitles = useMemo(() => titlesForSelection(orgs, bulk.selected), [orgs, bulk.selected]);
-
-  if (isError) {
-    return (
-      <div className="page">
-        <PageHeader title="Organizations" />
-        <RegisterRule />
-        <ErrorState
-          title="Couldn’t load your organizations"
-          detail={(error as Error | null)?.message}
-          onRetry={() => void refetch()}
-        />
-      </div>
-    );
-  }
-  if (isLoading || !data) {
-    return (
-      <div className="page">
-        <PageHeader title="Organizations" subtitle="Loading…" />
-        <RegisterRule />
-        <SkeletonRows rows={8} />
-      </div>
-    );
-  }
+  const selectedTitles = useMemo(
+    () => titlesForSelection(orgs, bulk.selected),
+    [orgs, bulk.selected],
+  );
 
   return (
     <div className="page">
@@ -78,8 +57,14 @@ export function Orgs() {
         title="Organizations"
         subtitle={
           <>
-            <Mono className="text-faint">{orgs.length}</Mono>{' '}
-            {orgs.length === 1 ? 'organization' : 'organizations'} · sorted by affinity
+            {orgsQuery.data ? (
+              <>
+                <Mono className="text-faint">{orgs.length}</Mono>{' '}
+                {orgs.length === 1 ? 'organization' : 'organizations'} · sorted by affinity
+              </>
+            ) : (
+              'Loading…'
+            )}
           </>
         }
         actions={
@@ -107,55 +92,66 @@ export function Orgs() {
         }}
       />
 
-      <Section title="All organizations" meta={orgs.length}>
-        {orgs.length === 0 ? (
-          <EmptyState
-            glyph="org"
-            title="No organizations yet"
-            hint="Companies, universities, and communities you're tied to. They anchor roles, applications, and warm intros. Capture with ⌘K (“o Nile Robotics #robotics”) or use the button."
-            // Distinct from the header's "New organization" - both are on
-            // screen at once when the list is empty.
-            action={<NewNodeButton type="organization" label="Add your first organization" />}
-          />
-        ) : (
-          <>
-            <SelectAllRow
-              allSelected={allVisibleSelected}
-              onToggle={() => bulk.toggleAll(visibleIds, allVisibleSelected)}
+      <QueryBoundary
+        query={orgsQuery}
+        loadingLabel="Loading"
+        skeletonRows={8}
+        errorTitle="Couldn’t load your organizations"
+        isEmpty={(resolved) => resolved.orgs.length === 0}
+        empty={
+          <Section title="All organizations" meta={0}>
+            <EmptyState
+              glyph="org"
+              title="No organizations yet"
+              hint="Companies, universities, and communities you're tied to. They anchor roles, applications, and warm intros. Capture with ⌘K (“o Nile Robotics #robotics”) or use the button."
+              // Distinct from the header's "New organization" - both are on
+              // screen at once when the list is empty.
+              action={<NewNodeButton type="organization" label="Add your first organization" />}
             />
-            {orgs.map((o) => {
-              const isSelected = bulk.isSelected(o.id);
-              return (
-                <div key={o.id} className="row" data-selected={isSelected || undefined}>
-                  <SelectCheckbox
-                    checked={isSelected}
-                    label={`Select ${o.title}`}
-                    onToggle={() => bulk.toggleOne(o.id)}
-                  />
-                  <Link to={entityHref('organization', o.id)} className="people__link">
-                    <EntityGlyph type="organization" />
-                    <div className="row__main">
-                      <div className="row__title">{o.title}</div>
-                      <div className="row__sub">
-                        {[o.kind, o.domain, o.city].filter(Boolean).join(' · ') || '—'}
+          </Section>
+        }
+      >
+        {(resolved) => (
+          <Section title="All organizations" meta={resolved.orgs.length}>
+            <>
+              <SelectAllRow
+                allSelected={allVisibleSelected}
+                onToggle={() => bulk.toggleAll(visibleIds, allVisibleSelected)}
+              />
+              {orgs.map((o) => {
+                const isSelected = bulk.isSelected(o.id);
+                return (
+                  <div key={o.id} className="row" data-selected={isSelected || undefined}>
+                    <SelectCheckbox
+                      checked={isSelected}
+                      label={`Select ${o.title}`}
+                      onToggle={() => bulk.toggleOne(o.id)}
+                    />
+                    <Link to={entityHref('organization', o.id)} className="people__link">
+                      <EntityGlyph type="organization" />
+                      <div className="row__main">
+                        <div className="row__title">{o.title}</div>
+                        <div className="row__sub">
+                          {[o.kind, o.domain, o.city].filter(Boolean).join(' · ') || '—'}
+                        </div>
                       </div>
-                    </div>
-                    {o.openRoles > 0 && (
-                      <Chip tone="accent" mono>
-                        {o.openRoles} open role{o.openRoles > 1 ? 's' : ''}
+                      {o.openRoles > 0 && (
+                        <Chip tone="accent" mono>
+                          {o.openRoles} open role{o.openRoles > 1 ? 's' : ''}
+                        </Chip>
+                      )}
+                      <Chip mono glyph="person">
+                        {o.peopleCount}
                       </Chip>
-                    )}
-                    <Chip mono glyph="person">
-                      {o.peopleCount}
-                    </Chip>
-                    <StrengthBar value={o.affinity} label="affinity" />
-                  </Link>
-                </div>
-              );
-            })}
-          </>
+                      <StrengthBar value={o.affinity} label="affinity" />
+                    </Link>
+                  </div>
+                );
+              })}
+            </>
+          </Section>
         )}
-      </Section>
+      </QueryBoundary>
     </div>
   );
 }

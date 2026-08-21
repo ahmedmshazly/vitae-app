@@ -39,6 +39,9 @@
     },
     {
       "name": "dashboard"
+    },
+    {
+      "name": "applications"
     }
   ],
   "paths": {
@@ -1186,6 +1189,154 @@
         }
       }
     },
+    "/applications": {
+      "get": {
+        "operationId": "listApplications",
+        "summary": "Career application runway and attention summary",
+        "tags": [
+          "applications"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "applied",
+                "screening",
+                "interview",
+                "offer",
+                "rejected",
+                "withdrawn",
+                "accepted"
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Application summaries, stage counts, and attention totals",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (default-deny)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unknown application status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/applications/{id}": {
+      "get": {
+        "operationId": "getApplicationDossier",
+        "summary": "Application dossier with linked career evidence",
+        "tags": [
+          "applications"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Application dossier",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetailResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (default-deny)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Application not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/suggest": {
       "get": {
         "operationId": "stubSuggest",
@@ -2133,6 +2284,262 @@
       }
     },
     "schemas": {
+      "ApplicationStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "applied",
+          "screening",
+          "interview",
+          "offer",
+          "rejected",
+          "withdrawn",
+          "accepted"
+        ]
+      },
+      "ApplicationSummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "role_title",
+          "status",
+          "interview_count",
+          "notes_md",
+          "source",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "role_title": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApplicationStatus"
+          },
+          "organization": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true
+          },
+          "referred_by": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true
+          },
+          "applied_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "deadline": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "next_step": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "next_step_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "channel": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "location_mode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "salary_range": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "job_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "target_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resume_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "interview_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "next_interview": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true
+          },
+          "attention": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true
+          },
+          "notes_md": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "import_linkedin",
+              "import_github",
+              "import_vcard",
+              "import_csv",
+              "import_ics",
+              "import_bookmarks",
+              "parse_resume",
+              "import_aperture",
+              "system"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApplicationListResponse": {
+        "type": "object",
+        "required": [
+          "applications",
+          "counts",
+          "total",
+          "active",
+          "needs_attention"
+        ],
+        "properties": {
+          "applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApplicationSummary"
+            }
+          },
+          "counts": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "active": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "needs_attention": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "ApplicationDossier": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApplicationSummary"
+          },
+          {
+            "type": "object",
+            "required": [
+              "posting",
+              "interviews",
+              "target",
+              "resume"
+            ],
+            "properties": {
+              "posting": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true
+              },
+              "interviews": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              },
+              "target": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true
+              },
+              "resume": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true
+              }
+            }
+          }
+        ]
+      },
+      "ApplicationDetailResponse": {
+        "type": "object",
+        "required": [
+          "application"
+        ],
+        "properties": {
+          "application": {
+            "$ref": "#/components/schemas/ApplicationDossier"
+          }
+        }
+      },
       "Error": {
         "type": "object",
         "required": [

@@ -20,6 +20,7 @@ export const V1_MOUNT_PREFIXES = [
   '/letters',
   '/reminders',
   '/dashboard',
+  '/applications',
   '/status',
   '/export',
   '/settings',

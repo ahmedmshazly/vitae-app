@@ -23,4 +23,8 @@ describe('MANIFESTO_HOLDINGS', () => {
     expect(scores!.body).toMatch(/re-weight/i);
     expect(scores!.body).toMatch(/no oracle/i);
   });
+
+  it('does not promise a multi-account product outside the system boundary', () => {
+    expect(JSON.stringify(MANIFESTO_HOLDINGS)).not.toMatch(/multi-account/i);
+  });
 });

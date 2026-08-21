@@ -4,7 +4,12 @@ import { act } from 'react';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ToastProvider, useToast, type ToastSwipeDirection } from './toast.js';
+import {
+  ToastProvider,
+  useToast,
+  type ToastAnnouncementMode,
+  type ToastSwipeDirection,
+} from './toast.js';
 
 // Comments are stripped once, here, so no assertion below can be satisfied by
 // prose sitting above a rule that is gone. Same shape as layout.test.tsx.
@@ -28,7 +33,9 @@ function Fixture({ onUndo = () => {} }: { onUndo?: () => void }) {
     <div>
       <button onClick={() => toast('Draft saved', { variant: 'success' })}>Save</button>
       <button onClick={() => toast(FAILURE, { variant: 'error' })}>Break</button>
-      <button onClick={() => toast('Role deleted', { action: { label: 'Undo', onAction: onUndo } })}>
+      <button
+        onClick={() => toast('Role deleted', { action: { label: 'Undo', onAction: onUndo } })}
+      >
         Delete
       </button>
       <button
@@ -51,10 +58,19 @@ function Fixture({ onUndo = () => {} }: { onUndo?: () => void }) {
   );
 }
 
-function mount(props?: { onUndo?: () => void; swipeDirection?: ToastSwipeDirection }) {
-  const { swipeDirection, ...fixture } = props ?? {};
+function mount(props?: {
+  onUndo?: () => void;
+  swipeDirection?: ToastSwipeDirection;
+  itemClassName?: string;
+  announcementMode?: ToastAnnouncementMode;
+}) {
+  const { swipeDirection, itemClassName, announcementMode, ...fixture } = props ?? {};
   return render(
-    <ToastProvider swipeDirection={swipeDirection}>
+    <ToastProvider
+      swipeDirection={swipeDirection}
+      itemClassName={itemClassName}
+      announcementMode={announcementMode}
+    >
       <Fixture {...fixture} />
     </ToastProvider>,
   );
@@ -90,6 +106,23 @@ describe('ToastProvider', () => {
     expect(screen.queryAllByRole('listitem')).toHaveLength(0);
   });
 
+  it('can preserve a host selector while its call sites migrate', async () => {
+    const user = userEvent.setup();
+    mount({ itemClassName: 'legacy-toast' });
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    expect(toastFor('Draft saved')).toHaveClass('vt-toast', 'legacy-toast');
+  });
+
+  it('can keep a legacy status role on the actionable visible item', async () => {
+    const user = userEvent.setup();
+    mount({ announcementMode: 'item' });
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent('Role deleted');
+    expect(within(status).getByRole('button', { name: 'Undo' })).toBeInTheDocument();
+  });
+
   it('quotes the same hotkey in an action announcement as in the viewport name', async () => {
     const user = userEvent.setup();
     mount();
@@ -112,7 +145,9 @@ describe('ToastProvider', () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
     // The first toast keeps its own action, which is the callback that was
     // being dropped when one slot held one message.
-    expect(within(toastFor('Role deleted')).getByRole('button', { name: 'Undo' })).toBeInTheDocument();
+    expect(
+      within(toastFor('Role deleted')).getByRole('button', { name: 'Undo' }),
+    ).toBeInTheDocument();
   });
 
   it('caps the stack at four so a burst cannot grow off the top of the window', async () => {

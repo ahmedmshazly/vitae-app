@@ -1,6 +1,8 @@
 /**
  * First-run welcome, shown once per browser (localStorage flag) after the
- * first sign-in. Three keyboard moves, then out of the way.
+ * first sign-in. Three durable moves, then the in-product setup ledger takes
+ * over so onboarding can be resumed from Today instead of trapping the user
+ * in a long wizard.
  */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -22,18 +24,18 @@ export function useFirstRun(): [boolean, () => void] {
 const MOVES: Array<{ keys: string[]; title: string; body: string }> = [
   {
     keys: ['⌘', 'K'],
-    title: 'Capture anything',
-    body: 'One line files people, events, topics and the story as connected records.',
+    title: 'Start with the next fact',
+    body: 'One line becomes structured records and explicit connections after you review the preview.',
   },
   {
     keys: ['n'],
     title: 'Create any record',
-    body: 'Structured forms for all 28 types, with inline connections.',
+    body: 'Structured forms cover all 34 record types, with provenance and inline connections.',
   },
   {
     keys: ['⌘', 'P'],
-    title: 'Jump anywhere',
-    body: 'Fuzzy-search every record and open it from the keyboard.',
+    title: 'Find or act',
+    body: 'Search every record, open a workspace, or run an action without leaving the keyboard.',
   },
 ];
 
@@ -41,11 +43,17 @@ export function FirstRun({ onDone }: { onDone: () => void }) {
   return (
     <Modal open onOpenChange={(o) => !o && onDone()} title="Welcome to Vitae" size="sm">
       <div className="flex flex-col gap-4">
-        <p className="text-ink-soft">Your life, as a living network. Three keyboard moves:</p>
+        <div className="first-run__intro">
+          <span>Private · deterministic · yours</span>
+          <p>
+            Your life and career become useful one verified connection at a time. These three moves
+            are enough to begin.
+          </p>
+        </div>
 
         <ul className="m-0 flex list-none flex-col gap-2 p-0">
           {MOVES.map((m) => (
-            <li key={m.title} className="flex items-start gap-3 rounded-sm border border-hairline p-3">
+            <li key={m.title} className="first-run__move">
               <span className="flex min-w-13 flex-none justify-center gap-1 pt-0.5">
                 {m.keys.map((k) => (
                   <Kbd key={k}>{k}</Kbd>
@@ -61,7 +69,7 @@ export function FirstRun({ onDone }: { onDone: () => void }) {
 
         <div className="flex items-center gap-2">
           <Button variant="primary" onClick={onDone}>
-            Start exploring
+            Open Today
           </Button>
           <Link to="/tour" onClick={onDone} className="no-underline">
             <Button variant="ghost">Take the tour</Button>

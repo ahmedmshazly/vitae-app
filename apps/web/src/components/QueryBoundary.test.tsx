@@ -10,7 +10,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { Button, EmptyState, SkeletonText } from '@vitae/ui';
 import { enter } from '../lib/motion.js';
 import { renderWithApp } from '../test/render.js';
-import { QueryBoundary, keepLastResults, listQueryOptions, type QueryLike } from './QueryBoundary.js';
+import {
+  QueryBoundary,
+  keepLastResults,
+  listQueryOptions,
+  type QueryLike,
+} from './QueryBoundary.js';
 
 interface PeopleResp {
   people: Array<{ id: string; title: string }>;
@@ -29,7 +34,7 @@ function fakeQuery<T>(
 
 function peopleList(data: PeopleResp) {
   return (
-    <ul>
+    <ul aria-label="People">
       {data.people.map((p) => (
         <li key={p.id}>{p.title}</li>
       ))}
@@ -43,7 +48,7 @@ describe('QueryBoundary states', () => {
     renderWithApp(<QueryBoundary query={query}>{peopleList}</QueryBoundary>);
 
     expect(screen.getByRole('status', { name: 'Loading' })).toBeInTheDocument();
-    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+    expect(screen.queryByRole('list', { name: 'People' })).not.toBeInTheDocument();
   });
 
   it('renders a shape-matched skeleton instead of the default when one is given', () => {
@@ -56,13 +61,14 @@ describe('QueryBoundary states', () => {
             <SkeletonText lines={4} />
           </div>
         }
+        loadingLabel="Loading letter editor"
       >
         {peopleList}
       </QueryBoundary>,
     );
 
     expect(screen.getByTestId('letter-skeleton')).toBeInTheDocument();
-    expect(screen.queryByRole('status', { name: 'Loading' })).not.toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Loading letter editor' })).toBeInTheDocument();
   });
 
   it('treats a settled query with no data as still loading, which is the isLoading || !data idiom', () => {
@@ -95,7 +101,51 @@ describe('QueryBoundary states', () => {
     const alert = screen.getByRole('alert');
     expect(alert).toHaveTextContent('Couldn’t load your people');
     expect(alert).toHaveTextContent('graph unreachable');
-    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+    expect(screen.queryByRole('list', { name: 'People' })).not.toBeInTheDocument();
+  });
+
+  it('keeps truthful cached data visible when a background refresh fails', () => {
+    const query = fakeQuery<PeopleResp>({
+      data: { people: [LINA] },
+      isError: true,
+      error: new Error('network offline'),
+    });
+    renderWithApp(
+      <QueryBoundary query={query} className="people-region">
+        {peopleList}
+      </QueryBoundary>,
+    );
+
+    expect(screen.getByText('Lina Farouk')).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent('Couldn’t refresh this data');
+    expect(screen.getByRole('alert')).toHaveTextContent('Showing the last available version');
+    expect(document.querySelector('.people-region')).toHaveAttribute('data-query-state', 'content');
+  });
+
+  it('reports a background refresh without blanking the current view', () => {
+    const query = fakeQuery<PeopleResp>({ data: { people: [LINA] }, isFetching: true });
+    renderWithApp(
+      <QueryBoundary query={query} className="people-region" refreshingLabel="Refreshing people">
+        {peopleList}
+      </QueryBoundary>,
+    );
+
+    expect(screen.getByText('Lina Farouk')).toBeInTheDocument();
+    expect(screen.getByText('Refreshing people')).toBeInTheDocument();
+    expect(document.querySelector('.people-region')).toHaveAttribute('aria-busy', 'true');
+  });
+
+  it('does not offer a dead Retry control when the source cannot refetch', () => {
+    const query: QueryLike<PeopleResp> = {
+      data: undefined,
+      isPending: false,
+      isError: true,
+      error: 'This source is no longer available',
+    };
+    renderWithApp(<QueryBoundary query={query}>{peopleList}</QueryBoundary>);
+
+    expect(screen.getByRole('alert')).toHaveTextContent('This source is no longer available');
+    expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument();
   });
 
   it('wires the error Retry to refetch on every query it was handed', async () => {
@@ -146,7 +196,9 @@ describe('QueryBoundary states', () => {
 });
 
 describe('QueryBoundary empties', () => {
-  const nothing = <EmptyState glyph="person" title="No one here yet" hint="Add the first person you know." />;
+  const nothing = (
+    <EmptyState glyph="person" title="No one here yet" hint="Add the first person you know." />
+  );
   const noMatch = (
     <EmptyState
       glyph="filter"
@@ -159,7 +211,12 @@ describe('QueryBoundary empties', () => {
   it('shows the nothing-yet empty when no filter is narrowing the list', () => {
     const query = fakeQuery<PeopleResp>({ data: { people: [] } });
     renderWithApp(
-      <QueryBoundary query={query} isEmpty={(d) => d.people.length === 0} empty={nothing} emptyFiltered={noMatch}>
+      <QueryBoundary
+        query={query}
+        isEmpty={(d) => d.people.length === 0}
+        empty={nothing}
+        emptyFiltered={noMatch}
+      >
         {peopleList}
       </QueryBoundary>,
     );
@@ -185,6 +242,7 @@ describe('QueryBoundary empties', () => {
     expect(screen.getByText('No one matches Decaying')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Show everyone' })).toBeInTheDocument();
     expect(screen.queryByText('No one here yet')).not.toBeInTheDocument();
+    expect(document.querySelector('[data-query-state="empty-filtered"]')).not.toBeNull();
   });
 
   it('prefers the nothing-yet copy when a filter is on but the set itself is empty, the Atoms case', () => {
@@ -215,7 +273,7 @@ describe('QueryBoundary empties', () => {
     );
 
     expect(screen.getByText('No one here yet')).toBeInTheDocument();
-    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+    expect(screen.queryByRole('list', { name: 'People' })).not.toBeInTheDocument();
 
     // A key carrying nothing, a cursor the server left unset, is not a second
     // thing in the response.
@@ -231,7 +289,9 @@ describe('QueryBoundary empties', () => {
   });
 
   it('leaves a response carrying more than the one list to the caller isEmpty', () => {
-    const query = fakeQuery<{ atoms: string[]; owners: string[] }>({ data: { atoms: [], owners: ['p1'] } });
+    const query = fakeQuery<{ atoms: string[]; owners: string[] }>({
+      data: { atoms: [], owners: ['p1'] },
+    });
     renderWithApp(
       <QueryBoundary query={query} empty={nothing}>
         {(d) => (
@@ -259,7 +319,9 @@ describe('QueryBoundary empties', () => {
 
   it('renders children when the caller supplied no empty slot at all', () => {
     const query = fakeQuery<string[]>({ data: [] });
-    renderWithApp(<QueryBoundary query={query}>{(rows) => <p>{rows.length} rows</p>}</QueryBoundary>);
+    renderWithApp(
+      <QueryBoundary query={query}>{(rows) => <p>{rows.length} rows</p>}</QueryBoundary>,
+    );
 
     expect(screen.getByText('0 rows')).toBeInTheDocument();
   });
@@ -268,7 +330,10 @@ describe('QueryBoundary empties', () => {
 describe('QueryBoundary degraded secondary queries', () => {
   it('keeps rendering the children and adds a compact banner naming what failed', () => {
     const record = fakeQuery<PeopleResp>({ data: { people: [LINA] } });
-    const history = fakeQuery<{ revisions: string[] }>({ isError: true, error: new Error('history pruned') });
+    const history = fakeQuery<{ revisions: string[] }>({
+      isError: true,
+      error: new Error('history pruned'),
+    });
     renderWithApp(
       <QueryBoundary query={record} secondary={[{ query: history, label: 'the history' }]}>
         {peopleList}
@@ -295,7 +360,10 @@ describe('QueryBoundary degraded secondary queries', () => {
   it('retries only the secondary query from its own banner', async () => {
     const user = userEvent.setup();
     const record = fakeQuery<PeopleResp>({ data: { people: [LINA] } });
-    const history = fakeQuery<{ revisions: string[] }>({ isError: true, error: new Error('history pruned') });
+    const history = fakeQuery<{ revisions: string[] }>({
+      isError: true,
+      error: new Error('history pruned'),
+    });
     renderWithApp(
       <QueryBoundary query={record} secondary={[{ query: history, label: 'the history' }]}>
         {peopleList}
@@ -309,7 +377,10 @@ describe('QueryBoundary degraded secondary queries', () => {
 
   it('reports a degraded secondary over the empty state too, so the empty is not read as fact', () => {
     const record = fakeQuery<string[]>({ data: [] });
-    const history = fakeQuery<{ revisions: string[] }>({ isError: true, error: new Error('history pruned') });
+    const history = fakeQuery<{ revisions: string[] }>({
+      isError: true,
+      error: new Error('history pruned'),
+    });
     renderWithApp(
       <QueryBoundary
         query={record}
@@ -327,8 +398,14 @@ describe('QueryBoundary degraded secondary queries', () => {
   it('gathers two failed secondaries into one banner, so no two controls share the name Retry', async () => {
     const user = userEvent.setup();
     const record = fakeQuery<PeopleResp>({ data: { people: [LINA] } });
-    const history = fakeQuery<{ revisions: string[] }>({ isError: true, error: new Error('history pruned') });
-    const ledger = fakeQuery<{ owed: number }>({ isError: true, error: new Error('ledger offline') });
+    const history = fakeQuery<{ revisions: string[] }>({
+      isError: true,
+      error: new Error('history pruned'),
+    });
+    const ledger = fakeQuery<{ owed: number }>({
+      isError: true,
+      error: new Error('ledger offline'),
+    });
     renderWithApp(
       <QueryBoundary
         query={record}
@@ -357,7 +434,10 @@ describe('QueryBoundary degraded secondary queries', () => {
   });
 
   it('renders a sub-region failure as a compact banner rather than a full panel', () => {
-    const history = fakeQuery<{ revisions: string[] }>({ isError: true, error: new Error('history pruned') });
+    const history = fakeQuery<{ revisions: string[] }>({
+      isError: true,
+      error: new Error('history pruned'),
+    });
     renderWithApp(
       <QueryBoundary query={history} compact errorTitle="Couldn’t load the history">
         {(d) => <p>{d.revisions.length}</p>}
@@ -372,7 +452,10 @@ describe('QueryBoundary degraded secondary queries', () => {
 
   it('gives that compact banner the Retry that is its only way out', async () => {
     const user = userEvent.setup();
-    const history = fakeQuery<{ revisions: string[] }>({ isError: true, error: new Error('history pruned') });
+    const history = fakeQuery<{ revisions: string[] }>({
+      isError: true,
+      error: new Error('history pruned'),
+    });
     renderWithApp(
       <QueryBoundary query={history} compact errorTitle="Couldn’t load the history">
         {(d) => <p>{d.revisions.length}</p>}
@@ -397,8 +480,8 @@ describe('QueryBoundary box', () => {
       </QueryBoundary>,
     );
 
-    expect(view.container.children).toHaveLength(1);
-    const loadingBox = view.container.firstElementChild as HTMLElement;
+    expect(view.container.querySelectorAll('.atom-grid')).toHaveLength(1);
+    const loadingBox = view.container.querySelector('.atom-grid') as HTMLElement;
     expect(loadingBox).toHaveClass('atom-grid');
     expect(within(loadingBox).getByRole('status', { name: 'Loading' })).toBeInTheDocument();
 
@@ -409,8 +492,8 @@ describe('QueryBoundary box', () => {
       </QueryBoundary>,
     );
 
-    expect(view.container.children).toHaveLength(1);
-    const contentBox = view.container.firstElementChild as HTMLElement;
+    expect(view.container.querySelectorAll('.atom-grid')).toHaveLength(1);
+    const contentBox = view.container.querySelector('.atom-grid') as HTMLElement;
     expect(contentBox).toHaveClass('atom-grid');
     expect(within(contentBox).getByRole('list')).toBeInTheDocument();
   });
@@ -423,16 +506,24 @@ describe('QueryBoundary box', () => {
       </QueryBoundary>,
     );
     expect(view.container.firstElementChild).toHaveClass('atom-grid');
-    expect(within(view.container.firstElementChild as HTMLElement).getByRole('alert')).toBeInTheDocument();
+    expect(
+      within(view.container.firstElementChild as HTMLElement).getByRole('alert'),
+    ).toBeInTheDocument();
 
     const none = fakeQuery<PeopleResp>({ data: { people: [] } });
     view.rerender(
-      <QueryBoundary query={none} className="atom-grid" empty={<EmptyState title="No one here yet" />}>
+      <QueryBoundary
+        query={none}
+        className="atom-grid"
+        empty={<EmptyState title="No one here yet" />}
+      >
         {peopleList}
       </QueryBoundary>,
     );
     expect(view.container.firstElementChild).toHaveClass('atom-grid');
-    expect(within(view.container.firstElementChild as HTMLElement).getByText('No one here yet')).toBeInTheDocument();
+    expect(
+      within(view.container.firstElementChild as HTMLElement).getByText('No one here yet'),
+    ).toBeInTheDocument();
   });
 });
 
@@ -534,7 +625,10 @@ function pagedFetch() {
 
 /** Two real query results, to prove the tuple keeps its per-query types. */
 function TupleHarness() {
-  const people = useQuery({ queryKey: ['people'], queryFn: () => Promise.resolve({ people: [LINA] }) });
+  const people = useQuery({
+    queryKey: ['people'],
+    queryFn: () => Promise.resolve({ people: [LINA] }),
+  });
   const stats = useQuery({ queryKey: ['stats'], queryFn: () => Promise.resolve({ total: 7 }) });
   return (
     <QueryBoundary query={[people, stats]}>
@@ -557,7 +651,9 @@ describe('QueryBoundary with real query results', () => {
 describe('keepLastResults', () => {
   it('is the one-line spelling of placeholderData', () => {
     expect(keepLastResults.placeholderData).toBeTypeOf('function');
-    expect(listQueryOptions({ queryKey: ['atoms'], queryFn: () => Promise.resolve(1) })).toMatchObject({
+    expect(
+      listQueryOptions({ queryKey: ['atoms'], queryFn: () => Promise.resolve(1) }),
+    ).toMatchObject({
       placeholderData: keepLastResults.placeholderData,
     });
   });

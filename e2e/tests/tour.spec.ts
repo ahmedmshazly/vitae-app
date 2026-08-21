@@ -12,6 +12,7 @@ import { expectNoA11yViolations } from './helpers/a11y';
 test('the first stop shows capture with a quiet progress bar', async ({ page }) => {
   await page.goto('/tour');
 
+  await expect(page.getByRole('main')).toHaveCount(1);
   await expect(page.getByRole('heading', { name: 'Five stops, two minutes.' })).toBeVisible();
   await expect(page.getByRole('tab', { name: /Capture anything in one line/i })).toHaveAttribute(
     'aria-selected',
@@ -29,7 +30,10 @@ test('the first stop shows capture with a quiet progress bar', async ({ page }) 
 
   const active = page.locator('.mk-tour__stop--on');
   const markerGlow = await active.evaluate((el) => getComputedStyle(el, '::before').boxShadow);
-  expect(markerGlow === 'none' || markerGlow === '', 'active stop marker must not glow').toBeTruthy();
+  expect(
+    markerGlow === 'none' || markerGlow === '',
+    'active stop marker must not glow',
+  ).toBeTruthy();
 });
 
 test('rail, next, and arrow keys advance stops; last stop offers sign-in', async ({ page }) => {
@@ -42,11 +46,12 @@ test('rail, next, and arrow keys advance stops; last stop offers sign-in', async
   await expect(page.getByText(/flame/i)).toHaveCount(0);
 
   await page.getByRole('button', { name: 'Next stop' }).click();
-  await expect(page.getByRole('tab', { name: /Relationships with instrumentation/i })).toHaveAttribute(
-    'aria-selected',
-    'true',
-  );
+  await expect(
+    page.getByRole('tab', { name: /Relationships with instrumentation/i }),
+  ).toHaveAttribute('aria-selected', 'true');
 
+  const peopleTab = page.getByRole('tab', { name: /Relationships with instrumentation/i });
+  await peopleTab.focus();
   await page.keyboard.press('ArrowRight');
   await expect(page.getByRole('tab', { name: /The shape of your life/i })).toHaveAttribute(
     'aria-selected',

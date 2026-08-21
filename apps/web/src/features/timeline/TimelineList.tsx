@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mono } from '@vitae/ui';
+import { EmptyState, Mono } from '@vitae/ui';
 import { entityHref } from '../../lib/entity-href.js';
 import type { TimelineItem, TimelineLane } from './types.js';
 
@@ -21,9 +21,7 @@ export function TimelineList({
   const items = lanes
     .filter((l) => activeLanes.includes(l.name))
     .flatMap((l) =>
-      l.items
-        .filter((i) => showMoments || i.kind === 'span')
-        .map((i) => ({ ...i, lane: l.name })),
+      l.items.filter((i) => showMoments || i.kind === 'span').map((i) => ({ ...i, lane: l.name })),
     )
     .sort((a, b) => b.start.localeCompare(a.start) || a.title.localeCompare(b.title));
 
@@ -36,10 +34,12 @@ export function TimelineList({
 
   if (items.length === 0) {
     return (
-      <div className="empty" style={{ padding: 48 }}>
-        <div className="empty__title">Nothing dated yet</div>
-        <div>Add start dates to roles, projects, education, events, or trips.</div>
-      </div>
+      <EmptyState
+        className="explore-instrument__empty"
+        glyph="timeline"
+        title="Nothing dated in these lanes"
+        hint="Turn on another evidence lane, or add dates to roles, projects, education, events, or trips."
+      />
     );
   }
 
@@ -50,28 +50,29 @@ export function TimelineList({
           <h2 className="tl__listyearhead">{y}</h2>
           <ul className="tl__listul">
             {(byYear.get(y) ?? []).map((item) => (
-              <li key={item.id}>
+              <li
+                key={item.id}
+                className={`tl__listrow${selectedId === item.id ? ' tl__listrow--on' : ''}`}
+              >
                 <button
                   type="button"
-                  className={`tl__listrow${selectedId === item.id ? ' tl__listrow--on' : ''}`}
+                  className="tl__listselect"
+                  aria-pressed={selectedId === item.id}
                   onClick={() => onSelect(item)}
                 >
                   <Mono className="u-faint text-xs" style={{ width: 88, flex: 'none' }}>
                     {item.start.slice(5)}
                     {item.end ? `-${item.end.slice(5)}` : item.current ? '-now' : ''}
                   </Mono>
-                  <span className="tl__listrowtitle">{item.title}</span>
-                  <Mono className="u-faint text-xs">
-                    {item.lane}
-                  </Mono>
-                  <Link
-                    className="tl__listopen"
-                    to={entityHref(item.type, item.id)}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    open
-                  </Link>
+                  <span className="tl__listrowcopy">
+                    <span className="tl__listrowtitle">{item.title}</span>
+                    {item.subtitle && <span className="tl__listrowsub">{item.subtitle}</span>}
+                  </span>
+                  <Mono className="u-faint text-xs">{item.lane}</Mono>
                 </button>
+                <Link className="tl__listopen" to={entityHref(item.type, item.id)}>
+                  Open
+                </Link>
               </li>
             ))}
           </ul>

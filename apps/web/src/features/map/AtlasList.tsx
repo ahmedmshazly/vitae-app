@@ -1,4 +1,4 @@
-import { Mono } from '@vitae/ui';
+import { EmptyState, Mono } from '@vitae/ui';
 import { cityScreenPos } from './geo.js';
 import type { MapCity, MapTrip } from './types.js';
 
@@ -40,23 +40,33 @@ export function AtlasList({
           onChange={(e) => onFilterQuery(e.target.value)}
         />
       </div>
-      <section>
-        <h2 className="atlas__listhead">Cities ({mapped.length})</h2>
-        <ul className="atlas__listul">
-          {mapped.map((c) => (
-            <li key={c.city}>
-              <button
-                type="button"
-                className={`atlas__listrow${selectedCity === c.city ? ' atlas__listrow--on' : ''}`}
-                onClick={() => onSelectCity(c.city)}
-              >
-                <span className="atlas__listrowtitle">{c.city}</span>
-                <Mono>{c.count}</Mono>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {q && mapped.length === 0 && unmapped.length === 0 && tripHits.length === 0 && (
+        <EmptyState
+          glyph="search"
+          title="No matching places or trips"
+          hint="Try a shorter place name, or clear the filter to return to the complete Atlas list."
+        />
+      )}
+      {mapped.length > 0 && (
+        <section>
+          <h2 className="atlas__listhead">Cities ({mapped.length})</h2>
+          <ul className="atlas__listul">
+            {mapped.map((c) => (
+              <li key={c.city}>
+                <button
+                  type="button"
+                  className={`atlas__listrow${selectedCity === c.city ? ' atlas__listrow--on' : ''}`}
+                  aria-pressed={selectedCity === c.city}
+                  onClick={() => onSelectCity(c.city)}
+                >
+                  <span className="atlas__listrowtitle">{c.city}</span>
+                  <Mono>{c.count}</Mono>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       {unmapped.length > 0 && (
         <section>
           <h2 className="atlas__listhead">Unmapped ({unmapped.length})</h2>
@@ -64,12 +74,21 @@ export function AtlasList({
             {unmapped.map((c) => (
               <li key={c.city}>
                 <div className="atlas__unmappedrow">
-                  <button type="button" className="atlas__listrow" onClick={() => onSelectCity(c.city)}>
+                  <button
+                    type="button"
+                    className="atlas__listrow"
+                    aria-pressed={selectedCity === c.city}
+                    onClick={() => onSelectCity(c.city)}
+                  >
                     <span className="atlas__listrowtitle">{c.city}</span>
                     <Mono className="u-faint">no coords</Mono>
                   </button>
                   {onPlaceUnmapped && (
-                    <button type="button" className="graph__tool" onClick={() => onPlaceUnmapped(c.city)}>
+                    <button
+                      type="button"
+                      className="graph__tool"
+                      onClick={() => onPlaceUnmapped(c.city)}
+                    >
                       Place on map
                     </button>
                   )}

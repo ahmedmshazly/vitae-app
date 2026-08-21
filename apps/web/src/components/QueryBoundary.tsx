@@ -44,11 +44,11 @@
  * one wrapper a commit later, and the region would change shape at the moment
  * the data landed.
  */
-import type { ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { motion } from 'motion/react';
 import { keepPreviousData } from '@tanstack/react-query';
 import type { QueryFunction, QueryKey } from '@tanstack/react-query';
-import { Banner, Button, ErrorState, SkeletonRows } from '@vitae/ui';
+import { Banner, Button, ErrorState, SkeletonRows, StatusTrace } from '@vitae/ui';
 import { useEnter } from '../lib/motion.js';
 
 /**
@@ -60,6 +60,8 @@ export interface QueryLike<TData = unknown> {
   data: TData | undefined;
   isPending: boolean;
   isError: boolean;
+  /** TanStack sets this during a background refresh while `data` stays live. */
+  isFetching?: boolean;
   error?: unknown;
   refetch?: () => unknown;
 }
@@ -95,8 +97,18 @@ export interface QueryBoundaryProps<S extends QuerySource> {
   loading?: ReactNode;
   /** Rows for the default skeleton. Ignored when `loading` is given. */
   skeletonRows?: number;
+  /** Accessible copy for the loading region. */
+  loadingLabel?: string;
   /** What failed, in the user's terms: "Couldn't load your people". */
   errorTitle?: string;
+  /** A refresh failure with cached data is non-blocking and uses this title. */
+  staleErrorTitle?: string;
+  /** Action copy for retryable failures. */
+  retryLabel?: string;
+  /** Text beside the live trace while cached data refreshes. */
+  refreshingLabel?: string;
+  /** Opt out only when the surrounding screen already reports the refresh. */
+  showRefreshing?: boolean;
   /** "There is nothing here yet." Usually an `EmptyState` with an action. */
   empty?: ReactNode;
   /** "Your filter matched nothing." Its action clears the filter. */
@@ -134,9 +146,19 @@ export interface QueryBoundaryProps<S extends QuerySource> {
 }
 
 /** First readable message among the failed queries, for the error detail. */
+function messageFrom(error: unknown): string | undefined {
+  if (error instanceof Error) return error.message || undefined;
+  if (typeof error === 'string') return error.trim() || undefined;
+  if (error && typeof error === 'object' && 'message' in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === 'string') return message.trim() || undefined;
+  }
+  return undefined;
+}
+
 function firstMessage(queries: readonly SomeQuery[]): string | undefined {
   for (const q of queries) {
-    const message = (q.error as Error | null | undefined)?.message;
+    const message = messageFrom(q.error);
     if (message) return message;
   }
   return undefined;
@@ -175,7 +197,12 @@ export function QueryBoundary<const S extends QuerySource>({
   children,
   loading,
   skeletonRows = 6,
+  loadingLabel = 'Loading',
   errorTitle = 'Couldn’t load this',
+  staleErrorTitle = 'Couldn’t refresh this data',
+  retryLabel = 'Retry',
+  refreshingLabel = 'Refreshing data',
+  showRefreshing = true,
   empty,
   emptyFiltered,
   filtered = false,
@@ -186,12 +213,40 @@ export function QueryBoundary<const S extends QuerySource>({
   className,
 }: QueryBoundaryProps<S>) {
   const enter = useEnter();
+  const [retrying, setRetrying] = useState(false);
+  const mounted = useRef(true);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   const queries: readonly SomeQuery[] = Array.isArray(query) ? query : [query as SomeQuery];
   const degraded = (secondary ?? []).filter((s) => s.query.isError);
+  const staleFailed = queries.filter((q) => q.isError && q.data !== undefined);
+  const refreshing =
+    showRefreshing && queries.some((q) => q.isFetching && !q.isPending && !q.isError);
 
-  function retry(targets: readonly SomeQuery[]) {
-    for (const q of targets) void q.refetch?.();
+  const retry = useCallback(async (targets: readonly SomeQuery[]) => {
+    const retryable = targets.filter((q) => q.refetch);
+    if (retryable.length === 0) return;
+    setRetrying(true);
+    try {
+      await Promise.allSettled(retryable.map((q) => Promise.resolve().then(() => q.refetch?.())));
+    } finally {
+      if (mounted.current) setRetrying(false);
+    }
+  }, []);
+
+  function retryAction(targets: readonly SomeQuery[]) {
+    if (!targets.some((q) => q.refetch)) return undefined;
+    return (
+      <Button size="sm" disabled={retrying} onClick={() => void retry(targets)}>
+        {retrying ? 'Retrying…' : retryLabel}
+      </Button>
+    );
   }
 
   /**
@@ -201,46 +256,63 @@ export function QueryBoundary<const S extends QuerySource>({
    */
   function present(phase: string, node: ReactNode, withDegraded = true) {
     return (
-      <motion.div key={phase} className={className} variants={enter} initial="initial" animate="animate">
+      <motion.div
+        key={phase}
+        className={className}
+        data-query-state={phase}
+        aria-busy={refreshing || retrying || undefined}
+        variants={enter}
+        initial="initial"
+        animate="animate"
+      >
+        {withDegraded && staleFailed.length > 0 && (
+          <Banner tone="danger" title={staleErrorTitle} action={retryAction(staleFailed)}>
+            {firstMessage(staleFailed)
+              ? `${firstMessage(staleFailed)} Showing the last available version.`
+              : 'Showing the last available version.'}
+          </Banner>
+        )}
         {withDegraded && degraded.length > 0 && (
           <Banner
             tone="danger"
             title={`Couldn’t load ${phrase(degraded.map((s) => s.label))}`}
-            action={
-              degraded.some((s) => s.query.refetch) ? (
-                <Button size="sm" onClick={() => retry(degraded.map((s) => s.query))}>
-                  Retry
-                </Button>
-              ) : undefined
-            }
+            action={retryAction(degraded.map((s) => s.query))}
           >
             Everything else on this screen is current.
           </Banner>
+        )}
+        {refreshing && (
+          <StatusTrace
+            tone="live"
+            label={refreshingLabel}
+            detail="Keeping the current view in place"
+          />
         )}
         {node}
       </motion.div>
     );
   }
 
-  const failed = queries.filter((q) => q.isError);
+  // A refresh can fail after a query has already supplied data. That is a
+  // degraded state, not a reason to blank a truthful screen with an error.
+  const failed = queries.filter((q) => q.isError && q.data === undefined);
   if (failed.length > 0) {
     const detail = firstMessage(failed);
+    const canRetry = queries.some((q) => q.refetch);
     return present(
       'error',
       compact ? (
-        <Banner
-          tone="danger"
-          title={errorTitle}
-          action={
-            <Button size="sm" onClick={() => retry(queries)}>
-              Retry
-            </Button>
-          }
-        >
+        <Banner tone="danger" title={errorTitle} action={retryAction(queries)}>
           {detail}
         </Banner>
       ) : (
-        <ErrorState title={errorTitle} detail={detail} onRetry={() => retry(queries)} />
+        <ErrorState
+          title={errorTitle}
+          detail={detail}
+          onRetry={canRetry ? () => void retry(queries) : undefined}
+          retryLabel={retryLabel}
+          retrying={retrying}
+        />
       ),
       false,
     );
@@ -256,7 +328,21 @@ export function QueryBoundary<const S extends QuerySource>({
     // region keeps its box while the data is in flight. Not a `motion.div`: a
     // skeleton that animates in is a second entrance for one arrival, and it is
     // the content that enters.
-    return <div className={className}>{loading ?? <SkeletonRows rows={skeletonRows} />}</div>;
+    return (
+      <div className={className} data-query-state="loading" aria-busy="true">
+        {loading ?? <SkeletonRows rows={skeletonRows} label={loadingLabel} />}
+        {loading != null && (
+          <span
+            className="u-visually-hidden"
+            role="status"
+            aria-label={loadingLabel}
+            aria-live="polite"
+          >
+            {loadingLabel}
+          </span>
+        )}
+      </div>
+    );
   }
 
   const data = (Array.isArray(query) ? values : values[0]) as ResolvedData<S>;
@@ -267,7 +353,7 @@ export function QueryBoundary<const S extends QuerySource>({
     // is itself empty is still the first one.
     const nothingAtAll = isSourceEmpty ? isSourceEmpty(data) : !filtered;
     const node = nothingAtAll ? (empty ?? emptyFiltered) : (emptyFiltered ?? empty);
-    if (node != null) return present('empty', node);
+    if (node != null) return present(nothingAtAll ? 'empty' : 'empty-filtered', node);
   }
 
   return present('content', children(data));

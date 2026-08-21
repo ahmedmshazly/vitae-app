@@ -1,0 +1,535 @@
+/*
+ * Explore workspace — one Living Ledger, observed through query, connection,
+ * time, and place. The trace carries real state; ruled registers carry data.
+ */
+
+.explore-library {
+  max-width: 1240px;
+}
+
+.explore-library .vt-pagehead__sub {
+  max-width: 68ch;
+  text-wrap: pretty;
+}
+
+.explore-library__query.coll__bar {
+  min-height: 48px;
+  gap: var(--ae-space-2);
+  padding: var(--ae-space-2) var(--ae-space-3);
+  border-color: var(--ae-border-control);
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-surface-sunken);
+}
+
+.explore-library__query-label,
+.explore-control-band__label {
+  flex: none;
+  color: var(--ae-faint);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.explore-library__query-label {
+  padding-right: var(--ae-space-2);
+  border-right: 1px solid var(--ae-border);
+}
+
+.explore-library__query .coll__input {
+  min-width: 180px;
+  min-height: var(--ae-hit-target);
+}
+
+.explore-library__query .coll__chip {
+  min-height: var(--ae-control-h-sm);
+  background: var(--ae-surface-raised);
+}
+
+.explore-library__query .coll__chipx {
+  position: relative;
+  min-width: var(--ae-control-h-sm);
+  min-height: var(--ae-control-h-sm);
+  color: var(--ae-muted);
+}
+
+.explore-library__trace {
+  min-height: 44px;
+  margin: var(--ae-space-2) 0 var(--ae-space-5);
+  padding: var(--ae-space-2) var(--ae-space-3);
+  border-bottom: 1px solid var(--ae-border);
+  background: var(--ae-surface-sunken);
+}
+
+.explore-library__register {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--ae-border-strong);
+  border-bottom: 1px solid var(--ae-border-strong);
+}
+
+.explore-library__type {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  min-height: 64px;
+  align-items: center;
+  gap: var(--ae-space-3);
+  padding: var(--ae-space-3) var(--ae-space-4);
+  border: 0;
+  border-bottom: 1px solid var(--ae-border);
+  background: transparent;
+  color: var(--ae-fg);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--ae-dur) var(--ae-ease),
+    color var(--ae-dur) var(--ae-ease);
+}
+
+.explore-library__type:nth-child(odd) {
+  border-right: 1px solid var(--ae-border);
+}
+
+.explore-library__type:hover {
+  background: var(--ae-surface-raised);
+}
+
+.explore-library__type:active {
+  scale: 0.96;
+}
+
+.explore-library__type-glyph {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid var(--ae-border);
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-surface-sunken);
+}
+
+.explore-library__type-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.explore-library__type-copy strong {
+  overflow: hidden;
+  color: var(--ae-fg-strong);
+  font-size: var(--ae-text-base);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.explore-library__type-copy span {
+  color: var(--ae-faint);
+  font-size: var(--ae-text-xs);
+}
+
+.explore-library__type-count {
+  min-width: 28px;
+  color: var(--ae-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.explore-library__saved-view {
+  min-height: 52px;
+}
+
+/* Shared instrument chrome: context at the top, then explicit control bands. */
+.explore-instrument__heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, auto);
+  align-items: start;
+  gap: var(--ae-space-5);
+}
+
+.explore-instrument__heading .lifemap__titleblock {
+  display: grid;
+  gap: var(--ae-space-1);
+}
+
+.explore-instrument__heading .lifemap__title {
+  text-wrap: balance;
+}
+
+.explore-instrument__heading .lifemap__hint {
+  max-width: 72ch;
+  line-height: var(--ae-leading-normal);
+  text-wrap: pretty;
+}
+
+.explore-instrument__trace {
+  min-height: 36px;
+  align-self: start;
+  justify-self: end;
+  padding: var(--ae-space-1) 0;
+}
+
+.explore-control-band {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  align-items: start;
+  gap: var(--ae-space-3);
+  padding-top: var(--ae-space-2);
+  border-top: 1px solid var(--ae-border);
+}
+
+.explore-control-band__label {
+  padding-top: 8px;
+}
+
+.lifemap__chrome,
+.chronograph__chrome,
+.atlas__chrome {
+  gap: var(--ae-space-2);
+  background: var(--ae-surface-sunken);
+}
+
+.lifemap__mode,
+.lifemap__lens,
+.graph__filter,
+.graph__tool,
+.atlas__unmappedchip {
+  min-height: var(--ae-hit-target);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background var(--ae-dur) var(--ae-ease),
+    border-color var(--ae-dur) var(--ae-ease),
+    color var(--ae-dur) var(--ae-ease),
+    opacity var(--ae-dur-fast) linear;
+}
+
+.lifemap__mode:active,
+.lifemap__lens:active,
+.graph__filter:active,
+.graph__tool:active,
+.atlas__unmappedchip:active {
+  scale: 0.96;
+}
+
+.lifemap__mode--on,
+.lifemap__lens--on,
+.graph__filter--on,
+.graph__tool--accent {
+  border-color: var(--ae-border-control);
+  background: var(--ae-accent-bg);
+  color: var(--ae-fg-strong);
+}
+
+.graph__panel--lifemap,
+.chronograph__main,
+.atlas__main {
+  background: var(--ae-surface-sunken);
+}
+
+.graph__panel--lifemap {
+  border-top-color: var(--ae-border-strong);
+}
+
+.graph__tools--lifemap {
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  padding-bottom: var(--ae-space-1);
+  scrollbar-width: thin;
+}
+
+.graph__tools--lifemap > * {
+  flex: none;
+}
+
+.graph__peekrow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ae-space-2);
+  min-height: var(--ae-hit-target);
+}
+
+.graph__peekselect {
+  display: flex;
+  min-width: 0;
+  min-height: var(--ae-hit-target);
+  align-items: center;
+  gap: var(--ae-space-2);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.graph__peekopen {
+  display: inline-flex;
+  min-height: var(--ae-hit-target);
+  align-items: center;
+}
+
+.explore-instrument-state {
+  max-width: none;
+  min-height: 420px;
+  margin: 0;
+  background: var(--ae-surface-sunken);
+}
+
+.explore-instrument-state__head {
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ae-space-5);
+  padding: var(--ae-space-4) var(--ae-space-5);
+  border-bottom: 1px solid var(--ae-border-strong);
+}
+
+.explore-instrument-state__body {
+  max-width: 760px;
+  padding: var(--ae-space-6) var(--ae-space-5);
+}
+
+.explore-instrument__empty {
+  min-height: 100%;
+  place-content: center;
+  padding: var(--ae-space-8) var(--ae-space-5);
+}
+
+/* Chronograph: the list remains the exact keyboard-readable twin of canvas. */
+.tl__listrow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ae-space-2);
+  min-height: 44px;
+  padding: 0 var(--ae-space-2);
+  border-bottom: 1px solid var(--ae-border);
+  border-radius: 0;
+  transition: background var(--ae-dur) var(--ae-ease);
+}
+
+.tl__listrow:hover,
+.tl__listrow--on {
+  background: var(--ae-surface-raised);
+}
+
+.tl__listselect {
+  display: flex;
+  min-width: 0;
+  min-height: 44px;
+  align-items: center;
+  gap: var(--ae-space-3);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ae-fg-soft);
+  text-align: left;
+  cursor: pointer;
+}
+
+.tl__listrowcopy {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 1px;
+}
+
+.tl__listrowsub {
+  overflow: hidden;
+  color: var(--ae-faint);
+  font-size: var(--ae-text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tl__listopen {
+  display: inline-flex;
+  min-height: var(--ae-hit-target);
+  align-items: center;
+  padding: 0 var(--ae-space-2);
+}
+
+.tl__reviewstate {
+  padding: var(--ae-space-4) 0;
+  border-block: 1px solid var(--ae-border);
+}
+
+.tl__review .vt-error {
+  padding: var(--ae-space-3) 0;
+}
+
+.tl__bar,
+.tl__moment {
+  transition:
+    filter var(--ae-dur) var(--ae-ease),
+    outline-color var(--ae-dur) var(--ae-ease);
+}
+
+/* Atlas: one provenance trace precedes every place or route dossier. */
+.atlas__primary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.explore-instrument__heading--atlas {
+  grid-template-columns: minmax(0, 1fr) minmax(300px, auto);
+}
+
+.atlas__filters {
+  gap: var(--ae-space-2);
+}
+
+.atlas__dossier > .vt-status-trace {
+  margin: 0 var(--ae-space-3);
+  padding: var(--ae-space-2) 0;
+  border-bottom: 1px solid var(--ae-border);
+}
+
+.atlas__dossierlist {
+  scrollbar-width: thin;
+}
+
+.atlas__find {
+  border-color: var(--ae-border-control);
+}
+
+.atlas__find .lifemap__searchempty {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  color: var(--ae-muted);
+}
+
+.atlas__panel[aria-busy='true']::after {
+  content: 'Loading map tiles';
+  position: absolute;
+  right: var(--ae-space-3);
+  bottom: var(--ae-space-3);
+  padding: var(--ae-space-1) var(--ae-space-2);
+  border: 1px solid var(--ae-border);
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-surface-overlay);
+  color: var(--ae-muted);
+  font: var(--ae-text-xs)/var(--ae-leading-normal) var(--ae-font-mono);
+}
+
+@media (max-width: 900px) {
+  .explore-instrument__heading,
+  .explore-instrument__heading--atlas,
+  .atlas__primary {
+    grid-template-columns: 1fr;
+  }
+
+  .explore-instrument__trace {
+    justify-self: stretch;
+  }
+
+  .atlas__primaryactions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 720px) {
+  .explore-library__register {
+    grid-template-columns: 1fr;
+  }
+
+  .explore-library__type:nth-child(odd) {
+    border-right: 0;
+  }
+
+  .explore-library__query.coll__bar {
+    align-items: stretch;
+  }
+
+  .explore-library__query-label {
+    width: 100%;
+    padding: 0 0 var(--ae-space-1);
+    border-right: 0;
+    border-bottom: 1px solid var(--ae-border);
+  }
+
+  .explore-control-band {
+    grid-template-columns: 1fr;
+    gap: var(--ae-space-1);
+  }
+
+  .explore-control-band__label {
+    padding-top: 0;
+  }
+
+  .lifemap__chrome,
+  .chronograph__chrome,
+  .atlas__chrome {
+    max-height: min(48vh, 420px);
+    overflow-y: auto;
+    padding-inline: var(--ae-space-3);
+    scrollbar-width: thin;
+  }
+
+  .explore-instrument-state__head {
+    align-items: flex-start;
+    flex-direction: column;
+    padding-inline: var(--ae-space-3);
+  }
+
+  .explore-instrument-state__body {
+    padding: var(--ae-space-5) var(--ae-space-3);
+  }
+
+  .graph__tools--lifemap {
+    left: var(--ae-space-2);
+    right: var(--ae-space-2);
+  }
+
+  .lifemap__connectedwrap {
+    left: var(--ae-space-2);
+    bottom: 60px;
+  }
+
+  .tl__list {
+    padding-inline: var(--ae-space-3);
+  }
+
+  .tl__listselect > .u-mono:last-child {
+    display: none;
+  }
+
+  .atlas__perioddates {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+}
+
+@media (pointer: coarse) {
+  .explore-library__query .coll__chipx,
+  .lifemap__mode,
+  .lifemap__lens,
+  .graph__filter,
+  .graph__tool,
+  .atlas__unmappedchip,
+  .graph__peekselect,
+  .graph__peekopen,
+  .tl__listopen {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explore-library__type,
+  .lifemap__mode,
+  .lifemap__lens,
+  .graph__filter,
+  .graph__tool,
+  .atlas__unmappedchip,
+  .tl__listrow,
+  .tl__bar,
+  .tl__moment {
+    transition-duration: 0ms;
+  }
+}

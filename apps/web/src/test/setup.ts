@@ -29,3 +29,16 @@ if (!globalThis.ResizeObserver) {
     disconnect() {}
   } as unknown as typeof ResizeObserver;
 }
+
+// Radix Toast's swipe handler uses Pointer Capture. Browsers provide all
+// three methods; jsdom currently provides none, so a normal userEvent click
+// otherwise throws after the action has already succeeded.
+if (!Element.prototype.hasPointerCapture) {
+  Element.prototype.hasPointerCapture = () => false;
+}
+if (!Element.prototype.setPointerCapture) {
+  Element.prototype.setPointerCapture = () => {};
+}
+if (!Element.prototype.releasePointerCapture) {
+  Element.prototype.releasePointerCapture = () => {};
+}

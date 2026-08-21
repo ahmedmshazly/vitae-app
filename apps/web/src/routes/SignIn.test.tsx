@@ -37,14 +37,27 @@ beforeEach(() => {
 describe('SignIn, which ways in are offered', () => {
   it('offers both when both are configured, with Google as the primary', () => {
     renderSignIn();
-    expect(screen.getByRole('button', { name: 'Continue with Google' })).toHaveClass('vt-btn--primary');
-    expect(screen.getByRole('button', { name: /Developer sign-in/ })).not.toHaveClass('vt-btn--primary');
+    expect(screen.getByRole('button', { name: 'Continue with Google' })).toHaveClass(
+      'vt-btn--primary',
+    );
+    expect(screen.getByRole('button', { name: /Developer sign-in/ })).not.toHaveClass(
+      'vt-btn--primary',
+    );
+    expect(screen.getByText(/configured as the owner of this instance/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/accounts that do not match the configured owner email are denied/i),
+    ).toBeInTheDocument();
   });
 
   it('promotes the developer button to primary when it is the only way in', () => {
     renderSignIn({ googleEnabled: false });
     expect(screen.queryByRole('button', { name: /Google/ })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Developer sign-in/ })).toHaveClass('vt-btn--primary');
+    expect(screen.getByRole('button', { name: /Developer sign-in/ })).toHaveClass(
+      'vt-btn--primary',
+    );
+    expect(
+      screen.getByText(/local developer shortcut enabled for this build/i),
+    ).toBeInTheDocument();
   });
 
   it('hides the developer shortcut outside a local developer runtime', () => {
@@ -80,7 +93,9 @@ describe('SignIn, pending and failure', () => {
 
   it('reports a failed sign-in with a word and a glyph, not just a colour', async () => {
     const user = userEvent.setup();
-    auth.signInGoogle = vi.fn().mockRejectedValue(new Error('This Google account is not authorized for this system.'));
+    auth.signInGoogle = vi
+      .fn()
+      .mockRejectedValue(new Error('This Google account is not authorized for this system.'));
     renderSignIn();
 
     await user.click(screen.getByRole('button', { name: 'Continue with Google' }));

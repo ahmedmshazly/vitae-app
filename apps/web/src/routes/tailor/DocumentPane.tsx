@@ -17,7 +17,15 @@ function plain(text: string): string {
   return text.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*([^*]+)\*/g, '$1');
 }
 
-function EyeButton({ hidden, onClick, label }: { hidden: boolean; onClick: () => void; label: string }) {
+function EyeButton({
+  hidden,
+  onClick,
+  label,
+}: {
+  hidden: boolean;
+  onClick: () => void;
+  label: string;
+}) {
   return (
     <button
       type="button"
@@ -84,7 +92,11 @@ export function DocumentPane({ targetId, draft, onDraft }: Props) {
     return (
       <div className="card" style={{ minHeight: 320 }}>
         <h2 className="card__title">Document preview unavailable</h2>
-        <div className="u-muted">{modelQuery.error instanceof Error ? modelQuery.error.message : 'Could not assemble résumé model.'}</div>
+        <div className="u-muted">
+          {modelQuery.error instanceof Error
+            ? modelQuery.error.message
+            : 'Could not assemble résumé model.'}
+        </div>
       </div>
     );
   }
@@ -148,10 +160,19 @@ export function DocumentPane({ targetId, draft, onDraft }: Props) {
           }}
         >
           <div style={{ display: 'flex', gap: 6, alignItems: 'baseline' }}>
-            <span title="Drag entry" style={{ cursor: 'grab', color: PAPER_AFFORDANCE, userSelect: 'none' }}>⋮⋮</span>
+            <span
+              title="Drag entry"
+              style={{ cursor: 'grab', color: PAPER_AFFORDANCE, userSelect: 'none' }}
+            >
+              ⋮⋮
+            </span>
             <strong style={{ flex: 1, fontSize: 12.5 }}>{entry.role}</strong>
             {entry.dates && <span style={{ fontSize: 10.5, color: '#565656' }}>{entry.dates}</span>}
-            <EyeButton hidden={entry.disabled === true} onClick={() => toggleItem(entry.id, entry.disabled === true)} label={entry.role} />
+            <EyeButton
+              hidden={entry.disabled === true}
+              onClick={() => toggleItem(entry.id, entry.disabled === true)}
+              label={entry.role}
+            />
           </div>
           {(entry.org || entry.location) && (
             <div style={{ marginLeft: 19, fontSize: 10.5, fontStyle: 'italic', color: '#565656' }}>
@@ -207,7 +228,9 @@ export function DocumentPane({ targetId, draft, onDraft }: Props) {
             </Reorder.Group>
           )}
           {entry.bullets.length === 0 && sectionKey !== 'education' && (
-            <div style={{ marginLeft: 19, fontSize: 11, color: PAPER_AFFORDANCE }}>No selected details, choose atoms in the controls.</div>
+            <div style={{ marginLeft: 19, fontSize: 11, color: PAPER_AFFORDANCE }}>
+              No selected details, choose atoms in the controls.
+            </div>
           )}
         </div>
       </Reorder.Item>
@@ -218,7 +241,12 @@ export function DocumentPane({ targetId, draft, onDraft }: Props) {
     if (section.kind === 'entries') {
       const ids = (section.entries ?? []).map((entry) => entry.id);
       return (
-        <Reorder.Group axis="y" values={ids} onReorder={(next) => setItemOrder(section.key, next as string[])} style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+        <Reorder.Group
+          axis="y"
+          values={ids}
+          onReorder={(next) => setItemOrder(section.key, next as string[])}
+          style={{ listStyle: 'none', margin: 0, padding: 0 }}
+        >
           {(section.entries ?? []).map((entry) => renderEntry(entry, section.key))}
         </Reorder.Group>
       );
@@ -226,11 +254,27 @@ export function DocumentPane({ targetId, draft, onDraft }: Props) {
     if (section.kind === 'skillrows') {
       const ids = (section.skillRows ?? []).map((row) => row.id);
       return (
-        <Reorder.Group axis="y" values={ids} onReorder={(next) => setItemOrder(section.key, next as string[])} style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+        <Reorder.Group
+          axis="y"
+          values={ids}
+          onReorder={(next) => setItemOrder(section.key, next as string[])}
+          style={{ listStyle: 'none', margin: 0, padding: 0 }}
+        >
           {(section.skillRows ?? []).map((row) => (
             <Reorder.Item key={row.id} value={row.id} style={{ listStyle: 'none' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '16px 105px 1fr auto', gap: 4, marginBottom: 3, opacity: row.disabled ? 0.42 : 1, alignItems: 'start' }}>
-                <span title="Drag skill group" style={{ cursor: 'grab', color: PAPER_AFFORDANCE }}>⋮</span>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '16px 105px 1fr auto',
+                  gap: 4,
+                  marginBottom: 3,
+                  opacity: row.disabled ? 0.42 : 1,
+                  alignItems: 'start',
+                }}
+              >
+                <span title="Drag skill group" style={{ cursor: 'grab', color: PAPER_AFFORDANCE }}>
+                  ⋮
+                </span>
                 <strong style={{ fontSize: 10.5 }}>{row.label}</strong>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1px 4px' }}>
                   {row.skills.map((skill) => (
@@ -238,7 +282,9 @@ export function DocumentPane({ targetId, draft, onDraft }: Props) {
                       type="button"
                       key={skill.id}
                       title={`${skill.disabled ? 'Include' : 'Exclude'} ${skill.name}`}
-                      onClick={() => onDraft({ skillsDisabled: toggle(draft.skillsDisabled, skill.id) })}
+                      onClick={() =>
+                        onDraft({ skillsDisabled: toggle(draft.skillsDisabled, skill.id) })
+                      }
                       style={{
                         border: 0,
                         padding: 0,
@@ -254,7 +300,11 @@ export function DocumentPane({ targetId, draft, onDraft }: Props) {
                     </button>
                   ))}
                 </div>
-                <EyeButton hidden={row.disabled === true} onClick={() => toggleItem(row.id, row.disabled === true)} label={row.label} />
+                <EyeButton
+                  hidden={row.disabled === true}
+                  onClick={() => toggleItem(row.id, row.disabled === true)}
+                  label={row.label}
+                />
               </div>
             </Reorder.Item>
           ))}
@@ -263,13 +313,33 @@ export function DocumentPane({ targetId, draft, onDraft }: Props) {
     }
     const ids = (section.lines ?? []).map((line) => line.id);
     return (
-      <Reorder.Group axis="y" values={ids} onReorder={(next) => setItemOrder(section.key, next as string[])} style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+      <Reorder.Group
+        axis="y"
+        values={ids}
+        onReorder={(next) => setItemOrder(section.key, next as string[])}
+        style={{ listStyle: 'none', margin: 0, padding: 0 }}
+      >
         {(section.lines ?? []).map((line) => (
           <Reorder.Item key={line.id} value={line.id} style={{ listStyle: 'none' }}>
-            <div style={{ display: 'flex', gap: 6, alignItems: 'center', opacity: line.disabled ? 0.42 : 1, fontSize: 10.5, marginBottom: 2 }}>
-              <span title="Drag item" style={{ cursor: 'grab', color: PAPER_AFFORDANCE }}>⋮</span>
+            <div
+              style={{
+                display: 'flex',
+                gap: 6,
+                alignItems: 'center',
+                opacity: line.disabled ? 0.42 : 1,
+                fontSize: 10.5,
+                marginBottom: 2,
+              }}
+            >
+              <span title="Drag item" style={{ cursor: 'grab', color: PAPER_AFFORDANCE }}>
+                ⋮
+              </span>
               <span style={{ flex: 1 }}>{plain(line.text)}</span>
-              <EyeButton hidden={line.disabled === true} onClick={() => toggleItem(line.id, line.disabled === true)} label={line.text} />
+              <EyeButton
+                hidden={line.disabled === true}
+                onClick={() => toggleItem(line.id, line.disabled === true)}
+                label={line.text}
+              />
             </div>
           </Reorder.Item>
         ))}
@@ -282,11 +352,15 @@ export function DocumentPane({ targetId, draft, onDraft }: Props) {
       <div className="spread" style={{ marginBottom: 8 }}>
         <div>
           <h2 className="card__title">Live document</h2>
-          <div className="u-faint" style={{ fontSize: 'var(--ae-text-xs)' }}>Drag and toggle directly on the paper.</div>
+          <div className="u-faint" style={{ fontSize: 'var(--ae-text-xs)' }}>
+            Drag and toggle directly on the paper.
+          </div>
         </div>
         <div className="chips">
           <Chip mono>{selection.entries.length} details</Chip>
-          <Chip mono tone={pageEstimate.pages === 1 ? 'accent' : 'default'}>{pageEstimate.pages}p est.</Chip>
+          <Chip mono tone={pageEstimate.pages === 1 ? 'accent' : 'default'}>
+            {pageEstimate.pages}p est.
+          </Chip>
           {modelQuery.isFetching && <Chip mono>updating…</Chip>}
         </div>
       </div>
@@ -305,22 +379,54 @@ export function DocumentPane({ targetId, draft, onDraft }: Props) {
         }}
       >
         <div style={{ textAlign: 'center', marginBottom: 8 }}>
-          <div style={{ color: '#1f3a5f', fontFamily: 'Arial, sans-serif', fontSize: 27, fontWeight: 800 }}>{model.name}</div>
-          <div style={{ color: '#565656', fontFamily: 'Arial, sans-serif', fontSize: 14 }}>{model.headline}</div>
-          {model.tagline && <div style={{ color: '#565656', fontSize: 10.5, marginTop: 3 }}>{model.tagline}</div>}
+          <div
+            style={{
+              color: '#1f3a5f',
+              fontFamily: 'Arial, sans-serif',
+              fontSize: 27,
+              fontWeight: 800,
+            }}
+          >
+            {model.name}
+          </div>
+          <div style={{ color: '#565656', fontFamily: 'Arial, sans-serif', fontSize: 14 }}>
+            {model.headline}
+          </div>
+          {model.tagline && (
+            <div style={{ color: '#565656', fontSize: 10.5, marginTop: 3 }}>{model.tagline}</div>
+          )}
 
           <Reorder.Group
             axis="x"
             values={model.contacts.map((contact) => contact.key)}
             onReorder={(keys) => onDraft({ contactOrder: keys as string[] })}
-            style={{ listStyle: 'none', margin: '6px 0 0', padding: 0, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 5 }}
+            style={{
+              listStyle: 'none',
+              margin: '6px 0 0',
+              padding: 0,
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              gap: 5,
+            }}
           >
             {model.contacts.map((contact) => (
               <Reorder.Item key={contact.key} value={contact.key} style={{ listStyle: 'none' }}>
-                <span style={{ display: 'inline-flex', gap: 3, alignItems: 'center', opacity: contact.disabled ? 0.4 : 1, fontSize: 11, cursor: 'grab' }}>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    gap: 3,
+                    alignItems: 'center',
+                    opacity: contact.disabled ? 0.4 : 1,
+                    fontSize: 11,
+                    cursor: 'grab',
+                  }}
+                >
                   <EyeButton
                     hidden={contact.disabled === true}
-                    onClick={() => onDraft({ contactDisabled: toggle(draft.contactDisabled, contact.key) })}
+                    onClick={() =>
+                      onDraft({ contactDisabled: toggle(draft.contactDisabled, contact.key) })
+                    }
                     label={contact.key}
                   />
                   {contact.value}
@@ -329,13 +435,29 @@ export function DocumentPane({ targetId, draft, onDraft }: Props) {
             ))}
           </Reorder.Group>
 
-          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 4, marginTop: 5 }}>
-            {CONTACT_KEYS.filter((key) => !model.contacts.some((contact) => contact.key === key)).map((key) => (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              gap: 4,
+              marginTop: 5,
+            }}
+          >
+            {CONTACT_KEYS.filter(
+              (key) => !model.contacts.some((contact) => contact.key === key),
+            ).map((key) => (
               <Link
                 key={key}
-                to={model.profileId ? `/people/${model.profileId}` : '/people'}
+                to={model.profileId ? `/network/people/${model.profileId}` : '/network/people'}
                 title={`Add ${key} on your profile`}
-                style={{ color: PAPER_AFFORDANCE, border: `1px dashed ${PAPER_AFFORDANCE_BORDER}`, borderRadius: 10, padding: '1px 5px', fontSize: 11 }}
+                style={{
+                  color: PAPER_AFFORDANCE,
+                  border: `1px dashed ${PAPER_AFFORDANCE_BORDER}`,
+                  borderRadius: 10,
+                  padding: '1px 5px',
+                  fontSize: 11,
+                }}
               >
                 + {key}
               </Link>
@@ -343,7 +465,12 @@ export function DocumentPane({ targetId, draft, onDraft }: Props) {
           </div>
         </div>
 
-        <Reorder.Group axis="y" values={sectionOrder} onReorder={(keys) => onDraft({ sectionOrder: keys as string[] })} style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+        <Reorder.Group
+          axis="y"
+          values={sectionOrder}
+          onReorder={(keys) => onDraft({ sectionOrder: keys as string[] })}
+          style={{ listStyle: 'none', margin: 0, padding: 0 }}
+        >
           {sectionOrder.map((key) => {
             const isSummary = key === 'summary';
             const section = sectionsByKey.get(key);
@@ -352,19 +479,50 @@ export function DocumentPane({ targetId, draft, onDraft }: Props) {
             const title = isSummary ? 'Summary' : section!.title;
             return (
               <Reorder.Item key={key} value={key} style={{ listStyle: 'none' }}>
-                <section data-resume-section={key} style={{ opacity: hidden ? 0.38 : 1, marginTop: 6 }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '16px 1fr auto', alignItems: 'center', gap: 4, color: '#1f3a5f', fontFamily: 'Arial, sans-serif', fontWeight: 700, fontSize: 14 }}>
-                    <span title="Drag section" style={{ cursor: 'grab', color: PAPER_AFFORDANCE, fontSize: 11 }}>⋮⋮</span>
-                    <span style={{ borderBottom: '1px solid #c7ccd1', paddingBottom: 1 }}>{title}</span>
+                <section
+                  data-resume-section={key}
+                  style={{ opacity: hidden ? 0.38 : 1, marginTop: 6 }}
+                >
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '16px 1fr auto',
+                      alignItems: 'center',
+                      gap: 4,
+                      color: '#1f3a5f',
+                      fontFamily: 'Arial, sans-serif',
+                      fontWeight: 700,
+                      fontSize: 14,
+                    }}
+                  >
+                    <span
+                      title="Drag section"
+                      style={{ cursor: 'grab', color: PAPER_AFFORDANCE, fontSize: 11 }}
+                    >
+                      ⋮⋮
+                    </span>
+                    <span style={{ borderBottom: '1px solid #c7ccd1', paddingBottom: 1 }}>
+                      {title}
+                    </span>
                     <EyeButton
                       hidden={hidden}
-                      onClick={() => onDraft({ sectionsEnabled: { ...draft.sectionsEnabled, [key]: hidden } })}
+                      onClick={() =>
+                        onDraft({ sectionsEnabled: { ...draft.sectionsEnabled, [key]: hidden } })
+                      }
                       label={`${title} section`}
                     />
                   </div>
                   <div style={{ marginTop: 4, marginLeft: 20 }}>
                     {isSummary ? (
-                      model.summary ? <div style={{ fontSize: 10.5, lineHeight: 1.32 }}>{plain(model.summary)}</div> : <div style={{ color: PAPER_AFFORDANCE, fontSize: 11 }}>Add a summary in the controls.</div>
+                      model.summary ? (
+                        <div style={{ fontSize: 10.5, lineHeight: 1.32 }}>
+                          {plain(model.summary)}
+                        </div>
+                      ) : (
+                        <div style={{ color: PAPER_AFFORDANCE, fontSize: 11 }}>
+                          Add a summary in the controls.
+                        </div>
+                      )
                     ) : (
                       renderSection(section!)
                     )}

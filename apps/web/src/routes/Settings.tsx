@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Button,
@@ -55,11 +55,34 @@ export function formatGithubSync(lastSyncAt: string | null | undefined): string 
 /** Settings (SRS P22): profile, ranking constants, taxonomy, GitHub, health. */
 export function Settings() {
   const { user } = useAuth();
+  const { pathname } = useLocation();
   const qc = useQueryClient();
   const { flash } = useToast();
+  const view = pathname.endsWith('/profile')
+    ? 'profile'
+    : pathname.endsWith('/preferences')
+      ? 'preferences'
+      : pathname.endsWith('/system')
+        ? 'system'
+        : 'all';
+  const pageTitle =
+    view === 'all'
+      ? 'Settings'
+      : view === 'profile'
+        ? 'Profile'
+        : view === 'preferences'
+          ? 'Preferences'
+          : 'System';
 
-  const status = useQuery({ queryKey: ['status'], queryFn: () => api.get<Status>('/status') });
-  const settings = useQuery({ queryKey: ['settings'], queryFn: () => api.get<SettingsResp>('/settings') });
+  const status = useQuery({
+    queryKey: ['status'],
+    queryFn: () => api.get<Status>('/status'),
+    enabled: view === 'all' || view === 'system',
+  });
+  const settings = useQuery({
+    queryKey: ['settings'],
+    queryFn: () => api.get<SettingsResp>('/settings'),
+  });
   // FR-008: opening Settings used to kick off a full duplicate scan just to
   // print a candidate count in a link label. The scan is the expensive thing in
   // the system; it belongs on the page that exists to show its results.
@@ -82,15 +105,26 @@ export function Settings() {
   return (
     <div className="page">
       <PageHeader
-        title="Settings"
-        subtitle="Owner-only · single-user data plane."
+        title={pageTitle}
+        subtitle={
+          view === 'profile'
+            ? 'The owner identity used across your graph and career documents.'
+            : view === 'preferences'
+              ? 'Tune deterministic ranking, taxonomy, and document defaults.'
+              : view === 'system'
+                ? 'Live service health, connected sources, and ownership controls.'
+                : 'Owner-only · single-user data plane.'
+        }
         help={
           <InfoPopover title="Calibration">
             <p>
-              Profile and résumé defaults feed new Tailor sessions. Ranking constants reshape Ask. Skill aliases
-              teach the JD parser which nicknames mean which skills.
+              Profile and résumé defaults feed new Tailor sessions. Ranking constants reshape Ask.
+              Skill aliases teach the JD parser which nicknames mean which skills.
             </p>
-            <p>GitHub credentials and sync live primarily under Repositories; System status is the live health strip.</p>
+            <p>
+              GitHub credentials and sync live primarily under Repositories; System status is the
+              live health strip.
+            </p>
           </InfoPopover>
         }
       />
@@ -118,113 +152,129 @@ export function Settings() {
           <SkeletonRows rows={8} />
         </div>
       ) : (
-        <div className="grid-2">
-          <ProfileCard
-            profile={settings.data.profile}
-            email={user?.email ?? ''}
-            saving={patch.isPending}
-            onSave={(profile) => patch.mutate({ profile })}
-          />
-          <ResumeDefaultsCard
-            defaults={
-              settings.data.resumeDefaults ?? {
-                templateKey: 'cobalt',
-                accent: '#2563eb',
-                emphasis: 'technical',
-              }
-            }
-            saving={patch.isPending}
-            onSave={(resumeDefaults) => patch.mutate({ resumeDefaults })}
-          />
-          <WeightsCard
-            weights={settings.data.askWeights}
-            onChange={(askWeights) => patch.mutate({ askWeights })}
-          />
-          <AliasesCard
-            aliases={settings.data.skillAliases}
-            saving={patch.isPending}
-            onSave={(skillAliases) => patch.mutate({ skillAliases })}
-          />
-
-          <Section title="GitHub">
-            <GithubCard
-              configured={settings.data.github.configured}
-              lastSyncAt={settings.data.github.lastSyncAt}
-              onChanged={(message) => {
-                void qc.invalidateQueries({ queryKey: ['settings'] });
-                flash(message);
-              }}
+        <div className={`grid-2 settings-grid settings-grid--${view}`}>
+          {(view === 'all' || view === 'profile') && (
+            <ProfileCard
+              profile={settings.data.profile}
+              email={user?.email ?? ''}
+              saving={patch.isPending}
+              onSave={(profile) => patch.mutate({ profile })}
             />
-          </Section>
-
-          <Section
-            title="System status"
-            actions={
-              status.isSuccess ? (
-                <Chip tone={failing > 0 ? 'danger' : 'success'} mono>
-                  {failing > 0 ? `${failing} down` : 'healthy'}
-                </Chip>
-              ) : undefined
-            }
-          >
-            {status.isError ? (
-              <ErrorState
-                title="Couldn’t load system status"
-                detail={(status.error as Error | null)?.message}
-                onRetry={() => void status.refetch()}
+          )}
+          {(view === 'all' || view === 'preferences') && (
+            <>
+              <ResumeDefaultsCard
+                defaults={
+                  settings.data.resumeDefaults ?? {
+                    templateKey: 'cobalt',
+                    accent: '#2563eb',
+                    emphasis: 'technical',
+                  }
+                }
+                saving={patch.isPending}
+                onSave={(resumeDefaults) => patch.mutate({ resumeDefaults })}
               />
-            ) : status.isLoading || !status.data ? (
-              <div role="status" aria-label="Loading system status">
-                <SkeletonRows rows={4} />
-              </div>
-            ) : (
-              <div className="stack" style={{ gap: 8 }}>
-                {Object.entries(status.data.checks).map(([name, c]) => (
-                  <div key={name} className="spread">
-                    <span className="hstack">
-                      <Chip tone={c.ok ? 'success' : 'danger'} mono>
-                        {c.ok ? 'ok' : 'down'}
-                      </Chip>
-                      {name}
-                    </span>
-                    <Mono className="u-faint">{statusCheckDetail(c)}</Mono>
-                  </div>
-                ))}
-                <div className="spread">
-                  <span className="u-muted">Records</span>
-                  <Mono>
-                    {status.data.counts.nodes} nodes · {status.data.counts.edges} edges
-                  </Mono>
-                </div>
-                <div className="spread">
-                  <span className="u-muted">Environment</span>
-                  <Chip mono>{status.data.env.emulators ? 'emulators' : 'cloud'}</Chip>
-                </div>
-                <Link to="/import/duplicates" className="vt-btn vt-btn--sm" style={{ alignSelf: 'flex-start' }}>
-                  Open duplicates queue
-                </Link>
-              </div>
-            )}
-          </Section>
+              <WeightsCard
+                weights={settings.data.askWeights}
+                onChange={(askWeights) => patch.mutate({ askWeights })}
+              />
+              <AliasesCard
+                aliases={settings.data.skillAliases}
+                saving={patch.isPending}
+                onSave={(skillAliases) => patch.mutate({ skillAliases })}
+              />
+            </>
+          )}
 
-          <Section title="Identity">
-            <div className="stack" style={{ gap: 8 }}>
-              <div className="spread">
-                <span className="u-muted">Signed in as</span>
-                <Mono>{user?.email}</Mono>
+          {(view === 'all' || view === 'system') && (
+            <Section title="GitHub">
+              <GithubCard
+                configured={settings.data.github.configured}
+                lastSyncAt={settings.data.github.lastSyncAt}
+                onChanged={(message) => {
+                  void qc.invalidateQueries({ queryKey: ['settings'] });
+                  flash(message);
+                }}
+              />
+            </Section>
+          )}
+
+          {(view === 'all' || view === 'system') && (
+            <Section
+              title="System status"
+              actions={
+                status.isSuccess ? (
+                  <Chip tone={failing > 0 ? 'danger' : 'success'} mono>
+                    {failing > 0 ? `${failing} down` : 'healthy'}
+                  </Chip>
+                ) : undefined
+              }
+            >
+              {status.isError ? (
+                <ErrorState
+                  title="Couldn’t load system status"
+                  detail={(status.error as Error | null)?.message}
+                  onRetry={() => void status.refetch()}
+                />
+              ) : status.isLoading || !status.data ? (
+                <div role="status" aria-label="Loading system status">
+                  <SkeletonRows rows={4} />
+                </div>
+              ) : (
+                <div className="stack" style={{ gap: 8 }}>
+                  {Object.entries(status.data.checks).map(([name, c]) => (
+                    <div key={name} className="spread">
+                      <span className="hstack">
+                        <Chip tone={c.ok ? 'success' : 'danger'} mono>
+                          {c.ok ? 'ok' : 'down'}
+                        </Chip>
+                        {name}
+                      </span>
+                      <Mono className="u-faint">{statusCheckDetail(c)}</Mono>
+                    </div>
+                  ))}
+                  <div className="spread">
+                    <span className="u-muted">Records</span>
+                    <Mono>
+                      {status.data.counts.nodes} nodes · {status.data.counts.edges} edges
+                    </Mono>
+                  </div>
+                  <div className="spread">
+                    <span className="u-muted">Environment</span>
+                    <Chip mono>{status.data.env.emulators ? 'emulators' : 'cloud'}</Chip>
+                  </div>
+                  <Link
+                    to="/data/identity"
+                    className="vt-btn vt-btn--sm"
+                    style={{ alignSelf: 'flex-start' }}
+                  >
+                    Open duplicates queue
+                  </Link>
+                </div>
+              )}
+            </Section>
+          )}
+
+          {(view === 'all' || view === 'profile' || view === 'system') && (
+            <Section title="Identity">
+              <div className="stack" style={{ gap: 8 }}>
+                <div className="spread">
+                  <span className="u-muted">Signed in as</span>
+                  <Mono>{user?.email}</Mono>
+                </div>
+                <div className="spread">
+                  <span className="u-muted">Method</span>
+                  <Chip mono>{user?.via}</Chip>
+                </div>
+                <div className="spread">
+                  <span className="u-muted">Backups</span>
+                  <Link to="/data/exports" className="vt-btn vt-btn--sm">
+                    Export &amp; backups
+                  </Link>
+                </div>
               </div>
-              <div className="spread">
-                <span className="u-muted">Method</span>
-                <Chip mono>{user?.via}</Chip>
-              </div>
-              <div className="spread">
-                <span className="u-muted">Backups</span>
-                <Link to="/export" className="vt-btn vt-btn--sm">
-                  Export &amp; backups
-                </Link>
-              </div>
-            </div>
-          </Section>
+            </Section>
+          )}
         </div>
       )}
     </div>
@@ -289,7 +339,12 @@ function ResumeDefaultsCard({
         <span className="label" id={`${ids}-accent`}>
           Default accent
         </span>
-        <div className="hstack" style={{ flexWrap: 'wrap', gap: 8 }} role="group" aria-labelledby={`${ids}-accent`}>
+        <div
+          className="hstack"
+          style={{ flexWrap: 'wrap', gap: 8 }}
+          role="group"
+          aria-labelledby={`${ids}-accent`}
+        >
           {accents.map((accent) => (
             <button
               key={accent}
@@ -302,7 +357,8 @@ function ResumeDefaultsCard({
                 width: 28,
                 height: 28,
                 borderRadius: 999,
-                border: draft.accent === accent ? '2px solid var(--ae-fg)' : '1px solid var(--ae-border)',
+                border:
+                  draft.accent === accent ? '2px solid var(--ae-fg)' : '1px solid var(--ae-border)',
                 background: accent,
                 cursor: 'pointer',
               }}
@@ -381,23 +437,47 @@ function ProfileCard({
           rows={2}
           value={draft.links.join('\n')}
           onChange={(e) =>
-            setDraft({ ...draft, links: e.target.value.split('\n').map((l) => l.trim()).filter(Boolean) })
+            setDraft({
+              ...draft,
+              links: e.target.value
+                .split('\n')
+                .map((l) => l.trim())
+                .filter(Boolean),
+            })
           }
         />
       </div>
-      <Button size="sm" variant="primary" disabled={!dirty || saving} onClick={() => onSave(draft)} style={{ marginTop: 10 }}>
+      <Button
+        size="sm"
+        variant="primary"
+        disabled={!dirty || saving}
+        onClick={() => onSave(draft)}
+        style={{ marginTop: 10 }}
+      >
         {saving && dirty ? 'Saving…' : 'Save profile'}
       </Button>
     </Section>
   );
 }
 
-function WeightsCard({ weights, onChange }: { weights: Record<string, number>; onChange: (w: Record<string, number>) => void }) {
+function WeightsCard({
+  weights,
+  onChange,
+}: {
+  weights: Record<string, number>;
+  onChange: (w: Record<string, number>) => void;
+}) {
   const [draft, setDraft] = useState(weights);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const ids = useId();
 
   useEffect(() => setDraft(weights), [weights]);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
 
   function update(key: string, value: number) {
     const next = { ...draft, [key]: value };
@@ -466,7 +546,11 @@ function AliasesCard({
       </p>
       <div className="stack" style={{ gap: 6 }}>
         {rows.map((r, i) => (
-          <div key={`${r.alias}-${i}`} className="hstack" style={{ fontFamily: 'var(--ae-font-mono)', fontSize: 'var(--ae-text-sm)' }}>
+          <div
+            key={`${r.alias}-${i}`}
+            className="hstack"
+            style={{ fontFamily: 'var(--ae-font-mono)', fontSize: 'var(--ae-text-sm)' }}
+          >
             <span style={{ color: 'var(--ae-muted)' }}>{r.alias}</span>
             <span className="u-faint">→</span>
             <span style={{ color: 'var(--ae-fg-soft)', flex: 1 }}>{r.canonical}</span>
@@ -517,7 +601,13 @@ function AliasesCard({
           </Button>
         </div>
       </div>
-      <Button size="sm" variant="primary" disabled={!dirty || saving} onClick={() => onSave(rows)} style={{ marginTop: 10 }}>
+      <Button
+        size="sm"
+        variant="primary"
+        disabled={!dirty || saving}
+        onClick={() => onSave(rows)}
+        style={{ marginTop: 10 }}
+      >
         {saving && dirty ? 'Saving…' : 'Save aliases'}
       </Button>
     </Section>
@@ -597,7 +687,7 @@ function GithubCard({
       </div>
       <p className="u-muted" style={{ fontSize: 'var(--ae-text-xs)', margin: 0 }}>
         Stored server-side only, never echoed back. Sync and the repository list live on{' '}
-        <Link to="/repositories">Repositories</Link>.
+        <Link to="/data/sources/github">GitHub source</Link>.
       </p>
     </div>
   );

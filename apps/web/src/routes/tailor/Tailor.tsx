@@ -40,6 +40,8 @@ export function Tailor() {
 
   // ── Draft state: hydrated from the target, autosaved (debounced) ────────────
   const [draft, setDraft] = useState<Draft>(() => defaultDraft());
+  const [tailorResult, setTailorResult] = useState<TailorResult | null>(null);
+  const [scoreById, setScoreById] = useState<Map<string, AtomScore>>(() => new Map());
   const hydratedFor = useRef<string | null>(null);
   const skipSave = useRef(true);
 
@@ -91,8 +93,6 @@ export function Tailor() {
   const onDraft = (patch: Partial<Draft>) => setDraft((d) => ({ ...d, ...patch }));
 
   // ── Selection runs ──────────────────────────────────────────────────────────
-  const [tailorResult, setTailorResult] = useState<TailorResult | null>(null);
-  const [scoreById, setScoreById] = useState<Map<string, AtomScore>>(() => new Map());
   const tailorRun = useMutation({
     mutationFn: (body: Record<string, unknown>) => api.post<TailorResult>('/resumes/tailor', body),
     onSuccess: (res) => {
@@ -201,7 +201,8 @@ export function Tailor() {
           // header is where it has to say when that stops being true.
           saveState === 'failed' ? (
             <span role="alert" className="text-sm text-danger">
-              <strong className="font-semibold">Not saving.</strong> Your last changes are only in this tab.
+              <strong className="font-semibold">Not saving.</strong> Your last changes are only in
+              this tab.
             </span>
           ) : saveState === 'saving' ? (
             <Mono className="text-xs text-muted">saving…</Mono>
@@ -210,13 +211,26 @@ export function Tailor() {
           ) : undefined
         }
         help={
-            <InfoPopover title="How to make a résumé">
-              <p><strong>1.</strong> Pick or paste a job target (left), its description becomes weighted keywords.</p>
-              <p><strong>2.</strong> Choose <em>Auto</em> (scored &amp; packed to one page, pin, exclude, drag to reorder) or <em>Manual</em> (check exactly the atoms you want, drag to order them).</p>
-              <p><strong>3.</strong> Toggle and reorder résumé sections, pick a template, then <em>Compile</em> for a live PDF with ATS coverage.</p>
-              <p><strong>4.</strong> <em>Finalize</em> to save the output (one-page + 95% coverage gate) and find it under Outputs.</p>
-              <p>Everything you change is autosaved to this target, reload and carry on.</p>
-            </InfoPopover>
+          <InfoPopover title="How to make a résumé">
+            <p>
+              <strong>1.</strong> Pick or paste a job target (left), its description becomes
+              weighted keywords.
+            </p>
+            <p>
+              <strong>2.</strong> Choose <em>Auto</em> (scored &amp; packed to one page, pin,
+              exclude, drag to reorder) or <em>Manual</em> (check exactly the atoms you want, drag
+              to order them).
+            </p>
+            <p>
+              <strong>3.</strong> Toggle and reorder résumé sections, pick a template, then{' '}
+              <em>Compile</em> for a live PDF with ATS coverage.
+            </p>
+            <p>
+              <strong>4.</strong> <em>Finalize</em> to save the output (one-page + 95% coverage
+              gate) and find it under Outputs.
+            </p>
+            <p>Everything you change is autosaved to this target, reload and carry on.</p>
+          </InfoPopover>
         }
       />
       <RegisterRule />
@@ -225,8 +239,8 @@ export function Tailor() {
           read as "you have nothing" rather than "this did not load". */}
       {scoringFailed && (
         <p role="alert" className="mb-3 text-sm text-danger">
-          <strong className="font-semibold">Couldn’t score your atoms against this target.</strong> Any numbers below
-          are from the previous run.
+          <strong className="font-semibold">Couldn’t score your atoms against this target.</strong>{' '}
+          Any numbers below are from the previous run.
         </p>
       )}
 
@@ -235,11 +249,12 @@ export function Tailor() {
           <strong className="font-semibold">
             Couldn’t load your {targetsQuery.isError ? 'job targets' : 'atoms'}.
           </strong>{' '}
-          {((targetsQuery.error ?? atomsQuery.error) as Error | null)?.message}, the workspace below is incomplete.
+          {((targetsQuery.error ?? atomsQuery.error) as Error | null)?.message}, the workspace below
+          is incomplete.
         </p>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '280px minmax(520px, 1fr) 390px', gap: 12, alignItems: 'start' }}>
+      <div className="tailor-workspace">
         <TargetRail activeId={targetId} onSelect={(id) => setSearchParams({ target: id })} />
 
         {target ? (
@@ -260,7 +275,17 @@ export function Tailor() {
                   <button
                     key={m}
                     className="vt-chip"
-                    style={{ cursor: 'pointer', textTransform: 'capitalize', ...(draft.mode === m ? { borderColor: 'var(--ae-accent)', color: 'var(--ae-accent-soft)', fontWeight: 600 } : {}) }}
+                    style={{
+                      cursor: 'pointer',
+                      textTransform: 'capitalize',
+                      ...(draft.mode === m
+                        ? {
+                            borderColor: 'var(--ae-accent)',
+                            color: 'var(--ae-accent-soft)',
+                            fontWeight: 600,
+                          }
+                        : {}),
+                    }}
                     onClick={() => onDraft({ mode: m })}
                   >
                     {m}

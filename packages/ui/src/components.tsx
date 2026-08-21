@@ -3,7 +3,13 @@
  * system's job is consistency (mono-for-data, visible provenance, explainable
  * scores), not a heavy component framework. Styles live in styles/components.css.
  */
-import { forwardRef, type ButtonHTMLAttributes, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react';
+import {
+  forwardRef,
+  type ButtonHTMLAttributes,
+  type CSSProperties,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react';
 import { cva } from 'class-variance-authority';
 import { Glyph, glyphForType, type GlyphName } from './glyphs.js';
 import { cn } from './lib/cn.js';
@@ -54,10 +60,23 @@ export interface ChipProps {
   title?: string;
   style?: CSSProperties;
 }
-export function Chip({ children, glyph, tone = 'default', mono, onRemove, title, style }: ChipProps) {
+export function Chip({
+  children,
+  glyph,
+  tone = 'default',
+  mono,
+  onRemove,
+  title,
+  style,
+}: ChipProps) {
   return (
     <span
-      className={cn('vt-chip', tone !== 'default' && `vt-chip--${tone}`, mono && 'vt-chip--mono', onRemove && 'vt-chip--removable')}
+      className={cn(
+        'vt-chip',
+        tone !== 'default' && `vt-chip--${tone}`,
+        mono && 'vt-chip--mono',
+        onRemove && 'vt-chip--removable',
+      )}
       title={title}
       style={style}
     >
@@ -89,7 +108,12 @@ export interface FilterGroupProps<K extends string> {
   value: K;
   onChange: (key: K) => void;
 }
-export function FilterGroup<K extends string>({ label, options, value, onChange }: FilterGroupProps<K>) {
+export function FilterGroup<K extends string>({
+  label,
+  options,
+  value,
+  onChange,
+}: FilterGroupProps<K>) {
   return (
     <div className="vt-filters" role="group" aria-label={label}>
       {options.map((o) => (
@@ -183,7 +207,10 @@ export interface EntityGlyphProps {
 }
 export function EntityGlyph({ type, accent, size = 'md', title, glyph }: EntityGlyphProps) {
   return (
-    <span className={cn('vt-glyph', accent && 'vt-glyph--accent', size === 'sm' && 'vt-glyph--sm')} title={title ?? type}>
+    <span
+      className={cn('vt-glyph', accent && 'vt-glyph--accent', size === 'sm' && 'vt-glyph--sm')}
+      title={title ?? type}
+    >
       <Glyph name={glyph ?? glyphForType(type)} size={size === 'sm' ? 13 : 15} />
     </span>
   );
@@ -213,7 +240,10 @@ export function StrengthBar({ value, label }: StrengthBarProps) {
   return (
     <span className="vt-strength" title={`${label} ${v.toFixed(2)}`}>
       <span className="vt-strength__track" aria-hidden>
-        <span className="vt-strength__fill" style={{ width: `${v * 100}%`, opacity: 0.35 + 0.65 * v }} />
+        <span
+          className="vt-strength__fill"
+          style={{ width: `${v * 100}%`, opacity: 0.35 + 0.65 * v }}
+        />
       </span>
       <span className="u-mono vt-strength__value">{v.toFixed(2)}</span>
       <span className="u-visually-hidden">{label}</span>
@@ -255,7 +285,10 @@ export function FactorBar({ parts, scale, label }: FactorBarProps) {
           // to be unique, and the segments never reorder within a render.
           key={i}
           className="vt-factorbar__seg"
-          style={{ width: `${Math.min(100, (p.value / denom) * 100)}%`, opacity: Math.max(0.25, 0.92 - i * 0.13) }}
+          style={{
+            width: `${Math.min(100, (p.value / denom) * 100)}%`,
+            opacity: Math.max(0.25, 0.92 - i * 0.13),
+          }}
         />
       ))}
     </span>
@@ -271,6 +304,9 @@ export interface MeterProps {
 export function Meter({ used, budget, unit = 'lines' }: MeterProps) {
   const fill = budget > 0 ? used / budget : 0;
   const state = fill > 1 ? 'over' : fill > 0.92 ? 'warn' : 'ok';
+  const fillStyle = {
+    '--vt-meter-fill': Math.max(0, Math.min(fill, 1)),
+  } as CSSProperties;
   return (
     <div className="vt-meter">
       <div
@@ -282,8 +318,12 @@ export function Meter({ used, budget, unit = 'lines' }: MeterProps) {
         aria-valuemax={budget}
       >
         <div
-          className={cn('vt-meter__fill', state === 'warn' && 'vt-meter__fill--warn', state === 'over' && 'vt-meter__fill--over')}
-          style={{ width: `${Math.min(fill, 1) * 100}%` }}
+          className={cn(
+            'vt-meter__fill',
+            state === 'warn' && 'vt-meter__fill--warn',
+            state === 'over' && 'vt-meter__fill--over',
+          )}
+          style={fillStyle}
         />
       </div>
       <div className="vt-meter__label">
@@ -325,7 +365,11 @@ export function ChargeRing({ quiet, cadence, size = 56, children }: ChargeRingPr
   const charge = Math.max(0, Math.min(1, 1 - quiet / Math.max(1, cadence)));
   const dash = charge <= 0.001 ? `3 ${circ}` : `${(charge * circ).toFixed(1)} ${circ}`;
   return (
-    <span className="vt-charge" style={{ width: size, height: size }} title={`${quiet}d quiet · target ${cadence}d`}>
+    <span
+      className="vt-charge"
+      style={{ width: size, height: size }}
+      title={`${quiet}d quiet · target ${cadence}d`}
+    >
       <svg width={size} height={size} viewBox="0 0 56 56" aria-hidden>
         <circle cx="28" cy="28" r={r} fill="none" stroke="var(--ae-border)" strokeWidth="2.5" />
         <circle
@@ -392,7 +436,12 @@ export interface DotGridProps {
    * from assistive tech, which is what it was before, a silent 30 dots. */
   label?: string;
 }
-export function DotGrid({ days, color = 'var(--ae-accent)', recentWindow = 12, label }: DotGridProps) {
+export function DotGrid({
+  days,
+  color = 'var(--ae-accent)',
+  recentWindow = 12,
+  label,
+}: DotGridProps) {
   // An unchecked slot has to be visible as a slot, or a sparse grid reads as a
   // short grid. --ae-surface-raised is 1.15:1 on the canvas; --ae-border is the
   // dimmest thing that still draws.
@@ -422,12 +471,17 @@ export function DotGrid({ days, color = 'var(--ae-accent)', recentWindow = 12, l
 // ── ClosenessDots (1-5 declared closeness) ───────────────────────────────────
 export function ClosenessDots({ value, max = 5 }: { value: number | null; max?: number }) {
   return (
-    <span className="vt-closeness" title={value != null ? `closeness ${value}/${max}` : 'closeness unset'}>
+    <span
+      className="vt-closeness"
+      title={value != null ? `closeness ${value}/${max}` : 'closeness unset'}
+    >
       {Array.from({ length: max }, (_, i) => (
         <span
           key={i}
           className="vt-closeness__dot"
-          style={{ background: value != null && i < value ? 'var(--ae-accent)' : 'var(--ae-border)' }}
+          style={{
+            background: value != null && i < value ? 'var(--ae-accent)' : 'var(--ae-border)',
+          }}
         />
       ))}
     </span>

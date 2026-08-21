@@ -34,9 +34,7 @@ describe('GraphSearch', () => {
   });
 
   it('renders nothing when closed', () => {
-    const { container } = renderWithApp(
-      <GraphSearch open={false} nodes={nodes} onClose={() => {}} onPick={() => {}} />,
-    );
-    expect(container).toBeEmptyDOMElement();
+    renderWithApp(<GraphSearch open={false} nodes={nodes} onClose={() => {}} onPick={() => {}} />);
+    expect(screen.queryByRole('search')).not.toBeInTheDocument();
   });
 });

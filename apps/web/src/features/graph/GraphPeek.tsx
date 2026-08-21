@@ -48,7 +48,11 @@ export function GraphPeek({
   }
 
   return (
-    <div className="graph__peek graph__peek--dossier" role="dialog" aria-label={`${selected.title} details`}>
+    <div
+      className="graph__peek graph__peek--dossier"
+      role="dialog"
+      aria-label={`${selected.title} details`}
+    >
       <div className="hstack" style={{ gap: 'var(--ae-space-2)' }}>
         <EntityGlyph type={selected.type} size="sm" />
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -71,27 +75,27 @@ export function GraphPeek({
             <div key={label} className="graph__peekgroup">
               <div className="graph__peekgrouplabel">{label}</div>
               {rows.map((row) => (
-                <button
-                  key={`${row.edgeType}-${row.neighbor.id}`}
-                  type="button"
-                  className="graph__peekrow"
-                  onClick={() => onSelectNeighbor(row.neighbor)}
-                >
-                  <span
-                    className="graph__filterdot"
-                    style={{ background: colorForType(palette, row.neighbor.type) }}
-                    aria-hidden
-                  />
-                  <span className="graph__peekrowtitle">{row.neighbor.title}</span>
+                <div key={`${row.edgeType}-${row.neighbor.id}`} className="graph__peekrow">
+                  <button
+                    type="button"
+                    className="graph__peekselect"
+                    onClick={() => onSelectNeighbor(row.neighbor)}
+                  >
+                    <span
+                      className="graph__filterdot"
+                      style={{ background: colorForType(palette, row.neighbor.type) }}
+                      aria-hidden
+                    />
+                    <span className="graph__peekrowtitle">{row.neighbor.title}</span>
+                  </button>
                   <Link
                     className="graph__peekopen"
                     to={entityHref(row.neighbor.type, row.neighbor.id)}
-                    onClick={(e) => e.stopPropagation()}
                     aria-label={`Open ${row.neighbor.title}`}
                   >
-                    open
+                    Open
                   </Link>
-                </button>
+                </div>
               ))}
             </div>
           ))}
@@ -131,7 +135,11 @@ export function FocusBreadcrumb({ trail, onHop, onReset }: FocusBreadcrumbProps)
     <nav className="lifemap__trail" aria-label="Focus trail">
       {trail.map((hop, i) => (
         <span key={`${hop.id}-${i}`} className="lifemap__trailhop">
-          {i > 0 && <span className="lifemap__trailsep" aria-hidden>→</span>}
+          {i > 0 && (
+            <span className="lifemap__trailsep" aria-hidden>
+              →
+            </span>
+          )}
           <button type="button" className="lifemap__trailbtn" onClick={() => onHop(hop.id)}>
             {hop.title}
           </button>
@@ -161,8 +169,8 @@ export function PathStory({ path, loading, emptyHint, failed }: PathStoryProps) 
   if (failed) {
     return (
       <div className="lifemap__story" role="alert">
-        <strong className="font-semibold">Couldn’t work out a path.</strong> The lookup failed, the map itself is
-        unaffected.
+        <strong className="font-semibold">Couldn’t work out a path.</strong> The lookup failed, the
+        map itself is unaffected.
       </div>
     );
   }

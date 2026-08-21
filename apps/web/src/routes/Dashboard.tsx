@@ -35,10 +35,20 @@ import { daysUntil, parseIsoDate, todayIso } from '../lib/dates.js';
 import { staggered, useEmphasis, useEnterItem } from '../lib/motion.js';
 import { useToast } from '../features/Toast.js';
 import { InteractionLogger } from '../features/InteractionLogger.js';
-import { GettingStarted, useGettingStartedDismissed, type SetupState } from '../features/GettingStarted.js';
+import {
+  GettingStarted,
+  useGettingStartedDismissed,
+  type SetupState,
+} from '../features/GettingStarted.js';
 import { entityHref } from '../lib/entity-href.js';
 
-interface MomentumFactor { key: string; label: string; pct: number; weight: number; detail: string }
+interface MomentumFactor {
+  key: string;
+  label: string;
+  pct: number;
+  weight: number;
+  detail: string;
+}
 
 interface Dashboard {
   reminders: Array<{ id: string; note: string; due_on: string; subject_id: string }>;
@@ -50,11 +60,23 @@ interface Dashboard {
   }>;
   pipeline: Array<{ id: string; title: string; status: string }>;
   pipelineCounts: Record<string, number>;
-  habits: Array<{ id: string; title: string; streak: number; grid: boolean[]; checkedToday: boolean }>;
+  habits: Array<{
+    id: string;
+    title: string;
+    streak: number;
+    grid: boolean[];
+    checkedToday: boolean;
+  }>;
   recent: Array<{ id: string; type: string; title: string; source: string }>;
   resumes: number;
   focus: {
-    tasks: Array<{ id: string; title: string; due: string | null; priority: string | null; status: string }>;
+    tasks: Array<{
+      id: string;
+      title: string;
+      due: string | null;
+      priority: string | null;
+      status: string;
+    }>;
     goals: Array<{ id: string; title: string; progress: number; keyResults: number }>;
   };
   upcoming: Array<{ id: string; type: string; title: string; date: string; label: string }>;
@@ -171,7 +193,10 @@ const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Satur
  * structural, so it has to encode something true, where in the week you are
  * is the one thing a screen called Today can honestly claim.
  */
-export function weekTicks(iso: string): { ticks: Array<{ at: number; label: string }>; index: number } {
+export function weekTicks(iso: string): {
+  ticks: Array<{ at: number; label: string }>;
+  index: number;
+} {
   // getDay() is Sunday-first; the rule reads Monday-first, like a calendar.
   const index = (parseIsoDate(iso).getDay() + 6) % 7;
   // Centre of each day's slot, not the boundary between them, a tick at 100%
@@ -212,7 +237,11 @@ export function Dashboard() {
           ...prev,
           habits: prev.habits.map((h) =>
             h.id === habitId
-              ? { ...h, checkedToday: !h.checkedToday, grid: [...h.grid.slice(0, -1), !h.checkedToday] }
+              ? {
+                  ...h,
+                  checkedToday: !h.checkedToday,
+                  grid: [...h.grid.slice(0, -1), !h.checkedToday],
+                }
               : h,
           ),
         });
@@ -284,7 +313,14 @@ export function Dashboard() {
             {drifting > 0 && ` · ${drifting} drifting`}
           </>
         }
-        actions={<Momentum momentum={data.insights.momentum} />}
+        actions={
+          <div className="hstack">
+            <Link className="planner__back" to="/today/planner">
+              Planner
+            </Link>
+            <Momentum momentum={data.insights.momentum} />
+          </div>
+        }
       />
       <RegisterRule ticks={week.ticks} activeIndex={week.index} label="Days of this week" />
 
@@ -320,7 +356,11 @@ export function Dashboard() {
             <EmptyState
               glyph="habit"
               title="No habits tracked"
-              hint={<>Capture one with ⌘K: <Mono>habit Writing</Mono>.</>}
+              hint={
+                <>
+                  Capture one with ⌘K: <Mono>habit Writing</Mono>.
+                </>
+              }
             />
           ) : (
             data.habits.map((h) => (
@@ -364,7 +404,11 @@ export function Dashboard() {
       <HowThingsStand data={data} />
 
       {logTarget && (
-        <InteractionLogger personId={logTarget.id} personName={logTarget.name} onClose={() => setLogTarget(null)} />
+        <InteractionLogger
+          personId={logTarget.id}
+          personName={logTarget.name}
+          onClose={() => setLogTarget(null)}
+        />
       )}
     </div>
   );
@@ -432,7 +476,10 @@ function Bar({ value, label, decorative }: { value: number; label: string; decor
       aria-valuemax={decorative ? undefined : 100}
       aria-valuetext={decorative ? undefined : `${percent}%`}
     >
-      <span className="block h-full rounded-full bg-accent" style={{ width: `${clamped * 100}%` }} />
+      <span
+        className="block h-full rounded-full bg-accent"
+        style={{ width: `${clamped * 100}%` }}
+      />
     </div>
   );
 }
@@ -451,7 +498,10 @@ function Momentum({ momentum }: { momentum: Dashboard['insights']['momentum'] })
       </div>
       <Mono className="text-xl text-ink-strong">{momentum.score}</Mono>
       <InfoPopover title="What drives momentum" triggerLabel="breakdown">
-        <p>A transparent 0-100 read on whether the system is being worked. Each factor contributes its weight:</p>
+        <p>
+          A transparent 0-100 read on whether the system is being worked. Each factor contributes
+          its weight:
+        </p>
         <div className="mt-2 flex flex-col gap-3">
           {momentum.factors.map((f) => (
             <div key={f.key} className="grid gap-1">
@@ -482,15 +532,13 @@ function HabitRow({
   const pulse = useEmphasis();
   const grid = habit.grid.slice(-14);
   return (
-    <motion.div
-      className={ROW}
-      variants={pulse}
-      animate={controls}
-    >
+    <motion.div className={ROW} variants={pulse} animate={controls}>
       <button
         type="button"
         aria-pressed={habit.checkedToday}
-        aria-label={habit.checkedToday ? `Uncheck ${habit.title} for today` : `Check ${habit.title} for today`}
+        aria-label={
+          habit.checkedToday ? `Uncheck ${habit.title} for today` : `Check ${habit.title} for today`
+        }
         onClick={() => {
           void controls.start('animate');
           onToggle();
@@ -504,7 +552,9 @@ function HabitRow({
       </button>
       <span className="min-w-0 flex-1 truncate text-ink">{habit.title}</span>
       <DotGrid days={grid} label={`${habit.title}, last 14 days`} recentWindow={grid.length} />
-      <Mono className={habit.streak >= STREAK_THRESHOLD ? 'text-sm text-ember' : 'text-sm text-muted'}>
+      <Mono
+        className={habit.streak >= STREAK_THRESHOLD ? 'text-sm text-ember' : 'text-sm text-muted'}
+      >
         {habit.streak}d streak
       </Mono>
     </motion.div>
@@ -519,13 +569,15 @@ function ReconnectRow({
   onLog: () => void;
 }) {
   const quiet = entry.daysSinceLast != null ? Math.round(entry.daysSinceLast) : null;
-  const cadence = Number((entry.person.props as Record<string, unknown> | undefined)?.cadence_target_days ?? 60);
+  const cadence = Number(
+    (entry.person.props as Record<string, unknown> | undefined)?.cadence_target_days ?? 60,
+  );
   const over = quiet != null && quiet > cadence;
   return (
     <div className={ROW}>
       <ChargeRing quiet={quiet ?? cadence * 2} cadence={cadence} size={24} />
       <Link
-        to={`/people/${entry.person.id}`}
+        to={`/network/people/${entry.person.id}`}
         className="min-w-0 flex-1 truncate text-ink no-underline hover:underline"
       >
         {entry.person.title}
@@ -570,8 +622,13 @@ function HowThingsStand({ data }: { data: Dashboard }) {
             {PIPELINE_ORDER.map((stage) => {
               const count = data.pipelineCounts?.[stage] ?? 0;
               return (
-                <p key={stage} className="flex flex-col items-center gap-1 rounded-sm border border-hairline p-3">
-                  <Mono className={count > 0 ? 'text-lg text-ink-strong' : 'text-lg text-faint'}>{count}</Mono>
+                <p
+                  key={stage}
+                  className="flex flex-col items-center gap-1 rounded-sm border border-hairline p-3"
+                >
+                  <Mono className={count > 0 ? 'text-lg text-ink-strong' : 'text-lg text-faint'}>
+                    {count}
+                  </Mono>
                   <span className="text-xs text-muted">{stage}</span>
                 </p>
               );
@@ -581,11 +638,7 @@ function HowThingsStand({ data }: { data: Dashboard }) {
             <p className="text-sm text-muted">No applications yet.</p>
           ) : (
             data.pipeline.slice(0, 4).map((a) => (
-              <Link
-                key={a.id}
-                to={`/n/${a.id}`}
-                className={ROW_LINK}
-              >
+              <Link key={a.id} to={`/career/applications/${a.id}`} className={ROW_LINK}>
                 <EntityGlyph type="application" size="sm" />
                 <span className="min-w-0 flex-1 truncate">{a.title}</span>
                 <Chip mono>{a.status}</Chip>
@@ -598,10 +651,16 @@ function HowThingsStand({ data }: { data: Dashboard }) {
           <div>
             <h3 className="mb-2 text-sm text-muted">Goals</h3>
             {data.focus.goals.length === 0 ? (
-              <p className="text-sm text-muted">No active goals. Set one with a few key results to track progress.</p>
+              <p className="text-sm text-muted">
+                No active goals. Set one with a few key results to track progress.
+              </p>
             ) : (
               data.focus.goals.map((g) => (
-                <Link key={g.id} to={`/n/${g.id}`} className="-mx-2 block rounded-sm px-2 py-2 text-ink no-underline hover:bg-raised hover:no-underline">
+                <Link
+                  key={g.id}
+                  to={`/n/${g.id}`}
+                  className="-mx-2 block rounded-sm px-2 py-2 text-ink no-underline hover:bg-raised hover:no-underline"
+                >
                   <span className="mb-1 flex items-baseline justify-between gap-3">
                     <span className="min-w-0 truncate">{g.title}</span>
                     <Mono className="text-sm text-faint">{Math.round(g.progress * 100)}%</Mono>
@@ -637,14 +696,12 @@ function HowThingsStand({ data }: { data: Dashboard }) {
 
       <h3 className="mt-6 mb-2 text-sm text-muted">Recent captures</h3>
       {data.recent.length === 0 ? (
-        <p className="text-sm text-muted">Nothing captured yet. Press ⌘K to add your first record.</p>
+        <p className="text-sm text-muted">
+          Nothing captured yet. Press ⌘K to add your first record.
+        </p>
       ) : (
         data.recent.map((n) => (
-          <Link
-            key={n.id}
-            to={entityHref(n.type, n.id)}
-            className={ROW_LINK}
-          >
+          <Link key={n.id} to={entityHref(n.type, n.id)} className={ROW_LINK}>
             <EntityGlyph type={n.type} size="sm" />
             <span className="min-w-0 flex-1 truncate">{n.title}</span>
             <ProvenanceChip source={n.source} />

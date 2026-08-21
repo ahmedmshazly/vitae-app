@@ -323,7 +323,9 @@ button.vt-row__main {
   background: transparent;
   color: var(--ae-muted);
   cursor: pointer;
-  transition: color var(--ae-dur) var(--ae-ease), background var(--ae-dur) var(--ae-ease);
+  transition:
+    color var(--ae-dur) var(--ae-ease),
+    background var(--ae-dur) var(--ae-ease);
 }
 .vt-banner__x:hover {
   color: var(--ae-fg);
@@ -430,6 +432,12 @@ button.vt-row__main {
   align-items: center;
   gap: var(--ae-space-1);
   border-bottom: 1px solid var(--ae-border);
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+}
+.vt-tabs__list::-webkit-scrollbar {
+  display: none;
 }
 .vt-tabs__tab {
   position: relative;
@@ -489,5 +497,33 @@ button.vt-row__main {
 @media (prefers-reduced-motion: reduce) {
   .vt-disclosure__panel {
     animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .vt-card {
+    padding: var(--ae-space-3);
+  }
+  .vt-banner {
+    flex-wrap: wrap;
+  }
+  .vt-banner__action {
+    flex-basis: 100%;
+    padding-left: calc(16px + var(--ae-space-3));
+  }
+  .vt-tabs__tab {
+    flex: none;
+  }
+}
+
+@media (pointer: coarse) {
+  .vt-row,
+  .vt-disclosure__trigger,
+  .vt-tabs__tab {
+    min-height: var(--ae-hit-target);
+  }
+  .vt-banner__x {
+    width: var(--ae-hit-target);
+    height: var(--ae-hit-target);
   }
 }

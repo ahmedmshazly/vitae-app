@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
+  Banner,
   Button,
   Chip,
   EmptyState,
@@ -17,6 +18,7 @@ import {
   RegisterRule,
   Section,
   SkeletonRows,
+  StatusTrace,
 } from '@vitae/ui';
 import { api } from '../lib/api.js';
 import { entityHref } from '../lib/entity-href.js';
@@ -86,32 +88,45 @@ export function targetFacts(t: Target): string {
   return parts.join(' · ');
 }
 
+export function contactLensHref(orgName?: string): string {
+  const q = new URLSearchParams({ lens: 'contact', need: 'intro' });
+  if (orgName?.trim()) q.set('org', orgName.trim());
+  if (orgName?.trim()) q.set('run', '1');
+  return `/network/intelligence?${q.toString()}`;
+}
+
+export function reachLensHref(orgId?: string): string {
+  const q = new URLSearchParams({ lens: 'reach' });
+  if (orgId) q.set('org', orgId);
+  return `/network/intelligence?${q.toString()}`;
+}
+
 function PathNarrative({ hops, selfId }: { hops: Hop[]; selfId: string | null }) {
   return (
-    <div className="flex flex-wrap items-center gap-y-2" aria-label="Introduction path">
+    <div className="network-path" aria-label="Introduction path">
       {hops.map((h, j) => {
         const isSelf = selfId != null && h.nodeId === selfId;
         const isOrg = h.type === 'organization';
-        const node = 'inline-flex max-w-56 items-center gap-1.5 rounded border px-2 py-1 text-sm';
+        const node = 'network-path__node';
         return (
-          <span key={`${h.nodeId}-${j}`} className="inline-flex items-center">
+          <span key={`${h.nodeId}-${j}`} className="network-path__segment">
             {j > 0 && (
-              <span className="inline-flex min-w-16 flex-col items-center gap-0.5 px-2">
+              <span className="network-path__connector">
                 <span
-                  className="block h-0.5 w-full rounded-full bg-accent"
+                  className="network-path__line"
                   style={{ opacity: edgeWeight(h) }}
                   aria-hidden
                 />
                 {/* The label sets the connector's width. Pinned at 5rem it ran
                     under the node beside it, so "knows · 1.00" overlapped a name. */}
-                <span className="u-mono text-center text-xs whitespace-nowrap text-muted">{edgeLabel(h)}</span>
+                <span className="network-path__edge u-mono">{edgeLabel(h)}</span>
               </span>
             )}
             {isSelf ? (
-              <span className={`${node} border-dashed border-hairline text-muted`}>You</span>
+              <span className={`${node} network-path__node--self`}>You</span>
             ) : (
               <Link
-                className={`${node} ${isOrg ? 'border-strong text-ink-strong' : 'border-hairline text-ink'}`}
+                className={`${node} ${isOrg ? 'network-path__node--organization' : 'network-path__node--person'}`}
                 to={entityHref(h.type, h.nodeId)}
               >
                 {!isOrg && <EntityGlyph type={h.type} size="sm" />}
@@ -125,28 +140,34 @@ function PathNarrative({ hops, selfId }: { hops: Hop[]; selfId: string | null })
   );
 }
 
-function TargetButton({ t, active, onSelect }: { t: Target; active: boolean; onSelect: () => void }) {
+function TargetButton({
+  t,
+  active,
+  onSelect,
+}: {
+  t: Target;
+  active: boolean;
+  onSelect: () => void;
+}) {
   return (
     <button
       type="button"
       // aria-current, not colour: which target you are looking at was carried
       // by a border tint alone.
       aria-current={active ? 'true' : undefined}
-      className={`mb-1 block w-full cursor-pointer rounded border px-3 py-2 text-left ${
-        active ? 'border-strong bg-raised' : 'border-hairline bg-surface hover:border-strong'
-      }`}
+      className="network-target"
       onClick={onSelect}
     >
-      <span className="flex items-baseline justify-between gap-2">
-        <span className="truncate text-sm text-ink">{t.title}</span>
-        <Mono className={`text-xs whitespace-nowrap ${t.reachable ? 'text-ink-soft' : 'text-faint'}`}>{t.reach}</Mono>
+      <span className="network-target__head">
+        <span className="network-target__title">{t.title}</span>
+        <Mono className="network-target__reach">{active ? `viewing · ${t.reach}` : t.reach}</Mono>
       </span>
-      <span className="mt-0.5 block truncate text-xs text-muted">
+      <span className="network-target__meta">
         {[t.stage, t.kind, t.city].filter(Boolean).join(' · ') || '—'}
       </span>
       {/* The rail sorts by application stage then by how strongly you are
           connected, and used to show neither. These are the facts behind it. */}
-      <span className="u-mono mt-0.5 block truncate text-xs text-faint">{targetFacts(t)}</span>
+      <span className="network-target__facts u-mono">{targetFacts(t)}</span>
     </button>
   );
 }
@@ -163,10 +184,18 @@ export function Intros() {
   });
 
   const orgFromUrl = params.get('org');
+  const orgNameFromUrl = params.get('orgName');
+  const namedTarget = orgNameFromUrl
+    ? targets.data?.targets.find(
+        (t) => t.title.localeCompare(orgNameFromUrl, undefined, { sensitivity: 'base' }) === 0,
+      )
+    : undefined;
   const targetId =
     orgFromUrl && targets.data?.targets.some((t) => t.id === orgFromUrl)
       ? orgFromUrl
-      : (targets.data?.targets[0]?.id ?? null);
+      : namedTarget
+        ? namedTarget.id
+        : (targets.data?.targets[0]?.id ?? null);
   const target = targets.data?.targets.find((t) => t.id === targetId) ?? null;
 
   // The URL always names the org on screen, so the page can be linked and
@@ -175,9 +204,10 @@ export function Intros() {
     if (!targetId) return;
     setParams(
       (prev) => {
-        if (prev.get('org') === targetId) return prev;
+        if (prev.get('org') === targetId && !prev.has('orgName')) return prev;
         const next = new URLSearchParams(prev);
         next.set('org', targetId);
+        next.delete('orgName');
         return next;
       },
       { replace: true },
@@ -186,7 +216,8 @@ export function Intros() {
 
   const paths = useQuery({
     queryKey: ['intro-paths', targetId],
-    queryFn: () => api.get<{ paths: IntroPath[]; org?: { id: string } }>(`/intros/paths?orgId=${targetId}`),
+    queryFn: () =>
+      api.get<{ paths: IntroPath[]; org?: { id: string } }>(`/intros/paths?orgId=${targetId}`),
     enabled: Boolean(targetId),
   });
 
@@ -210,7 +241,11 @@ export function Intros() {
 
   const groups = [
     { key: 'pursuing', label: 'Pursuing', items: filtered.filter((t) => Boolean(t.stage)) },
-    { key: 'reachable', label: 'Reachable', items: filtered.filter((t) => !t.stage && t.reachable) },
+    {
+      key: 'reachable',
+      label: 'Reachable',
+      items: filtered.filter((t) => !t.stage && t.reachable),
+    },
     { key: 'cold', label: 'No path', items: filtered.filter((t) => !t.stage && !t.reachable) },
   ].filter((g) => g.items.length > 0);
 
@@ -224,27 +259,57 @@ export function Intros() {
   const hasOrgs = (targets.data?.targets ?? []).length > 0;
 
   return (
-    <div className="page">
-      <PageHeader
-        title="Warm intros"
-        subtitle="Who can open the door: ranked paths into orgs you care about."
-        help={
-          <InfoPopover title="How paths are ranked">
-            <p>
-              A path is a chain of ties from you to the organization. Every hop dilutes the ask, so a shorter chain of
-              strong ties outranks a longer one - the score on each card is that trade-off resolved, and the line into
-              each hop is drawn heavier the stronger the tie, with its value beside it.
-            </p>
-            <p>
-              The rail lists organizations you have applied to first, then the ones you are best connected to. Each
-              entry shows how many people you already know there and how many roles are open.
-            </p>
-          </InfoPopover>
-        }
-      />
+    <div className="page page--network page--network-intelligence">
+      <div className="network-intelligence__head">
+        <PageHeader
+          title="Warm paths"
+          subtitle="Choose a destination, inspect every hop, then ask the strongest opener."
+          help={
+            <InfoPopover title="How paths are ranked">
+              <p>
+                A path is a chain of recorded ties from you to the organization. Every hop dilutes
+                the ask, so a shorter chain of strong ties outranks a longer one. Line weight
+                represents the strength of each tie; the adjacent label carries its exact meaning.
+              </p>
+              <p>
+                Organizations with active applications come first, followed by the destinations you
+                can already reach. Every target states how many people and open roles support that
+                position.
+              </p>
+            </InfoPopover>
+          }
+        />
+        <nav className="network-lenses" aria-label="Network intelligence lens">
+          <Link className="network-lenses__item" to={contactLensHref(target?.title)}>
+            Who to contact
+          </Link>
+          <Link
+            className="network-lenses__item"
+            aria-current="page"
+            to={reachLensHref(targetId ?? undefined)}
+          >
+            Warm paths
+          </Link>
+        </nav>
+      </div>
       <RegisterRule />
 
-      {targets.isError ? (
+      {targets.isError && targets.data && (
+        <Banner
+          className="network-secondary-state"
+          tone="danger"
+          title="Organizations could not be refreshed"
+          action={
+            <Button size="sm" onClick={() => void targets.refetch()}>
+              Retry targets
+            </Button>
+          }
+        >
+          Showing the last verified target list and reachability facts.
+        </Banner>
+      )}
+
+      {targets.isError && !targets.data ? (
         <ErrorState
           title="Couldn’t load your organizations"
           detail={(targets.error as Error | null)?.message}
@@ -258,15 +323,15 @@ export function Intros() {
           title="No organizations yet"
           hint="Capture the companies you want to reach, then the people who work there. Paths appear here as soon as one connects."
           action={
-            <Link className="vt-btn vt-btn--sm" to="/orgs">
+            <Link className="vt-btn vt-btn--sm" to="/network/organizations">
               Open organizations
             </Link>
           }
         />
       ) : (
-        <div className="grid gap-6 md:grid-cols-[minmax(0,17rem)_minmax(0,1fr)]">
-          <aside aria-label="Target organizations">
-            <div className="mb-3">
+        <div className="network-intelligence__workspace">
+          <aside className="network-targets" aria-label="Target organizations">
+            <div className="network-targets__filter">
               <Input
                 aria-label="Filter organizations"
                 placeholder="Filter orgs…"
@@ -276,29 +341,32 @@ export function Intros() {
             </div>
 
             {groups.map((g) => (
-              <section key={g.key} className="mb-4" aria-label={g.label}>
-                <h2 className="u-display mb-1 text-xs text-faint">{g.label}</h2>
-                {g.items.map((t) => (
-                  <TargetButton key={t.id} t={t} active={t.id === targetId} onSelect={() => selectOrg(t.id)} />
-                ))}
+              <section key={g.key} className="network-targets__group" aria-label={g.label}>
+                <h2>{g.label}</h2>
+                <div className="network-targets__items">
+                  {g.items.map((t) => (
+                    <TargetButton
+                      key={t.id}
+                      t={t}
+                      active={t.id === targetId}
+                      onSelect={() => selectOrg(t.id)}
+                    />
+                  ))}
+                </div>
               </section>
             ))}
 
             {filtered.length === 0 && (
-              <p className="p-2 text-sm text-muted">
+              <div className="network-targets__empty" role="status">
                 No organizations match “{railQ}”.{' '}
-                <button
-                  type="button"
-                  className="cursor-pointer border-0 bg-transparent p-0 text-ink underline"
-                  onClick={() => setRailQ('')}
-                >
+                <button type="button" onClick={() => setRailQ('')}>
                   Clear the filter
                 </button>
-              </p>
+              </div>
             )}
           </aside>
 
-          <div className="min-w-0">
+          <div className="network-paths">
             {target && (
               <Section
                 title={`Reach ${target.title}`}
@@ -309,7 +377,29 @@ export function Intros() {
                   </Link>
                 }
               >
-                {paths.isError ? (
+                {paths.isFetching && paths.data && (
+                  <StatusTrace
+                    className="network-trace"
+                    tone="live"
+                    label={`Rechecking paths to ${target.title}`}
+                    detail="Keeping the current path evidence visible"
+                  />
+                )}
+                {paths.isError && paths.data && (
+                  <Banner
+                    className="network-secondary-state"
+                    tone="danger"
+                    title={`Paths to ${target.title} could not be refreshed`}
+                    action={
+                      <Button size="sm" onClick={() => void paths.refetch()}>
+                        Retry paths
+                      </Button>
+                    }
+                  >
+                    Showing the last completed path calculation.
+                  </Banner>
+                )}
+                {paths.isError && !paths.data ? (
                   // Was unchecked, so a failed lookup rendered "No path yet" and
                   // sent you off to capture people who already exist - the screen
                   // blaming your graph for the server's fault.
@@ -326,15 +416,15 @@ export function Intros() {
                     title={`No warm path to ${target.title} yet`}
                     hint={`Nobody you know connects to ${target.title}. Link someone you know to a role there, or add a person who works there.`}
                     action={
-                      <Link className="vt-btn vt-btn--sm" to="/people">
+                      <Link className="vt-btn vt-btn--sm" to="/network/people">
                         Open People
                       </Link>
                     }
                   />
                 ) : (
                   pathList.map((p, i) => (
-                    <article key={i} className="border-b border-hairline py-4 last:border-b-0">
-                      <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <article key={i} className="network-intro-path">
+                      <header className="network-intro-path__head">
                         {/* The rank was carried by a "strongest" chip that
                             replaced the path's own strength label on the first
                             card, so one of the two was always missing. It is a
@@ -342,22 +432,32 @@ export function Intros() {
                             a name of its own, which matters here: three people
                             in this graph are called Jordan, and three cards
                             otherwise offer three controls called "Ask Jordan". */}
-                        <Mono className="text-xs text-faint">#{i + 1}</Mono>
+                        <Mono className="network-intro-path__rank">Path {i + 1}</Mono>
                         <Chip mono>{p.strengthLabel}</Chip>
-                        {/* Not sliced to four: the factors are the explanation. */}
-                        {(p.factors ?? []).map((f, fi) => (
-                          <Chip key={fi} mono>
-                            {f}
-                          </Chip>
-                        ))}
-                        <Mono className="ml-auto text-md text-ink">{p.score.toFixed(2)}</Mono>
-                      </div>
+                        <span className="network-intro-path__score">
+                          <small>path score</small>
+                          <Mono>{p.score.toFixed(2)}</Mono>
+                        </span>
+                      </header>
 
                       <PathNarrative hops={p.hops} selfId={selfId} />
 
-                      <p className="mt-2 text-sm text-ink-soft">{p.why}</p>
+                      <div className="network-intro-path__evidence">
+                        <p>{p.why}</p>
+                        {(p.factors ?? []).length > 0 && (
+                          <div aria-label="Path evidence">
+                            <span>Evidence</span>
+                            {/* Not sliced: these factors are the explanation. */}
+                            {(p.factors ?? []).map((f, fi) => (
+                              <Chip key={fi} mono>
+                                {f}
+                              </Chip>
+                            ))}
+                          </div>
+                        )}
+                      </div>
 
-                      <div className="mt-3 flex flex-wrap items-center gap-3">
+                      <div className="network-intro-path__actions">
                         {p.askerId && p.askerName && (
                           <Button
                             size="sm"
@@ -367,7 +467,10 @@ export function Intros() {
                               setComposer({
                                 personId: p.askerId!,
                                 personName: p.askerName!,
-                                kind: p.hops.filter((h) => h.type === 'person').length <= 2 ? 'explore' : 'intro',
+                                kind:
+                                  p.hops.filter((h) => h.type === 'person').length <= 2
+                                    ? 'explore'
+                                    : 'intro',
                                 targetOrgId: targetId ?? undefined,
                                 targetOrgName: target.title,
                               })
@@ -380,7 +483,7 @@ export function Intros() {
                           // Named, not "Open person": five cards each offering an
                           // "Open person" link is five controls with one name.
                           <Link
-                            className="text-sm"
+                            className="network-intro-path__profile"
                             to={entityHref('person', p.askerId)}
                             aria-label={`Open ${p.askerName} - path ${i + 1}`}
                           >

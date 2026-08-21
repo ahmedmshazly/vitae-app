@@ -74,6 +74,17 @@ describe('Shell', () => {
     expect(live?.textContent).toBe('People');
   });
 
+  it('keeps the browser title aligned with the current screen', async () => {
+    renderWithApp(
+      <Shell>
+        <div>main</div>
+      </Shell>,
+      { route: '/career/applications/application-1' },
+    );
+
+    await waitFor(() => expect(document.title).toBe('Career / Applications, Dossier · Vitae'));
+  });
+
   it('gives the content region a focus target for a route change to move to', async () => {
     renderWithApp(
       <Shell>

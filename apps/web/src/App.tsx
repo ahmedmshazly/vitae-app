@@ -1,5 +1,5 @@
 import { lazy, Suspense, type ComponentType, type ReactNode } from 'react';
-import { Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { AuthProvider, useAuth } from './lib/auth.js';
 import { Shell } from './app/Shell.js';
 import { ToastProvider } from './features/Toast.js';
@@ -20,6 +20,12 @@ const Ask = lazyNamed(() => import('./routes/Ask.js'), 'Ask');
 const SearchResults = lazyNamed(() => import('./routes/SearchResults.js'), 'SearchResults');
 const Atoms = lazyNamed(() => import('./routes/Atoms.js'), 'Atoms');
 const ResumeHub = lazyNamed(() => import('./routes/ResumeHub.js'), 'ResumeHub');
+const CareerOverview = lazyNamed(() => import('./routes/career/index.js'), 'CareerOverview');
+const Applications = lazyNamed(() => import('./routes/career/index.js'), 'Applications');
+const ApplicationDossier = lazyNamed(
+  () => import('./routes/career/index.js'),
+  'ApplicationDossier',
+);
 const Tailor = lazyNamed(() => import('./routes/tailor/Tailor.js'), 'Tailor');
 const Outputs = lazyNamed(() => import('./routes/Outputs.js'), 'Outputs');
 const Letters = lazyNamed(() => import('./routes/Letters.js'), 'Letters');
@@ -40,6 +46,15 @@ const Repositories = lazyNamed(() => import('./routes/Repositories.js'), 'Reposi
 const Duplicates = lazyNamed(() => import('./routes/Duplicates.js'), 'Duplicates');
 const ExportPage = lazyNamed(() => import('./routes/ExportPage.js'), 'ExportPage');
 const NotFound = lazyNamed(() => import('./routes/NotFound.js'), 'NotFound');
+const Planner = lazyNamed(() => import('./routes/workspaces/Planner.js'), 'Planner');
+const NetworkHome = lazyNamed(() => import('./routes/workspaces/WorkspaceHomes.js'), 'NetworkHome');
+const ExploreHome = lazyNamed(() => import('./routes/workspaces/WorkspaceHomes.js'), 'ExploreHome');
+const DataHome = lazyNamed(() => import('./routes/workspaces/WorkspaceHomes.js'), 'DataHome');
+const SettingsHome = lazyNamed(
+  () => import('./routes/workspaces/WorkspaceHomes.js'),
+  'SettingsHome',
+);
+const Help = lazyNamed(() => import('./routes/workspaces/WorkspaceHomes.js'), 'Help');
 // Marketing is lazy for the same reason every other route is: eager imports
 // put all three pages, their motion code and the primitives they pull in
 // inside the entry chunk, so the app shell paid for the landing page and the
@@ -62,21 +77,55 @@ function PublicPage({ children }: { children: ReactNode }) {
 /** People/orgs keep CRM hubs; generic browse covers every other type. */
 function BrowseRedirect() {
   const { type } = useParams();
-  if (type === 'person') return <Navigate to="/people" replace />;
-  if (type === 'organization') return <Navigate to="/orgs" replace />;
+  if (type === 'person') return <Navigate to="/network/people" replace />;
+  if (type === 'organization') return <Navigate to="/network/organizations" replace />;
   return <Browse />;
+}
+
+/** Ask and warm introductions are two lenses over one relationship decision. */
+function NetworkIntelligence() {
+  const [params] = useSearchParams();
+  return params.get('lens') === 'reach' ? <Intros /> : <Ask />;
 }
 
 export function App() {
   return (
     <Routes>
       {/* These routes are fully public and must never wait on Firebase or the API. */}
-      <Route path="/tour" element={<PublicPage><Tour /></PublicPage>} />
-      <Route path="/manifesto" element={<PublicPage><Manifesto /></PublicPage>} />
+      <Route
+        path="/welcome"
+        element={
+          <PublicPage>
+            <Landing />
+          </PublicPage>
+        }
+      />
+      <Route
+        path="/tour"
+        element={
+          <PublicPage>
+            <Tour />
+          </PublicPage>
+        }
+      />
+      <Route
+        path="/manifesto"
+        element={
+          <PublicPage>
+            <Manifesto />
+          </PublicPage>
+        }
+      />
       <Route
         path="/reference/entities"
         element={
-          <Suspense fallback={<div className="app-splash"><Spinner /></div>}>
+          <Suspense
+            fallback={
+              <div className="app-splash">
+                <Spinner />
+              </div>
+            }
+          >
             <EntityCatalog />
           </Suspense>
         }
@@ -106,7 +155,6 @@ function AuthGateContent() {
   if (!user) {
     return (
       <Routes>
-        <Route path="/welcome" element={<PublicPage><Landing /></PublicPage>} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="*" element={<Navigate to="/welcome" replace />} />
       </Routes>
@@ -125,11 +173,53 @@ function AuthedApp() {
           {/* Keyed by route so a crash on one page doesn't stay stuck once the
               user navigates away, the boundary remounts fresh per route. */}
           <ErrorBoundary key={pathname}>
-            <Suspense fallback={<div className="app-splash"><Spinner /></div>}>
+            <Suspense
+              fallback={
+                <div className="app-splash">
+                  <Spinner />
+                </div>
+              }
+            >
               <Routes>
-                <Route path="/welcome" element={<Navigate to="/" replace />} />
                 <Route path="/signin" element={<Navigate to="/" replace />} />
                 <Route path="/" element={<Dashboard />} />
+
+                {/* Canonical task-led workspaces. Compatibility routes remain
+                    mounted below so bookmarks and shared record links survive. */}
+                <Route path="/today/planner" element={<Planner />} />
+                <Route path="/network" element={<NetworkHome />} />
+                <Route path="/network/people" element={<People />} />
+                <Route path="/network/people/:id" element={<Person />} />
+                <Route path="/network/organizations" element={<Orgs />} />
+                <Route path="/network/organizations/:id" element={<Org />} />
+                <Route path="/network/intelligence" element={<NetworkIntelligence />} />
+                <Route path="/career" element={<CareerOverview />} />
+                <Route path="/career/applications" element={<Applications />} />
+                <Route path="/career/applications/:id" element={<ApplicationDossier />} />
+                <Route path="/career/resume" element={<ResumeHub />} />
+                <Route path="/career/resume/evidence" element={<Atoms />} />
+                <Route path="/career/resume/tailor" element={<Tailor />} />
+                <Route path="/career/resume/outputs" element={<Outputs />} />
+                <Route path="/career/resume/letters" element={<Letters />} />
+                <Route path="/career/resume/templates" element={<Templates />} />
+                <Route path="/explore" element={<ExploreHome />} />
+                <Route path="/explore/library" element={<Collections />} />
+                <Route path="/explore/graph" element={<GraphView />} />
+                <Route path="/explore/timeline" element={<Timeline />} />
+                <Route path="/explore/atlas" element={<MapView />} />
+                <Route path="/data" element={<DataHome />} />
+                <Route path="/data/imports" element={<ImportHub />} />
+                <Route path="/data/identity" element={<Duplicates />} />
+                <Route path="/data/sources/github" element={<Repositories />} />
+                <Route path="/data/exports" element={<ExportPage />} />
+                <Route path="/data/trash" element={<Trash />} />
+                <Route path="/settings" element={<SettingsHome />} />
+                <Route path="/settings/profile" element={<Settings />} />
+                <Route path="/settings/preferences" element={<Settings />} />
+                <Route path="/settings/system" element={<Settings />} />
+                <Route path="/help" element={<Help />} />
+
+                {/* Stable legacy addresses. */}
                 <Route path="/people" element={<People />} />
                 <Route path="/people/:id" element={<Person />} />
                 <Route path="/orgs" element={<Orgs />} />
@@ -154,7 +244,6 @@ function AuthedApp() {
                 <Route path="/resume/letters" element={<Letters />} />
                 <Route path="/resume/templates" element={<Templates />} />
                 <Route path="/trash" element={<Trash />} />
-                <Route path="/settings" element={<Settings />} />
                 {/* A dead URL used to render the Dashboard, so a broken link
                     looked exactly like a successful navigation home. */}
                 <Route path="*" element={<NotFound />} />

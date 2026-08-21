@@ -14,6 +14,7 @@ import {
   RegisterRule,
   Section,
   SkeletonRows,
+  StatusTrace,
 } from '@vitae/ui';
 import type { MatchSignal, NodeType } from '@vitae/core';
 import { api, type ApiError } from '../lib/api.js';
@@ -85,7 +86,13 @@ interface NodeFull {
 
 interface NodeResp {
   node: NodeFull;
-  edges: Array<{ id: string; type: string; src: string; dst: string; props: Record<string, unknown> }>;
+  edges: Array<{
+    id: string;
+    type: string;
+    src: string;
+    dst: string;
+    props: Record<string, unknown>;
+  }>;
   neighbors: Record<string, { id: string; type: NodeType; title: string }>;
 }
 
@@ -129,7 +136,11 @@ export function Duplicates() {
 
   const dismiss = useMutation({
     mutationFn: async (cluster: DupCluster) => {
-      await Promise.all(cluster.pairs.map((pair) => api.post('/duplicates/dismiss', { aId: pair.a.id, bId: pair.b.id })));
+      await Promise.all(
+        cluster.pairs.map((pair) =>
+          api.post('/duplicates/dismiss', { aId: pair.a.id, bId: pair.b.id }),
+        ),
+      );
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['duplicates'] });
@@ -170,31 +181,36 @@ export function Duplicates() {
   const clusters = result.data?.clusters ?? [];
   const probable = clusters.filter((cluster) => cluster.verdict === 'probable').length;
   const typeCount = new Set(clusters.map((cluster) => cluster.type)).size;
+  const mergeCount = merges.data?.merges.filter((merge) => !merge.undone_at).length ?? 0;
 
   return (
-    <div className="page dedup-page">
+    <div className="page dedup-page data-workspace-page data-identity-page">
       <PageHeader
         title="Identity audit"
         subtitle="Explainable matching across every entity type. Vitae suggests; you decide."
         help={
           <InfoPopover title="How matching works">
             <p>
-              Candidates are scored with evidence you can read (shared emails, names, orgs), not a
+              Candidates are scored with evidence you can read (shared emails, names, orgs), not an
               opaque similarity percentage alone. Probable pairs default toward caution.
             </p>
             <p>
-              Merges tombstone the dropped record and rewire relationships. Each merge stays
-              conflict-safe undoable for 30 days.
+              Merges tombstone the dropped record and rewire relationships. Each merge can be undone
+              safely for 30 days.
             </p>
           </InfoPopover>
         }
         actions={
           <div className="hstack">
-            <Button size="sm" disabled={rescan.isPending || result.isLoading} onClick={() => rescan.mutate()}>
+            <Button
+              size="sm"
+              disabled={rescan.isPending || result.isLoading}
+              onClick={() => rescan.mutate()}
+            >
               {rescan.isPending ? 'Scanning…' : 'Rescan'}
             </Button>
-            <Link to="/import" className="vt-btn vt-btn--sm">
-              ← Import
+            <Link to="/data/imports" className="vt-btn vt-btn--sm">
+              Back to imports
             </Link>
           </div>
         }
@@ -212,6 +228,115 @@ export function Duplicates() {
         label={clusters.length > 0 ? 'Candidate clusters in the queue' : undefined}
       />
 
+      <nav className="data-process" aria-label="Identity audit workflow">
+        <ol>
+          <li
+            data-state={
+              result.isLoading || rescan.isPending
+                ? 'current'
+                : result.isSuccess
+                  ? 'done'
+                  : 'upcoming'
+            }
+            aria-current={result.isLoading || rescan.isPending ? 'step' : undefined}
+          >
+            <span className="data-process__node" aria-hidden />
+            <span>
+              <strong>Scan records</strong>
+              <small>Build explainable candidates</small>
+            </span>
+          </li>
+          <li
+            data-state={audit ? 'done' : clusters.length > 0 ? 'current' : 'upcoming'}
+            aria-current={!audit && clusters.length > 0 ? 'step' : undefined}
+          >
+            <span className="data-process__node" aria-hidden />
+            <span>
+              <strong>Compare identity</strong>
+              <small>Read matches and contradictions</small>
+            </span>
+          </li>
+          <li data-state={audit ? 'current' : 'upcoming'} aria-current={audit ? 'step' : undefined}>
+            <span className="data-process__node" aria-hidden />
+            <span>
+              <strong>Consolidate</strong>
+              <small>Choose survivor and fields</small>
+            </span>
+          </li>
+          <li data-state={mergeCount > 0 ? 'done' : 'upcoming'}>
+            <span className="data-process__node" aria-hidden />
+            <span>
+              <strong>Recover if needed</strong>
+              <small>Conflict-safe undo window</small>
+            </span>
+          </li>
+        </ol>
+      </nav>
+
+      <div className="data-operation-trace">
+        {rescan.isPending ? (
+          <StatusTrace
+            tone="live"
+            label="Scanning current records"
+            detail="Existing decisions stay intact"
+          />
+        ) : rescan.isError ? (
+          <StatusTrace
+            tone="danger"
+            label="Identity scan stopped"
+            detail={(rescan.error as Error).message}
+          />
+        ) : dismiss.isPending ? (
+          <StatusTrace
+            tone="live"
+            label="Remembering identity decision"
+            detail="Updating the candidate queue"
+          />
+        ) : dismiss.isError ? (
+          <StatusTrace
+            tone="danger"
+            label="Identity decision was not saved"
+            detail={(dismiss.error as Error).message}
+          />
+        ) : undo.isPending ? (
+          <StatusTrace
+            tone="live"
+            label="Restoring merged records"
+            detail="Checking for later conflicts"
+          />
+        ) : undo.isError ? (
+          <StatusTrace
+            tone="danger"
+            label="Merge could not be undone"
+            detail={(undo.error as Error).message}
+          />
+        ) : removeAlias.isPending ? (
+          <StatusTrace
+            tone="live"
+            label="Removing learned alias"
+            detail="Canonical record stays unchanged"
+          />
+        ) : removeAlias.isError ? (
+          <StatusTrace
+            tone="danger"
+            label="Learned alias was not removed"
+            detail={(removeAlias.error as Error).message}
+          />
+        ) : result.isSuccess && clusters.length === 0 ? (
+          <StatusTrace
+            tone="success"
+            label="Identity scan is clear"
+            detail="No candidate clusters"
+          />
+        ) : result.isSuccess ? (
+          <StatusTrace
+            tone={probable > 0 ? 'warning' : 'neutral'}
+            label={`${clusters.length} ${clusters.length === 1 ? 'cluster awaits' : 'clusters await'} review`}
+            detail={probable > 0 ? `${probable} marked probable` : 'All candidates marked possible'}
+          />
+        ) : null}
+      </div>
+
       {result.isError ? (
         <ErrorState
           title="Couldn’t load the identity queue"
@@ -226,18 +351,14 @@ export function Duplicates() {
         <>
           <Section title="Queue" meta={clusters.length}>
             <div className="dedup-summary" aria-label="Queue summary">
-              <div>
-                <Mono>{clusters.length}</Mono>
-                <span>candidate clusters</span>
-              </div>
-              <div>
-                <Mono>{probable}</Mono>
-                <span>probable</span>
-              </div>
-              <div>
-                <Mono>{typeCount}</Mono>
-                <span>entity types</span>
-              </div>
+              <strong>
+                <Mono>{clusters.length}</Mono> candidate{' '}
+                {clusters.length === 1 ? 'cluster' : 'clusters'}
+              </strong>
+              <span>
+                <Mono>{probable}</Mono> probable across <Mono>{typeCount}</Mono>{' '}
+                {typeCount === 1 ? 'entity type' : 'entity types'}
+              </span>
             </div>
 
             {clusters.length === 0 ? (
@@ -261,7 +382,7 @@ export function Duplicates() {
                       className="dedup-cluster"
                       aria-labelledby={`cluster-${cluster.id}`}
                     >
-                      <div className="spread">
+                      <header className="dedup-cluster__head">
                         <div className="hstack">
                           <Chip tone={cluster.verdict === 'probable' ? 'danger' : 'warning'} mono>
                             {cluster.verdict}
@@ -271,34 +392,43 @@ export function Duplicates() {
                           </Mono>
                         </div>
                         <Mono className="u-faint">{cluster.members.length} records</Mono>
-                      </div>
-                      <h3 id={`cluster-${cluster.id}`} className="dedup-cluster__title">
-                        {heading}
-                      </h3>
-                      <div className="dedup-cluster__members">
-                        {cluster.members.map((member, index) => (
-                          <div key={member.id} className="dedup-cluster__member">
-                            <span className="dedup-cluster__node" aria-hidden>
-                              {index + 1}
-                            </span>
-                            <Link to={entityHref(member.type, member.id)}>
-                              <strong>{member.title}</strong>
-                              <span>{member.meta}</span>
-                            </Link>
+                      </header>
+                      <div className="dedup-cluster__body">
+                        <div className="dedup-cluster__identity">
+                          <h3 id={`cluster-${cluster.id}`} className="dedup-cluster__title">
+                            {heading}
+                          </h3>
+                          <div className="dedup-cluster__members">
+                            {cluster.members.map((member, index) => (
+                              <div key={member.id} className="dedup-cluster__member">
+                                <span className="dedup-cluster__node" aria-hidden>
+                                  {index + 1}
+                                </span>
+                                <Link to={entityHref(member.type, member.id)}>
+                                  <strong>{member.title}</strong>
+                                  <span>{member.meta}</span>
+                                </Link>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                      <div className="dedup-cluster__evidence">
-                        {[...new Set(cluster.pairs.flatMap((pair) => pair.evidence))].slice(0, 6).map((item) => (
-                          <Chip key={item} mono>
-                            {item}
-                          </Chip>
-                        ))}
-                        {cluster.pairs.some((pair) => pair.contradictions.length) ? (
-                          <Chip tone="warning" mono>
-                            has contradictions
-                          </Chip>
-                        ) : null}
+                        </div>
+                        <div className="dedup-cluster__evidence">
+                          <span className="dedup-cluster__evidence-label">Match evidence</span>
+                          <div className="chips">
+                            {[...new Set(cluster.pairs.flatMap((pair) => pair.evidence))]
+                              .slice(0, 6)
+                              .map((item) => (
+                                <Chip key={item} mono>
+                                  {item}
+                                </Chip>
+                              ))}
+                            {cluster.pairs.some((pair) => pair.contradictions.length) ? (
+                              <Chip tone="warning" mono>
+                                has contradictions
+                              </Chip>
+                            ) : null}
+                          </div>
+                        </div>
                       </div>
                       <div className="dedup-cluster__actions">
                         <Button
@@ -315,7 +445,7 @@ export function Duplicates() {
                           onClick={() => setAudit(cluster)}
                           aria-label={`Audit cluster: ${heading}`}
                         >
-                          Audit cluster →
+                          Review evidence
                         </Button>
                       </div>
                     </article>
@@ -325,7 +455,10 @@ export function Duplicates() {
             )}
           </Section>
 
-          <Section title="Merge history" meta={merges.isSuccess ? merges.data.merges.length : undefined}>
+          <Section
+            title="Merge history"
+            meta={merges.isSuccess ? merges.data.merges.length : undefined}
+          >
             {merges.isError ? (
               <ErrorState
                 title="Couldn’t load merge history"
@@ -372,7 +505,10 @@ export function Duplicates() {
             )}
           </Section>
 
-          <Section title="Learned aliases" meta={aliases.isSuccess ? aliases.data.aliases.length : undefined}>
+          <Section
+            title="Learned aliases"
+            meta={aliases.isSuccess ? aliases.data.aliases.length : undefined}
+          >
             {aliases.isError ? (
               <ErrorState
                 title="Couldn’t load learned aliases"
@@ -401,7 +537,10 @@ export function Duplicates() {
                         {alias.alias} → {alias.canonical_title}
                       </div>
                     </div>
-                    <Link className="vt-btn vt-btn--sm" to={entityHref(alias.type, alias.canonical_id)}>
+                    <Link
+                      className="vt-btn vt-btn--sm"
+                      to={entityHref(alias.type, alias.canonical_id)}
+                    >
                       Open
                     </Link>
                     <Button
@@ -452,8 +591,10 @@ function ClusterAudit({
   onComplete: () => Promise<void>;
 }) {
   const [step, setStep] = useState(0);
-  const [includedIds, setIncludedIds] = useState(() => new Set(cluster.members.map((member) => member.id)));
-  const [keepId, setKeepId] = useState(cluster.members[0]!.id);
+  const [includedIds, setIncludedIds] = useState(
+    () => new Set(cluster.members.map((member) => member.id)),
+  );
+  const [keepId, setKeepId] = useState(cluster.members[0]?.id ?? '');
   const [fieldSource, setFieldSource] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const { flash } = useToast();
@@ -471,7 +612,9 @@ function ClusterAudit({
 
   const fields = useMemo(() => {
     const envelope = ['title', 'subtitle', 'notes_md', 'start_date', 'end_date', 'status'];
-    const propKeys = [...new Set(included.flatMap((record) => Object.keys(record.node.props)))].sort();
+    const propKeys = [
+      ...new Set(included.flatMap((record) => Object.keys(record.node.props))),
+    ].sort();
     return [
       ...envelope.map((key) => ({ key, label: key.replace(/_/g, ' '), prop: false })),
       ...propKeys.map((key) => ({ key, label: key.replace(/_/g, ' '), prop: true })),
@@ -482,15 +625,52 @@ function ClusterAudit({
     return prop ? record.node.props[key] : (record.node as unknown as Record<string, unknown>)[key];
   }
 
-  function sourceFor(field: { key: string; prop: boolean }): NodeResp {
+  function sourceFor(field: { key: string; prop: boolean }): NodeResp | undefined {
     const explicit = included.find((record) => record.node.id === fieldSource[field.key]);
     if (explicit) return explicit;
     if (keep && displayValue(valueFor(keep, field.key, field.prop)) !== '—') return keep;
-    return included.find((record) => displayValue(valueFor(record, field.key, field.prop)) !== '—') ?? keep!;
+    return (
+      included.find((record) => displayValue(valueFor(record, field.key, field.prop)) !== '—') ??
+      keep
+    );
+  }
+
+  const hasValidMergeSet =
+    included.length >= 2 &&
+    included.length === includedIds.size &&
+    includedIds.has(keepId) &&
+    Boolean(keep);
+
+  function toggleIncluded(memberId: string) {
+    const next = new Set(includedIds);
+    if (next.has(memberId)) {
+      if (next.size === 1) {
+        flash('Keep at least one record in the identity audit.');
+        return;
+      }
+      next.delete(memberId);
+    } else {
+      next.add(memberId);
+    }
+
+    const nextKeepId = next.has(keepId)
+      ? keepId
+      : (cluster.members.find((member) => next.has(member.id))?.id ?? '');
+
+    setIncludedIds(next);
+    setKeepId(nextKeepId);
+    setFieldSource((current) =>
+      Object.fromEntries(Object.entries(current).filter(([, sourceId]) => next.has(sourceId))),
+    );
   }
 
   async function mergeCluster() {
-    if (!keep) return;
+    if (!hasValidMergeSet || !keep) {
+      flash('Choose at least two records and a canonical survivor before consolidating.', {
+        variant: 'error',
+      });
+      return;
+    }
     setBusy(true);
     try {
       const drops = included.filter((record) => record.node.id !== keepId);
@@ -498,6 +678,7 @@ function ClusterAudit({
       const patch: Record<string, unknown> = {};
       for (const field of fields) {
         const source = sourceFor(field);
+        if (!source) throw new Error(`No selected source is available for ${field.label}.`);
         let value = valueFor(source, field.key, field.prop);
         if (field.prop && ['emails', 'phones'].includes(field.key)) {
           value = [
@@ -532,9 +713,10 @@ function ClusterAudit({
     }
   }
 
-  const canContinue = step !== 0 || includedIds.size >= 2;
   const relationCount = included.reduce((sum, record) => sum + record.edges.length, 0);
-  const priorNames = included.filter((record) => record.node.id !== keepId).map((record) => record.node.title);
+  const priorNames = included
+    .filter((record) => record.node.id !== keepId)
+    .map((record) => record.node.title);
 
   return (
     <Modal
@@ -551,13 +733,17 @@ function ClusterAudit({
           {step < STEPS.length - 1 ? (
             <Button
               variant="primary"
-              disabled={!canContinue || loading || Boolean(loadError)}
+              disabled={!hasValidMergeSet || loading || Boolean(loadError)}
               onClick={() => setStep((value) => value + 1)}
             >
               Continue
             </Button>
           ) : (
-            <Button variant="primary" disabled={busy || includedIds.size < 2} onClick={() => void mergeCluster()}>
+            <Button
+              variant="primary"
+              disabled={busy || !hasValidMergeSet || loading || Boolean(loadError)}
+              onClick={() => void mergeCluster()}
+            >
               {busy ? 'Consolidating…' : `Merge ${includedIds.size} records`}
             </Button>
           )}
@@ -596,21 +782,16 @@ function ClusterAudit({
           <h3>Are these the same real-world {typeLabel(cluster.type)}?</h3>
           <p className="u-muted">Inspect evidence and remove any false member before continuing.</p>
           {cluster.members.map((member) => {
-            const related = cluster.pairs.filter((pair) => pair.a.id === member.id || pair.b.id === member.id);
+            const related = cluster.pairs.filter(
+              (pair) => pair.a.id === member.id || pair.b.id === member.id,
+            );
             return (
               <label key={member.id} className="dedup-audit__identity">
                 <input
                   type="checkbox"
                   checked={includedIds.has(member.id)}
                   aria-label={`Include ${member.title} in this merge`}
-                  onChange={() =>
-                    setIncludedIds((current) => {
-                      const next = new Set(current);
-                      if (next.has(member.id)) next.delete(member.id);
-                      else next.add(member.id);
-                      return next;
-                    })
-                  }
+                  onChange={() => toggleIncluded(member.id)}
                 />
                 <div>
                   <strong>{member.title}</strong>
@@ -623,13 +804,15 @@ function ClusterAudit({
                         {evidence}
                       </Chip>
                     ))}
-                    {[...new Set(related.flatMap((pair) => pair.contradictions.map((item) => item.label)))].map(
-                      (item) => (
-                        <Chip key={item} tone="warning" mono>
-                          {item}
-                        </Chip>
+                    {[
+                      ...new Set(
+                        related.flatMap((pair) => pair.contradictions.map((item) => item.label)),
                       ),
-                    )}
+                    ].map((item) => (
+                      <Chip key={item} tone="warning" mono>
+                        {item}
+                      </Chip>
+                    ))}
                   </div>
                 </div>
               </label>
@@ -641,7 +824,9 @@ function ClusterAudit({
       {!loading && !loadError && step === 1 ? (
         <section className="dedup-audit__pane">
           <h3>Choose the canonical survivor</h3>
-          <p className="u-muted">The survivor keeps its stable URL and becomes the destination for every relationship.</p>
+          <p className="u-muted">
+            The survivor keeps its stable URL and becomes the destination for every relationship.
+          </p>
           {included.map((record) => (
             <button
               key={record.node.id}
@@ -669,16 +854,19 @@ function ClusterAudit({
         <section className="dedup-audit__pane">
           <h3>Audit every field</h3>
           <p className="u-muted">
-            Choose the source of truth for every envelope and type-specific property. Contact arrays are still
-            safely unioned by the server.
+            Choose the source of truth for every envelope and type-specific property. Contact arrays
+            are still safely unioned by the server.
           </p>
           <div className="dedup-audit__fields">
             {fields.map((field) => (
-              <div key={`${field.prop ? 'prop' : 'node'}:${field.key}`} className="dedup-audit__field">
+              <div
+                key={`${field.prop ? 'prop' : 'node'}:${field.key}`}
+                className="dedup-audit__field"
+              >
                 <strong>{field.label}</strong>
                 <div>
                   {included.map((record) => {
-                    const selected = sourceFor(field).node.id === record.node.id;
+                    const selected = sourceFor(field)?.node.id === record.node.id;
                     return (
                       <button
                         key={record.node.id}
@@ -686,7 +874,9 @@ function ClusterAudit({
                         className={selected ? 'is-selected' : ''}
                         aria-pressed={selected}
                         aria-label={`Use ${record.node.title} for ${field.label}`}
-                        onClick={() => setFieldSource((current) => ({ ...current, [field.key]: record.node.id }))}
+                        onClick={() =>
+                          setFieldSource((current) => ({ ...current, [field.key]: record.node.id }))
+                        }
                       >
                         <small>{record.node.title}</small>
                         <span>{displayValue(valueFor(record, field.key, field.prop))}</span>
@@ -704,8 +894,8 @@ function ClusterAudit({
         <section className="dedup-audit__pane">
           <h3>Relationship impact</h3>
           <p className="u-muted">
-            {relationCount} relationship endpoints will be examined. Exact duplicates and self-loops are
-            tombstoned; unique edges move to the survivor.
+            {relationCount} relationship endpoints will be examined. Exact duplicates and self-loops
+            are tombstoned; unique edges move to the survivor.
           </p>
           <div className="dedup-audit__relations">
             {included.map((record) => (
@@ -738,13 +928,13 @@ function ClusterAudit({
           <h3>Ready to consolidate into {keep.node.title}</h3>
           <ul>
             <li>
-              {includedIds.size - 1} duplicate record{includedIds.size === 2 ? '' : 's'} will be tombstoned, never
-              hard-deleted.
+              {includedIds.size - 1} duplicate record{includedIds.size === 2 ? '' : 's'} will be
+              tombstoned, never hard-deleted.
             </li>
             <li>{relationCount} relationship endpoints will be rewired or deduplicated.</li>
             <li>
-              {priorNames.length ? priorNames.join(', ') : 'No alternate names'} will remain recoverable as prior
-              identity values.
+              {priorNames.length ? priorNames.join(', ') : 'No alternate names'} will remain
+              recoverable as prior identity values.
             </li>
             <li>Each merge has conflict-safe undo for 30 days.</li>
           </ul>

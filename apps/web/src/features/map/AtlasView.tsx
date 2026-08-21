@@ -2,10 +2,10 @@
  * Atlas, navigable life map of places (FR-VIS-003).
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useReducedMotion } from 'motion/react';
-import { ErrorState, SkeletonRows } from '@vitae/ui';
+import { EmptyState, ErrorState, SkeletonRows, StatusTrace } from '@vitae/ui';
 import { useToast } from '../Toast.js';
 import { api } from '../../lib/api.js';
 import { readGraphPalette, type GraphPalette } from '../../lib/graph-palette.js';
@@ -58,7 +58,9 @@ export function AtlasView() {
   const [prefs, patchPrefs, resetPrefs] = useAtlasDisplayPrefs();
   const [prefsOpen, setPrefsOpen] = useState(false);
   const [mode, setMode] = useState<AtlasViewMode>('atlas');
-  const [activeFilters, setActiveFilters] = useState(() => new Set(TYPE_FILTERS.map((f) => f.label)));
+  const [activeFilters, setActiveFilters] = useState(
+    () => new Set(TYPE_FILTERS.map((f) => f.label)),
+  );
   const [period, setPeriod] = useState<AtlasPeriod>(() => initialPeriod(params));
   const year = new Date().getFullYear();
   const [customFrom, setCustomFrom] = useState(() => params.get('from') ?? `${year}-01-01`);
@@ -109,7 +111,10 @@ export function AtlasView() {
     [allCorridors, selectedCorridorKey],
   );
   const selectedCorridor = useMemo(
-    () => (selectedCorridorKey ? allCorridors.find((c) => c.key === selectedCorridorKey) ?? null : null),
+    () =>
+      selectedCorridorKey
+        ? (allCorridors.find((c) => c.key === selectedCorridorKey) ?? null)
+        : null,
     [allCorridors, selectedCorridorKey],
   );
 
@@ -133,7 +138,7 @@ export function AtlasView() {
   }, [data]);
 
   const selectedEntry = useMemo(
-    () => (selectedCity ? data?.cities.find((c) => c.city === selectedCity) ?? null : null),
+    () => (selectedCity ? (data?.cities.find((c) => c.city === selectedCity) ?? null) : null),
     [data, selectedCity],
   );
 
@@ -350,35 +355,61 @@ export function AtlasView() {
 
   if (isError) {
     return (
-      <div className="page">
-        <ErrorState detail={(error as Error | null)?.message} onRetry={() => void refetch()} />
+      <div className="page page--atlas explore-instrument-state">
+        <header className="explore-instrument-state__head">
+          <h1 className="lifemap__title">Atlas</h1>
+          <StatusTrace
+            tone="danger"
+            label="Place evidence unavailable"
+            detail="The map index could not be read"
+          />
+        </header>
+        <div className="explore-instrument-state__body">
+          <ErrorState
+            title="Couldn’t assemble the Atlas"
+            detail={(error as Error | null)?.message}
+            onRetry={() => void refetch()}
+          />
+        </div>
       </div>
     );
   }
   if (isLoading || !data) {
     return (
-      <div className="page">
-        <SkeletonRows rows={8} />
+      <div className="page page--atlas explore-instrument-state" aria-busy="true">
+        <header className="explore-instrument-state__head">
+          <h1 className="lifemap__title">Atlas</h1>
+          <StatusTrace
+            tone="live"
+            label="Assembling place evidence"
+            detail="Reading places, trips, and coordinates"
+          />
+        </header>
+        <div className="explore-instrument-state__body">
+          <SkeletonRows rows={8} label="Assembling the Atlas" />
+        </div>
       </div>
     );
   }
 
   const hint = pickMode
-    ? 'Click the map to place · Esc cancels'
+    ? 'Choose a point on the map; press Escape to cancel'
     : comparePickFrom
-      ? `Compare: pick another place (from ${comparePickFrom}) · Esc cancels`
+      ? `Choose another place to compare with ${comparePickFrom}`
       : selectedCorridor
-        ? `Corridor: ${selectedCorridor.a} ↔ ${selectedCorridor.b} · Esc clears`
+        ? `Inspecting the recorded corridor between ${selectedCorridor.a} and ${selectedCorridor.b}`
         : comparePair
-          ? `Compare: ${comparePair.a} · ${comparePair.b} · Esc clears`
+          ? `Comparing evidence from ${comparePair.a} and ${comparePair.b}`
           : selectedTrip
-            ? `Route: ${selectedTrip.title} · Esc clears`
+            ? `Following the recorded route for ${selectedTrip.title}`
             : selectedCity
-              ? `${selectedCity} · who do you know here?`
-              : 'Pan · Patterns · click corridor · Find · Fit (0) · L list';
+              ? `Inspecting the records connected to ${selectedCity}`
+              : 'Explore where your work, relationships, and journeys meet';
 
   const findHits = findOpen
-    ? data.cities.filter((c) => c.city.toLowerCase().includes(findQ.trim().toLowerCase())).slice(0, 12)
+    ? data.cities
+        .filter((c) => c.city.toLowerCase().includes(findQ.trim().toLowerCase()))
+        .slice(0, 12)
     : [];
 
   const showMap = mode === 'atlas' && !(data.cities.length === 0 && data.trips.length === 0);
@@ -389,8 +420,12 @@ export function AtlasView() {
     : [];
 
   const compareShared = comparePair ? sharedPeople(data.cities, comparePair.a, comparePair.b) : [];
-  const compareTrips = comparePair ? tripsLinkingCities(data.trips, comparePair.a, comparePair.b) : [];
-  const compareCorridor = comparePair ? findCorridor(allCorridors, comparePair.a, comparePair.b) : null;
+  const compareTrips = comparePair
+    ? tripsLinkingCities(data.trips, comparePair.a, comparePair.b)
+    : [];
+  const compareCorridor = comparePair
+    ? findCorridor(allCorridors, comparePair.a, comparePair.b)
+    : null;
 
   const showUnmapped = unmappedDockOpen && !resolvingLabel;
   const showCorridor = Boolean(selectedCorridor) && !showUnmapped && !comparePair;
@@ -401,6 +436,16 @@ export function AtlasView() {
     !showCompare &&
     !comparePickFrom &&
     (selectedEntry || selectedTrip);
+
+  const selectedContext = selectedTrip
+    ? `route ${selectedTrip.title}`
+    : selectedCity
+      ? `place ${selectedCity}`
+      : selectedCorridor
+        ? `corridor ${selectedCorridor.a} ↔ ${selectedCorridor.b}`
+        : comparePair
+          ? `compare ${comparePair.a} · ${comparePair.b}`
+          : undefined;
 
   return (
     <div className="page page--atlas">
@@ -435,6 +480,9 @@ export function AtlasView() {
         hint={hint}
         unmappedCount={unmappedCount}
         unmappedDockOpen={unmappedDockOpen}
+        cityCount={data.cities.length}
+        tripCount={data.trips.length}
+        selectedContext={selectedContext}
         onUnmappedClick={() => {
           setUnmappedDockOpen((o) => !o);
           setPrefsOpen(false);
@@ -466,10 +514,17 @@ export function AtlasView() {
               onFilterQuery={setFindQ}
             />
           ) : data.cities.length === 0 && data.trips.length === 0 ? (
-            <div className="empty" style={{ paddingTop: 120 }}>
-              <div className="empty__title">No places yet</div>
-              <div>Add a city to people, orgs, trips, or events, pins appear here.</div>
-            </div>
+            <EmptyState
+              className="explore-instrument__empty"
+              glyph="map"
+              title="No places yet"
+              hint="Add a city to a person, organization, trip, or event; the Atlas will connect the evidence."
+              action={
+                <Link className="vt-btn vt-btn--sm" to="/data/imports">
+                  Import records
+                </Link>
+              }
+            />
           ) : (
             <AtlasCanvas
               ref={mapHandle}
@@ -491,13 +546,25 @@ export function AtlasView() {
 
           {showMap && (
             <div className="atlas__hud" role="group" aria-label="Map camera">
-              <button type="button" className="atlas__hudbtn" onClick={() => mapHandle.current?.fit()}>
+              <button
+                type="button"
+                className="atlas__hudbtn"
+                onClick={() => mapHandle.current?.fit()}
+              >
                 Fit
               </button>
-              <button type="button" className="atlas__hudbtn" onClick={() => mapHandle.current?.zoomIn()}>
+              <button
+                type="button"
+                className="atlas__hudbtn"
+                onClick={() => mapHandle.current?.zoomIn()}
+              >
                 +
               </button>
-              <button type="button" className="atlas__hudbtn" onClick={() => mapHandle.current?.zoomOut()}>
+              <button
+                type="button"
+                className="atlas__hudbtn"
+                onClick={() => mapHandle.current?.zoomOut()}
+              >
                 −
               </button>
             </div>
@@ -550,6 +617,9 @@ export function AtlasView() {
                     </button>
                   </li>
                 ))}
+                {findQ.trim() && findHits.length === 0 && (
+                  <li className="lifemap__searchempty">No places match “{findQ.trim()}”</li>
+                )}
               </ul>
             </div>
           )}
@@ -627,13 +697,18 @@ export function AtlasView() {
             onSelectTrip={selectTrip}
             onCopyLink={() => {
               if (!selectedCity) return;
-              const url = `${window.location.origin}/map?city=${encodeURIComponent(selectedCity)}`;
-              void navigator.clipboard.writeText(url);
+              const url = `${window.location.origin}/explore/atlas?city=${encodeURIComponent(selectedCity)}`;
+              if (!navigator.clipboard) {
+                flash('Couldn’t reach the clipboard.', { variant: 'error' });
+                return;
+              }
+              void navigator.clipboard
+                .writeText(url)
+                .then(() => flash(`Copied a link to ${selectedCity}`))
+                .catch(() => flash('Couldn’t reach the clipboard.', { variant: 'error' }));
             }}
             onCompare={
-              selectedEntry && !selectedTrip
-                ? () => startCompare(selectedEntry.city)
-                : undefined
+              selectedEntry && !selectedTrip ? () => startCompare(selectedEntry.city) : undefined
             }
           />
         )}

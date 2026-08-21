@@ -14,6 +14,7 @@ import {
   Section,
   Skeleton,
   SkeletonRows,
+  StatusTrace,
   type GlyphName,
 } from '@vitae/ui';
 import { api } from '../lib/api.js';
@@ -27,7 +28,13 @@ interface StagedRow {
   subtitle: string | null;
   payload: Record<string, unknown>;
   confidence: number;
-  dup: { nodeId: string; nodeTitle: string; weight: number; verdict: string; evidence: string[] } | null;
+  dup: {
+    nodeId: string;
+    nodeTitle: string;
+    weight: number;
+    verdict: string;
+    evidence: string[];
+  } | null;
   decision: 'accept' | 'skip';
   status: string;
 }
@@ -38,7 +45,13 @@ export interface Batch {
   filename: string | null;
   status: 'staged' | 'committed' | 'discarded' | 'rolled_back';
   created_at: string;
-  stats: { rows: number; accepted: number; dupCandidates: number; created?: number; failed?: number };
+  stats: {
+    rows: number;
+    accepted: number;
+    dupCandidates: number;
+    created?: number;
+    failed?: number;
+  };
 }
 interface SettingsResp {
   github: { configured: boolean; lastSyncAt: string | null };
@@ -46,13 +59,53 @@ interface SettingsResp {
 
 type Kind = 'linkedin' | 'contacts' | 'calendar' | 'bookmarks' | 'resume' | 'aperture';
 
-const IMPORTERS: Array<{ kind: Kind | 'github'; glyph: GlyphName; name: string; desc: string; accept?: string }> = [
-  { kind: 'linkedin', glyph: 'person', name: 'LinkedIn export', desc: 'Positions, Education, Skills, Connections CSVs', accept: '.csv' },
-  { kind: 'github', glyph: 'repository', name: 'GitHub sync', desc: 'Repos → repository nodes, languages → skills' },
-  { kind: 'contacts', glyph: 'person', name: 'Contacts', desc: 'vCard (.vcf) or CSV address book', accept: '.vcf,.csv,.txt' },
-  { kind: 'resume', glyph: 'resume', name: 'Résumé disassembly', desc: 'Paste text, lines become résumé atoms' },
-  { kind: 'bookmarks', glyph: 'link', name: 'Bookmarks', desc: 'Browser bookmarks HTML export', accept: '.html,.htm' },
-  { kind: 'calendar', glyph: 'calendar', name: 'Calendar', desc: 'ICS events: RRULE kept, not expanded', accept: '.ics' },
+const IMPORTERS: Array<{
+  kind: Kind | 'github';
+  glyph: GlyphName;
+  name: string;
+  desc: string;
+  accept?: string;
+}> = [
+  {
+    kind: 'linkedin',
+    glyph: 'person',
+    name: 'LinkedIn export',
+    desc: 'Positions, Education, Skills, Connections CSVs',
+    accept: '.csv',
+  },
+  {
+    kind: 'github',
+    glyph: 'repository',
+    name: 'GitHub sync',
+    desc: 'Repos → repository nodes, languages → skills',
+  },
+  {
+    kind: 'contacts',
+    glyph: 'person',
+    name: 'Contacts',
+    desc: 'vCard (.vcf) or CSV address book',
+    accept: '.vcf,.csv,.txt',
+  },
+  {
+    kind: 'resume',
+    glyph: 'resume',
+    name: 'Résumé disassembly',
+    desc: 'Paste text, lines become résumé atoms',
+  },
+  {
+    kind: 'bookmarks',
+    glyph: 'link',
+    name: 'Bookmarks',
+    desc: 'Browser bookmarks HTML export',
+    accept: '.html,.htm',
+  },
+  {
+    kind: 'calendar',
+    glyph: 'calendar',
+    name: 'Calendar',
+    desc: 'ICS events: RRULE kept, not expanded',
+    accept: '.ics',
+  },
   {
     kind: 'aperture',
     glyph: 'graph',
@@ -91,27 +144,30 @@ export function sourceStatus(
   };
 }
 
-const STATUS_COLOR: Record<SourceStatus['tone'], string> = {
-  muted: 'var(--ae-muted)',
-  warning: 'var(--ae-warning)',
-  success: 'var(--ae-success)',
-  danger: 'var(--ae-danger)',
-};
-
 /** Bulk seeding with staging, review, commit, and per-batch rollback. */
 export function ImportHub() {
   const [active, setActive] = useState<string | null>(null);
   const [pasteOpen, setPasteOpen] = useState(false);
   const [pasteText, setPasteText] = useState('');
-  const [mapperCsv, setMapperCsv] = useState<{ filename: string; content: string; headers: string[] } | null>(null);
+  const [mapperCsv, setMapperCsv] = useState<{
+    filename: string;
+    content: string;
+    headers: string[];
+  } | null>(null);
   const [fileAccept, setFileAccept] = useState<string | undefined>(undefined);
   const fileInput = useRef<HTMLInputElement | null>(null);
-  const pendingKind = useRef<Kind>('linkedin');
+  const [pendingKind, setPendingKind] = useState<Kind>('linkedin');
   const qc = useQueryClient();
   const { flash } = useToast();
 
-  const batches = useQuery({ queryKey: ['imports'], queryFn: () => api.get<{ batches: Batch[] }>('/imports') });
-  const settings = useQuery({ queryKey: ['settings'], queryFn: () => api.get<SettingsResp>('/settings') });
+  const batches = useQuery({
+    queryKey: ['imports'],
+    queryFn: () => api.get<{ batches: Batch[] }>('/imports'),
+  });
+  const settings = useQuery({
+    queryKey: ['settings'],
+    queryFn: () => api.get<SettingsResp>('/settings'),
+  });
   const batch = useQuery({
     queryKey: ['import', active],
     queryFn: () => api.get<{ batch: Batch; rows: StagedRow[] }>(`/imports/${active}`),
@@ -125,14 +181,21 @@ export function ImportHub() {
         api.get<{ nodes: Array<{ id: string; title: string }> }>('/nodes?type=role&limit=100'),
         api.get<{ nodes: Array<{ id: string; title: string }> }>('/nodes?type=project&limit=100'),
       ]);
-      return [...roles.nodes.map((n) => ({ ...n, kind: 'role' })), ...projects.nodes.map((n) => ({ ...n, kind: 'project' }))];
+      return [
+        ...roles.nodes.map((n) => ({ ...n, kind: 'role' })),
+        ...projects.nodes.map((n) => ({ ...n, kind: 'project' })),
+      ];
     },
     enabled: batch.data?.rows.some((r) => r.entity === 'atom') ?? false,
   });
 
   const stage = useMutation({
-    mutationFn: (body: { kind: Kind; filename?: string | null; content: string; mapping?: Record<string, string> }) =>
-      api.post<{ batch: Batch; rows: StagedRow[] }>('/imports', body),
+    mutationFn: (body: {
+      kind: Kind;
+      filename?: string | null;
+      content: string;
+      mapping?: Record<string, string>;
+    }) => api.post<{ batch: Batch; rows: StagedRow[] }>('/imports', body),
     onSuccess: (res) => {
       void qc.invalidateQueries({ queryKey: ['imports'] });
       setActive(res.batch.id);
@@ -143,7 +206,8 @@ export function ImportHub() {
   });
 
   const githubSync = useMutation({
-    mutationFn: () => api.post<{ status: string; created: number; updated: number }>('/imports/github/sync'),
+    mutationFn: () =>
+      api.post<{ status: string; created: number; updated: number }>('/imports/github/sync'),
     onSuccess: (r) => {
       void qc.invalidateQueries();
       flash(
@@ -171,7 +235,7 @@ export function ImportHub() {
       setPasteOpen(true);
       return;
     }
-    pendingKind.current = kind;
+    setPendingKind(kind);
     setFileAccept(IMPORTERS.find((im) => im.kind === kind)?.accept);
     // Defer the click so the accept attribute is committed before the chooser opens.
     queueMicrotask(() => fileInput.current?.click());
@@ -181,11 +245,18 @@ export function ImportHub() {
     const reader = new FileReader();
     reader.onload = () => {
       const content = String(reader.result ?? '');
-      const kind = pendingKind.current;
+      const kind = pendingKind;
       if (kind === 'contacts' && !/BEGIN:VCARD/i.test(content)) {
         const headers = (content.split(/\r?\n/, 1)[0] ?? '')
           .split(',')
-          .map((h) => h.replace(/^"|"$/g, '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, ''))
+          .map((h) =>
+            h
+              .replace(/^"|"$/g, '')
+              .trim()
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '_')
+              .replace(/^_+|_+$/g, ''),
+          )
           .filter(Boolean);
         const known = ['name', 'full_name', 'first_name', 'given_name'];
         if (!headers.some((h) => known.includes(h))) {
@@ -199,8 +270,15 @@ export function ImportHub() {
   }
 
   const rowDecision = useMutation({
-    mutationFn: ({ rowId, decision, payload }: { rowId: string; decision?: 'accept' | 'skip'; payload?: Record<string, unknown> }) =>
-      api.patch(`/imports/${active}/rows/${rowId}`, { decision, payload }),
+    mutationFn: ({
+      rowId,
+      decision,
+      payload,
+    }: {
+      rowId: string;
+      decision?: 'accept' | 'skip';
+      payload?: Record<string, unknown>;
+    }) => api.patch(`/imports/${active}/rows/${rowId}`, { decision, payload }),
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['import', active] }),
   });
 
@@ -209,13 +287,16 @@ export function ImportHub() {
     onSuccess: (r) => {
       const batchId = active;
       void qc.invalidateQueries();
-      flash(`Committed ${r.created} records${r.failed ? ` · ${r.failed} rows failed and stayed staged` : ''}`, {
-        undo: async () => {
-          await api.post(`/imports/${batchId}/rollback`);
-          await qc.invalidateQueries();
-          flash('Import rolled back. Records removed');
+      flash(
+        `Committed ${r.created} records${r.failed ? ` · ${r.failed} rows failed and stayed staged` : ''}`,
+        {
+          undo: async () => {
+            await api.post(`/imports/${batchId}/rollback`);
+            await qc.invalidateQueries();
+            flash('Import rolled back. Records removed');
+          },
         },
-      });
+      );
       setActive(null);
     },
   });
@@ -256,23 +337,27 @@ export function ImportHub() {
   const accepted = rows.filter((r) => r.decision === 'accept');
   const isStaged = batch.data?.batch.status === 'staged';
   const busy = stage.isPending || githubSync.isPending;
+  const preparingSource = pasteOpen || Boolean(mapperCsv);
 
   return (
-    <div className="page">
+    <div className="page data-workspace-page data-import-page">
       <PageHeader
         title="Import"
-        subtitle="Everything stages first. Nothing commits without review, and every batch rolls back as a unit."
+        subtitle="Bring records in through a reviewable chain of custody. Files stay isolated until you commit them."
         help={
           <InfoPopover title="Why staging">
             <p>
-              An import parses and dedupe-checks before it writes. You accept or skip each row, then commit :
-              or discard the batch and leave the graph untouched.
+              A file import parses and checks for duplicates before it writes. You accept or skip
+              each row, then commit—or discard the batch and leave the graph untouched.
             </p>
-            <p>A committed batch can still be rolled back; the records it created are removed together.</p>
+            <p>
+              GitHub syncs directly after connection. Every committed file batch can still be rolled
+              back as one unit.
+            </p>
           </InfoPopover>
         }
         actions={
-          <Link to="/import/duplicates" className="vt-btn vt-btn--sm">
+          <Link to="/data/identity" className="vt-btn vt-btn--sm">
             <Glyph name="merge" size={14} /> Duplicates
           </Link>
         }
@@ -292,6 +377,93 @@ export function ImportHub() {
         label={stagedCount > 0 ? 'Staged imports waiting for review' : undefined}
       />
 
+      <nav className="data-process" aria-label="Import workflow">
+        <ol>
+          <li
+            data-state={active || busy || preparingSource ? 'done' : 'current'}
+            aria-current={!active && !busy && !preparingSource ? 'step' : undefined}
+          >
+            <span className="data-process__node" aria-hidden />
+            <span>
+              <strong>Choose source</strong>
+              <small>File, text, or connected service</small>
+            </span>
+          </li>
+          <li
+            data-state={active ? 'done' : busy || preparingSource ? 'current' : 'upcoming'}
+            aria-current={!active && (busy || preparingSource) ? 'step' : undefined}
+          >
+            <span className="data-process__node" aria-hidden />
+            <span>
+              <strong>Read safely</strong>
+              <small>Parse and check identity</small>
+            </span>
+          </li>
+          <li
+            data-state={active && isStaged ? 'current' : active ? 'done' : 'upcoming'}
+            aria-current={active && isStaged ? 'step' : undefined}
+          >
+            <span className="data-process__node" aria-hidden />
+            <span>
+              <strong>Review evidence</strong>
+              <small>Accept, skip, or reassign</small>
+            </span>
+          </li>
+          <li
+            data-state={active && !isStaged ? 'current' : 'upcoming'}
+            aria-current={active && !isStaged ? 'step' : undefined}
+          >
+            <span className="data-process__node" aria-hidden />
+            <span>
+              <strong>Commit or undo</strong>
+              <small>One batch, one recovery unit</small>
+            </span>
+          </li>
+        </ol>
+      </nav>
+
+      <div className="data-operation-trace">
+        {stage.isPending ? (
+          <StatusTrace
+            tone="live"
+            label="Reading source into staging"
+            detail="The graph is unchanged"
+          />
+        ) : stage.isError ? (
+          <StatusTrace
+            tone="danger"
+            label="Source could not be staged"
+            detail={(stage.error as Error).message}
+          />
+        ) : githubSync.isPending ? (
+          <StatusTrace tone="live" label="Syncing GitHub records" detail="Checking for changes" />
+        ) : githubSync.isError ? (
+          <StatusTrace
+            tone="danger"
+            label="GitHub sync stopped"
+            detail={(githubSync.error as Error).message}
+          />
+        ) : active && batch.data ? (
+          <StatusTrace
+            tone={
+              isStaged ? 'warning' : batch.data.batch.status === 'committed' ? 'success' : 'neutral'
+            }
+            label={isStaged ? 'Batch isolated from the graph' : `Batch ${batch.data.batch.status}`}
+            detail={
+              isStaged
+                ? `${accepted.length} of ${rows.length} rows accepted`
+                : batch.data.batch.kind
+            }
+          />
+        ) : stagedCount > 0 ? (
+          <StatusTrace
+            tone="warning"
+            label={`${stagedCount} ${stagedCount === 1 ? 'batch needs' : 'batches need'} review`}
+            detail="Open one from batch history"
+          />
+        ) : null}
+      </div>
+
       <input
         ref={fileInput}
         type="file"
@@ -307,62 +479,79 @@ export function ImportHub() {
       />
 
       <Section title="Sources" meta={IMPORTERS.length}>
-        <div className="imp__cards">
-          {IMPORTERS.map((im) => {
+        <ol className="imp__cards data-source-ledger">
+          {IMPORTERS.map((im, index) => {
             const st = sourceStatus(im.kind, lastByKind, settings.data?.github, settingsState);
             const pending =
-              (im.kind === 'github' && githubSync.isPending) || (im.kind !== 'github' && stage.isPending && pendingKind.current === im.kind);
+              (im.kind === 'github' && githubSync.isPending) ||
+              (im.kind !== 'github' && stage.isPending && pendingKind === im.kind);
             return (
-              <button
-                key={im.kind}
-                type="button"
-                className="imp__card"
-                onClick={() => openImporter(im.kind)}
-                disabled={busy}
-                aria-label={
-                  im.kind === 'github'
-                    ? `Sync GitHub: ${st.label}`
-                    : im.kind === 'resume'
-                      ? `Open résumé disassembly: ${st.label}`
-                      : `Import ${im.name}: ${st.label}`
-                }
-              >
-                <div className="spread">
+              <li key={im.kind}>
+                <button
+                  type="button"
+                  className="imp__card"
+                  onClick={() => openImporter(im.kind)}
+                  disabled={busy || (im.kind === 'github' && settings.isLoading)}
+                  aria-label={
+                    im.kind === 'github'
+                      ? `Sync GitHub: ${st.label}`
+                      : im.kind === 'resume'
+                        ? `Open résumé disassembly: ${st.label}`
+                        : `Import ${im.name}: ${st.label}`
+                  }
+                >
+                  <Mono className="data-ledger-index" aria-hidden>
+                    {String(index + 1).padStart(2, '0')}
+                  </Mono>
                   <span className="imp__glyph" aria-hidden>
                     <Glyph name={im.glyph} size={16} />
                   </span>
-                  <Mono style={{ fontSize: 10, color: STATUS_COLOR[st.tone] }}>{pending ? 'working…' : st.label}</Mono>
-                </div>
-                <div className="imp__name">{im.name}</div>
-                <div className="imp__desc">{im.desc}</div>
-              </button>
+                  <span className="data-source-ledger__copy">
+                    <span className="imp__name">{im.name}</span>
+                    <span className="imp__desc">{im.desc}</span>
+                  </span>
+                  <Mono className="data-source-ledger__status" data-tone={st.tone}>
+                    <span className="data-state-dot" aria-hidden />
+                    {pending ? 'working…' : st.label}
+                  </Mono>
+                  <Glyph
+                    name="chevron-down"
+                    size={14}
+                    className="data-source-ledger__chevron"
+                    aria-hidden
+                  />
+                </button>
+              </li>
             );
           })}
-        </div>
+        </ol>
       </Section>
 
       {pasteOpen && (
         <Section title="Résumé disassembly">
-          <p className="m-0 mb-3 text-sm text-ink-soft">
-            Paste résumé text. Substantial lines become candidate atoms; assign each to a role or project, then commit.
-          </p>
-          <textarea
-            className="textarea"
-            rows={10}
-            aria-label="Résumé text to disassemble"
-            placeholder="Paste your résumé text here…"
-            value={pasteText}
-            onChange={(e) => setPasteText(e.target.value)}
-          />
-          <div className="hstack" style={{ marginTop: 10 }}>
-            <Button
-              variant="primary"
-              disabled={!pasteText.trim() || stage.isPending}
-              onClick={() => stage.mutate({ kind: 'resume', content: pasteText })}
-            >
-              {stage.isPending ? 'Staging…' : 'Disassemble'}
-            </Button>
-            <Button onClick={() => setPasteOpen(false)}>Cancel</Button>
+          <div className="data-stage-editor">
+            <p className="m-0 mb-3 text-sm text-ink-soft">
+              Paste résumé text. Substantial lines become candidate atoms; assign each to a role or
+              project, then commit.
+            </p>
+            <textarea
+              className="textarea"
+              rows={10}
+              aria-label="Résumé text to disassemble"
+              placeholder="Paste your résumé text here…"
+              value={pasteText}
+              onChange={(e) => setPasteText(e.target.value)}
+            />
+            <div className="hstack" style={{ marginTop: 10 }}>
+              <Button
+                variant="primary"
+                disabled={!pasteText.trim() || stage.isPending}
+                onClick={() => stage.mutate({ kind: 'resume', content: pasteText })}
+              >
+                {stage.isPending ? 'Staging…' : 'Disassemble'}
+              </Button>
+              <Button onClick={() => setPasteOpen(false)}>Cancel</Button>
+            </div>
           </div>
         </Section>
       )}
@@ -373,7 +562,12 @@ export function ImportHub() {
           filename={mapperCsv.filename}
           onCancel={() => setMapperCsv(null)}
           onConfirm={(mapping) =>
-            stage.mutate({ kind: 'contacts', filename: mapperCsv.filename, content: mapperCsv.content, mapping })
+            stage.mutate({
+              kind: 'contacts',
+              filename: mapperCsv.filename,
+              content: mapperCsv.content,
+              mapping,
+            })
           }
         />
       )}
@@ -409,14 +603,16 @@ export function ImportHub() {
                   : '.'}
               </p>
               {rows.length === 0 ? (
-                <EmptyState glyph="capture" title="This batch has no rows" hint="Discard it and import again from a source above." />
+                <EmptyState
+                  glyph="capture"
+                  title="This batch has no rows"
+                  hint="Discard it and import again from a source above."
+                />
               ) : (
-                <div className="imp__panel" style={{ maxHeight: 420, overflowY: 'auto' }}>
+                <div className="imp__panel data-import-review" aria-busy={rowDecision.isPending}>
                   {rows.map((r) => (
-                    <div key={r.id} className="imp__row">
-                      <Mono className="u-faint" style={{ width: 70, fontSize: 11 }}>
-                        {r.entity}
-                      </Mono>
+                    <div key={r.id} className="imp__row data-import-row" data-decision={r.decision}>
+                      <Mono className="u-faint data-import-row__kind">{r.entity}</Mono>
                       <div className="row__main">
                         <div className="row__title">{r.title}</div>
                         {r.subtitle && <div className="row__sub">{r.subtitle}</div>}
@@ -424,10 +620,15 @@ export function ImportHub() {
                       {r.entity === 'atom' && isStaged && (
                         <select
                           className="input"
-                          style={{ width: 180 }}
+                          disabled={rowDecision.isPending || owners.isLoading || owners.isError}
                           aria-label={`Assign ${r.title} to a role or project`}
                           value={(r.payload.owner_node as string) ?? ''}
-                          onChange={(e) => rowDecision.mutate({ rowId: r.id, payload: { owner_node: e.target.value } })}
+                          onChange={(e) =>
+                            rowDecision.mutate({
+                              rowId: r.id,
+                              payload: { owner_node: e.target.value },
+                            })
+                          }
                         >
                           <option value="">assign to…</option>
                           {(owners.data ?? []).map((o) => (
@@ -437,7 +638,7 @@ export function ImportHub() {
                           ))}
                         </select>
                       )}
-                      <Mono className="u-faint" style={{ fontSize: 11 }}>
+                      <Mono className="u-faint data-import-row__confidence">
                         conf {r.confidence.toFixed(2)}
                       </Mono>
                       {r.dup ? (
@@ -454,6 +655,7 @@ export function ImportHub() {
                         <button
                           type="button"
                           className={`imp__toggle${r.decision === 'accept' ? ' imp__toggle--on' : ''}`}
+                          disabled={rowDecision.isPending}
                           aria-pressed={r.decision === 'accept'}
                           aria-label={
                             r.decision === 'accept'
@@ -474,10 +676,53 @@ export function ImportHub() {
                   ))}
                 </div>
               )}
+              {owners.isLoading ? (
+                <StatusTrace
+                  tone="live"
+                  label="Loading résumé destinations"
+                  detail="Roles and projects"
+                />
+              ) : owners.isError ? (
+                <StatusTrace
+                  tone="danger"
+                  label="Résumé destinations unavailable"
+                  detail={(owners.error as Error).message}
+                />
+              ) : rowDecision.isPending ? (
+                <StatusTrace
+                  tone="live"
+                  label="Saving row decision"
+                  detail="Review remains in staging"
+                />
+              ) : rowDecision.isError ? (
+                <StatusTrace
+                  tone="danger"
+                  label="Row decision was not saved"
+                  detail={(rowDecision.error as Error).message}
+                />
+              ) : commit.isError ? (
+                <StatusTrace
+                  tone="danger"
+                  label="Batch was not committed"
+                  detail={(commit.error as Error).message}
+                />
+              ) : discard.isError ? (
+                <StatusTrace
+                  tone="danger"
+                  label="Batch was not discarded"
+                  detail={(discard.error as Error).message}
+                />
+              ) : rollback.isError ? (
+                <StatusTrace
+                  tone="danger"
+                  label="Batch was not rolled back"
+                  detail={(rollback.error as Error).message}
+                />
+              ) : null}
               <div className="imp__stagfoot">
                 <Mono style={{ fontSize: 11, color: 'var(--ae-faint)' }}>
-                  {rows.filter((r) => !r.dup).length} new · {rows.filter((r) => r.dup).length} candidates ·{' '}
-                  {rows.filter((r) => r.status === 'committed').length} committed
+                  {rows.filter((r) => !r.dup).length} new · {rows.filter((r) => r.dup).length}{' '}
+                  candidates · {rows.filter((r) => r.status === 'committed').length} committed
                 </Mono>
                 <div className="hstack">
                   {isStaged ? (
@@ -541,11 +786,14 @@ export function ImportHub() {
           // activates with Enter/Space. The Roll back action is a sibling, not
           // a nested button (nesting interactive elements is invalid).
           <div className="imp__panel">
-            {history.map((b) => {
+            {history.map((b, index) => {
               const when = b.created_at.slice(0, 10);
               const created = b.stats.created ?? b.stats.rows;
               return (
                 <div key={b.id} className="imp__row">
+                  <Mono className="data-ledger-index" aria-hidden>
+                    {String(index + 1).padStart(2, '0')}
+                  </Mono>
                   <button
                     type="button"
                     className="imp__rowmain"
@@ -553,9 +801,7 @@ export function ImportHub() {
                     aria-label={`Open ${b.kind} import from ${when}: ${b.status}`}
                     aria-current={active === b.id ? 'true' : undefined}
                   >
-                    <Mono className="u-faint" style={{ width: 84, fontSize: 11 }}>
-                      {when}
-                    </Mono>
+                    <Mono className="u-faint data-import-history__date">{when}</Mono>
                     <div className="row__main">
                       <div className="row__title">
                         {b.kind}
@@ -568,7 +814,16 @@ export function ImportHub() {
                         {b.stats.failed ? ` · ${b.stats.failed} need attention` : ''}
                       </div>
                     </div>
-                    <Chip tone={b.status === 'staged' ? 'warning' : b.status === 'committed' ? 'success' : 'default'} mono>
+                    <Chip
+                      tone={
+                        b.status === 'staged'
+                          ? 'warning'
+                          : b.status === 'committed'
+                            ? 'success'
+                            : 'default'
+                      }
+                      mono
+                    >
                       {b.status}
                     </Chip>
                   </button>
@@ -628,9 +883,10 @@ function CsvMapper({
   return (
     <Section title={`Map columns: ${filename}`}>
       <p className="m-0 mb-3 text-sm text-ink-soft">
-        This CSV&apos;s headers weren&apos;t recognized. Point each field at the right column (only name is required).
+        This CSV&apos;s headers weren&apos;t recognized. Point each field at the right column (only
+        name is required).
       </p>
-      <div className="grid-2">
+      <div className="grid-2 data-column-map">
         {FIELDS.map((f) => (
           <div key={f} className="field">
             <label className="label" htmlFor={`${ids}-${f}`}>
@@ -642,7 +898,7 @@ function CsvMapper({
               value={map[f] ?? ''}
               onChange={(e) => setMap((m) => ({ ...m, [f]: e.target.value }))}
             >
-              <option value="">: </option>
+              <option value="">Ignore this field</option>
               {headers.map((h) => (
                 <option key={h} value={h}>
                   {h}

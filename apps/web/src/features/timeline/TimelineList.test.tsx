@@ -52,7 +52,7 @@ describe('TimelineList', () => {
         onSelect={() => {}}
       />,
     );
-    expect(screen.getByText('Nothing dated yet')).toBeInTheDocument();
+    expect(screen.getByText('Nothing dated in these lanes')).toBeInTheDocument();
   });
 
   it('groups by year, hides moments when asked, and selects a row', async () => {

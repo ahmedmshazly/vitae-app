@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { factorLabel, intentFromParams, intentIsAskable, intentToParams, matchedTheAsk } from './Ask.js';
+import {
+  contactLensHref,
+  factorExplanation,
+  factorLabel,
+  intentFromParams,
+  intentIsAskable,
+  intentToParams,
+  matchedTheAsk,
+  reachLensHref,
+} from './Ask.js';
 
 const params = (s: string) => new URLSearchParams(s);
 
@@ -26,14 +35,21 @@ describe('intentIsAskable', () => {
 
 describe('intent round-trip', () => {
   it('survives the URL, which is what makes an ask linkable', () => {
-    const intent = { need: 'intro', org: 'Nile Robotics', topics: 'reinforcement learning, hiring', city: 'Berlin' };
+    const intent = {
+      need: 'intro',
+      org: 'Nile Robotics',
+      topics: 'reinforcement learning, hiring',
+      city: 'Berlin',
+    };
     const back = intentFromParams(intentToParams(intent));
     expect(back).toEqual(intent);
   });
 
   it('marks an explicit ask so a reload re-runs it', () => {
     expect(intentToParams({ need: 'advice', org: '', topics: '', city: '' }).get('run')).toBe('1');
-    expect(intentIsAskable(intentToParams({ need: 'advice', org: '', topics: '', city: '' }))).toBe(true);
+    expect(intentIsAskable(intentToParams({ need: 'advice', org: '', topics: '', city: '' }))).toBe(
+      true,
+    );
   });
 
   it('leaves empty fields out of the URL rather than writing org=', () => {
@@ -43,14 +59,44 @@ describe('intent round-trip', () => {
     expect(q.get('topics')).toBe('ml');
   });
 
+  it('keeps an explicit ask on the canonical contact lens', () => {
+    expect(
+      intentToParams({ need: 'intro', org: 'Nile Robotics', topics: '', city: '' }).get('lens'),
+    ).toBe('contact');
+  });
+
   it('defaults a missing need rather than ranking for undefined', () => {
     expect(intentFromParams(params('topics=ml')).need).toBe('referral');
   });
 });
 
+describe('network intelligence links', () => {
+  it('keeps the current ask on the canonical contact lens', () => {
+    const href = contactLensHref(
+      { need: 'intro', org: 'Nile Robotics', topics: 'robotics', city: 'Cairo' },
+      true,
+    );
+    const url = new URL(href, 'https://vitae.local');
+    expect(url.pathname).toBe('/network/intelligence');
+    expect(url.searchParams.get('lens')).toBe('contact');
+    expect(url.searchParams.get('org')).toBe('Nile Robotics');
+    expect(url.searchParams.get('run')).toBe('1');
+  });
+
+  it('hands an organization name to the warm-path lens without inventing an id', () => {
+    const url = new URL(reachLensHref('Nile Robotics'), 'https://vitae.local');
+    expect(url.pathname).toBe('/network/intelligence');
+    expect(url.searchParams.get('lens')).toBe('reach');
+    expect(url.searchParams.get('orgName')).toBe('Nile Robotics');
+    expect(url.searchParams.has('org')).toBe(false);
+  });
+});
+
 describe('factorLabel', () => {
   it('prefers what the ranker said about this particular match', () => {
-    expect(factorLabel({ factor: 'topic', raw: 1, weighted: 1.6, detail: 'via topics' })).toBe('via topics');
+    expect(factorLabel({ factor: 'topic', raw: 1, weighted: 1.6, detail: 'via topics' })).toBe(
+      'via topics',
+    );
   });
 
   // "graph" and "reciprocity" are the algorithm's words, not a reader's.
@@ -65,6 +111,24 @@ describe('factorLabel', () => {
   });
 });
 
+describe('factorExplanation', () => {
+  it('explains ranker vocabulary as recorded evidence and relationship context', () => {
+    expect(factorExplanation({ factor: 'topic', raw: 1, weighted: 0.4 })).toContain('topics');
+    expect(factorExplanation({ factor: 'graph', raw: 1, weighted: 0.2 })).toContain(
+      'relationship network',
+    );
+    expect(factorExplanation({ factor: 'strength', raw: 1, weighted: 0.8 })).toContain(
+      'relationship strength',
+    );
+  });
+
+  it('gives an unknown factor an honest generic explanation', () => {
+    expect(factorExplanation({ factor: 'custom', raw: 1, weighted: 0.1 })).toBe(
+      'A recorded custom signal contributed to this rank.',
+    );
+  });
+});
+
 describe('matchedTheAsk', () => {
   const chip = (factor: string, weighted: number) => ({ factor, raw: 1, weighted });
 
@@ -73,7 +137,9 @@ describe('matchedTheAsk', () => {
   // know them. A high total is not a match.
   it('is false when the leader ranks only on the relationship', () => {
     expect(matchedTheAsk([chip('strength', 1.2), chip('graph', 0.27)])).toBe(false);
-    expect(matchedTheAsk([chip('strength', 5), chip('pinned', 1), chip('reciprocity', 2)])).toBe(false);
+    expect(matchedTheAsk([chip('strength', 5), chip('pinned', 1), chip('reciprocity', 2)])).toBe(
+      false,
+    );
   });
 
   it('is true when any factor answers the question that was asked', () => {

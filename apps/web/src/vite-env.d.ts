@@ -6,6 +6,7 @@ interface ImportMetaEnv {
   readonly VITE_FIREBASE_AUTH_DOMAIN: string;
   readonly VITE_FIREBASE_PROJECT_ID: string;
   readonly VITE_FIREBASE_USE_EMULATOR: string;
+  readonly VITE_PUBLIC_REPOSITORY_URL?: string;
 }
 interface ImportMeta {
   readonly env: ImportMetaEnv;

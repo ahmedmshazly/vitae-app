@@ -66,8 +66,7 @@ const EMPTY_BLOCKS: LetterBlock[] = [
 ];
 
 function atomLabel(atom: AtomRow): string {
-  const text =
-    atom.variants.find((v) => v.is_default)?.text ?? atom.variants[0]?.text ?? atom.id;
+  const text = atom.variants.find((v) => v.is_default)?.text ?? atom.variants[0]?.text ?? atom.id;
   const short = text.length > 72 ? `${text.slice(0, 72)}…` : text;
   return atom.owner_title ? `${atom.owner_title} - ${short}` : short;
 }
@@ -97,9 +96,7 @@ export function Letters() {
   const lettersQuery = useQuery({
     queryKey: ['letters', statusFilter === 'archived'],
     queryFn: () =>
-      api.get<{ letters: Letter[] }>(
-        `/letters?includeDeleted=${statusFilter === 'archived'}`,
-      ),
+      api.get<{ letters: Letter[] }>(`/letters?includeDeleted=${statusFilter === 'archived'}`),
   });
   const lettersData = lettersQuery.data;
   const isLoading = lettersQuery.isLoading;
@@ -127,10 +124,7 @@ export function Letters() {
     () => (resumesData?.resumes ?? []).filter((r) => !r.deleted_at),
     [resumesData],
   );
-  const atoms = useMemo(
-    () => (atomsData?.atoms ?? []).filter((a) => !a.deleted_at),
-    [atomsData],
-  );
+  const atoms = useMemo(() => (atomsData?.atoms ?? []).filter((a) => !a.deleted_at), [atomsData]);
   const targetsById = useMemo(() => new Map(targets.map((t) => [t.id, t])), [targets]);
 
   const letters = useMemo(() => {
@@ -321,7 +315,7 @@ export function Letters() {
                 New letter
               </Button>
             ) : (
-              <Link className="vt-btn vt-btn--primary" to="/resume/tailor">
+              <Link className="vt-btn vt-btn--primary" to="/career/resume/tailor">
                 Add a target first
               </Link>
             )

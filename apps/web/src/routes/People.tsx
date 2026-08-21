@@ -6,13 +6,11 @@ import {
   Chip,
   EmptyState,
   EntityGlyph,
-  ErrorState,
   FilterGroup,
   Mono,
   PageHeader,
   RegisterRule,
   Section,
-  SkeletonRows,
   StrengthBar,
 } from '@vitae/ui';
 import { personRelationLabel } from '@vitae/core';
@@ -28,6 +26,7 @@ import {
   useVisibleSelection,
 } from '../features/BulkNodeDelete.js';
 import { entityHref } from '../lib/entity-href.js';
+import { QueryBoundary } from '../components/QueryBoundary.js';
 
 interface PersonItem {
   id: string;
@@ -65,10 +64,11 @@ type FilterKey = (typeof FILTERS)[number]['key'];
 export function People() {
   const [filter, setFilter] = useState<FilterKey>('all');
   const bulk = useBulkNodeDelete({ noun: 'person', nouns: 'people' });
-  const { data, isLoading, isError, error, refetch } = useQuery({
+  const peopleQuery = useQuery({
     queryKey: ['people'],
     queryFn: () => api.get<{ people: PersonItem[] }>('/people'),
   });
+  const data = peopleQuery.data;
 
   const people = useMemo(() => {
     if (!data) return [] as PersonItem[];
@@ -78,7 +78,9 @@ export function People() {
         (p) =>
           p.status === 'decaying' ||
           p.status === 'dormant' ||
-          (p.cadenceTargetDays != null && p.daysSinceLast != null && p.daysSinceLast > p.cadenceTargetDays),
+          (p.cadenceTargetDays != null &&
+            p.daysSinceLast != null &&
+            p.daysSinceLast > p.cadenceTargetDays),
       );
     } else if (filter === 'closest') {
       list = list.filter((p) => (p.closeness ?? 0) >= 4);
@@ -99,30 +101,7 @@ export function People() {
     [data, bulk.selected],
   );
 
-  if (isError) {
-    return (
-      <div className="page">
-        <PageHeader title="People" />
-        <RegisterRule />
-        <ErrorState
-          title="Couldn’t load your people"
-          detail={(error as Error | null)?.message}
-          onRetry={() => void refetch()}
-        />
-      </div>
-    );
-  }
-  if (isLoading || !data) {
-    return (
-      <div className="page">
-        <PageHeader title="People" subtitle="Loading…" />
-        <RegisterRule />
-        <SkeletonRows rows={8} />
-      </div>
-    );
-  }
-
-  const total = data.people.length;
+  const total = data?.people.length ?? 0;
   const filtered = filter !== 'all';
 
   return (
@@ -130,16 +109,20 @@ export function People() {
       <PageHeader
         title="People"
         subtitle={
-          <>
-            <Mono className="text-faint">{total}</Mono> {total === 1 ? 'person' : 'people'}
-            {filtered && (
-              <>
-                {' · '}
-                <Mono className="text-faint">{people.length}</Mono> shown
-              </>
-            )}
-            {' · sorted by tie strength'}
-          </>
+          data ? (
+            <>
+              <Mono className="text-faint">{total}</Mono> {total === 1 ? 'person' : 'people'}
+              {filtered && (
+                <>
+                  {' · '}
+                  <Mono className="text-faint">{people.length}</Mono> shown
+                </>
+              )}
+              {' · sorted by tie strength'}
+            </>
+          ) : (
+            'Loading…'
+          )
         }
         actions={
           <>
@@ -171,13 +154,26 @@ export function People() {
         }}
       />
 
-      <Section title={filtered ? FILTERS.find((f) => f.key === filter)!.label : 'Everyone'} meta={people.length}>
-        {people.length === 0 ? (
-          filtered ? (
-            // The empty check used the *filtered* list, so a filter matching
-            // nothing showed "No one here yet - add people you know" on a graph
-            // of 118. Nothing-here-yet and nothing-matched need different words
-            // and different actions.
+      <QueryBoundary
+        query={peopleQuery}
+        loadingLabel="Loading"
+        skeletonRows={8}
+        errorTitle="Couldn’t load your people"
+        filtered={filtered}
+        isEmpty={() => people.length === 0}
+        isSourceEmpty={(resolved) => resolved.people.length === 0}
+        empty={
+          <Section title="Everyone" meta={0}>
+            <EmptyState
+              glyph="person"
+              title="No one here yet"
+              hint="Add people you know - Vitae tracks how you’re connected and nudges you to reconnect. Capture fast with ⌘K (“p Lina Farouk @@DevFest #ml”) or use the button."
+              action={<NewNodeButton type="person" label="Add your first person" />}
+            />
+          </Section>
+        }
+        emptyFiltered={
+          <Section title={FILTERS.find((f) => f.key === filter)!.label} meta={0}>
             <EmptyState
               glyph="filter"
               title={`No one matches ${FILTERS.find((f) => f.key === filter)!.label.toLowerCase()}`}
@@ -188,76 +184,78 @@ export function People() {
                 </Button>
               }
             />
-          ) : (
-            <EmptyState
-              glyph="person"
-              title="No one here yet"
-              hint="Add people you know - Vitae tracks how you’re connected and nudges you to reconnect. Capture fast with ⌘K (“p Lina Farouk @@DevFest #ml”) or use the button."
-              // Distinct from the header's "New person": both are on screen
-              // at once when the list is empty, and two controls sharing an
-              // accessible name is ambiguous by name and by voice.
-              action={<NewNodeButton type="person" label="Add your first person" />}
-            />
-          )
-        ) : (
-          <>
-            <SelectAllRow
-              allSelected={allVisibleSelected}
-              onToggle={() => bulk.toggleAll(visibleIds, allVisibleSelected)}
-            />
-            {people.map((p) => {
-              const overBy =
-                p.cadenceTargetDays != null && p.daysSinceLast != null
-                  ? Math.round(p.daysSinceLast - p.cadenceTargetDays)
-                  : null;
-              const isSelected = bulk.isSelected(p.id);
-              const relationLabel = personRelationLabel(p.relation);
-              return (
-                <div key={p.id} className="row" data-selected={isSelected || undefined}>
-                  <SelectCheckbox
-                    checked={isSelected}
-                    label={`Select ${p.title}`}
-                    onToggle={() => bulk.toggleOne(p.id)}
-                  />
-                  <Link to={entityHref('person', p.id)} className="people__link">
-                    <EntityGlyph type="person" />
-                    <div className="row__main">
-                      <div className="row__title">{p.title}</div>
-                      <div className="row__sub">
-                        {[relationLabel, p.headline, p.org, p.city].filter(Boolean).join(' · ') || '—'}
+          </Section>
+        }
+      >
+        {() => (
+          <Section
+            title={filtered ? FILTERS.find((f) => f.key === filter)!.label : 'Everyone'}
+            meta={people.length}
+          >
+            <>
+              <SelectAllRow
+                allSelected={allVisibleSelected}
+                onToggle={() => bulk.toggleAll(visibleIds, allVisibleSelected)}
+              />
+              {people.map((p) => {
+                const overBy =
+                  p.cadenceTargetDays != null && p.daysSinceLast != null
+                    ? Math.round(p.daysSinceLast - p.cadenceTargetDays)
+                    : null;
+                const isSelected = bulk.isSelected(p.id);
+                const relationLabel = personRelationLabel(p.relation);
+                return (
+                  <div key={p.id} className="row" data-selected={isSelected || undefined}>
+                    <SelectCheckbox
+                      checked={isSelected}
+                      label={`Select ${p.title}`}
+                      onToggle={() => bulk.toggleOne(p.id)}
+                    />
+                    <Link to={entityHref('person', p.id)} className="people__link">
+                      <EntityGlyph type="person" />
+                      <div className="row__main">
+                        <div className="row__title">{p.title}</div>
+                        <div className="row__sub">
+                          {[relationLabel, p.headline, p.org, p.city].filter(Boolean).join(' · ') ||
+                            '—'}
+                        </div>
                       </div>
-                    </div>
-                    <div className="chips" style={{ flex: 'none' }}>
-                      {p.isPlaceholder && <Chip tone="accent">unattributed</Chip>}
-                      {p.recordCount > 0 && (
-                        <Chip title={`${p.recordCount} records belong to ${p.title}`}>
-                          {p.recordCount} records
-                        </Chip>
-                      )}
-                      {p.topics.slice(0, 2).map((t) => (
-                        <Chip key={t}>{t}</Chip>
-                      ))}
-                    </div>
-                    <StrengthBar value={p.strength} label="tie strength" />
-                    {/* Cadence carries the word as well as the tone. */}
-                    <Mono
-                      className={
-                        overBy == null
-                          ? 'w-19 text-right text-xs text-muted'
+                      <div className="chips" style={{ flex: 'none' }}>
+                        {p.isPlaceholder && <Chip tone="accent">unattributed</Chip>}
+                        {p.recordCount > 0 && (
+                          <Chip title={`${p.recordCount} records belong to ${p.title}`}>
+                            {p.recordCount} records
+                          </Chip>
+                        )}
+                        {p.topics.slice(0, 2).map((t) => (
+                          <Chip key={t}>{t}</Chip>
+                        ))}
+                      </div>
+                      <StrengthBar value={p.strength} label="tie strength" />
+                      {/* Cadence carries the word as well as the tone. */}
+                      <Mono
+                        className={
+                          overBy == null
+                            ? 'w-19 text-right text-xs text-muted'
+                            : overBy > 0
+                              ? 'w-19 text-right text-xs text-warning'
+                              : 'w-19 text-right text-xs text-success'
+                        }
+                      >
+                        {overBy == null
+                          ? 'no cadence'
                           : overBy > 0
-                            ? 'w-19 text-right text-xs text-warning'
-                            : 'w-19 text-right text-xs text-success'
-                      }
-                    >
-                      {overBy == null ? 'no cadence' : overBy > 0 ? `${overBy}d over` : 'on track'}
-                    </Mono>
-                  </Link>
-                </div>
-              );
-            })}
-          </>
+                            ? `${overBy}d over`
+                            : 'on track'}
+                      </Mono>
+                    </Link>
+                  </div>
+                );
+              })}
+            </>
+          </Section>
         )}
-      </Section>
+      </QueryBoundary>
     </div>
   );
 }

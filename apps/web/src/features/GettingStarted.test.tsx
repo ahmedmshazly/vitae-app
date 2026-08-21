@@ -28,7 +28,7 @@ describe('GettingStarted', () => {
     );
     expect(screen.getByRole('link', { name: /Add someone you know/ })).toHaveAttribute(
       'href',
-      '/people',
+      '/network/people',
     );
     expect(screen.getByRole('link', { name: /Set up your profile/ })).toBeInTheDocument();
   });

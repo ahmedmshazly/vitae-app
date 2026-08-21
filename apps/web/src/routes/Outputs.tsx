@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -53,28 +53,20 @@ export function Outputs() {
   const [q, setQ] = useState('');
   const [status, setStatus] = useState('');
   const [template, setTemplate] = useState('');
-  const [selectedId, setSelectedId] = useState<string | null>(searchParams.get('focus'));
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [archive, setArchive] = useState<Resume | null>(null);
   const [downloadError, setDownloadError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const focus = searchParams.get('focus');
-    if (focus) {
-      setSelectedId(focus);
-      const next = new URLSearchParams(searchParams);
-      next.delete('focus');
-      setSearchParams(next, { replace: true });
-    }
-  }, [searchParams, setSearchParams]);
+  const focusId = searchParams.get('focus');
+  const detailId = selectedId ?? focusId;
   const listQuery = useQuery({
     queryKey: ['resumes', status === 'archived'],
     queryFn: () =>
       api.get<{ resumes: Resume[] }>(`/resumes?includeDeleted=${status === 'archived'}`),
   });
   const detailQuery = useQuery({
-    queryKey: ['resume', selectedId],
-    queryFn: () => api.get<{ resume: Resume }>(`/resumes/${selectedId}?includeDeleted=true`),
-    enabled: Boolean(selectedId),
+    queryKey: ['resume', detailId],
+    queryFn: () => api.get<{ resume: Resume }>(`/resumes/${detailId}?includeDeleted=true`),
+    enabled: Boolean(detailId),
   });
   const data = listQuery.data;
   const isLoading = listQuery.isLoading;
@@ -176,7 +168,7 @@ export function Outputs() {
         title="Outputs"
         subtitle="Search, inspect, compare, download, duplicate, and track every reproducible résumé artifact."
         actions={
-          <Button variant="primary" onClick={() => navigate('/resume/tailor')}>
+          <Button variant="primary" onClick={() => navigate('/career/resume/tailor')}>
             New résumé
           </Button>
         }
@@ -213,7 +205,12 @@ export function Outputs() {
           ]}
         />
         <Mono className="u-faint">
-          {listQuery.data ? (resumes.length === total ? `${total}` : `${resumes.length} of ${total}`) : '—'} outputs
+          {listQuery.data
+            ? resumes.length === total
+              ? `${total}`
+              : `${resumes.length} of ${total}`
+            : '—'}{' '}
+          outputs
         </Mono>
       </div>
       {downloadError ? (
@@ -237,7 +234,7 @@ export function Outputs() {
           title="No outputs yet"
           hint="Finalized and draft résumés appear here with their target snapshot and build artifacts."
           action={
-            <Button variant="primary" onClick={() => navigate('/resume/tailor')}>
+            <Button variant="primary" onClick={() => navigate('/career/resume/tailor')}>
               Tailor a résumé
             </Button>
           }
@@ -293,7 +290,11 @@ export function Outputs() {
               </button>
               <div className="output-row__actions">
                 {resume.artifact_ids?.pdf ? (
-                  <Button size="sm" aria-label={`Open the PDF for ${rowName(resume)}`} onClick={() => void openArtifact(resume, 'pdf')}>
+                  <Button
+                    size="sm"
+                    aria-label={`Open the PDF for ${rowName(resume)}`}
+                    onClick={() => void openArtifact(resume, 'pdf')}
+                  >
                     PDF
                   </Button>
                 ) : (
@@ -327,8 +328,16 @@ export function Outputs() {
       )}
 
       <Sheet
-        open={Boolean(selectedId)}
-        onOpenChange={(open) => !open && setSelectedId(null)}
+        open={Boolean(detailId)}
+        onOpenChange={(open) => {
+          if (open) return;
+          setSelectedId(null);
+          if (focusId) {
+            const next = new URLSearchParams(searchParams);
+            next.delete('focus');
+            setSearchParams(next, { replace: true });
+          }
+        }}
         title={detail?.name ?? 'Output details'}
         wide
         footer={
@@ -490,7 +499,7 @@ export function Outputs() {
             {detail.target_id && (
               <Button
                 variant="ghost"
-                onClick={() => navigate(`/resume/tailor?target=${detail.target_id}`)}
+                onClick={() => navigate(`/career/resume/tailor?target=${detail.target_id}`)}
               >
                 Open target workspace →
               </Button>

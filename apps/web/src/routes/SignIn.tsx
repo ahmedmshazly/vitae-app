@@ -43,37 +43,55 @@ export function SignIn() {
         <NoWayIn />
       ) : (
         <>
-          <h2 className="u-display text-md text-ink-strong">Sign in</h2>
+          <div className="signin__door-head">
+            <h2 className="u-display text-md text-ink-strong">Sign in</h2>
+            <p className="signin__door-copy">
+              {googleEnabled
+                ? 'Use the Google account configured as the owner of this instance.'
+                : 'Use the local developer shortcut enabled for this build.'}
+            </p>
+          </div>
 
-          {googleEnabled && (
-            <Button
-              variant="primary"
-              size="lg"
-              className="w-full justify-center"
-              disabled={pending !== null}
-              onClick={() => void run('google', signInGoogle)}
-            >
-              <Glyph name="person" size={16} />
-              {pending === 'google' ? 'Signing in…' : 'Continue with Google'}
-            </Button>
-          )}
+          <div className="signin__providers" aria-busy={pending !== null}>
+            {googleEnabled && (
+              <Button
+                variant="primary"
+                size="lg"
+                className="w-full justify-center"
+                disabled={pending !== null}
+                onClick={() => void run('google', signInGoogle)}
+              >
+                <Glyph name="person" size={16} />
+                {pending === 'google' ? 'Signing in…' : 'Continue with Google'}
+              </Button>
+            )}
 
-          {devLoginEnabled && (
-            <Button
-              variant={googleEnabled ? 'default' : 'primary'}
-              size="lg"
-              className="w-full justify-center"
-              disabled={pending !== null}
-              onClick={() => void run('dev', signInDev)}
-            >
-              {pending === 'dev' ? 'Signing in…' : 'Developer sign-in'}
-              <span className="rounded-sm border border-strong px-1 font-mono text-xs text-muted">DEV</span>
-            </Button>
-          )}
+            {devLoginEnabled && (
+              <Button
+                variant={googleEnabled ? 'default' : 'primary'}
+                size="lg"
+                className="w-full justify-center"
+                disabled={pending !== null}
+                onClick={() => void run('dev', signInDev)}
+              >
+                {pending === 'dev' ? 'Signing in…' : 'Developer sign-in'}
+                <span
+                  aria-hidden="true"
+                  className="rounded-sm border border-strong px-1 font-mono text-xs text-muted"
+                >
+                  DEV
+                </span>
+              </Button>
+            )}
+          </div>
 
           {/* Never colour alone: the tone carries a glyph and the word "Failed". */}
           {error && (
-            <p role="alert" className="flex items-start gap-2 text-sm text-danger">
+            <p
+              role="alert"
+              aria-live="assertive"
+              className="signin__error flex items-start gap-2 text-sm text-danger"
+            >
               <Glyph name="close" size={14} className="mt-0.5 shrink-0" />
               <span>
                 <strong className="font-semibold">Sign-in failed.</strong> {error}
@@ -81,8 +99,9 @@ export function SignIn() {
             </p>
           )}
 
-          <p className="text-sm text-muted">
-            Access is by invitation. If your account isn’t recognised, it hasn’t been added yet.
+          <p className="signin__access-note">
+            This is a single-owner system. Verified accounts that do not match the configured owner
+            email are denied.
           </p>
         </>
       )}
@@ -99,8 +118,11 @@ export function SignIn() {
 export function SignInSplash() {
   return (
     <SignInLayout>
-      <h2 className="u-display text-md text-ink-strong">Sign in</h2>
-      <div className="flex flex-col gap-3" role="status" aria-label="Checking your session">
+      <div className="signin__door-head">
+        <h2 className="u-display text-md text-ink-strong">Sign in</h2>
+        <p className="signin__door-copy">Checking this browser for an existing owner session.</p>
+      </div>
+      <div className="signin__providers" role="status" aria-label="Checking your session">
         <Skeleton height={44} />
         <Skeleton height={44} />
       </div>
@@ -112,7 +134,10 @@ export function SignInSplash() {
 function NoWayIn() {
   return (
     <>
-      <h2 className="u-display text-md text-ink-strong">No way in</h2>
+      <div className="signin__door-head">
+        <h2 className="u-display text-md text-ink-strong">No way in</h2>
+        <p className="signin__door-copy">This build cannot authenticate its configured operator.</p>
+      </div>
       <p role="alert" className="flex items-start gap-2 text-sm text-danger">
         <Glyph name="close" size={14} className="mt-0.5 shrink-0" />
         <span>
@@ -134,30 +159,47 @@ function NoWayIn() {
  */
 function SignInLayout({ children }: { children: React.ReactNode }) {
   return (
-    <main className="grid min-h-screen lg:grid-cols-[1fr_26rem]">
+    <main className="signin grid min-h-screen lg:grid-cols-[1fr_26rem]">
       {/* Content is centred within its own column, not pinned to the page
           edge. A 1fr column at 1440px is 1000px wide, and left-pinning a
           36ch block inside it just moves the void from one side to the other. */}
-      <section className="flex flex-col justify-center gap-6 p-6 lg:items-center lg:p-12">
-        <div className="max-w-[36ch]">
+      <section className="signin__identity flex flex-col justify-center gap-6 p-6 lg:items-center lg:p-12">
+        <div className="signin__identity-inner max-w-[42rem]">
           <LogoStacked markSize={56} style={{ alignItems: 'flex-start' }} />
           {/* A sign-in screen has nothing true to encode, so the rule carries
               no ticks. Faking them is worse than having none. */}
-          <div className="mt-6">
+          <div className="signin__register mt-6">
             <RegisterRule />
           </div>
-          <p className="text-lg leading-normal text-ink-soft">
-            Your life, as a living network. People, work, and moments: connected.
+          <h1 className="signin__claim">Keep the whole story—not just the latest document.</h1>
+          <p className="signin__identity-copy">
+            Vitae is a private, self-hosted system for one working life: people, evidence, and
+            moments connected in a ledger you can inspect and export.
           </p>
+          <ol className="signin__ledger" aria-label="How Vitae turns memory into action">
+            <li>
+              <span>Capture</span>
+              <strong>One line or a structured form</strong>
+            </li>
+            <li>
+              <span>Connect</span>
+              <strong>Typed records with provenance</strong>
+            </li>
+            <li>
+              <span>Act</span>
+              <strong>Reconnect, rank, compile, export</strong>
+            </li>
+          </ol>
         </div>
       </section>
 
-      <div className="flex flex-col justify-center gap-4 border-t border-hairline p-6 lg:border-t-0 lg:border-l lg:p-12">
+      <div className="signin__door flex flex-col justify-center gap-4 border-t border-hairline p-6 lg:border-t-0 lg:border-l lg:p-12">
         {children}
-        <p className="mt-4 border-t border-hairline pt-4 text-xs leading-normal text-faint">
-          Self-hosted instance · <span className="font-mono">app.vitae.example</span>
+        <p className="signin__foot mt-4 border-t border-hairline pt-4 text-xs leading-normal text-faint">
+          <span className="signin__instance">Single-owner · self-hosted · default-deny</span>
           <br />
-          New here? <Link to="/tour">Take the tour</Link> · <Link to="/welcome">What is Vitae?</Link>
+          New here? <Link to="/tour">Take the tour</Link> ·{' '}
+          <Link to="/welcome">What is Vitae?</Link>
         </p>
       </div>
     </main>

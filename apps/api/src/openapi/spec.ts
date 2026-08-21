@@ -2,7 +2,13 @@
  * OpenAPI 3.1 document for Vitae `/api/v1`. Built in code so contract tests can
  * regenerate and diff against the checked-in artifact.
  */
-import type { OpenAPIObject, OperationObject, PathItemObject, PathsObject } from 'openapi3-ts/oas31';
+import type {
+  OpenAPIObject,
+  OperationObject,
+  PathItemObject,
+  PathsObject,
+} from 'openapi3-ts/oas31';
+import { SOURCE_TYPES } from '@vitae/core';
 import { V1_MOUNT_PREFIXES } from './mounts.js';
 
 const errorRef = { $ref: '#/components/schemas/Error' };
@@ -319,6 +325,59 @@ function detailedPaths(): PathsObject {
     '/dashboard': {
       get: op('getDashboard', 'Today aggregate (focus, setup, insights)', { tags: ['dashboard'] }),
     },
+    '/applications': {
+      get: op('listApplications', 'Career application runway and attention summary', {
+        tags: ['applications'],
+        parameters: [
+          {
+            name: 'status',
+            in: 'query',
+            schema: {
+              type: 'string',
+              enum: [
+                'draft',
+                'applied',
+                'screening',
+                'interview',
+                'offer',
+                'rejected',
+                'withdrawn',
+                'accepted',
+              ],
+            },
+          },
+          { name: 'q', in: 'query', schema: { type: 'string' } },
+        ],
+        responses: {
+          '200': {
+            description: 'Application summaries, stage counts, and attention totals',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ApplicationListResponse' },
+              },
+            },
+          },
+          '422': errorResponse('Unknown application status'),
+        },
+      }),
+    },
+    '/applications/{id}': {
+      get: op('getApplicationDossier', 'Application dossier with linked career evidence', {
+        tags: ['applications'],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': {
+            description: 'Application dossier',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ApplicationDetailResponse' },
+              },
+            },
+          },
+          '404': errorResponse('Application not found'),
+        },
+      }),
+    },
   };
 }
 
@@ -328,14 +387,18 @@ function stubPathsForMounts(): PathsObject {
   const stubs: PathsObject[] = [];
 
   for (const prefix of V1_MOUNT_PREFIXES) {
-    const covered = [...detailed].some((p) => p === prefix || p.startsWith(`${prefix}/`) || p.startsWith(`${prefix}{`));
+    const covered = [...detailed].some(
+      (p) => p === prefix || p.startsWith(`${prefix}/`) || p.startsWith(`${prefix}{`),
+    );
     // `/people` is covered only if we have /people paths; favors is a different prefix.
     if (covered) continue;
     const tag = prefix.replace(/^\//, '').split('/')[0] ?? 'misc';
     const path = prefix.includes('{') ? prefix : prefix;
     // Prefer a collection GET on the mount root.
     if (detailed.has(path)) continue;
-    stubs.push(stubGet(path, `stub${tag.charAt(0).toUpperCase()}${tag.slice(1)}`, `${prefix} mount`, tag));
+    stubs.push(
+      stubGet(path, `stub${tag.charAt(0).toUpperCase()}${tag.slice(1)}`, `${prefix} mount`, tag),
+    );
   }
 
   return mergePaths(...stubs);
@@ -365,6 +428,7 @@ export function buildOpenApiDocument(): OpenAPIObject {
       { name: 'retention' },
       { name: 'export' },
       { name: 'dashboard' },
+      { name: 'applications' },
     ],
     paths: {
       ...paths,
@@ -402,10 +466,102 @@ export function buildOpenApiDocument(): OpenAPIObject {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: 'Owner session JWT from Google or POST /auth/dev-login. Cookie session is equivalent.',
+          description:
+            'Owner session JWT from Google or POST /auth/dev-login. Cookie session is equivalent.',
         },
       },
       schemas: {
+        ApplicationStatus: {
+          type: 'string',
+          enum: [
+            'draft',
+            'applied',
+            'screening',
+            'interview',
+            'offer',
+            'rejected',
+            'withdrawn',
+            'accepted',
+          ],
+        },
+        ApplicationSummary: {
+          type: 'object',
+          required: [
+            'id',
+            'title',
+            'role_title',
+            'status',
+            'interview_count',
+            'notes_md',
+            'source',
+            'created_at',
+            'updated_at',
+          ],
+          properties: {
+            id: { type: 'string' },
+            title: { type: 'string' },
+            role_title: { type: 'string' },
+            status: { $ref: '#/components/schemas/ApplicationStatus' },
+            organization: { type: ['object', 'null'], additionalProperties: true },
+            referred_by: { type: ['object', 'null'], additionalProperties: true },
+            applied_on: { type: ['string', 'null'], format: 'date' },
+            deadline: { type: ['string', 'null'], format: 'date' },
+            next_step: { type: ['string', 'null'] },
+            next_step_date: { type: ['string', 'null'], format: 'date' },
+            channel: { type: ['string', 'null'] },
+            location_mode: { type: ['string', 'null'] },
+            salary_range: { type: ['string', 'null'] },
+            job_url: { type: ['string', 'null'] },
+            target_id: { type: ['string', 'null'] },
+            resume_id: { type: ['string', 'null'] },
+            interview_count: { type: 'integer', minimum: 0 },
+            next_interview: { type: ['object', 'null'], additionalProperties: true },
+            attention: { type: ['object', 'null'], additionalProperties: true },
+            notes_md: { type: 'string' },
+            source: { type: 'string', enum: [...SOURCE_TYPES] },
+            created_at: { type: 'string', format: 'date-time' },
+            updated_at: { type: 'string', format: 'date-time' },
+          },
+        },
+        ApplicationListResponse: {
+          type: 'object',
+          required: ['applications', 'counts', 'total', 'active', 'needs_attention'],
+          properties: {
+            applications: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/ApplicationSummary' },
+            },
+            counts: { type: 'object', additionalProperties: { type: 'integer', minimum: 0 } },
+            total: { type: 'integer', minimum: 0 },
+            active: { type: 'integer', minimum: 0 },
+            needs_attention: { type: 'integer', minimum: 0 },
+          },
+        },
+        ApplicationDossier: {
+          allOf: [
+            { $ref: '#/components/schemas/ApplicationSummary' },
+            {
+              type: 'object',
+              required: ['posting', 'interviews', 'target', 'resume'],
+              properties: {
+                posting: { type: ['object', 'null'], additionalProperties: true },
+                interviews: {
+                  type: 'array',
+                  items: { type: 'object', additionalProperties: true },
+                },
+                target: { type: ['object', 'null'], additionalProperties: true },
+                resume: { type: ['object', 'null'], additionalProperties: true },
+              },
+            },
+          ],
+        },
+        ApplicationDetailResponse: {
+          type: 'object',
+          required: ['application'],
+          properties: {
+            application: { $ref: '#/components/schemas/ApplicationDossier' },
+          },
+        },
         Error: {
           type: 'object',
           required: ['error'],

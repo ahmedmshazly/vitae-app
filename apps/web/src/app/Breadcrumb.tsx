@@ -17,24 +17,55 @@ interface Crumb {
 function crumbFor(pathname: string): Crumb {
   const exact: Record<string, Crumb> = {
     [ROUTES.today.path]: { parent: '', leaf: 'Today', glyph: 'today' },
-    [ROUTES.people.path]: { parent: '', leaf: 'People', glyph: 'person' },
-    [ROUTES.orgs.path]: { parent: '', leaf: 'Organizations', glyph: 'org' },
-    [ROUTES.askPeople.path]: { parent: 'Ask', leaf: 'Who should I call', glyph: 'ask' },
-    [ROUTES.intros.path]: { parent: '', leaf: 'Warm intros', glyph: 'merge' },
-    [ROUTES.resumeAtoms.path]: { parent: 'Résumé', leaf: 'Atoms', glyph: 'resume' },
+    [ROUTES.planner.path]: { parent: 'Today', leaf: 'Planner', glyph: 'calendar' },
+    [ROUTES.network.path]: { parent: '', leaf: 'Network', glyph: 'person' },
+    [ROUTES.people.path]: { parent: 'Network', leaf: 'People', glyph: 'person' },
+    [ROUTES.orgs.path]: { parent: 'Network', leaf: 'Organizations', glyph: 'org' },
+    '/network/intelligence': { parent: 'Network', leaf: 'Intelligence', glyph: 'ask' },
+    [ROUTES.career.path]: { parent: '', leaf: 'Career', glyph: 'application' },
+    [ROUTES.applications.path]: { parent: 'Career', leaf: 'Applications', glyph: 'application' },
+    [ROUTES.resumeOverview.path]: { parent: 'Career', leaf: 'Résumé', glyph: 'resume' },
+    [ROUTES.resumeAtoms.path]: { parent: 'Résumé', leaf: 'Evidence', glyph: 'document' },
     [ROUTES.resumeTailor.path]: { parent: 'Résumé', leaf: 'Tailoring workspace', glyph: 'resume' },
     [ROUTES.resumeOutputs.path]: { parent: 'Résumé', leaf: 'Outputs', glyph: 'resume' },
-    [ROUTES.resumeLetters.path]: { parent: 'Résumé', leaf: 'Cover letters', glyph: 'resume' },
-    [ROUTES.resumeTemplates.path]: { parent: 'Résumé', leaf: 'Templates', glyph: 'resume' },
-    [ROUTES.collections.path]: { parent: '', leaf: 'Collections', glyph: 'filter' },
-    [ROUTES.graph.path]: { parent: '', leaf: 'Life map', glyph: 'graph' },
-    [ROUTES.timeline.path]: { parent: '', leaf: 'Chronograph', glyph: 'timeline' },
-    [ROUTES.map.path]: { parent: '', leaf: 'Atlas', glyph: 'map' },
-    [ROUTES.import.path]: { parent: '', leaf: 'Import', glyph: 'export' },
+    [ROUTES.resumeLetters.path]: { parent: 'Résumé', leaf: 'Cover letters', glyph: 'document' },
+    [ROUTES.resumeTemplates.path]: { parent: 'Résumé', leaf: 'Templates', glyph: 'adjust' },
+    [ROUTES.explore.path]: { parent: '', leaf: 'Explore', glyph: 'graph' },
+    [ROUTES.collections.path]: { parent: 'Explore', leaf: 'Library', glyph: 'filter' },
+    [ROUTES.graph.path]: { parent: 'Explore', leaf: 'Life map', glyph: 'graph' },
+    [ROUTES.timeline.path]: { parent: 'Explore', leaf: 'Chronograph', glyph: 'timeline' },
+    [ROUTES.map.path]: { parent: 'Explore', leaf: 'Atlas', glyph: 'map' },
+    [ROUTES.data.path]: { parent: '', leaf: 'Data', glyph: 'capture' },
+    [ROUTES.import.path]: { parent: 'Data', leaf: 'Imports', glyph: 'capture' },
+    [ROUTES.duplicates.path]: { parent: 'Data', leaf: 'Identity audit', glyph: 'merge' },
+    [ROUTES.repositories.path]: { parent: 'Data', leaf: 'GitHub', glyph: 'repository' },
+    [ROUTES.export.path]: { parent: 'Data', leaf: 'Exports & backups', glyph: 'export' },
+    [ROUTES.trash.path]: { parent: 'Data', leaf: 'Trash', glyph: 'trash' },
+    [ROUTES.settingsProfile.path]: { parent: 'Settings', leaf: 'Profile', glyph: 'person' },
+    [ROUTES.settingsPreferences.path]: { parent: 'Settings', leaf: 'Preferences', glyph: 'adjust' },
+    [ROUTES.settingsSystem.path]: { parent: 'Settings', leaf: 'System', glyph: 'graph' },
+    '/help': { parent: '', leaf: 'Help & shortcuts', glyph: 'ask' },
+
+    // Compatibility addresses keep the labels their existing tests and saved
+    // links announced, while the canonical paths above expose the new IA.
+    '/people': { parent: '', leaf: 'People', glyph: 'person' },
+    '/orgs': { parent: '', leaf: 'Organizations', glyph: 'org' },
+    '/ask/people': { parent: 'Ask', leaf: 'Who should I call', glyph: 'ask' },
+    '/intros': { parent: '', leaf: 'Warm intros', glyph: 'merge' },
+    '/resume/atoms': { parent: 'Résumé', leaf: 'Atoms', glyph: 'resume' },
+    '/resume/tailor': { parent: 'Résumé', leaf: 'Tailoring workspace', glyph: 'resume' },
+    '/resume/outputs': { parent: 'Résumé', leaf: 'Outputs', glyph: 'resume' },
+    '/resume/letters': { parent: 'Résumé', leaf: 'Cover letters', glyph: 'resume' },
+    '/resume/templates': { parent: 'Résumé', leaf: 'Templates', glyph: 'resume' },
+    '/collections': { parent: '', leaf: 'Collections', glyph: 'filter' },
+    '/graph': { parent: '', leaf: 'Life map', glyph: 'graph' },
+    '/timeline': { parent: '', leaf: 'Chronograph', glyph: 'timeline' },
+    '/map': { parent: '', leaf: 'Atlas', glyph: 'map' },
+    '/import': { parent: '', leaf: 'Import', glyph: 'export' },
     '/import/duplicates': { parent: 'Import', leaf: 'Duplicates', glyph: 'merge' },
-    [ROUTES.export.path]: { parent: '', leaf: 'Export & backup', glyph: 'export' },
+    '/export': { parent: '', leaf: 'Export & backup', glyph: 'export' },
     '/search': { parent: '', leaf: 'Search', glyph: 'search' },
-    [ROUTES.trash.path]: { parent: '', leaf: 'Trash', glyph: 'trash' },
+    '/trash': { parent: '', leaf: 'Trash', glyph: 'trash' },
     [ROUTES.settings.path]: { parent: '', leaf: 'Settings', glyph: 'adjust' },
     // Reachable routes that had no crumb and so fell through to "Today".
     '/resume': { parent: '', leaf: 'Résumé', glyph: 'resume' },
@@ -42,9 +73,18 @@ function crumbFor(pathname: string): Crumb {
     '/reference/entities': { parent: 'Reference', leaf: 'Entity catalog', glyph: 'graph' },
   };
   if (exact[pathname]) return exact[pathname];
-  if (pathname.startsWith(`${ROUTES.people.path}/`)) return { parent: 'People', leaf: 'Profile', glyph: 'person' };
-  if (pathname.startsWith(`${ROUTES.orgs.path}/`)) return { parent: 'Organizations', leaf: 'Profile', glyph: 'org' };
-  if (pathname.startsWith('/n/')) return { parent: 'Collections', leaf: 'Record', glyph: 'document' };
+  if (pathname.startsWith(`${ROUTES.people.path}/`))
+    return { parent: 'Network / People', leaf: 'Profile', glyph: 'person' };
+  if (pathname.startsWith(`${ROUTES.orgs.path}/`))
+    return { parent: 'Network / Organizations', leaf: 'Profile', glyph: 'org' };
+  if (pathname.startsWith(`${ROUTES.applications.path}/`))
+    return { parent: 'Career / Applications', leaf: 'Dossier', glyph: 'application' };
+  if (pathname.startsWith('/people/'))
+    return { parent: 'People', leaf: 'Profile', glyph: 'person' };
+  if (pathname.startsWith('/orgs/'))
+    return { parent: 'Organizations', leaf: 'Profile', glyph: 'org' };
+  if (pathname.startsWith('/n/'))
+    return { parent: 'Collections', leaf: 'Record', glyph: 'document' };
   if (pathname.startsWith('/browse/')) {
     const type = pathname.split('/')[2] ?? '';
     return { parent: 'Collections', leaf: type.replace(/_/g, ' '), glyph: 'filter' };
@@ -72,7 +112,10 @@ export function Breadcrumb() {
           <span className="topbar__crumb-sep">/</span>
         </>
       )}
-      <span className="cur" style={{ textTransform: pathname.startsWith('/browse/') ? 'capitalize' : undefined }}>
+      <span
+        className="cur"
+        style={{ textTransform: pathname.startsWith('/browse/') ? 'capitalize' : undefined }}
+      >
         {leaf}
       </span>
     </div>

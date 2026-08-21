@@ -41,31 +41,31 @@ interface Overview {
 
 const WORKFLOW: Array<{ to: string; label: string; body: string; cta: string }> = [
   {
-    to: '/resume/tailor',
+    to: '/career/resume/tailor',
     label: 'Tailor',
     body: 'Paste a JD, score atoms, compile a one-page PDF.',
     cta: 'Open Tailor',
   },
   {
-    to: '/resume/atoms',
+    to: '/career/resume/evidence',
     label: 'Atoms',
     body: 'Edit achievement bullets, wording variants, and skills.',
     cta: 'Edit atoms',
   },
   {
-    to: '/resume/outputs',
+    to: '/career/resume/outputs',
     label: 'Outputs',
     body: 'Inspect, download, duplicate, or archive finalized résumés.',
     cta: 'Browse outputs',
   },
   {
-    to: '/resume/letters',
+    to: '/career/resume/letters',
     label: 'Letters',
     body: 'Draft hook / body / closer blocks against a job target.',
     cta: 'Cover letters',
   },
   {
-    to: '/resume/templates',
+    to: '/career/resume/templates',
     label: 'Templates',
     body: 'Pick the default layout and review calibrated accents.',
     cta: 'Templates',
@@ -90,8 +90,8 @@ export function ResumeHub() {
         help={
           <InfoPopover title="How the résumé engine works">
             <p>
-              Everything is deterministic - no AI guesswork. Your bullets (“atoms”) are scored against the JD and
-              packed to one page, then rendered to LaTeX and compiled.
+              Everything is deterministic - no AI guesswork. Your bullets (“atoms”) are scored
+              against the JD and packed to one page, then rendered to LaTeX and compiled.
             </p>
             <p>
               New here? Hit <strong>New résumé</strong> and paste any job description.
@@ -99,7 +99,11 @@ export function ResumeHub() {
           </InfoPopover>
         }
         actions={
-          <Button variant="primary" glyph="resume" onClick={() => navigate('/resume/tailor')}>
+          <Button
+            variant="primary"
+            glyph="resume"
+            onClick={() => navigate('/career/resume/tailor')}
+          >
             New résumé
           </Button>
         }
@@ -122,22 +126,25 @@ export function ResumeHub() {
             label="Atoms"
             value={counts?.atoms}
             loading={overview.isLoading}
-            hint={counts && `${counts.pinnedAtoms} pinned · ${counts.incompleteAtoms} need variants/skills`}
-            to="/resume/atoms"
+            hint={
+              counts &&
+              `${counts.pinnedAtoms} pinned · ${counts.incompleteAtoms} need variants/skills`
+            }
+            to="/career/resume/evidence"
           />
           <Kpi
             label="Targets"
             value={counts?.targets}
             loading={overview.isLoading}
             hint={counts && `${counts.activeTargets} saved/active`}
-            to="/resume/tailor"
+            to="/career/resume/tailor"
           />
           <Kpi
             label="Outputs"
             value={counts?.outputs}
             loading={overview.isLoading}
             hint={counts && `${counts.finalized} final/sent`}
-            to="/resume/outputs"
+            to="/career/resume/outputs"
           />
           <Kpi
             label="Base résumé"
@@ -149,7 +156,7 @@ export function ResumeHub() {
                 ? 'Diffs compare new finals against this output'
                 : 'Finalize a résumé to set the first base')
             }
-            to="/resume/outputs"
+            to="/career/resume/outputs"
           />
         </div>
       )}
@@ -180,7 +187,7 @@ export function ResumeHub() {
         title="Recent outputs"
         meta={overview.data ? recent.length : undefined}
         actions={
-          <Button size="sm" variant="ghost" onClick={() => navigate('/resume/outputs')}>
+          <Button size="sm" variant="ghost" onClick={() => navigate('/career/resume/outputs')}>
             View all
           </Button>
         }
@@ -190,14 +197,16 @@ export function ResumeHub() {
         ) : overview.isLoading ? (
           <SkeletonRows rows={3} />
         ) : recent.length === 0 ? (
-          <p className="text-sm text-muted">No outputs yet. Start in Tailor and finalize a résumé.</p>
+          <p className="text-sm text-muted">
+            No outputs yet. Start in Tailor and finalize a résumé.
+          </p>
         ) : (
           recent.map((resume) => (
             <button
               key={resume.id}
               type="button"
               className="row w-full cursor-pointer border-0 bg-transparent text-left text-ink"
-              onClick={() => navigate(`/resume/outputs?focus=${resume.id}`)}
+              onClick={() => navigate(`/career/resume/outputs?focus=${resume.id}`)}
             >
               <span className="row__main">
                 <span className="row__title">{resume.name}</span>
@@ -206,7 +215,10 @@ export function ResumeHub() {
                   {(resume.updated_at ?? resume.created_at ?? '').slice(0, 10) || '—'}
                 </span>
               </span>
-              <Chip tone={resume.status === 'final' || resume.status === 'sent' ? 'accent' : 'default'} mono>
+              <Chip
+                tone={resume.status === 'final' || resume.status === 'sent' ? 'accent' : 'default'}
+                mono
+              >
                 {resume.status}
               </Chip>
             </button>

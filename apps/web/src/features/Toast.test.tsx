@@ -1,27 +1,7 @@
-import { act, type ReactNode } from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type * as MotionReact from 'motion/react';
+import { act } from 'react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { flashToast, ToastProvider, useToast } from './Toast.js';
-
-// AnimatePresence keeps an exiting child mounted until its exit animation
-// completes, which is driven by rAF timing that doesn't resolve
-// deterministically under fake timers. These tests exercise the dismiss-
-// timer logic, not Framer Motion's animation engine (already trusted,
-// third-party), so AnimatePresence is mocked to a passthrough, when
-// `toast` becomes null the motion.div just unmounts immediately, like any
-// normal conditional render.
-// Note there is no `useReducedMotion` override here any more. Toast reads the
-// preference through lib/motion's hooks, which source it from @vitae/ui rather
-// than from Framer, so overriding Framer's hook stopped doing anything and
-// only advertised a reduced-motion run that was not happening.
-vi.mock('motion/react', async (importOriginal) => {
-  const actual = await importOriginal<typeof MotionReact>();
-  return {
-    ...actual,
-    AnimatePresence: ({ children }: { children: ReactNode }) => children,
-  };
-});
 
 function Harness({ onUndo }: { onUndo: () => void | Promise<void> }) {
   const { flash } = useToast();
@@ -30,111 +10,111 @@ function Harness({ onUndo }: { onUndo: () => void | Promise<void> }) {
       <button onClick={() => flash('Saved')}>flash-plain</button>
       <button onClick={() => flash('Saved', { undo: onUndo })}>flash-undo</button>
       <button onClick={() => flash('Sync failed', { variant: 'error' })}>flash-error</button>
+      <button
+        onClick={() => {
+          flash('First saved');
+          flash('Second saved');
+        }}
+      >
+        flash-two
+      </button>
     </div>
   );
 }
 
 function renderHarness(onUndo: () => void | Promise<void> = vi.fn()) {
-  render(
+  return render(
     <ToastProvider>
       <Harness onUndo={onUndo} />
     </ToastProvider>,
   );
 }
 
-describe('Toast', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-  afterEach(() => {
-    vi.useRealTimers();
+function toastFor(message: string): HTMLElement {
+  const toast = screen.getByText(message).closest('li');
+  if (!toast) throw new Error(`No toast wraps ${message}`);
+  return toast;
+}
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+describe('Toast compatibility adapter', () => {
+  it('mounts the robust notification region before the first message', () => {
+    renderHarness();
+    expect(screen.getByRole('region', { name: /notifications/i })).toBeInTheDocument();
+    expect(screen.queryAllByRole('listitem')).toHaveLength(0);
   });
 
-  it('shows the flashed message as role=status by default', () => {
+  it('keeps flash(message) and maps it to the neutral design-system variant', () => {
     renderHarness();
     fireEvent.click(screen.getByText('flash-plain'));
-    expect(screen.getByRole('status')).toHaveTextContent('Saved');
+
+    expect(toastFor('Saved')).toHaveAttribute('data-variant', 'status');
+    expect(toastFor('Saved')).toHaveClass('toast');
   });
 
-  it('uses role=alert for an error-variant toast', () => {
+  it('maps the app error variant to a labelled, glyph-backed error toast', () => {
     renderHarness();
     fireEvent.click(screen.getByText('flash-error'));
-    expect(screen.getByRole('alert')).toHaveTextContent('Sync failed');
+
+    const toast = toastFor('Sync failed');
+    expect(toast).toHaveAttribute('data-variant', 'error');
+    expect(within(toast).getByText('Error')).toBeInTheDocument();
+    expect(toast.querySelector('.vt-toast__glyph svg')).not.toBeNull();
   });
 
-  it('flashToast (the non-component escape hatch) always flashes as an error', () => {
+  it('keeps flashToast as an error escape hatch for non-component callers', () => {
     renderHarness();
-    act(() => {
-      flashToast('Mutation failed');
-    });
-    expect(screen.getByRole('alert')).toHaveTextContent('Mutation failed');
+    act(() => flashToast('Mutation failed'));
+
+    expect(toastFor('Mutation failed')).toHaveAttribute('data-variant', 'error');
   });
 
-  it('auto-dismisses a plain toast at 5s, not before', () => {
-    renderHarness();
-    fireEvent.click(screen.getByText('flash-plain'));
-    expect(screen.getByRole('status')).toBeInTheDocument();
-    act(() => {
-      vi.advanceTimersByTime(4999);
-    });
-    expect(screen.getByRole('status')).toBeInTheDocument();
-    act(() => {
-      vi.advanceTimersByTime(1);
-    });
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
-  });
-
-  it('holds a toast with Undo for 8s instead of 5s', () => {
-    renderHarness();
-    fireEvent.click(screen.getByText('flash-undo'));
-    act(() => {
-      vi.advanceTimersByTime(5000);
-    });
-    expect(screen.getByRole('status')).toBeInTheDocument();
-    act(() => {
-      vi.advanceTimersByTime(3000);
-    });
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
-  });
-
-  it('pauses the dismiss timer while the pointer is over the toast', () => {
-    renderHarness();
-    fireEvent.click(screen.getByText('flash-plain'));
-    const toast = screen.getByRole('status');
-    act(() => {
-      vi.advanceTimersByTime(4000);
-    });
-    fireEvent.pointerEnter(toast);
-    act(() => {
-      vi.advanceTimersByTime(10000); // would have long since dismissed if not paused
-    });
-    expect(screen.getByRole('status')).toBeInTheDocument();
-    fireEvent.pointerLeave(toast);
-    act(() => {
-      vi.advanceTimersByTime(999);
-    });
-    expect(screen.getByRole('status')).toBeInTheDocument();
-    act(() => {
-      vi.advanceTimersByTime(1);
-    });
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
-  });
-
-  it('Undo fires the compensating call and dismisses immediately', () => {
+  it('maps undo to a live queued action and closes only that item', async () => {
     const onUndo = vi.fn();
     renderHarness(onUndo);
+    fireEvent.click(screen.getByText('flash-two'));
     fireEvent.click(screen.getByText('flash-undo'));
-    fireEvent.click(screen.getByText('Undo'));
+
+    const item = toastFor('Saved');
+    fireEvent.click(within(item).getByRole('button', { name: 'Undo' }));
+
     expect(onUndo).toHaveBeenCalledTimes(1);
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Saved')).not.toBeInTheDocument());
+    expect(screen.getByText('First saved')).toBeInTheDocument();
+    expect(screen.getByText('Second saved')).toBeInTheDocument();
   });
 
-  it('a second flash() replaces the first, only one toast at a time', () => {
+  it('queues flashes fired in the same tick instead of replacing feedback', () => {
     renderHarness();
-    fireEvent.click(screen.getByText('flash-plain'));
-    expect(screen.getAllByText('Saved')).toHaveLength(1);
-    fireEvent.click(screen.getByText('flash-error'));
-    expect(screen.queryByText('Saved')).not.toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveTextContent('Sync failed');
+    fireEvent.click(screen.getByText('flash-two'));
+
+    expect(screen.getByText('First saved')).toBeInTheDocument();
+    expect(screen.getByText('Second saved')).toBeInTheDocument();
+    expect(screen.getAllByRole('listitem')).toHaveLength(2);
+  });
+
+  it('preserves the eight-second Undo window from the app API', async () => {
+    vi.useFakeTimers();
+    renderHarness();
+    fireEvent.click(screen.getByText('flash-undo'));
+    const item = toastFor('Saved');
+
+    await act(async () => vi.advanceTimersByTime(7999));
+    expect(item).toHaveAttribute('data-state', 'open');
+
+    await act(async () => vi.advanceTimersByTime(1));
+    expect(item).toHaveAttribute('data-state', 'closed');
+  });
+
+  it('turns a rejected Undo into actionable error feedback', async () => {
+    renderHarness(() => Promise.reject(new Error('offline')));
+    fireEvent.click(screen.getByText('flash-undo'));
+    fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+
+    const failure = await screen.findByText('Couldn’t undo that change');
+    expect(failure.closest('li')).toHaveAttribute('data-variant', 'error');
   });
 });

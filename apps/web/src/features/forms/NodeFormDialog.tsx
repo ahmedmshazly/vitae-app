@@ -13,10 +13,7 @@ import { api } from '../../lib/api.js';
 import { useToast } from '../Toast.js';
 import { EntityForm, type EntityFormSubmit, type EntityFormValues } from './EntityForm.js';
 import { newDraftKey, type ConnectionDraft } from './EdgeSubEditorRow.js';
-import {
-  additionalConnectionSub,
-  connectionOptionsFor,
-} from './ConnectionComposer.js';
+import { additionalConnectionSub, connectionOptionsFor } from './ConnectionComposer.js';
 import { entityHref } from '../../lib/entity-href.js';
 
 interface NodeResp {
@@ -30,7 +27,13 @@ interface NodeResp {
     end_date?: string;
     props: Record<string, unknown>;
   };
-  edges: Array<{ id: string; type: string; src: string; dst: string; props: Record<string, unknown> }>;
+  edges: Array<{
+    id: string;
+    type: string;
+    src: string;
+    dst: string;
+    props: Record<string, unknown>;
+  }>;
   neighbors: Record<string, { id: string; type: string; title: string }>;
 }
 
@@ -110,7 +113,13 @@ export function NodeFormDialog({
         const other = neighbors[otherId];
         if (!other || !(sub.targetTypes as string[]).includes(other.type)) continue;
         if (drafts.some((d) => d.edgeId === e.id)) continue;
-        drafts.push({ key: newDraftKey(), sub, target: other, props: { ...e.props }, edgeId: e.id });
+        drafts.push({
+          key: newDraftKey(),
+          sub,
+          target: other,
+          props: { ...e.props },
+          edgeId: e.id,
+        });
       }
     }
 
@@ -197,6 +206,12 @@ export function NodeFormDialog({
         .then((result) => {
           if (!cancelled) setDuplicateCheck(result);
         })
+        .catch(() => {
+          // Duplicate hints are advisory. A failed check must not block the
+          // form or escape as an unhandled rejection; the server still owns
+          // validation when the record is committed.
+          if (!cancelled) setDuplicateCheck(null);
+        })
         .finally(() => {
           if (!cancelled) setCheckingDuplicates(false);
         });
@@ -268,7 +283,8 @@ export function NodeFormDialog({
     await commitSubmit(submission);
   }
 
-  const loadingEdit = Boolean(nodeId) && !existing.data;
+  const loadingEdit = Boolean(nodeId) && existing.isPending;
+  const failedEdit = Boolean(nodeId) && existing.isError && !existing.data;
 
   return (
     <Modal
@@ -277,7 +293,7 @@ export function NodeFormDialog({
       title={nodeId ? `Edit ${typeLabel(type)}` : `New ${typeLabel(type)}`}
       size="lg"
       footer={
-        loadingEdit ? undefined : (
+        loadingEdit || failedEdit ? undefined : (
           <>
             <Button type="button" onClick={() => onOpenChange(false)}>
               Cancel
@@ -289,7 +305,22 @@ export function NodeFormDialog({
         )
       }
     >
-      {loadingEdit ? (
+      {failedEdit ? (
+        <div className="entity-form-load-error" role="alert">
+          <Glyph name="alert" size={18} />
+          <div>
+            <strong>Couldn’t load this record.</strong>
+            <p>
+              {existing.error instanceof Error
+                ? existing.error.message
+                : 'The record is unavailable right now.'}
+            </p>
+            <Button size="sm" onClick={() => void existing.refetch()}>
+              Retry
+            </Button>
+          </div>
+        </div>
+      ) : loadingEdit ? (
         // Skeletons in the shape of what is coming, same field grid, same row
         // heights, rather than a centred spinner on a full panel.
         <div className="entity-form" role="status" aria-label="Loading record">
@@ -308,18 +339,24 @@ export function NodeFormDialog({
             <p role="alert" className="mb-4 flex items-start gap-2 text-sm text-danger">
               <Glyph name="close" size={14} className="mt-0.5 shrink-0" />
               <span>
-                <strong className="font-semibold">Couldn’t save.</strong> {saveError} Nothing was lost, everything
-                you typed is still here.
+                <strong className="font-semibold">Couldn’t save.</strong> {saveError} Nothing was
+                lost, everything you typed is still here.
               </span>
             </p>
           )}
           {duplicateCheck?.candidates.length ? (
-            <div className={`dedup-live${pendingSubmit ? ' dedup-live--checkpoint' : ''}`} aria-live="polite">
+            <div
+              className={`dedup-live${pendingSubmit ? ' dedup-live--checkpoint' : ''}`}
+              aria-live="polite"
+            >
               <div className="spread">
                 <div>
-                  <strong>{pendingSubmit ? 'Review before creating' : 'Possible existing records'}</strong>
+                  <strong>
+                    {pendingSubmit ? 'Review before creating' : 'Possible existing records'}
+                  </strong>
                   <div className="u-muted" style={{ fontSize: 'var(--ae-text-xs)' }}>
-                    Vitae found {duplicateCheck.candidates.length} same-type candidate{duplicateCheck.candidates.length === 1 ? '' : 's'}.
+                    Vitae found {duplicateCheck.candidates.length} same-type candidate
+                    {duplicateCheck.candidates.length === 1 ? '' : 's'}.
                   </div>
                 </div>
                 {checkingDuplicates ? <Spinner /> : null}
@@ -330,10 +367,13 @@ export function NodeFormDialog({
                     <div className="row__main">
                       <div className="row__title">{candidate.title}</div>
                       <div className="row__sub">
-                        {candidate.verdict} · {candidate.score.toFixed(0)}% · {candidate.evidence.join(' · ')}
+                        {candidate.verdict} · {candidate.score.toFixed(0)}% ·{' '}
+                        {candidate.evidence.join(' · ')}
                       </div>
                       {candidate.contradictions.length ? (
-                        <div className="dedup-live__warning">{candidate.contradictions.map((item) => item.label).join(' · ')}</div>
+                        <div className="dedup-live__warning">
+                          {candidate.contradictions.map((item) => item.label).join(' · ')}
+                        </div>
                       ) : null}
                     </div>
                     <Button
@@ -367,7 +407,9 @@ export function NodeFormDialog({
               ) : null}
             </div>
           ) : checkingDuplicates ? (
-            <div className="dedup-live dedup-live--quiet"><Spinner /> Checking for existing records…</div>
+            <div className="dedup-live dedup-live--quiet">
+              <Spinner /> Checking for existing records…
+            </div>
           ) : null}
           <EntityForm
             key={nodeId ?? 'create'}

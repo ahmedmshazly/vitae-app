@@ -5,6 +5,7 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { SOURCE_TYPES } from '@vitae/core';
 import { describe, expect, it } from 'vitest';
 import { V1_MOUNT_PREFIXES } from '../../openapi/mounts.js';
 import { buildOpenApiDocument } from '../../openapi/spec.js';
@@ -27,8 +28,16 @@ describe('OpenAPI document', () => {
 
   it('documents at least one path for every v1 mount prefix', () => {
     const paths = Object.keys(buildOpenApiDocument().paths ?? {});
-    const missing = V1_MOUNT_PREFIXES.filter((prefix) => !paths.some((p) => pathCoversMount(p, prefix)));
+    const missing = V1_MOUNT_PREFIXES.filter(
+      (prefix) => !paths.some((p) => pathCoversMount(p, prefix)),
+    );
     expect(missing, `undocumented mounts: ${missing.join(', ')}`).toEqual([]);
+  });
+
+  it('describes application provenance with the shared source enum', () => {
+    const summary = buildOpenApiDocument().components?.schemas?.ApplicationSummary as
+      { properties?: { source?: unknown } } | undefined;
+    expect(summary?.properties?.source).toEqual({ type: 'string', enum: [...SOURCE_TYPES] });
   });
 
   it('matches the checked-in docs/api/openapi.json (run pnpm openapi to refresh)', () => {

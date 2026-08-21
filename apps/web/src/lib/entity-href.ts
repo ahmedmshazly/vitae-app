@@ -1,9 +1,10 @@
 import { isNodeType, type NodeType } from '@vitae/core';
 
-/** Detail page for a node, people/orgs keep CRM hubs; everything else is `/n/:id`. */
+/** Detail page for a node, people/orgs keep Network dossiers; everything else is `/n/:id`. */
 export function entityHref(type: string, id: string): string {
-  if (type === 'person') return `/people/${id}`;
-  if (type === 'organization') return `/orgs/${id}`;
+  if (type === 'person') return `/network/people/${id}`;
+  if (type === 'organization') return `/network/organizations/${id}`;
+  if (type === 'application') return `/career/applications/${id}`;
   return `/n/${id}`;
 }
 
@@ -12,11 +13,12 @@ export function entityHref(type: string, id: string): string {
  * GitHub hub; every other creatable type uses generic Browse.
  */
 export function entityListHref(type: string): string {
-  if (type === 'person') return '/people';
-  if (type === 'organization') return '/orgs';
-  if (type === 'repository') return '/repositories';
+  if (type === 'person') return '/network/people';
+  if (type === 'organization') return '/network/organizations';
+  if (type === 'application') return '/career/applications';
+  if (type === 'repository') return '/data/sources/github';
   if (isNodeType(type)) return `/browse/${type as NodeType}`;
-  return '/collections';
+  return '/explore/library';
 }
 
 export function typeLabel(type: string): string {

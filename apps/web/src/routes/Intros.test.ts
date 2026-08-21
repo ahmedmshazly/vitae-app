@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { edgeLabel, edgeWeight, targetFacts } from './Intros.js';
+import { contactLensHref, edgeLabel, edgeWeight, reachLensHref, targetFacts } from './Intros.js';
 
 const hop = (over: Partial<Parameters<typeof edgeLabel>[0]> = {}) => ({
   nodeId: 'n1',
@@ -87,5 +87,23 @@ describe('targetFacts', () => {
   // explains why there is no path, so it stays.
   it('omits open roles when there are none, and always states what you know', () => {
     expect(targetFacts(t({ peopleCount: 0, openRoles: 0 }))).toBe('0 known');
+  });
+});
+
+describe('network intelligence links', () => {
+  it('carries the selected organization into the contact lens as an explicit intro ask', () => {
+    const url = new URL(contactLensHref('Nile Robotics'), 'https://vitae.local');
+    expect(url.pathname).toBe('/network/intelligence');
+    expect(url.searchParams.get('lens')).toBe('contact');
+    expect(url.searchParams.get('need')).toBe('intro');
+    expect(url.searchParams.get('org')).toBe('Nile Robotics');
+    expect(url.searchParams.get('run')).toBe('1');
+  });
+
+  it('keeps a selected target on the canonical reach lens', () => {
+    const url = new URL(reachLensHref('org-1'), 'https://vitae.local');
+    expect(url.pathname).toBe('/network/intelligence');
+    expect(url.searchParams.get('lens')).toBe('reach');
+    expect(url.searchParams.get('org')).toBe('org-1');
   });
 });

@@ -18,6 +18,7 @@ import {
   RegisterRule,
   Section,
   SkeletonRows,
+  StatusTrace,
 } from '@vitae/ui';
 import { api } from '../lib/api.js';
 import { useToast } from '../features/Toast.js';
@@ -94,9 +95,13 @@ export function Repositories() {
   const { flash } = useToast();
   const [token, setToken] = useState('');
   const tokenId = useId();
+  const tokenHelpId = `${tokenId}-help`;
   const bulk = useBulkNodeDelete({ noun: 'repository', nouns: 'repositories' });
 
-  const settings = useQuery({ queryKey: ['settings'], queryFn: () => api.get<Settings>('/settings') });
+  const settings = useQuery({
+    queryKey: ['settings'],
+    queryFn: () => api.get<Settings>('/settings'),
+  });
   const repos = useQuery({
     queryKey: ['nodes', 'repository'],
     queryFn: () => api.get<{ nodes: RepoNode[] }>('/nodes?type=repository'),
@@ -128,7 +133,8 @@ export function Repositories() {
   });
 
   const sync = useMutation({
-    mutationFn: () => api.post<{ status: string; created: number; updated: number }>('/imports/github/sync', {}),
+    mutationFn: () =>
+      api.post<{ status: string; created: number; updated: number }>('/imports/github/sync', {}),
     onSuccess: (r) => {
       if (r.status === 'not_modified') flash('Already up to date. Nothing changed.');
       else flash(`Synced: ${r.created} new · ${r.updated} updated.`);
@@ -138,7 +144,8 @@ export function Repositories() {
   });
 
   const list = useMemo(
-    () => [...(repos.data?.nodes ?? [])].sort((a, b) => (b.props.stars ?? 0) - (a.props.stars ?? 0)),
+    () =>
+      [...(repos.data?.nodes ?? [])].sort((a, b) => (b.props.stars ?? 0) - (a.props.stars ?? 0)),
     [repos.data],
   );
   const visibleIds = useMemo(() => list.map((r) => r.id), [list]);
@@ -147,10 +154,13 @@ export function Repositories() {
     () => list.map((r) => ({ id: r.id, title: r.props.full_name ?? r.title })),
     [list],
   );
-  const selectedTitles = useMemo(() => titlesForSelection(titled, bulk.selected), [titled, bulk.selected]);
+  const selectedTitles = useMemo(
+    () => titlesForSelection(titled, bulk.selected),
+    [titled, bulk.selected],
+  );
 
   return (
-    <div className="page">
+    <div className="page data-workspace-page data-repositories-page">
       <PageHeader
         title="Repositories"
         subtitle="Connect GitHub once, then sync your repos in as first-class records. Languages become skills automatically."
@@ -160,11 +170,14 @@ export function Repositories() {
             shortcuts={[{ keys: '⌘P', label: 'Command palette → “Sync GitHub”' }]}
           >
             <p>
-              Add a GitHub <strong>personal access token</strong> (repo read scope). <strong>Sync now</strong> pulls
-              your non-fork repos in as <code>repository</code> nodes and links each repo’s primary language to a{' '}
-              <code>skill</code>.
+              Add a GitHub <strong>personal access token</strong> (repo read scope).{' '}
+              <strong>Sync now</strong> pulls your non-fork repos in as <code>repository</code>{' '}
+              nodes and links each repo’s primary language to a <code>skill</code>.
             </p>
-            <p>Each repo is a normal record, open it to add context, connect it to a project, or hide it.</p>
+            <p>
+              Each repo is a normal record, open it to add context, connect it to a project, or hide
+              it.
+            </p>
           </InfoPopover>
         }
         actions={
@@ -176,7 +189,7 @@ export function Repositories() {
             />
             <Button
               variant="primary"
-              glyph="capture"
+              glyph="repository"
               disabled={!connection.canSync || sync.isPending}
               onClick={() => sync.mutate()}
               aria-label={
@@ -204,6 +217,111 @@ export function Repositories() {
         label={list.length > 0 ? 'Synced repositories by star rank' : undefined}
       />
 
+      <nav className="data-process" aria-label="Repository sync workflow">
+        <ol>
+          <li
+            data-state={connection.connected ? 'done' : 'current'}
+            aria-current={!connection.connected ? 'step' : undefined}
+          >
+            <span className="data-process__node" aria-hidden />
+            <span>
+              <strong>Connect privately</strong>
+              <small>Store one server-side token</small>
+            </span>
+          </li>
+          <li
+            data-state={
+              sync.isPending || (connection.connected && !lastSyncAt && list.length === 0)
+                ? 'current'
+                : connection.connected && (Boolean(lastSyncAt) || list.length > 0)
+                  ? 'done'
+                  : 'upcoming'
+            }
+            aria-current={
+              sync.isPending || (connection.connected && !lastSyncAt && list.length === 0)
+                ? 'step'
+                : undefined
+            }
+          >
+            <span className="data-process__node" aria-hidden />
+            <span>
+              <strong>Sync records</strong>
+              <small>Pull current non-fork repositories</small>
+            </span>
+          </li>
+          <li
+            data-state={list.length > 0 && !sync.isPending ? 'current' : 'upcoming'}
+            aria-current={list.length > 0 && !sync.isPending ? 'step' : undefined}
+          >
+            <span className="data-process__node" aria-hidden />
+            <span>
+              <strong>Enrich the graph</strong>
+              <small>Open, connect, or annotate</small>
+            </span>
+          </li>
+        </ol>
+      </nav>
+
+      <div className="data-operation-trace">
+        {settings.isLoading ? (
+          <StatusTrace
+            tone="live"
+            label="Checking GitHub connection"
+            detail="No credential is shown"
+          />
+        ) : settings.isError ? (
+          <StatusTrace
+            tone="danger"
+            label="GitHub settings unavailable"
+            detail={(settings.error as Error).message}
+          />
+        ) : saveToken.isPending ? (
+          <StatusTrace tone="live" label="Saving GitHub token" detail="Server-side only" />
+        ) : saveToken.isError ? (
+          <StatusTrace
+            tone="danger"
+            label="GitHub token was not saved"
+            detail={(saveToken.error as Error).message}
+          />
+        ) : disconnect.isPending ? (
+          <StatusTrace
+            tone="live"
+            label="Disconnecting GitHub"
+            detail="Synced repository records will remain"
+          />
+        ) : disconnect.isError ? (
+          <StatusTrace
+            tone="danger"
+            label="GitHub was not disconnected"
+            detail={(disconnect.error as Error).message}
+          />
+        ) : sync.isPending ? (
+          <StatusTrace
+            tone="live"
+            label="Syncing GitHub repositories"
+            detail="Checking current records"
+          />
+        ) : sync.isError ? (
+          <StatusTrace
+            tone="danger"
+            label="Repository sync stopped"
+            detail={(sync.error as Error).message}
+          />
+        ) : connection.connected ? (
+          <StatusTrace
+            tone={lastSyncAt ? 'success' : 'neutral'}
+            label={lastSyncAt ? 'GitHub connection is current' : 'GitHub is ready to sync'}
+            detail={lastSyncAt ? `Last sync ${formatLastSync(lastSyncAt)}` : 'No sync recorded'}
+          />
+        ) : (
+          <StatusTrace
+            tone="warning"
+            label="GitHub needs a connection"
+            detail="Add a read-only token below"
+          />
+        )}
+      </div>
+
       <BulkDeleteConfirm
         open={bulk.confirmDelete}
         onOpenChange={bulk.setConfirmDelete}
@@ -220,7 +338,18 @@ export function Repositories() {
       <Section
         title="GitHub connection"
         actions={
-          <Chip tone={connection.tone === 'danger' ? 'danger' : connection.tone === 'success' ? 'success' : connection.tone === 'warning' ? 'warning' : 'default'} mono>
+          <Chip
+            tone={
+              connection.tone === 'danger'
+                ? 'danger'
+                : connection.tone === 'success'
+                  ? 'success'
+                  : connection.tone === 'warning'
+                    ? 'warning'
+                    : 'default'
+            }
+            mono
+          >
             {connection.label}
           </Chip>
         }
@@ -236,37 +365,61 @@ export function Repositories() {
             <SkeletonRows rows={3} />
           </div>
         ) : (
-          <>
-            <div className="spread" style={{ marginBottom: 'var(--ae-space-3)' }}>
-              <span className="u-muted">Last sync</span>
-              <Mono>{formatLastSync(lastSyncAt)}</Mono>
+          <div className="data-github-connection">
+            <div className="data-github-connection__brief">
+              <span className="data-state-dot" data-tone={connection.tone} aria-hidden />
+              <div>
+                <strong>
+                  {connection.connected ? 'Credential available' : 'Credential required'}
+                </strong>
+                <p>
+                  The token is encrypted at rest and never returned to this browser after saving.
+                </p>
+              </div>
+              <div className="data-github-connection__time">
+                <span>Last sync</span>
+                <Mono>{formatLastSync(lastSyncAt)}</Mono>
+              </div>
             </div>
-            <div className="field">
-              <label className="label" htmlFor={tokenId}>
-                Personal access token
-              </label>
-              <div className="hstack">
+            <form
+              className="data-github-connection__form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (token.trim() && !saveToken.isPending) saveToken.mutate(token.trim());
+              }}
+            >
+              <div className="field">
+                <label className="label" htmlFor={tokenId}>
+                  {connection.connected ? 'Replace personal access token' : 'Personal access token'}
+                </label>
                 <input
                   id={tokenId}
                   className="input"
                   type="password"
                   autoComplete="off"
                   spellCheck={false}
-                  style={{ flex: 1 }}
                   placeholder="ghp_… (repo read scope)"
                   value={token}
                   onChange={(e) => setToken(e.target.value)}
+                  aria-describedby={tokenHelpId}
                 />
+              </div>
+              <div className="data-github-connection__actions">
                 <Button
+                  type="submit"
                   size="sm"
                   variant="primary"
                   disabled={!token.trim() || saveToken.isPending}
-                  onClick={() => saveToken.mutate(token.trim())}
                 >
-                  {saveToken.isPending ? 'Saving…' : connection.connected ? 'Replace' : 'Connect'}
+                  {saveToken.isPending
+                    ? 'Saving…'
+                    : connection.connected
+                      ? 'Replace token'
+                      : 'Connect GitHub'}
                 </Button>
                 {connection.connected && (
                   <Button
+                    type="button"
                     size="sm"
                     disabled={disconnect.isPending}
                     onClick={() => disconnect.mutate()}
@@ -276,12 +429,13 @@ export function Repositories() {
                   </Button>
                 )}
               </div>
-            </div>
-            <p className="u-muted" style={{ fontSize: 'var(--ae-text-xs)', margin: '8px 0 0' }}>
-              Stored server-side only, never echoed back. Create one at github.com → Settings → Developer settings →
-              Personal access tokens. Disconnecting removes the credential and keeps synced repositories.
+            </form>
+            <p id={tokenHelpId} className="data-github-connection__help">
+              Stored server-side only, never echoed back. Create one at github.com → Settings →
+              Developer settings → Personal access tokens. Disconnecting removes the credential and
+              keeps synced repositories.
             </p>
-          </>
+          </div>
         )}
       </Section>
 
@@ -311,7 +465,7 @@ export function Repositories() {
                 ? 'Retry the GitHub settings request above, then sync.'
                 : connection.connected
                   ? 'Hit “Sync now” to pull your repositories in.'
-                  : 'Add a token above, then sync, your repos and their languages land automatically.'
+                  : 'Add a token above, then sync; your repos and their languages land automatically.'
             }
             action={
               connection.canSync ? (
@@ -322,22 +476,33 @@ export function Repositories() {
             }
           />
         ) : (
-          <div className="repo-list">
+          <div className="repo-list data-repo-ledger" aria-busy={bulk.deleting}>
             <SelectAllRow
               allSelected={allVisibleSelected}
               onToggle={() => bulk.toggleAll(visibleIds, allVisibleSelected)}
             />
-            {list.map((r) => {
+            {list.map((r, index) => {
               const isSelected = bulk.isSelected(r.id);
               const name = r.props.full_name ?? r.title;
               return (
-                <div key={r.id} className="row" data-selected={isSelected || undefined}>
+                <div
+                  key={r.id}
+                  className="row data-repo-row"
+                  data-selected={isSelected || undefined}
+                >
+                  <Mono className="data-ledger-index" aria-hidden>
+                    {String(index + 1).padStart(2, '0')}
+                  </Mono>
                   <SelectCheckbox
                     checked={isSelected}
                     label={`Select ${name}`}
                     onToggle={() => bulk.toggleOne(r.id)}
                   />
-                  <Link to={entityHref('repository', r.id)} className="people__link" aria-label={`Open ${name}`}>
+                  <Link
+                    to={entityHref('repository', r.id)}
+                    className="people__link data-repo-link"
+                    aria-label={`Open ${name}`}
+                  >
                     <div className="row__main">
                       <div className="row__title">
                         {name} {r.props.is_private && <Chip mono>private</Chip>}
@@ -347,6 +512,9 @@ export function Repositories() {
                     {r.props.primary_language && <Chip mono>{r.props.primary_language}</Chip>}
                     {typeof r.props.stars === 'number' && r.props.stars > 0 && (
                       <Mono className="u-faint">{r.props.stars} stars</Mono>
+                    )}
+                    {typeof r.props.forks === 'number' && r.props.forks > 0 && (
+                      <Mono className="u-faint">{r.props.forks} forks</Mono>
                     )}
                     <ProvenanceChip source={r.source} />
                   </Link>

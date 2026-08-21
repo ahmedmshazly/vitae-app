@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { TOUR_STOPS } from './Tour.js';
+import { NODE_TYPES } from '@vitae/core';
+import { adjacentTourImages, TOUR_STOPS } from './Tour.js';
 
 describe('TOUR_STOPS', () => {
   it('walks five product surfaces in order', () => {
@@ -25,5 +26,16 @@ describe('TOUR_STOPS', () => {
     for (const stop of TOUR_STOPS) {
       expect(stop.img).toMatch(/^\/landing\/.+\.png$/);
     }
+  });
+
+  it('preloads only the neighboring captures', () => {
+    expect(adjacentTourImages(0)).toEqual(['/landing/today.png']);
+    expect(adjacentTourImages(2)).toEqual(['/landing/today.png', '/landing/graph.png']);
+    expect(adjacentTourImages(4)).toEqual(['/landing/graph.png']);
+  });
+
+  it('derives structured-form coverage from the canonical catalog', () => {
+    const depth = TOUR_STOPS.find((stop) => stop.key.includes('DEPTH'));
+    expect(depth?.body).toContain(`All ${NODE_TYPES.length} record types`);
   });
 });

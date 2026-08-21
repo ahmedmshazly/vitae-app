@@ -5,7 +5,12 @@ import { NODE_PROPS_SCHEMAS } from '../schema/node-props.js';
 import { EDGE_PROPS_SCHEMAS } from '../schema/edge-props.js';
 import { NODE_FORM_DESCRIPTORS } from './node-forms.js';
 import { EDGE_FORM_DESCRIPTORS, edgeEndpointsAllowed } from './edge-forms.js';
-import { SUBJECT_BEARING_TYPES, isSubjectBearing, subjectAssignment, subjectEdgeFor } from './subjects.js';
+import {
+  SUBJECT_BEARING_TYPES,
+  isSubjectBearing,
+  subjectAssignment,
+  subjectEdgeFor,
+} from './subjects.js';
 
 /** Keys of a props schema when it is an object schema; null for records. */
 function shapeKeys(schema: z.ZodType): Set<string> | null {
@@ -94,6 +99,7 @@ describe('form descriptors stay honest against the Zod schemas', () => {
       ['REFERRED_BY', 'application', 'person'],
       ['APPLIED_TO', 'application', 'organization'],
       ['APPLIED_TO', 'job_posting', 'organization'],
+      ['RELATES_TO', 'application', 'job_posting'],
       ['RELATES_TO', 'goal', 'publication'],
       ['COMPLETED', 'person', 'course'],
       ['RECOMMENDS', 'person', 'reference'],
@@ -143,8 +149,7 @@ describe('form descriptors stay honest against the Zod schemas', () => {
     for (const type of NODE_TYPES) {
       const subject = NODE_FORM_DESCRIPTORS[type].subject;
       if (!subject) continue;
-      const [src, dst] =
-        subject.direction === 'in' ? ['person', type] : [type, 'person'];
+      const [src, dst] = subject.direction === 'in' ? ['person', type] : [type, 'person'];
       const result = edgeEndpointsAllowed(subject.edgeType, src, dst);
       expect(result.ok, `${type} subject ${subject.edgeType}: ${src} → ${dst}`).toBe(true);
     }

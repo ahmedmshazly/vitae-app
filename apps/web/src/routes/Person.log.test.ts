@@ -61,7 +61,8 @@ describe('interactionTicks', () => {
   });
 
   it('keeps every tick inside the rule', () => {
-    for (const t of interactionTicks([at('2026-01-01T00:00:00Z'), at('2026-12-31T00:00:00Z')]).ticks) {
+    for (const t of interactionTicks([at('2026-01-01T00:00:00Z'), at('2026-12-31T00:00:00Z')])
+      .ticks) {
       expect(t.at).toBeGreaterThan(0);
       expect(t.at).toBeLessThan(1);
     }

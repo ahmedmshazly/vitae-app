@@ -17,6 +17,7 @@ import {
   Skeleton,
   Section,
   SkeletonRows,
+  StatusTrace,
 } from '@vitae/ui';
 import { tokenizeQuery } from '@vitae/core';
 import { api } from '../lib/api.js';
@@ -40,10 +41,13 @@ export const COLLECTION_TILE_GROUPS = NEW_ENTITY_MENU_GROUPS;
 
 export function Collections() {
   const [saveOpen, setSaveOpen] = useState(false);
-  const [confirmDeleteView, setConfirmDeleteView] = useState<{ id: string; name: string } | null>(null);
+  const [confirmDeleteView, setConfirmDeleteView] = useState<{ id: string; name: string } | null>(
+    null,
+  );
   const [viewName, setViewName] = useState('');
   const [params, setParams] = useSearchParams();
   const q = params.get('q') ?? '';
+  const queryTokens = tokens(q);
   const [draft, setDraft] = useState('');
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -98,7 +102,9 @@ export function Collections() {
       flash('Saved, pinned to the rail');
     },
     onError: (err) =>
-      flash(err instanceof Error ? err.message : 'The view could not be saved.', { variant: 'error' }),
+      flash(err instanceof Error ? err.message : 'The view could not be saved.', {
+        variant: 'error',
+      }),
   });
 
   const deleteViewM = useMutation({
@@ -118,7 +124,9 @@ export function Collections() {
       });
     },
     onError: (err) =>
-      flash(err instanceof Error ? err.message : 'The view could not be deleted.', { variant: 'error' }),
+      flash(err instanceof Error ? err.message : 'The view could not be deleted.', {
+        variant: 'error',
+      }),
   });
 
   function saveView() {
@@ -127,36 +135,79 @@ export function Collections() {
   }
 
   return (
-    <div className="page">
+    <div className="page explore-library">
       <PageHeader
-        title="Collections"
-        subtitle="Everything, filterable, the deterministic ask layer."
+        title="Library"
+        subtitle="Browse every record as one evidence library, then keep useful queries as reusable lenses."
         actions={<NewEntityMenu />}
       />
       <RegisterRule />
 
-      <form className="coll__bar" onSubmit={addToken}>
-        <span className="u-faint">⌕</span>
-        {tokens(q).map((tok) => (
+      <form className="coll__bar explore-library__query" role="search" onSubmit={addToken}>
+        <label className="explore-library__query-label" htmlFor="library-query">
+          Query
+        </label>
+        {queryTokens.map((tok) => (
           <span key={tok} className="coll__chip">
             {tok}
-            <button type="button" className="coll__chipx" onClick={() => removeToken(tok)} aria-label={`remove ${tok}`}>
+            <button
+              type="button"
+              className="coll__chipx"
+              onClick={() => removeToken(tok)}
+              aria-label={`remove ${tok}`}
+            >
               ×
             </button>
           </span>
         ))}
         <input
+          id="library-query"
           className="coll__input"
-          placeholder="type:person tag:ml city:Berlin…"
+          placeholder={q ? 'Add another clause…' : 'Try type:person, tag:ml, or city:Berlin'}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
         />
         {q && (
-          <Button size="sm" onClick={() => { setViewName(q.slice(0, 60)); setSaveOpen(true); }}>
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => {
+              setViewName(q.slice(0, 60));
+              setSaveOpen(true);
+            }}
+          >
             Save view
           </Button>
         )}
       </form>
+
+      <div className="explore-library__trace">
+        {q ? (
+          <StatusTrace
+            tone={results.isError ? 'danger' : results.isFetching ? 'live' : 'neutral'}
+            label={
+              results.isError
+                ? 'Query unavailable'
+                : results.isFetching
+                  ? 'Reading the library'
+                  : `${results.data?.nodes.length ?? 0} matching ${results.data?.nodes.length === 1 ? 'record' : 'records'}`
+            }
+            detail={`${queryTokens.length} ${queryTokens.length === 1 ? 'clause' : 'clauses'} · deterministic match`}
+          />
+        ) : (
+          <StatusTrace
+            tone={counts.isError ? 'danger' : counts.isFetching ? 'live' : 'neutral'}
+            label={
+              counts.isError
+                ? 'Library index unavailable'
+                : counts.isFetching
+                  ? 'Reading the library index'
+                  : `${counts.data?.total ?? 0} ${counts.data?.total === 1 ? 'record' : 'records'} indexed`
+            }
+            detail={`${views.data?.views.length ?? 0} saved ${views.data?.views.length === 1 ? 'view' : 'views'}`}
+          />
+        )}
+      </div>
 
       {q ? (
         <Section title="Matches" meta={results.data?.nodes.length}>
@@ -174,6 +225,11 @@ export function Collections() {
               glyph="filter"
               title="No matches"
               hint="Relax a filter, or check the Trash, deleted records stay recoverable for 30 days."
+              action={
+                <Link className="vt-btn vt-btn--sm" to="/data/trash">
+                  Check Trash
+                </Link>
+              }
             />
           ) : (
             results.data!.nodes.map((n) => (
@@ -200,29 +256,29 @@ export function Collections() {
           ) : (
             COLLECTION_TILE_GROUPS.map((group) => (
               <Section key={group.label} title={group.label}>
-                <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                <div className="explore-library__register">
                   {group.types.map((type) => (
                     <button
                       key={type}
                       type="button"
-                      // No lift, no glow: the hover was a translateY plus
-                      // --ae-glow-soft, which is both a banned effect and an
-                      // undefined token, so the whole box-shadow was inert.
-                      className="cursor-pointer rounded border border-hairline bg-surface p-4 text-left text-ink hover:border-strong"
+                      className="explore-library__type"
                       onClick={() => navigate(entityListHref(type))}
+                      aria-label={`Open ${typeLabel(type)} records${counts.data ? `, ${counts.data.counts[type] ?? 0}` : ''}`}
                     >
-                      <span className="flex items-center justify-between">
+                      <span className="explore-library__type-glyph">
                         <EntityGlyph type={type} />
-                        {/* A pending or failed count rendered 0, which is
-                            indistinguishable from a type that is genuinely
-                            empty, the tile stated a fact it did not have. */}
+                      </span>
+                      <span className="explore-library__type-copy">
+                        <strong>{typeLabel(type)}</strong>
+                        <span>Open register</span>
+                      </span>
+                      <span className="explore-library__type-count" aria-hidden>
                         {counts.isLoading ? (
                           <Skeleton width={20} height={15} />
                         ) : (
                           <Mono className="text-md">{counts.data?.counts[type] ?? 0}</Mono>
                         )}
                       </span>
-                      <span className="mt-2 block text-base text-ink-soft capitalize">{typeLabel(type)}</span>
                     </button>
                   ))}
                 </div>
@@ -232,22 +288,23 @@ export function Collections() {
 
           {views.isError && (
             <Section title="Saved views">
-              <p role="alert" className="text-sm text-danger">
-                <strong className="font-semibold">Couldn’t load your saved views.</strong> The collections above are
-                unaffected.
-              </p>
+              <ErrorState
+                title="Couldn’t load saved views"
+                detail="The library index is unaffected. Retry to restore the reusable query list."
+                onRetry={() => void views.refetch()}
+              />
             </Section>
           )}
           {(views.data?.views.length ?? 0) > 0 && (
             <Section title="Saved views" meta={views.data!.views.length}>
               {views.data!.views.map((v) => (
-                <div key={v.id} className="row">
+                <div key={v.id} className="row explore-library__saved-view">
                   <button
                     className="row__main cursor-pointer border-0 bg-transparent p-0 text-left text-ink"
                     onClick={() => setQuery(v.query)}
                   >
                     <div className="row__title">{v.name}</div>
-                    <div className="row__sub u-mono">{v.query}</div>
+                    <div className="row__sub u-mono">Lens · {v.query}</div>
                   </button>
                   {/* Was a bare × that deleted on click with no confirmation,
                       no toast and no undo, the only destructive action left

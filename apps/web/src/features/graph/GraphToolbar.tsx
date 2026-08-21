@@ -1,4 +1,4 @@
-import { InfoPopover } from '@vitae/ui';
+import { InfoPopover, StatusTrace } from '@vitae/ui';
 import { colorForType, type GraphPalette } from '../../lib/graph-palette.js';
 import { LENSES, shortTypeLabel } from './constants.js';
 import type { GraphLens, GraphMode } from './types.js';
@@ -19,6 +19,10 @@ export interface GraphToolbarProps {
   truncated: boolean;
   palette: GraphPalette;
   modeHint: string;
+  nodeCount?: number;
+  connectionCount?: number;
+  focusTitle?: string;
+  busy?: boolean;
 }
 
 export function GraphToolbar({
@@ -36,95 +40,132 @@ export function GraphToolbar({
   truncated,
   palette,
   modeHint,
+  nodeCount,
+  connectionCount,
+  focusTitle,
+  busy = false,
 }: GraphToolbarProps) {
   return (
     <header className="lifemap__chrome">
-      <div className="lifemap__titleblock">
-        <span className="flex items-center gap-2">
-          <h1 className="lifemap__title">Life map</h1>
-          {/* The graph has real keyboard locomotion and no way to find out.
-              Nothing announced it, so it may as well not have existed. */}
-          <InfoPopover
-            title="Moving around the map"
-            shortcuts={[
-              { keys: '⌘F', label: 'Find a record and jump to it' },
-              { keys: '← →', label: 'Walk the connections of the selected record' },
-              { keys: 'Enter', label: 'Open the selected record' },
-              { keys: 'F', label: 'Re-centre the map on the selection' },
-              { keys: 'P', label: 'Toggle path mode' },
-              { keys: '+ −', label: 'Show more or fewer hops' },
-              { keys: 'Esc', label: 'Clear the selection' },
-            ]}
-          >
-            <p>
-              Colour marks the kind of record, the eight slots are fixed, so a type keeps its hue whatever is
-              filtered. Every node is labelled as well, so the colour never carries the meaning by itself.
-            </p>
-            <p>Double-click a node to open it; drag the background to pan and scroll to zoom.</p>
-          </InfoPopover>
-        </span>
-        <p className="lifemap__hint">
-          {modeHint}
-          <span className="u-faint"> · depth {depth}</span>
-          {truncated ? <span className="u-faint"> · truncated at 1.5k</span> : null}
-        </p>
+      <div className="explore-instrument__heading">
+        <div className="lifemap__titleblock">
+          <span className="flex items-center gap-2">
+            <h1 className="lifemap__title">Life map</h1>
+            {/* The graph has real keyboard locomotion and no way to find out.
+                Nothing announced it, so it may as well not have existed. */}
+            <InfoPopover
+              title="Moving around the map"
+              shortcuts={[
+                { keys: '⌘F', label: 'Find a record and jump to it' },
+                { keys: '← →', label: 'Walk the connections of the selected record' },
+                { keys: 'Enter', label: 'Open the selected record' },
+                { keys: 'F', label: 'Re-centre the map on the selection' },
+                { keys: 'P', label: 'Toggle path mode' },
+                { keys: '+ −', label: 'Show more or fewer hops' },
+                { keys: 'Esc', label: 'Clear the selection' },
+              ]}
+            >
+              <p>
+                Colour marks the kind of record, the eight slots are fixed, so a type keeps its hue
+                whatever is filtered. Every node is labelled as well, so the colour never carries
+                the meaning by itself.
+              </p>
+              <p>Double-click a node to open it; drag the background to pan and scroll to zoom.</p>
+            </InfoPopover>
+          </span>
+          <p className="lifemap__hint">
+            {modeHint}
+            <span className="u-faint"> · depth {depth}</span>
+          </p>
+        </div>
+        <StatusTrace
+          className="explore-instrument__trace"
+          tone={truncated ? 'warning' : busy ? 'live' : 'neutral'}
+          label={
+            busy
+              ? 'Connecting records'
+              : truncated
+                ? 'Showing a bounded map'
+                : 'Map assembled from your records'
+          }
+          detail={
+            busy
+              ? 'Reading nodes and relationships'
+              : `${nodeCount ?? 0} ${nodeCount === 1 ? 'record' : 'records'} · ${connectionCount ?? 0} ${connectionCount === 1 ? 'connection' : 'connections'}${focusTitle ? ` · focus ${focusTitle}` : ''}${truncated ? ' · limit 1,500' : ''}`
+          }
+        />
       </div>
 
-      <div className="lifemap__modes" role="group" aria-label="Explorer mode">
-        <button
-          type="button"
-          className={`lifemap__mode${mode === 'explore' ? ' lifemap__mode--on' : ''}`}
-          onClick={() => onMode('explore')}
-        >
-          Explore
-        </button>
-        <button
-          type="button"
-          className={`lifemap__mode${mode === 'path' ? ' lifemap__mode--on' : ''}`}
-          onClick={() => onMode('path')}
-        >
-          Path
-        </button>
-      </div>
-
-      <div className="lifemap__row" aria-label="Entity filters">
-        {typeGroups.map((group) => (
-          <div key={group.label} className="lifemap__group">
-            <span className="lifemap__grouplabel">{group.label}</span>
-            <div className="chips">
-              {group.types.map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  className={`graph__filter${activeTypes.has(t) ? ' graph__filter--on' : ''}`}
-                  style={{ borderColor: activeTypes.has(t) ? colorForType(palette, t) : undefined }}
-                  onClick={() => onToggleType(t)}
-                >
-                  <span
-                    className="graph__filterdot"
-                    style={{ background: colorForType(palette, t) }}
-                    aria-hidden
-                  />
-                  {shortTypeLabel(t)}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="lifemap__row lifemap__row--lenses" aria-label="Discovery lenses">
-        {LENSES.map((l) => (
+      <div className="explore-control-band">
+        <span className="explore-control-band__label">Mode</span>
+        <div className="lifemap__modes" role="group" aria-label="Explorer mode">
           <button
-            key={l.id}
             type="button"
-            title={l.hint}
-            className={`lifemap__lens${lens === l.id ? ' lifemap__lens--on' : ''}`}
-            onClick={() => onLens(l.id)}
+            className={`lifemap__mode${mode === 'explore' ? ' lifemap__mode--on' : ''}`}
+            aria-pressed={mode === 'explore'}
+            onClick={() => onMode('explore')}
           >
-            {l.label}
+            Explore
           </button>
-        ))}
+          <button
+            type="button"
+            className={`lifemap__mode${mode === 'path' ? ' lifemap__mode--on' : ''}`}
+            aria-pressed={mode === 'path'}
+            onClick={() => onMode('path')}
+          >
+            Path
+          </button>
+        </div>
+      </div>
+
+      <div className="explore-control-band">
+        <span className="explore-control-band__label">Records</span>
+        <div className="lifemap__row" aria-label="Entity filters">
+          {typeGroups.map((group) => (
+            <div key={group.label} className="lifemap__group">
+              <span className="lifemap__grouplabel">{group.label}</span>
+              <div className="chips">
+                {group.types.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    aria-pressed={activeTypes.has(t)}
+                    className={`graph__filter${activeTypes.has(t) ? ' graph__filter--on' : ''}`}
+                    style={{
+                      borderColor: activeTypes.has(t) ? colorForType(palette, t) : undefined,
+                    }}
+                    onClick={() => onToggleType(t)}
+                  >
+                    <span
+                      className="graph__filterdot"
+                      style={{ background: colorForType(palette, t) }}
+                      aria-hidden
+                    />
+                    {shortTypeLabel(t)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="explore-control-band">
+        <span className="explore-control-band__label">Lens</span>
+        <div className="lifemap__row lifemap__row--lenses" aria-label="Discovery lenses">
+          {LENSES.map((l) => (
+            <button
+              key={l.id}
+              type="button"
+              title={l.hint}
+              aria-pressed={lens === l.id}
+              className={`lifemap__lens${lens === l.id ? ' lifemap__lens--on' : ''}`}
+              onClick={() => onLens(l.id)}
+            >
+              {l.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {lens === 'edgeKinds' && edgeTypes.length > 0 && (
@@ -133,6 +174,7 @@ export function GraphToolbar({
             <button
               key={et}
               type="button"
+              aria-pressed={activeEdgeTypes.has(et)}
               className={`graph__filter${activeEdgeTypes.has(et) ? ' graph__filter--on' : ''}`}
               onClick={() => onToggleEdgeType(et)}
             >

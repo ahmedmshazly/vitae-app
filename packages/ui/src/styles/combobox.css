@@ -66,7 +66,9 @@
   font-size: var(--ae-text-base);
   cursor: pointer;
   user-select: none;
-  transition: background var(--ae-dur-fast) var(--ae-ease), color var(--ae-dur-fast) var(--ae-ease);
+  transition:
+    background var(--ae-dur-fast) var(--ae-ease),
+    color var(--ae-dur-fast) var(--ae-ease);
 }
 .vt-cbx__opt-text {
   display: flex;
@@ -163,5 +165,11 @@
      travel that a zero duration cannot switch off. */
   .vt-cbx__panel {
     animation: none;
+  }
+}
+
+@media (pointer: coarse) {
+  .vt-cbx__opt {
+    min-height: var(--ae-hit-target);
   }
 }

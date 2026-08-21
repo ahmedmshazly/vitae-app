@@ -2,10 +2,10 @@
  * Chronograph, career/life timeline with brush → review (FR-VIS-002/005).
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useReducedMotion } from 'motion/react';
-import { ErrorState, SkeletonRows } from '@vitae/ui';
+import { EmptyState, ErrorState, SkeletonRows, StatusTrace } from '@vitae/ui';
 import { api } from '../../lib/api.js';
 import { todayIso } from '../../lib/dates.js';
 import { entityHref } from '../../lib/entity-href.js';
@@ -54,7 +54,12 @@ export function TimelineView() {
     queryFn: () => api.get<TimelineData>('/timeline'),
   });
 
-  const { data: review, isFetching: reviewLoading, isError: reviewFailed } = useQuery({
+  const {
+    data: review,
+    isFetching: reviewLoading,
+    isError: reviewFailed,
+    refetch: refetchReview,
+  } = useQuery({
     queryKey: ['timeline-review', brush?.from, brush?.to],
     queryFn: () =>
       api.get<TimelineReviewResult>(
@@ -101,7 +106,7 @@ export function TimelineView() {
     if (!data?.years.length) return;
     const t = setTimeout(() => jumpToday(), reducedMotion ? 50 : 400);
     return () => clearTimeout(t);
-  }, [data?.years, zoom]);  
+  }, [data?.years, zoom]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -161,25 +166,51 @@ export function TimelineView() {
 
   if (isError) {
     return (
-      <div className="page">
-        <ErrorState detail={(error as Error | null)?.message} onRetry={() => void refetch()} />
+      <div className="page page--chronograph explore-instrument-state">
+        <header className="explore-instrument-state__head">
+          <h1 className="lifemap__title">Chronograph</h1>
+          <StatusTrace
+            tone="danger"
+            label="Chronology unavailable"
+            detail="The dated records could not be read"
+          />
+        </header>
+        <div className="explore-instrument-state__body">
+          <ErrorState
+            title="Couldn’t assemble the chronograph"
+            detail={(error as Error | null)?.message}
+            onRetry={() => void refetch()}
+          />
+        </div>
       </div>
     );
   }
   if (isLoading || !data) {
     return (
-      <div className="page">
-        <SkeletonRows rows={8} />
+      <div className="page page--chronograph explore-instrument-state" aria-busy="true">
+        <header className="explore-instrument-state__head">
+          <h1 className="lifemap__title">Chronograph</h1>
+          <StatusTrace
+            tone="live"
+            label="Assembling chronology"
+            detail="Reading dated records and lanes"
+          />
+        </header>
+        <div className="explore-instrument-state__body">
+          <SkeletonRows rows={8} label="Assembling the chronograph" />
+        </div>
       </div>
     );
   }
 
+  const recordCount = data.lanes.reduce((sum, lane) => sum + lane.items.length, 0);
+
   const hint =
     mode === 'list'
-      ? 'Chronological list twin · Enter opens · L toggles view'
+      ? 'A keyboard-friendly list of the same dated evidence'
       : brush
-        ? `Reviewing ${brush.from} → ${brush.to} · Esc clears`
-        : 'Drag to brush a season · scroll · ⌘/Ctrl+wheel zoom · T today · L list';
+        ? `Reviewing ${brush.from} → ${brush.to}; press Escape to clear`
+        : 'Brush a season to review it, or scroll through the complete record';
 
   return (
     <div className={`page page--chronograph${brush ? ' page--chronograph-review' : ''}`}>
@@ -196,15 +227,25 @@ export function TimelineView() {
         onToday={jumpToday}
         onFit={fitCareer}
         hint={hint}
+        recordCount={recordCount}
+        activeRange={brush}
+        reviewState={reviewFailed ? 'failed' : reviewLoading ? 'loading' : brush ? 'ready' : 'idle'}
       />
 
       <div className="chronograph__body">
         <div className="chronograph__main">
           {data.lanes.length === 0 ? (
-            <div className="empty" style={{ padding: 80 }}>
-              <div className="empty__title">Nothing dated yet</div>
-              <div>Add start dates to roles, projects, education, events, or trips, or import a career.</div>
-            </div>
+            <EmptyState
+              className="explore-instrument__empty"
+              glyph="timeline"
+              title="Nothing dated yet"
+              hint="Add start dates to roles, projects, education, events, or trips, or import a career history."
+              action={
+                <Link className="vt-btn vt-btn--sm" to="/data/imports">
+                  Import records
+                </Link>
+              }
+            />
           ) : mode === 'list' ? (
             <TimelineList
               lanes={data.lanes}
@@ -241,6 +282,7 @@ export function TimelineView() {
             failed={reviewFailed}
             onClear={() => setBrush(null)}
             onExportMarkdown={exportMarkdown}
+            onRetry={() => void refetchReview()}
           />
         )}
       </div>

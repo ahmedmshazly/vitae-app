@@ -22,16 +22,47 @@ export interface SetupState {
 const DISMISS_KEY = 'vitae.v1.gettingStartedDismissed';
 
 const STEPS: Array<{ key: keyof SetupState; label: string; hint: string; to: string }> = [
-  { key: 'self', label: 'Set up your profile', hint: 'Your “self” record anchors everything.', to: '/people' },
-  { key: 'people', label: 'Add someone you know', hint: 'People power the CRM and reconnect nudges.', to: '/people' },
-  { key: 'interactions', label: 'Log an interaction', hint: 'Log a chat, coffee, or call to update cadence.', to: '/people' },
-  { key: 'github', label: 'Connect GitHub', hint: 'Sync your repos in as records; languages become skills.', to: '/repositories' },
-  { key: 'atoms', label: 'Add résumé atoms', hint: 'Reusable achievement bullets for the résumé engine.', to: '/resume/atoms' },
-  { key: 'resume', label: 'Build a résumé', hint: 'Turn a job description into a tailored one-pager.', to: '/resume/tailor' },
+  {
+    key: 'self',
+    label: 'Set up your profile',
+    hint: 'Your “self” record anchors everything.',
+    to: '/settings/profile',
+  },
+  {
+    key: 'people',
+    label: 'Add someone you know',
+    hint: 'People power relationship context and reconnect nudges.',
+    to: '/network/people',
+  },
+  {
+    key: 'interactions',
+    label: 'Log an interaction',
+    hint: 'Log a chat, coffee, or call to update cadence.',
+    to: '/network/people',
+  },
+  {
+    key: 'github',
+    label: 'Connect GitHub',
+    hint: 'Sync repositories as evidence; languages become skills.',
+    to: '/data/sources/github',
+  },
+  {
+    key: 'atoms',
+    label: 'Add résumé evidence',
+    hint: 'Reusable achievement statements for the résumé engine.',
+    to: '/career/resume/evidence',
+  },
+  {
+    key: 'resume',
+    label: 'Build a résumé',
+    hint: 'Turn a job description into a tailored one-pager.',
+    to: '/career/resume/tailor',
+  },
 ];
 
 export function useGettingStartedDismissed(): [boolean, () => void] {
-  const dismissed = typeof localStorage !== 'undefined' && localStorage.getItem(DISMISS_KEY) === '1';
+  const dismissed =
+    typeof localStorage !== 'undefined' && localStorage.getItem(DISMISS_KEY) === '1';
   return [dismissed, () => localStorage.setItem(DISMISS_KEY, '1')];
 }
 
@@ -84,10 +115,18 @@ export function GettingStarted({ setup, onDismiss }: { setup: SetupState; onDism
                   ].join(' ')}
                   aria-hidden
                 >
-                  {done ? <Glyph name="check" size={13} /> : <span className="size-1.5 rounded-full bg-current" />}
+                  {done ? (
+                    <Glyph name="check" size={13} />
+                  ) : (
+                    <span className="size-1.5 rounded-full bg-current" />
+                  )}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className={done ? 'block text-muted line-through' : 'block text-ink-strong'}>{s.label}</span>
+                  <span
+                    className={done ? 'block text-muted line-through' : 'block text-ink-strong'}
+                  >
+                    {s.label}
+                  </span>
                   {!done && <span className="block text-xs text-muted">{s.hint}</span>}
                 </span>
                 <span className="sr-only">{done ? 'done' : 'not done'}</span>
