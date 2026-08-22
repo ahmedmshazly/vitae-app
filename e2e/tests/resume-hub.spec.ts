@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { signInDemo } from './helpers/auth';
+import { chooseOption, chosenOption } from './helpers/controls';
 import { expectNoA11yViolations } from './helpers/a11y';
 
 const OVERVIEW = '**/api/v1/resumes/overview';
@@ -29,12 +30,13 @@ test('settings exposes résumé defaults for template, accent, and wording', asy
   await expect(page.getByRole('heading', { name: 'Résumé defaults' })).toBeVisible({
     timeout: 10_000,
   });
-  const wording = page.getByLabel('Default wording');
-  const nextWording = (await wording.inputValue()) === 'leadership' ? 'technical' : 'leadership';
-  await wording.selectOption(nextWording);
-  await page.locator('button[aria-label^="Use #"][aria-pressed="false"]').first().click();
+  const next = (await chosenOption(page, 'Default wording')) === 'Leadership'
+    ? 'Technical'
+    : 'Leadership';
+  await chooseOption(page, 'Default wording', next);
+  await page.locator('button[aria-label^="Use "][aria-pressed="false"]').first().click();
   await page.getByRole('button', { name: /Save résumé defaults/i }).click();
-  await expect(wording).toHaveValue(nextWording);
+  await expect(page.getByRole('combobox', { name: 'Default wording' })).toContainText(next);
 });
 
 test('mobile dock links the résumé workspace on narrow viewports', async ({ page }) => {

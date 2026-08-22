@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { signInDemo } from './helpers/auth';
+import { chooseOption } from './helpers/controls';
 
 /**
  * Tailor target lifecycle: edit status/fields/keywords, archive + restore.
@@ -22,10 +23,10 @@ test('tailor target rail supports status, keyword edit, and archive/restore', as
     .fill('Requirements\n- Python\n- Kubernetes\n- SQL');
   await page.getByRole('button', { name: /parse keywords/i }).click();
   await expect(page.getByRole('button', { name: new RegExp(role) })).toBeVisible({ timeout: 15_000 });
-  await expect(page.getByLabel('Target status')).toBeVisible({ timeout: 10_000 });
+  const status = page.getByRole('combobox', { name: 'Target status' });
+  await expect(status).toBeVisible({ timeout: 10_000 });
 
-  await page.getByLabel('Target status').selectOption('active');
-  await expect(page.getByLabel('Target status')).toHaveValue('active');
+  await chooseOption(page, 'Target status', 'Active');
 
   await page
     .locator('.card')

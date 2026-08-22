@@ -31,9 +31,11 @@ async function shot(name) {
 
 await shot('today');
 
-await page.goto(`${BASE}/people`);
-await page.locator('.people__link').first().waitFor({ timeout: 10_000 });
-const sarah = page.locator('.people__link').filter({ hasText: 'Sarah Chen' }).first();
+// The canonical route, not the legacy /people alias, and the row's own link
+// rather than a class name the stylesheet is free to rename.
+await page.goto(`${BASE}/network/people`);
+const sarah = page.getByRole('link', { name: /Sarah Chen/ }).first();
+await sarah.waitFor({ timeout: 10_000 });
 const sarahHref = await sarah.getAttribute('href');
 if (!sarahHref) throw new Error('seed has no person named Sarah Chen');
 await page.goto(sarahHref.startsWith('http') ? sarahHref : `${BASE}${sarahHref}`);
@@ -50,7 +52,7 @@ await shot('capture');
 await page.keyboard.press('Escape');
 await page.waitForTimeout(400);
 
-await page.goto(`${BASE}/graph`);
+await page.goto(`${BASE}/explore/graph`);
 await page.waitForTimeout(3000);
 await shot('graph');
 
