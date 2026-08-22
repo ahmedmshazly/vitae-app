@@ -89,7 +89,16 @@ ensure_emulators() {
     return 0
   fi
   step "Starting the Firebase Auth emulator (log: $EMULATOR_LOG)"
-  setsid pnpm dev:emulators >"$EMULATOR_LOG" 2>&1 &
+  # Without the Emulator UI. Nothing here opens it, and firebase treats a taken
+  # UI port as fatal, so a browser tab left open by any other project on this
+  # machine would otherwise take the whole suite down with it.
+  EMULATOR_CONFIG="$(mktemp -t vitae-ci-firebase.XXXXXX.json)"
+  node -e 'const c=require("./firebase.json");c.emulators.ui={enabled:false};require("fs").writeFileSync(process.argv[1],JSON.stringify(c))' "$EMULATOR_CONFIG"
+  # --config moves firebase's notion of the project root to the temp file's
+  # directory, where there is no .firebaserc, so the project has to be named.
+  EMULATOR_PROJECT="$(node -p 'JSON.parse(require("fs").readFileSync(".firebaserc","utf8")).projects.default')"
+  setsid npx firebase emulators:start --only auth \
+    --config "$EMULATOR_CONFIG" --project "$EMULATOR_PROJECT" >"$EMULATOR_LOG" 2>&1 &
   EMULATOR_PID=$!
   STARTED_EMULATORS=1
   for _ in $(seq 1 60); do
