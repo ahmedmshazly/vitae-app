@@ -121,6 +121,14 @@ describe('SuggestTextInput keeps the combobox contract', () => {
       screen.getByRole('option', { name: /Acme Corp/ }).id,
     );
 
+    // The lookup is debounced and a new term sends the highlight back to the
+    // first option, which is right. On a loaded machine the keystrokes can
+    // spread past the debounce, so wait for the term to settle on the whole
+    // word before moving the highlight off it.
+    await waitFor(() =>
+      expect(mockApi.get).toHaveBeenLastCalledWith(expect.stringContaining('Acme')),
+    );
+
     await user.keyboard('{ArrowDown}');
     expect(input).toHaveAttribute(
       'aria-activedescendant',
