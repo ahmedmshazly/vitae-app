@@ -1,6 +1,20 @@
-import { useEffect, useId, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { Button, Chip, ErrorState, FilterGroup, Modal, SkeletonText } from '@vitae/ui';
+import { useEffect, useId, useRef, useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  Banner,
+  Button,
+  Chip,
+  ChipGroup,
+  ErrorState,
+  Field,
+  FilterGroup,
+  Inline,
+  Modal,
+  SkeletonText,
+  Spread,
+  StatusTrace,
+  Textarea,
+} from '@vitae/ui';
 import { api } from '../lib/api.js';
 import { useToast } from './Toast.js';
 
@@ -18,6 +32,11 @@ export interface ComposerContext {
 const TONES = ['warm', 'direct', 'formal'] as const;
 type Tone = (typeof TONES)[number];
 
+interface Draft {
+  body: string;
+  facts: string[];
+}
+
 /**
  * Outreach composer (reference P: composer). Deterministic drafts assembled
  * server-side from live relationship facts; tone switch regenerates unless
@@ -32,64 +51,113 @@ export function Composer({ ctx, onClose }: { ctx: ComposerContext; onClose: () =
   const [body, setBody] = useState('');
   const [facts, setFacts] = useState<string[]>([]);
   const [edited, setEdited] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [failed, setFailed] = useState<string | null>(null);
-  const [sending, setSending] = useState(false);
   const qc = useQueryClient();
   const { flash } = useToast();
 
-  async function generate(t: Tone) {
-    setLoading(true);
-    setFailed(null);
-    try {
-      const res = await api.post<{ body: string; facts: string[] }>('/composer/draft', {
-        personId: ctx.personId,
-        kind: ctx.kind,
-        tone: t,
-        targetPersonId: ctx.targetPersonId,
-        targetOrgId: ctx.targetOrgId,
-        roleTitle: ctx.roleTitle,
-      });
+  /**
+   * Which draft request is the live one. Two POSTs used to race: flipping tone
+   * mid-fetch let whichever resolved last win, so a warm draft could land
+   * under a formal pill. A superseded request now resolves to null and writes
+   * nothing.
+   */
+  const ticket = useRef(0);
+
+  const draftM = useMutation({
+    mutationFn: async (t: Tone): Promise<Draft | null> => {
+      const mine = ++ticket.current;
+      try {
+        const res = await api.post<Draft>('/composer/draft', {
+          personId: ctx.personId,
+          kind: ctx.kind,
+          tone: t,
+          targetPersonId: ctx.targetPersonId,
+          targetOrgId: ctx.targetOrgId,
+          roleTitle: ctx.roleTitle,
+        });
+        return mine === ticket.current ? res : null;
+      } catch (err) {
+        // A failure the user has already moved past is not their failure to
+        // read. Only the live request may report one.
+        if (mine !== ticket.current) return null;
+        throw err;
+      }
+    },
+    onSuccess: (res) => {
+      if (!res) return;
       setBody(res.body);
       setFacts(res.facts);
       setEdited(false);
-    } catch (err) {
-      // try/finally with no catch: a failed draft used to leave an empty
-      // textarea above an enabled Send button, saying nothing at all.
-      setFailed(err instanceof Error ? err.message : 'The draft could not be assembled.');
-    } finally {
-      setLoading(false);
-    }
+    },
+  });
+
+  /**
+   * Every control that describes the draft resets with the request, not after
+   * it. A new context replaces the composer in place without unmounting it, so
+   * a tone pill and an edited flag left behind would describe the previous
+   * recipient's message, and the evidence chips would cite a draft that is no
+   * longer on screen.
+   */
+  function generate(t: Tone) {
+    setTone(t);
+    setEdited(false);
+    setFacts([]);
+    draftM.mutate(t);
   }
 
+  // Keyed on who and what is being asked, not on `generate`, which is a new
+  // function every render.
   useEffect(() => {
-    void generate('warm');
-     
+    generate('warm');
   }, [ctx.personId, ctx.kind]);
 
   function pickTone(t: Tone) {
     setTone(t);
-    if (!edited) void generate(t);
+    if (!edited) generate(t);
   }
 
-  async function send() {
-    setSending(true);
-    try {
-      await api.post('/composer/send', {
+  const sendM = useMutation({
+    mutationFn: () =>
+      api.post('/composer/send', {
         personId: ctx.personId,
         kind: ctx.kind,
         channel: ctx.channel ?? 'email',
         body,
-      });
+      }),
+    onSuccess: async () => {
       onClose();
       flash(`Queued ${ctx.channel ?? 'email'} to ${ctx.personName} · logged as outreach`);
       await qc.invalidateQueries();
-    } catch (err) {
-      flash(err instanceof Error ? `Send failed: ${err.message}` : 'Send failed');
-    } finally {
-      setSending(false);
+    },
+    onError: (err) =>
+      flash(err instanceof Error ? `Send failed: ${err.message}` : 'Send failed', {
+        variant: 'error',
+      }),
+  });
+
+  function copyDraft() {
+    // The optional chain used to short-circuit the whole expression, so where
+    // there is no clipboard neither handler ever attached and Copy was a
+    // silent no-op. Check for the API before reaching for it.
+    if (!navigator.clipboard) {
+      flash('Clipboard is not available here, select the draft and copy it manually.', {
+        variant: 'error',
+      });
+      return;
     }
+    void navigator.clipboard
+      .writeText(body)
+      .then(() => flash('Copied draft to clipboard'))
+      .catch(() =>
+        flash('Couldn’t reach the clipboard, select the text and copy it.', { variant: 'error' }),
+      );
   }
+
+  // `idle` is the single commit between mount and the first request. Reading it
+  // as drafting keeps the skeleton in place instead of flashing an empty box.
+  const drafting = draftM.isPending || draftM.status === 'idle';
+  const draftError = draftM.isError ? ((draftM.error as Error | null)?.message ?? null) : null;
+  const sendError = sendM.isError ? ((sendM.error as Error | null)?.message ?? null) : null;
+  const blocked = drafting || draftError !== null || !body.trim();
 
   return (
     <Modal
@@ -110,71 +178,88 @@ export function Composer({ ctx, onClose }: { ctx: ComposerContext; onClose: () =
         />
       }
       footer={
-        <div className="spread" style={{ width: '100%' }}>
-          <div className="hstack">
-            <Button variant="ghost" size="sm" onClick={() => void generate(tone)}>
-              Regenerate
-            </Button>
-            {edited && (
-              <span className="u-faint" style={{ fontSize: 'var(--ae-text-xs)' }}>
-                edited, tone switch won&apos;t overwrite
-              </span>
-            )}
-          </div>
-          <div className="hstack">
+        <Spread className="w-full">
+          <Inline>
             <Button
               variant="ghost"
-              disabled={!body.trim()}
-              onClick={() => {
-                // Reported success unconditionally, including when there was no
-                // clipboard to write to and when the write rejected.
-                void navigator.clipboard
-                  ?.writeText(body)
-                  .then(() => flash('Copied draft to clipboard'))
-                  .catch(() => flash('Couldn’t reach the clipboard, select the text and copy it.', { variant: 'error' }));
-              }}
+              size="sm"
+              disabled={drafting}
+              onClick={() => generate(tone)}
             >
+              {drafting ? 'Regenerating…' : 'Regenerate'}
+            </Button>
+            {edited && (
+              <span className="text-xs text-faint">edited, tone switch won&apos;t overwrite</span>
+            )}
+          </Inline>
+          <Inline>
+            <Button variant="ghost" disabled={blocked} onClick={copyDraft}>
               Copy
             </Button>
-            <Button variant="primary" disabled={sending || loading || !!failed || !body.trim()} onClick={() => void send()}>
-              {sending ? 'Queuing…' : 'Send & log'}
+            <Button
+              variant="primary"
+              disabled={blocked || sendM.isPending}
+              onClick={() => sendM.mutate()}
+            >
+              {sendM.isPending ? 'Queuing…' : 'Send & log'}
             </Button>
-          </div>
-        </div>
+          </Inline>
+        </Spread>
       }
     >
+      {/* A failed send is the one failure that costs the user their typing, so
+          it stays on the surface that holds the text rather than living only
+          in a toast that has already gone. */}
+      {sendError && (
+        <Banner
+          tone="danger"
+          title="This message was not sent"
+          action={
+            <Button size="sm" disabled={sendM.isPending} onClick={() => sendM.mutate()}>
+              {sendM.isPending ? 'Sending…' : 'Try again'}
+            </Button>
+          }
+        >
+          {sendError} Your draft is still here, nothing was logged.
+        </Banner>
+      )}
+
       {facts.length > 0 && (
-        <div className="chips" style={{ marginBottom: 10 }}>
+        <ChipGroup className="mb-3">
           {facts.map((f) => (
             <Chip key={f} mono>
               {f}
             </Chip>
           ))}
-        </div>
+        </ChipGroup>
       )}
 
-      {failed ? (
-        <ErrorState title="Couldn’t draft that message" detail={failed} onRetry={() => void generate(tone)} />
-      ) : loading ? (
+      {draftError ? (
+        <ErrorState
+          title="Couldn’t draft that message"
+          detail={draftError}
+          onRetry={() => generate(tone)}
+        />
+      ) : drafting ? (
         // A skeleton in the shape of the draft, not a spinner in the middle of
-        // a large empty modal.
-        <SkeletonText lines={6} />
+        // a large empty modal. The trace above it is what says out loud that
+        // the wait is deliberate: the skeleton itself is aria-hidden.
+        <div aria-busy="true">
+          <StatusTrace tone="live" label="Assembling the draft" detail={`${tone} tone`} />
+          <SkeletonText lines={6} />
+        </div>
       ) : (
-        <div className="field">
-          <label className="label" htmlFor={`${ids}-body`}>
-            Draft message
-          </label>
-          <textarea
+        <Field label="Draft message" htmlFor={`${ids}-body`}>
+          <Textarea
             id={`${ids}-body`}
-            className="textarea"
-            style={{ minHeight: 200, fontFamily: 'var(--ae-font-sans)' }}
+            rows={9}
             value={body}
             onChange={(e) => {
               setBody(e.target.value);
               setEdited(true);
             }}
           />
-        </div>
+        </Field>
       )}
     </Modal>
   );

@@ -9,9 +9,16 @@
  *
  * Search and inline creation are `EntityPicker`'s job; this adds the "That's
  * me" shortcut and the chosen-subject row.
+ *
+ * The shortcut used to be `{self && …}` over a query destructured for `data`
+ * alone, so a slow /auth/me and a failed one both rendered as the button
+ * simply not being there. Somebody filling in their own publication concluded
+ * Vitae had no way to say "mine" and typed their own name into the search
+ * instead. Pending is a skeleton in the button's slot; failure says so, and
+ * offers the retry, above the search that still works either way.
  */
 import { useQuery } from '@tanstack/react-query';
-import { EntityGlyph } from '@vitae/ui';
+import { Button, EntityGlyph, Inline, Skeleton, StatusTrace } from '@vitae/ui';
 import type { SubjectDescriptor } from '@vitae/core';
 import { api } from '../../lib/api.js';
 import { EntityPicker, type PickedEntity } from '../../components/EntityPicker.js';
@@ -46,7 +53,7 @@ export function SubjectPicker({
   onChange: (next: SubjectChoice | null) => void;
   error?: string;
 }) {
-  const { data: self } = useSelfPerson();
+  const { data: self, isPending, isError, refetch } = useSelfPerson();
   const isMe = value !== null && self !== null && value.id === self?.id;
 
   return (
@@ -75,14 +82,11 @@ export function SubjectPicker({
         </div>
       ) : (
         <div className="subject-picker__choose">
+          {isPending && <Skeleton width={92} height={30} />}
           {self && (
-            <button
-              type="button"
-              className="vt-btn"
-              onClick={() => onChange({ id: self.id, title: self.title })}
-            >
+            <Button type="button" onClick={() => onChange({ id: self.id, title: self.title })}>
               That&rsquo;s me
-            </button>
+            </Button>
           )}
           <EntityPicker
             types={['person']}
@@ -90,6 +94,24 @@ export function SubjectPicker({
             onPick={(person: PickedEntity) => onChange({ id: person.id, title: person.title })}
           />
         </div>
+      )}
+
+      {/* announce={false} on purpose. Nobody asked for this lookup; it fails
+          while the form is opening, and an assertive alert would cut across
+          whatever the form was announcing about itself. The line is here to be
+          read, and the search below it is the way forward regardless. */}
+      {!value && isError && (
+        <Inline gap={2} align="center">
+          <StatusTrace
+            tone="danger"
+            announce={false}
+            label="Couldn’t check who you are"
+            detail="Search for yourself by name above."
+          />
+          <Button type="button" size="sm" variant="ghost" onClick={() => void refetch()}>
+            Retry
+          </Button>
+        </Inline>
       )}
 
       {error && (

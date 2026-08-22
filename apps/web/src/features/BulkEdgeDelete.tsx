@@ -1,10 +1,21 @@
 /**
  * Multi-select soft-unlink for connection lists (Person + Record).
+ *
+ * Two defects of the same shape as its node sibling. The bar was a bare
+ * fragment the callers put in a `Section`'s actions slot, so staging the first
+ * connection grew the "Connections" heading and pushed the list down mid
+ * gesture, and the count sat in no live region: a screen-reader user could not
+ * tell how many connections were staged before confirming a destructive act.
+ * And a partial failure went out on the neutral toast channel with no Undo, no
+ * retry and the whole selection cleared, so eight unlinks with two failures
+ * looked exactly like eight unlinks that worked.
  */
 import { useCallback, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Button, ConfirmDialog, Mono } from '@vitae/ui';
+import { Button, ConfirmDialog } from '@vitae/ui';
 import { api } from '../lib/api.js';
+import { BulkBar } from '../components/BulkBar.js';
 import { useToast } from './Toast.js';
 
 export function useBulkEdgeDelete() {
@@ -46,18 +57,27 @@ export function useBulkEdgeDelete() {
     try {
       const results = await Promise.allSettled(ids.map((id) => api.del(`/edges/${id}`)));
       const succeeded = ids.filter((_, i) => results[i]?.status === 'fulfilled');
-      const failed = ids.length - succeeded.length;
+      const failedIds = ids.filter((_, i) => results[i]?.status === 'rejected');
       await qc.invalidateQueries({ queryKey: ['node'] });
-      setSelected(new Set());
-      if (failed === 0) {
+      const undo = async () => {
+        await Promise.allSettled(succeeded.map((id) => api.post(`/edges/${id}/restore`)));
+        await qc.invalidateQueries({ queryKey: ['node'] });
+      };
+      if (failedIds.length === 0) {
+        setSelected(new Set());
         flash(`Unlinked ${succeeded.length} ${succeeded.length === 1 ? 'connection' : 'connections'}`, {
-          undo: async () => {
-            await Promise.allSettled(succeeded.map((id) => api.post(`/edges/${id}/restore`)));
-            await qc.invalidateQueries({ queryKey: ['node'] });
-          },
+          undo,
         });
       } else {
-        flash(`Unlinked ${succeeded.length} · ${failed} failed`);
+        // The ones that failed stay staged so the retry is one click. Undo
+        // stays on offer either way, attached to the ids that actually moved:
+        // a half-finished unlink is exactly the outcome somebody wants to back
+        // out of, and it was the one case that offered no way back.
+        setSelected(new Set(failedIds));
+        flash(`Unlinked ${succeeded.length} · ${failedIds.length} still selected and not unlinked`, {
+          variant: 'error',
+          ...(succeeded.length > 0 ? { undo } : {}),
+        });
       }
     } finally {
       setBusy(false);
@@ -79,28 +99,42 @@ export function useBulkEdgeDelete() {
   };
 }
 
+/**
+ * The staging bar for connections. Render it unconditionally; `BulkBar` owns
+ * the `count > 0` decision, which is what keeps its live region mounted before
+ * there is anything to announce. Portalled for the reason `BulkDeleteBar`
+ * documents: the callers pass it to a `Section` actions slot, and a fixed layer
+ * has to escape whatever that slot is nested in.
+ */
 export function BulkUnlinkBar({
   selectedCount,
   onClear,
   onUnlink,
+  allSelected,
+  onToggleAll,
 }: {
   selectedCount: number;
   onClear: () => void;
   onUnlink: () => void;
+  /** Pass both to put select-all in the bar itself. */
+  allSelected?: boolean;
+  onToggleAll?: () => void;
 }) {
-  if (selectedCount === 0) return null;
-  return (
-    <>
-      <Mono className="u-muted" style={{ fontSize: 'var(--ae-text-sm)' }}>
-        {selectedCount} selected
-      </Mono>
-      <Button size="sm" onClick={onClear}>
-        Clear
-      </Button>
+  if (typeof document === 'undefined') return null;
+  return createPortal(
+    <BulkBar
+      count={selectedCount}
+      noun="connection"
+      label="Connection bulk actions"
+      allSelected={allSelected}
+      onToggleAll={onToggleAll}
+      onClear={onClear}
+    >
       <Button variant="danger" size="sm" glyph="trash" onClick={onUnlink}>
         Unlink
       </Button>
-    </>
+    </BulkBar>,
+    document.body,
   );
 }
 

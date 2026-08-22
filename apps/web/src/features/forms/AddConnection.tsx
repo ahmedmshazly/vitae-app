@@ -3,10 +3,20 @@
  * compatibility with the node in hand → entity picker for the other endpoint →
  * per-edge-type props mini-form → POST /edges. Relationships are records
  * (SRS §4.4), so creating one is a first-class, typed act.
+ *
+ * A failed POST used to say the same sentence twice and in the wrong place:
+ * the local onError flashed on the neutral channel while the query client's
+ * MutationCache flashed the same message as an error, both of them behind the
+ * dialog the user is still looking at. There is one report now, in the dialog,
+ * directly above the button that retries it.
+ *
+ * The Relationship select carries its own label. A `<label for>` does not name
+ * a Radix `<button role="combobox">`, so the field's visible name was reaching
+ * nobody and the control announced only whichever value was showing.
  */
 import { useMemo, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button, Chip, EntityGlyph, Field, Modal, Select } from '@vitae/ui';
+import { Button, Chip, EntityGlyph, Field, Modal, Select, Stack, StatusTrace } from '@vitae/ui';
 import {
   connectionOptionSelectLabel,
   connectionOptionsFor,
@@ -73,9 +83,6 @@ export function AddConnection({
       reset();
       onOpenChange(false);
     },
-    onError: (err) => {
-      flash((err as Error).message || 'Could not create link');
-    },
   });
 
   function reset() {
@@ -106,10 +113,10 @@ export function AddConnection({
         </>
       }
     >
-      <div className="stack" style={{ gap: 'var(--ae-space-4)' }}>
-        <Field label="Relationship" htmlFor="ac-type" help={selected?.descriptor.description}>
+      <Stack gap={4}>
+        <Field label="Relationship" help={selected?.descriptor.description}>
           <Select
-            id="ac-type"
+            label={`Relationship: ${selected ? connectionOptionSelectLabel(selected) : 'not chosen'}`}
             value={optionKey}
             onChange={(v) => {
               setOptionKey(v);
@@ -126,14 +133,20 @@ export function AddConnection({
         </Field>
 
         {selected && !target && (
-          <Field label={selected.direction === 'out' ? 'To' : 'From'} htmlFor="ac-target">
-            <EntityPicker
-              key={selected.targetTypes.join(',')}
-              types={selected.targetTypes}
-              excludeIds={[nodeId, ...excludeIds]}
-              onPick={setTarget}
-              autoFocus
-            />
+          // The htmlFor that used to be here pointed at an id nothing renders:
+          // EntityPicker takes no id and names its own input from its
+          // placeholder. Until it accepts a name, the group is what carries
+          // which end of the relationship this picker is filling in.
+          <Field label={selected.direction === 'out' ? 'To' : 'From'}>
+            <div role="group" aria-label={selected.direction === 'out' ? 'To' : 'From'}>
+              <EntityPicker
+                key={selected.targetTypes.join(',')}
+                types={selected.targetTypes}
+                excludeIds={[nodeId, ...excludeIds]}
+                onPick={setTarget}
+                autoFocus
+              />
+            </div>
           </Field>
         )}
 
@@ -164,7 +177,19 @@ export function AddConnection({
               ))}
           </div>
         )}
-      </div>
+
+        {create.isError && (
+          <StatusTrace
+            tone="danger"
+            label="Not linked"
+            detail={
+              create.error instanceof Error && create.error.message
+                ? create.error.message
+                : 'Nothing was created. Try again.'
+            }
+          />
+        )}
+      </Stack>
     </Modal>
   );
 }

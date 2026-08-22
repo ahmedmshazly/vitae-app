@@ -1,4 +1,4 @@
-import { type PointerEvent, type RefObject } from 'react';
+import { useId, type KeyboardEvent, type PointerEvent, type RefObject } from 'react';
 import { colorForType, withAlpha, type GraphPalette } from '../../lib/graph-palette.js';
 import type { TimelineDisplayPrefs } from './displayPrefs.js';
 import type { BrushRange, TimelineItem, TimelineLane, TimelineZoom } from './types.js';
@@ -21,6 +21,19 @@ export interface TimelineCanvasProps {
   onBrushCommit: (range: BrushRange) => void;
   scrollRef: RefObject<HTMLDivElement>;
 }
+
+/** One month, as a fraction of a year. The step Shift+Arrow moves a brush. */
+const BRUSH_STEP = 1 / 12;
+
+/**
+ * The painted marks are small because the row pitch is small: a bar is
+ * `rowH - 8` tall and a moment is a fixed 12px diamond. This grows the target
+ * without moving the ink, the same way `.vt-btn--sm::after` does, and stops
+ * 3px short of the neighbouring row so the gutter between two lanes of bars
+ * stays live for brushing.
+ */
+const BAR_HALO = "after:content-[''] after:absolute after:inset-x-0 after:top-[-3px] after:bottom-[-3px]";
+const MOMENT_HALO = "after:content-[''] after:absolute after:inset-[-3px]";
 
 function barTone(
   item: TimelineItem,
@@ -61,6 +74,7 @@ export function TimelineCanvas({
   onBrushCommit,
   scrollRef,
 }: TimelineCanvasProps) {
+  const laneIdBase = useId();
   const min = years[0] ?? new Date().getFullYear() - 1;
   const span = Math.max(years.length, 1);
   const px = PX_PER_YEAR[zoom];
@@ -84,6 +98,35 @@ export function TimelineCanvas({
     if (i.end) return yearFrac(i.end);
     if (i.current) return nowFrac;
     return yearFrac(i.start) + (i.kind === 'moment' ? 0.02 : 0.15);
+  }
+
+  // Brushing a season was pointer-only, so the review, its digest and its
+  // Markdown export were unreachable without a mouse. Shift plus an arrow on a
+  // focused mark anchors a range at that mark's start and walks the far end a
+  // month at a time.
+  function extendBrush(item: TimelineItem, direction: 1 | -1) {
+    const anchor = yearFrac(item.start);
+    const far = brush && brush.from === item.start ? yearFrac(brush.to) : anchor;
+    const next = Math.max(anchor + BRUSH_STEP, far + direction * BRUSH_STEP);
+    onBrushCommit({ from: item.start, to: fracToIsoClamped(next, years) });
+  }
+
+  // TimelineView listens for Enter on the window and opens whatever was
+  // selected before, which is the wrong record whenever focus has moved on.
+  // The mark owns its own key: press once to select, again to open.
+  function onMarkKeyDown(ev: KeyboardEvent<HTMLButtonElement>, item: TimelineItem, selected: boolean) {
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (selected) onOpen(item);
+      else onSelect(item);
+      return;
+    }
+    if (ev.shiftKey && (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft')) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      extendBrush(item, ev.key === 'ArrowRight' ? 1 : -1);
+    }
   }
 
   function onTrackPointerDown(e: PointerEvent<HTMLDivElement>) {
@@ -169,13 +212,20 @@ export function TimelineCanvas({
         )}
 
         <div className="tl__lanes">
-          {visibleLanes.map((lane) => {
+          {visibleLanes.map((lane, laneIndex) => {
             const items = lane.items.filter((i) => prefs.showMoments || i.kind === 'span');
             const rows = stackRows(items, endOf);
             const rowCount = items.length === 0 ? 1 : Math.max(1, ...rows.values()) + 1;
+            // The lane name floated beside the track with nothing tying it to
+            // the marks in it, so the one axis the chronograph organises
+            // everything by never reached a screen reader.
+            const laneId = `${laneIdBase}-lane-${laneIndex}`;
             return (
-              <div key={lane.name} className="tl__lane">
-                <span className={`tl__lanename${prefs.stickyLabels ? ' tl__lanename--sticky' : ''}`}>
+              <div key={lane.name} className="tl__lane" role="group" aria-labelledby={laneId}>
+                <span
+                  id={laneId}
+                  className={`tl__lanename${prefs.stickyLabels ? ' tl__lanename--sticky' : ''}`}
+                >
                   {lane.name}
                 </span>
                 <div className="tl__track" style={{ height: rowCount * rowH, width: innerWidth }}>
@@ -197,7 +247,7 @@ export function TimelineCanvas({
                         <button
                           key={item.id}
                           type="button"
-                          className={`tl__moment${selected ? ' tl__moment--on' : ''}`}
+                          className={`tl__moment${selected ? ' tl__moment--on' : ''} ${MOMENT_HALO}`}
                           aria-label={fullLabel}
                           aria-pressed={selected}
                           style={{
@@ -206,6 +256,7 @@ export function TimelineCanvas({
                             borderColor: tone.border,
                             background: tone.bg,
                           }}
+                          onKeyDown={(ev) => onMarkKeyDown(ev, item, selected)}
                           onClick={(ev) => {
                             ev.stopPropagation();
                             onSelect(item);
@@ -227,7 +278,12 @@ export function TimelineCanvas({
                       <button
                         key={item.id}
                         type="button"
-                        className={`tl__bar${item.current ? ' tl__bar--current' : ''}${selected ? ' tl__bar--on' : ''}`}
+                        // `--on` shares one rule with `:hover`, so a selected
+                        // bar looked exactly like the bar under the cursor.
+                        // The outline is the marker hover does not get. The
+                        // `!` is only because app.css sits outside Tailwind's
+                        // layers and would otherwise win, see the report.
+                        className={`tl__bar${item.current ? ' tl__bar--current' : ''}${selected ? ' tl__bar--on outline-1 outline-offset-1 outline-accent' : ''} overflow-visible! ${BAR_HALO}`}
                         aria-label={fullLabel}
                         aria-pressed={selected}
                         style={{
@@ -238,6 +294,7 @@ export function TimelineCanvas({
                           background: tone.bg,
                           borderColor: tone.border,
                         }}
+                        onKeyDown={(ev) => onMarkKeyDown(ev, item, selected)}
                         onClick={(ev) => {
                           ev.stopPropagation();
                           onSelect(item);
@@ -251,9 +308,6 @@ export function TimelineCanvas({
                         {/* Still going was signalled by a tint and a ring and
                             nothing else. Never colour alone. */}
                         {item.current && <span className="u-mono text-xs text-muted"> → now</span>}
-                        {/* Still going was signalled by a tint and a ring and
-                            nothing else. Never colour alone. */}
-
                       </button>
                     );
                   })}

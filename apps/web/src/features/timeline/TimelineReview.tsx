@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Button, Chip, ErrorState, Mono, StatusTrace } from '@vitae/ui';
+import { Button, Chip, Disclosure, EmptyState, ErrorState, Mono, StatusTrace } from '@vitae/ui';
 import { entityHref } from '../../lib/entity-href.js';
 import type { TimelineReviewResult } from './types.js';
 
@@ -21,21 +21,42 @@ export function TimelineReviewDock({
   failed,
   onRetry,
 }: TimelineReviewProps) {
+  // TimelineView passes isFetching, which is false while a query is pending
+  // but paused, offline for instance. That left a fourth state with no trace
+  // and no error that rendered as the idle header: a panel asking you to brush
+  // the range you had just brushed. Waiting is now the fallback, not a peer.
+  const waiting = loading || (!failed && !review);
+
   return (
     <aside className="tl__review" aria-label="Season review">
       <div className="tl__reviewhead">
         <div>
-          <div className="tl__reviewtitle">{review?.label ?? 'Season review'}</div>
-          <div className="u-faint" style={{ fontSize: 'var(--ae-text-xs)' }}>
-            Brush a range on the chronograph
-          </div>
+          <h2 className="tl__reviewtitle text-base">{review?.label ?? 'Season review'}</h2>
+          {/* The subtitle told you to brush a range while showing the digest of
+              the range you brushed, and the dates it read were never on screen
+              even though the export prints them. */}
+          {review ? (
+            <Mono className="u-faint text-xs">
+              {review.from} → {review.to}
+            </Mono>
+          ) : (
+            <span className="u-faint text-xs">Brush a range on the chronograph</span>
+          )}
         </div>
-        <button type="button" className="vt-modal__x" aria-label="Clear brush" onClick={onClear}>
+        {/* Every other x in the app is a Close. This one answered to Clear
+            brush, the same name the panel's own button carries, so the two
+            were indistinguishable by name alone. */}
+        <button
+          type="button"
+          className="vt-modal__x"
+          aria-label="Close season review"
+          onClick={onClear}
+        >
           ×
         </button>
       </div>
 
-      {loading && (
+      {waiting && (
         <div className="tl__reviewstate">
           <StatusTrace label="Reading this season" detail="Grouping dated evidence" tone="live" />
         </div>
@@ -43,7 +64,7 @@ export function TimelineReviewDock({
 
       {/* `isError` was never read, so a failed digest fell back to the default
           header and looked exactly like not having brushed anything yet. */}
-      {!loading && failed && (
+      {!waiting && failed && (
         <ErrorState
           title="Couldn’t summarise that range"
           detail="The chronograph is unaffected. Retry this range or clear the brush to choose another."
@@ -52,7 +73,7 @@ export function TimelineReviewDock({
         />
       )}
 
-      {!loading && !failed && review && (
+      {!waiting && !failed && review && (
         <>
           <div className="tl__reviewsummary">
             {Object.entries(review.summary)
@@ -65,17 +86,31 @@ export function TimelineReviewDock({
           </div>
 
           {review.sections.length === 0 ? (
-            <p className="u-faint">Nothing dated in this window, try a wider brush.</p>
+            // Was one line of faint text with no way out, in the one state
+            // where the panel most needs to offer the next move.
+            <EmptyState
+              glyph="timeline"
+              title="Nothing dated in this window"
+              hint="Brush a wider season, or clear the brush and choose another."
+              action={
+                <Button size="sm" onClick={onClear}>
+                  Clear brush
+                </Button>
+              }
+            />
           ) : (
-            <div className="tl__reviewsections">
+            <>
+              <div className="tl__reviewsections">
               {review.sections.map((sec) => (
-                <details key={sec.key} className="tl__reviewsec" open={sec.count <= 8}>
-                  <summary>
-                    {sec.title}{' '}
-                    <Mono className="u-faint" style={{ fontSize: 'var(--ae-text-xs)' }}>
-                      {sec.count}
-                    </Mono>
-                  </summary>
+                // Was a raw details/summary: a 27px target with the browser's
+                // own triangle in a panel where everything else is 32px.
+                <Disclosure
+                  key={sec.key}
+                  className="tl__reviewsec"
+                  label={sec.title}
+                  meta={sec.count}
+                  defaultOpen={sec.count <= 8}
+                >
                   <ul className="tl__reviewlist">
                     {sec.items.map((item) => (
                       <li key={item.id}>
@@ -97,24 +132,23 @@ export function TimelineReviewDock({
                       the rest.
                     </p>
                   )}
-                </details>
-              ))}
-            </div>
-          )}
+                  </Disclosure>
+                ))}
+              </div>
 
-          <div className="tl__reviewfoot">
-            <Button
-              size="sm"
-              variant="primary"
-              onClick={onExportMarkdown}
-              disabled={!review.sections.length}
-            >
-              Export Markdown
-            </Button>
-            <Button size="sm" onClick={onClear}>
-              Clear brush
-            </Button>
-          </div>
+              {/* The footer lived outside this branch, so an empty window put a
+                  second Clear brush under the one the empty state offers and a
+                  permanently dead Export beside it. */}
+              <div className="tl__reviewfoot">
+                <Button size="sm" variant="primary" onClick={onExportMarkdown}>
+                  Export Markdown
+                </Button>
+                <Button size="sm" onClick={onClear}>
+                  Clear brush
+                </Button>
+              </div>
+            </>
+          )}
         </>
       )}
     </aside>
