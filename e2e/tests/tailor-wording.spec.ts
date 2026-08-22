@@ -11,7 +11,11 @@ test('tailor exposes wording emphasis and accent controls before compile', async
 
   await page.getByText('Machine Learning Engineer').first().click();
   await expect(page).toHaveURL(/target=/);
-  await expect(page.getByText(/Weighted keywords \(/)).toBeVisible({ timeout: 10_000 });
+  // The parser version is its own chip beside the heading now, rather than a
+  // parenthetical inside it, so the heading is what to wait on.
+  await expect(page.getByRole('heading', { name: /^Weighted keywords/ })).toBeVisible({
+    timeout: 10_000,
+  });
 
   await chooseOption(page, 'Wording emphasis', 'Leadership');
 

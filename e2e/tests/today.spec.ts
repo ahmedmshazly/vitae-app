@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { signIn } from './helpers/auth';
 import { expectNoA11yViolations } from './helpers/a11y';
 import { ensureQueue } from './helpers/fixtures';
+import { toast } from './helpers/toast';
 
 /**
  * Screen 2: Today. The four states, the two mutations, and the register rule.
@@ -43,11 +44,11 @@ test('a reminder can be completed from the queue and undone from the toast', asy
     .getByRole('button', { name: 'Done' }).click();
 
   // The button says Done; so does the confirmation.
-  const toast = page.getByRole('status');
-  await expect(toast).toContainText('Done');
+  const done = toast(page, 'Done');
+  await expect(done).toBeVisible();
   await expect(rows).toHaveCount(before - 1);
 
-  await toast.getByRole('button', { name: 'Undo' }).click();
+  await done.getByRole('button', { name: 'Undo' }).click();
   await expect(rows).toHaveCount(before);
 });
 
@@ -64,7 +65,8 @@ test('checking a habit flips at once, confirms, and survives a reload', async ({
 
   await check.click();
   await expect(uncheck).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByRole('status')).toContainText('Checked');
+  // Anchored: resetting a habit this run leaves an Unchecked toast beside it.
+  await expect(toast(page, /^Checked/)).toBeVisible();
 
   await page.reload();
   await expect(page.getByRole('button', { name: /^Uncheck Deep work 2h/ })).toBeVisible();

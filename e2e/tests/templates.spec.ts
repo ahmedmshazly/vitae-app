@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { apiPatch } from './helpers/api.js';
 import { signIn } from './helpers/auth';
 import { expectNoA11yViolations } from './helpers/a11y';
+import { toast } from './helpers/toast';
 
 /**
  * Screen 22: Templates.
@@ -77,8 +78,14 @@ test('a partial warmup is named as partial, and every layout action has its own 
   await expect(service).toContainText('Only calibrated layouts can be verified');
   await expect(service.getByText('Calibrated', { exact: true })).toHaveCount(0);
 
-  await expect(card(page, 'Cobalt').getByRole('button', { name: 'Cobalt is the current default' })).toBeDisabled();
-  await expect(card(page, 'Onyx').getByRole('button', { name: 'Make Onyx the default' })).toBeVisible();
+  // The names lead with the words on the button, so saying "make default" to a
+  // voice control matches the control it names.
+  await expect(
+    card(page, 'Cobalt').getByRole('button', { name: 'Current default: Cobalt' }),
+  ).toBeDisabled();
+  await expect(
+    card(page, 'Onyx').getByRole('button', { name: 'Make default: Onyx' }),
+  ).toBeVisible();
   await expect(card(page, 'Cobalt').getByText('58 lines/page')).toBeVisible();
   await expect(card(page, 'Onyx').getByText('96 chars/line')).toBeVisible();
 });
@@ -144,8 +151,8 @@ test('changing the default reports success and survives reload without leaving t
   expect(candidateName).toBeTruthy();
 
   try {
-    await candidate.getByRole('button', { name: `Make ${candidateName!} the default` }).click();
-    await expect(page.locator('.toast')).toContainText(`${candidateName} is now the default template.`);
+    await candidate.getByRole('button', { name: `Make default: ${candidateName!}` }).click();
+    await expect(toast(page, `${candidateName} is now the default template.`)).toBeVisible();
     await expect(card(page, candidateName!).getByText('Default', { exact: true })).toBeVisible();
   } finally {
     // Settings outlive a test worker. Put the real workspace back exactly as we
@@ -160,8 +167,10 @@ test('changing the default reports success and survives reload without leaving t
 
 test('changing the default refreshes the already-cached Settings value', async ({ page }) => {
   await signIn(page);
-  await page.goto('/settings');
-  const settingsTemplate = page.getByLabel('Default template');
+  await page.goto('/settings/preferences');
+  // Settings' template picker is the shared Select, a combobox whose trigger
+  // shows the layout's name; a native select's `value` is not there to read.
+  const settingsTemplate = page.getByRole('combobox', { name: 'Default template' });
   await expect(settingsTemplate).toBeVisible();
 
   await page.goto('/resume/templates');
@@ -176,13 +185,15 @@ test('changing the default refreshes the already-cached Settings value', async (
   expect(candidateKey).toBeTruthy();
 
   try {
-    await candidate.getByRole('button', { name: `Make ${candidateName!} the default` }).click();
-    await expect(page.locator('.toast')).toContainText(`${candidateName} is now the default template.`);
+    await candidate.getByRole('button', { name: `Make default: ${candidateName!}` }).click();
+    await expect(toast(page, `${candidateName} is now the default template.`)).toBeVisible();
 
     // The Settings query was loaded first. Its five-second stale window used to
     // preserve the old default on this exact navigation path.
-    await page.goto('/settings');
-    await expect(page.getByLabel('Default template')).toHaveValue(candidateKey!);
+    await page.goto('/settings/preferences');
+    await expect(page.getByRole('combobox', { name: 'Default template' })).toContainText(
+      candidateName!,
+    );
   } finally {
     const restored = await apiPatch(page, '/resumes/templates/default', { templateKey: originalKey });
     expect(restored.ok(), `could not restore template default: ${restored.status()}`).toBe(true);
@@ -208,7 +219,7 @@ test('a rejected default change leaves the current default intact and reports th
       body: '{"error":{"code":"UNAVAILABLE","message":"settings store unavailable"}}',
     });
   });
-  await candidate.getByRole('button', { name: `Make ${candidateName!} the default` }).click();
+  await candidate.getByRole('button', { name: `Make default: ${candidateName!}` }).click();
 
   await expect(page.getByRole('alert')).toContainText('settings store unavailable');
   await expect(card(page, originalName!).getByText('Default', { exact: true })).toBeVisible();

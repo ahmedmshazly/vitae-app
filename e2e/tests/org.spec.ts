@@ -3,6 +3,7 @@ import { apiPost, expectOkJson } from './helpers/api.js';
 import { signIn } from './helpers/auth';
 import { expectNoA11yViolations } from './helpers/a11y';
 import { addOpenRole } from './helpers/fixtures';
+import { toast } from './helpers/toast';
 
 /**
  * Screen 9: the organization profile. It answers "should I care about this
@@ -25,12 +26,17 @@ async function openOrg(page: Page, name: string) {
 test('open roles reach the profile, not just the list', async ({ page }) => {
   await signIn(page);
   const href = await openOrg(page, 'Nile Robotics');
-  const orgId = href.split('/orgs/')[1]!;
+  const orgId = href.split('/').pop()!;
 
-  /** How many open roles the profile currently claims. */
+  /** How many open roles the profile currently claims. The four header
+   * numbers are a definition list now, so each one is read off its own term
+   * instead of out of one packed sentence. */
   const shown = async () => {
-    const chip = page.getByText(/^\d+ open roles?$/);
-    return (await chip.count()) ? Number((await chip.innerText()).replace(/\D/g, '')) : 0;
+    const cell = page
+      .getByLabel('Organization relationship facts')
+      .locator('div')
+      .filter({ hasText: /^Open roles/ });
+    return Number((await cell.locator('.u-mono').innerText()).replace(/\D/g, ''));
   };
 
   // Relative, not absolute: no seeded org has an opening, but this spec adds
@@ -53,10 +59,12 @@ test('the header carries the numbers, in mono, without a colour band', async ({ 
   await signIn(page);
   await openOrg(page, 'Nile Robotics');
 
-  const sub = page.getByText(/known · affinity/);
-  await expect(sub).toBeVisible();
-  await expect(sub.locator('.u-mono').first()).toHaveText(/^\d+$/);
-  await expect(sub.locator('.u-mono').last()).toHaveText(/^\d\.\d{2}$/);
+  // Each number now sits under the word for what it counts, rather than in one
+  // packed subtitle that made the reader match value to noun by position.
+  const facts = page.getByLabel('Organization relationship facts');
+  const fact = (term: string) => facts.locator('div').filter({ hasText: new RegExp(`^${term}`) });
+  await expect(fact('Known people').locator('.u-mono')).toHaveText(/^\d+$/);
+  await expect(fact('Affinity').locator('.u-mono')).toHaveText(/^\d\.\d{2}$/);
 });
 
 test('inroad strength is one hue at varying weight, never two bands', async ({ page }) => {
@@ -92,7 +100,7 @@ test('each empty region says something different, and something useful', async (
 test('a related org states which way the relationship points', async ({ page }) => {
   await signIn(page);
   const href = await openOrg(page, 'Nile Robotics');
-  const orgId = href.split('/orgs/')[1]!;
+  const orgId = href.split('/').pop()!;
 
   const other = await apiPost(page, '/nodes', {
     type: 'organization',
@@ -156,7 +164,7 @@ test('a failed delete says so instead of silently doing nothing', async ({ page 
   // Delete was a bare `void del()` outside useMutation: it never reached the
   // global error toast, and the dialog closed before it settled, so a failure
   // left the page looking as though nothing had been asked of it.
-  await expect(page.locator('.toast')).toContainText('something still links here');
+  await expect(toast(page, 'something still links here')).toBeVisible();
   await expect(page).toHaveURL(href);
   await expect(page.getByRole('heading', { name: 'Helio Health' })).toBeVisible();
 });

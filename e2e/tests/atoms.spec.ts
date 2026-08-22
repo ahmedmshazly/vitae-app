@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { signInDemo } from './helpers/auth';
 import { expectNoA11yViolations } from './helpers/a11y';
+import { toast } from './helpers/toast';
 
 const ATOMS = '**/api/v1/atoms?*';
 
@@ -114,11 +115,11 @@ test('archiving an atom confirms, reports, and can be undone', async ({ page }) 
 
   // Completed in silence before, and archiving was a one-way door even though
   // the restore endpoint already existed.
-  const toast = page.locator('.toast');
-  await expect(toast).toContainText('Archived');
+  const archived = toast(page, 'Archived');
+  await expect(archived).toBeVisible();
   await expect(page.locator('.atom-card')).toHaveCount(before - 1);
 
-  await toast.getByRole('button', { name: 'Undo' }).click();
+  await archived.getByRole('button', { name: 'Undo' }).click();
   await expect(page.locator('.atom-card')).toHaveCount(before);
 });
 

@@ -59,8 +59,11 @@ test('the canvas ground is flat, no wash, no texture, no tint', async ({ page })
 
   const ground = await panel(page).evaluate((el) => {
     const cs = getComputedStyle(el);
-    const canvasBg = getComputedStyle(document.documentElement).getPropertyValue('--ae-bg').trim();
-    return { image: cs.backgroundImage, color: cs.backgroundColor, token: canvasBg };
+    const root = getComputedStyle(document.documentElement);
+    const grounds = ['--ae-bg', '--ae-surface-sunken', '--ae-surface'].map((t) =>
+      root.getPropertyValue(t).trim(),
+    );
+    return { image: cs.backgroundImage, color: cs.backgroundColor, grounds };
   });
 
   // Was `background-color: #080b11` under two radial aurora washes and a 26px
@@ -68,10 +71,12 @@ test('the canvas ground is flat, no wash, no texture, no tint', async ({ page })
   // three separate standing bans, all in one rule.
   expect(ground.image).toBe('none');
 
-  // …and the ground is the page's own, not a blue-black of its own invention.
-  const hex = ground.token.replace('#', '');
-  const rgb = `rgb(${parseInt(hex.slice(0, 2), 16)}, ${parseInt(hex.slice(2, 4), 16)}, ${parseInt(hex.slice(4, 6), 16)})`;
-  expect(ground.color).toBe(rgb);
+  // …and the ground is one of the page's own greys, not a blue-black of its
+  // own invention. The instrument sits on the sunken surface, one step below
+  // the page, which is a token like any other.
+  const rgb = (hex: string) =>
+    `rgb(${parseInt(hex.slice(1, 3), 16)}, ${parseInt(hex.slice(3, 5), 16)}, ${parseInt(hex.slice(5, 7), 16)})`;
+  expect(ground.grounds.map(rgb)).toContain(ground.color);
 });
 
 test('the canvas is reachable without sight', async ({ page }) => {

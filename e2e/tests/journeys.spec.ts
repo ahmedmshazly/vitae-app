@@ -41,8 +41,9 @@ test('J4: paste a JD, auto-tailor, and compile a PDF', async ({ page }) => {
   await signIn(page);
   await page.goto('/resume/tailor');
 
-  // New target session (the rail's "+ New", not the topbar's New-record menu).
-  await page.getByRole('button', { name: '+ New' }).click();
+  // New target session (the rail's own button, not the topbar's New-record
+  // menu). It says what it makes now, and says Cancel while the form is open.
+  await page.getByRole('button', { name: 'New target' }).click();
   await page.getByPlaceholder('Role title').fill('Playwright ML Engineer');
   await page.getByPlaceholder('Paste the job description here…').fill(
     'Requirements\n- Strong Python\n- Kubernetes\n- Reinforcement learning and gRPC',
@@ -50,7 +51,9 @@ test('J4: paste a JD, auto-tailor, and compile a PDF', async ({ page }) => {
   await page.getByRole('button', { name: /parse keywords/i }).click();
 
   // Keyword chips appear (BM25F parse) and the session lands in the URL.
-  await expect(page.getByText(/Weighted keywords \(/)).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole('heading', { name: /^Weighted keywords/ })).toBeVisible({
+    timeout: 10_000,
+  });
   await expect(page).toHaveURL(/target=/);
 
   // Auto-selection fills the page meter.

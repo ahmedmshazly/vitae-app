@@ -15,7 +15,8 @@ test('tailor target rail supports status, keyword edit, and archive/restore', as
   await signInDemo(page);
   await page.goto('/resume/tailor');
 
-  await page.locator('.card').filter({ hasText: 'Job targets' }).getByRole('button', { name: '+ New' }).click();
+  // The rail's button says what it makes, so it needs no scoping by class.
+  await page.getByRole('button', { name: 'New target' }).click();
   await page.getByPlaceholder('Role title').fill(role);
   await page.getByPlaceholder('Company').fill('Lifecycle Co');
   await page
@@ -28,12 +29,9 @@ test('tailor target rail supports status, keyword edit, and archive/restore', as
 
   await chooseOption(page, 'Target status', 'Active');
 
-  await page
-    .locator('.card')
-    .filter({ hasText: 'Job targets' })
-    .getByRole('button', { name: 'Edit', exact: true })
-    .first()
-    .click();
+  // Both Edit buttons on the rail now say which panel they open, so neither
+  // needs to be found by position inside a class.
+  await page.getByRole('button', { name: 'Edit: role and company' }).click();
   await page.getByLabel('Role title').fill(edited);
   await page.getByLabel('Company').fill('Edited Co');
   await page.getByRole('button', { name: /save details/i }).click();
@@ -41,10 +39,7 @@ test('tailor target rail supports status, keyword edit, and archive/restore', as
     timeout: 10_000,
   });
 
-  await page
-    .locator('.spread', { hasText: 'Weighted keywords' })
-    .getByRole('button', { name: 'Edit', exact: true })
-    .click();
+  await page.getByRole('button', { name: 'Edit: weighted keywords' }).click();
   await page.getByPlaceholder('Add keyword').fill('lifecycle-kw');
   await page.getByRole('button', { name: 'Add', exact: true }).click();
   await page.getByRole('button', { name: /save keywords/i }).click();

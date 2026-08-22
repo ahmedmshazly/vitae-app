@@ -39,7 +39,9 @@ test('orbit, focus, and matrix lenses stay operable', async ({ page }) => {
   await expect(page.getByText(/A line-free audit surface/)).toBeVisible();
 
   await lenses.getByRole('button', { name: /Focus/ }).click();
-  await expect(page.getByRole('heading', { name: /Focus needs a center/i })).toBeVisible();
+  // The empty state is the shared EmptyState, whose title is a span: an empty
+  // state is not a section of the document.
+  await expect(page.getByText(/Focus needs a center/i)).toBeVisible();
 });
 
 test('the observatory page has no automated a11y violations', async ({ page }) => {

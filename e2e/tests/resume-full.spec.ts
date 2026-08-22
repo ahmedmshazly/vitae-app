@@ -15,7 +15,9 @@ test('manual selection → compile → finalize → appears in Outputs', async (
   // (keyword chips render in the same commit as the draft hydration).
   await page.getByText('Machine Learning Engineer').first().click();
   await expect(page).toHaveURL(/target=/);
-  await expect(page.getByText(/Weighted keywords \(/)).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole('heading', { name: /^Weighted keywords/ })).toBeVisible({
+    timeout: 10_000,
+  });
 
   // Switch to manual mode and hand-pick three atoms.
   await page.getByRole('button', { name: 'manual', exact: true }).click();

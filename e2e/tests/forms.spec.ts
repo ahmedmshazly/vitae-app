@@ -27,15 +27,16 @@ test('Create a person through the structured form (+ New)', async ({ page }) => 
   // the class that used to carry it.
   await expect(page.getByRole('heading', { name })).toBeVisible();
 
-  // Appears in the People list.
+  // Appears in the People list. The row's checkbox carries a visually-hidden
+  // "Select <name>" label, so the name alone matches twice.
   await page.goto('/people');
-  await expect(page.getByText(name)).toBeVisible();
+  await expect(page.getByRole('link', { name })).toBeVisible();
 });
 
 test('Edit the KNOWS relationship, closeness updates cadence', async ({ page }) => {
   await signIn(page);
   await page.goto('/people');
-  await page.getByText('Sarah Chen').first().click();
+  await page.getByRole('link', { name: 'Sarah Chen' }).first().click();
 
   await page
     .getByRole('region', { name: /^Relationship strength/ })
@@ -73,7 +74,7 @@ test('Suggestion-backed fields offer existing values and a stub-create', async (
 test('Add and remove a typed connection on a record', async ({ page }) => {
   await signIn(page);
   await page.goto('/browse/idea');
-  await page.getByText('Résumé atoms as a graph').first().click();
+  await page.getByRole('link', { name: 'Résumé atoms as a graph' }).first().click();
 
   // Add: idea ABOUT→ Sarah Chen.
   // Renamed in Screen 6: "+ add" named neither the action nor its object.

@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { signIn } from './helpers/auth';
 import { expectNoA11yViolations } from './helpers/a11y';
+import { toast } from './helpers/toast';
 
 /**
  * Screen 27: Settings.
@@ -63,9 +64,11 @@ test('a failed settings load says so with a titled error', async ({ page }) => {
       body: '{"error":{"code":"boom","message":"settings store unreachable"}}',
     });
   });
-  await page.goto('/settings');
+  // /settings is the index of the four panels now; the controls, and the query
+  // behind them, live one level down.
+  await page.goto('/settings/profile');
 
-  await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Profile', exact: true })).toBeVisible();
   const alert = page.getByRole('alert');
   await expect(alert).toContainText('Couldn’t load settings');
   await expect(alert).toContainText('settings store unreachable');
@@ -82,7 +85,7 @@ test('a failed system status reports itself instead of spinning forever', async 
       body: '{"error":{"code":"boom","message":"health endpoint unreachable"}}',
     });
   });
-  await page.goto('/settings');
+  await page.goto('/settings/system');
 
   const alert = page.getByRole('alert');
   await expect(alert).toContainText('Couldn’t load system status');
@@ -101,7 +104,7 @@ test('system checks name ok/down in text, not only as a coloured dot', async ({ 
     counts: { nodes: 10, edges: 20 },
     env: { node: 'v22', emulators: true, devLogin: true },
   });
-  await page.goto('/settings');
+  await page.goto('/settings/system');
 
   await expect(page.getByText('1 down')).toBeVisible();
   await expect(page.getByText('connection refused')).toBeVisible();
@@ -117,13 +120,16 @@ test('GitHub token and ranking weights are labelled controls', async ({ page }) 
     counts: { nodes: 1, edges: 1 },
     env: { node: 'v22', emulators: true, devLogin: true },
   });
-  await page.goto('/settings');
-
+  // The credential sits with System, the ranking constants with Preferences:
+  // two panels, so this walks both rather than one long page.
+  await page.goto('/settings/system');
   await expect(page.getByLabel('Personal access token')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Disconnect GitHub token' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Repositories' })).toBeVisible();
+
+  await page.goto('/settings/preferences');
   await expect(page.getByLabel('Affiliation (org match)')).toBeVisible();
   await expect(page.getByLabel('Topic overlap')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Repositories' })).toBeVisible();
 });
 
 test('saving the profile reports success', async ({ page }) => {
@@ -154,11 +160,11 @@ test('saving the profile reports success', async ({ page }) => {
     counts: { nodes: 1, edges: 1 },
     env: { node: 'v22', emulators: true, devLogin: true },
   });
-  await page.goto('/settings');
+  await page.goto('/settings/profile');
 
   await page.getByLabel('Name').fill('Ada Lovelace');
   await page.getByRole('button', { name: 'Save profile' }).click();
-  await expect(page.locator('.toast')).toContainText('Profile saved.');
+  await expect(toast(page, 'Profile saved.')).toBeVisible();
 });
 
 test('the settings page has no automated a11y violations', async ({ page }) => {
@@ -170,7 +176,14 @@ test('the settings page has no automated a11y violations', async ({ page }) => {
     counts: { nodes: 2, edges: 3 },
     env: { node: 'v22', emulators: true, devLogin: true },
   });
-  await page.goto('/settings');
-  await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
-  await expectNoA11yViolations(page);
+  for (const [path, heading] of [
+    ['/settings', 'Settings'],
+    ['/settings/profile', 'Profile'],
+    ['/settings/preferences', 'Preferences'],
+    ['/settings/system', 'System'],
+  ] as const) {
+    await page.goto(path);
+    await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
+    await expectNoA11yViolations(page);
+  }
 });

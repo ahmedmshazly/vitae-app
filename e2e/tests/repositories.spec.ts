@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { signIn } from './helpers/auth';
 import { expectNoA11yViolations } from './helpers/a11y';
+import { toast } from './helpers/toast';
 
 /**
  * Screen 25: Repositories.
@@ -163,7 +164,7 @@ test('saving a token refreshes the connection chip', async ({ page }) => {
   await expect(page.getByText('not connected')).toBeVisible();
   await page.getByLabel('Personal access token').fill('ghp_test_token_for_e2e');
   await page.getByRole('button', { name: 'Connect', exact: true }).click();
-  await expect(page.locator('.toast')).toContainText('GitHub token saved.');
+  await expect(toast(page, 'GitHub token saved.')).toBeVisible();
   await expect(page.getByText('connected', { exact: true })).toBeVisible();
 });
 
@@ -191,7 +192,7 @@ test('Sync now reports success without leaving the page blank', async ({ page })
   await page.goto('/repositories');
 
   await page.getByRole('button', { name: /Sync GitHub now/ }).click();
-  await expect(page.locator('.toast')).toContainText('Synced: 1 new · 0 updated.');
+  await expect(toast(page, 'Synced: 1 new · 0 updated.')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Open jordan/atlas' })).toBeVisible();
 });
 

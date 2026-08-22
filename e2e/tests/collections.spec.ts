@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { apiPost, expectOkJson } from './helpers/api.js';
 import { signIn } from './helpers/auth';
 import { expectNoA11yViolations } from './helpers/a11y';
+import { toast } from './helpers/toast';
 
 /**
  * Screen 10: Browse and Collections, the two ways into everything you own.
@@ -16,7 +17,9 @@ const NODES_Q = '**/api/v1/nodes?q=*';
 
 async function goCollections(page: Page) {
   await page.goto('/collections');
-  await expect(page.getByRole('heading', { name: 'Collections', exact: true })).toBeVisible();
+  // The screen is titled Library since the six-workspace IA; /collections is
+  // kept mounted as the bookmarkable URL it always was.
+  await expect(page.getByRole('heading', { name: 'Library', exact: true })).toBeVisible();
 }
 
 test('a tile never states a count it does not have', async ({ page }) => {
@@ -105,12 +108,12 @@ test('saving a view confirms, and reports a failure instead of rejecting into no
 
   // Was a bare `await api.post` outside useMutation: the rejection went
   // nowhere and the dialog sat open saying nothing.
-  await expect(page.locator('.toast')).toContainText('views are read-only');
+  await expect(toast(page, 'views are read-only')).toBeVisible();
   await expect(page.getByLabel('Name')).toHaveValue(name);
 
   await page.unroute(VIEWS);
   await page.getByRole('button', { name: 'Save', exact: true }).click();
-  await expect(page.locator('.toast')).toContainText('Saved');
+  await expect(toast(page, 'Saved')).toBeVisible();
   // The saved-view rail only renders once the query has refetched, and the
   // tiles are behind the results view while a query is active.
   await page.goto('/collections');
@@ -135,10 +138,10 @@ test('deleting a saved view asks first, and can be undone', async ({ page }) => 
   await page.getByRole('button', { name: 'Delete view' }).click();
 
   await expect(page.getByRole('region', { name: /^Saved views/ })).not.toContainText(name);
-  const toast = page.locator('.toast');
-  await expect(toast).toContainText('Deleted');
+  const deleted = toast(page, 'Deleted');
+  await expect(deleted).toBeVisible();
 
-  await toast.getByRole('button', { name: 'Undo' }).click();
+  await deleted.getByRole('button', { name: 'Undo' }).click();
   await expect(page.getByRole('region', { name: /^Saved views/ })).toContainText(name);
 
   // Leave nothing behind.

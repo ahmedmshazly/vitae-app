@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { signIn } from './helpers/auth';
 import { expectNoA11yViolations } from './helpers/a11y';
+import { toast } from './helpers/toast';
 
 /**
  * Screen 5: the entity form system. The behaviours here are only observable
@@ -96,7 +97,7 @@ test('a rejected save explains itself and keeps everything typed', async ({ page
   await page.unroute(NODES);
   await page.getByRole('button', { name: /^Create person/ }).click();
   await expect(page.getByRole('dialog')).toBeHidden({ timeout: 15_000 });
-  await expect(page.locator('.toast')).toContainText(`Created ${name}`);
+  await expect(toast(page, `Created ${name}`)).toBeVisible();
 });
 
 test('a list field adds one row at a time, in the imperative', async ({ page }) => {

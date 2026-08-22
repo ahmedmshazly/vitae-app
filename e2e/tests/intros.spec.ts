@@ -3,7 +3,7 @@ import { signIn } from './helpers/auth';
 import { expectNoA11yViolations } from './helpers/a11y';
 
 /**
- * Screen 13: Warm intros.
+ * Screen 13: Warm paths, mounted at /intros.
  *
  * Paths read left to right as a sentence. Failed lookups must not blame the
  * graph, and strength explanations must not rely on colour alone.
@@ -18,7 +18,8 @@ function reach(page: Page) {
 
 async function goIntros(page: Page) {
   await page.goto('/intros');
-  await expect(page.getByRole('heading', { name: 'Warm intros', exact: true })).toBeVisible();
+  // Titled Warm paths since the six-workspace IA; /intros stays mounted.
+  await expect(page.getByRole('heading', { name: 'Warm paths', exact: true })).toBeVisible();
 }
 
 test('a failed path lookup says the lookup failed, not that your graph is empty', async ({ page }) => {

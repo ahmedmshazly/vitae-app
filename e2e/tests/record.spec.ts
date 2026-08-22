@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { signIn } from './helpers/auth';
 import { API_BASE } from './helpers/api';
 import { expectNoA11yViolations } from './helpers/a11y';
+import { toast } from './helpers/toast';
 
 /**
  * Screen 6: record detail. The register rule here is the brand book's own
@@ -92,7 +93,7 @@ test('pinning confirms with the verb and rolls back when it fails', async ({ pag
   const wasPinned = (await pin.innerText()).trim() === 'Unpin';
 
   await pin.click();
-  await expect(page.locator('.toast')).toContainText(wasPinned ? 'Unpinned' : 'Pinned');
+  await expect(toast(page, wasPinned ? /^Unpinned/ : /^Pinned/)).toBeVisible();
   await expect(pin).toHaveText(wasPinned ? 'Pin' : 'Unpin');
 
   // Put it back, then prove a rejected toggle reverts rather than sticking.
@@ -109,7 +110,7 @@ test('pinning confirms with the verb and rolls back when it fails', async ({ pag
       : route.continue(),
   );
   await pin.click();
-  await expect(page.locator('.toast')).toContainText('read-only');
+  await expect(toast(page, 'read-only')).toBeVisible();
   await expect(pin).toHaveText(wasPinned ? 'Unpin' : 'Pin');
 });
 

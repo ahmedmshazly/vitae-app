@@ -88,6 +88,8 @@ test('a failed load says so instead of drawing an empty world', async ({ page })
   );
   await page.goto('/map');
 
+  // The instrument head carries a silent status line beside the body error, so
+  // the failure is named once out loud and once in the chrome.
   await expect(page.getByRole('alert')).toContainText('the atlas service is down');
 });
 

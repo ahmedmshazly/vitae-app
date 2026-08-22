@@ -190,7 +190,7 @@ test('the reminders drawer reports a failed load and offers a retry', async ({ p
   await page.route(REMINDERS, (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
   await signIn(page);
   await page.getByRole('button', { name: /reminders/i }).click();
-  await expect(page.getByRole('alert')).toContainText('Couldn’t load reminders.');
+  await expect(page.getByRole('alert')).toContainText('Couldn’t load reminders');
 
   await page.unroute(REMINDERS);
   await page.getByRole('button', { name: 'Retry' }).click();
@@ -208,7 +208,8 @@ test('first-run is a dialog, is dismissible, and stays dismissed', async ({ page
 
   await expectNoA11yViolations(page, '.vt-modal');
 
-  await welcome.getByRole('button', { name: 'Start exploring' }).click();
+  // Two ways out, and the dialog names both: straight to Today, or the tour.
+  await welcome.getByRole('button', { name: 'Open Today' }).click();
   await expect(welcome).toBeHidden();
 
   await page.reload();

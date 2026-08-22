@@ -56,14 +56,16 @@ test('an ask that nothing matched says so, however well you know the leader', as
   // list, it is a full list ranked on something other than the question. The
   // old banner tested `score < 1.2` and stayed silent here, because the closest
   // contact scores 1.47 on tie strength alone.
-  const banner = page.getByRole('status');
-  await expect(banner).toContainText('Nobody matched what you asked for');
+  // Scoped to the ranked region: the screen carries other live regions now,
+  // one for the recall shortcuts and one for a re-rank in flight.
+  const banner = ranked(page).getByRole('status');
+  await expect(banner).toContainText('No contact matched the intent');
   await expect(ranked(page).locator('article').first()).toBeVisible();
 
   // …and it goes away the moment a factor actually answers the ask.
   await askFor(page, 'need=referral&topics=reinforcement+learning&run=1');
   await expect(ranked(page).locator('article').first()).toBeVisible();
-  await expect(page.getByText('Nobody matched what you asked for')).toHaveCount(0);
+  await expect(page.getByText('No contact matched the intent')).toHaveCount(0);
 });
 
 test('every rank is explained by name and number, not by colour', async ({ page }) => {
@@ -138,7 +140,7 @@ test('a failed history costs the shortcuts, not the ability to ask', async ({ pa
 
   // Was gated only on `data?.asks?.length`, so a failure and "no history yet"
   // were the same silent nothing.
-  await expect(page.getByRole('alert')).toContainText('Couldn’t load your recent asks');
+  await expect(page.getByRole('alert')).toContainText('Recent asks could not be loaded');
   await expect(ranked(page).locator('article').first()).toBeVisible();
 });
 
@@ -147,7 +149,7 @@ test('a card opens on request and offers three distinct next moves', async ({ pa
   await askFor(page, 'need=referral&topics=reinforcement+learning&run=1');
 
   const first = ranked(page).locator('article').first();
-  const head = first.getByRole('button', { name: /^#1 / });
+  const head = first.getByRole('button', { name: /rank 1$/ });
   await expect(head).toHaveAttribute('aria-expanded', 'false');
   await head.click();
   await expect(head).toHaveAttribute('aria-expanded', 'true');
@@ -163,7 +165,7 @@ test('a card opens on request and offers three distinct next moves', async ({ pa
 test('a failed draft says so instead of leaving an empty box above a live Send', async ({ page }) => {
   await signIn(page);
   await askFor(page, 'need=referral&topics=reinforcement+learning&run=1');
-  await ranked(page).locator('article').first().getByRole('button', { name: /^#1 / }).click();
+  await ranked(page).locator('article').first().getByRole('button', { name: /rank 1$/ }).click();
 
   await page.route('**/api/v1/composer/draft', (route) =>
     route.fulfill({
@@ -183,7 +185,7 @@ test('a failed draft says so instead of leaving an empty box above a live Send',
 test('the tone switch carries its state in more than a border colour', async ({ page }) => {
   await signIn(page);
   await askFor(page, 'need=referral&topics=reinforcement+learning&run=1');
-  await ranked(page).locator('article').first().getByRole('button', { name: /^#1 / }).click();
+  await ranked(page).locator('article').first().getByRole('button', { name: /rank 1$/ }).click();
   await page.getByRole('button', { name: 'Draft the ask' }).click();
 
   const tones = page.getByRole('group', { name: 'Tone' });
@@ -200,6 +202,6 @@ test('no automated a11y violations, asked or not', async ({ page }) => {
   await expectNoA11yViolations(page);
 
   await askFor(page, 'need=referral&topics=reinforcement+learning&run=1');
-  await ranked(page).locator('article').first().getByRole('button', { name: /^#1 / }).click();
+  await ranked(page).locator('article').first().getByRole('button', { name: /rank 1$/ }).click();
   await expectNoA11yViolations(page);
 });

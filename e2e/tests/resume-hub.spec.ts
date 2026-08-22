@@ -25,7 +25,8 @@ test('resume hub shows live overview KPIs and links into the workflow', async ({
 
 test('settings exposes résumé defaults for template, accent, and wording', async ({ page }) => {
   await signInDemo(page);
-  await page.goto('/settings');
+  // Résumé defaults live in the Preferences panel; /settings is its index.
+  await page.goto('/settings/preferences');
 
   await expect(page.getByRole('heading', { name: 'Résumé defaults' })).toBeVisible({
     timeout: 10_000,

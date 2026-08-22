@@ -15,7 +15,7 @@ test('Today: queue, habits, reconnect, and the reference tier', async ({ page })
   await expect(page.getByRole('heading', { name: /^Habits/ })).toBeVisible();
   await expect(page.getByRole('heading', { name: /^Reconnect/ })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'How things stand' })).toBeVisible();
-  await expect(page.getByText('Applications')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Applications' })).toBeVisible();
   // Either verb. The toggle is named after the habit it toggles, and which
   // verb it carries depends on whether today is already ticked — `seed.ts`
   // checks "Deep work 2h" on `daysAgo(0)`, so on a freshly seeded database it
@@ -30,7 +30,9 @@ test('Today: queue, habits, reconnect, and the reference tier', async ({ page })
 test('Log an interaction from a person page: strength recomputes', async ({ page }) => {
   await signIn(page);
   await page.goto('/people');
-  await page.getByText('Sarah Chen').first().click();
+  // A row's checkbox carries a visually-hidden "Select <name>" label, so the
+  // name alone is ambiguous; the row's own link is what opens the record.
+  await page.getByRole('link', { name: 'Sarah Chen' }).first().click();
   await page.getByRole('button', { name: 'Log interaction' }).click();
   // Unique note per run, reruns against the same data must not accumulate
   // strict-mode duplicates.
@@ -50,7 +52,7 @@ test('Ask → why-panel → composer → send & log', async ({ page }) => {
   await expect(page.getByRole('img', { name: /^Score \d/ }).first()).toBeVisible();
   // The card has to be opened now: expanding the top result automatically was
   // the screen making a choice on your behalf before you had read anything.
-  await page.getByRole('button', { name: /^#1 / }).click();
+  await page.getByRole('button', { name: /rank 1$/ }).click();
   await page.getByRole('button', { name: 'Draft the ask' }).first().click();
   await expect(page.getByText('Send & log')).toBeVisible();
   await page.getByRole('button', { name: 'Send & log' }).click();
@@ -88,20 +90,20 @@ test('Import: stage a vCard, commit, then roll the batch back', async ({ page })
 
   // Staged review: the row appears with a "new" badge, nothing committed yet.
   await expect(page.getByText('review before commit')).toBeVisible({ timeout: 10_000 });
-  await expect(page.getByText('Playwright Import')).toBeVisible();
+  await expect(page.getByText('Playwright Import', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: /^Commit 1 row$/ }).click();
   await expect(page.getByText('Committed 1 records', { exact: false })).toBeVisible({ timeout: 10_000 });
 
   // The person is now live.
   await page.goto('/people');
-  await expect(page.getByText('Playwright Import')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Playwright Import' })).toBeVisible();
 
   // Roll the batch back from history, the person disappears.
   await page.goto('/import');
   await page.getByRole('button', { name: /Roll back/ }).first().click();
   await expect(page.getByText('records removed', { exact: false })).toBeVisible({ timeout: 10_000 });
   await page.goto('/people');
-  await expect(page.getByText('Playwright Import')).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Playwright Import' })).toHaveCount(0);
 });
 
 const DUP_VCF = `BEGIN:VCARD
