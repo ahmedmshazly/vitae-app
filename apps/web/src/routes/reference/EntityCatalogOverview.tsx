@@ -1,5 +1,6 @@
-import type { Ref } from 'react';
+import { useId, type Ref } from 'react';
 import {
+  CATALOG_COUNTS,
   CATALOG_GRAPH,
   ENTITY_GROUPS,
   type CatalogGraphNode,
@@ -11,20 +12,42 @@ const VIEW_HEIGHT = 1000;
 const OFFSET_X = VIEW_WIDTH / 2;
 const OFFSET_Y = VIEW_HEIGHT / 2;
 
+/**
+ * An exported SVG travels without the app's stylesheet, so every colour the
+ * screen resolves through a custom property has to be written out literally
+ * here. Each entry names the token it mirrors, and the colocated test reads
+ * packages/ui/src/styles/tokens.css and fails when one drifts: three of these
+ * had already drifted, so the exported "canonical" map was not the map anyone
+ * saw on screen.
+ */
+export const OVERVIEW_INK = {
+  '--ae-bg': '#0f0f0f',
+  '--ae-surface': '#151515',
+  '--ae-surface-raised': '#1c1c1c',
+  '--ae-accent-bg': '#262626',
+  '--ae-border-strong': '#3f3f3f',
+  '--ae-border-control': '#727271',
+  '--ae-fg': '#e8e8e6',
+  '--ae-fg-soft': '#c9c9c6',
+  '--ae-fg-strong': '#fafaf8',
+} as const;
+
+/**
+ * The wildcard hatch is filled from a presentation attribute on the node
+ * rather than from a rule here, because its pattern id is per-instance (see
+ * `idPrefix`) and a stylesheet cannot name an id it does not know.
+ */
 export const OVERVIEW_SVG_EXPORT_STYLE = `
-  .ec-overview__backdrop{fill:#0f0f0f;stroke:#2b2b2b;stroke-width:2}
-  .ec-overview__group rect{fill:#151515;stroke:#3f3f3f;stroke-width:2}
-  .ec-overview__group>text,.ec-overview__relation-zone>text{fill:#e8e8e6;font:600 18px "Instrument Sans Variable",sans-serif}
-  .ec-overview__relation-zone rect{fill:#151515;stroke:#727271;stroke-width:2}
-  #ec-any-pattern path{stroke:#e8e8e6;stroke-width:1}
-  .ec-overview__node rect,.ec-overview__node path{stroke:#c9c9c6;stroke-width:1.4}
-  .ec-overview__node--entity rect{fill:#1c1c1c}
-  .ec-overview__node--relation path{fill:#262626}
-  .ec-overview__node--any path{fill:url(#ec-any-pattern)}
-  .ec-overview__node text{fill:#fafaf8;font:600 12px "IBM Plex Mono",monospace}
-  .ec-overview__node--relation .ec-overview__relation-label{font-size:10px}
-  .ec-overview__node--relation .ec-overview__endpoint-signature{fill:#c9c9c6;font-size:6.5px}
-  .ec-overview__legend text{fill:#c9c9c6;font:500 13px "Instrument Sans Variable",sans-serif}
+  .ec-overview__backdrop{fill:${OVERVIEW_INK['--ae-bg']};stroke:${OVERVIEW_INK['--ae-border-strong']};stroke-width:2}
+  .ec-overview__group rect{fill:${OVERVIEW_INK['--ae-surface-raised']};stroke:${OVERVIEW_INK['--ae-border-strong']};stroke-width:2}
+  .ec-overview__group>text,.ec-overview__relation-zone>text{fill:${OVERVIEW_INK['--ae-fg']};font:600 18px "Instrument Sans Variable",sans-serif}
+  .ec-overview__relation-zone rect{fill:${OVERVIEW_INK['--ae-surface']};stroke:${OVERVIEW_INK['--ae-border-control']};stroke-width:2}
+  .ec-overview__hatch{stroke:${OVERVIEW_INK['--ae-fg']};stroke-width:1}
+  .ec-overview__node rect,.ec-overview__node path{stroke:${OVERVIEW_INK['--ae-fg-soft']};stroke-width:1.4}
+  .ec-overview__node--entity rect{fill:${OVERVIEW_INK['--ae-surface-raised']}}
+  .ec-overview__node--relation path{fill:${OVERVIEW_INK['--ae-accent-bg']}}
+  .ec-overview__node text{fill:${OVERVIEW_INK['--ae-fg-strong']};font:600 12px "IBM Plex Mono",monospace}
+  .ec-overview__legend text{fill:${OVERVIEW_INK['--ae-fg-soft']};font:500 13px "Instrument Sans Variable",sans-serif}
 `;
 
 const GROUP_BOUNDS: Record<
@@ -42,52 +65,27 @@ function coordinates(node: CatalogGraphNode): { x: number; y: number } {
   return { x: node.structuredX + OFFSET_X, y: node.structuredY + OFFSET_Y };
 }
 
-const GROUP_CODES: Record<CatalogGraphNode['group'], string> = {
-  Career: 'C',
-  Content: 'Co',
-  'Job search': 'J',
-  Life: 'L',
-  'Long tail': 'T',
-  Relations: 'R',
-  Universal: '*',
-};
-
-const GROUP_ORDER: CatalogGraphNode['group'][] = [
-  'Career',
-  'Content',
-  'Job search',
-  'Life',
-  'Long tail',
-  'Universal',
-  'Relations',
-];
-
-function endpointSignature(
-  relationId: string,
-  nodeById: Map<string, CatalogGraphNode>,
-): string {
-  function groupsFor(role: 'source' | 'target'): string {
-    const groups = new Set<CatalogGraphNode['group']>();
-    for (const link of CATALOG_GRAPH.links) {
-      if (link.relationId !== relationId || link.role !== role) continue;
-      const endpoint = nodeById.get(role === 'source' ? link.source : link.target);
-      if (endpoint) groups.add(endpoint.group);
-    }
-    return GROUP_ORDER.filter((group) => groups.has(group))
-      .map((group) => GROUP_CODES[group])
-      .join('·');
-  }
-  return `${groupsFor('source')} → ${groupsFor('target')}`;
-}
-
 export function EntityCatalogOverview({
   svgRef,
   className = '',
+  idPrefix,
 }: {
   svgRef?: Ref<SVGSVGElement>;
   className?: string;
+  /**
+   * Namespace for the three document-unique ids this sheet owns. It defaults
+   * to a per-instance value because the diagram is mounted more than once at
+   * a time: the export snapshot keeps a copy while the A4 atlas renders
+   * another, and with a fixed id the visible wildcard node resolved its
+   * pattern through the hidden copy.
+   */
+  idPrefix?: string;
 }) {
-  const nodeById = new Map(CATALOG_GRAPH.nodes.map((node) => [node.id, node]));
+  const uid = useId();
+  const prefix = idPrefix ?? `ec-overview-${uid.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const titleId = `${prefix}-title`;
+  const descId = `${prefix}-desc`;
+  const patternId = `${prefix}-any-pattern`;
 
   return (
     <svg
@@ -95,17 +93,18 @@ export function EntityCatalogOverview({
       className={`ec-overview ${className}`.trim()}
       viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
       role="img"
-      aria-labelledby="ec-overview-title ec-overview-desc"
+      aria-labelledby={`${titleId} ${descId}`}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <title id="ec-overview-title">Vitae complete entity and relation map</title>
-      <desc id="ec-overview-desc">
-        All entity types are grouped around first-class relation diamonds. Each relation shows
-        a compact source-to-target group signature; exact endpoints are listed in the matrix.
+      <title id={titleId}>Vitae complete entity and relation map</title>
+      <desc id={descId}>
+        All entity types are grouped around first-class relation diamonds. The canonical
+        relation matrix on the next sheet lists the exact source and target types every
+        relation accepts.
       </desc>
       <defs>
-        <pattern id="ec-any-pattern" width="8" height="8" patternUnits="userSpaceOnUse">
-          <path d="M-2 2 L2 -2 M0 8 L8 0 M6 10 L10 6" />
+        <pattern id={patternId} width="8" height="8" patternUnits="userSpaceOnUse">
+          <path className="ec-overview__hatch" d="M-2 2 L2 -2 M0 8 L8 0 M6 10 L10 6" />
         </pattern>
       </defs>
 
@@ -126,7 +125,7 @@ export function EntityCatalogOverview({
       <g className="ec-overview__relation-zone">
         <rect x="570" y="60" width="510" height="675" rx="24" />
         <text x="592" y="91">
-          Relation vocabulary · endpoint group signatures
+          Relation vocabulary
         </text>
       </g>
 
@@ -143,19 +142,10 @@ export function EntityCatalogOverview({
                 <path d="M 0 -27 L 51 0 L 0 27 L -51 0 Z" />
                 <text
                   className="ec-overview__relation-label"
-                  y="-5"
                   textAnchor="middle"
                   dominantBaseline="central"
                 >
                   {node.label}
-                </text>
-                <text
-                  className="ec-overview__endpoint-signature"
-                  y="12"
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                >
-                  {endpointSignature(node.id, nodeById)}
                 </text>
               </g>
             );
@@ -167,7 +157,10 @@ export function EntityCatalogOverview({
                 className="ec-overview__node ec-overview__node--any"
                 transform={`translate(${x} ${y})`}
               >
-                <path d="M-63 -24 L-50 -38 H50 L63 -24 V24 L50 38 H-50 L-63 24 Z" />
+                <path
+                  d="M-63 -24 L-50 -38 H50 L63 -24 V24 L50 38 H-50 L-63 24 Z"
+                  fill={`url(#${patternId})`}
+                />
                 <text textAnchor="middle" dominantBaseline="central">
                   Any entity
                 </text>
@@ -194,8 +187,10 @@ export function EntityCatalogOverview({
         <text>Rectangle = entity</text>
         <text x="180">Diamond = relation</text>
         <text x="370">Pattern = wildcard endpoint</text>
-        <text x="650">C/Co/J/L/T = endpoint groups · exact pairs on matrix</text>
-        <text x="1120">34 entities · 28 relations</text>
+        <text x="650">Exact endpoints on the canonical relation matrix</text>
+        <text x="1150">
+          {CATALOG_COUNTS.nodes} entities · {CATALOG_COUNTS.edges} relations
+        </text>
       </g>
     </svg>
   );

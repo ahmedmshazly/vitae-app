@@ -34,14 +34,6 @@
   max-width: 440px;
 }
 
-.ec-observatory-header .ec-header__actions button {
-  background: var(--ae-surface);
-}
-
-.ec-observatory-header .ec-header__actions button:first-child {
-  background: var(--ae-accent-bg);
-  box-shadow: none;
-}
 
 .ec-observatory {
   position: relative;
@@ -68,8 +60,6 @@
 
 .ec-lens-switcher button,
 .ec-observatory-tools button,
-.ec-inspector-actions button,
-.ec-focus-empty button,
 .ec-cockpit__inline-actions button,
 .ec-cockpit__workspace button,
 .ec-cockpit__danger-zone button {
@@ -92,8 +82,6 @@
 
 .ec-lens-switcher button:hover,
 .ec-observatory-tools button:hover:not(:disabled),
-.ec-inspector-actions button:hover,
-.ec-focus-empty button:hover,
 .ec-cockpit__workspace button:hover,
 .ec-cockpit__inline-actions button:hover {
   border-color: var(--ae-border-control);
@@ -164,47 +152,60 @@
 
 .ec-observatory-search__results {
   position: absolute;
-  top: calc(100% + 7px);
+  top: calc(100% + var(--ae-space-1));
   right: 0;
   left: 0;
   z-index: 80;
   max-height: min(520px, 70vh);
   overflow: auto;
   border: 1px solid var(--ae-border-control);
-  border-radius: 13px;
+  border-radius: var(--ae-radius-lg);
   background: var(--ae-surface-overlay);
-  padding: 7px;
+  padding: var(--ae-space-1);
   box-shadow: var(--ae-shadow-overlay);
+}
+
+.ec-observatory-search__results ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .ec-observatory-search__results button {
   display: grid;
   grid-template-columns: 62px minmax(120px, 1fr) minmax(90px, auto);
-  gap: 9px;
+  align-items: center;
+  gap: var(--ae-space-2);
   width: 100%;
+  min-height: var(--ae-hit-target);
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--ae-radius);
   background: transparent;
-  padding: 9px 10px;
+  padding: var(--ae-space-1) var(--ae-space-2);
   color: var(--ae-fg);
   text-align: left;
   cursor: pointer;
 }
 
-.ec-observatory-search__results button:hover,
-.ec-observatory-search__results button[aria-selected='true'] {
+.ec-observatory-search__results button:hover {
   background: var(--ae-accent-bg);
+}
+
+.ec-observatory-search__results button:focus-visible {
+  outline: none;
+  box-shadow: var(--ae-focus-ring);
 }
 
 .ec-observatory-search__results button > span {
   color: var(--ae-faint);
-  font-size: 9px;
+  font-size: 11px;
   text-transform: uppercase;
 }
 
 .ec-observatory-search__results button small {
   overflow: hidden;
   color: var(--ae-faint);
+  font-size: 11px;
   text-align: right;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -212,7 +213,7 @@
 
 .ec-observatory-search__results p {
   margin: 0;
-  padding: 16px;
+  padding: var(--ae-space-4);
   color: var(--ae-faint);
 }
 
@@ -309,35 +310,31 @@
   text-align: center;
 }
 
+.ec-observatory-loading {
+  place-content: stretch;
+  padding: var(--ae-space-3);
+}
+
+/* The canvas keeps its box while it draws, so the trace sits over it rather
+   than replacing it and snapping the layout. */
+.ec-observatory-loading--overlay {
+  z-index: 6;
+  place-content: center;
+  background: color-mix(in srgb, var(--ae-bg) 72%, transparent);
+  pointer-events: none;
+}
+
+.ec-observatory-loading__label {
+  position: absolute;
+  inset-inline: 0;
+  bottom: var(--ae-space-4);
+  color: var(--ae-muted);
+  font-size: var(--ae-text-sm);
+}
+
 .ec-focus-empty {
   justify-items: center;
   padding: 28px;
-}
-
-.ec-focus-empty > span {
-  display: grid;
-  width: 92px;
-  height: 92px;
-  place-items: center;
-  border: 1px solid var(--ae-border-control);
-  border-radius: 50%;
-  background: var(--ae-accent-bg);
-  color: var(--ae-accent-soft);
-  font-size: 46px;
-  box-shadow: none;
-}
-
-.ec-focus-empty h2 {
-  margin: 24px 0 6px;
-  color: var(--ae-fg-strong);
-  font: 600 27px var(--ae-font-display);
-}
-
-.ec-focus-empty p {
-  max-width: 520px;
-  margin: 0 0 20px;
-  color: var(--ae-faint);
-  line-height: 1.55;
 }
 
 .ec-observatory-minimap {
@@ -351,18 +348,19 @@
 .ec-observatory-legend {
   position: absolute;
   z-index: 8;
-  bottom: 13px;
-  left: 13px;
+  bottom: var(--ae-space-3);
+  left: var(--ae-space-3);
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 11px;
+  gap: var(--ae-space-2);
+  max-width: calc(100% - var(--ae-space-6));
   border: 1px solid var(--ae-border-strong);
-  border-radius: 9px;
+  border-radius: var(--ae-radius-lg);
   background: var(--ae-bg);
-  padding: 7px 9px;
-  color: var(--ae-faint);
-  font: 9px var(--ae-font-mono);
+  padding: var(--ae-space-2) var(--ae-space-3);
+  color: var(--ae-muted);
+  font: var(--ae-text-xs) var(--ae-font-mono);
 }
 
 .ec-observatory-legend span {
@@ -385,6 +383,40 @@
   background: var(--ae-accent);
 }
 
+/* The group key repeats the outline dash each group's nodes carry on the
+   canvas, so the five groups stay apart for a reader who cannot separate the
+   five hues. */
+.ec-observatory-legend__group i {
+  border-color: currentcolor;
+  background: none;
+}
+
+.ec-observatory-legend__group i[data-group='Career'] {
+  border-color: var(--ae-viz-1);
+}
+
+.ec-observatory-legend__group i[data-group='Content'] {
+  border-style: dashed;
+  border-color: var(--ae-viz-2);
+}
+
+.ec-observatory-legend__group i[data-group='Life'] {
+  border-style: dotted;
+  border-color: var(--ae-viz-3);
+}
+
+.ec-observatory-legend__group i[data-group='Job search'] {
+  border-style: double;
+  border-width: 3px;
+  border-color: var(--ae-viz-4);
+}
+
+.ec-observatory-legend__group i[data-group='Long tail'] {
+  border-style: dotted;
+  border-width: 2px;
+  border-color: var(--ae-viz-6);
+}
+
 .ec-observatory-legend i.is-direction {
   width: 17px;
   height: 1px;
@@ -392,10 +424,9 @@
   background: var(--ae-border-strong);
 }
 
-.ec-observatory-legend b {
+.ec-observatory-legend__count {
   margin-left: 3px;
-  color: var(--ae-muted);
-  font-weight: 500;
+  color: var(--ae-fg);
 }
 
 .ec-observatory-inspector {
@@ -417,46 +448,47 @@
   padding: 8px 10px;
 }
 
-.ec-inspector-actions button {
-  min-height: 31px;
-  padding: 4px 8px;
-  font-size: 11px;
+/* The close control is the smallest target on the screen and the one whose
+   miss costs most: it sits beside "Open in Focus", which changes the lens.
+   Button size="sm" carries the 32px floor, so this only places it. */
+.ec-inspector-actions .vt-btn:last-child {
+  margin-left: auto;
+  font-size: var(--ae-text-lg);
 }
 
-.ec-inspector-actions button:last-child {
-  width: 31px;
-  margin-left: auto;
-  color: var(--ae-fg);
-  font-size: 17px;
+/* The dossier takes focus when a selection replaces the index that opened it,
+   so the ring has to be visible on a container that is not itself a control. */
+.ec-inspector-body:focus-visible {
+  outline: none;
+  box-shadow: var(--ae-focus-ring);
 }
 
 .ec-inspector-signal {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 7px;
-  padding: 12px 14px 0;
+  gap: var(--ae-space-2);
+  margin: 0;
+  border-bottom: 1px solid var(--ae-border);
+  padding: 12px 14px;
 }
 
 .ec-inspector-signal > div {
-  border: 1px solid var(--ae-border);
-  border-radius: 8px;
-  background: transparent;
-  padding: 7px;
+  display: grid;
+  gap: 2px;
 }
 
-.ec-inspector-signal span {
-  display: block;
-  color: var(--ae-faint);
-  font: 8px var(--ae-font-mono);
+.ec-inspector-signal dt {
+  color: var(--ae-muted);
+  font: var(--ae-text-xs) / 1.2 var(--ae-font-mono);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
-.ec-inspector-signal strong {
-  display: block;
-  margin-top: 2px;
+.ec-inspector-signal dd {
+  margin: 0;
   color: var(--ae-fg-strong);
-  font: 600 17px var(--ae-font-mono);
+  font-size: 17px;
+  font-weight: 600;
 }
 
 /* Expert cockpit */
@@ -527,71 +559,85 @@
   cursor: pointer;
 }
 
-.ec-observatory-drawer details {
+.ec-observatory-drawer .vt-disclosure {
   border-bottom: 1px solid var(--ae-border);
-  padding: 0 13px 13px;
+  padding: 0 var(--ae-space-3) var(--ae-space-3);
 }
 
-.ec-observatory-drawer summary {
-  padding: 13px 0 10px;
+.ec-observatory-drawer .vt-disclosure__panel {
+  display: grid;
+  gap: var(--ae-space-2);
+}
+
+.ec-observatory-drawer .vt-disclosure__trigger {
+  padding-block: var(--ae-space-3) var(--ae-space-2);
   color: var(--ae-fg-soft);
   font-size: 12px;
   font-weight: 600;
-  cursor: pointer;
 }
 
-.ec-observatory-drawer summary small {
-  float: right;
+.ec-observatory-drawer .vt-disclosure__meta {
   color: var(--ae-faint);
-  font: 9px var(--ae-font-mono);
+  font-size: 11px;
 }
 
 .ec-cockpit__checks {
   display: grid;
-  gap: 5px;
+  gap: var(--ae-space-1);
 }
 
-.ec-cockpit__checks label,
-.ec-cockpit__toggles label {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  min-height: 30px;
+.ec-cockpit__checks .vt-check,
+.ec-cockpit__toggles .vt-check {
+  min-height: var(--ae-hit-target);
   color: var(--ae-muted);
   font-size: 11px;
 }
 
-.ec-cockpit__checks label > span {
+.ec-cockpit__checks .vt-check__label {
+  min-width: 0;
+}
+
+.ec-cockpit__check-label {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  min-width: 0;
+}
+
+/* The group swatch. Hue alone would be the only carrier of which group a row
+   belongs to, so the name sits right beside it and the count after that. */
+.ec-cockpit__check-label i {
+  flex: none;
   width: 8px;
   height: 8px;
-  border-radius: 2px;
+  border-radius: var(--ae-radius-sm);
   background: var(--ae-faint);
 }
 
-.ec-cockpit__checks label[data-group='Career'] > span {
+.ec-cockpit__check-label[data-group='Career'] i {
   background: var(--ae-viz-1);
 }
 
-.ec-cockpit__checks label[data-group='Content'] > span {
+.ec-cockpit__check-label[data-group='Content'] i {
   background: var(--ae-viz-2);
 }
 
-.ec-cockpit__checks label[data-group='Job search'] > span {
+.ec-cockpit__check-label[data-group='Job search'] i {
   background: var(--ae-viz-4);
 }
 
-.ec-cockpit__checks label[data-group='Life'] > span {
+.ec-cockpit__check-label[data-group='Life'] i {
   background: var(--ae-viz-3);
 }
 
-.ec-cockpit__checks label[data-group='Long tail'] > span {
+.ec-cockpit__check-label[data-group='Long tail'] i {
   background: var(--ae-viz-6);
 }
 
-.ec-cockpit__checks label small {
+.ec-cockpit__check-label small {
   margin-left: auto;
   color: var(--ae-faint);
-  font: 9px var(--ae-font-mono);
+  font: 11px var(--ae-font-mono);
 }
 
 .ec-cockpit__checks--relations {
@@ -600,14 +646,28 @@
   overflow: auto;
 }
 
-.ec-cockpit__checks--relations label {
+.ec-cockpit__checks--relations .vt-check {
   overflow: hidden;
 }
 
 .ec-cockpit__checks--relations code {
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* A sentence when a control has put the scene somewhere the scene cannot
+   explain: no relations selected, motion off, an inverted degree window. */
+.ec-cockpit__note {
+  margin: 0;
+  color: var(--ae-faint);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.ec-cockpit__note--warn {
+  color: var(--ae-warning);
 }
 
 .ec-cockpit__inline-actions {
@@ -721,32 +781,33 @@
   z-index: 4;
   inset: 0;
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   background: var(--ae-surface);
-  padding: 18px;
+  padding: var(--ae-space-4);
 }
 
 .ec-matrix-lens__intro {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 22px;
+  gap: var(--ae-space-5);
   border-bottom: 1px solid var(--ae-border);
-  padding: 0 2px 13px;
+  padding: 0 var(--ae-space-1) var(--ae-space-3);
 }
 
 .ec-matrix-lens__intro > div {
   display: grid;
-  gap: 3px;
+  gap: var(--ae-space-1);
 }
 
 .ec-matrix-lens__intro span {
   color: var(--ae-accent);
-  font: 9px var(--ae-font-mono);
+  font: 11px var(--ae-font-mono);
   letter-spacing: 0.08em;
 }
 
-.ec-matrix-lens__intro strong {
+.ec-matrix-lens__intro h2 {
+  margin: 0;
   color: var(--ae-fg);
   font: 600 17px var(--ae-font-display);
 }
@@ -763,23 +824,33 @@
 .ec-matrix-scroll {
   min-width: 0;
   overflow: auto;
-  outline: none;
-  padding: 18px 18px 50px;
+  padding: var(--ae-space-4) var(--ae-space-4) var(--ae-space-6);
   scrollbar-color: var(--ae-border-strong) transparent;
 }
 
 .ec-matrix-scroll:focus-visible {
-  box-shadow: inset 0 0 0 2px var(--ae-accent-bg);
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--ae-accent);
 }
 
 .ec-matrix-grid {
+  /* One knob for both axes, so the coarse-pointer bump that tokens.css already
+     applies to --ae-hit-target carries the header column with it. */
+  --ec-matrix-head: calc(var(--ae-hit-target) * 4);
   display: grid;
   width: max-content;
   border: 1px solid var(--ae-border);
   background: var(--ae-surface);
 }
 
-.ec-matrix-grid > * {
+/* The grid needs real rows for a screen reader to say "row 4 of 35", and the
+   layout needs the cells to stay direct children of the one grid. `contents`
+   is how a row can be both. */
+.ec-matrix-grid__rowgroup {
+  display: contents;
+}
+
+.ec-matrix-grid > * > * {
   min-width: 0;
   min-height: 0;
 }
@@ -793,6 +864,12 @@
   cursor: pointer;
 }
 
+.ec-matrix-grid :focus-visible {
+  z-index: 12;
+  outline: none;
+  box-shadow: var(--ae-focus-ring);
+}
+
 .ec-matrix-grid__corner {
   position: sticky;
   top: 0;
@@ -804,9 +881,9 @@
   border-right: 1px solid var(--ae-border-strong);
   border-bottom: 1px solid var(--ae-border-strong);
   background: var(--ae-surface);
-  padding: 10px;
+  padding: var(--ae-space-2);
   color: var(--ae-faint);
-  font: 8px var(--ae-font-mono);
+  font: 11px var(--ae-font-mono);
   text-transform: uppercase;
 }
 
@@ -819,20 +896,20 @@
   position: sticky;
   top: 0;
   z-index: 6;
-  border-top: 3px solid var(--matrix-group) !important;
+  border-top: 3px var(--matrix-group-line, solid) var(--matrix-group) !important;
   background: var(--ae-surface) !important;
 }
 
 .ec-matrix-grid__column span {
   position: absolute;
-  bottom: 5px;
-  left: 14px;
-  width: 96px;
+  bottom: var(--ae-space-2);
+  left: 50%;
+  width: calc(var(--ec-matrix-head) * 1.2);
   overflow: hidden;
   transform: rotate(-58deg);
   transform-origin: left bottom;
   color: var(--matrix-group);
-  font: 8px var(--ae-font-mono);
+  font: 11px var(--ae-font-mono);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -843,14 +920,35 @@
   z-index: 5;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--ae-space-2);
   justify-content: space-between;
-  border-left: 3px solid var(--matrix-group) !important;
+  border-left: 3px var(--matrix-group-line, solid) var(--matrix-group) !important;
   background: var(--ae-surface) !important;
-  padding: 0 7px;
+  padding: 0 var(--ae-space-2);
   color: var(--matrix-group) !important;
   text-align: left;
-  font: 8px var(--ae-font-mono);
+  font: 11px var(--ae-font-mono);
+}
+
+/* Group is five hues and nothing else on this surface, and the row header has
+   no room for a word. The rule that carries the hue carries a matching stroke
+   pattern too, the same one each group's nodes wear on the canvas, so the
+   groups stay apart without colour vision. The group name is in every header's
+   accessible name as well. */
+.ec-matrix-grid [data-group='Content'] {
+  --matrix-group-line: dashed;
+}
+
+.ec-matrix-grid [data-group='Life'] {
+  --matrix-group-line: dotted;
+}
+
+.ec-matrix-grid [data-group='Job search'] {
+  --matrix-group-line: double;
+}
+
+.ec-matrix-grid [data-group='Long tail'] {
+  --matrix-group-line: groove;
 }
 
 .ec-matrix-grid__row span {
@@ -861,7 +959,7 @@
 
 .ec-matrix-grid__row small {
   color: var(--ae-faint);
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .ec-matrix-grid__row.is-selected,
@@ -877,7 +975,7 @@
   padding: 0;
 }
 
-.ec-matrix-grid__cell:disabled {
+.ec-matrix-grid__cell[aria-disabled='true'] {
   cursor: default;
 }
 
@@ -892,10 +990,10 @@
 }
 
 .ec-matrix-grid__cell.has-relations:hover,
-.ec-matrix-grid__cell.has-relations[aria-selected='true'] {
+.ec-matrix-grid__cell[data-open='true'] {
   z-index: 2;
   background: var(--ae-accent-bg);
-  box-shadow: inset 0 0 0 1px var(--ae-accent);
+  box-shadow: inset 0 0 0 2px var(--ae-accent);
 }
 
 .ec-matrix-grid__cell[data-source-selected='true'],
@@ -904,73 +1002,75 @@
 }
 
 .ec-matrix-grid__cell span {
-  font: 700 7px var(--ae-font-mono);
+  font: 700 11px var(--ae-font-mono);
 }
 
-.ec-matrix-grid__cell i {
-  position: absolute;
-  right: 3px;
-  bottom: 3px;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--ae-accent);
-}
-
-.ec-matrix-popover {
-  position: absolute;
-  top: 88px;
-  right: 18px;
-  z-index: 20;
-  width: min(330px, calc(100% - 36px));
-  border: 1px solid var(--ae-border-control);
-  border-radius: 12px;
-  background: var(--ae-surface-overlay);
-  padding: 13px;
-  box-shadow: var(--ae-shadow-overlay);
-}
-
-.ec-matrix-popover > div:first-child {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  padding-right: 28px;
-  color: var(--ae-fg);
-  font: 11px var(--ae-font-mono);
-}
-
-.ec-matrix-popover > div:nth-child(2) {
-  display: grid;
-  gap: 5px;
-  margin-top: 10px;
-}
-
-.ec-matrix-popover > div:nth-child(2) button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border: 1px solid var(--ae-border-strong);
-  border-radius: 7px;
+/* The relations behind one cell. Docked under the grid rather than floating
+   over it, so reading a cell never hides the neighbours it is being compared
+   against. */
+.ec-matrix-detail {
+  border-top: 1px solid var(--ae-border-strong);
   background: var(--ae-surface);
-  padding: 8px;
-  color: var(--ae-fg);
-  cursor: pointer;
+  padding: var(--ae-space-3) var(--ae-space-1) 0;
 }
 
-.ec-matrix-popover small {
+.ec-matrix-detail:focus-visible {
+  outline: none;
+  box-shadow: inset 0 2px 0 0 var(--ae-accent);
+}
+
+.ec-matrix-detail__head {
+  display: flex;
+  gap: var(--ae-space-2);
+  align-items: center;
+  color: var(--ae-fg);
+  font-size: 11px;
+}
+
+.ec-matrix-detail__head b {
   color: var(--ae-faint);
 }
 
-.ec-matrix-popover__close {
-  position: absolute;
-  top: 7px;
-  right: 8px;
-  border: 0;
-  background: transparent;
-  color: var(--ae-muted);
-  font-size: 18px;
+.ec-matrix-detail__head > :last-child {
+  margin-left: auto;
+}
+
+.ec-matrix-detail__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ae-space-2);
+  margin: var(--ae-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ec-matrix-detail__list button {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  min-height: var(--ae-hit-target);
+  border: 1px solid var(--ae-border-strong);
+  border-radius: var(--ae-radius);
+  background: var(--ae-surface-raised);
+  padding: 0 var(--ae-space-3);
+  color: var(--ae-fg);
+  font-size: 11px;
   cursor: pointer;
 }
+
+.ec-matrix-detail__list button:hover {
+  border-color: var(--ae-accent);
+}
+
+.ec-matrix-detail__list button:focus-visible {
+  outline: none;
+  box-shadow: var(--ae-focus-ring);
+}
+
+.ec-matrix-detail__list small {
+  color: var(--ae-faint);
+}
+
 
 /* Command interface */
 .ec-command-backdrop {
@@ -1152,7 +1252,7 @@
   }
 
   .ec-matrix-lens {
-    padding: 10px;
+    padding: var(--ae-space-2);
   }
 
   .ec-matrix-lens__intro {
@@ -1164,7 +1264,7 @@
   }
 
   .ec-matrix-scroll {
-    padding-inline: 4px;
+    padding-inline: var(--ae-space-1);
   }
 
   .ec-observatory-header .ec-header__actions {

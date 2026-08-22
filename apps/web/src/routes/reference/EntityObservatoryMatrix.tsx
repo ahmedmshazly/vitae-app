@@ -1,21 +1,42 @@
-import { useMemo, useState, type CSSProperties } from 'react';
 import {
-  OBSERVATORY_GROUP_COLORS,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+} from 'react';
+import { Button, Mono } from '@vitae/ui';
+import {
+  OBSERVATORY_GROUP_SLOTS,
   buildObservatoryMatrix,
   type ObservatoryMatrixCell,
   type ObservatorySelectionId,
   type ObservatoryWorkspaceState,
 } from './entityObservatoryModel.js';
 
+/**
+ * Group fill as a token reference rather than a literal. The canvas needs real
+ * colour strings because it paints to a bitmap; this is DOM, so it can name the
+ * variable and follow the theme.
+ */
 function groupColor(group: string): string {
-  if (group === 'Universal') return '#fafaf8';
-  return (
-    OBSERVATORY_GROUP_COLORS[group as keyof typeof OBSERVATORY_GROUP_COLORS] ?? '#a3a3a0'
-  );
+  if (group === 'Universal') return 'var(--ae-fg-strong)';
+  const slot = OBSERVATORY_GROUP_SLOTS[group as keyof typeof OBSERVATORY_GROUP_SLOTS];
+  return slot ? `var(--ae-viz-${slot})` : 'var(--ae-muted)';
 }
 
 function cellKey(sourceId: string, targetId: string): string {
   return `${sourceId}|${targetId}`;
+}
+
+/** Where focus sits in the grid. Row 0 is the header row, column 0 the header
+ * column, so the corner is (0, 0) and the first data cell is (1, 1). */
+interface Cursor {
+  r: number;
+  c: number;
 }
 
 export function EntityObservatoryMatrix({
@@ -25,13 +46,28 @@ export function EntityObservatoryMatrix({
   state: ObservatoryWorkspaceState;
   onSelect: (id: ObservatorySelectionId, compare: boolean) => void;
 }) {
+  const ids = useId();
   const matrix = useMemo(() => buildObservatoryMatrix(state), [state]);
   const [activeCellKey, setActiveCellKey] = useState<string | null>(null);
-  const activeCell = activeCellKey ? matrix.cells.get(activeCellKey) ?? null : null;
+  // Read through the live matrix rather than caching the cell, so a filter or
+  // sort that removes the cell closes the panel instead of leaving relations on
+  // screen for a cell that is no longer there.
+  const activeCell = activeCellKey ? (matrix.cells.get(activeCellKey) ?? null) : null;
   const selected = new Set([...state.selectedIds, ...state.compareIds]);
   const entities = matrix.entities;
-  const columns = state.display.transpose ? [...entities].reverse() : entities;
+  // Transposing swaps which axis carries the source, which the two lookups
+  // below already do. It used to also reverse the column order, which scrambled
+  // the reading order for no reason and broke the diagonal.
+  const columns = entities;
   const rows = entities;
+  const rowAxis = state.display.transpose ? 'target' : 'source';
+  const columnAxis = state.display.transpose ? 'source' : 'target';
+
+  const gridRef = useRef<HTMLDivElement | null>(null);
+  const detailRef = useRef<HTMLDivElement | null>(null);
+  // 1156 cells would otherwise be 1156 tab stops. One cell holds the tab stop
+  // and the arrow keys move it, which is how a grid is meant to be walked.
+  const [cursor, setCursor] = useState<Cursor>({ r: 1, c: 1 });
 
   function matrixCell(rowId: ObservatorySelectionId, columnId: ObservatorySelectionId) {
     return state.display.transpose
@@ -46,127 +82,251 @@ export function EntityObservatoryMatrix({
   ): string {
     const source = state.display.transpose ? columnLabel : rowLabel;
     const target = state.display.transpose ? rowLabel : columnLabel;
-    if (!cell) return `${source} to ${target}: no canonical relation`;
-    return `${source} to ${target}: ${cell.relations.map((relation) => relation.type).join(', ')}`;
+    if (!cell) return `${source} to ${target}, no canonical relation`;
+    const names = cell.relations.map((relation) => relation.type).join(', ');
+    return `${source} to ${target}, ${cell.relations.length} relation${cell.relations.length === 1 ? '' : 's'}: ${names}`;
+  }
+
+  const focusCursor = useCallback((next: Cursor) => {
+    setCursor(next);
+    const grid = gridRef.current;
+    const target = grid?.querySelector<HTMLElement>(`[data-r="${next.r}"][data-c="${next.c}"]`);
+    target?.focus();
+  }, []);
+
+  function onGridKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    // Modified keys belong to the browser and to the app's own shortcuts.
+    if (event.altKey || event.metaKey) return;
+    const lastRow = rows.length;
+    const lastColumn = columns.length;
+    const clamp = (r: number, c: number): Cursor => ({
+      r: Math.min(Math.max(r, 0), lastRow),
+      c: Math.min(Math.max(c, 0), lastColumn),
+    });
+    let next: Cursor | null = null;
+    switch (event.key) {
+      case 'ArrowUp':
+        next = clamp(cursor.r - 1, cursor.c);
+        break;
+      case 'ArrowDown':
+        next = clamp(cursor.r + 1, cursor.c);
+        break;
+      case 'ArrowLeft':
+        next = clamp(cursor.r, cursor.c - 1);
+        break;
+      case 'ArrowRight':
+        next = clamp(cursor.r, cursor.c + 1);
+        break;
+      case 'PageUp':
+        next = clamp(cursor.r - 10, cursor.c);
+        break;
+      case 'PageDown':
+        next = clamp(cursor.r + 10, cursor.c);
+        break;
+      case 'Home':
+        next = event.ctrlKey ? clamp(0, 0) : clamp(cursor.r, 0);
+        break;
+      case 'End':
+        next = event.ctrlKey ? clamp(lastRow, lastColumn) : clamp(cursor.r, lastColumn);
+        break;
+      case 'Escape':
+        if (activeCellKey) {
+          setActiveCellKey(null);
+          focusCursor(cursor);
+          event.preventDefault();
+        }
+        return;
+      default:
+        return;
+    }
+    if (event.ctrlKey && event.key !== 'Home' && event.key !== 'End') return;
+    event.preventDefault();
+    focusCursor(next);
+  }
+
+  // The detail is a panel, not an overlay, so nothing moves focus into it for
+  // us. Opening a cell has to hand focus over or the keyboard user never
+  // reaches the relations they just asked to see.
+  useEffect(() => {
+    if (activeCellKey) detailRef.current?.focus();
+  }, [activeCellKey]);
+
+  function closeDetail() {
+    setActiveCellKey(null);
+    focusCursor(cursor);
   }
 
   return (
-    <div className="ec-matrix-lens" data-transposed={state.display.transpose}>
+    <section className="ec-matrix-lens" data-transposed={state.display.transpose} aria-labelledby={`${ids}-title`}>
       <div className="ec-matrix-lens__intro">
         <div>
-          <span>Source ↓ · target →</span>
-          <strong>{matrix.relationCount} exact endpoint mappings</strong>
+          <span>
+            {rowAxis} ↓ · {columnAxis} →
+          </span>
+          <h2 id={`${ids}-title`}>{matrix.relationCount} exact endpoint mappings</h2>
         </div>
         <p>
-          A line-free audit surface. Select a header to focus an entity or a populated cell to
-          inspect its exact relation vocabulary.
+          A line-free audit surface. Select a header to focus an entity, or a populated cell to read
+          its exact relation vocabulary. Arrow keys walk the grid, Escape closes a cell.
         </p>
       </div>
 
-      {activeCell ? (
-        <div className="ec-matrix-popover" role="dialog" aria-label="Matrix cell relations">
-          <div>
-            <span>{activeCell.sourceId.replace('entity:', '')}</span>
-            <b>→</b>
-            <span>{activeCell.targetId.replace('entity:', '')}</span>
-          </div>
-          <div>
-            {activeCell.relations.map((relation) => (
+      <div
+        className="ec-matrix-scroll"
+        role="region"
+        aria-label="Relation matrix, scrollable"
+        tabIndex={0}
+      >
+        <div
+          ref={gridRef}
+          className="ec-matrix-grid"
+          style={{
+            gridTemplateColumns: `var(--ec-matrix-head) repeat(${columns.length}, var(--ae-hit-target))`,
+            gridTemplateRows: `var(--ec-matrix-head) repeat(${rows.length}, var(--ae-hit-target))`,
+          }}
+          role="grid"
+          aria-labelledby={`${ids}-title`}
+          aria-rowcount={rows.length + 1}
+          aria-colcount={columns.length + 1}
+          onKeyDown={onGridKeyDown}
+        >
+          <div className="ec-matrix-grid__rowgroup" role="row" aria-rowindex={1}>
+            <div
+              className="ec-matrix-grid__corner"
+              role="columnheader"
+              aria-colindex={1}
+              data-r={0}
+              data-c={0}
+              tabIndex={cursor.r === 0 && cursor.c === 0 ? 0 : -1}
+              onFocus={() => setCursor({ r: 0, c: 0 })}
+            >
+              <span>{columnAxis}</span>
+              <b>{rowAxis}</b>
+            </div>
+            {columns.map((entity, index) => (
               <button
-                key={relation.id}
+                key={`column:${entity.id}`}
                 type="button"
-                onClick={(event) => onSelect(relation.id, event.shiftKey)}
+                role="columnheader"
+                aria-colindex={index + 2}
+                data-r={0}
+                data-c={index + 1}
+                data-group={entity.group}
+                tabIndex={cursor.r === 0 && cursor.c === index + 1 ? 0 : -1}
+                onFocus={() => setCursor({ r: 0, c: index + 1 })}
+                className={`ec-matrix-grid__column${selected.has(entity.id) ? ' is-selected' : ''}`}
+                style={{ '--matrix-group': groupColor(entity.group) } as CSSProperties}
+                aria-label={`${entity.label}, ${entity.group} group, ${entity.degree} relation endpoints`}
+                title={`${entity.label} · ${entity.group} · ${entity.degree} relation endpoints`}
+                onClick={(event) => onSelect(entity.id, event.shiftKey)}
               >
-                <code>{relation.type}</code>
-                <small>{relation.label}</small>
+                <span aria-hidden>{entity.label}</span>
               </button>
             ))}
           </div>
-          <button
-            className="ec-matrix-popover__close"
-            type="button"
-            aria-label="Close matrix cell"
-            onClick={() => setActiveCellKey(null)}
-          >
-            ×
-          </button>
-        </div>
-      ) : null}
-
-      <div className="ec-matrix-scroll" tabIndex={0} aria-label="Scrollable relation matrix">
-        <div
-          className="ec-matrix-grid"
-          style={{
-            gridTemplateColumns: `108px repeat(${columns.length}, 28px)`,
-            gridTemplateRows: `108px repeat(${rows.length}, 28px)`,
-          }}
-          role="grid"
-          aria-rowcount={rows.length + 1}
-          aria-colcount={columns.length + 1}
-        >
-          <div className="ec-matrix-grid__corner" role="columnheader">
-            <span>target</span>
-            <b>source</b>
-          </div>
-          {columns.map((entity) => (
-            <button
-              key={`column:${entity.id}`}
-              type="button"
-              role="columnheader"
-              className={`ec-matrix-grid__column${selected.has(entity.id) ? ' is-selected' : ''}`}
-              style={{ '--matrix-group': groupColor(entity.group) } as CSSProperties}
-              title={`${entity.label} · ${entity.degree} relation endpoints`}
-              onClick={(event) => onSelect(entity.id, event.shiftKey)}
-            >
-              <span>{entity.label}</span>
-            </button>
-          ))}
-          {rows.flatMap((row) => [
-            <button
+          {rows.map((row, rowIndex) => (
+            <div
               key={`row:${row.id}`}
-              type="button"
-              role="rowheader"
-              className={`ec-matrix-grid__row${selected.has(row.id) ? ' is-selected' : ''}`}
-              style={{ '--matrix-group': groupColor(row.group) } as CSSProperties}
-              onClick={(event) => onSelect(row.id, event.shiftKey)}
+              className="ec-matrix-grid__rowgroup"
+              role="row"
+              aria-rowindex={rowIndex + 2}
             >
-              <span>{row.label}</span>
-              <small>{row.degree}</small>
-            </button>,
-            ...columns.map((column) => {
-              const cell = matrixCell(row.id, column.id);
-              const key = cellKey(
-                state.display.transpose ? column.id : row.id,
-                state.display.transpose ? row.id : column.id,
-              );
-              const count = cell?.relations.length ?? 0;
-              return (
-                <button
-                  key={`cell:${row.id}:${column.id}`}
-                  type="button"
-                  role="gridcell"
-                  aria-label={describeCell(row.label, column.label, cell)}
-                  aria-selected={activeCellKey === key}
-                  className={`ec-matrix-grid__cell${count ? ' has-relations' : ''}`}
-                  data-count={count}
-                  data-source-selected={selected.has(row.id)}
-                  data-target-selected={selected.has(column.id)}
-                  disabled={!cell}
-                  title={cell?.relations.map((relation) => relation.type).join(', ')}
-                  onClick={() => setActiveCellKey(key)}
-                >
-                  {cell ? (
-                    <>
-                      <span>{count}</span>
-                      <i aria-hidden />
-                    </>
-                  ) : null}
-                </button>
-              );
-            }),
-          ])}
+              <button
+                type="button"
+                role="rowheader"
+                aria-colindex={1}
+                data-r={rowIndex + 1}
+                data-c={0}
+                data-group={row.group}
+                tabIndex={cursor.r === rowIndex + 1 && cursor.c === 0 ? 0 : -1}
+                onFocus={() => setCursor({ r: rowIndex + 1, c: 0 })}
+                className={`ec-matrix-grid__row${selected.has(row.id) ? ' is-selected' : ''}`}
+                style={{ '--matrix-group': groupColor(row.group) } as CSSProperties}
+                aria-label={`${row.label}, ${row.group} group, ${row.degree} relation endpoints`}
+                title={`${row.label} · ${row.group} · ${row.degree} relation endpoints`}
+                onClick={(event) => onSelect(row.id, event.shiftKey)}
+              >
+                <span aria-hidden>{row.label}</span>
+                <small aria-hidden>{row.degree}</small>
+              </button>
+              {columns.map((column, columnIndex) => {
+                const cell = matrixCell(row.id, column.id);
+                const key = cellKey(
+                  state.display.transpose ? column.id : row.id,
+                  state.display.transpose ? row.id : column.id,
+                );
+                const count = cell?.relations.length ?? 0;
+                return (
+                  <button
+                    key={`cell:${row.id}:${column.id}`}
+                    type="button"
+                    role="gridcell"
+                    aria-colindex={columnIndex + 2}
+                    data-r={rowIndex + 1}
+                    data-c={columnIndex + 1}
+                    tabIndex={cursor.r === rowIndex + 1 && cursor.c === columnIndex + 1 ? 0 : -1}
+                    onFocus={() => setCursor({ r: rowIndex + 1, c: columnIndex + 1 })}
+                    aria-label={describeCell(row.label, column.label, cell)}
+                    aria-expanded={cell ? activeCellKey === key : undefined}
+                    aria-haspopup={cell ? 'dialog' : undefined}
+                    className={`ec-matrix-grid__cell${count ? ' has-relations' : ''}`}
+                    data-count={count}
+                    data-open={activeCellKey === key}
+                    data-source-selected={selected.has(row.id)}
+                    data-target-selected={selected.has(column.id)}
+                    // Not `disabled`: a disabled button cannot take focus, so
+                    // every empty cell would be a hole the arrow keys fall
+                    // through and the grid would stop being walkable.
+                    aria-disabled={cell ? undefined : true}
+                    title={cell?.relations.map((relation) => relation.type).join(', ')}
+                    onClick={() => cell && setActiveCellKey(key)}
+                  >
+                    {cell ? <span aria-hidden>{count}</span> : null}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
         </div>
       </div>
-    </div>
+
+      {/* Docked rather than floating: an overlay anchored to a 32px cell either
+          covers the neighbours the reader is comparing it against or lands off
+          screen at the edges of a 34-column grid. */}
+      {activeCell ? (
+        <div
+          className="ec-matrix-detail"
+          role="dialog"
+          aria-label={`Relations from ${activeCell.sourceId.replace('entity:', '')} to ${activeCell.targetId.replace('entity:', '')}`}
+          tabIndex={-1}
+          ref={detailRef}
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') {
+              event.stopPropagation();
+              closeDetail();
+            }
+          }}
+        >
+          <div className="ec-matrix-detail__head">
+            <Mono>{activeCell.sourceId.replace('entity:', '')}</Mono>
+            <b aria-hidden>→</b>
+            <Mono>{activeCell.targetId.replace('entity:', '')}</Mono>
+            <Button size="sm" variant="ghost" onClick={closeDetail}>
+              Close
+            </Button>
+          </div>
+          <ul className="ec-matrix-detail__list">
+            {activeCell.relations.map((relation) => (
+              <li key={relation.id}>
+                <button type="button" onClick={(event) => onSelect(relation.id, event.shiftKey)}>
+                  <code>{relation.type}</code>
+                  <small>{relation.label}</small>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </section>
   );
 }

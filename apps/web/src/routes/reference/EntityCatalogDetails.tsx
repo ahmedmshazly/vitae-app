@@ -1,6 +1,6 @@
+import { Disclosure } from '@vitae/ui';
 import {
   EDGE_ENVELOPE,
-  ENTITY_GROUPS,
   NODE_ENVELOPE,
   endpointText,
   fieldSummary,
@@ -9,6 +9,16 @@ import {
   type CatalogRelation,
   type CatalogSelection,
 } from './entityCatalogModel.js';
+
+/** The arrow is the compact mark; the word is what a reader actually hears. */
+function Arrow({ label }: { label: string }) {
+  return (
+    <>
+      <span aria-hidden>→</span>
+      <span className="u-visually-hidden">{label}</span>
+    </>
+  );
+}
 
 function FieldRow({
   field,
@@ -24,10 +34,14 @@ function FieldRow({
       <tr className="ec-field" data-depth={depth}>
         <th scope="row">
           <code>{depth > 0 ? '↳ ' : ''}{field.key}</code>
-          {field.required ? <span className="ec-required" title="Required">*</span> : null}
           <span className="ec-field__label">{field.label}</span>
         </th>
         <td>
+          {/* fieldSummary already writes "required" here in words. The column
+              used to carry a coloured asterisk as well, which meant colour and
+              an unexplained glyph were the only marks of the most consequential
+              fact in the table, and `*` also means "wildcard endpoint" on the
+              atlas notation sheet. */}
           <span className="ec-field__summary">{fieldSummary(field)}</span>
           {!compact && field.note ? <span className="ec-field__note">{field.note}</span> : null}
         </td>
@@ -66,29 +80,42 @@ export function EntityDetails({ entity }: { entity: CatalogEntity }) {
     <div className="ec-detail">
       <div className="ec-detail__eyebrow">{entity.group} · entity</div>
       <h2 className="ec-detail__title"><code>{entity.type}</code></h2>
-      <p className="ec-detail__lead">
-        Primary label: <strong>{entity.titleLabel}</strong>
-        {entity.subtitleLabel ? <> · Secondary label: <strong>{entity.subtitleLabel}</strong></> : null}
-      </p>
+
+      {/* Identity first, then a definition ledger: these facts used to be four
+          prose sentences, so nothing was programmatically paired and no value
+          lined up with the one above it. */}
+      <dl className="ec-detail__facts">
+        <div>
+          <dt>Primary label</dt>
+          <dd>{entity.titleLabel}</dd>
+        </div>
+        {entity.subtitleLabel ? (
+          <div>
+            <dt>Secondary label</dt>
+            <dd>{entity.subtitleLabel}</dd>
+          </div>
+        ) : null}
+        <div>
+          <dt>Dates</dt>
+          <dd>{entity.envelopeDates ? 'Start and end enabled' : 'Not shown by default'}</dd>
+        </div>
+        <div>
+          <dt>Subject</dt>
+          <dd>
+            {entity.subject ? (
+              <>
+                {entity.subject.label} · <code>{entity.subject.edgeType}</code>{' '}
+                {entity.subject.direction} · {entity.subject.required ? 'required' : 'optional'}
+                {entity.subject.defaultToSelf ? ' · defaults to self' : ''}
+              </>
+            ) : (
+              'Not required when creating this type'
+            )}
+          </dd>
+        </div>
+      </dl>
 
       <FieldTable fields={entity.fields} label={`${entity.type} properties`} />
-
-      <div className="ec-detail__section">
-        <h3>Creation and envelope</h3>
-        <p>
-          Dates: <strong>{entity.envelopeDates ? 'start/end enabled' : 'not shown by default'}</strong>
-        </p>
-        {entity.subject ? (
-          <p>
-            Subject: <strong>{entity.subject.label}</strong> ·{' '}
-            <code>{entity.subject.edgeType}</code> {entity.subject.direction} ·{' '}
-            {entity.subject.required ? 'required' : 'optional'}
-            {entity.subject.defaultToSelf ? ' · defaults to self' : ''}
-          </p>
-        ) : (
-          <p>No subject relationship is required when creating this type.</p>
-        )}
-      </div>
 
       <div className="ec-detail__section">
         <h3>Inline relations</h3>
@@ -96,7 +123,10 @@ export function EntityDetails({ entity }: { entity: CatalogEntity }) {
           <ul className="ec-relation-list">
             {entity.formEdges.map((edge, index) => (
               <li key={`${edge.edgeType}-${edge.direction}-${index}`}>
-                <span aria-hidden>{edge.direction === 'out' ? '→' : '←'}</span>{' '}
+                <span aria-hidden>{edge.direction === 'out' ? '→' : '←'}</span>
+                <span className="u-visually-hidden">
+                  {edge.direction === 'out' ? 'outgoing' : 'incoming'}
+                </span>{' '}
                 <code>{edge.edgeType}</code> · {edge.label} · {endpointText(edge.targets)} ·{' '}
                 {edge.cardinality}
               </li>
@@ -109,14 +139,12 @@ export function EntityDetails({ entity }: { entity: CatalogEntity }) {
 
       {entity.notes ? <p className="ec-detail__note">{entity.notes}</p> : null}
 
-      <details className="ec-disclosure">
-        <summary>Shared node fields ({NODE_ENVELOPE.createFields.length})</summary>
+      <Disclosure label="Shared node fields" meta={NODE_ENVELOPE.createFields.length}>
         <FieldTable fields={[...NODE_ENVELOPE.createFields]} label="Shared node fields" />
-      </details>
-      <details className="ec-disclosure">
-        <summary>System fields ({NODE_ENVELOPE.systemFields.length})</summary>
+      </Disclosure>
+      <Disclosure label="System fields" meta={NODE_ENVELOPE.systemFields.length}>
         <FieldTable fields={[...NODE_ENVELOPE.systemFields]} label="Node system fields" />
-      </details>
+      </Disclosure>
     </div>
   );
 }
@@ -128,24 +156,28 @@ export function RelationDetails({ relation }: { relation: CatalogRelation }) {
       <h2 className="ec-detail__title"><code>{relation.type}</code></h2>
       <p className="ec-detail__lead">{relation.description}</p>
 
-      <div className="ec-endpoints" aria-label="Allowed endpoints">
+      {/* Source and target are a term/value pair each. The separating arrow is
+          drawn by the stylesheet, because a bare span between two rows is not
+          allowed inside a dl and carries nothing a reader needs. */}
+      <dl className="ec-endpoints">
         <div>
-          <span>Source</span>
-          <strong>{endpointText(relation.sources)}</strong>
+          <dt>Source</dt>
+          <dd>{endpointText(relation.sources)}</dd>
         </div>
-        <span className="ec-endpoints__arrow" aria-hidden>→</span>
         <div>
-          <span>Target</span>
-          <strong>{endpointText(relation.targets)}</strong>
+          <dt>Target</dt>
+          <dd>{endpointText(relation.targets)}</dd>
         </div>
-      </div>
+      </dl>
 
       {relation.allowedPairs.length > 0 ? (
         <div className="ec-detail__section">
           <h3>Exact allowed pairs</h3>
           <ul className="ec-relation-list">
             {relation.allowedPairs.map(([source, target]) => (
-              <li key={`${source}-${target}`}><code>{source}</code> → <code>{target}</code></li>
+              <li key={`${source}-${target}`}>
+                <code>{source}</code> <Arrow label="to" /> <code>{target}</code>
+              </li>
             ))}
           </ul>
         </div>
@@ -154,14 +186,12 @@ export function RelationDetails({ relation }: { relation: CatalogRelation }) {
       <FieldTable fields={relation.fields} label={`${relation.type} properties`} />
       {relation.notes ? <p className="ec-detail__note">{relation.notes}</p> : null}
 
-      <details className="ec-disclosure">
-        <summary>Shared edge fields ({EDGE_ENVELOPE.createFields.length})</summary>
+      <Disclosure label="Shared edge fields" meta={EDGE_ENVELOPE.createFields.length}>
         <FieldTable fields={[...EDGE_ENVELOPE.createFields]} label="Shared edge fields" />
-      </details>
-      <details className="ec-disclosure">
-        <summary>System fields ({EDGE_ENVELOPE.systemFields.length})</summary>
+      </Disclosure>
+      <Disclosure label="System fields" meta={EDGE_ENVELOPE.systemFields.length}>
         <FieldTable fields={[...EDGE_ENVELOPE.systemFields]} label="Edge system fields" />
-      </details>
+      </Disclosure>
     </div>
   );
 }
@@ -183,8 +213,4 @@ export function SelectionDetails({ selection }: { selection: CatalogSelection })
       </p>
     </div>
   );
-}
-
-export function groupLabelForType(type: string): string {
-  return ENTITY_GROUPS.find((group) => (group.types as readonly string[]).includes(type))?.label ?? 'Other';
 }

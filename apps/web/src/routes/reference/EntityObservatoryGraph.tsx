@@ -4,6 +4,7 @@ import {
   useImperativeHandle,
   useMemo,
   useRef,
+  useState,
 } from 'react';
 import {
   CanvasEvent,
@@ -19,6 +20,7 @@ import {
   type ObservatorySceneNode,
   type ObservatoryWorkspaceState,
 } from './entityObservatoryModel.js';
+import { Button, ErrorState, StatusTrace } from '@vitae/ui';
 import { readGraphPalette, withAlpha, type GraphPalette } from '../../lib/graph-palette.js';
 
 export interface EntityObservatoryGraphHandle {
@@ -35,6 +37,9 @@ interface EntityObservatoryGraphProps {
   onHover: (id: string | null) => void;
   onPin: (id: string, x: number, y: number) => void;
   onClear: () => void;
+  /** The Matrix lens reads the same scene without a canvas, so it is the
+   * offer to make when this one cannot draw. */
+  onRequestMatrix: () => void;
 }
 
 interface GraphRuntime {
@@ -52,6 +57,21 @@ function groupFill(palette: GraphPalette, group: string | undefined): string {
     OBSERVATORY_GROUP_COLORS[group as keyof typeof OBSERVATORY_GROUP_COLORS] ?? palette.muted
   );
 }
+
+/**
+ * A second channel for schema group, because five hues on their own are not a
+ * signal anyone with a colour-vision deficiency can read, and the Focus lens
+ * draws no group hulls to label the clusters. Selected, compared and pinned
+ * nodes keep their own dash: those three already carry a 3px accent stroke,
+ * so the group texture is the one that gives way.
+ */
+const GROUP_DASH: Record<string, number[] | undefined> = {
+  Career: undefined,
+  Content: [6, 3],
+  'Job search': [2, 3],
+  Life: [9, 3, 2, 3],
+  'Long tail': [1, 3],
+};
 
 function nodeColor(palette: GraphPalette, node: ObservatorySceneNode): string {
   if (node.kind === 'relation') return palette.accentSoft;
@@ -97,14 +117,20 @@ function graphData(
           stroke: node.selected ? palette.accent : node.compared ? compareStroke : color,
           strokeOpacity: isGroup ? 0.55 : 0.9,
           lineWidth: node.selected || node.compared ? 3 : isGroup ? 1.2 : 1.5,
-          lineDash: node.compared ? [5, 4] : node.pinned ? [4, 3] : undefined,
+          lineDash: node.compared
+            ? [5, 4]
+            : node.pinned
+              ? [4, 3]
+              : isGroup || isRelation || isAny
+                ? undefined
+                : GROUP_DASH[node.group ?? ''],
           cursor: node.selectionId ? 'pointer' : 'default',
           label: node.showLabel,
           labelText: node.showLabel ? node.label : '',
           labelPlacement: isGroup ? 'center' : 'bottom',
           labelOffsetY: isGroup ? 0 : 5,
           labelFill: node.selected ? palette.accent : isGroup ? color : palette.fg,
-          labelFontFamily: "'IBM Plex Mono', monospace",
+          labelFontFamily: palette.fontMono,
           labelFontSize: isGroup ? 13 : isRelation ? 9 : 10.5,
           labelFontWeight: isGroup || node.selected ? 600 : 500,
           labelBackground: !isGroup && node.showLabel,
@@ -146,7 +172,7 @@ function graphData(
         label: edge.bundled && edge.count > 1,
         labelText: edge.bundled && edge.count > 1 ? String(edge.count) : '',
         labelFill: palette.fg,
-        labelFontFamily: "'IBM Plex Mono', monospace",
+        labelFontFamily: palette.fontMono,
         labelFontSize: 9,
         labelBackground: true,
         labelBackgroundFill: palette.bg,
@@ -161,7 +187,7 @@ export const EntityObservatoryGraph = forwardRef<
   EntityObservatoryGraphHandle,
   EntityObservatoryGraphProps
 >(function EntityObservatoryGraph(
-  { scene, state, onSelect, onHover, onPin, onClear },
+  { scene, state, onSelect, onHover, onPin, onClear, onRequestMatrix },
   forwardedRef,
 ) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -171,11 +197,22 @@ export const EntityObservatoryGraph = forwardRef<
   callbacksRef.current = { onSelect, onHover, onPin, onClear };
   const palette = useMemo(() => readGraphPalette(), []);
   const data = useMemo(() => graphData(scene, state, palette), [scene, state, palette]);
+  // Creation is deferred by a microtask and both render() and fitView() are
+  // async, so between mount and the first paint the container is an empty
+  // black box. The parent's Suspense covers the dynamic import, not the draw,
+  // and every plugin toggle tears the canvas down again long after Suspense
+  // has resolved.
+  const [ready, setReady] = useState(false);
+  const [renderError, setRenderError] = useState<Error | null>(null);
+  // Bumping this recreates the graph from scratch, which is what Retry means
+  // once a canvas has failed.
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
     let cancelled = false;
+    setReady(false);
 
     // Deferring creation by one microtask prevents React StrictMode's development-only
     // setup/cleanup probe from starting a canvas render that it immediately destroys.
@@ -294,9 +331,15 @@ export const EntityObservatoryGraph = forwardRef<
           if (runtime.disposed) return;
           runtime.ready = true;
           await graph.fitView({ when: 'overflow', direction: 'both' }, false);
+          setReady(true);
         })
+        // Re-throwing here left a rejected promise on runtime.renderChain that
+        // only the cleanup's `finally` ever touched, which re-raised it as an
+        // unhandled rejection. No boundary above this route could have caught
+        // it either, so a dead renderer showed as a black rectangle forever.
         .catch((error: unknown) => {
-          if (!runtime.disposed) throw error;
+          if (runtime.disposed) return;
+          setRenderError(error instanceof Error ? error : new Error(String(error)));
         });
     });
 
@@ -311,6 +354,7 @@ export const EntityObservatoryGraph = forwardRef<
     };
     // The graph instance owns its plugins and event handlers. Recreate only when plugin shape changes.
   }, [
+    attempt,
     state.display.edgeMode,
     state.display.fisheye,
     state.display.labelDensity,
@@ -329,6 +373,15 @@ export const EntityObservatoryGraph = forwardRef<
           : false,
       });
       await runtime.graph.render();
+    })
+    // Without this the chain stayed rejected: every later control change
+    // short-circuited, so the canvas silently froze on a scene that no longer
+    // matched the filters the cockpit said were applied. Resolving the chain
+    // and starting a clean one keeps the next change recoverable.
+    .catch((error: unknown) => {
+      if (runtime.disposed) return;
+      runtime.renderChain = Promise.resolve();
+      setRenderError(error instanceof Error ? error : new Error(String(error)));
     });
   }, [data, state.display.motion, state.display.pulseSpeed]);
 
@@ -351,13 +404,45 @@ export const EntityObservatoryGraph = forwardRef<
     [],
   );
 
+  if (renderError) {
+    return (
+      <div className="ec-observatory-loading">
+        <ErrorState
+          title="The observatory canvas could not draw"
+          detail={renderError.message}
+          onRetry={() => {
+            setRenderError(null);
+            setAttempt((n) => n + 1);
+          }}
+          action={
+            <Button size="sm" onClick={onRequestMatrix}>
+              Read it as a matrix
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
+
   return (
-    <div
-      ref={containerRef}
-      className="ec-observatory-graph"
-      role="application"
-      aria-label="Interactive schema observatory. Select an item, drag to pin it, or hold Shift and drag to lasso."
-      data-route-count={scene.routeCount}
-    />
+    <>
+      <div
+        ref={containerRef}
+        className="ec-observatory-graph"
+        role="application"
+        aria-busy={!ready}
+        aria-label="Interactive schema observatory. Select an item, drag to pin it, or hold Shift and drag to lasso."
+        data-route-count={scene.routeCount}
+      />
+      {ready ? null : (
+        <div className="ec-observatory-loading ec-observatory-loading--overlay">
+          <StatusTrace
+            tone="live"
+            label="Drawing the schema"
+            detail={`${scene.nodes.length} nodes`}
+          />
+        </div>
+      )}
+    </>
   );
 });

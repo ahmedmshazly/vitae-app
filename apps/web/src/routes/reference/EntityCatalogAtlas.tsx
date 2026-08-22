@@ -22,6 +22,21 @@ import { EntityObservatorySnapshot } from './EntityObservatorySnapshot.js';
 const CANONICAL_MATRIX_STATE = cloneObservatoryState(DEFAULT_OBSERVATORY_STATE);
 CANONICAL_MATRIX_STATE.lens = 'matrix';
 
+/**
+ * Direction is the whole content of a directed-edge catalog, and an arrow on
+ * its own is announced inconsistently or not at all. The glyph stays as the
+ * compact mark the printed sheet needs; the word rides along for anyone
+ * reading the page rather than looking at it.
+ */
+function Direction({ direction }: { direction: 'out' | 'in' }) {
+  return (
+    <strong>
+      <span aria-hidden>{direction === 'out' ? '→' : '←'}</span>
+      <span className="u-visually-hidden">{direction === 'out' ? 'outgoing' : 'incoming'}</span>
+    </strong>
+  );
+}
+
 function AtlasHeader({
   title,
   meta,
@@ -56,7 +71,10 @@ export function EntityCatalogAtlas({
         <div className="ec-atlas__overview-title">
           <div>
             <p>Vitae · life and career graph</p>
-            <h1>Entity and relation map</h1>
+            {/* An h2, not an h1: the page banner above the tabs already owns
+                the document's only h1, and it stays mounted on this tab. Every
+                other sheet titles itself with an h2 too. */}
+            <h2>Entity and relation map</h2>
           </div>
           <dl>
             <div><dt>Entities</dt><dd>{CATALOG_COUNTS.nodes}</dd></div>
@@ -124,9 +142,17 @@ export function EntityCatalogAtlas({
           return (
             <article key={group.label} className="ec-atlas__sheet ec-atlas__sheet--group">
               <AtlasHeader title={group.label} meta={`${entities.length} entity types`} />
-              <div className="ec-atlas__card-grid">
+              {/* A register of records, so a list: without it these were the
+                  largest unnumbered run of divs on the sheet. `role` is
+                  explicit because the grid display drops list semantics in
+                  some browsers. */}
+              <ul
+                className="ec-atlas__card-grid"
+                role="list"
+                aria-label={`${group.label} entity types`}
+              >
                 {entities.map((entity) => (
-                  <section key={entity.type} className="ec-atlas-card">
+                  <li key={entity.type} className="ec-atlas-card">
                     <header>
                       <div>
                         <span>Entity</span>
@@ -144,26 +170,25 @@ export function EntityCatalogAtlas({
                       ) : null}
                       {entity.formEdges.map((edge, index) => (
                         <p key={`${edge.edgeType}-${index}`}>
-                          <strong>{edge.direction === 'out' ? '→' : '←'}</strong>{' '}
+                          <Direction direction={edge.direction} />{' '}
                           <code>{edge.edgeType}</code> · {endpointText(edge.targets)} · {edge.cardinality}
                         </p>
                       ))}
                       {entity.envelopeDates ? <p><strong>Envelope</strong> · start/end dates</p> : null}
                     </div>
                     {entity.notes ? <p className="ec-atlas-card__note">{entity.notes}</p> : null}
-                  </section>
+                  </li>
                 ))}
-              </div>
-              <div className="ec-atlas__notes">Review notes</div>
+              </ul>
             </article>
           );
         })}
 
         <article className="ec-atlas__sheet ec-atlas__sheet--relations">
           <AtlasHeader title="Relations" meta={`${CATALOG_RELATIONS.length} directed edge types`} />
-          <div className="ec-atlas__relation-grid">
+          <ul className="ec-atlas__relation-grid" role="list" aria-label="Directed relation types">
             {CATALOG_RELATIONS.map((relation) => (
-              <section key={relation.type} className="ec-atlas-card ec-atlas-card--relation">
+              <li key={relation.type} className="ec-atlas-card ec-atlas-card--relation">
                 <header>
                   <div>
                     <span>Relation</span>
@@ -172,7 +197,12 @@ export function EntityCatalogAtlas({
                   <small>{relation.label}</small>
                 </header>
                 <p className="ec-atlas-card__endpoints">
-                  {endpointText(relation.sources)} <strong>→</strong> {endpointText(relation.targets)}
+                  {endpointText(relation.sources)}{' '}
+                  <strong>
+                    <span aria-hidden>→</span>
+                    <span className="u-visually-hidden">to</span>
+                  </strong>{' '}
+                  {endpointText(relation.targets)}
                 </p>
                 {relation.allowedPairs.length > 0 ? (
                   <p className="ec-atlas-card__pairs">
@@ -182,10 +212,9 @@ export function EntityCatalogAtlas({
                 <p>{relation.description}</p>
                 <FieldTable fields={relation.fields} label={`${relation.type} properties`} compact />
                 {relation.notes ? <p className="ec-atlas-card__note">{relation.notes}</p> : null}
-              </section>
+              </li>
             ))}
-          </div>
-          <div className="ec-atlas__notes">Review notes</div>
+          </ul>
         </article>
 
         <article className="ec-atlas__sheet ec-atlas__sheet--enums">
@@ -204,9 +233,10 @@ export function EntityCatalogAtlas({
             <section className="ec-atlas__notation">
               <h3>Notation</h3>
               <dl>
-                <div><dt><code>*</code></dt><dd>required field</dd></div>
                 <div><dt><code>A → B</code></dt><dd>directed source to target</dd></div>
+                <div><dt><code>→</code> / <code>←</code></dt><dd>outgoing / incoming from this entity</dd></div>
                 <div><dt>Any entity</dt><dd>wildcard endpoint (<code>*</code>)</dd></div>
+                <div><dt>required</dt><dd>the field must be supplied</dd></div>
                 <div><dt>default</dt><dd>value applied when omitted</dd></div>
                 <div><dt>nullable</dt><dd>explicit <code>null</code> is accepted</dd></div>
               </dl>

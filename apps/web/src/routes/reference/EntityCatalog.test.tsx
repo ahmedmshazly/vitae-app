@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle } from 'react';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EntityCatalog } from './EntityCatalog.js';
@@ -67,7 +67,7 @@ describe('EntityCatalog observatory', () => {
 
       fireEvent.click(within(lenses).getByRole('button', { name: /Matrix/ }));
       expect(screen.getByText(/A line-free audit surface/)).toBeInTheDocument();
-      expect(screen.getByLabelText(/person to person: KNOWS/)).toBeEnabled();
+      expect(screen.getByLabelText(/person to person, \d+ relations?: .*KNOWS/)).toBeEnabled();
     },
     // Heavy under full-suite load (jsdom + large catalog); keep a floor above the default.
     20_000,
@@ -75,7 +75,7 @@ describe('EntityCatalog observatory', () => {
 
   it('opens the printable A4 atlas with overview, matrix, and anatomy sheets', async () => {
     await renderCatalog();
-    fireEvent.click(screen.getByRole('button', { name: 'A4 atlas' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'A4 atlas' }));
     expect(screen.getByRole('heading', { name: 'Entity and relation map' })).toBeInTheDocument();
     expect(screen.getByText('Canonical relation matrix')).toBeInTheDocument();
     expect(screen.getByText('Shared anatomy')).toBeInTheDocument();
@@ -85,6 +85,7 @@ describe('EntityCatalog observatory', () => {
     await renderCatalog();
     fireEvent.click(screen.getByRole('button', { name: 'Controls' }));
     expect(screen.getByRole('heading', { name: 'Visual controls' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Workspace' }));
     fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Audit view' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save current' }));
     expect(screen.getByLabelText('Saved workspace')).not.toHaveValue('');
@@ -102,7 +103,9 @@ describe('EntityCatalog observatory', () => {
     const { container } = await renderCatalog();
     fireEvent.click(screen.getByRole('button', { name: 'Print current lens' }));
     expect(container.querySelector('.ec')).toHaveAttribute('data-print-mode', 'workspace');
-    callback?.(0);
+    // The frame callback prints and then clears the print mode, so it moves
+    // state and has to run inside act.
+    act(() => callback?.(0));
     expect(print).toHaveBeenCalledOnce();
 
     fireEvent.click(screen.getByRole('button', { name: 'Print overview pack' }));

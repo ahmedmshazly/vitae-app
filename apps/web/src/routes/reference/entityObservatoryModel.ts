@@ -144,6 +144,10 @@ export const OBSERVATORY_GROUP_SLOTS: Record<CatalogGroup, number> = {
   'Long tail': 6,
 };
 
+/** The legend and the cockpit both key off the same order, so a group sits in
+ * the same place in each. */
+export const OBSERVATORY_GROUP_ORDER = Object.keys(OBSERVATORY_GROUP_SLOTS) as CatalogGroup[];
+
 const ALL_GROUPS = ENTITY_GROUPS.map((group) => group.label);
 const ALL_RELATIONS = CATALOG_RELATIONS.map((relation) => relation.type);
 const RELATION_BY_ID = new Map<string, CatalogRelation>(

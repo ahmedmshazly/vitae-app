@@ -1,9 +1,5 @@
-import {
-  useRef,
-  useState,
-  type ChangeEvent,
-  type CSSProperties,
-} from 'react';
+import { useId, useRef, useState, type ChangeEvent, type CSSProperties } from 'react';
+import { Button, Checkbox, ConfirmDialog, Disclosure, Field, Input, Kbd } from '@vitae/ui';
 import { CATALOG_RELATIONS, ENTITY_GROUPS } from './entityCatalogModel.js';
 import {
   cloneObservatoryState,
@@ -56,6 +52,10 @@ const LENSES: Array<{ value: ObservatoryLens; label: string; key: string }> = [
   { value: 'matrix', label: 'Matrix', key: '3' },
 ];
 
+/** The degree filter is a window over a fixed catalog, so a value outside it
+ * can only produce an empty scene the user did not ask for. */
+const MAX_DEGREE = 99;
+
 function replaceState(
   state: ObservatoryWorkspaceState,
   mutate: (draft: ObservatoryWorkspaceState) => void,
@@ -63,6 +63,12 @@ function replaceState(
   const next = cloneObservatoryState(state);
   mutate(next);
   return next;
+}
+
+function clampDegree(value: string): number {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return 0;
+  return Math.min(Math.max(Math.round(parsed), 0), MAX_DEGREE);
 }
 
 export function EntityObservatoryControls({
@@ -94,10 +100,17 @@ export function EntityObservatoryControls({
   onImportWorkspace,
   onUnpinAll,
 }: EntityObservatoryControlsProps) {
+  const ids = useId();
   const [workspaceName, setWorkspaceName] = useState('My observatory');
+  const [confirming, setConfirming] = useState<'delete-workspace' | 'reset' | null>(null);
   const importRef = useRef<HTMLInputElement | null>(null);
   const selectedLabel =
     state.selectedIds[0]?.replace(/^entity:|^relation:/, '') ?? 'No focus selected';
+  const searching = search.trim().length > 0;
+  const activeWorkspace = savedWorkspaces.find((workspace) => workspace.id === activeWorkspaceId);
+  // A minimum above the maximum is a window that can never contain anything.
+  // The scene goes blank and nothing else on the screen explains why.
+  const degreeRangeInverted = state.filters.minDegree > state.filters.maxDegree;
 
   function setLens(lens: ObservatoryLens) {
     onStateChange(
@@ -116,7 +129,10 @@ export function EntityObservatoryControls({
 
   return (
     <>
-      <div className="ec-observatory-toolbar" aria-label="Schema observatory controls">
+      {/* An aria-label on a plain div names nothing: only an element with a
+          role takes one. This strip groups the screen's controls, so it says
+          so. */}
+      <div className="ec-observatory-toolbar" role="group" aria-label="Schema observatory controls">
         <div className="ec-lens-switcher" role="group" aria-label="Observatory lens">
           {LENSES.map((lens) => (
             <button
@@ -124,43 +140,64 @@ export function EntityObservatoryControls({
               type="button"
               className={state.lens === lens.value ? 'is-active' : ''}
               aria-pressed={state.lens === lens.value}
+              // The shortcut used to be plain text inside the button, so the
+              // name came out as "Orbit 1" and the digit read as part of the
+              // label rather than as the key that reaches it.
+              aria-keyshortcuts={lens.key}
               onClick={() => setLens(lens.value)}
             >
               <span>{lens.label}</span>
-              <kbd>{lens.key}</kbd>
+              <span aria-hidden>
+                <Kbd>{lens.key}</Kbd>
+              </span>
             </button>
           ))}
         </div>
 
         <div className="ec-observatory-search">
-          <label htmlFor="ec-observatory-search">Search schema</label>
-          <input
-            id="ec-observatory-search"
-            type="search"
-            value={search}
-            placeholder="Entity, relation, or field…"
-            autoComplete="off"
-            onChange={(event) => onSearch(event.target.value)}
-          />
-          {search.trim() ? (
-            <div className="ec-observatory-search__results" role="listbox">
+          {/* Not a listbox. The results are real buttons the user can Tab to
+              and Shift-click to compare, and a listbox whose options are
+              buttons is a contract this never kept: no aria-activedescendant,
+              no arrow keys, and a paragraph where only options may go. What it
+              owes a screen reader is the count, which it now says out loud. */}
+          <Field label="Search schema" htmlFor={`${ids}-search`}>
+            <Input
+              id={`${ids}-search`}
+              type="search"
+              value={search}
+              placeholder="Entity, relation, or field…"
+              autoComplete="off"
+              aria-describedby={`${ids}-search-count`}
+              onChange={(event) => onSearch(event.target.value)}
+            />
+          </Field>
+          <p className="u-visually-hidden" role="status" id={`${ids}-search-count`}>
+            {searching
+              ? searchResults.length
+                ? `${searchResults.length} matching schema item${searchResults.length === 1 ? '' : 's'}`
+                : 'No matching schema item'
+              : ''}
+          </p>
+          {searching ? (
+            <div className="ec-observatory-search__results">
               {searchResults.length ? (
-                searchResults.map((result) => (
-                  <button
-                    key={result.id}
-                    type="button"
-                    role="option"
-                    aria-selected={state.selectedIds.includes(result.id)}
-                    onClick={(event) => {
-                      onSelect(result.id, event.shiftKey);
-                      onSearch('');
-                    }}
-                  >
-                    <span>{result.kind}</span>
-                    <code>{result.label}</code>
-                    <small>{result.meta}</small>
-                  </button>
-                ))
+                <ul aria-label="Schema search results">
+                  {searchResults.map((result) => (
+                    <li key={result.id}>
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          onSelect(result.id, event.shiftKey);
+                          onSearch('');
+                        }}
+                      >
+                        <span>{result.kind}</span>
+                        <code>{result.label}</code>
+                        <small>{result.meta}</small>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               ) : (
                 <p>No matching schema item.</p>
               )}
@@ -169,40 +206,55 @@ export function EntityObservatoryControls({
         </div>
 
         <div className="ec-observatory-tools">
-          <button type="button" title="Zoom out" aria-label="Zoom out" onClick={onZoomOut}>−</button>
-          <button type="button" title="Fit view" onClick={onFit}>Fit</button>
-          <button type="button" title="Zoom in" aria-label="Zoom in" onClick={onZoomIn}>+</button>
-          <button type="button" title="Undo" aria-label="Undo visual change" disabled={!canUndo} onClick={onUndo}>↶</button>
-          <button type="button" title="Redo" aria-label="Redo visual change" disabled={!canRedo} onClick={onRedo}>↷</button>
-          <button type="button" disabled={!state.selectedIds.length} onClick={onClear}>
+          <Button size="sm" aria-label="Zoom out" onClick={onZoomOut}>
+            <span aria-hidden>−</span>
+          </Button>
+          <Button size="sm" onClick={onFit}>
+            Fit
+          </Button>
+          <Button size="sm" aria-label="Zoom in" onClick={onZoomIn}>
+            <span aria-hidden>+</span>
+          </Button>
+          <Button size="sm" aria-label="Undo visual change" disabled={!canUndo} onClick={onUndo}>
+            <span aria-hidden>↶</span>
+          </Button>
+          <Button size="sm" aria-label="Redo visual change" disabled={!canRedo} onClick={onRedo}>
+            <span aria-hidden>↷</span>
+          </Button>
+          <Button size="sm" disabled={!state.selectedIds.length} onClick={onClear}>
             Clear
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            size="sm"
             className={drawerOpen ? 'is-active' : ''}
             aria-expanded={drawerOpen}
             onClick={onToggleDrawer}
           >
             Controls
-          </button>
-          <button type="button" title="Command palette" onClick={onOpenCommands}>
-            ⌘K
-          </button>
+          </Button>
+          {/* The glyph alone was the accessible name, so this button announced
+              itself as "command K". */}
+          <Button size="sm" aria-label="Open command palette" onClick={onOpenCommands}>
+            <span aria-hidden>⌘K</span>
+          </Button>
         </div>
       </div>
 
-      <div className="ec-observatory-context">
+      {/* Every control above changes this line and nothing announced it. A
+          polite status means the lens, the focus and the compare pick are
+          spoken when they change, rather than only being visible. */}
+      <div className="ec-observatory-context" role="status">
         <span className="ec-observatory-context__pulse" aria-hidden />
         <strong>{state.lens.toUpperCase()}</strong>
-        <span>·</span>
+        <span aria-hidden>·</span>
         <code>{selectedLabel}</code>
-        <span>·</span>
+        <span aria-hidden>·</span>
         <span>{state.filters.groups.length} groups</span>
-        <span>·</span>
+        <span aria-hidden>·</span>
         <span>{state.filters.relations.length} relations</span>
         {state.compareIds.length ? (
           <>
-            <span>·</span>
+            <span aria-hidden>·</span>
             <span className="ec-observatory-context__compare">
               comparing {state.compareIds[0].replace(/^entity:|^relation:/, '')}
             </span>
@@ -228,45 +280,49 @@ export function EntityObservatoryControls({
             <span>Observatory cockpit</span>
             <h2>Visual controls</h2>
           </div>
-          <button type="button" aria-label="Close controls" onClick={onToggleDrawer}>×</button>
+          <Button size="sm" variant="ghost" glyph="close" aria-label="Close controls" onClick={onToggleDrawer} />
         </div>
 
-        <details open>
-          <summary>Entity groups</summary>
+        <Disclosure label="Entity groups" defaultOpen>
           <div className="ec-cockpit__checks ec-cockpit__checks--groups">
             {ENTITY_GROUPS.map((group) => {
               const checked = state.filters.groups.includes(group.label);
               return (
-                <label key={group.label} data-group={group.label}>
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() =>
-                      onStateChange(
-                        replaceState(state, (draft) => {
-                          draft.filters.groups = checked
-                            ? draft.filters.groups.filter((value) => value !== group.label)
-                            : [...draft.filters.groups, group.label];
-                        }),
-                      )
-                    }
-                  />
-                  <span aria-hidden />
-                  {group.label}
-                  <small>{group.types.length}</small>
-                </label>
+                <Checkbox
+                  key={group.label}
+                  checked={checked}
+                  onChange={() =>
+                    onStateChange(
+                      replaceState(state, (draft) => {
+                        draft.filters.groups = checked
+                          ? draft.filters.groups.filter((value) => value !== group.label)
+                          : [...draft.filters.groups, group.label];
+                      }),
+                    )
+                  }
+                  label={
+                    <span className="ec-cockpit__check-label" data-group={group.label}>
+                      <i aria-hidden />
+                      {group.label}
+                      <small>{group.types.length}</small>
+                    </span>
+                  }
+                />
               );
             })}
           </div>
-        </details>
+        </Disclosure>
 
-        <details>
-          <summary>
-            Relation vocabulary <small>{state.filters.relations.length}/28</small>
-          </summary>
+        <Disclosure
+          label="Relation vocabulary"
+          // Was a literal 28 beside a live count, so the pair went silently
+          // wrong the moment the catalog gained a relation.
+          meta={`${state.filters.relations.length}/${CATALOG_RELATIONS.length}`}
+        >
           <div className="ec-cockpit__inline-actions">
-            <button
-              type="button"
+            <Button
+              size="sm"
+              aria-label="Show every relation"
               onClick={() =>
                 onStateChange(
                   replaceState(state, (draft) => {
@@ -276,9 +332,10 @@ export function EntityObservatoryControls({
               }
             >
               All
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              size="sm"
+              aria-label="Hide every relation"
               onClick={() =>
                 onStateChange(
                   replaceState(state, (draft) => {
@@ -288,35 +345,37 @@ export function EntityObservatoryControls({
               }
             >
               None
-            </button>
+            </Button>
           </div>
+          {state.filters.relations.length === 0 ? (
+            <p className="ec-cockpit__note" role="status">
+              No relation is showing, so every route is hidden. Pick one, or choose All.
+            </p>
+          ) : null}
           <div className="ec-cockpit__checks ec-cockpit__checks--relations">
             {CATALOG_RELATIONS.map((relation) => {
               const checked = state.filters.relations.includes(relation.type);
               return (
-                <label key={relation.id}>
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() =>
-                      onStateChange(
-                        replaceState(state, (draft) => {
-                          draft.filters.relations = checked
-                            ? draft.filters.relations.filter((value) => value !== relation.type)
-                            : [...draft.filters.relations, relation.type];
-                        }),
-                      )
-                    }
-                  />
-                  <code>{relation.type}</code>
-                </label>
+                <Checkbox
+                  key={relation.id}
+                  checked={checked}
+                  onChange={() =>
+                    onStateChange(
+                      replaceState(state, (draft) => {
+                        draft.filters.relations = checked
+                          ? draft.filters.relations.filter((value) => value !== relation.type)
+                          : [...draft.filters.relations, relation.type];
+                      }),
+                    )
+                  }
+                  label={<code>{relation.type}</code>}
+                />
               );
             })}
           </div>
-        </details>
+        </Disclosure>
 
-        <details open>
-          <summary>Relationship lens</summary>
+        <Disclosure label="Relationship lens" defaultOpen>
           <div className="ec-cockpit__field-grid">
             <label>
               Direction
@@ -359,7 +418,8 @@ export function EntityObservatoryControls({
                 onChange={(event) =>
                   onStateChange(
                     replaceState(state, (draft) => {
-                      draft.display.labelDensity = event.target.value as typeof draft.display.labelDensity;
+                      draft.display.labelDensity = event.target
+                        .value as typeof draft.display.labelDensity;
                     }),
                   )
                 }
@@ -407,12 +467,15 @@ export function EntityObservatoryControls({
               <input
                 type="number"
                 min="0"
-                max="23"
+                max={MAX_DEGREE}
                 value={state.filters.minDegree}
+                aria-invalid={degreeRangeInverted || undefined}
                 onChange={(event) =>
                   onStateChange(
                     replaceState(state, (draft) => {
-                      draft.filters.minDegree = Math.max(0, Number(event.target.value));
+                      // Was `Math.max(0, Number(...))` with no ceiling, so a
+                      // typed 500 emptied the scene and nothing said why.
+                      draft.filters.minDegree = clampDegree(event.target.value);
                     }),
                   )
                 }
@@ -423,61 +486,64 @@ export function EntityObservatoryControls({
               <input
                 type="number"
                 min="0"
-                max="99"
+                max={MAX_DEGREE}
                 value={state.filters.maxDegree}
+                aria-invalid={degreeRangeInverted || undefined}
                 onChange={(event) =>
                   onStateChange(
                     replaceState(state, (draft) => {
-                      draft.filters.maxDegree = Math.max(0, Number(event.target.value));
+                      draft.filters.maxDegree = clampDegree(event.target.value);
                     }),
                   )
                 }
               />
             </label>
           </div>
-        </details>
+          {degreeRangeInverted ? (
+            <p className="ec-cockpit__note ec-cockpit__note--warn" role="status">
+              The minimum is above the maximum, so nothing can pass the degree filter.
+            </p>
+          ) : null}
+        </Disclosure>
 
-        <details>
-          <summary>Motion and rendering</summary>
+        <Disclosure label="Motion and rendering">
           <div className="ec-cockpit__toggles">
-            {[
-              ['Motion', 'motion'],
-              ['Minimap', 'minimap'],
-              ['Fisheye lens', 'fisheye'],
-            ].map(([label, key]) => (
-              <label key={key}>
-                <input
-                  type="checkbox"
-                  checked={Boolean(state.display[key as 'motion' | 'minimap' | 'fisheye'])}
-                  onChange={() =>
-                    onStateChange(
-                      replaceState(state, (draft) => {
-                        const property = key as 'motion' | 'minimap' | 'fisheye';
-                        draft.display[property] = !draft.display[property];
-                      }),
-                    )
-                  }
-                />
-                {label}
-              </label>
-            ))}
-            <label>
-              <input
-                type="checkbox"
-                checked={state.filters.showWildcard}
+            {(
+              [
+                ['Motion', 'motion'],
+                ['Minimap', 'minimap'],
+                ['Fisheye lens', 'fisheye'],
+              ] as const
+            ).map(([label, key]) => (
+              <Checkbox
+                key={key}
+                label={label}
+                checked={Boolean(state.display[key])}
                 onChange={() =>
                   onStateChange(
                     replaceState(state, (draft) => {
-                      draft.filters.showWildcard = !draft.filters.showWildcard;
+                      draft.display[key] = !draft.display[key];
                     }),
                   )
                 }
               />
-              Wildcard hub
-            </label>
+            ))}
+            <Checkbox
+              label="Wildcard hub"
+              checked={state.filters.showWildcard}
+              onChange={() =>
+                onStateChange(
+                  replaceState(state, (draft) => {
+                    draft.filters.showWildcard = !draft.filters.showWildcard;
+                  }),
+                )
+              }
+            />
           </div>
           <label className="ec-cockpit__range">
-            <span>Route opacity <output>{state.display.routeOpacity.toFixed(2)}</output></span>
+            <span>
+              Route opacity <output>{state.display.routeOpacity.toFixed(2)}</output>
+            </span>
             <input
               type="range"
               min="0.15"
@@ -494,7 +560,9 @@ export function EntityObservatoryControls({
             />
           </label>
           <label className="ec-cockpit__range">
-            <span>Route weight <output>{state.display.routeThickness.toFixed(1)}×</output></span>
+            <span>
+              Route weight <output>{state.display.routeThickness.toFixed(1)}×</output>
+            </span>
             <input
               type="range"
               min="0.5"
@@ -511,13 +579,16 @@ export function EntityObservatoryControls({
             />
           </label>
           <label className="ec-cockpit__range">
-            <span>Motion speed <output>{state.display.pulseSpeed.toFixed(1)}×</output></span>
+            <span>
+              Motion speed <output>{state.display.pulseSpeed.toFixed(1)}×</output>
+            </span>
             <input
               type="range"
               min="0.25"
               max="2"
               step="0.25"
               value={state.display.pulseSpeed}
+              disabled={!state.display.motion}
               onChange={(event) =>
                 onStateChange(
                   replaceState(state, (draft) => {
@@ -527,11 +598,13 @@ export function EntityObservatoryControls({
               }
             />
           </label>
-        </details>
+          {state.display.motion ? null : (
+            <p className="ec-cockpit__note">Motion is off, so speed changes nothing.</p>
+          )}
+        </Disclosure>
 
         {state.lens === 'matrix' ? (
-          <details open>
-            <summary>Matrix controls</summary>
+          <Disclosure label="Matrix controls" defaultOpen>
             <div className="ec-cockpit__field-grid">
               <label>
                 Sort axes
@@ -550,26 +623,22 @@ export function EntityObservatoryControls({
                   <option value="degree">Endpoint degree</option>
                 </select>
               </label>
-              <label className="ec-cockpit__toggle-field">
-                <input
-                  type="checkbox"
-                  checked={state.display.transpose}
-                  onChange={() =>
-                    onStateChange(
-                      replaceState(state, (draft) => {
-                        draft.display.transpose = !draft.display.transpose;
-                      }),
-                    )
-                  }
-                />
-                Transpose axes
-              </label>
+              <Checkbox
+                label="Transpose axes"
+                checked={state.display.transpose}
+                onChange={() =>
+                  onStateChange(
+                    replaceState(state, (draft) => {
+                      draft.display.transpose = !draft.display.transpose;
+                    }),
+                  )
+                }
+              />
             </div>
-          </details>
+          </Disclosure>
         ) : null}
 
-        <details>
-          <summary>Workspace</summary>
+        <Disclosure label="Workspace">
           <div className="ec-cockpit__workspace">
             <label>
               Saved workspace
@@ -593,26 +662,35 @@ export function EntityObservatoryControls({
                 onChange={(event) => setWorkspaceName(event.target.value)}
               />
             </label>
-            <div>
-              <button
-                type="button"
+            <div className="ec-cockpit__inline-actions">
+              <Button
+                size="sm"
                 disabled={!workspaceName.trim()}
                 onClick={() => onSaveWorkspace(workspaceName.trim())}
               >
                 Save current
-              </button>
-              <button
-                type="button"
+              </Button>
+              {/* Deleting a saved workspace cannot be undone by the Undo
+                  button beside it, which only walks visual state. */}
+              <Button
+                size="sm"
+                variant="danger"
                 disabled={!activeWorkspaceId}
-                onClick={() => activeWorkspaceId && onDeleteWorkspace(activeWorkspaceId)}
+                onClick={() => setConfirming('delete-workspace')}
               >
                 Delete
-              </button>
+              </Button>
             </div>
-            <div>
-              <button type="button" onClick={onCopyLink}>Copy share link</button>
-              <button type="button" onClick={onExportWorkspace}>Export JSON</button>
-              <button type="button" onClick={() => importRef.current?.click()}>Import JSON</button>
+            <div className="ec-cockpit__inline-actions">
+              <Button size="sm" onClick={onCopyLink}>
+                Copy share link
+              </Button>
+              <Button size="sm" onClick={onExportWorkspace}>
+                Export JSON
+              </Button>
+              <Button size="sm" onClick={() => importRef.current?.click()}>
+                Import JSON
+              </Button>
               <input
                 ref={importRef}
                 type="file"
@@ -622,12 +700,13 @@ export function EntityObservatoryControls({
               />
             </div>
           </div>
-        </details>
+        </Disclosure>
 
-        <details>
-          <summary>Canvas and reset</summary>
+        <Disclosure label="Canvas and reset">
           <label className="ec-cockpit__range">
-            <span>Panel width <output>{state.display.panelWidth}px</output></span>
+            <span>
+              Panel width <output>{state.display.panelWidth}px</output>
+            </span>
             <input
               type="range"
               min="280"
@@ -644,9 +723,11 @@ export function EntityObservatoryControls({
             />
           </label>
           <div className="ec-cockpit__danger-zone">
-            <button type="button" onClick={onUnpinAll}>Unpin all</button>
-            <button
-              type="button"
+            <Button size="sm" onClick={onUnpinAll}>
+              Unpin all
+            </Button>
+            <Button
+              size="sm"
               disabled={!state.hiddenIds.length}
               onClick={() =>
                 onStateChange(
@@ -657,11 +738,38 @@ export function EntityObservatoryControls({
               }
             >
               Restore hidden ({state.hiddenIds.length})
-            </button>
-            <button type="button" onClick={onReset}>Reset observatory</button>
+            </Button>
+            <Button size="sm" variant="danger" onClick={() => setConfirming('reset')}>
+              Reset observatory
+            </Button>
           </div>
-        </details>
+        </Disclosure>
       </aside>
+
+      <ConfirmDialog
+        open={confirming === 'delete-workspace'}
+        onOpenChange={(open) => !open && setConfirming(null)}
+        title={`Delete ${activeWorkspace?.name ?? 'this workspace'}?`}
+        body="The saved workspace is removed from this browser. What is on screen stays as it is."
+        confirmLabel="Delete workspace"
+        destructive
+        onConfirm={() => {
+          if (activeWorkspaceId) onDeleteWorkspace(activeWorkspaceId);
+          setConfirming(null);
+        }}
+      />
+      <ConfirmDialog
+        open={confirming === 'reset'}
+        onOpenChange={(open) => !open && setConfirming(null)}
+        title="Reset the observatory?"
+        body="Filters, lens, pins, hidden items and the current selection all go back to their defaults. Saved workspaces are kept."
+        confirmLabel="Reset observatory"
+        destructive
+        onConfirm={() => {
+          onReset();
+          setConfirming(null);
+        }}
+      />
     </>
   );
 }
