@@ -71,8 +71,11 @@ export function FirstRun({ onDone }: { onDone: () => void }) {
           <Button variant="primary" onClick={onDone}>
             Open Today
           </Button>
-          <Link to="/tour" onClick={onDone} className="no-underline">
-            <Button variant="ghost">Take the tour</Button>
+          {/* A link, wearing the ghost button's clothes. It used to be a Button
+              inside the Link, which is a control inside a control: two things
+              to tab to for one thing to do. */}
+          <Link to="/tour" onClick={onDone} className="vt-btn vt-btn--ghost">
+            Take the tour
           </Link>
         </div>
       </div>

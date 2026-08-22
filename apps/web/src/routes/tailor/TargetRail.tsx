@@ -265,6 +265,12 @@ export function TargetRail({
               <Button
                 size="sm"
                 variant="ghost"
+                // Two buttons on this rail said only "Edit", which names
+                // nothing: the accessible name leads with the visible word,
+                // then says which of the two panels it opens.
+                aria-label={
+                  editingFields ? 'Cancel: role and company' : 'Edit: role and company'
+                }
                 onClick={() => {
                   setEditRole(active.role_title);
                   setEditCompany(active.company ?? '');
@@ -320,6 +326,9 @@ export function TargetRail({
               <Button
                 size="sm"
                 variant="ghost"
+                aria-label={
+                  editingKeywords ? 'Cancel: weighted keywords' : 'Edit: weighted keywords'
+                }
                 onClick={() => {
                   setKeywordDraft(
                     active.parsed.keywords.map((keyword) => ({
