@@ -180,7 +180,20 @@ export function GraphCanvas({
 
     if (shouldShowLabel(n, globalScale, onPath) && !dimmed) {
       const label = n.title.length > 24 ? `${n.title.slice(0, 23)}…` : n.title;
-      const fontSize = Math.max(11 / globalScale, 2.4);
+      // Names are the one thing here drawn outside the zoom transform. Under it
+      // the type size has to shrink as you zoom in to stay 11px on screen, and
+      // somewhere below 5px this typeface's glyph advances round to whole units,
+      // which the transform then magnifies into gaps inside words: the map read
+      // "K uber net es" and "Nile R obot ics". Placing the name in screen space
+      // asks for a real 11px, so the spacing is the one the font intended.
+      const t = ctx.getTransform();
+      const unit = t.a; // one graph unit, in device pixels
+      const dpr = globalScale > 0 ? unit / globalScale : 1; // device px per CSS px
+      const x = t.a * n.x! + t.c * n.y! + t.e;
+      const top = t.b * n.x! + t.d * n.y! + t.f + r * unit + 1.5 * dpr;
+      const fontSize = 11 * dpr;
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.font = `${fontSize}px ${palette.fontSans}`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
@@ -188,10 +201,11 @@ export function GraphCanvas({
       // The plate is the page's own ground at 78%, not a warm near-black
       // literal that predates the neutral canvas.
       ctx.fillStyle = withAlpha(palette.plate, 0.78);
-      ctx.fillRect(n.x! - w / 2 - 2, n.y! + r + 1.5, w + 4, fontSize + 2.5);
+      ctx.fillRect(x - w / 2 - 2 * dpr, top, w + 4 * dpr, fontSize + 2.5 * dpr);
       ctx.fillStyle =
         n.id === hoverId || n.id === selectedId || onPath ? palette.fg : palette.muted;
-      ctx.fillText(label, n.x!, n.y! + r + 2.8);
+      ctx.fillText(label, x, top + 1.3 * dpr);
+      ctx.restore();
     }
     ctx.globalAlpha = 1;
   }

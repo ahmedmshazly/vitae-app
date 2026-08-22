@@ -92,6 +92,17 @@ All notable changes are recorded here.
 - The breadcrumb wrapped to a second line inside a 58px bar, because the whole
   parent trail was one unbreakable run of text. Each part now truncates on its
   own, and the trail gives way before the page you are on does.
+- Node names on the graph and the life map were drawn with gaps inside the
+  words: the map read "K uber net es" and "Nile R obot ics". The name was drawn
+  under the zoom transform, so its type size had to shrink as you zoomed in to
+  stay 11px on screen, and below about 5px the variable typeface rounds its
+  glyph advances to whole units, which the transform then magnifies. Names are
+  drawn in screen space at a real 11px now, so the spacing is the one the font
+  intended.
+- The graph's floating tool strip had no ground of its own, so the map ran
+  underneath it and a node surfacing in the 6px between two buttons came up cut
+  into a crescent, reading as a glitch rather than as depth. The strip sits on
+  the same ground the canvas already draws its labels on.
 
 ## 1.0.0
 

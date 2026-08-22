@@ -1052,8 +1052,10 @@ button.row {
   border-top: 1px solid var(--ae-border);
 }
 .graph__tools--lifemap {
-  left: 14px;
-  right: 14px;
+  left: 8px;
+  right: 8px;
+  width: fit-content;
+  margin-left: auto;
   justify-content: flex-end;
   flex-wrap: wrap;
 }
@@ -1077,10 +1079,17 @@ button.row {
 }
 .graph__tools {
   position: absolute;
-  bottom: 14px;
-  right: 14px;
+  bottom: 8px;
+  right: 8px;
   display: flex;
   gap: 6px;
+  padding: 6px;
+  border-radius: var(--ae-radius-lg);
+  /* The map runs underneath these controls, and through the 6px between them a
+     node came up cut into a crescent by two button edges, reading as a glitch
+     rather than as depth. The mat is the ground the canvas already draws on, so
+     the strip sits on the map without becoming a panel on top of it. */
+  background: var(--ae-bg);
 }
 .graph__tool {
   font-family: var(--ae-font-mono);
