@@ -108,6 +108,11 @@ export function EntityPicker({ types, onPick, placeholder, excludeIds = [], auto
         .filter((h) => !excludeIds.includes(h.id))
         .slice(0, 8);
 
+  // The debounce means a keystroke is not yet a query, and a query in flight is
+  // not yet an answer. Both gaps are the search still running, and neither is a
+  // result worth acting on.
+  const pending = q !== value.trim() || search.isFetching;
+
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
       if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
@@ -117,7 +122,12 @@ export function EntityPicker({ types, onPick, placeholder, excludeIds = [], auto
   }, []);
 
   // Create stubs: active chip, or every type when ≤4, else first 4 with a hint.
-  const createOptions: NodeType[] = value.trim()
+  //
+  // They wait for the search. While it ran, the results were gone and these
+  // rows were the whole list, so a person who typed a name and pressed Enter
+  // straight away got a second record rather than the one the lookup was about
+  // to return. An answer that has not arrived is not the same as no match.
+  const createOptions: NodeType[] = value.trim() && !pending
     ? typeFilter
       ? [typeFilter]
       : effectiveTypes.length <= 4
@@ -173,8 +183,8 @@ export function EntityPicker({ types, onPick, placeholder, excludeIds = [], auto
 
   const listboxId = `${ids}-listbox`;
   const optionId = (i: number) => `${ids}-opt-${i}`;
-  const searching = search.isFetching && hits.length === 0;
-  const noMatch = Boolean(q) && !search.isFetching && !search.isError && hits.length === 0;
+  const searching = pending && hits.length === 0;
+  const noMatch = Boolean(q) && !pending && !search.isError && hits.length === 0;
 
   return (
     <div ref={rootRef} className="entity-picker">

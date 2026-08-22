@@ -112,6 +112,12 @@ All notable changes are recorded here.
   visual baselines were taken before the redesign, under the label "Real
   interface · fictional demo data". They are fresh captures of the current
   build against the seeded stack.
+- The record picker offered to create what it was still looking for. While the
+  search was in flight the results were not on screen yet, so the create rows
+  were the whole list: typing a name and pressing Enter straight away wrote a
+  second record rather than choosing the one the lookup was about to return.
+  An answer that has not arrived is not the same as no match, so those rows now
+  wait for it, and the field says it is still searching until then.
 
 ## 1.0.0
 

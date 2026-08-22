@@ -83,6 +83,36 @@ describe('EntityPicker', () => {
     expect(onPick).not.toHaveBeenCalled();
   });
 
+  it('waits for the search before offering to create what it might find', async () => {
+    const user = userEvent.setup();
+    const onPick = vi.fn();
+    let answer: ((value: unknown) => void) | null = null;
+    mockApi.get.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          answer = resolve;
+        }),
+    );
+
+    renderWithApp(<EntityPicker types={['person']} onPick={onPick} />);
+    await user.type(screen.getByRole('combobox'), 'Ada');
+    await waitFor(() => expect(answer).not.toBeNull());
+
+    // While the lookup is out there is no list, so Enter has nothing to commit.
+    // It used to have exactly one row, "Create person", and pressing Enter on a
+    // slow connection wrote a second Ada rather than finding the first.
+    expect(screen.queryByRole('option')).toBeNull();
+    await user.keyboard('{Enter}');
+    expect(mockApi.post).not.toHaveBeenCalled();
+
+    answer!({ results: [{ id: 'p1', type: 'person', title: 'Ada Lovelace' }] });
+    await screen.findByRole('option', { name: /Ada Lovelace/ });
+    await user.keyboard('{Enter}');
+
+    expect(onPick).toHaveBeenCalledWith({ id: 'p1', type: 'person', title: 'Ada Lovelace' });
+    expect(mockApi.post).not.toHaveBeenCalled();
+  });
+
   it('says a search with no hits found nothing, and what to do next', async () => {
     const user = userEvent.setup();
     mockApi.get.mockResolvedValue({ results: [] });
