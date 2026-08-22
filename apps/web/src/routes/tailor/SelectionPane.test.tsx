@@ -88,10 +88,10 @@ describe('SelectionPane', () => {
     expect(screen.getByRole('button', { name: 'Selecting…' })).toBeDisabled();
   });
 
-  it('labels the pin and exclude actions in words, not glyphs', async () => {
+  it('names the bullet each pin and exclude action belongs to', async () => {
     const user = userEvent.setup();
     const { onDraft } = renderPane({ tailorResult: result() });
-    const pin = screen.getByRole('button', { name: 'Pin' });
+    const pin = screen.getByRole('button', { name: 'Pin Staff Engineer at Northstar bullet' });
     expect(pin).toHaveAttribute('aria-pressed', 'false');
     await user.click(pin);
     expect(onDraft).toHaveBeenCalledWith({ atomOrder: undefined, pins: ['atom-1'] });
@@ -101,8 +101,12 @@ describe('SelectionPane', () => {
     const user = userEvent.setup();
     const draft = { ...defaultDraft(), pins: ['atom-1'] } as Draft;
     const { onDraft } = renderPane({ draft, tailorResult: result() });
-    expect(screen.getByRole('button', { name: 'Unpin' })).toHaveAttribute('aria-pressed', 'true');
-    await user.click(screen.getByRole('button', { name: 'Exclude' }));
+    expect(
+      screen.getByRole('button', { name: 'Unpin Staff Engineer at Northstar bullet' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    await user.click(
+      screen.getByRole('button', { name: 'Exclude Staff Engineer at Northstar bullet' }),
+    );
     expect(onDraft).toHaveBeenCalledWith({ blocks: ['atom-1'], pins: [] });
   });
 

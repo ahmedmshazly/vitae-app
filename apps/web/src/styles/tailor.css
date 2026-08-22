@@ -1,0 +1,53 @@
+/* The resume tailor's four panes.
+ *
+ * Split out of app.css so a screen's rules sit next to each other rather than
+ * a thousand lines apart. Loaded after app.css, so anything here wins a
+ * specificity tie by source order.
+ */
+
+/* Score breakdown popover
+ * -------------------------------------------------------------------------
+ * The hit rows and the multiplier rows are lists now, not sibling divs, so
+ * a screen reader can say how many of each there are. These strip the list
+ * furniture the browser adds; app.css still owns the rest of the popover.
+ */
+.atom-score-pop__hits,
+.atom-score-pop__factors {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.atom-score-pop__factors {
+  margin-bottom: 8px;
+}
+.atom-score-pop__factor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.atom-score-pop__formula {
+  font-size: var(--ae-text-xs);
+  color: var(--ae-faint);
+}
+
+/* Selection pane: keyboard reorder
+ * -------------------------------------------------------------------------
+ * Two arrows per row, beside Pin and Exclude. They stay narrow so a bullet
+ * keeps the width it had when reordering was drag-only, and .vt-btn--sm
+ * already grows its own hit target past the painted box.
+ */
+.tailor-move {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 2px;
+}
+.tailor-move .vt-btn {
+  min-width: 24px;
+  padding-inline: 4px;
+  font-size: var(--ae-text-sm);
+  line-height: 1;
+}

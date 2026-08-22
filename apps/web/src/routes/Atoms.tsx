@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { NodeType } from '@vitae/core';
 import {
+  Banner,
   Button,
   Checkbox,
   Chip,
@@ -12,15 +13,18 @@ import {
   Input,
   Mono,
   PageHeader,
+  RegisterRule,
+  Section,
   Select,
   Sheet,
-  ErrorState,
-  RegisterRule,
-  SkeletonRows,
+  Skeleton,
+  Stack,
   Textarea,
 } from '@vitae/ui';
 import { EntityPicker } from '../components/EntityPicker.js';
+import { QueryBoundary, keepLastResults } from '../components/QueryBoundary.js';
 import { entityHref, typeLabel } from '../lib/entity-href.js';
+import { facetParam, textParam, useListParams } from '../lib/list-params.js';
 import { api } from '../lib/api.js';
 import { useToast } from '../features/Toast.js';
 
@@ -62,6 +66,11 @@ interface Atom {
   skills?: Array<{ id: string; name: string }>;
 }
 
+interface AtomLibrary {
+  atoms: Atom[];
+  owners?: NodeOption[];
+}
+
 interface EditorState {
   owner_node: string;
   kind: string;
@@ -88,7 +97,64 @@ const EVIDENCE_NODE_TYPES: NodeType[] = [
   'media_item',
 ];
 
-const EMPHASES: Emphasis[] = ['technical', 'leadership', 'concise', 'detailed'];
+/**
+ * Emphasis is a stored token; it is not a word to show anybody. Every option
+ * list and every control name reads from this one table, so the Select, the
+ * textarea's name and the stored value cannot drift into three spellings.
+ */
+const EMPHASIS_OPTIONS: Array<{ value: Emphasis; label: string }> = [
+  { value: 'technical', label: 'Technical' },
+  { value: 'leadership', label: 'Leadership' },
+  { value: 'concise', label: 'Concise' },
+  { value: 'detailed', label: 'Detailed' },
+];
+const EMPHASES: Emphasis[] = EMPHASIS_OPTIONS.map((option) => option.value);
+function emphasisLabel(value: Emphasis): string {
+  return EMPHASIS_OPTIONS.find((option) => option.value === value)?.label ?? value;
+}
+
+const KIND_OPTIONS = [
+  { value: 'achievement', label: 'Achievement' },
+  { value: 'responsibility', label: 'Responsibility' },
+  { value: 'summary_fragment', label: 'Summary fragment' },
+  { value: 'skill_line', label: 'Skill line' },
+];
+function kindLabel(value: string): string {
+  return KIND_OPTIONS.find((option) => option.value === value)?.label ?? value.replace('_', ' ');
+}
+
+/** The library filters, in the plural, because they name a set of rows. */
+const KIND_FILTERS = [
+  { value: 'achievement', label: 'Achievements' },
+  { value: 'responsibility', label: 'Responsibilities' },
+  { value: 'summary_fragment', label: 'Summary fragments' },
+  { value: 'skill_line', label: 'Skill lines' },
+];
+const STATE_FILTERS = [
+  { value: 'pinned', label: 'Pinned' },
+  { value: 'blocked', label: 'Blocked' },
+  { value: 'incomplete', label: 'Needs attention' },
+  { value: 'archived', label: 'Archived' },
+];
+
+type KindFilter = 'all' | 'achievement' | 'responsibility' | 'summary_fragment' | 'skill_line';
+type StateFilter = 'all' | 'pinned' | 'blocked' | 'incomplete' | 'archived';
+
+/**
+ * The filtered view is a link. The search box and both dropdowns used to sit
+ * in local state while `owner` was read off the URL two lines away, so half of
+ * a filtered library could be shared and half of it could not, and the back
+ * button threw the filters away.
+ */
+const ATOM_LIST = {
+  q: textParam(),
+  kind: facetParam<KindFilter>(
+    ['all', 'achievement', 'responsibility', 'summary_fragment', 'skill_line'],
+    'all',
+  ),
+  state: facetParam<StateFilter>(['all', 'pinned', 'blocked', 'incomplete', 'archived'], 'all'),
+};
+
 const EMPTY: EditorState = {
   owner_node: '',
   kind: 'achievement',
@@ -137,15 +203,49 @@ function buildEvidencePayload(form: EditorState): AtomEvidence[] {
   return evidence;
 }
 
+/** What one card is called, once, instead of its whole contents read as a sentence. */
+function cardName(atom: Atom): string {
+  const variant = atom.variants.find((item) => item.is_default) ?? atom.variants[0];
+  const text = variant?.text?.trim();
+  if (!text) return `${kindLabel(atom.kind)} with no default variant`;
+  return text.length > 80 ? `${text.slice(0, 80)}…` : text;
+}
+
+/**
+ * The shape that is actually coming: a two column grid of tall cards. The list
+ * skeleton this replaces was four glyph-plus-two-lines rows, so the region
+ * changed shape and height at the moment the data landed.
+ */
+function AtomGridSkeleton() {
+  return (
+    <div className="atom-grid">
+      {Array.from({ length: 4 }, (_, index) => (
+        <div key={index} className="rounded border border-hairline bg-surface p-4">
+          <Skeleton width="34%" height={18} />
+          <div className="mt-4 grid gap-3">
+            <Skeleton height={14} />
+            <Skeleton width="76%" height={14} />
+            <Skeleton width="42%" height={12} />
+            <Skeleton width="58%" height={18} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function Atoms() {
+  const ids = useId();
   const qc = useQueryClient();
   const { flash } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [q, setQ] = useState('');
-  const [kind, setKind] = useState('');
-  const [stateFilter, setStateFilter] = useState('');
+  const list = useListParams(ATOM_LIST);
+  const q = list.values.q;
+  const kind = list.values.kind === 'all' ? '' : list.values.kind;
+  const stateFilter = list.values.state === 'all' ? '' : list.values.state;
   const [editing, setEditing] = useState<Atom | null | 'new'>(null);
   const [form, setForm] = useState<EditorState>(EMPTY);
+  const [skillFilter, setSkillFilter] = useState('');
   const [archive, setArchive] = useState<Atom | null>(null);
   const includeDeleted = stateFilter === 'archived';
   const ownerFromUrl = searchParams.get('owner') ?? '';
@@ -153,9 +253,12 @@ export function Atoms() {
   const atomsQuery = useQuery({
     queryKey: ['atoms', includeDeleted, ownerFromUrl],
     queryFn: () =>
-      api.get<{ atoms: Atom[]; owners?: NodeOption[] }>(
+      api.get<AtomLibrary>(
         `/atoms?includeDeleted=${includeDeleted}${ownerFromUrl ? `&owner=${encodeURIComponent(ownerFromUrl)}` : ''}`,
       ),
+    // Choosing "Archived" is a new query key. Without this the whole library
+    // blanked to a skeleton and back on every trip in and out of that filter.
+    ...keepLastResults,
   });
   const catalogQuery = useQuery({
     queryKey: ['atom-skills'],
@@ -163,7 +266,6 @@ export function Atoms() {
   });
   const data = atomsQuery.data;
   const catalog = catalogQuery.data;
-  const isLoading = atomsQuery.isLoading;
   const owners = useMemo(() => {
     const owned = data?.owners ?? [];
     // Keep the currently edited owner visible even if filters change.
@@ -197,6 +299,23 @@ export function Atoms() {
       }),
     [data, kind, q, stateFilter],
   );
+
+  const selectedSkills = useMemo(
+    () => skills.filter((skill) => form.skill_ids.includes(skill.id)),
+    [skills, form.skill_ids],
+  );
+  /**
+   * Ticked tags first, then a plain substring filter. A 220px window over a
+   * few hundred checkboxes hid the tags the atom already carried below the
+   * fold, so confirming them meant scrolling and hunting for ticks.
+   */
+  const pickerSkills = useMemo(() => {
+    const needle = skillFilter.trim().toLowerCase();
+    const chosen = new Set(form.skill_ids);
+    return skills
+      .filter((skill) => !needle || skill.title.toLowerCase().includes(needle))
+      .sort((a, b) => Number(chosen.has(b.id)) - Number(chosen.has(a.id)));
+  }, [skills, skillFilter, form.skill_ids]);
 
   const save = useMutation({
     mutationFn: async () => {
@@ -255,6 +374,9 @@ export function Atoms() {
   });
 
   function open(atom?: Atom) {
+    // A failure from the last atom edited is not a fact about this one.
+    save.reset();
+    setSkillFilter('');
     setForm(
       atom
         ? fromAtom(atom)
@@ -291,11 +413,23 @@ export function Atoms() {
     }));
   }
 
+  function toggleSkill(id: string, checked: boolean) {
+    setForm((current) => ({
+      ...current,
+      skill_ids: checked
+        ? [...current.skill_ids, id]
+        : current.skill_ids.filter((value) => value !== id),
+    }));
+  }
+
   const valid = Boolean(
     form.owner_node &&
     form.variants.length &&
     form.variants.every((variant) => variant.text.trim()),
   );
+
+  const selectedOwner = owners.find((node) => node.id === form.owner_node);
+  const ownersUnavailable = atomsQuery.isError && owners.length === 0;
 
   return (
     <div className="page resume-page">
@@ -314,131 +448,153 @@ export function Atoms() {
         <Input
           aria-label="Search atoms"
           placeholder="Search bullet text or owner…"
-          value={q}
-          onChange={(event) => setQ(event.target.value)}
+          value={list.drafts.q}
+          onChange={(event) => list.set('q', event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key !== 'Enter') return;
+            event.preventDefault();
+            list.commit('q');
+          }}
         />
+        {/* Radix puts `label` on the trigger as `aria-label`, and an aria-label
+            overrides the button's own text, so the chosen filter was dropped
+            from the name: both of these read "Filter by kind" whether or not a
+            kind was picked. The name has to carry the value. */}
         <Select
           value={kind || undefined}
-          onChange={(value) => setKind(value ?? '')}
-          label="Filter by kind"
+          onChange={(value) => list.set('kind', (value ?? 'all') as KindFilter)}
+          label={`Kind: ${KIND_FILTERS.find((option) => option.value === kind)?.label ?? 'All kinds'}`}
           placeholder="All kinds"
-          options={[
-            { value: 'achievement', label: 'Achievements' },
-            { value: 'responsibility', label: 'Responsibilities' },
-            { value: 'summary_fragment', label: 'Summary fragments' },
-            { value: 'skill_line', label: 'Skill lines' },
-          ]}
+          options={KIND_FILTERS}
         />
         <Select
           value={stateFilter || undefined}
-          onChange={(value) => setStateFilter(value ?? '')}
-          label="Filter by state"
+          onChange={(value) => list.set('state', (value ?? 'all') as StateFilter)}
+          label={`State: ${STATE_FILTERS.find((option) => option.value === stateFilter)?.label ?? 'All states'}`}
           placeholder="All states"
-          options={[
-            { value: 'pinned', label: 'Pinned' },
-            { value: 'blocked', label: 'Blocked' },
-            { value: 'incomplete', label: 'Needs attention' },
-            { value: 'archived', label: 'Archived' },
-          ]}
+          options={STATE_FILTERS}
         />
-        <Mono className="u-faint">
+        {/* The count changes on every keystroke with nothing moving focus, so
+            redrawing it is not the same as saying it. */}
+        <Mono className="u-faint" role="status" aria-live="polite" aria-label="Atoms shown">
           {atomsQuery.data ? (atoms.length === total ? `${total}` : `${atoms.length} of ${total}`) : '—'} shown
         </Mono>
       </div>
 
-      {atomsQuery.isError ? (
-        // `isError` was unread, so a failed load rendered an empty grid saying
-        // "No matching atoms - create an atom here, or clear the filters": the
-        // screen blaming your library for the server's fault.
-        <ErrorState
-          title="Couldn’t load your atom library"
-          detail={(atomsQuery.error as Error | null)?.message}
-          onRetry={() => void atomsQuery.refetch()}
-        />
-      ) : isLoading ? (
-        <SkeletonRows rows={4} />
-      ) : total === 0 ? (
-        // An empty library and a filter that matched nothing are different
-        // situations with different ways out; one message hedged between them.
-        <EmptyState
-          glyph="resume"
-          title="No atoms yet"
-          hint="Atoms are the achievement bullets every tailored résumé is built from. Write your first one here."
-          action={
-            <Button variant="primary" onClick={() => open()}>
-              Create atom
-            </Button>
-          }
-        />
-      ) : atoms.length === 0 ? (
-        <EmptyState
-          glyph="filter"
-          title="No atoms match these filters"
-          hint={`All ${total} of your atoms are hidden by the current search, kind or state.`}
-          action={
-            <Button
-              onClick={() => {
-                setQ('');
-                setKind('');
-                setStateFilter('');
-              }}
-            >
-              Clear the filters
-            </Button>
-          }
-        />
-      ) : (
-        <div className="atom-grid">
-          {atoms.map((atom) => {
-            const variant = atom.variants.find((item) => item.is_default) ?? atom.variants[0];
-            return (
-              <button className="atom-card" key={atom.id} onClick={() => open(atom)}>
-                <div className="spread">
-                  <div className="chips">
-                    <Chip mono>{atom.kind.replace('_', ' ')}</Chip>
-                    {atom.pinned && <Chip tone="accent">Pinned</Chip>}
-                    {atom.blocked && <Chip>Blocked</Chip>}
-                    {atom.deleted_at && <Chip>Archived</Chip>}
-                  </div>
-                  <span className="atom-card__edit">Edit</span>
-                </div>
-                <p className="atom-card__text">{variant?.text || 'No default variant'}</p>
-                <div className="atom-card__owner">
-                  {atom.owner_title ?? atom.owner_node} · {atom.owner_type ?? 'record'}
-                </div>
-                <div className="chips">
-                  {atom.skills?.slice(0, 4).map((skill) => (
-                    <Chip key={skill.id}>{skill.name}</Chip>
-                  ))}
-                  {(atom.evidence ?? []).slice(0, 3).map((item, index) =>
-                    item.kind === 'node' ? (
-                      <Chip key={`ev-n-${item.node_id}`} mono>
-                        {item.title ?? item.label ?? 'Record'}
-                      </Chip>
-                    ) : (
-                      <Chip key={`ev-u-${index}`} mono>
-                        URL
-                      </Chip>
-                    ),
-                  )}
-                  {(atom.evidence?.length ?? 0) > 3 && (
-                    <Mono className="u-faint">+{(atom.evidence?.length ?? 0) - 3} evidence</Mono>
-                  )}
-                  {atom.variants.length > 1 && (
-                    <Mono className="u-faint">+{atom.variants.length - 1} variants</Mono>
-                  )}
-                  {atom.metrics.map((metric, index) => (
-                    <Chip key={index} mono>
-                      {metric.value}
-                      {metric.unit ?? ''}
-                    </Chip>
-                  ))}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      )}
+      {/* One contract for the four states, and the two failures kept apart: a
+          refresh that fails after the library has already loaded is a banner
+          over the rows you were reading, not a full-height error where they
+          used to be. */}
+      <QueryBoundary
+        query={atomsQuery}
+        errorTitle="Couldn’t load your atom library"
+        staleErrorTitle="Couldn’t refresh your atom library"
+        refreshingLabel="Refreshing your atom library"
+        loading={<AtomGridSkeleton />}
+        loadingLabel="Loading your atoms"
+        isEmpty={() => atoms.length === 0}
+        isSourceEmpty={(library) => library.atoms.length === 0}
+        empty={
+          // An empty library and a filter that matched nothing are different
+          // situations with different ways out; one message hedged between them.
+          <EmptyState
+            glyph="resume"
+            title="No atoms yet"
+            hint="Atoms are the achievement bullets every tailored résumé is built from. Write your first one here."
+            action={
+              <Button variant="primary" onClick={() => open()}>
+                Create atom
+              </Button>
+            }
+          />
+        }
+        emptyFiltered={
+          <EmptyState
+            glyph="filter"
+            title="No atoms match these filters"
+            hint={`All ${total} of your atoms are hidden by the current search, kind or state.`}
+            action={<Button onClick={() => list.reset()}>Clear the filters</Button>}
+          />
+        }
+      >
+        {() => (
+          // A grid of records is a list. It was a bare div of buttons, each
+          // holding block elements a button may not contain, and each one
+          // announcing its whole contents as a single name.
+          <ul className="atom-grid m-0 list-none p-0" aria-label="Atoms">
+            {atoms.map((atom) => {
+              const variant = atom.variants.find((item) => item.is_default) ?? atom.variants[0];
+              return (
+                <li key={atom.id}>
+                  <button
+                    type="button"
+                    className="atom-card h-full"
+                    aria-label={`Edit atom: ${cardName(atom)}`}
+                    onClick={() => open(atom)}
+                  >
+                    <span className="spread">
+                      <span className="chips">
+                        <Chip mono>{atom.kind.replace('_', ' ')}</Chip>
+                        {/* State is not taxonomy. "Blocked" means this bullet
+                            is kept out of every tailored résumé, and it used
+                            to render with the weight of a skill tag. */}
+                        {atom.pinned && (
+                          <Chip glyph="pin" tone="accent">
+                            Pinned
+                          </Chip>
+                        )}
+                        {atom.blocked && (
+                          <Chip glyph="alert" tone="warning">
+                            Blocked
+                          </Chip>
+                        )}
+                        {atom.deleted_at && <Chip glyph="trash">Archived</Chip>}
+                      </span>
+                      <span className="atom-card__edit">Edit</span>
+                    </span>
+                    <span className="atom-card__text block">
+                      {variant?.text || 'No default variant'}
+                    </span>
+                    <span className="atom-card__owner block">
+                      {atom.owner_title ?? atom.owner_node} · {atom.owner_type ?? 'record'}
+                    </span>
+                    <span className="chips">
+                      {atom.skills?.slice(0, 4).map((skill) => (
+                        <Chip key={skill.id}>{skill.name}</Chip>
+                      ))}
+                      {(atom.evidence ?? []).slice(0, 3).map((item, index) =>
+                        item.kind === 'node' ? (
+                          <Chip key={`ev-n-${item.node_id}`} mono>
+                            {item.title ?? item.label ?? 'Record'}
+                          </Chip>
+                        ) : (
+                          <Chip key={`ev-u-${index}`} mono>
+                            URL
+                          </Chip>
+                        ),
+                      )}
+                      {(atom.evidence?.length ?? 0) > 3 && (
+                        <Mono className="u-faint">
+                          +{(atom.evidence?.length ?? 0) - 3} evidence
+                        </Mono>
+                      )}
+                      {atom.variants.length > 1 && (
+                        <Mono className="u-faint">+{atom.variants.length - 1} variants</Mono>
+                      )}
+                      {atom.metrics.map((metric, index) => (
+                        <Chip key={index} mono>
+                          {metric.value}
+                          {metric.unit ?? ''}
+                        </Chip>
+                      ))}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </QueryBoundary>
 
       <Sheet
         open={editing !== null}
@@ -449,15 +605,22 @@ export function Atoms() {
           <>
             {editing !== 'new' && editing && (
               <>
-                <Button variant="ghost" onClick={() => duplicate.mutate(editing.id)}>
-                  Duplicate
+                {/* The one mutation on this screen with no pending signal at
+                    all: a full round trip looked like a dropped click, so the
+                    second press made a second copy. */}
+                <Button
+                  variant="ghost"
+                  disabled={duplicate.isPending}
+                  onClick={() => duplicate.mutate(editing.id)}
+                >
+                  {duplicate.isPending ? 'Duplicating…' : 'Duplicate'}
                 </Button>
                 <Button variant="danger" onClick={() => setArchive(editing)}>
                   {editing.deleted_at ? 'Restore' : 'Archive'}
                 </Button>
               </>
             )}
-            <span style={{ flex: 1 }} />
+            <span className="flex-1" />
             <Button onClick={() => setEditing(null)}>Cancel</Button>
             <Button
               variant="primary"
@@ -469,134 +632,221 @@ export function Atoms() {
           </>
         }
       >
-        <div className="stack" style={{ gap: 16 }}>
+        <Stack gap={4}>
+          {/* This was a bare div carrying `u-danger`, a class defined in no
+              stylesheet, at the bottom of a long scrolling sheet: unstyled
+              body text below the fold, with the Save button back to reading
+              "Save atom" as if nothing had happened. */}
+          {save.isError && (
+            <Banner tone="danger" title="Couldn’t save this atom">
+              {save.error.message}
+            </Banner>
+          )}
           <div className="grid-2">
             <Field
               label="Owned by"
+              htmlFor={`${ids}-owner`}
               required
               help="Choose one of your roles or projects. Only records you own appear in the library."
             >
               <Select
+                id={`${ids}-owner`}
+                label={`Owned by: ${selectedOwner ? `${selectedOwner.title}, ${selectedOwner.type}` : 'not chosen'}`}
                 value={form.owner_node || undefined}
                 onChange={(value) => setForm({ ...form, owner_node: value ?? '' })}
-                placeholder={owners.length ? 'Select role or project' : 'No owned roles/projects yet'}
+                placeholder={
+                  ownersUnavailable
+                    ? 'Roles and projects could not be loaded'
+                    : owners.length
+                      ? 'Select role or project'
+                      : 'No owned roles/projects yet'
+                }
                 options={owners.map((node) => ({
                   value: node.id,
                   label: `${node.title} · ${node.type}`,
                 }))}
               />
             </Field>
-            <Field label="Kind" required>
+            <Field label="Kind" htmlFor={`${ids}-kind`} required>
               <Select
+                id={`${ids}-kind`}
+                label={`Kind: ${kindLabel(form.kind)}`}
                 value={form.kind}
                 clearable={false}
                 onChange={(value) => setForm({ ...form, kind: value ?? 'achievement' })}
-                options={[
-                  { value: 'achievement', label: 'Achievement' },
-                  { value: 'responsibility', label: 'Responsibility' },
-                  { value: 'summary_fragment', label: 'Summary fragment' },
-                  { value: 'skill_line', label: 'Skill line' },
-                ]}
+                options={KIND_OPTIONS}
               />
             </Field>
           </div>
-          <div className="spread">
-            <h3>Wording variants</h3>
-            {form.variants.length < 4 && (
-              <Button
-                size="sm"
-                onClick={() =>
-                  setForm({
-                    ...form,
-                    variants: [
-                      ...form.variants,
-                      {
-                        emphasis:
-                          EMPHASES.find(
-                            (value) => !form.variants.some((variant) => variant.emphasis === value),
-                          ) ?? 'detailed',
-                        text: '',
-                        is_default: false,
-                      },
-                    ],
-                  })
-                }
-              >
-                Add variant
-              </Button>
-            )}
-          </div>
-          {form.variants.map((variant, index) => (
-            <div className="atom-variant" key={`${variant.emphasis}-${index}`}>
-              <div className="atom-variant__controls">
-                <Select
-                  value={variant.emphasis}
-                  clearable={false}
-                  onChange={(value) => updateVariant(index, { emphasis: value as Emphasis })}
-                  options={EMPHASES.map((value) => ({ value, label: value }))}
-                />
-                <Checkbox
-                  checked={variant.is_default}
-                  onChange={(checked) => checked && updateVariant(index, { is_default: true })}
-                  label="Default"
-                />
-                {form.variants.length > 1 && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() =>
-                      setForm({
-                        ...form,
-                        variants: form.variants
-                          .filter((_, i) => i !== index)
-                          .map((item, i) => ({ ...item, is_default: i === 0 })),
-                      })
-                    }
-                  >
-                    Remove
-                  </Button>
-                )}
-              </div>
-              <Textarea
-                aria-label={`${variant.emphasis} wording`}
-                value={variant.text}
-                onChange={(event) => updateVariant(index, { text: event.target.value })}
-                placeholder="Action + context + measurable result…"
-              />
-            </div>
-          ))}
+          <Section
+            title="Wording variants"
+            meta={`${form.variants.length} of 4`}
+            actions={
+              form.variants.length < 4 && (
+                <Button
+                  size="sm"
+                  onClick={() =>
+                    setForm({
+                      ...form,
+                      variants: [
+                        ...form.variants,
+                        {
+                          emphasis:
+                            EMPHASES.find(
+                              (value) =>
+                                !form.variants.some((variant) => variant.emphasis === value),
+                            ) ?? 'detailed',
+                          text: '',
+                          is_default: false,
+                        },
+                      ],
+                    })
+                  }
+                >
+                  Add variant
+                </Button>
+              )
+            }
+          >
+            <Stack gap={3}>
+              {form.variants.map((variant, index) => (
+                <div className="atom-variant" key={`${variant.emphasis}-${index}`}>
+                  <div className="atom-variant__controls">
+                    {/* Four unnamed comboboxes announcing their own value:
+                        "technical, combobox" said nothing about what the
+                        control does or which block it belongs to. */}
+                    <Select
+                      label={`Variant ${index + 1} emphasis: ${emphasisLabel(variant.emphasis)}`}
+                      value={variant.emphasis}
+                      clearable={false}
+                      onChange={(value) => updateVariant(index, { emphasis: value as Emphasis })}
+                      options={EMPHASIS_OPTIONS}
+                    />
+                    <Checkbox
+                      checked={variant.is_default}
+                      onChange={(checked) => checked && updateVariant(index, { is_default: true })}
+                      label={
+                        <>
+                          Default
+                          <span className="u-visually-hidden"> wording, variant {index + 1}</span>
+                        </>
+                      }
+                    />
+                    {form.variants.length > 1 && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        aria-label={`Remove variant ${index + 1}`}
+                        onClick={() =>
+                          setForm({
+                            ...form,
+                            variants: form.variants
+                              .filter((_, i) => i !== index)
+                              .map((item, i) => ({ ...item, is_default: i === 0 })),
+                          })
+                        }
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                  <Textarea
+                    aria-label={`${emphasisLabel(variant.emphasis)} wording, variant ${index + 1} of ${form.variants.length}`}
+                    value={variant.text}
+                    onChange={(event) => updateVariant(index, { text: event.target.value })}
+                    placeholder="Action + context + measurable result…"
+                  />
+                </div>
+              ))}
+            </Stack>
+          </Section>
           <Field
             label="Skill tags"
             help="Tags strengthen deterministic matching against job descriptions."
           >
-            <div className="atom-skill-picker">
-              {skills.map((skill) => (
-                <Checkbox
-                  key={skill.id}
-                  label={skill.title}
-                  checked={form.skill_ids.includes(skill.id)}
-                  onChange={(checked) =>
-                    setForm({
-                      ...form,
-                      skill_ids: checked
-                        ? [...form.skill_ids, skill.id]
-                        : form.skill_ids.filter((id) => id !== skill.id),
-                    })
+            <Stack gap={2}>
+              {/* The catalogue query was destructured for `.data` alone, so
+                  while it was in flight, and for good if it failed, the picker
+                  was an empty box that read as "you have no skills". Tags are
+                  what job-description matching runs on. */}
+              {catalogQuery.isError ? (
+                <Banner
+                  tone="danger"
+                  title="Couldn’t load your skill catalogue"
+                  action={
+                    <Button size="sm" onClick={() => void catalogQuery.refetch()}>
+                      Retry
+                    </Button>
                   }
-                />
-              ))}
-            </div>
+                >
+                  {catalogQuery.error.message} You can save this atom without tags and add them
+                  later.
+                </Banner>
+              ) : catalogQuery.isPending ? (
+                <div
+                  className="atom-skill-picker"
+                  role="status"
+                  aria-label="Loading your skills"
+                  aria-live="polite"
+                >
+                  {Array.from({ length: 6 }, (_, index) => (
+                    <Skeleton key={index} height={18} />
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <div className="chips">
+                    <Mono className="text-xs text-muted">
+                      {form.skill_ids.length} tagged of {skills.length}
+                    </Mono>
+                    {selectedSkills.map((skill) => (
+                      <Chip key={skill.id} glyph="tag">
+                        {skill.title}
+                      </Chip>
+                    ))}
+                  </div>
+                  {skills.length > 0 && (
+                    <Input
+                      aria-label="Filter skills"
+                      placeholder="Filter skills…"
+                      value={skillFilter}
+                      onChange={(event) => setSkillFilter(event.target.value)}
+                    />
+                  )}
+                  <div className="atom-skill-picker" role="group" aria-label="Skill tags">
+                    {skills.length === 0 ? (
+                      <span className="text-xs text-muted">
+                        No skills in your library yet. Capture one and it will appear here.
+                      </span>
+                    ) : pickerSkills.length === 0 ? (
+                      <span className="text-xs text-muted">No skills match that filter.</span>
+                    ) : (
+                      pickerSkills.map((skill) => (
+                        <Checkbox
+                          key={skill.id}
+                          label={skill.title}
+                          checked={form.skill_ids.includes(skill.id)}
+                          onChange={(checked) => toggleSkill(skill.id, checked)}
+                        />
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
+            </Stack>
           </Field>
           <div className="grid-2">
-            <Field label="Metric">
+            <Field label="Metric" htmlFor={`${ids}-metric`}>
               <Input
+                id={`${ids}-metric`}
                 placeholder="38"
                 value={form.metricValue}
                 onChange={(event) => setForm({ ...form, metricValue: event.target.value })}
               />
             </Field>
-            <Field label="Metric unit">
+            <Field label="Metric unit" htmlFor={`${ids}-metric-unit`}>
               <Input
+                id={`${ids}-metric-unit`}
                 placeholder="%, users, hours…"
                 value={form.metricUnit}
                 onChange={(event) => setForm({ ...form, metricUnit: event.target.value })}
@@ -658,8 +908,13 @@ export function Atoms() {
               />
             </div>
           </Field>
-          <Field label="Evidence URL" help="Optional external link kept as private provenance.">
+          <Field
+            label="Evidence URL"
+            htmlFor={`${ids}-evidence-url`}
+            help="Optional external link kept as private provenance."
+          >
             <Input
+              id={`${ids}-evidence-url`}
               type="url"
               placeholder="https://…"
               value={form.evidenceUrl}
@@ -678,12 +933,7 @@ export function Atoms() {
               label="Exclude by default"
             />
           </div>
-          {save.error && (
-            <div className="u-danger" role="alert">
-              {save.error.message}
-            </div>
-          )}
-        </div>
+        </Stack>
       </Sheet>
       <ConfirmDialog
         open={archive !== null}
