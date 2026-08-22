@@ -103,6 +103,10 @@ describe('CommandOverlay', () => {
 
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    // Radix schedules its own restore on a timeout, so a synchronous assertion
+    // here passes while the browser still ends up on <body>. Let that timeout
+    // land first, then ask.
+    await new Promise((r) => setTimeout(r, 20));
     expect(opener).toHaveFocus();
   });
 });

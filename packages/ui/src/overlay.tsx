@@ -3,7 +3,7 @@
  * free). Animation is CSS-only via data-state attributes at --ae-dur/--ae-ease
  * so this package carries no animation runtime.
  */
-import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, type ReactNode } from 'react';
 import * as RadixDialog from '@radix-ui/react-dialog';
 import * as RadixDropdown from '@radix-ui/react-dropdown-menu';
 import * as RadixPopover from '@radix-ui/react-popover';
@@ -100,23 +100,28 @@ export interface CommandOverlayProps {
   className?: string;
 }
 export function CommandOverlay({ open, onOpenChange, title, description, children, className }: CommandOverlayProps) {
-  // Radix restores focus from the Content's unmount effect. Every caller
+  // Radix restores focus from the Content's unmount cleanup. Every caller
   // conditionally renders the whole palette (`{open && <QuickAdd/>}`) so the
-  // Root is torn down in the same commit that closes it, and that effect never
-  // gets to run, focus landed on <body> and keyboard users lost their place,
-  // despite this component's docblock promising otherwise. Remembering the
-  // opener here survives the unmount.
+  // Root is torn down in the same commit that closes it, and focus landed on
+  // <body>: keyboard users lost their place, despite this component's docblock
+  // promising otherwise. Remembering the opener here survives the unmount.
   const opener = useRef<HTMLElement | null>(null);
-  useEffect(() => {
-    if (open) opener.current = document.activeElement as HTMLElement | null;
+  // A layout effect, not a passive one. The Content's own focus effect is a
+  // child of this component, so it runs first among the passive effects, and
+  // both callers mount the palette already open. A passive effect here would
+  // only ever find the palette's input focused and remember that, and a node
+  // inside the palette is detached by the time focus is restored. Layout
+  // effects all run before any passive effect, so this reads the real opener.
+  useLayoutEffect(() => {
+    if (!open) return;
+    const el = document.activeElement as HTMLElement | null;
+    if (el && !el.closest('.vt-palette')) opener.current = el;
   }, [open]);
-  useEffect(
-    () => () => {
-      const el = opener.current;
-      if (el?.isConnected) el.focus();
-    },
-    [],
-  );
+  const restore = useCallback(() => {
+    const el = opener.current;
+    if (el?.isConnected) el.focus();
+  }, []);
+  useEffect(() => () => restore(), [restore]);
 
   return (
     <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
@@ -127,6 +132,14 @@ export function CommandOverlay({ open, onOpenChange, title, description, childre
         <RadixDialog.Overlay className="vt-overlay" />
         <RadixDialog.Content
           className={cn('vt-palette', className)}
+          onCloseAutoFocus={(e) => {
+            // Radix defers its own restore into a `setTimeout` that lands
+            // after the unmount cleanup above, so the two race and the later
+            // one wins with whatever the focus scope happened to record. Own
+            // the restore instead: one answer, not two.
+            e.preventDefault();
+            restore();
+          }}
           onOpenAutoFocus={(e) => {
             // Focus the palette's own input, not the first button in the list.
             const el = (e.currentTarget as HTMLElement | null)?.querySelector<HTMLElement>('input, textarea');
