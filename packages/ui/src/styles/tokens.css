@@ -35,8 +35,10 @@
   --ae-fg-soft: #c9c9c6; /* 11.6:1 / 9.5:1, secondary prose */
   --ae-muted: #a3a3a0; /* 7.6:1 / 6.2:1, labels, inactive nav, metadata */
   /* Floor of the system, held above 4.5:1 against the lightest surface,
-     not merely the canvas. Do not darken. Nothing may go below this. */
-  --ae-faint: #8c8c89; /* 5.7:1 / 4.7:1 */
+     not merely the canvas. The lightest ground is --ae-accent-bg, the
+     selected-row fill, which is a step above --ae-surface-overlay and which
+     the old value missed at 4.49:1. Do not darken. Nothing may go below this. */
+  --ae-faint: #8f8f8c; /* 5.9:1 canvas / 4.9:1 overlay / 4.7:1 accent-bg */
 
   /* ── Accent, paper white. There is no accent hue; do not introduce a
      coloured accent "for just this one screen." ── */

@@ -39,7 +39,7 @@ paper white is the action accent, so colour remains available for state and data
 | Hairline / strong rule   | `--ae-border`, `--ae-border-strong`         | `#2b2b2b`, `#3f3f3f`                                      |
 | Control boundary         | `--ae-border-control`                       | `#727271`; use when a border alone defines a control      |
 | Strong / body / soft ink | `--ae-fg-strong`, `--ae-fg`, `--ae-fg-soft` | `#fafaf8`, `#e8e8e6`, `#c9c9c6`                           |
-| Muted / faint ink        | `--ae-muted`, `--ae-faint`                  | `#a3a3a0`, `#8c8c89`; faint is the contrast floor         |
+| Muted / faint ink        | `--ae-muted`, `--ae-faint`                  | `#a3a3a0`, `#8f8f8c`; faint is the contrast floor         |
 | Action accent            | `--ae-accent`, `--ae-accent-ink`            | paper white on near-black; there is no default accent hue |
 
 Outcome colours are `success #7eb795`, `warning #c8a344`, `danger #e17263`, `info #9a9484`, and

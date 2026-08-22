@@ -28,7 +28,7 @@
   --ae-fg-strong: #fafaf8;
   --ae-fg-soft: #c9c9c6;
   --ae-muted: #a3a3a0;
-  --ae-faint: #8c8c89;
+  --ae-faint: #8f8f8c;
   /* Accent: brightness is the accent */
   --ae-accent: #fafaf8;
   --ae-accent-ink: #0f0f0f;
@@ -689,14 +689,16 @@ tbody tr:hover td { background: var(--ae-surface); }
             <tr><td><code>--ae-fg</code></td><td class="n"><span class="sw" style="background:#E8E8E6"></span>#E8E8E6</td><td class="n">15.6</td><td class="n">12.8</td><td>Body text, default</td></tr>
             <tr><td><code>--ae-fg-soft</code></td><td class="n"><span class="sw" style="background:#C9C9C6"></span>#C9C9C6</td><td class="n">11.6</td><td class="n">9.5</td><td>Secondary prose, descriptions</td></tr>
             <tr><td><code>--ae-muted</code></td><td class="n"><span class="sw" style="background:#A3A3A0"></span>#A3A3A0</td><td class="n">7.6</td><td class="n">6.2</td><td>Labels, inactive nav, metadata</td></tr>
-            <tr><td><code>--ae-faint</code></td><td class="n"><span class="sw" style="background:#8C8C89"></span>#8C8C89</td><td class="n">5.7</td><td class="n">4.7</td><td>11px content: provenance, timestamps, counts</td></tr>
+            <tr><td><code>--ae-faint</code></td><td class="n"><span class="sw" style="background:#8F8F8C"></span>#8F8F8C</td><td class="n">5.9</td><td class="n">4.9</td><td>11px content: provenance, timestamps, counts</td></tr>
           </tbody>
         </table>
       </div>
       <div class="note" style="margin-top:16px">
         <code>--ae-faint</code> is the floor of the system: it carries real 11px content, so
         it is held above 4.5:1 <strong>against the lightest surface</strong>, not merely
-        against the canvas. Do not darken it. Nothing may go below it.
+        against the canvas. The lightest surface is <code>--ae-accent-bg</code>, the
+        selected-row ground, a step above the overlay: faint clears 4.7:1 there.
+        Do not darken it. Nothing may go below it.
       </div>
     </div>
 

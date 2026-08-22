@@ -63,7 +63,7 @@ export function readGraphPalette(): GraphPalette {
     border: v('--ae-border', '#2b2b2b'),
     borderStrong: v('--ae-border-strong', '#3f3f3f'),
     muted: v('--ae-muted', '#a3a3a0'),
-    faint: v('--ae-faint', '#8c8c89'),
+    faint: v('--ae-faint', '#8f8f8c'),
     fg: v('--ae-fg', '#e8e8e6'),
     accent: v('--ae-accent', '#fafaf8'),
     accentSoft: v('--ae-accent-soft', '#c9c9c6'),
