@@ -106,8 +106,10 @@ test('selecting a node announces it, because the canvas only repaints', async ({
 
   // Reach a node the way someone without a mouse would.
   await page.keyboard.press('ControlOrMeta+f');
-  await page.getByPlaceholder(/find|search/i).first().fill('Sarah');
-  await page.waitForTimeout(400);
+  await page.getByPlaceholder(/Find in map/).fill('Sarah');
+  // Enter commits the highlighted row, so wait for the row rather than for a
+  // count of milliseconds. On a loaded machine the clock runs out first.
+  await expect(page.getByRole('option', { name: /Sarah/ }).first()).toBeVisible();
   await page.keyboard.press('Enter');
 
   await expect(live).toContainText(/connections?\./, { timeout: 10_000 });
@@ -126,10 +128,16 @@ test('a failed path lookup reports itself instead of rendering nothing', async (
     }),
   );
   await page.getByRole('button', { name: 'Path', exact: true }).click();
-  await page.keyboard.press('ControlOrMeta+f');
-  await page.getByPlaceholder(/find|search/i).first().fill('Sarah');
-  await page.waitForTimeout(400);
-  await page.keyboard.press('Enter');
+  await page.getByPlaceholder(/Search a destination record/).fill('Sarah');
+  // The destination search is debounced, and the picker keeps a create row
+  // under the same highlight as the results. Pressing Enter before the lookup
+  // answered therefore minted a new record instead of choosing Sarah, and no
+  // path was ever asked for. Click the person once she is on screen.
+  await page
+    .getByRole('option', { name: /Sarah/ })
+    .filter({ hasNotText: 'Create' })
+    .first()
+    .click();
 
   // PathStory returned null when the query failed, so asking for a path looked
   // exactly like never having asked.

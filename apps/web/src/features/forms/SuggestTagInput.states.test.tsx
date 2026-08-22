@@ -79,11 +79,22 @@ describe('SuggestTagInput reports what it could not do', () => {
 describe('SuggestTagInput keeps the combobox contract', () => {
   it('points the input at the option Enter would commit', async () => {
     const user = userEvent.setup();
-    mockApi.get.mockResolvedValue({
-      values: [
-        { value: 'robotics', count: 2 },
-        { value: 'robustness', count: 1 },
-      ],
+    // Answer the term that was actually asked for. The lookup is debounced and
+    // a new term sends the highlight home, so on a loaded machine a list drawn
+    // from a half-typed term can still be on screen when the arrow key lands,
+    // and the answer for the whole word then re-homes the row. Keying the mock
+    // to the term makes the list itself say which lookup drew it.
+    mockApi.get.mockImplementation((url: string) => {
+      const q = new URLSearchParams(url.split('?')[1] ?? '').get('q') ?? '';
+      return Promise.resolve({
+        values:
+          q === 'rob'
+            ? [
+                { value: 'robotics', count: 2 },
+                { value: 'robustness', count: 1 },
+              ]
+            : [],
+      });
     });
     renderWithApp(<Harness />);
 
