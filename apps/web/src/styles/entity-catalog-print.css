@@ -77,15 +77,13 @@
   gap: 8px;
 }
 
-.ec-header__actions button,
 .ec-graph-tools button,
-.ec-segmented button,
-.ec-view-tabs button {
+.ec-segmented button {
   appearance: none;
   min-height: 36px;
   border: 1px solid var(--ae-border-strong);
   border-radius: var(--ae-radius);
-  background: rgba(15, 20, 30, 0.78);
+  background: var(--ae-surface-raised);
   padding: 7px 12px;
   color: var(--ae-muted);
   cursor: pointer;
@@ -95,36 +93,54 @@
     color var(--ae-dur) var(--ae-ease);
 }
 
-.ec-header__actions button:first-child {
+.ec-graph-tools button:hover:not(:disabled),
+.ec-segmented button:hover {
   border-color: var(--ae-accent);
+  color: var(--ae-fg-strong);
+}
+
+/* This route mounts outside Shell, so the only exit is this link. */
+.ec-header__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ae-space-1);
+  min-height: var(--ae-hit-target);
+  color: var(--ae-muted);
+  font-size: var(--ae-text-sm);
+  text-decoration: none;
+}
+
+.ec-header__back:hover {
   color: var(--ae-accent-soft);
 }
 
-.ec-header__actions button:hover,
-.ec-graph-tools button:hover:not(:disabled),
-.ec-segmented button:hover,
-.ec-view-tabs button:hover {
-  border-color: var(--ae-accent);
-  color: var(--ae-fg-strong);
+.ec-header__back:focus-visible {
+  outline: none;
+  border-radius: var(--ae-radius-sm);
+  box-shadow: var(--ae-focus-ring);
+}
+
+/* One region for everything this screen can report. */
+.ec-report:not(:empty) {
+  display: grid;
+  gap: var(--ae-space-2);
+  padding: var(--ae-space-3) clamp(20px, 4vw, 64px) 0;
+}
+
+/* The landmark wraps both views, so it must not introduce a box of its own. */
+.ec-main {
+  display: contents;
 }
 
 .ec-view-tabs {
   position: sticky;
   top: 0;
   z-index: 30;
-  display: flex;
-  gap: 4px;
-  padding: 9px clamp(20px, 4vw, 64px);
   border-bottom: 1px solid var(--ae-border);
-  background: rgba(8, 11, 17, 0.88);
+  background: var(--ae-bg);
+  padding: 0 clamp(20px, 4vw, 64px);
 }
 
-.ec-view-tabs button {
-  border-color: transparent;
-  background: transparent;
-}
-
-.ec-view-tabs button.is-active,
 .ec-segmented button.is-active {
   border-color: var(--ae-accent-bg);
   background: var(--ae-accent-bg-soft);
@@ -454,11 +470,6 @@
   color: var(--ae-faint);
 }
 
-.ec-required {
-  margin-left: 2px;
-  color: var(--ae-warning);
-}
-
 .ec-field__summary,
 .ec-field__note,
 .ec-field__label {
@@ -497,26 +508,45 @@
   overflow-wrap: anywhere;
 }
 
-.ec-disclosure {
-  margin-top: 12px;
-  border: 1px solid var(--ae-border);
-  border-radius: var(--ae-radius);
-  background: transparent;
+/* Composition only. The shared Disclosure owns the trigger, the panel and the
+   expanded state; this rules the two of them into the dossier's stack. */
+.ec-detail .vt-disclosure {
+  margin-top: 8px;
+  border-top: 1px solid var(--ae-border);
 }
 
-.ec-disclosure summary {
-  padding: 10px 11px;
-  color: var(--ae-muted);
+/* Definition ledger, the dossier idiom: term and value share one aligned pair
+   of columns rather than running together as prose. */
+.ec-detail__facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  margin: 0 0 18px;
+}
+
+.ec-detail__facts > div {
+  display: grid;
+  grid-column: span 2;
+  grid-template-columns: subgrid;
+  align-items: baseline;
+  gap: 12px;
+  border-top: 1px solid var(--ae-border);
+  padding: 7px 0;
+}
+
+.ec-detail__facts dt {
+  color: var(--ae-faint);
   font-size: var(--ae-text-xs);
-  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.ec-disclosure[open] {
-  padding: 0 10px 10px;
-}
-
-.ec-disclosure[open] summary {
-  margin: 0 -10px;
+.ec-detail__facts dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--ae-fg);
+  font-size: var(--ae-text-xs);
+  line-height: 1.45;
 }
 
 .ec-endpoints {
@@ -527,6 +557,15 @@
   margin: 14px 0;
 }
 
+/* Drawn, not written: source and target are each a term/value pair, and a bare
+   span between them inside a dl is neither valid nor useful to a reader. */
+.ec-endpoints::before {
+  content: '→';
+  grid-area: 1 / 2;
+  color: var(--ae-fg-soft);
+  font-size: 18px;
+}
+
 .ec-endpoints > div {
   min-width: 0;
   border: 1px solid var(--ae-border);
@@ -535,25 +574,26 @@
   padding: 9px;
 }
 
-.ec-endpoints span {
-  display: block;
+.ec-endpoints > div:first-of-type {
+  grid-area: 1 / 1;
+}
+
+.ec-endpoints > div:last-of-type {
+  grid-area: 1 / 3;
+}
+
+.ec-endpoints dt {
   margin-bottom: 4px;
   color: var(--ae-faint);
-  font-size: 10px;
+  font-size: var(--ae-text-xs);
   text-transform: uppercase;
 }
 
-.ec-endpoints strong {
-  display: block;
+.ec-endpoints dd {
+  margin: 0;
   overflow-wrap: anywhere;
   color: var(--ae-fg);
-  font: 500 11px/1.4 var(--ae-font-mono);
-}
-
-.ec-endpoints .ec-endpoints__arrow {
-  margin: 0;
-  color: var(--ae-accent-soft);
-  font-size: 18px;
+  font: 500 var(--ae-text-xs)/1.4 var(--ae-font-mono);
 }
 
 .ec-browser section,
@@ -577,20 +617,27 @@
 }
 
 .ec-browser__group summary small {
-  color: var(--ae-faint);
-  font: 9px var(--ae-font-mono);
+  color: var(--ae-muted);
+  font: var(--ae-text-xs) var(--ae-font-mono);
 }
 
 .ec-browser section > div,
-.ec-browser__group > div {
+.ec-browser__group-list {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 5px;
-  margin-top: 8px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ec-browser__group-list > li {
+  display: grid;
+  min-width: 0;
 }
 
 .ec-browser section button,
-.ec-browser__group button {
+.ec-browser__group-list button {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -605,22 +652,22 @@
 }
 
 .ec-browser section button:hover,
-.ec-browser__group button:hover {
+.ec-browser__group-list button:hover {
   border-color: var(--ae-accent);
   background: var(--ae-accent-bg-soft);
 }
 
 .ec-browser section button code,
-.ec-browser__group button code {
+.ec-browser__group-list button code {
   max-width: 100%;
-  font-size: 10px;
+  font-size: var(--ae-text-xs);
 }
 
 .ec-browser section button span,
-.ec-browser__group button span {
+.ec-browser__group-list button span {
   margin-top: 3px;
-  color: var(--ae-faint);
-  font-size: 9px;
+  color: var(--ae-muted);
+  font-size: var(--ae-text-xs);
 }
 
 /* Overview SVG, the same vector is used on screen, in print, and for export. */
@@ -654,7 +701,9 @@
   stroke-width: 2;
 }
 
-.ec-overview #ec-any-pattern path {
+/* Keyed off a class, not the pattern id: the id is per-instance so that two
+   mounted copies of the diagram cannot resolve each other's paint server. */
+.ec-overview__hatch {
   stroke: var(--ae-fg);
   stroke-width: 1;
 }
@@ -673,23 +722,16 @@
   fill: var(--ae-accent-bg);
 }
 
-.ec-overview__node--any path {
-  fill: url('#ec-any-pattern');
-}
+/* The wildcard fill is a presentation attribute on the node itself, because
+   its pattern id is per-instance and a stylesheet cannot name it. */
 
+/* Below the 11px screen floor on purpose: this is an A4 sheet, and the node
+   labels have to fit inside fixed 124x48 boxes in a 1600-unit viewBox that
+   renders at roughly 0.7 of its user units on screen and 0.17mm per unit on
+   paper. 12 units is the largest size the longest type name still fits. */
 .ec-overview__node text {
-  fill: #fff;
+  fill: var(--ae-fg-strong);
   font: 600 12px var(--ae-font-mono);
-}
-
-.ec-overview__node--relation .ec-overview__relation-label {
-  font-size: 10px;
-}
-
-.ec-overview__node--relation .ec-overview__endpoint-signature {
-  fill: var(--ae-accent-soft);
-  font-size: 6.5px;
-  letter-spacing: 0.02em;
 }
 
 .ec-overview__legend text {
@@ -741,7 +783,7 @@
   text-transform: uppercase;
 }
 
-.ec-atlas__overview-title h1 {
+.ec-atlas__overview-title h2 {
   margin: 2px 0 0;
   font-family: 'Source Serif 4', Georgia, serif;
   font-size: 33px;
@@ -843,11 +885,17 @@
   font-size: 6.5px;
 }
 
+/* A ul, so the sheet's largest register carries a count and a position. The
+   sheets set type well below the 11px screen floor throughout: they are A4
+   pages first, and 34 entity cards only fit three to a row at this size. */
 .ec-atlas__card-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: start;
   gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .ec-atlas-card {
@@ -908,6 +956,9 @@
 .ec-atlas__relation-grid {
   columns: 3;
   column-gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .ec-atlas-card--relation {
@@ -983,10 +1034,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ec-header__actions button,
   .ec-graph-tools button,
-  .ec-segmented button,
-  .ec-view-tabs button {
+  .ec-segmented button {
     transition: none;
   }
 }
@@ -1132,7 +1181,7 @@
     margin: 0;
   }
 
-  .ec-atlas__overview-title h1 {
+  .ec-atlas__overview-title h2 {
     font-size: 22pt;
   }
 
@@ -1155,10 +1204,6 @@
     fill: #000 !important;
   }
 
-  .ec-overview__node--relation .ec-overview__endpoint-signature {
-    fill: #111 !important;
-  }
-
   .ec-overview__node--entity rect {
     fill: #fff !important;
     stroke: #000 !important;
@@ -1170,11 +1215,12 @@
   }
 
   .ec-overview__node--any path {
-    fill: url('#ec-any-pattern') !important;
     stroke: #000 !important;
   }
 
-  .ec-overview #ec-any-pattern path {
+  /* The wildcard fill stays as the per-instance pattern the node names in a
+     presentation attribute; only the hatch itself is re-inked for paper. */
+  .ec-overview__hatch {
     stroke: #000 !important;
   }
 
@@ -1226,11 +1272,6 @@
   .ec-atlas__notes {
     break-inside: avoid;
     page-break-inside: avoid;
-  }
-
-  .ec-atlas__sheet--group > .ec-atlas__notes,
-  .ec-atlas__sheet--relations > .ec-atlas__notes {
-    display: none;
   }
 
   * {

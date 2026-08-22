@@ -31,6 +31,9 @@ import './styles/network.css';
 import './styles/dedup.css';
 import './styles/data-workspace.css';
 import './styles/explore-workspace.css';
+import './styles/tailor.css';
+import './styles/browse.css';
+import './styles/data-tools.css';
 import './styles/resume-paper.css';
 import './styles/marketing.css';
 // entity-catalog-print.css and entity-observatory.css are imported by
