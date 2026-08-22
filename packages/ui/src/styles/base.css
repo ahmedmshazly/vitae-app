@@ -51,6 +51,20 @@ figure {
   a:hover {
     text-decoration: underline;
   }
+  /* A link inside a sentence is told apart from the sentence by its colour
+     alone, and in this palette that is accent ink on muted body text: 2.41:1,
+     under the 3:1 the rule asks for and under what anyone reading grey prose
+     can see. A prose link carries an underline, so the difference is a shape.
+     Row links are several elements wide and underlining them reads as damage,
+     which is why this reaches only the bare anchors that sit inside running
+     text. Anything with a class of its own is a component and keeps its own
+     treatment. */
+  p > a:not([class]),
+  li > a:not([class]),
+  dd > a:not([class]) {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
 }
 
 button,
