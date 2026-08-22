@@ -265,15 +265,20 @@ export function Repositories() {
       </nav>
 
       <div className="data-operation-trace">
+        {/* The settings section below announces its own wait and its own
+            failure. This line is the screen's operation trace, so for those two
+            states it is chrome, not a second announcement. */}
         {settings.isLoading ? (
           <StatusTrace
             tone="live"
+            announce={false}
             label="Checking GitHub connection"
             detail="No credential is shown"
           />
         ) : settings.isError ? (
           <StatusTrace
             tone="danger"
+            announce={false}
             label="GitHub settings unavailable"
             detail={(settings.error as Error).message}
           />

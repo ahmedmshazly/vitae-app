@@ -171,6 +171,7 @@ export function TimelineView() {
           <h1 className="lifemap__title">Chronograph</h1>
           <StatusTrace
             tone="danger"
+            announce={false}
             label="Chronology unavailable"
             detail="The dated records could not be read"
           />
@@ -192,6 +193,7 @@ export function TimelineView() {
           <h1 className="lifemap__title">Chronograph</h1>
           <StatusTrace
             tone="live"
+            announce={false}
             label="Assembling chronology"
             detail="Reading dated records and lanes"
           />

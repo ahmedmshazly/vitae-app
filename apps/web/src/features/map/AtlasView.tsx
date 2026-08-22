@@ -360,6 +360,7 @@ export function AtlasView() {
           <h1 className="lifemap__title">Atlas</h1>
           <StatusTrace
             tone="danger"
+            announce={false}
             label="Place evidence unavailable"
             detail="The map index could not be read"
           />
@@ -381,6 +382,7 @@ export function AtlasView() {
           <h1 className="lifemap__title">Atlas</h1>
           <StatusTrace
             tone="live"
+            announce={false}
             label="Assembling place evidence"
             detail="Reading places, trips, and coordinates"
           />

@@ -48,6 +48,9 @@ export function TimelineToolbar({
         </div>
         <StatusTrace
           className="explore-instrument__trace"
+          // The review panel below announces its own wait and its own failure.
+          // For those two states this line is chrome, not a second voice.
+          announce={reviewState !== 'failed' && reviewState !== 'loading'}
           tone={
             reviewState === 'failed' ? 'danger' : reviewState === 'loading' ? 'live' : 'neutral'
           }
