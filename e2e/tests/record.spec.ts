@@ -14,17 +14,29 @@ const NODE = '**/api/v1/nodes/*';
 const REVISIONS = '**/api/v1/nodes/*/revisions';
 
 /** Open a seeded record with properties, connections and a history. */
-async function openRecord(page: Page, title: string) {
+async function openRecord(page: Page, title: string, type: string) {
   await page.keyboard.press('Meta+p');
   await page.getByLabel('Command or record search').fill(title);
-  await page.getByRole('option').filter({ hasText: new RegExp(title, 'i') }).first().click();
+  // The seed holds both a role and an application called "Senior ML Engineer",
+  // and an application opens its own dossier, not the record screen. Every hit
+  // names its type, so the type is what tells the two apart.
+  await page
+    .getByRole('option')
+    .filter({ hasText: new RegExp(title, 'i') })
+    .filter({ has: page.getByText(type, { exact: true }) })
+    .first()
+    .click();
   await expect(page.getByRole('heading', { name: title })).toBeVisible();
+  // Landing anywhere else turns every assertion below into a search for chrome
+  // that screen never had, which reads as six broken features rather than one
+  // ambiguous title.
+  await expect(page).toHaveURL(/\/n\//);
   return page.url();
 }
 
 test('the register rule carries one tick per revision, with the latest active', async ({ page }) => {
   await signIn(page);
-  await openRecord(page, 'Senior ML Engineer');
+  await openRecord(page, 'Senior ML Engineer', 'role');
 
   const rule = page.getByRole('img', { name: /^Revisions of this record/ });
   await expect(rule).toBeVisible();
@@ -56,7 +68,7 @@ test('the register rule carries one tick per revision, with the latest active', 
 
 test('property labels read as labels, and the count matches the rows', async ({ page }) => {
   await signIn(page);
-  await openRecord(page, 'Senior ML Engineer');
+  await openRecord(page, 'Senior ML Engineer', 'role');
 
   const properties = page.getByRole('region', { name: /^Properties/ });
   const labels = await properties.locator('dt').allInnerTexts();
@@ -75,7 +87,7 @@ test('property labels read as labels, and the count matches the rows', async ({ 
 
 test('a section heading keeps a space between its title and its count', async ({ page }) => {
   await signIn(page);
-  await openRecord(page, 'Senior ML Engineer');
+  await openRecord(page, 'Senior ML Engineer', 'role');
 
   // The heading is a flex container, which drops a whitespace-only text node
   // between children, this rendered "Connections5".
@@ -87,7 +99,7 @@ test('a section heading keeps a space between its title and its count', async ({
 
 test('pinning confirms with the verb and rolls back when it fails', async ({ page }) => {
   await signIn(page);
-  await openRecord(page, 'Senior ML Engineer');
+  await openRecord(page, 'Senior ML Engineer', 'role');
 
   const pin = page.getByRole('button', { name: /^(Pin|Unpin)$/ });
   const wasPinned = (await pin.innerText()).trim() === 'Unpin';
@@ -126,7 +138,7 @@ test('a record with no notes and no connections says so, in its own words', asyn
       json: { ...body, node: { ...body.node, notes_md: '', props: {} }, edges: [], neighbors: {} },
     });
   });
-  await openRecord(page, 'Senior ML Engineer');
+  await openRecord(page, 'Senior ML Engineer', 'role');
 
   // Three different absences, three different sentences.
   await expect(page.getByText('Nothing connected yet')).toBeVisible();
@@ -136,7 +148,7 @@ test('a record with no notes and no connections says so, in its own words', asyn
 
 test('a failed load names the record, and a failed history does not take the page down', async ({ page }) => {
   await signIn(page);
-  const url = await openRecord(page, 'Senior ML Engineer');
+  const url = await openRecord(page, 'Senior ML Engineer', 'role');
 
   // History is a separate query: it must degrade on its own.
   await page.route(REVISIONS, (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
@@ -163,6 +175,6 @@ test('a failed load names the record, and a failed history does not take the pag
 
 test('the record page has no automated a11y violations', async ({ page }) => {
   await signIn(page);
-  await openRecord(page, 'Senior ML Engineer');
+  await openRecord(page, 'Senior ML Engineer', 'role');
   await expectNoA11yViolations(page);
 });

@@ -36,8 +36,10 @@ test('tailor target rail supports status, keyword edit, and archive/restore', as
   // Both Edit buttons on the rail now say which panel they open, so neither
   // needs to be found by position inside a class.
   await page.getByRole('button', { name: 'Edit: role and company' }).click();
-  await page.getByLabel('Role title').fill(edited);
-  await page.getByLabel('Company').fill('Edited Co');
+  // By role, not by label alone: the button that closes this panel is named
+  // "Cancel: role and company", and getByLabel matches that substring too.
+  await page.getByRole('textbox', { name: 'Role title' }).fill(edited);
+  await page.getByRole('textbox', { name: 'Company' }).fill('Edited Co');
   await page.getByRole('button', { name: /save details/i }).click();
   await expect(page.getByRole('button', { name: new RegExp(edited.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) })).toBeVisible({
     timeout: 10_000,

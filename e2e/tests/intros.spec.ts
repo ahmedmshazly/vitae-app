@@ -147,7 +147,7 @@ test('every path is ranked, and same-named askers stay distinguishable', async (
   await goIntros(page);
 
   const cards = reach(page).locator('article');
-  await expect(cards.first()).toContainText('#1');
+  await expect(cards.first()).toContainText('Path 1');
 
   // This graph holds three different people called "Jordan", so three cards
   // offered three controls named "Ask Jordan" pointing at three destinations.

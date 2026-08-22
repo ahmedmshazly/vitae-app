@@ -15,6 +15,23 @@ import { expect, type Page } from '@playwright/test';
  * its own scan in its own spec; here the dialog is what is under test.
  */
 export async function expectNoA11yViolations(page: Page, within?: string): Promise<void> {
+  // Entrance motion is part of the design system, and a fading element is a
+  // different colour on every frame. Scanning mid-flight sampled half-opacity
+  // ink and reported contrast the settled screen never shows: a 27px heading
+  // at 2.19:1, a primary button at 4.33:1. Run every animation to its end
+  // first, so the scan reads the page the user actually sits with.
+  await page.evaluate(async () => {
+    for (const a of document.getAnimations()) {
+      // An infinite animation has no end to jump to, and finish() throws on
+      // one. It also never settles, so nothing here could wait for it.
+      try {
+        a.finish();
+      } catch {
+        /* leave it running */
+      }
+    }
+    await new Promise((r) => requestAnimationFrame(() => r(null)));
+  });
   let builder = new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']);
   if (within) builder = builder.include(within);
   const results = await builder.analyze();

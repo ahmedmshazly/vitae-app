@@ -36,9 +36,12 @@ test('a tile never states a count it does not have', async ({ page }) => {
   // A pending count rendered 0 on every tile, which is indistinguishable from
   // a type that is genuinely empty, the tile asserted a fact it did not have.
   await expect(page.locator('.vt-skel').first()).toBeVisible();
-  // The tile's accessible name folds in the glyph's title and the count, so
-  // it is addressed by position in its group instead.
-  const personTile = page.getByRole('region', { name: 'Career' }).getByRole('button').first();
+  // A link, not a button: a register has an address, and the tile is the only
+  // way into it. Its accessible name carries the count, so the count itself is
+  // read off the tile's text.
+  const personTile = page
+    .getByRole('region', { name: 'Career' })
+    .getByRole('link', { name: /^Open person records/ });
   await expect(personTile).toBeVisible();
   await expect(personTile).not.toContainText(/\d/);
 
@@ -60,13 +63,21 @@ test('a failed count says so instead of reporting zero of everything', async ({ 
   const alert = page.getByRole('alert');
   await expect(alert).toContainText('Couldn’t count your records');
   await expect(alert).toContainText('the graph is unreachable');
-  await expect(page.getByRole('region', { name: 'Career' })).toHaveCount(0);
+
+  // The failure costs the numbers, not the way in. Every register still opens,
+  // and no tile fills the hole with a zero it cannot support.
+  const career = page.getByRole('region', { name: 'Career' });
+  const personTile = career.getByRole('link', { name: /^Open person records/ });
+  await expect(personTile).toHaveAccessibleName(/count unavailable$/);
+  await expect(career).not.toContainText(/\d/);
 });
 
 test('a failed query reports a failure, not "No matches"', async ({ page }) => {
   await signIn(page);
   await goCollections(page);
 
+  // By its label, not its placeholder: the placeholder is a worked example
+  // that changes once a clause is present, and a hint is not a name.
   await page.route(NODES_Q, (route) =>
     route.fulfill({
       status: 500,
@@ -74,7 +85,7 @@ test('a failed query reports a failure, not "No matches"', async ({ page }) => {
       body: '{"error":{"code":"boom","message":"query engine is down"}}',
     }),
   );
-  await page.getByPlaceholder('type:person tag:ml city:Berlin…').fill('type:person');
+  await page.getByLabel('Query').fill('type:person');
   await page.keyboard.press('Enter');
 
   // results.isError was never checked, so a failed fetch fell through to the
@@ -88,7 +99,7 @@ test('saving a view confirms, and reports a failure instead of rejecting into no
   await signIn(page);
   await goCollections(page);
 
-  await page.getByPlaceholder('type:person tag:ml city:Berlin…').fill('type:person');
+  await page.getByLabel('Query').fill('type:person');
   await page.keyboard.press('Enter');
   await page.getByRole('button', { name: 'Save view' }).click();
 

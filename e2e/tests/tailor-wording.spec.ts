@@ -30,8 +30,10 @@ test('tailor exposes wording emphasis and accent controls before compile', async
   await modes.getByRole('button', { name: 'Manual', exact: true }).click();
   await expect(page.getByText(/all atoms/i)).toBeVisible({ timeout: 10_000 });
   // A Radix checkbox is a button with the role, not an `input`, so ask for the
-  // role rather than the tag.
-  await page.getByRole('checkbox').first().click();
+  // role rather than the tag. Scoped to the atom lists: the target rail has a
+  // Show archived checkbox of its own, first in the document, and toggling
+  // that selects no bullet at all.
+  await page.getByRole('list', { name: /^Atoms from / }).getByRole('checkbox').first().click();
   await expect(page.getByText(/\d+ bullets/)).toBeVisible({ timeout: 10_000 });
 
   await page.getByRole('button', { name: /compile pdf/i }).click();
