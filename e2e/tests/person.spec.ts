@@ -14,7 +14,13 @@ const SUMMARY = '**/api/v1/people/*/summary';
 async function openPerson(page: Page, name: string) {
   await page.goto('/people');
   await page.locator('.people__link').first().waitFor();
-  const href = await page.locator('.people__link').filter({ hasText: name }).first().getAttribute('href');
+  const rows = page.locator('.people__link').filter({ hasText: name });
+  // The seed holds one person per name. Two rows means an earlier spec left a
+  // record behind, and `.first()` would then open whichever of them the list
+  // sorted highest and fail three assertions later on missing data. Say which
+  // spec broke, here, instead.
+  await expect(rows).toHaveCount(1);
+  const href = await rows.first().getAttribute('href');
   if (!href) throw new Error(`seed has no person named ${name}`);
   await page.goto(href);
   await expect(page.getByRole('heading', { name })).toBeVisible();

@@ -113,9 +113,23 @@ EMAIL:sarah@nile-robotics.com
 END:VCARD`;
 
 async function rollbackCommittedImports(page: Page, filename: string) {
-  await page.goto('/import');
   for (;;) {
-    const row = page.locator('.imp__row', { hasText: filename }).filter({
+    await page.goto('/import');
+    // Batch history is a query, and `count()` is the one locator call that does
+    // not wait for it. Probing straight after the navigation therefore read an
+    // empty list off a loading skeleton and reported a clean slate, so the
+    // committed Sarah survived this cleanup and every later spec then found two
+    // of her: no favors on the one the People list happened to open first, and
+    // a one hop path where warm intros expected a chain. Wait for the history
+    // to say what it holds before believing it holds nothing.
+    const history = page.getByRole('region', { name: /^Batch history/ });
+    await expect(
+      history
+        .getByRole('list', { name: 'Import batches' })
+        .or(history.getByText('No imports yet')),
+    ).toBeVisible({ timeout: 15_000 });
+
+    const row = history.locator('.imp__row', { hasText: filename }).filter({
       has: page.getByRole('button', { name: /Roll back/ }),
     }).first();
     if (await row.count() === 0) return;
