@@ -106,6 +106,9 @@ describe('SuggestTextInput keeps the combobox contract', () => {
     const user = userEvent.setup();
     mockApi.get.mockResolvedValue({
       values: [
+        // An exact match is dropped from the list, so this row is also the
+        // signal that the debounced term has reached the whole word.
+        { value: 'Acme', count: 9 },
         { value: 'Acme Corp', count: 3 },
         { value: 'Acme Labs', count: 1 },
       ],
@@ -116,17 +119,15 @@ describe('SuggestTextInput keeps the combobox contract', () => {
     await user.type(input, 'Acme');
     await screen.findByRole('option', { name: /Acme Corp/ });
 
+    // A new term sends the highlight back to the first option, which is right.
+    // On a loaded machine the keystrokes can spread past the 140ms debounce, so
+    // read the term off the list itself rather than off the clock: while the
+    // lookup still trails the typing, the exact match is one of the rows.
+    await waitFor(() => expect(screen.queryByRole('option', { name: /^Acme ×9/ })).toBeNull());
+
     expect(input).toHaveAttribute(
       'aria-activedescendant',
       screen.getByRole('option', { name: /Acme Corp/ }).id,
-    );
-
-    // The lookup is debounced and a new term sends the highlight back to the
-    // first option, which is right. On a loaded machine the keystrokes can
-    // spread past the debounce, so wait for the term to settle on the whole
-    // word before moving the highlight off it.
-    await waitFor(() =>
-      expect(mockApi.get).toHaveBeenLastCalledWith(expect.stringContaining('Acme')),
     );
 
     await user.keyboard('{ArrowDown}');
