@@ -40,17 +40,23 @@ test('settings exposes résumé defaults for template, accent, and wording', asy
   await expect(page.getByRole('combobox', { name: 'Default wording' })).toContainText(next);
 });
 
-test('mobile dock links the résumé workspace on narrow viewports', async ({ page }) => {
+test('the résumé workspace stays reachable on narrow viewports', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await signInDemo(page);
   await page.goto('/');
 
+  // The dock carries the six workspaces, not every screen under them. Résumé
+  // is Career's, so the route to it is the route the IA describes.
   const dock = page.getByRole('navigation', { name: 'Primary' });
   await expect(dock).toBeVisible({ timeout: 10_000 });
-  await dock.getByRole('link', { name: 'Résumé' }).click();
-  await expect(page).toHaveURL(/\/resume\/?$/);
-  await dock.getByRole('link', { name: 'Outputs' }).click();
-  await expect(page).toHaveURL(/\/resume\/outputs/);
+  await dock.getByRole('link', { name: 'Career' }).click();
+  await expect(page).toHaveURL(/\/career\/?$/);
+
+  const workspace = page.getByRole('navigation', { name: 'Career workspace' });
+  await workspace.getByRole('link', { name: 'Résumé', exact: true }).click();
+  await expect(page).toHaveURL(/\/career\/resume\/?$/);
+  await workspace.getByRole('link', { name: 'Outputs', exact: true }).click();
+  await expect(page).toHaveURL(/\/career\/resume\/outputs/);
 });
 
 test('a failed overview says so instead of reporting an empty workspace', async ({ page }) => {

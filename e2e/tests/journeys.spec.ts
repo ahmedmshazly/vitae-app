@@ -9,6 +9,11 @@ import { signIn } from './helpers/auth';
  *   J8: recover a deleted record from Trash
  */
 
+// These three walk the whole stack: a capture that waits on the search index,
+// a compile that waits on Tectonic, a delete that waits on Trash. The file
+// default of 30s is a budget for one screen, not for a journey across five.
+test.describe.configure({ timeout: 120_000 });
+
 test('J1: capture a person with the ⌘K grammar', async ({ page }) => {
   await signIn(page);
   await page.keyboard.press('Meta+k');

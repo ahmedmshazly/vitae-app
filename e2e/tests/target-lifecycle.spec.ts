@@ -7,6 +7,10 @@ import { chooseOption } from './helpers/controls';
  * Requires demo seed (for auth/space); creates a uniquely named target so
  * prior runs do not pollute assertions.
  */
+// Create, parse, restatus, rename, re-keyword, archive, restore: seven round
+// trips to the API, which is more than the 30s single-screen default covers.
+test.describe.configure({ timeout: 90_000 });
+
 test('tailor target rail supports status, keyword edit, and archive/restore', async ({ page }) => {
   const stamp = Date.now();
   const role = `Lifecycle Target ${stamp}`;

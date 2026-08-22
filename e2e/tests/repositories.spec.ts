@@ -68,7 +68,10 @@ test('GitHub does not claim a missing token while Settings is still loading', as
   await page.goto('/repositories');
 
   await expect(page.getByRole('heading', { name: 'Repositories', exact: true })).toBeVisible();
-  await expect(page.getByText('checking')).toBeVisible();
+  // The word also appears in the sync button's own explanation, so read it off
+  // the chip that states the connection rather than off the whole page.
+  const chip = page.getByRole('region', { name: /^GitHub connection/ }).getByText('checking');
+  await expect(chip).toBeVisible();
   await expect(page.getByText('not connected')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /Sync GitHub: connect a token first/ })).toBeDisabled();
 });
@@ -163,7 +166,7 @@ test('saving a token refreshes the connection chip', async ({ page }) => {
 
   await expect(page.getByText('not connected')).toBeVisible();
   await page.getByLabel('Personal access token').fill('ghp_test_token_for_e2e');
-  await page.getByRole('button', { name: 'Connect', exact: true }).click();
+  await page.getByRole('button', { name: 'Connect GitHub', exact: true }).click();
   await expect(toast(page, 'GitHub token saved.')).toBeVisible();
   await expect(page.getByText('connected', { exact: true })).toBeVisible();
 });
