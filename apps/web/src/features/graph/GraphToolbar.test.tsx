@@ -4,6 +4,7 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { TooltipProvider } from '@vitae/ui';
 import type { GraphPalette } from '../../lib/graph-palette.js';
 import { renderWithApp } from '../../test/render.js';
 import { GraphToolbar } from './GraphToolbar.js';
@@ -20,6 +21,7 @@ const palette: GraphPalette = {
   plate: '#000',
   dim: '#333',
   fontSans: 'sans-serif',
+  fontMono: 'mono',
   slots: Array(8).fill('#0f0') as string[],
 };
 
@@ -45,7 +47,10 @@ describe('GraphToolbar', () => {
         truncated={false}
         palette={palette}
         modeHint="Explore the map"
+        nodeCount={4}
+        connectionCount={3}
       />,
+      { wrapper: ({ children }) => <TooltipProvider>{children}</TooltipProvider> },
     );
 
     expect(screen.getByRole('group', { name: 'Explorer mode' })).toBeInTheDocument();

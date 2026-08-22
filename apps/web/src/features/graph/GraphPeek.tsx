@@ -1,8 +1,20 @@
+import { useId, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { edgeDisplayLabel, edgeTypeLabel } from '@vitae/core';
-import { Button, Chip, EntityGlyph, Mono } from '@vitae/ui';
+import {
+  Button,
+  Chip,
+  EmptyState,
+  EntityGlyph,
+  ErrorState,
+  Glyph,
+  Inline,
+  Mono,
+  StatusTrace,
+} from '@vitae/ui';
 import { entityHref } from '../../lib/entity-href.js';
-import { colorForType, type GraphPalette } from '../../lib/graph-palette.js';
+import type { GraphPalette } from '../../lib/graph-palette.js';
 import type { FgNode, FocusTrailHop, GraphPathResult } from './types.js';
 
 export interface PeekLink {
@@ -16,6 +28,7 @@ export interface PeekLink {
 export interface GraphPeekProps {
   selected: FgNode;
   links: PeekLink[];
+  /** Kept for the caller's sake, the peek now names types rather than tinting them. */
   palette: GraphPalette;
   onClose: () => void;
   onSelectNeighbor: (node: FgNode) => void;
@@ -29,7 +42,6 @@ export interface GraphPeekProps {
 export function GraphPeek({
   selected,
   links,
-  palette,
   onClose,
   onSelectNeighbor,
   onOpen,
@@ -38,6 +50,7 @@ export function GraphPeek({
   onCopyLink,
   recordHref,
 }: GraphPeekProps) {
+  const groupId = useId();
   const grouped = new Map<string, PeekLink[]>();
   for (const link of links) {
     const key = edgeDisplayLabel(link.edgeType, link.direction, {
@@ -48,58 +61,74 @@ export function GraphPeek({
   }
 
   return (
+    // Not a dialog: nothing focuses it, nothing traps focus in it, and the
+    // canvas keeps the caret. It is an inspector anchored to the selection.
     <div
       className="graph__peek graph__peek--dossier"
-      role="dialog"
+      role="region"
       aria-label={`${selected.title} details`}
     >
-      <div className="hstack" style={{ gap: 'var(--ae-space-2)' }}>
+      <Inline gap={2}>
         <EntityGlyph type={selected.type} size="sm" />
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="flex-1 min-w-0">
           <div className="graph__peektitle">{selected.title}</div>
-          <div className="hstack" style={{ gap: 6 }}>
+          <Inline gap={2}>
             <Chip mono>{selected.isSelf ? 'self' : selected.type}</Chip>
-            <Mono className="u-faint" style={{ fontSize: 'var(--ae-text-xs)' }}>
+            <Mono className="text-xs u-faint">
               {selected.degree} links · hop {selected.hop}
             </Mono>
-          </div>
+          </Inline>
         </div>
         <button type="button" className="vt-modal__x" aria-label="Close peek" onClick={onClose}>
-          ×
+          <Glyph name="close" size={14} />
         </button>
-      </div>
+      </Inline>
 
-      {grouped.size > 0 && (
+      {grouped.size > 0 ? (
         <div className="graph__peeklist">
-          {[...grouped.entries()].map(([label, rows]) => (
-            <div key={label} className="graph__peekgroup">
-              <div className="graph__peekgrouplabel">{label}</div>
-              {rows.map((row) => (
-                <div key={`${row.edgeType}-${row.neighbor.id}`} className="graph__peekrow">
-                  <button
-                    type="button"
-                    className="graph__peekselect"
-                    onClick={() => onSelectNeighbor(row.neighbor)}
-                  >
-                    <span
-                      className="graph__filterdot"
-                      style={{ background: colorForType(palette, row.neighbor.type) }}
-                      aria-hidden
-                    />
-                    <span className="graph__peekrowtitle">{row.neighbor.title}</span>
-                  </button>
-                  <Link
-                    className="graph__peekopen"
-                    to={entityHref(row.neighbor.type, row.neighbor.id)}
-                    aria-label={`Open ${row.neighbor.title}`}
-                  >
-                    Open
-                  </Link>
-                </div>
-              ))}
+          {[...grouped.entries()].map(([label, rows], gi) => (
+            <div
+              key={label}
+              className="graph__peekgroup"
+              role="group"
+              aria-labelledby={`${groupId}-${gi}`}
+            >
+              <h3 id={`${groupId}-${gi}`} className="graph__peekgrouplabel font-normal">
+                {label}
+              </h3>
+              <ul className="list-none m-0 p-0">
+                {rows.map((row) => (
+                  <li key={`${row.edgeType}-${row.neighbor.id}`} className="graph__peekrow">
+                    <button
+                      type="button"
+                      className="graph__peekselect"
+                      onClick={() => onSelectNeighbor(row.neighbor)}
+                    >
+                      {/* A tinted dot was the only thing saying what kind of
+                          record this row was, and it was aria-hidden. The glyph
+                          carries a shape and names the type in its title. */}
+                      <EntityGlyph type={row.neighbor.type} size="sm" />
+                      <span className="graph__peekrowtitle">{row.neighbor.title}</span>
+                    </button>
+                    <Link
+                      className="graph__peekopen"
+                      to={entityHref(row.neighbor.type, row.neighbor.id)}
+                      aria-label={`Open ${row.neighbor.title}`}
+                    >
+                      Open
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>
+      ) : (
+        <EmptyState
+          glyph="graph"
+          title="No connections in view"
+          hint="Widen the record filters above, or press + to expand the depth."
+        />
       )}
 
       <div className="graph__peekactions">
@@ -116,9 +145,9 @@ export function GraphPeek({
           Copy link
         </Button>
       </div>
-      <Link className="u-faint" style={{ fontSize: 'var(--ae-text-xs)' }} to={recordHref}>
-        {recordHref}
-      </Link>
+      {/* Evidence, not a second route to the same place. As a link its name was
+          a URL fragment read out slash by slash beside "Open record". */}
+      <Mono className="text-xs text-muted">{recordHref}</Mono>
     </div>
   );
 }
@@ -140,13 +169,23 @@ export function FocusBreadcrumb({ trail, onHop, onReset }: FocusBreadcrumbProps)
               →
             </span>
           )}
-          <button type="button" className="lifemap__trailbtn" onClick={() => onHop(hop.id)}>
+          {/* Every hop re-fetches the whole graph, so a mis-tap is expensive.
+              These were roughly 23px and 17px tall. */}
+          <button
+            type="button"
+            className="lifemap__trailbtn inline-flex items-center min-h-8 pointer-coarse:min-h-11"
+            onClick={() => onHop(hop.id)}
+          >
             {hop.title}
           </button>
         </span>
       ))}
-      <button type="button" className="lifemap__trailreset" onClick={onReset}>
-        reset
+      <button
+        type="button"
+        className="lifemap__trailreset inline-flex items-center min-h-8 pointer-coarse:min-h-11"
+        onClick={onReset}
+      >
+        Reset
       </button>
     </nav>
   );
@@ -158,42 +197,74 @@ export interface PathStoryProps {
   emptyHint: string;
   /** The lookup itself failed, distinct from "there is no path". */
   failed?: boolean;
+  /** Run the lookup again. Defaults to refetching the path query. */
+  onRetry?: () => void;
 }
 
-export function PathStory({ path, loading, emptyHint, failed }: PathStoryProps) {
-  if (loading) {
-    return <div className="lifemap__story u-faint">Finding path…</div>;
-  }
-  // A failed lookup left `path` undefined and returned null, so asking for a
-  // path showed nothing at all, indistinguishable from never having asked.
-  if (failed) {
-    return (
-      <div className="lifemap__story" role="alert">
-        <strong className="font-semibold">Couldn’t work out a path.</strong> The lookup failed, the
-        map itself is unaffected.
-      </div>
-    );
-  }
-  if (!path) return null;
-  if (!path.found || path.hops.length === 0) {
-    return <div className="lifemap__story lifemap__story--empty">{emptyHint}</div>;
-  }
+/**
+ * One persistent live region for the path lookup.
+ *
+ * Every state used to be its own element with its own role, or none: loading
+ * was a bare div nobody heard, the result arrived in a region created in the
+ * same commit as its content, and a failed lookup offered no way to try again.
+ */
+export function PathStory({ path, loading, emptyHint, failed, onRetry }: PathStoryProps) {
+  const client = useQueryClient();
+  const retry =
+    onRetry ??
+    (() => {
+      void client.refetchQueries({ queryKey: ['graph-path'] });
+    });
 
-  const parts: string[] = [];
-  for (let i = 0; i < path.hops.length; i++) {
-    const hop = path.hops[i]!;
-    if (i === 0) {
-      parts.push(hop.title);
-      continue;
+  let body: ReactNode = null;
+  let empty = false;
+
+  if (loading) {
+    body = (
+      <StatusTrace
+        tone="live"
+        label="Finding path"
+        detail="Reading the connections between the two records"
+        announce={false}
+      />
+    );
+  } else if (failed) {
+    body = (
+      <ErrorState
+        title="Couldn’t work out a path"
+        detail="The lookup failed. The map itself is unaffected."
+        onRetry={retry}
+      />
+    );
+  } else if (path && (!path.found || path.hops.length === 0)) {
+    body = <span className="lifemap__storytext">{emptyHint}</span>;
+    empty = true;
+  } else if (path) {
+    const parts: string[] = [];
+    for (let i = 0; i < path.hops.length; i++) {
+      const hop = path.hops[i]!;
+      if (i === 0) {
+        parts.push(hop.title);
+        continue;
+      }
+      const via = hop.viaEdgeType ? edgeTypeLabel(hop.viaEdgeType) : 'linked';
+      parts.push(`:  ${via} → ${hop.title}`);
     }
-    const via = hop.viaEdgeType ? edgeTypeLabel(hop.viaEdgeType) : 'linked';
-    parts.push(`:  ${via} → ${hop.title}`);
+    body = (
+      <>
+        <span className="lifemap__storylabel">Path</span>
+        <span className="lifemap__storytext">{parts.join(' ')}</span>
+      </>
+    );
   }
 
   return (
-    <div className="lifemap__story" role="status">
-      <span className="lifemap__storylabel">Path</span>
-      <span className="lifemap__storytext">{parts.join(' ')}</span>
+    <div
+      className={body ? `lifemap__story${empty ? ' lifemap__story--empty' : ''}` : undefined}
+      role="status"
+      aria-live="polite"
+    >
+      {body}
     </div>
   );
 }

@@ -41,7 +41,7 @@ describe('GraphPathfinder', () => {
       />,
     );
     expect(screen.getByText('Ada')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Search who or what…')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search a destination record…')).toBeInTheDocument();
   });
 
   it('clears a chosen destination', async () => {
@@ -59,7 +59,7 @@ describe('GraphPathfinder', () => {
       />,
     );
     expect(screen.getByText('Grace')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'clear' }));
+    await user.click(screen.getByRole('button', { name: 'Clear' }));
     expect(onClearTo).toHaveBeenCalled();
   });
 });

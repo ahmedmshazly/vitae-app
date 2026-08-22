@@ -1,4 +1,5 @@
-import { InfoPopover, StatusTrace } from '@vitae/ui';
+import { useId } from 'react';
+import { InfoPopover, Inline, StatusTrace, Tooltip } from '@vitae/ui';
 import { colorForType, type GraphPalette } from '../../lib/graph-palette.js';
 import { LENSES, shortTypeLabel } from './constants.js';
 import type { GraphLens, GraphMode } from './types.js';
@@ -23,6 +24,10 @@ export interface GraphToolbarProps {
   connectionCount?: number;
   focusTitle?: string;
   busy?: boolean;
+  /** The map request failed. Overrides the count-based guess below. */
+  failed?: boolean;
+  /** What the failed request said, shown as the trace detail. */
+  errorMessage?: string;
 }
 
 export function GraphToolbar({
@@ -44,12 +49,25 @@ export function GraphToolbar({
   connectionCount,
   focusTitle,
   busy = false,
+  failed,
+  errorMessage,
 }: GraphToolbarProps) {
+  const groupLabelId = useId();
+
+  // The counts are the view's, and the view is null whenever the query has no
+  // data. So "not loading and no count" is the same fact as "the map did not
+  // load", and until the caller passes `failed` it is the only honest reading.
+  // Without it the trace fell through `?? 0` and told a screen reader the map
+  // was assembled and simply held nothing.
+  const loadFailed = failed ?? (!busy && nodeCount == null);
+
+  const counts = `${nodeCount ?? 0} ${nodeCount === 1 ? 'record' : 'records'} · ${connectionCount ?? 0} ${connectionCount === 1 ? 'connection' : 'connections'}${focusTitle ? ` · focus ${focusTitle}` : ''}${truncated ? ' · limit 1,500' : ''}`;
+
   return (
     <header className="lifemap__chrome">
       <div className="explore-instrument__heading">
         <div className="lifemap__titleblock">
-          <span className="flex items-center gap-2">
+          <Inline align="center" gap={2}>
             <h1 className="lifemap__title">Life map</h1>
             {/* The graph has real keyboard locomotion and no way to find out.
                 Nothing announced it, so it may as well not have existed. */}
@@ -72,7 +90,7 @@ export function GraphToolbar({
               </p>
               <p>Double-click a node to open it; drag the background to pan and scroll to zoom.</p>
             </InfoPopover>
-          </span>
+          </Inline>
           <p className="lifemap__hint">
             {modeHint}
             <span className="u-faint"> · depth {depth}</span>
@@ -80,18 +98,25 @@ export function GraphToolbar({
         </div>
         <StatusTrace
           className="explore-instrument__trace"
-          tone={truncated ? 'warning' : busy ? 'live' : 'neutral'}
+          tone={loadFailed ? 'danger' : truncated ? 'warning' : busy ? 'live' : 'neutral'}
+          // The canvas already owns the assertive alert for this failure, so
+          // this one stays silent rather than saying it twice.
+          announce={!loadFailed}
           label={
-            busy
-              ? 'Connecting records'
-              : truncated
-                ? 'Showing a bounded map'
-                : 'Map assembled from your records'
+            loadFailed
+              ? 'Couldn’t draw the map'
+              : busy
+                ? 'Connecting records'
+                : truncated
+                  ? 'Showing a bounded map'
+                  : 'Map assembled from your records'
           }
           detail={
-            busy
-              ? 'Reading nodes and relationships'
-              : `${nodeCount ?? 0} ${nodeCount === 1 ? 'record' : 'records'} · ${connectionCount ?? 0} ${connectionCount === 1 ? 'connection' : 'connections'}${focusTitle ? ` · focus ${focusTitle}` : ''}${truncated ? ' · limit 1,500' : ''}`
+            loadFailed
+              ? (errorMessage ?? 'The map request did not complete. Retry from the canvas.')
+              : busy
+                ? 'Reading nodes and relationships'
+                : counts
           }
         />
       </div>
@@ -120,10 +145,19 @@ export function GraphToolbar({
 
       <div className="explore-control-band">
         <span className="explore-control-band__label">Records</span>
-        <div className="lifemap__row" aria-label="Entity filters">
-          {typeGroups.map((group) => (
-            <div key={group.label} className="lifemap__group">
-              <span className="lifemap__grouplabel">{group.label}</span>
+        {/* aria-label needs a role to land on. Without one these three bands
+            reached assistive tech as an unbroken run of thirty toggles. */}
+        <div className="lifemap__row" role="group" aria-label="Entity filters">
+          {typeGroups.map((group, gi) => (
+            <div
+              key={group.label}
+              className="lifemap__group"
+              role="group"
+              aria-labelledby={`${groupLabelId}-${gi}`}
+            >
+              <span className="lifemap__grouplabel" id={`${groupLabelId}-${gi}`}>
+                {group.label}
+              </span>
               <div className="chips">
                 {group.types.map((t) => (
                   <button
@@ -131,9 +165,6 @@ export function GraphToolbar({
                     type="button"
                     aria-pressed={activeTypes.has(t)}
                     className={`graph__filter${activeTypes.has(t) ? ' graph__filter--on' : ''}`}
-                    style={{
-                      borderColor: activeTypes.has(t) ? colorForType(palette, t) : undefined,
-                    }}
                     onClick={() => onToggleType(t)}
                   >
                     <span
@@ -152,35 +183,41 @@ export function GraphToolbar({
 
       <div className="explore-control-band">
         <span className="explore-control-band__label">Lens</span>
-        <div className="lifemap__row lifemap__row--lenses" aria-label="Discovery lenses">
+        <div className="lifemap__row lifemap__row--lenses" role="group" aria-label="Discovery lenses">
           {LENSES.map((l) => (
-            <button
-              key={l.id}
-              type="button"
-              title={l.hint}
-              aria-pressed={lens === l.id}
-              className={`lifemap__lens${lens === l.id ? ' lifemap__lens--on' : ''}`}
-              onClick={() => onLens(l.id)}
-            >
-              {l.label}
-            </button>
+            // A title attribute is a mouse-only reveal. The tooltip opens on
+            // focus too, which is the only way these five names explain
+            // themselves to a keyboard or a touch.
+            <Tooltip key={l.id} content={l.hint}>
+              <button
+                type="button"
+                aria-pressed={lens === l.id}
+                className={`lifemap__lens${lens === l.id ? ' lifemap__lens--on' : ''}`}
+                onClick={() => onLens(l.id)}
+              >
+                {l.label}
+              </button>
+            </Tooltip>
           ))}
         </div>
       </div>
 
       {lens === 'edgeKinds' && edgeTypes.length > 0 && (
-        <div className="lifemap__row" aria-label="Edge kinds">
-          {edgeTypes.map((et) => (
-            <button
-              key={et}
-              type="button"
-              aria-pressed={activeEdgeTypes.has(et)}
-              className={`graph__filter${activeEdgeTypes.has(et) ? ' graph__filter--on' : ''}`}
-              onClick={() => onToggleEdgeType(et)}
-            >
-              {edgeTypeLabel(et)}
-            </button>
-          ))}
+        <div className="explore-control-band">
+          <span className="explore-control-band__label">Kinds</span>
+          <div className="lifemap__row" role="group" aria-label="Edge kinds">
+            {edgeTypes.map((et) => (
+              <button
+                key={et}
+                type="button"
+                aria-pressed={activeEdgeTypes.has(et)}
+                className={`graph__filter${activeEdgeTypes.has(et) ? ' graph__filter--on' : ''}`}
+                onClick={() => onToggleEdgeType(et)}
+              >
+                {edgeTypeLabel(et)}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </header>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { EmptyState, Spread } from '@vitae/ui';
 import type { FgNode } from './types.js';
 
 export interface GraphSearchProps {
@@ -8,29 +9,72 @@ export interface GraphSearchProps {
   onPick: (node: FgNode) => void;
 }
 
-/** ⌘F typeahead over nodes currently in the life-map view. */
+const LISTBOX_ID = 'lifemap-search-listbox';
+const optionId = (i: number) => `lifemap-search-option-${i}`;
+/** How many rows the panel will show at once. */
+const HIT_LIMIT = 12;
+
+/**
+ * ⌘F typeahead over nodes currently in the life-map view.
+ *
+ * It drives a list with the arrow keys, so it owes assistive tech the combobox
+ * contract that goes with that: the input owns the listbox, the rows are real
+ * options, and the highlighted row is named through aria-activedescendant.
+ * Before, arrowing changed a background tone and announced nothing, which made
+ * the one keyboard entry point into the map unusable without sight.
+ */
 export function GraphSearch({ open, nodes, onClose, onPick }: GraphSearchProps) {
   const [q, setQ] = useState('');
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const opener = useRef<HTMLElement | null>(null);
 
+  // Reset while rendering rather than from an effect. The effect version set
+  // state on every open/close and is the shape the React lint rule warns about.
+  const [wasOpen, setWasOpen] = useState(open);
+  if (wasOpen !== open) {
+    setWasOpen(open);
+    setQ('');
+    setActive(0);
+  }
+
+  // Closing used to leave focus on <body>, on a screen whose whole value is
+  // keyboard locomotion. Remember where ⌘F was pressed and hand it back.
   useEffect(() => {
-    if (!open) {
-      setQ('');
-      setActive(0);
-      return;
+    if (open) {
+      opener.current = document.activeElement as HTMLElement | null;
+      const t = setTimeout(() => inputRef.current?.focus(), 0);
+      return () => clearTimeout(t);
     }
-    const t = setTimeout(() => inputRef.current?.focus(), 0);
-    return () => clearTimeout(t);
+    const el = opener.current;
+    opener.current = null;
+    if (el?.isConnected) el.focus();
+    return undefined;
   }, [open]);
 
-  const hits = useMemo(() => {
+  const matches = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    if (!needle) return nodes.slice(0, 12);
-    return nodes
-      .filter((n) => n.title.toLowerCase().includes(needle) || n.type.includes(needle))
-      .slice(0, 12);
+    if (!needle) return nodes;
+    return nodes.filter(
+      (n) => n.title.toLowerCase().includes(needle) || n.type.includes(needle),
+    );
   }, [nodes, q]);
+
+  const hits = useMemo(() => matches.slice(0, HIT_LIMIT), [matches]);
+  // The list can shrink under a stale index, so clamp here instead of chasing
+  // it with another effect.
+  const activeIndex = hits.length === 0 ? 0 : Math.min(active, hits.length - 1);
+
+  const searching = q.trim().length > 0;
+  const noun = searching ? 'matches' : 'records in view';
+  const status =
+    hits.length === 0
+      ? 'No matches in view'
+      : matches.length > hits.length
+        ? `Showing ${hits.length} of ${matches.length} ${noun}, keep typing to narrow`
+        : searching
+          ? `${hits.length} ${hits.length === 1 ? 'match' : 'matches'}`
+          : `${hits.length} ${hits.length === 1 ? 'record' : 'records'} in view`;
 
   if (!open) return null;
 
@@ -41,6 +85,11 @@ export function GraphSearch({ open, nodes, onClose, onPick }: GraphSearchProps) 
         className="lifemap__searchinput"
         value={q}
         placeholder="Find in map…"
+        role="combobox"
+        aria-expanded={hits.length > 0}
+        aria-controls={LISTBOX_ID}
+        aria-activedescendant={hits.length > 0 ? optionId(activeIndex) : undefined}
+        aria-autocomplete="list"
         aria-label="Search nodes in graph"
         onChange={(e) => {
           setQ(e.target.value);
@@ -52,36 +101,42 @@ export function GraphSearch({ open, nodes, onClose, onPick }: GraphSearchProps) 
             onClose();
           } else if (e.key === 'ArrowDown') {
             e.preventDefault();
-            setActive((i) => Math.min(i + 1, hits.length - 1));
+            setActive(Math.min(activeIndex + 1, hits.length - 1));
           } else if (e.key === 'ArrowUp') {
             e.preventDefault();
-            setActive((i) => Math.max(i - 1, 0));
-          } else if (e.key === 'Enter' && hits[active]) {
+            setActive(Math.max(activeIndex - 1, 0));
+          } else if (e.key === 'Enter' && hits[activeIndex]) {
             e.preventDefault();
-            onPick(hits[active]!);
+            onPick(hits[activeIndex]!);
             onClose();
           }
         }}
       />
-      <ul className="lifemap__searchlist" role="listbox">
+      <div className="lifemap__searchlist" id={LISTBOX_ID} role="listbox" aria-label="Records in view">
         {hits.map((n, i) => (
-          <li key={n.id}>
-            <button
-              type="button"
-              className={`lifemap__searchrow${i === active ? ' lifemap__searchrow--on' : ''}`}
-              onMouseEnter={() => setActive(i)}
-              onClick={() => {
-                onPick(n);
-                onClose();
-              }}
-            >
-              <span>{n.title}</span>
-              <span className="u-faint">{n.type}</span>
-            </button>
-          </li>
+          <button
+            key={n.id}
+            id={optionId(i)}
+            role="option"
+            aria-selected={i === activeIndex}
+            type="button"
+            className={`lifemap__searchrow items-center min-h-8 pointer-coarse:min-h-11${i === activeIndex ? ' lifemap__searchrow--on' : ''}`}
+            onMouseEnter={() => setActive(i)}
+            onClick={() => {
+              onPick(n);
+              onClose();
+            }}
+          >
+            <span>{n.title}</span>
+            <span className="u-faint">{n.type}</span>
+          </button>
         ))}
-        {hits.length === 0 && <li className="u-faint lifemap__searchempty">No matches in view</li>}
-      </ul>
+      </div>
+      {/* Beside the listbox, never inside it: an option list may only contain
+          options, and the count has to be spoken as it changes. */}
+      <p className="u-faint lifemap__searchempty" role="status">
+        {status}
+      </p>
     </div>
   );
 }
@@ -99,16 +154,27 @@ export function ConnectedList({ open, selected, rows, onSelect, onToggle }: Conn
   if (!open) return null;
   return (
     <div className="lifemap__connectedpanel" role="region" aria-label="Connected nodes">
-      <div className="hstack" style={{ justifyContent: 'space-between', marginBottom: 6 }}>
+      {/* Was an inline style putting 6px of margin on a hand-rolled row. */}
+      <Spread align="center" className="mb-2">
         <span className="lifemap__grouplabel">Connected</span>
-        <button type="button" className="graph__tool" onClick={onToggle}>
-          hide
+        {/* "hide" named nothing and reported nothing, while the toolbar's own
+            toggle for the same panel already carried its state. */}
+        <button type="button" className="graph__tool" aria-expanded={open} onClick={onToggle}>
+          Hide connected list
         </button>
-      </div>
+      </Spread>
       {!selected ? (
-        <p className="u-faint">Select a node to list its neighborhood.</p>
+        <EmptyState
+          glyph="search"
+          title="Nothing selected"
+          hint="Pick a node on the map, or press ⌘F to find one."
+        />
       ) : rows.length === 0 ? (
-        <p className="u-faint">No neighbors in the current view.</p>
+        <EmptyState
+          glyph="graph"
+          title="No neighbors in view"
+          hint="Widen the record filters or expand the depth."
+        />
       ) : (
         <ul className="lifemap__connectedlist">
           {rows.map(({ node, edgeLabel }) => (

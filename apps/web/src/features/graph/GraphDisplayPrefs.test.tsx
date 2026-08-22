@@ -9,7 +9,7 @@ import { DEFAULT_DISPLAY_PREFS } from './displayPrefs.js';
 import { GraphDisplayPrefsPanel } from './GraphDisplayPrefs.js';
 
 describe('GraphDisplayPrefsPanel', () => {
-  it('opens the dialog, patches a checkbox, and resets', async () => {
+  it('opens the panel, patches a checkbox, and resets', async () => {
     const user = userEvent.setup();
     const onToggle = vi.fn();
     const onPatch = vi.fn();
@@ -37,7 +37,7 @@ describe('GraphDisplayPrefsPanel', () => {
         onReset={onReset}
       />,
     );
-    expect(screen.getByRole('dialog', { name: 'Life map display preferences' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Life map display preferences' })).toBeInTheDocument();
     await user.click(screen.getByLabelText('Dim non-neighbors on hover'));
     expect(onPatch).toHaveBeenCalledWith({ dimOnHover: false });
     await user.click(screen.getByRole('button', { name: 'Reset' }));

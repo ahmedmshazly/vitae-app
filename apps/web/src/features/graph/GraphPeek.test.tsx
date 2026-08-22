@@ -21,6 +21,7 @@ const palette: GraphPalette = {
   plate: '#000',
   dim: '#333',
   fontSans: 'sans-serif',
+  fontMono: 'mono',
   slots: Array(8).fill('#0f0') as string[],
 };
 
@@ -53,7 +54,7 @@ describe('GraphPeek', () => {
         recordHref="/people/p1"
       />,
     );
-    expect(screen.getByRole('dialog', { name: 'Alice details' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Alice details' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Close peek' }));
     expect(onClose).toHaveBeenCalled();
     await user.click(screen.getByRole('button', { name: 'Open record' }));
@@ -64,14 +65,15 @@ describe('GraphPeek', () => {
 });
 
 describe('PathStory', () => {
-  it('shows loading text while a path is fetched', () => {
+  it('names the wait while a path is fetched', () => {
     renderWithApp(<PathStory path={undefined} loading emptyHint="Pick endpoints" />);
-    expect(screen.getByText('Finding path…')).toBeInTheDocument();
+    expect(screen.getByText('Finding path')).toBeInTheDocument();
   });
 
   it('surfaces a failed lookup as an alert', () => {
     renderWithApp(<PathStory path={undefined} loading={false} emptyHint="Pick endpoints" failed />);
     expect(screen.getByRole('alert')).toHaveTextContent(/Couldn.t work out a path/);
+    expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
   });
 
   it('announces found hops as status', () => {

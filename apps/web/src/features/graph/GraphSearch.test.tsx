@@ -20,14 +20,15 @@ describe('GraphSearch', () => {
     const onClose = vi.fn();
     renderWithApp(<GraphSearch open nodes={nodes} onClose={onClose} onPick={onPick} />);
 
-    const input = screen.getByLabelText('Search nodes in graph');
+    const input = screen.getByRole('combobox', { name: 'Search nodes in graph' });
     await waitFor(() => expect(input).toHaveFocus());
     await user.type(input, 'zzz');
-    expect(screen.getByText('No matches in view')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('No matches in view');
+    expect(input).toHaveAttribute('aria-expanded', 'false');
 
     await user.clear(input);
     await user.type(input, 'Ada');
-    expect(screen.getByText('Ada Lovelace')).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: /Ada Lovelace/ })).toBeInTheDocument();
     await user.keyboard('{Enter}');
     expect(onPick).toHaveBeenCalledWith(expect.objectContaining({ id: '1' }));
     expect(onClose).toHaveBeenCalled();

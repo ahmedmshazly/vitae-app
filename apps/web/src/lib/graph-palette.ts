@@ -51,6 +51,7 @@ export interface GraphPalette {
   /** The face node labels are drawn in. Canvas takes a font string, not a
    *  class, so the family has to be read out of the token like a colour. */
   fontSans: string;
+  fontMono: string;
   slots: string[]; // viz-1..viz-8
 }
 
@@ -73,6 +74,7 @@ export function readGraphPalette(): GraphPalette {
     // labels really did render in it, in a typeface used nowhere else on
     // screen. The identity's sans is Instrument Sans.
     fontSans: v('--ae-font-sans', "'Instrument Sans Variable', ui-sans-serif, sans-serif"),
+    fontMono: v('--ae-font-mono', "'IBM Plex Mono', ui-monospace, monospace"),
     slots: [
       v('--ae-viz-1', '#1f9c86'),
       v('--ae-viz-2', '#b08a18'),

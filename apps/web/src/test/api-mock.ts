@@ -17,11 +17,17 @@ export const mockApi = {
 
 vi.mock('../lib/api.js', () => ({
   api: mockApi,
+  // Same shape as the real one in lib/api.ts. It used to take (status,
+  // message), so a test that constructed an error the way the app does put
+  // the code where the message goes and asserted on the wrong string.
   ApiError: class ApiError extends Error {
-    status: number;
-    constructor(status: number, message: string) {
+    constructor(
+      readonly status: number,
+      readonly code: string,
+      message: string,
+      readonly details?: unknown,
+    ) {
       super(message);
-      this.status = status;
     }
   },
   setAuthTokenProvider: vi.fn(),
