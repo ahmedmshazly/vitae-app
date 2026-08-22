@@ -50,6 +50,37 @@ All notable changes are recorded here.
   picture.
 - Radix selects wrapped in a `<label>` reached the browser with no accessible
   name, because the trigger is a button. They carry their own labels.
+- The ⌘K keycap inside the sidebar's capture button kept the raised surface it
+  uses everywhere else while inheriting that button's dark ink, so it painted
+  dark on dark at 1.12:1 and failed the contrast scan on every screen the
+  sidebar appears on.
+- The entity catalog's print stylesheet styled `.ec button`, which outranks
+  `.vt-btn--primary` and repainted the primary action near-white on near-white.
+- Four screens announced one failure twice, once from a status line in the
+  header and once from the error region in the body. In those states the header
+  line is chrome, not a second voice.
+- First run nested a button inside a link, so one control carried two roles.
+- Two buttons on the résumé target rail were both named only "Edit". They now
+  say which panel they open, and say Cancel while it is open.
+- Escape out of the ⌘K or ⌘P palette left focus on the document body instead of
+  the control that opened it.
+- The faint ink token promised AA against every surface and cleared it against
+  only some. The lightest ground in the palette is the selected-row fill, a step
+  above the overlay, and faint landed on it at 4.49:1. The token is a shade
+  lighter now and clears 4.7:1 on the lightest ground it can sit on.
+- Every mutation that reported its own failure said the same sentence twice, in
+  two stacked toasts. The app-wide net fired alongside a local handler rather
+  than instead of one. It now yields to any mutation that names its own failure,
+  and the one handler that rolled back without saying why now says why.
+- Every navigation mounted the destination screen twice. The route wrapper waited
+  for its own fade-out before swapping, but a wrapper renders whatever screen is
+  current, so the incoming one mounted inside the outgoing wrapper, faded itself
+  out, and was then destroyed and mounted again. Anything done in those 90ms went
+  with it: a dialog that had just opened, a character that had just been typed, a
+  click that had just landed. Each screen now mounts once.
+- A link inside a sentence was told apart from the sentence by its colour alone,
+  at 2.41:1 where the rule asks for 3:1. Prose links carry an underline now, so
+  the difference is a shape and not only a hue.
 
 ## 1.0.0
 
