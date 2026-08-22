@@ -1,0 +1,66 @@
+/* The import hub and the duplicate reviewer.
+ *
+ * Split out of app.css so a screen's rules sit next to each other rather than
+ * a thousand lines apart. Loaded after app.css, so anything here wins a
+ * specificity tie by source order.
+ */
+
+/* ── Import hub ─────────────────────────────────────────────────────────── */
+
+/* Staged rows and batch history are semantic lists now. A list needs its
+   browser defaults stripped before it reads as the ruled register it is
+   drawn as. */
+.data-import-page ul.imp__panel,
+.data-import-page ol.imp__panel {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Review is a scroll destination, not a control: it takes focus when a batch
+   opens so the reviewer lands on the work, and draws no ring for it. */
+.data-import-anchor:focus {
+  outline: none;
+}
+
+/* The destination picker and the résumé editor are shared primitives now, so
+   the two rules aimed at the raw `select` and `.textarea` stopped matching. */
+.data-import-row .vt-sel {
+  width: 190px;
+}
+
+.data-stage-editor .vt-inp--area {
+  min-height: 210px;
+}
+
+/* Was `style={{ marginTop: 10 }}` and `marginTop: 12` on three action rows. */
+.data-import-actions {
+  margin-top: var(--ae-space-3);
+}
+
+/* Was `style={{ fontSize: 11, color: … }}`, both below the type floor by
+   accident rather than by intent. */
+.data-import-caution {
+  font-size: var(--ae-text-xs);
+  color: var(--ae-warning);
+}
+
+.data-import-tally {
+  font-size: var(--ae-text-xs);
+  color: var(--ae-faint);
+}
+
+/* A failed destinations load keeps its way forward next to the reason. */
+.data-import-recover {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ae-space-3);
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .data-import-row .vt-sel {
+    grid-column: 2 / -1;
+    width: 100%;
+  }
+}

@@ -1,4 +1,4 @@
-import { useId, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -6,15 +6,17 @@ import {
   Chip,
   EmptyState,
   ErrorState,
+  Field,
   Glyph,
   InfoPopover,
   Mono,
   PageHeader,
   RegisterRule,
   Section,
-  Skeleton,
+  Select,
   SkeletonRows,
   StatusTrace,
+  Textarea,
   type GlyphName,
 } from '@vitae/ui';
 import { api } from '../lib/api.js';
@@ -156,7 +158,15 @@ export function ImportHub() {
   } | null>(null);
   const [fileAccept, setFileAccept] = useState<string | undefined>(undefined);
   const fileInput = useRef<HTMLInputElement | null>(null);
+  const reviewAnchor = useRef<HTMLDivElement | null>(null);
   const [pendingKind, setPendingKind] = useState<Kind>('linkedin');
+  const pasteIds = useId();
+  // Reading a file off disk happens before any mutation exists, so neither
+  // `stage.isPending` nor a query can report it. Without these two the whole
+  // read was silent: a large file looked like a dead click and a failed read
+  // looked like nothing had happened at all.
+  const [reading, setReading] = useState<string | null>(null);
+  const [readError, setReadError] = useState<{ filename: string; detail: string } | null>(null);
   const qc = useQueryClient();
   const { flash } = useToast();
 
@@ -243,7 +253,17 @@ export function ImportHub() {
 
   function onFile(file: File) {
     const reader = new FileReader();
+    const failed = (detail: string) => {
+      setReading(null);
+      setReadError({ filename: file.name, detail });
+      flash(`Couldn’t read ${file.name}. Nothing was staged.`, { variant: 'error' });
+    };
+    setReadError(null);
+    setReading(file.name);
+    reader.onerror = () => failed(reader.error?.message ?? 'The file could not be read.');
+    reader.onabort = () => failed('The read stopped before the file was finished.');
     reader.onload = () => {
+      setReading(null);
       const content = String(reader.result ?? '');
       const kind = pendingKind;
       if (kind === 'contacts' && !/BEGIN:VCARD/i.test(content)) {
@@ -336,8 +356,16 @@ export function ImportHub() {
   const rows = batch.data?.rows ?? [];
   const accepted = rows.filter((r) => r.decision === 'accept');
   const isStaged = batch.data?.batch.status === 'staged';
-  const busy = stage.isPending || githubSync.isPending;
+  const busy = Boolean(reading) || stage.isPending || githubSync.isPending;
   const preparingSource = pasteOpen || Boolean(mapperCsv);
+  const rollingBack = history.find((b) => b.id === rollback.variables);
+
+  // Staging drops Review below the source register and the paste editor, far
+  // enough down a full ledger to land off-screen. Focus follows the work, the
+  // same way a route change moves focus to the content region.
+  useEffect(() => {
+    if (active) reviewAnchor.current?.focus();
+  }, [active]);
 
   return (
     <div className="page data-workspace-page data-import-page">
@@ -422,8 +450,20 @@ export function ImportHub() {
         </ol>
       </nav>
 
+      {/* Every mutation on this page reports here. The chain used to live inside
+          the Review Section, which only mounts once a batch is open, so a
+          failed commit, discard, or rollback started from batch history had
+          nowhere to appear. */}
       <div className="data-operation-trace">
-        {stage.isPending ? (
+        {reading ? (
+          <StatusTrace tone="live" label={`Reading ${reading}`} detail="Nothing is staged yet" />
+        ) : readError ? (
+          <StatusTrace
+            tone="danger"
+            label={`Couldn’t read ${readError.filename}`}
+            detail={`${readError.detail} Nothing was staged.`}
+          />
+        ) : stage.isPending ? (
           <StatusTrace
             tone="live"
             label="Reading source into staging"
@@ -442,6 +482,42 @@ export function ImportHub() {
             tone="danger"
             label="GitHub sync stopped"
             detail={(githubSync.error as Error).message}
+          />
+        ) : rollback.isPending ? (
+          <StatusTrace
+            tone="live"
+            label={rollingBack ? `Rolling back the ${rollingBack.kind} batch` : 'Rolling back'}
+            detail="Records that batch wrote are being removed"
+          />
+        ) : rollback.isError ? (
+          <StatusTrace
+            tone="danger"
+            label="Batch was not rolled back"
+            detail={(rollback.error as Error).message}
+          />
+        ) : commit.isPending ? (
+          <StatusTrace tone="live" label="Committing accepted rows" detail="Writing to the graph" />
+        ) : commit.isError ? (
+          <StatusTrace
+            tone="danger"
+            label="Batch was not committed"
+            detail={(commit.error as Error).message}
+          />
+        ) : discard.isPending ? (
+          <StatusTrace tone="live" label="Discarding the batch" detail="Nothing will be written" />
+        ) : discard.isError ? (
+          <StatusTrace
+            tone="danger"
+            label="Batch was not discarded"
+            detail={(discard.error as Error).message}
+          />
+        ) : rowDecision.isPending ? (
+          <StatusTrace tone="live" label="Saving row decision" detail="Review stays in staging" />
+        ) : rowDecision.isError ? (
+          <StatusTrace
+            tone="danger"
+            label="Row decision was not saved"
+            detail={(rowDecision.error as Error).message}
           />
         ) : active && batch.data ? (
           <StatusTrace
@@ -534,15 +610,16 @@ export function ImportHub() {
               Paste résumé text. Substantial lines become candidate atoms; assign each to a role or
               project, then commit.
             </p>
-            <textarea
-              className="textarea"
-              rows={10}
-              aria-label="Résumé text to disassemble"
-              placeholder="Paste your résumé text here…"
-              value={pasteText}
-              onChange={(e) => setPasteText(e.target.value)}
-            />
-            <div className="hstack" style={{ marginTop: 10 }}>
+            <Field label="Résumé text" htmlFor={`${pasteIds}-text`}>
+              <Textarea
+                id={`${pasteIds}-text`}
+                rows={10}
+                placeholder="Paste your résumé text here…"
+                value={pasteText}
+                onChange={(e) => setPasteText(e.target.value)}
+              />
+            </Field>
+            <div className="hstack data-import-actions">
               <Button
                 variant="primary"
                 disabled={!pasteText.trim() || stage.isPending}
@@ -572,196 +649,186 @@ export function ImportHub() {
         />
       )}
 
+      {/* Staging pushes Review below the source register, off-screen on a full
+          ledger. The anchor takes focus when a batch opens, the way a route
+          change moves focus to the content region. */}
       {active && (
-        <Section
-          title="Review"
-          meta={batch.data ? `${batch.data.batch.kind} · ${batch.data.batch.status}` : undefined}
-          actions={
-            isStaged ? (
-              <Mono style={{ fontSize: 11, color: 'var(--ae-warning)' }}>review before commit</Mono>
-            ) : undefined
-          }
-        >
-          {batch.isError ? (
-            <ErrorState
-              title="Couldn’t load this import batch"
-              detail={(batch.error as Error | null)?.message}
-              onRetry={() => void batch.refetch()}
-            />
-          ) : batch.isLoading || !batch.data ? (
-            <div role="status" aria-label="Loading staged rows">
-              <SkeletonRows rows={5} />
-            </div>
-          ) : (
-            <>
-              <p className="m-0 mb-3 text-sm text-ink-soft">
-                {batch.data.batch.status === 'staged' ? 'Staged' : batch.data.batch.status}
-                {batch.data.batch.detail ? ` · ${batch.data.batch.detail}` : ''}
-                {batch.data.batch.filename ? ` · ${batch.data.batch.filename}` : ''}
-                {batch.data.batch.status === 'staged'
-                  ? ', accept or skip each row, then commit.'
-                  : '.'}
-              </p>
-              {rows.length === 0 ? (
-                <EmptyState
-                  glyph="capture"
-                  title="This batch has no rows"
-                  hint="Discard it and import again from a source above."
-                />
-              ) : (
-                <div className="imp__panel data-import-review" aria-busy={rowDecision.isPending}>
-                  {rows.map((r) => (
-                    <div key={r.id} className="imp__row data-import-row" data-decision={r.decision}>
-                      <Mono className="u-faint data-import-row__kind">{r.entity}</Mono>
-                      <div className="row__main">
-                        <div className="row__title">{r.title}</div>
-                        {r.subtitle && <div className="row__sub">{r.subtitle}</div>}
-                      </div>
-                      {r.entity === 'atom' && isStaged && (
-                        <select
-                          className="input"
-                          disabled={rowDecision.isPending || owners.isLoading || owners.isError}
-                          aria-label={`Assign ${r.title} to a role or project`}
-                          value={(r.payload.owner_node as string) ?? ''}
-                          onChange={(e) =>
-                            rowDecision.mutate({
-                              rowId: r.id,
-                              payload: { owner_node: e.target.value },
-                            })
-                          }
-                        >
-                          <option value="">assign to…</option>
-                          {(owners.data ?? []).map((o) => (
-                            <option key={o.id} value={o.id}>
-                              {o.kind}: {o.title}
-                            </option>
-                          ))}
-                        </select>
-                      )}
-                      <Mono className="u-faint data-import-row__confidence">
-                        conf {r.confidence.toFixed(2)}
-                      </Mono>
-                      {r.dup ? (
-                        <Chip
-                          tone={r.dup.verdict === 'probable' ? 'danger' : 'warning'}
-                          title={`≈ ${r.dup.nodeTitle} · ${r.dup.evidence.join(', ')} · weight ${r.dup.weight}`}
-                        >
-                          {r.dup.verdict} dup
-                        </Chip>
-                      ) : (
-                        <Chip tone="success">new</Chip>
-                      )}
-                      {isStaged && (
-                        <button
-                          type="button"
-                          className={`imp__toggle${r.decision === 'accept' ? ' imp__toggle--on' : ''}`}
-                          disabled={rowDecision.isPending}
-                          aria-pressed={r.decision === 'accept'}
-                          aria-label={
-                            r.decision === 'accept'
-                              ? `Skip ${r.title} (currently accepted)`
-                              : `Accept ${r.title} (currently skipped)`
-                          }
-                          onClick={() =>
-                            rowDecision.mutate({
-                              rowId: r.id,
-                              decision: r.decision === 'accept' ? 'skip' : 'accept',
-                            })
-                          }
-                        >
-                          {r.decision}
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-              {owners.isLoading ? (
-                <StatusTrace
-                  tone="live"
-                  label="Loading résumé destinations"
-                  detail="Roles and projects"
-                />
-              ) : owners.isError ? (
-                <StatusTrace
-                  tone="danger"
-                  label="Résumé destinations unavailable"
-                  detail={(owners.error as Error).message}
-                />
-              ) : rowDecision.isPending ? (
-                <StatusTrace
-                  tone="live"
-                  label="Saving row decision"
-                  detail="Review remains in staging"
-                />
-              ) : rowDecision.isError ? (
-                <StatusTrace
-                  tone="danger"
-                  label="Row decision was not saved"
-                  detail={(rowDecision.error as Error).message}
-                />
-              ) : commit.isError ? (
-                <StatusTrace
-                  tone="danger"
-                  label="Batch was not committed"
-                  detail={(commit.error as Error).message}
-                />
-              ) : discard.isError ? (
-                <StatusTrace
-                  tone="danger"
-                  label="Batch was not discarded"
-                  detail={(discard.error as Error).message}
-                />
-              ) : rollback.isError ? (
-                <StatusTrace
-                  tone="danger"
-                  label="Batch was not rolled back"
-                  detail={(rollback.error as Error).message}
-                />
-              ) : null}
-              <div className="imp__stagfoot">
-                <Mono style={{ fontSize: 11, color: 'var(--ae-faint)' }}>
-                  {rows.filter((r) => !r.dup).length} new · {rows.filter((r) => r.dup).length}{' '}
-                  candidates · {rows.filter((r) => r.status === 'committed').length} committed
-                </Mono>
-                <div className="hstack">
-                  {isStaged ? (
-                    <>
-                      <Button onClick={() => discard.mutate()} disabled={discard.isPending}>
-                        {discard.isPending ? 'Discarding…' : 'Discard'}
-                      </Button>
-                      <Button
-                        variant="primary"
-                        onClick={() => commit.mutate()}
-                        disabled={commit.isPending || accepted.length === 0}
+        <div className="data-import-anchor" ref={reviewAnchor} tabIndex={-1}>
+          <Section
+            title="Review"
+            meta={batch.data ? `${batch.data.batch.kind} · ${batch.data.batch.status}` : undefined}
+            actions={
+              isStaged ? (
+                <Mono className="data-import-caution">review before commit</Mono>
+              ) : undefined
+            }
+          >
+            {batch.isError ? (
+              <ErrorState
+                title="Couldn’t load this import batch"
+                detail={(batch.error as Error | null)?.message}
+                onRetry={() => void batch.refetch()}
+              />
+            ) : batch.isLoading || !batch.data ? (
+              <SkeletonRows rows={5} label="Loading staged rows" />
+            ) : (
+              <>
+                <p className="m-0 mb-3 text-sm text-ink-soft">
+                  {batch.data.batch.status === 'staged' ? 'Staged' : batch.data.batch.status}
+                  {batch.data.batch.detail ? ` · ${batch.data.batch.detail}` : ''}
+                  {batch.data.batch.filename ? ` · ${batch.data.batch.filename}` : ''}
+                  {batch.data.batch.status === 'staged'
+                    ? ', accept or skip each row, then commit.'
+                    : '.'}
+                </p>
+                {rows.length === 0 ? (
+                  <EmptyState
+                    glyph="capture"
+                    title="This batch has no rows"
+                    hint="Discard it and import again from a source above."
+                  />
+                ) : (
+                  <ul
+                    className="imp__panel data-import-review"
+                    aria-label="Staged rows"
+                    aria-busy={rowDecision.isPending}
+                  >
+                    {rows.map((r) => (
+                      <li
+                        key={r.id}
+                        className="imp__row data-import-row"
+                        data-decision={r.decision}
                       >
-                        {commit.isPending
-                          ? 'Committing…'
-                          : `Commit ${accepted.length} row${accepted.length === 1 ? '' : 's'}`}
-                      </Button>
-                    </>
-                  ) : batch.data.batch.status === 'committed' ? (
+                        <Mono className="u-faint data-import-row__kind">{r.entity}</Mono>
+                        <div className="row__main">
+                          <div className="row__title">{r.title}</div>
+                          {r.subtitle && <div className="row__sub">{r.subtitle}</div>}
+                        </div>
+                        {r.entity === 'atom' && isStaged && (
+                          <Select
+                            label={`Assign ${r.title} to a role or project`}
+                            placeholder="assign to…"
+                            disabled={rowDecision.isPending || owners.isLoading || owners.isError}
+                            value={(r.payload.owner_node as string) || undefined}
+                            onChange={(value) =>
+                              rowDecision.mutate({
+                                rowId: r.id,
+                                payload: { owner_node: value ?? '' },
+                              })
+                            }
+                            options={(owners.data ?? []).map((o) => ({
+                              value: o.id,
+                              label: `${o.kind}: ${o.title}`,
+                            }))}
+                          />
+                        )}
+                        <Mono className="u-faint data-import-row__confidence">
+                          conf {r.confidence.toFixed(2)}
+                        </Mono>
+                        {r.dup ? (
+                          <Chip
+                            tone={r.dup.verdict === 'probable' ? 'danger' : 'warning'}
+                            title={`≈ ${r.dup.nodeTitle} · ${r.dup.evidence.join(', ')} · weight ${r.dup.weight}`}
+                          >
+                            {r.dup.verdict} dup
+                          </Chip>
+                        ) : (
+                          <Chip tone="success">new</Chip>
+                        )}
+                        {isStaged && (
+                          <button
+                            type="button"
+                            className={`imp__toggle${r.decision === 'accept' ? ' imp__toggle--on' : ''}`}
+                            disabled={rowDecision.isPending}
+                            aria-pressed={r.decision === 'accept'}
+                            aria-label={
+                              r.decision === 'accept'
+                                ? `Skip ${r.title} (currently accepted)`
+                                : `Accept ${r.title} (currently skipped)`
+                            }
+                            onClick={() =>
+                              rowDecision.mutate({
+                                rowId: r.id,
+                                decision: r.decision === 'accept' ? 'skip' : 'accept',
+                              })
+                            }
+                          >
+                            {r.decision}
+                          </button>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {/* Only the query this Section owns reports here. The mutation
+                  chain is page-level, so a standing destinations failure can no
+                  longer sit on top of the reason a commit was refused. */}
+                {owners.isLoading ? (
+                  <StatusTrace
+                    tone="live"
+                    label="Loading résumé destinations"
+                    detail="Roles and projects"
+                  />
+                ) : owners.isError ? (
+                  <div className="data-import-recover">
+                    <StatusTrace
+                      tone="danger"
+                      label="Résumé destinations unavailable"
+                      detail={(owners.error as Error).message}
+                    />
                     <Button
-                      variant="danger"
-                      onClick={() => rollback.mutate(active)}
-                      disabled={rollback.isPending}
-                      aria-label={`Roll back ${batch.data.batch.kind} import from ${batch.data.batch.created_at.slice(0, 10)}: ${batch.data.batch.stats.created ?? batch.data.batch.stats.rows} records`}
+                      size="sm"
+                      onClick={() => void owners.refetch()}
+                      disabled={owners.isFetching}
                     >
-                      {rollback.isPending ? 'Rolling back…' : 'Roll back batch'}
+                      {owners.isFetching ? 'Retrying…' : 'Retry'}
                     </Button>
-                  ) : (
-                    <Button onClick={() => setActive(null)}>Close</Button>
-                  )}
+                  </div>
+                ) : null}
+                <div className="imp__stagfoot">
+                  <Mono className="data-import-tally">
+                    {rows.filter((r) => !r.dup).length} new · {rows.filter((r) => r.dup).length}{' '}
+                    candidates · {rows.filter((r) => r.status === 'committed').length} committed
+                  </Mono>
+                  <div className="hstack">
+                    {isStaged ? (
+                      <>
+                        <Button onClick={() => discard.mutate()} disabled={discard.isPending}>
+                          {discard.isPending ? 'Discarding…' : 'Discard'}
+                        </Button>
+                        <Button
+                          variant="primary"
+                          onClick={() => commit.mutate()}
+                          disabled={commit.isPending || accepted.length === 0}
+                        >
+                          {commit.isPending
+                            ? 'Committing…'
+                            : `Commit ${accepted.length} row${accepted.length === 1 ? '' : 's'}`}
+                        </Button>
+                      </>
+                    ) : batch.data.batch.status === 'committed' ? (
+                      <Button
+                        variant="danger"
+                        onClick={() => rollback.mutate(active)}
+                        disabled={rollback.isPending}
+                        aria-label={`Roll back ${batch.data.batch.kind} import from ${batch.data.batch.created_at.slice(0, 10)}: ${batch.data.batch.stats.created ?? batch.data.batch.stats.rows} records`}
+                      >
+                        {rollback.isPending ? 'Rolling back…' : 'Roll back batch'}
+                      </Button>
+                    ) : (
+                      <Button onClick={() => setActive(null)}>Close</Button>
+                    )}
+                  </div>
                 </div>
+              </>
+            )}
+            {batch.isError && (
+              <div className="hstack data-import-actions">
+                <Button onClick={() => setActive(null)}>Close</Button>
               </div>
-            </>
-          )}
-          {batch.isError && (
-            <div className="hstack" style={{ marginTop: 12 }}>
-              <Button onClick={() => setActive(null)}>Close</Button>
-            </div>
-          )}
-        </Section>
+            )}
+          </Section>
+        </div>
       )}
 
       <Section title="Batch history" meta={batches.isSuccess ? history.length : undefined}>
@@ -772,9 +839,7 @@ export function ImportHub() {
             onRetry={() => void batches.refetch()}
           />
         ) : batches.isLoading ? (
-          <div role="status" aria-label="Loading import history">
-            <HistorySkeleton />
-          </div>
+          <SkeletonRows rows={4} label="Loading import history" />
         ) : history.length === 0 ? (
           <EmptyState
             glyph="capture"
@@ -785,12 +850,13 @@ export function ImportHub() {
           // FR-023: the row is a real button, so it is reachable by Tab and
           // activates with Enter/Space. The Roll back action is a sibling, not
           // a nested button (nesting interactive elements is invalid).
-          <div className="imp__panel">
+          <ol className="imp__panel data-import-history" aria-label="Import batches">
             {history.map((b, index) => {
               const when = b.created_at.slice(0, 10);
               const created = b.stats.created ?? b.stats.rows;
+              const undoing = rollback.isPending && rollback.variables === b.id;
               return (
-                <div key={b.id} className="imp__row">
+                <li key={b.id} className="imp__row">
                   <Mono className="data-ledger-index" aria-hidden>
                     {String(index + 1).padStart(2, '0')}
                   </Mono>
@@ -835,32 +901,15 @@ export function ImportHub() {
                       disabled={rollback.isPending}
                       aria-label={`Roll back ${b.kind} import from ${when}: ${created} records`}
                     >
-                      Roll back
+                      {undoing ? 'Rolling back…' : 'Roll back'}
                     </Button>
                   )}
-                </div>
+                </li>
               );
             })}
-          </div>
+          </ol>
         )}
       </Section>
-    </div>
-  );
-}
-
-function HistorySkeleton() {
-  return (
-    <div className="imp__panel">
-      {Array.from({ length: 4 }, (_, i) => (
-        <div key={i} className="imp__row" aria-hidden>
-          <Skeleton width={72} height={12} />
-          <span style={{ flex: 1 }}>
-            <Skeleton width="40%" height={12} />
-            <Skeleton width="55%" height={10} style={{ marginTop: 6 }} />
-          </span>
-          <Skeleton width={64} height={20} />
-        </div>
-      ))}
     </div>
   );
 }
@@ -888,27 +937,19 @@ function CsvMapper({
       </p>
       <div className="grid-2 data-column-map">
         {FIELDS.map((f) => (
-          <div key={f} className="field">
-            <label className="label" htmlFor={`${ids}-${f}`}>
-              {f}
-            </label>
-            <select
+          <Field key={f} label={f} htmlFor={`${ids}-${f}`}>
+            <Select
               id={`${ids}-${f}`}
-              className="input"
-              value={map[f] ?? ''}
-              onChange={(e) => setMap((m) => ({ ...m, [f]: e.target.value }))}
-            >
-              <option value="">Ignore this field</option>
-              {headers.map((h) => (
-                <option key={h} value={h}>
-                  {h}
-                </option>
-              ))}
-            </select>
-          </div>
+              label={`${f} column`}
+              placeholder="Ignore this field"
+              value={map[f] || undefined}
+              onChange={(value) => setMap((m) => ({ ...m, [f]: value ?? '' }))}
+              options={headers.map((h) => ({ value: h, label: h }))}
+            />
+          </Field>
         ))}
       </div>
-      <div className="hstack" style={{ marginTop: 12 }}>
+      <div className="hstack data-import-actions">
         <Button
           variant="primary"
           disabled={!map.name}

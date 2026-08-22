@@ -179,6 +179,9 @@ export function Duplicates() {
   });
 
   const clusters = result.data?.clusters ?? [];
+  // Only the tick the reader is standing on takes the accent. This used to be
+  // pinned to 0, so auditing the seventh cluster still marked the first.
+  const auditIndex = audit ? clusters.slice(0, 12).findIndex((c) => c.id === audit.id) : -1;
   const probable = clusters.filter((cluster) => cluster.verdict === 'probable').length;
   const typeCount = new Set(clusters.map((cluster) => cluster.type)).size;
   const mergeCount = merges.data?.merges.filter((merge) => !merge.undone_at).length ?? 0;
@@ -224,7 +227,7 @@ export function Duplicates() {
               }))
             : undefined
         }
-        activeIndex={clusters.length > 0 ? 0 : undefined}
+        activeIndex={auditIndex >= 0 ? auditIndex : undefined}
         label={clusters.length > 0 ? 'Candidate clusters in the queue' : undefined}
       />
 
@@ -337,20 +340,22 @@ export function Duplicates() {
         ) : null}
       </div>
 
-      {result.isError ? (
-        <ErrorState
-          title="Couldn’t load the identity queue"
-          detail={(result.error as Error | null)?.message}
-          onRetry={() => void result.refetch()}
-        />
-      ) : result.isLoading ? (
-        <div role="status" aria-label="Loading identity queue">
-          <SkeletonRows rows={6} />
-        </div>
-      ) : (
-        <>
-          <Section title="Queue" meta={clusters.length}>
-            <div className="dedup-summary" aria-label="Queue summary">
+      {/* This gate used to wrap all three Sections, so one failed scan also
+          erased merge history and learned aliases, taking the Undo for an
+          already-merged pair with it. It now covers only what it loaded. */}
+      <Section title="Queue" meta={result.isSuccess ? clusters.length : undefined}>
+        {result.isError ? (
+          <ErrorState
+            title="Couldn’t load the identity queue"
+            detail={(result.error as Error | null)?.message}
+            onRetry={() => void result.refetch()}
+            retrying={result.isFetching}
+          />
+        ) : result.isLoading ? (
+          <SkeletonRows rows={6} label="Loading identity queue" />
+        ) : (
+          <>
+            <div className="dedup-summary" role="group" aria-label="Queue summary">
               <strong>
                 <Mono>{clusters.length}</Mono> candidate{' '}
                 {clusters.length === 1 ? 'cluster' : 'clusters'}
@@ -453,111 +458,109 @@ export function Duplicates() {
                 })}
               </div>
             )}
-          </Section>
+          </>
+        )}
+      </Section>
 
-          <Section
-            title="Merge history"
-            meta={merges.isSuccess ? merges.data.merges.length : undefined}
-          >
-            {merges.isError ? (
-              <ErrorState
-                title="Couldn’t load merge history"
-                detail={(merges.error as Error | null)?.message}
-                onRetry={() => void merges.refetch()}
-              />
-            ) : merges.isLoading ? (
-              <div role="status" aria-label="Loading merge history">
-                <SkeletonRows rows={3} />
-              </div>
-            ) : (merges.data?.merges.length ?? 0) === 0 ? (
-              <EmptyState
-                glyph="merge"
-                title="No merges yet"
-                hint="When you consolidate a cluster, it appears here with conflict-safe undo for 30 days."
-              />
-            ) : (
-              <div className="dedup-list">
-                {merges.data!.merges.map((merge) => (
-                  <div key={merge.id} className="dedup-list__row">
-                    <Mono className="u-faint" style={{ width: 84 }}>
-                      {merge.merged_at.slice(0, 10)}
-                    </Mono>
-                    <div className="row__main">
-                      <div className="row__title">
-                        {merge.drop_title} → {merge.keep_title}
-                      </div>
+      <Section
+        title="Merge history"
+        meta={merges.isSuccess ? merges.data.merges.length : undefined}
+      >
+        {merges.isError ? (
+          <ErrorState
+            title="Couldn’t load merge history"
+            detail={(merges.error as Error | null)?.message}
+            onRetry={() => void merges.refetch()}
+          />
+        ) : merges.isLoading ? (
+          <SkeletonRows rows={3} label="Loading merge history" />
+        ) : (merges.data?.merges.length ?? 0) === 0 ? (
+          <EmptyState
+            glyph="merge"
+            title="No merges yet"
+            hint="When you consolidate a cluster, it appears here with conflict-safe undo for 30 days."
+          />
+        ) : (
+          <ul className="dedup-list" aria-label="Merges">
+            {merges.data!.merges.map((merge) => {
+              // One undo runs at a time, so every button greys out. Only
+              // the row that is actually running says so.
+              const undoing = undo.isPending && undo.variables === merge.id;
+              return (
+                <li key={merge.id} className="dedup-list__row">
+                  <Mono className="u-faint dedup-list__stamp">{merge.merged_at.slice(0, 10)}</Mono>
+                  <div className="row__main">
+                    <div className="row__title">
+                      {merge.drop_title} → {merge.keep_title}
                     </div>
-                    {merge.undone_at ? (
-                      <Chip mono>undone</Chip>
-                    ) : (
-                      <Button
-                        size="sm"
-                        disabled={undo.isPending}
-                        onClick={() => undo.mutate(merge.id)}
-                        aria-label={`Undo merge of ${merge.drop_title} into ${merge.keep_title}`}
-                      >
-                        Undo
-                      </Button>
-                    )}
                   </div>
-                ))}
-              </div>
-            )}
-          </Section>
-
-          <Section
-            title="Learned aliases"
-            meta={aliases.isSuccess ? aliases.data.aliases.length : undefined}
-          >
-            {aliases.isError ? (
-              <ErrorState
-                title="Couldn’t load learned aliases"
-                detail={(aliases.error as Error | null)?.message}
-                onRetry={() => void aliases.refetch()}
-              />
-            ) : aliases.isLoading ? (
-              <div role="status" aria-label="Loading learned aliases">
-                <SkeletonRows rows={3} />
-              </div>
-            ) : (aliases.data?.aliases.length ?? 0) === 0 ? (
-              <EmptyState
-                glyph="merge"
-                title="No learned aliases"
-                hint="Aliases appear when a merge preserves an alternate name as an inspectable prior identity."
-              />
-            ) : (
-              <div className="dedup-list">
-                {aliases.data!.aliases.map((alias) => (
-                  <div key={alias.id} className="dedup-list__row">
-                    <Mono className="u-faint" style={{ width: 100 }}>
-                      {typeLabel(alias.type)}
-                    </Mono>
-                    <div className="row__main">
-                      <div className="row__title">
-                        {alias.alias} → {alias.canonical_title}
-                      </div>
-                    </div>
-                    <Link
-                      className="vt-btn vt-btn--sm"
-                      to={entityHref(alias.type, alias.canonical_id)}
-                    >
-                      Open
-                    </Link>
+                  {merge.undone_at ? (
+                    <Chip mono>undone</Chip>
+                  ) : (
                     <Button
                       size="sm"
-                      disabled={removeAlias.isPending}
-                      onClick={() => removeAlias.mutate(alias.id)}
-                      aria-label={`Forget alias ${alias.alias}`}
+                      disabled={undo.isPending}
+                      onClick={() => undo.mutate(merge.id)}
+                      aria-label={`Undo merge of ${merge.drop_title} into ${merge.keep_title}`}
                     >
-                      Forget
+                      {undoing ? 'Undoing…' : 'Undo'}
                     </Button>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </Section>
+
+      <Section
+        title="Learned aliases"
+        meta={aliases.isSuccess ? aliases.data.aliases.length : undefined}
+      >
+        {aliases.isError ? (
+          <ErrorState
+            title="Couldn’t load learned aliases"
+            detail={(aliases.error as Error | null)?.message}
+            onRetry={() => void aliases.refetch()}
+          />
+        ) : aliases.isLoading ? (
+          <SkeletonRows rows={3} label="Loading learned aliases" />
+        ) : (aliases.data?.aliases.length ?? 0) === 0 ? (
+          <EmptyState
+            glyph="merge"
+            title="No learned aliases"
+            hint="Aliases appear when a merge preserves an alternate name as an inspectable prior identity."
+          />
+        ) : (
+          <ul className="dedup-list" aria-label="Learned aliases">
+            {aliases.data!.aliases.map((alias) => (
+              <li key={alias.id} className="dedup-list__row">
+                <Mono className="u-faint dedup-list__stamp dedup-list__stamp--wide">
+                  {typeLabel(alias.type)}
+                </Mono>
+                <div className="row__main">
+                  <div className="row__title">
+                    {alias.alias} → {alias.canonical_title}
                   </div>
-                ))}
-              </div>
-            )}
-          </Section>
-        </>
-      )}
+                </div>
+                <Link className="vt-btn vt-btn--sm" to={entityHref(alias.type, alias.canonical_id)}>
+                  Open
+                </Link>
+                <Button
+                  size="sm"
+                  disabled={removeAlias.isPending}
+                  onClick={() => removeAlias.mutate(alias.id)}
+                  aria-label={`Forget alias ${alias.alias}`}
+                >
+                  {removeAlias.isPending && removeAlias.variables === alias.id
+                    ? 'Forgetting…'
+                    : 'Forget'}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Section>
 
       {audit ? (
         <ClusterAudit
@@ -572,6 +575,17 @@ export function Duplicates() {
       ) : null}
     </div>
   );
+}
+
+/**
+ * What one consolidation run actually wrote. The loop applies one merge per
+ * dropped record, so stopping halfway leaves part of the cluster consolidated;
+ * that is a reportable outcome, not a plain failure.
+ */
+interface MergeOutcome {
+  merged: string[];
+  blocked: { title: string; reason: string } | null;
+  total: number;
 }
 
 function displayValue(value: unknown): string {
@@ -596,8 +610,11 @@ function ClusterAudit({
   );
   const [keepId, setKeepId] = useState(cluster.members[0]?.id ?? '');
   const [fieldSource, setFieldSource] = useState<Record<string, string>>({});
-  const [busy, setBusy] = useState(false);
+  // Drops the server has already absorbed. A run that stops halfway has written
+  // part of the cluster, so a retry has to work on what is left of it.
+  const [consolidated, setConsolidated] = useState<string[]>([]);
   const { flash } = useToast();
+  const qc = useQueryClient();
   const queries = useQueries({
     queries: cluster.members.map((member) => ({
       queryKey: ['node', member.id],
@@ -664,16 +681,17 @@ function ClusterAudit({
     );
   }
 
-  async function mergeCluster() {
-    if (!hasValidMergeSet || !keep) {
-      flash('Choose at least two records and a canonical survivor before consolidating.', {
-        variant: 'error',
-      });
-      return;
-    }
-    setBusy(true);
-    try {
-      const drops = included.filter((record) => record.node.id !== keepId);
+  const remainingDrops = included.filter(
+    (record) => record.node.id !== keepId && !consolidated.includes(record.node.id),
+  );
+
+  const consolidate = useMutation({
+    mutationFn: async (): Promise<MergeOutcome> => {
+      if (!hasValidMergeSet || !keep) {
+        throw new Error(
+          'Choose at least two records and a canonical survivor before consolidating.',
+        );
+      }
       const props = { ...keep.node.props };
       const patch: Record<string, unknown> = {};
       for (const field of fields) {
@@ -702,16 +720,37 @@ function ClusterAudit({
       // survivor values while unioning contacts and rewiring edges, so the last
       // merge remains immediately undoable and earlier merges can be unwound in
       // reverse history order without a post-merge edit invalidating every undo.
-      for (const drop of drops) {
-        await api.post('/duplicates/merge', { keepId, dropId: drop.node.id, fields: {} });
+      const merged: string[] = [];
+      for (const drop of remainingDrops) {
+        try {
+          await api.post('/duplicates/merge', { keepId, dropId: drop.node.id, fields: {} });
+          merged.push(drop.node.id);
+        } catch (err) {
+          // Everything before this one is already written. Report that rather
+          // than a flat failure the user would retry against a stale cluster.
+          return {
+            merged,
+            blocked: { title: drop.node.title, reason: (err as Error).message },
+            total: remainingDrops.length,
+          };
+        }
       }
-      await onComplete();
-    } catch (err) {
-      flash(`Couldn’t consolidate identity: ${(err as Error).message}`, { variant: 'error' });
-    } finally {
-      setBusy(false);
-    }
-  }
+      return { merged, blocked: null, total: remainingDrops.length };
+    },
+    onSuccess: (outcome) => {
+      setConsolidated((current) => [...current, ...outcome.merged]);
+      if (!outcome.blocked) {
+        void onComplete();
+        return;
+      }
+      void qc.invalidateQueries({ queryKey: ['duplicates'] });
+      void qc.invalidateQueries({ queryKey: ['merges'] });
+      flash(
+        `Merged ${outcome.merged.length} of ${outcome.total}. ${outcome.blocked.title} was not merged.`,
+        { variant: 'error' },
+      );
+    },
+  });
 
   const relationCount = included.reduce((sum, record) => sum + record.edges.length, 0);
   const priorNames = included
@@ -741,10 +780,14 @@ function ClusterAudit({
           ) : (
             <Button
               variant="primary"
-              disabled={busy || !hasValidMergeSet || loading || Boolean(loadError)}
-              onClick={() => void mergeCluster()}
+              disabled={consolidate.isPending || !hasValidMergeSet || loading || Boolean(loadError)}
+              onClick={() => consolidate.mutate()}
             >
-              {busy ? 'Consolidating…' : `Merge ${includedIds.size} records`}
+              {consolidate.isPending
+                ? 'Consolidating…'
+                : consolidated.length > 0
+                  ? `Retry ${remainingDrops.length} record${remainingDrops.length === 1 ? '' : 's'}`
+                  : `Merge ${includedIds.size} records`}
             </Button>
           )}
         </>
@@ -767,13 +810,38 @@ function ClusterAudit({
         ))}
       </nav>
 
+      {consolidate.isPending ? (
+        <StatusTrace
+          tone="live"
+          label="Consolidating identity"
+          detail={`${remainingDrops.length} into ${keep?.node.title ?? 'the survivor'}`}
+        />
+      ) : consolidate.isError ? (
+        <StatusTrace
+          tone="danger"
+          label="Nothing was merged"
+          detail={(consolidate.error as Error).message}
+        />
+      ) : consolidate.data?.blocked ? (
+        <StatusTrace
+          tone="danger"
+          label={`Merged ${consolidate.data.merged.length} of ${consolidate.data.total}. ${consolidate.data.blocked.title} was not merged`}
+          detail={consolidate.data.blocked.reason}
+        />
+      ) : null}
+
       {loadError ? (
-        <ErrorState title="Couldn’t load cluster records" detail={loadError.message} />
+        <ErrorState
+          title="Couldn’t load cluster records"
+          detail={loadError.message}
+          onRetry={() => void Promise.all(queries.map((query) => query.refetch()))}
+          retrying={queries.some((query) => query.isFetching)}
+        />
       ) : null}
 
       {loading ? (
-        <div role="status" aria-label="Loading cluster records" style={{ minHeight: 240 }}>
-          <SkeletonRows rows={5} />
+        <div className="dedup-audit__loading">
+          <SkeletonRows rows={5} label="Loading cluster records" />
         </div>
       ) : null}
 
@@ -842,9 +910,20 @@ function ClusterAudit({
                   {record.node.source} · confidence {record.node.confidence.toFixed(2)}
                 </small>
               </span>
-              <Mono>
-                {record.edges.length} relations · rev {record.node.rev}
-              </Mono>
+              {/* Selection used to be carried by border-colour and background
+                  alone, two near-black tones apart, on the choice that decides
+                  which record keeps its URL and which get tombstoned. */}
+              <span className="dedup-audit__survivor-meta">
+                <Mono>
+                  {record.edges.length} relations · rev {record.node.rev}
+                </Mono>
+                {keepId === record.node.id ? (
+                  <span className="dedup-audit__survivor-mark">
+                    <Glyph name="check" size={14} />
+                    <Chip mono>survivor</Chip>
+                  </span>
+                ) : null}
+              </span>
             </button>
           ))}
         </section>
@@ -901,19 +980,21 @@ function ClusterAudit({
             {included.map((record) => (
               <div key={record.node.id}>
                 <strong>{record.node.title}</strong>
-                {record.edges.length ? (
-                  record.edges.map((edge) => {
-                    const otherId = edge.src === record.node.id ? edge.dst : edge.src;
-                    return (
-                      <span key={edge.id}>
-                        <Mono>{edge.type}</Mono>
-                        {record.neighbors[otherId]?.title ?? otherId}
-                      </span>
-                    );
-                  })
-                ) : (
-                  <span className="u-muted">No relationships</span>
-                )}
+                <ul aria-label={`Relationships of ${record.node.title}`}>
+                  {record.edges.length ? (
+                    record.edges.map((edge) => {
+                      const otherId = edge.src === record.node.id ? edge.dst : edge.src;
+                      return (
+                        <li key={edge.id}>
+                          <Mono>{edge.type}</Mono>
+                          {record.neighbors[otherId]?.title ?? otherId}
+                        </li>
+                      );
+                    })
+                  ) : (
+                    <li className="u-muted">No relationships</li>
+                  )}
+                </ul>
               </div>
             ))}
           </div>

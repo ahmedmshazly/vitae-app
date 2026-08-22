@@ -1,19 +1,23 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  Banner,
   Button,
   Chip,
   ConfirmDialog,
   EmptyState,
+  ErrorState,
+  Inline,
   Input,
   Mono,
   PageHeader,
+  RegisterRule,
+  Section,
   Select,
   Sheet,
-  ErrorState,
-  RegisterRule,
   SkeletonRows,
+  StatusTrace,
 } from '@vitae/ui';
 import { api } from '../lib/api.js';
 import { useToast } from '../features/Toast.js';
@@ -45,6 +49,73 @@ interface Resume {
   needs_manual_trim?: boolean;
 }
 
+/** The six things this screen can ask the server to do to an output. */
+type OutputAction = 'sent' | 'base' | 'duplicate' | 'restore' | 'reexport' | 'archive';
+
+/**
+ * What each action says while it is still in flight. Every one of them ran
+ * through a single mutation whose only visible effect was a `disabled`
+ * attribute, so a click on Duplicate or Mark sent read as a click that missed.
+ */
+const PENDING_LABEL: Record<OutputAction, string> = {
+  sent: 'Marking sent…',
+  base: 'Setting as base…',
+  duplicate: 'Duplicating…',
+  restore: 'Restoring…',
+  reexport: 'Rebuilding…',
+  archive: 'Archiving…',
+};
+
+/** What each action says once the server has done it. */
+const DONE_LABEL: Record<OutputAction, string> = {
+  sent: 'Marked as sent',
+  base: 'Set as the base résumé. New finals diff against it.',
+  duplicate: 'Duplicated. The copy is in your outputs.',
+  restore: 'Restored',
+  reexport: 'Artifacts rebuilt',
+  archive: 'Archived',
+};
+
+const STATUS_OPTIONS = [
+  { value: 'draft', label: 'Draft' },
+  { value: 'final', label: 'Final' },
+  { value: 'sent', label: 'Sent' },
+  { value: 'archived', label: 'Archived' },
+];
+
+const TEMPLATE_OPTIONS = [
+  { value: 'cobalt', label: 'Cobalt' },
+  { value: 'onyx', label: 'Onyx' },
+  { value: 'argon', label: 'Argon' },
+];
+
+/** The chosen option in its own words, so a filter can state what it is set to. */
+function optionLabel(
+  options: Array<{ value: string; label: string }>,
+  value: string,
+  fallback: string,
+): string {
+  return options.find((option) => option.value === value)?.label ?? fallback;
+}
+
+/**
+ * A ruled register of stated facts: term on the left, value on the right, a
+ * hairline between. The detail sheet opened on two bordered boxes that gave
+ * "Final gate" the same weight as the role the résumé was built for, and never
+ * said which word was the term and which was the value.
+ */
+function Facts({ children }: { children: ReactNode }) {
+  return <dl className="m-0 grid grid-cols-[minmax(0,auto)_minmax(0,1fr)] gap-x-6">{children}</dl>;
+}
+function Fact({ term, children }: { term: ReactNode; children: ReactNode }) {
+  return (
+    <div className="col-span-2 grid grid-cols-subgrid items-center border-b border-hairline py-2 last:border-b-0">
+      <dt className="text-sm text-muted">{term}</dt>
+      <dd className="m-0 flex min-w-0 justify-end text-right text-sm text-ink">{children}</dd>
+    </div>
+  );
+}
+
 export function Outputs() {
   const qc = useQueryClient();
   const { flash } = useToast();
@@ -55,13 +126,17 @@ export function Outputs() {
   const [template, setTemplate] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [archive, setArchive] = useState<Resume | null>(null);
-  const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [artifactError, setArtifactError] = useState<string | null>(null);
   const focusId = searchParams.get('focus');
   const detailId = selectedId ?? focusId;
+  // One query for the whole register, archive included. The archived flag used
+  // to sit in the cache key, so choosing or clearing "Archived" started a
+  // second fetch and put every row back through a skeleton. Which outputs to
+  // show is a decision this screen already makes for search, status and
+  // template; deleted_at is no different.
   const listQuery = useQuery({
-    queryKey: ['resumes', status === 'archived'],
-    queryFn: () =>
-      api.get<{ resumes: Resume[] }>(`/resumes?includeDeleted=${status === 'archived'}`),
+    queryKey: ['resumes', 'all'],
+    queryFn: () => api.get<{ resumes: Resume[] }>('/resumes?includeDeleted=true'),
   });
   const detailQuery = useQuery({
     queryKey: ['resume', detailId],
@@ -72,13 +147,20 @@ export function Outputs() {
   const isLoading = listQuery.isLoading;
   const detailData = detailQuery.data;
   const detailLoading = detailQuery.isLoading;
-  /** Everything the server returned, before this screen's own filters. */
+  // A first load that failed has nothing to show and says so. A refresh that
+  // failed still has the last good register, and throwing that away to report
+  // the failure loses more than it tells you.
+  const loadFailed = listQuery.isError && !data;
+  const refreshFailed = listQuery.isError && Boolean(data);
+  /** Everything the register holds, archive included, before this screen filters. */
   const total = data?.resumes.length ?? 0;
 
   const resumes = useMemo(
     () =>
       (data?.resumes ?? []).filter((resume) => {
-        if (status === 'archived' && !resume.deleted_at) return false;
+        // The archive is its own view. Now that every output arrives in one
+        // response, the live views have to exclude the archived ones.
+        if (Boolean(resume.deleted_at) !== (status === 'archived')) return false;
         if (status && status !== 'archived' && resume.status !== status) return false;
         if (template && resume.template_key !== template) return false;
         const haystack =
@@ -89,7 +171,7 @@ export function Outputs() {
   );
 
   const mutate = useMutation({
-    mutationFn: async ({ action, resume }: { action: string; resume: Resume }) => {
+    mutationFn: async ({ action, resume }: { action: OutputAction; resume: Resume }) => {
       if (action === 'sent') return api.post(`/resumes/${resume.id}/mark-sent`);
       if (action === 'base') return api.post(`/resumes/${resume.id}/set-base`);
       if (action === 'duplicate') return api.post(`/resumes/${resume.id}/duplicate`);
@@ -100,7 +182,7 @@ export function Outputs() {
     onSuccess: async (_data, variables) => {
       const { action, resume } = variables;
       setArchive(null);
-      setDownloadError(null);
+      setArtifactError(null);
       await qc.invalidateQueries({ queryKey: ['resumes'] });
       await qc.invalidateQueries({ queryKey: ['resume'] });
       await qc.invalidateQueries({ queryKey: ['resume-overview'] });
@@ -109,17 +191,9 @@ export function Outputs() {
       }
       // Six actions ran through this mutation and not one of them said
       // anything. The verb has to match the button that was pressed.
-      const said: Record<string, string> = {
-        sent: 'Marked as sent',
-        base: 'Set as the base résumé. New finals diff against it.',
-        duplicate: 'Duplicated. The copy is in your outputs.',
-        restore: 'Restored',
-        reexport: 'Artifacts rebuilt',
-        archive: 'Archived',
-      };
       // Archiving is reversible and `restore` is an action in this very switch,
       // so there was never a reason for it to be a one-way door.
-      flash(said[action] ?? 'Done', {
+      flash(DONE_LABEL[action], {
         undo:
           action === 'archive'
             ? async () => {
@@ -130,18 +204,21 @@ export function Outputs() {
             : undefined,
       });
     },
-    onError: (error) => {
-      setDownloadError(error instanceof Error ? error.message : 'Request failed.');
-    },
+    // No local onError. The app's mutation cache already reports every failure
+    // as a toast, so a second copy pinned under the toolbar said the same thing
+    // twice and then stayed there after the next action succeeded.
   });
 
+  /** The action in flight, if any, so each control can name its own state. */
+  const pending = mutate.isPending ? mutate.variables?.action : undefined;
+
   async function openArtifact(resume: Resume, kind: 'pdf' | 'tex') {
-    setDownloadError(null);
+    setArtifactError(null);
     try {
       const result = await api.get<{ url: string }>(`/resumes/${resume.id}/artifacts/${kind}`);
       window.open(result.url, '_blank', 'noopener,noreferrer');
     } catch (error) {
-      setDownloadError(
+      setArtifactError(
         error instanceof Error
           ? error.message
           : 'This output has no stored artifact. Use Rebuild artifacts.',
@@ -162,6 +239,9 @@ export function Outputs() {
   }
 
   const detail = detailData?.resume;
+  const detailArtifacts = detail?.artifacts ?? [];
+  const detailSelection = detail?.selection?.entries ?? [];
+  const detailFit = detail?.fit_decisions ?? [];
   return (
     <div className="page resume-page">
       <PageHeader
@@ -184,41 +264,57 @@ export function Outputs() {
         <Select
           value={status || undefined}
           onChange={(value) => setStatus(value ?? '')}
-          label="Filter by status"
+          // Radix puts `label` on the trigger as its aria-label, and an
+          // aria-label replaces the trigger's own text: a fixed "Filter by
+          // status" read the same whether this was showing everything or four
+          // sent finals. The value has to be part of the name.
+          label={`Status: ${optionLabel(STATUS_OPTIONS, status, 'All statuses')}`}
           placeholder="All statuses"
-          options={[
-            { value: 'draft', label: 'Draft' },
-            { value: 'final', label: 'Final' },
-            { value: 'sent', label: 'Sent' },
-            { value: 'archived', label: 'Archived' },
-          ]}
+          options={STATUS_OPTIONS}
         />
         <Select
           value={template || undefined}
           onChange={(value) => setTemplate(value ?? '')}
-          label="Filter by template"
+          label={`Template: ${optionLabel(TEMPLATE_OPTIONS, template, 'All templates')}`}
           placeholder="All templates"
-          options={[
-            { value: 'cobalt', label: 'Cobalt' },
-            { value: 'onyx', label: 'Onyx' },
-            { value: 'argon', label: 'Argon' },
-          ]}
+          options={TEMPLATE_OPTIONS}
         />
-        <Mono className="u-faint">
-          {listQuery.data
-            ? resumes.length === total
-              ? `${total}`
-              : `${resumes.length} of ${total}`
-            : '—'}{' '}
+        {/* The count is the only report that a keystroke changed the register,
+            and nothing moves focus when it does, so it has to be announced and
+            not merely redrawn. Mounted whatever the state: a live region
+            created together with its first message is one nothing was
+            watching. */}
+        <Mono className="u-faint" role="status" aria-live="polite" aria-label="Outputs shown">
+          {data ? (resumes.length === total ? `${total}` : `${resumes.length} of ${total}`) : '—'}{' '}
           outputs
         </Mono>
       </div>
-      {downloadError ? (
-        <p role="alert" className="mb-3 text-sm text-danger">
-          {downloadError}
-        </p>
+      {artifactError ? (
+        // A red paragraph, undismissable, and shared with every mutation
+        // failure, which the global toast already reported. This is now the
+        // artifact fetches alone, which have no toast behind them.
+        <Banner
+          tone="danger"
+          title="Couldn’t open that artifact"
+          onDismiss={() => setArtifactError(null)}
+        >
+          {artifactError}
+        </Banner>
       ) : null}
-      {listQuery.isError ? (
+      {refreshFailed ? (
+        <Banner
+          tone="danger"
+          title="Couldn’t refresh your outputs"
+          action={
+            <Button size="sm" onClick={() => void listQuery.refetch()}>
+              Retry
+            </Button>
+          }
+        >
+          Showing the last register that loaded.
+        </Banner>
+      ) : null}
+      {loadFailed ? (
         // `isError` was unread, so a failed load rendered the empty panel and
         // invited you to go and tailor résumés you may already have.
         <ErrorState
@@ -259,18 +355,38 @@ export function Outputs() {
           }
         />
       ) : (
-        <div className="output-list">
-          {resumes.map((resume) => (
-            <article className="output-row" key={resume.id}>
-              <button className="output-row__main" onClick={() => setSelectedId(resume.id)}>
-                <div className="output-row__identity">
-                  <strong>{resume.name}</strong>
-                  <span>
-                    {resume.target?.company ?? 'Saved target'} ·{' '}
-                    {resume.target?.role_title ?? 'Résumé'} · {resume.created_at.slice(0, 10)}
+        // A run of sibling articles is a stack of divs to a screen reader: no
+        // count, no position, no way to step through it as a list.
+        <ul className="output-list m-0 list-none p-0" aria-label="Outputs">
+          {resumes.map((resume) => {
+            const rebuilding =
+              mutate.isPending &&
+              mutate.variables?.action === 'reexport' &&
+              mutate.variables.resume.id === resume.id;
+            return (
+              <li className="output-row" key={resume.id}>
+                {/* Forty-four rows each offered a button called "PDF" and one
+                    called "Details", two names across the whole list. The row
+                    itself opens the sheet, so the second button was the same
+                    destination under a name nothing could address. */}
+                <button
+                  type="button"
+                  className="output-row__main"
+                  aria-label={`Details for ${rowName(resume)}`}
+                  onClick={() => setSelectedId(resume.id)}
+                >
+                  <span className="output-row__identity">
+                    <strong>{resume.name}</strong>
+                    <span>
+                      {resume.target?.company ?? 'Saved target'} ·{' '}
+                      {resume.target?.role_title ?? 'Résumé'} · {resume.created_at.slice(0, 10)}
+                    </span>
                   </span>
-                </div>
-                <div className="chips">
+                </button>
+                {/* Outside the button. Nine chips inside it made the name one
+                    unpunctuated sentence of template, pages, coverage and
+                    status before you reached what the button did. */}
+                <div className="chips min-w-0 pr-3">
                   {resume.is_base && <Chip tone="accent">Base</Chip>}
                   <Chip mono>
                     {resume.template_key} {resume.template_version && `v${resume.template_version}`}
@@ -287,44 +403,39 @@ export function Outputs() {
                     {resume.status}
                   </Chip>
                 </div>
-              </button>
-              <div className="output-row__actions">
-                {resume.artifact_ids?.pdf ? (
-                  <Button
-                    size="sm"
-                    aria-label={`Open the PDF for ${rowName(resume)}`}
-                    onClick={() => void openArtifact(resume, 'pdf')}
-                  >
-                    PDF
-                  </Button>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    aria-label={`Rebuild the artifacts for ${rowName(resume)}`}
-                    disabled={mutate.isPending}
-                    onClick={() => mutate.mutate({ action: 'reexport', resume })}
-                  >
-                    {mutate.isPending && mutate.variables?.resume.id === resume.id
-                      ? 'Rebuilding…'
-                      : 'Rebuild'}
-                  </Button>
-                )}
-                {/* Forty-four rows each offered a "PDF" and a "Details": one
-                    name apiece across the whole list, for assistive tech and
-                    for anything trying to address a particular row. */}
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  aria-label={`Details for ${rowName(resume)}`}
-                  onClick={() => setSelectedId(resume.id)}
-                >
-                  Details
-                </Button>
-              </div>
-            </article>
-          ))}
-        </div>
+                <div className="output-row__actions">
+                  {resume.artifact_ids?.pdf ? (
+                    <Button
+                      size="sm"
+                      aria-label={`Open the PDF for ${rowName(resume)}`}
+                      onClick={() => void openArtifact(resume, 'pdf')}
+                    >
+                      PDF
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      // An aria-label replaces the content, so the visible
+                      // "Rebuilding…" never reached anyone listening.
+                      aria-label={
+                        rebuilding
+                          ? `Rebuilding the artifacts for ${rowName(resume)}`
+                          : `Rebuild the artifacts for ${rowName(resume)}`
+                      }
+                      // Scoped to this row. One shared flag greyed out every
+                      // other row's Rebuild whenever anything on the screen ran.
+                      disabled={rebuilding}
+                      onClick={() => mutate.mutate({ action: 'reexport', resume })}
+                    >
+                      {rebuilding ? 'Rebuilding…' : 'Rebuild'}
+                    </Button>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       )}
 
       <Sheet
@@ -344,34 +455,41 @@ export function Outputs() {
           detail && (
             <>
               {detail.deleted_at ? (
-                <Button onClick={() => mutate.mutate({ action: 'restore', resume: detail })}>
-                  Restore
+                <Button
+                  disabled={mutate.isPending}
+                  onClick={() => mutate.mutate({ action: 'restore', resume: detail })}
+                >
+                  {pending === 'restore' ? PENDING_LABEL.restore : 'Restore'}
                 </Button>
               ) : (
                 <Button variant="danger" onClick={() => setArchive(detail)}>
                   Archive
                 </Button>
               )}
-              <span style={{ flex: 1 }} />
+              <span aria-hidden className="flex-1" />
               <Button
-                disabled={Boolean(detail.deleted_at)}
+                disabled={Boolean(detail.deleted_at) || mutate.isPending}
                 onClick={() => mutate.mutate({ action: 'duplicate', resume: detail })}
               >
-                Duplicate
+                {pending === 'duplicate' ? PENDING_LABEL.duplicate : 'Duplicate'}
               </Button>
               {!detail.deleted_at &&
                 !detail.is_base &&
                 ['final', 'sent'].includes(detail.status) && (
-                  <Button onClick={() => mutate.mutate({ action: 'base', resume: detail })}>
-                    Set as base
+                  <Button
+                    disabled={mutate.isPending}
+                    onClick={() => mutate.mutate({ action: 'base', resume: detail })}
+                  >
+                    {pending === 'base' ? PENDING_LABEL.base : 'Set as base'}
                   </Button>
                 )}
               {!detail.deleted_at && detail.status === 'final' && (
                 <Button
                   variant="primary"
+                  disabled={mutate.isPending}
                   onClick={() => mutate.mutate({ action: 'sent', resume: detail })}
                 >
-                  Mark sent
+                  {pending === 'sent' ? PENDING_LABEL.sent : 'Mark sent'}
                 </Button>
               )}
             </>
@@ -389,28 +507,53 @@ export function Outputs() {
         ) : detailLoading || !detail ? (
           <SkeletonRows rows={4} />
         ) : (
-          <div className="stack" style={{ gap: 18 }}>
-            <div className="output-detail-hero">
-              <div>
-                <span>Target</span>
-                <strong>{detail.target?.role_title ?? '—'}</strong>
-                <p>{detail.target?.company ?? '—'}</p>
-              </div>
-              <div>
-                <span>Final gate</span>
-                <strong>{detail.status}</strong>
-                <p>
-                  {detail.pages ?? '—'} page ·{' '}
-                  {detail.coverage
-                    ? `${Math.round(detail.coverage.weightedPct * 100)}% coverage`
-                    : 'not compiled'}
-                </p>
-              </div>
-            </div>
-            <div>
-              <h3>Private artifacts</h3>
-              <div className="hstack" style={{ marginTop: 8, flexWrap: 'wrap', gap: 8 }}>
-                {detail.artifacts?.map((artifact) => (
+          <div>
+            {/* The footer buttons are below the fold of a long sheet, so the
+                state of the one you pressed is reported up here as well. */}
+            {pending && <StatusTrace tone="live" label={PENDING_LABEL[pending]} />}
+            <Facts>
+              <Fact term="Target role">{detail.target?.role_title ?? 'None recorded'}</Fact>
+              <Fact term="Company">{detail.target?.company ?? 'None recorded'}</Fact>
+              <Fact term="Status">
+                <Inline gap={2} align="center" wrap>
+                  <Chip
+                    tone={
+                      detail.status === 'final' || detail.status === 'sent' ? 'accent' : 'default'
+                    }
+                  >
+                    {detail.status}
+                  </Chip>
+                  {detail.is_base && <Chip tone="accent">Base</Chip>}
+                  {detail.deleted_at && (
+                    <Chip tone="warning" glyph="alert">
+                      archived
+                    </Chip>
+                  )}
+                </Inline>
+              </Fact>
+              <Fact term="Pages">
+                {detail.pages != null
+                  ? `${detail.pages} page${detail.pages === 1 ? '' : 's'}`
+                  : 'Not compiled'}
+              </Fact>
+              <Fact term="Coverage">
+                {detail.coverage
+                  ? `${Math.round(detail.coverage.weightedPct * 100)}%`
+                  : 'Not measured'}
+              </Fact>
+              <Fact term="Template">
+                <Mono>
+                  {detail.template_key}
+                  {detail.template_version ? ` v${detail.template_version}` : ''}
+                </Mono>
+              </Fact>
+              <Fact term="Built">
+                <Mono>{detail.created_at.slice(0, 16).replace('T', ' ')}</Mono>
+              </Fact>
+            </Facts>
+            <Section title="Private artifacts" meta={detailArtifacts.length}>
+              <Inline gap={2} align="center" wrap>
+                {detailArtifacts.map((artifact) => (
                   <Button
                     key={artifact.artifact_kind}
                     onClick={() =>
@@ -420,27 +563,38 @@ export function Outputs() {
                     {artifact.artifact_kind.toUpperCase()} · {Math.ceil(artifact.bytes / 1024)} KB
                   </Button>
                 ))}
-                {(missingPdf(detail) || !detail.artifacts?.length) && (
-                  <>
-                    <span className="u-muted">
-                      No stored PDF/TeX. Rebuild from this output&apos;s saved selection.
-                    </span>
-                    <Button
-                      variant="primary"
-                      disabled={mutate.isPending || Boolean(detail.deleted_at)}
-                      onClick={() => mutate.mutate({ action: 'reexport', resume: detail })}
-                    >
-                      {mutate.isPending && mutate.variables?.action === 'reexport'
-                        ? 'Rebuilding…'
-                        : 'Rebuild artifacts'}
-                    </Button>
-                  </>
+                {/* Two different situations shared one sentence: nothing stored
+                    at all, and a TeX file stored with no PDF beside it. The
+                    second one printed "No stored PDF/TeX" next to a working
+                    TEX button. */}
+                {detailArtifacts.length === 0 && (
+                  <span className="u-muted">
+                    Nothing stored yet. Rebuild from this output&apos;s saved selection.
+                  </span>
                 )}
-              </div>
-            </div>
+                {detailArtifacts.length > 0 && missingPdf(detail) && (
+                  <span className="u-muted">No stored PDF. Rebuild to compile one.</span>
+                )}
+                {(detailArtifacts.length === 0 || missingPdf(detail)) && (
+                  <Button
+                    variant="primary"
+                    disabled={mutate.isPending || Boolean(detail.deleted_at)}
+                    onClick={() => mutate.mutate({ action: 'reexport', resume: detail })}
+                  >
+                    {pending === 'reexport' ? PENDING_LABEL.reexport : 'Rebuild artifacts'}
+                  </Button>
+                )}
+              </Inline>
+            </Section>
             {detail.base_diff && (
-              <div>
-                <h3>Compared with base</h3>
+              <Section
+                title="Compared with base"
+                meta={
+                  (detail.base_diff.added?.length ?? 0) +
+                  (detail.base_diff.removed?.length ?? 0) +
+                  (detail.base_diff.changed?.length ?? 0)
+                }
+              >
                 <div className="resume-diff">
                   <div>
                     <strong>+{detail.base_diff.added?.length ?? 0}</strong>
@@ -455,47 +609,67 @@ export function Outputs() {
                     <span>reworded</span>
                   </div>
                 </div>
-              </div>
+              </Section>
             )}
-            {(detail.fit_decisions?.length || detail.needs_manual_trim) && (
-              <div>
-                <h3>Fit loop</h3>
-                <div className="chips" style={{ marginTop: 8 }}>
-                  {detail.needs_manual_trim && <Chip>needs manual trim</Chip>}
-                  {(detail.fit_decisions ?? []).map((decision) => (
-                    <Chip key={`${decision.iteration}-${decision.atomId}`} mono>
-                      #{decision.iteration}{' '}
-                      {decision.action === 'concise-swap' ? '→ concise' : 'dropped'} ·{' '}
-                      {decision.pagesBefore}p
+            {/* Rendered whether or not the fit loop ran. The fallback used to
+                sit inside a branch that only opened when there was something
+                to show, so an output the loop never touched said nothing at
+                all about it. */}
+            <Section title="Fit loop" meta={detailFit.length}>
+              <Inline gap={2} align="center" wrap>
+                {detail.needs_manual_trim && (
+                  <Chip tone="warning" glyph="alert">
+                    needs manual trim
+                  </Chip>
+                )}
+                {detailFit.map((decision) => (
+                  <Chip key={`${decision.iteration}-${decision.atomId}`} mono>
+                    #{decision.iteration}{' '}
+                    {decision.action === 'concise-swap' ? '→ concise' : 'dropped'} ·{' '}
+                    {decision.pagesBefore}p
+                  </Chip>
+                ))}
+                {detailFit.length === 0 && !detail.needs_manual_trim && (
+                  <span className="u-muted">No auto-trim steps. It fit as selected.</span>
+                )}
+              </Inline>
+            </Section>
+            <Section title="Selected evidence" meta={detailSelection.length}>
+              {detailSelection.length > 0 ? (
+                // A list, and named, because this is the actual content of the
+                // output: which atoms went in and at what emphasis.
+                <ul className="m-0 list-none p-0" aria-label="Selected evidence">
+                  {detailSelection.map((entry) => (
+                    <li className="output-bullet" key={entry.atomId}>
+                      <Chip mono>{entry.emphasis}</Chip>
+                      <span>{entry.text}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                // `?? ` only fires on undefined, and `[].map()` is an empty
+                // array, so this line could not be reached by an output that
+                // stored a selection with nothing in it.
+                <span className="u-muted">No atom selection stored.</span>
+              )}
+            </Section>
+            <Section title="Coverage gaps" meta={detail.coverage?.gaps?.length ?? 0}>
+              {detail.coverage?.gaps?.length ? (
+                <Inline gap={2} align="center" wrap>
+                  {detail.coverage.gaps.map((gap) => (
+                    <Chip key={gap.term} tone="warning" glyph="alert">
+                      {gap.term}
                     </Chip>
                   ))}
-                  {!detail.fit_decisions?.length && !detail.needs_manual_trim && (
-                    <span className="u-muted">No auto-trim steps.</span>
-                  )}
-                </div>
-              </div>
-            )}
-            <div>
-              <h3>Selected evidence</h3>
-              <div className="stack" style={{ gap: 8, marginTop: 8 }}>
-                {detail.selection?.entries?.map((entry) => (
-                  <div className="output-bullet" key={entry.atomId}>
-                    <Chip mono>{entry.emphasis}</Chip>
-                    <span>{entry.text}</span>
-                  </div>
-                )) ?? <span className="u-muted">No atom selection stored.</span>}
-              </div>
-            </div>
-            {detail.coverage?.gaps?.length ? (
-              <div>
-                <h3>Coverage gaps</h3>
-                <div className="chips" style={{ marginTop: 8 }}>
-                  {detail.coverage.gaps.map((gap) => (
-                    <Chip key={gap.term}>{gap.term}</Chip>
-                  ))}
-                </div>
-              </div>
-            ) : null}
+                </Inline>
+              ) : (
+                <span className="u-muted">
+                  {detail.coverage
+                    ? 'Every ranked term from the target appears in this résumé.'
+                    : 'Never compiled, so coverage was never measured.'}
+                </span>
+              )}
+            </Section>
             {detail.target_id && (
               <Button
                 variant="ghost"

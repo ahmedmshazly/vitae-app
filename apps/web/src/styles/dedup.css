@@ -32,7 +32,7 @@
 }
 .dedup-live__warning {
   color: var(--ae-warning);
-  font-size: 11px;
+  font-size: var(--ae-text-xs);
   margin-top: 2px;
 }
 .dedup-live__actions {
@@ -109,7 +109,7 @@
   border: 1px solid var(--ae-border-strong);
   border-radius: 50%;
   color: var(--ae-muted);
-  font: 10px var(--ae-font-mono);
+  font: var(--ae-text-xs) var(--ae-font-mono);
 }
 .dedup-cluster__member a {
   display: flex;
@@ -125,7 +125,7 @@
 }
 .dedup-cluster__member span {
   color: var(--ae-muted);
-  font: 10px var(--ae-font-mono);
+  font: var(--ae-text-xs) var(--ae-font-mono);
 }
 .dedup-cluster__evidence {
   display: flex;
@@ -140,8 +140,21 @@
   padding-top: 16px;
 }
 .dedup-list {
+  margin: 0;
+  padding: 0;
   border: 1px solid var(--ae-border);
   background: var(--ae-surface);
+  list-style: none;
+}
+
+/* Both ledgers now align on one content-derived column instead of the two
+   guessed pixel widths (84px, 100px) they used to carry inline. */
+.dedup-list__stamp {
+  flex: none;
+  min-width: 10ch;
+}
+.dedup-list__stamp--wide {
+  min-width: 12ch;
 }
 .dedup-list__row {
   display: flex;
@@ -168,16 +181,16 @@
   border-bottom: 2px solid transparent;
   background: transparent;
   color: var(--ae-faint);
-  font-size: 11px;
+  font-size: var(--ae-text-xs);
 }
 .dedup-audit__steps button span {
   display: grid;
   place-items: center;
-  width: 17px;
-  height: 17px;
+  width: 18px;
+  height: 18px;
   border: 1px solid currentColor;
   border-radius: 50%;
-  font: 9px var(--ae-font-mono);
+  font: var(--ae-text-xs) var(--ae-font-mono);
 }
 .dedup-audit__steps button.is-active {
   color: var(--ae-fg);
@@ -193,7 +206,8 @@
 .dedup-audit__steps button:disabled {
   cursor: default;
 }
-.dedup-audit__pane {
+.dedup-audit__pane,
+.dedup-audit__loading {
   min-height: 320px;
 }
 .dedup-audit__pane h3 {
@@ -203,8 +217,48 @@
   display: grid;
   grid-template-columns: 20px 1fr;
   gap: 10px;
-  padding: 13px 4px;
+  padding: var(--ae-space-3) var(--ae-space-1);
   border-bottom: 1px solid var(--ae-border);
+}
+
+/* The control that decides whether a record joins an irreversible merge, in OS
+   chrome inside a dialog drawn entirely in app chrome. It keeps the native
+   input because its accessible name is the record it acts on and the Radix
+   `Checkbox` has no `aria-label` passthrough; only the skin is replaced. */
+.dedup-audit__identity input[type='checkbox'] {
+  appearance: none;
+  align-self: start;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 1px solid var(--ae-border-control);
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-bg);
+  cursor: pointer;
+  transition:
+    background var(--ae-dur) var(--ae-ease),
+    border-color var(--ae-dur) var(--ae-ease);
+}
+.dedup-audit__identity input[type='checkbox']:hover {
+  border-color: var(--ae-muted);
+}
+.dedup-audit__identity input[type='checkbox']:checked {
+  border-color: var(--ae-accent);
+  background: var(--ae-accent);
+}
+.dedup-audit__identity input[type='checkbox']:checked::after {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 8px;
+  margin: 2px auto 0;
+  border: solid var(--ae-accent-ink);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+.dedup-audit__identity input[type='checkbox']:focus-visible {
+  outline: none;
+  box-shadow: var(--ae-focus-ring);
 }
 .dedup-audit__identity > div {
   display: grid;
@@ -212,7 +266,7 @@
 }
 .dedup-audit__identity .u-mono {
   color: var(--ae-muted);
-  font-size: 10px;
+  font-size: var(--ae-text-xs);
 }
 .dedup-audit__survivor {
   display: flex;
@@ -225,9 +279,21 @@
   color: var(--ae-fg);
   text-align: left;
 }
-.dedup-audit__survivor span {
+.dedup-audit__survivor > span:first-child {
   display: grid;
   gap: 4px;
+}
+.dedup-audit__survivor-meta {
+  display: flex;
+  flex: none;
+  gap: var(--ae-space-2);
+  align-items: center;
+}
+.dedup-audit__survivor-mark {
+  display: inline-flex;
+  gap: var(--ae-space-1);
+  align-items: center;
+  color: var(--ae-fg-strong);
 }
 .dedup-audit__survivor small,
 .dedup-audit__survivor .u-mono {
@@ -254,9 +320,9 @@
   border-bottom: 0;
 }
 .dedup-audit__field > strong {
-  padding: 12px;
+  padding: var(--ae-space-3);
   color: var(--ae-muted);
-  font-size: 11px;
+  font-size: var(--ae-text-xs);
   text-transform: capitalize;
 }
 .dedup-audit__field > div {
@@ -279,7 +345,7 @@
 .dedup-audit__field button small {
   overflow: hidden;
   color: var(--ae-faint);
-  font: 9px var(--ae-font-mono);
+  font: var(--ae-text-xs) var(--ae-font-mono);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -305,15 +371,22 @@
   padding: 12px;
   border: 1px solid var(--ae-border);
 }
-.dedup-audit__relations span {
+.dedup-audit__relations ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dedup-audit__relations li {
   display: flex;
   gap: 8px;
-  font-size: 12px;
+  font-size: var(--ae-text-sm);
 }
 .dedup-audit__relations .u-mono {
   min-width: 90px;
   color: var(--ae-muted);
-  font-size: 9px;
+  font-size: var(--ae-text-xs);
 }
 .dedup-audit__confirm {
   display: grid;
