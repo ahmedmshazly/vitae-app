@@ -34,7 +34,7 @@ function cellKey(sourceId: string, targetId: string): string {
 
 /** Where focus sits in the grid. Row 0 is the header row, column 0 the header
  * column, so the corner is (0, 0) and the first data cell is (1, 1). */
-interface Cursor {
+interface Spot {
   r: number;
   c: number;
 }
@@ -67,7 +67,7 @@ export function EntityObservatoryMatrix({
   const detailRef = useRef<HTMLDivElement | null>(null);
   // 1156 cells would otherwise be 1156 tab stops. One cell holds the tab stop
   // and the arrow keys move it, which is how a grid is meant to be walked.
-  const [cursor, setCursor] = useState<Cursor>({ r: 1, c: 1 });
+  const [spot, setSpot] = useState<Spot>({ r: 1, c: 1 });
 
   function matrixCell(rowId: ObservatorySelectionId, columnId: ObservatorySelectionId) {
     return state.display.transpose
@@ -87,8 +87,8 @@ export function EntityObservatoryMatrix({
     return `${source} to ${target}, ${cell.relations.length} relation${cell.relations.length === 1 ? '' : 's'}: ${names}`;
   }
 
-  const focusCursor = useCallback((next: Cursor) => {
-    setCursor(next);
+  const focusSpot = useCallback((next: Spot) => {
+    setSpot(next);
     const grid = gridRef.current;
     const target = grid?.querySelector<HTMLElement>(`[data-r="${next.r}"][data-c="${next.c}"]`);
     target?.focus();
@@ -99,40 +99,40 @@ export function EntityObservatoryMatrix({
     if (event.altKey || event.metaKey) return;
     const lastRow = rows.length;
     const lastColumn = columns.length;
-    const clamp = (r: number, c: number): Cursor => ({
+    const clamp = (r: number, c: number): Spot => ({
       r: Math.min(Math.max(r, 0), lastRow),
       c: Math.min(Math.max(c, 0), lastColumn),
     });
-    let next: Cursor | null = null;
+    let next: Spot | null = null;
     switch (event.key) {
       case 'ArrowUp':
-        next = clamp(cursor.r - 1, cursor.c);
+        next = clamp(spot.r - 1, spot.c);
         break;
       case 'ArrowDown':
-        next = clamp(cursor.r + 1, cursor.c);
+        next = clamp(spot.r + 1, spot.c);
         break;
       case 'ArrowLeft':
-        next = clamp(cursor.r, cursor.c - 1);
+        next = clamp(spot.r, spot.c - 1);
         break;
       case 'ArrowRight':
-        next = clamp(cursor.r, cursor.c + 1);
+        next = clamp(spot.r, spot.c + 1);
         break;
       case 'PageUp':
-        next = clamp(cursor.r - 10, cursor.c);
+        next = clamp(spot.r - 10, spot.c);
         break;
       case 'PageDown':
-        next = clamp(cursor.r + 10, cursor.c);
+        next = clamp(spot.r + 10, spot.c);
         break;
       case 'Home':
-        next = event.ctrlKey ? clamp(0, 0) : clamp(cursor.r, 0);
+        next = event.ctrlKey ? clamp(0, 0) : clamp(spot.r, 0);
         break;
       case 'End':
-        next = event.ctrlKey ? clamp(lastRow, lastColumn) : clamp(cursor.r, lastColumn);
+        next = event.ctrlKey ? clamp(lastRow, lastColumn) : clamp(spot.r, lastColumn);
         break;
       case 'Escape':
         if (activeCellKey) {
           setActiveCellKey(null);
-          focusCursor(cursor);
+          focusSpot(spot);
           event.preventDefault();
         }
         return;
@@ -141,7 +141,7 @@ export function EntityObservatoryMatrix({
     }
     if (event.ctrlKey && event.key !== 'Home' && event.key !== 'End') return;
     event.preventDefault();
-    focusCursor(next);
+    focusSpot(next);
   }
 
   // The detail is a panel, not an overlay, so nothing moves focus into it for
@@ -153,7 +153,7 @@ export function EntityObservatoryMatrix({
 
   function closeDetail() {
     setActiveCellKey(null);
-    focusCursor(cursor);
+    focusSpot(spot);
   }
 
   return (
@@ -197,8 +197,8 @@ export function EntityObservatoryMatrix({
               aria-colindex={1}
               data-r={0}
               data-c={0}
-              tabIndex={cursor.r === 0 && cursor.c === 0 ? 0 : -1}
-              onFocus={() => setCursor({ r: 0, c: 0 })}
+              tabIndex={spot.r === 0 && spot.c === 0 ? 0 : -1}
+              onFocus={() => setSpot({ r: 0, c: 0 })}
             >
               <span>{columnAxis}</span>
               <b>{rowAxis}</b>
@@ -212,8 +212,8 @@ export function EntityObservatoryMatrix({
                 data-r={0}
                 data-c={index + 1}
                 data-group={entity.group}
-                tabIndex={cursor.r === 0 && cursor.c === index + 1 ? 0 : -1}
-                onFocus={() => setCursor({ r: 0, c: index + 1 })}
+                tabIndex={spot.r === 0 && spot.c === index + 1 ? 0 : -1}
+                onFocus={() => setSpot({ r: 0, c: index + 1 })}
                 className={`ec-matrix-grid__column${selected.has(entity.id) ? ' is-selected' : ''}`}
                 style={{ '--matrix-group': groupColor(entity.group) } as CSSProperties}
                 aria-label={`${entity.label}, ${entity.group} group, ${entity.degree} relation endpoints`}
@@ -238,8 +238,8 @@ export function EntityObservatoryMatrix({
                 data-r={rowIndex + 1}
                 data-c={0}
                 data-group={row.group}
-                tabIndex={cursor.r === rowIndex + 1 && cursor.c === 0 ? 0 : -1}
-                onFocus={() => setCursor({ r: rowIndex + 1, c: 0 })}
+                tabIndex={spot.r === rowIndex + 1 && spot.c === 0 ? 0 : -1}
+                onFocus={() => setSpot({ r: rowIndex + 1, c: 0 })}
                 className={`ec-matrix-grid__row${selected.has(row.id) ? ' is-selected' : ''}`}
                 style={{ '--matrix-group': groupColor(row.group) } as CSSProperties}
                 aria-label={`${row.label}, ${row.group} group, ${row.degree} relation endpoints`}
@@ -264,8 +264,8 @@ export function EntityObservatoryMatrix({
                     aria-colindex={columnIndex + 2}
                     data-r={rowIndex + 1}
                     data-c={columnIndex + 1}
-                    tabIndex={cursor.r === rowIndex + 1 && cursor.c === columnIndex + 1 ? 0 : -1}
-                    onFocus={() => setCursor({ r: rowIndex + 1, c: columnIndex + 1 })}
+                    tabIndex={spot.r === rowIndex + 1 && spot.c === columnIndex + 1 ? 0 : -1}
+                    onFocus={() => setSpot({ r: rowIndex + 1, c: columnIndex + 1 })}
                     aria-label={describeCell(row.label, column.label, cell)}
                     aria-expanded={cell ? activeCellKey === key : undefined}
                     aria-haspopup={cell ? 'dialog' : undefined}

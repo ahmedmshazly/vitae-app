@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -627,16 +627,17 @@ function ClusterAudit({
   const included = records.filter((record) => includedIds.has(record.node.id));
   const keep = records.find((record) => record.node.id === keepId);
 
-  const fields = useMemo(() => {
-    const envelope = ['title', 'subtitle', 'notes_md', 'start_date', 'end_date', 'status'];
-    const propKeys = [
-      ...new Set(included.flatMap((record) => Object.keys(record.node.props))),
-    ].sort();
-    return [
-      ...envelope.map((key) => ({ key, label: key.replace(/_/g, ' '), prop: false })),
-      ...propKeys.map((key) => ({ key, label: key.replace(/_/g, ' '), prop: true })),
-    ];
-  }, [included]);
+  // Not memoized by hand: `included` is a fresh array every render, so the
+  // dependency never matched and the memo never hit. Holding onto it only
+  // stopped the compiler from memoizing the component at all.
+  const envelopeKeys = ['title', 'subtitle', 'notes_md', 'start_date', 'end_date', 'status'];
+  const propKeys = [
+    ...new Set(included.flatMap((record) => Object.keys(record.node.props))),
+  ].sort();
+  const fields = [
+    ...envelopeKeys.map((key) => ({ key, label: key.replace(/_/g, ' '), prop: false })),
+    ...propKeys.map((key) => ({ key, label: key.replace(/_/g, ' '), prop: true })),
+  ];
 
   function valueFor(record: NodeResp, key: string, prop: boolean): unknown {
     return prop ? record.node.props[key] : (record.node as unknown as Record<string, unknown>)[key];
