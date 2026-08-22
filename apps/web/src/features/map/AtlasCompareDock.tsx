@@ -2,7 +2,7 @@
  * Side dock comparing two Atlas cities.
  */
 import { Link } from 'react-router-dom';
-import { Button, Mono } from '@vitae/ui';
+import { Button, Mono, StatusTrace } from '@vitae/ui';
 import { entityHref } from '../../lib/entity-href.js';
 import type { Corridor, SharedPerson } from './corridors.js';
 import type { MapTrip } from './types.js';
@@ -28,16 +28,14 @@ export function AtlasCompareDock({
   onSelectTrip,
   onOpenCorridor,
 }: AtlasCompareDockProps) {
-  const strongest = linkingTrips[0] ?? null;
-
   return (
     <aside className="atlas__dossier" aria-label={`Compare ${cityA} and ${cityB}`}>
       <div className="atlas__dossierhead">
         <div>
-          <div className="atlas__dossiertitle">
+          <h2 className="atlas__dossiertitle">
             {cityA} · {cityB}
-          </div>
-          <div className="u-faint" style={{ fontSize: 'var(--ae-text-xs)', marginTop: 4 }}>
+          </h2>
+          <div className="u-faint text-xs mt-1">
             Compare places
             {corridor ? (
               <>
@@ -52,52 +50,71 @@ export function AtlasCompareDock({
         </button>
       </div>
 
+      {/* Both dossier panels say where their claims came from before making
+          them. This one opened straight into "Shared people" with no account
+          of what shared means or what was searched. */}
+      <StatusTrace
+        label="Comparison assembled from trips and place records"
+        detail={`${shared.length} shared ${shared.length === 1 ? 'person' : 'people'} · ${linkingTrips.length} linking ${linkingTrips.length === 1 ? 'trip' : 'trips'}`}
+        announce={false}
+      />
+
       {shared.length > 0 ? (
         <div className="atlas__companions">
           <span className="lifemap__grouplabel">Shared people</span>
-          <div className="chips">
+          <ul className="chips list-none m-0 p-0" aria-label="Shared people">
             {shared.map((p) => (
-              <Link key={p.id} className="atlas__companion" to={entityHref('person', p.id)}>
-                {p.title}
-              </Link>
+              <li key={p.id}>
+                <Link
+                  className="atlas__companion min-h-8 pointer-coarse:min-h-11"
+                  to={entityHref('person', p.id)}
+                >
+                  {p.title}
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       ) : (
-        <p className="u-faint" style={{ fontSize: 'var(--ae-text-sm)', margin: 0 }}>
-          No shared people in both places.
-        </p>
+        <p className="u-faint text-sm m-0">No shared people in both places.</p>
       )}
 
-      {linkingTrips.length > 0 && (
-        <div className="atlas__tripsblock">
+      {/* The trips half of the answer used to vanish entirely when it was
+          empty, so a search that found nothing looked like a panel that had
+          never looked. */}
+      {linkingTrips.length > 0 ? (
+        <div className="atlas__companions">
           <span className="lifemap__grouplabel">Linking trips</span>
-          {linkingTrips.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              className="atlas__tripbtn"
-              onClick={() => onSelectTrip(t)}
-            >
-              Show route · {t.title}
-            </button>
-          ))}
+          <ul className="atlas__tripsblock list-none m-0 p-0" aria-label="Linking trips">
+            {linkingTrips.map((t) => (
+              <li key={t.id}>
+                <button
+                  type="button"
+                  className="atlas__tripbtn w-full"
+                  onClick={() => onSelectTrip(t)}
+                >
+                  Show route · {t.title}
+                </button>
+              </li>
+            ))}
+          </ul>
         </div>
+      ) : (
+        <p className="u-faint text-sm m-0">No recorded trip connects these two places.</p>
       )}
 
       <div className="atlas__dossierfoot">
-        {strongest && (
-          <Button size="sm" variant="primary" onClick={() => onSelectTrip(strongest)}>
-            Show route
-          </Button>
-        )}
+        {/* The footer's primary was a second "Show route" that silently meant
+            linkingTrips[0]. Every route is now named once, in the list. */}
         {corridor && (
           <Button size="sm" onClick={onOpenCorridor}>
             Corridor
           </Button>
         )}
+        {/* Was "Clear", which reads as resetting the pair and keeping the dock.
+            It closes the dock, same as the × above it. */}
         <Button size="sm" onClick={onClose}>
-          Clear
+          Close comparison
         </Button>
       </div>
     </aside>

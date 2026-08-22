@@ -1,8 +1,8 @@
 /**
  * Atlas chrome, primary actions + filter row (camera lives on the map HUD).
  */
-import { useEffect, useRef } from 'react';
-import { StatusTrace } from '@vitae/ui';
+import { useId } from 'react';
+import { Checkbox, Input, Popover, StatusTrace, Tooltip } from '@vitae/ui';
 import type { AtlasDisplayPrefs } from './displayPrefs.js';
 import type { AtlasPeriod, AtlasViewMode } from './types.js';
 import { TYPE_FILTERS } from './types.js';
@@ -66,18 +66,11 @@ export function AtlasToolbar({
   tripCount = 0,
   selectedContext,
 }: AtlasToolbarProps) {
-  const moreRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!prefsOpen) return;
-    function onDoc(e: MouseEvent) {
-      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
-        onClosePrefs();
-      }
-    }
-    document.addEventListener('mousedown', onDoc);
-    return () => document.removeEventListener('mousedown', onDoc);
-  }, [prefsOpen, onClosePrefs]);
+  // The two filter bands carried an aria-label on a plain div, which ARIA
+  // drops entirely, and the dropped string was not even the label printed
+  // beside the band. Name them from the words on screen instead.
+  const recordsLabelId = useId();
+  const periodLabelId = useId();
 
   return (
     <header className="atlas__chrome">
@@ -128,15 +121,18 @@ export function AtlasToolbar({
             Find
           </button>
 
-          <button
-            type="button"
-            className={`graph__tool${prefs.showPatterns ? ' graph__tool--accent' : ''}`}
-            onClick={() => onPatchPrefs({ showPatterns: !prefs.showPatterns })}
-            aria-pressed={prefs.showPatterns}
-            title="Show corridor patterns between places"
-          >
-            Patterns
-          </button>
+          {/* `title` is the one explanation of what a corridor pattern is, and
+              it never reaches touch or a keyboard. The tooltip does both. */}
+          <Tooltip content="Show corridor patterns between places">
+            <button
+              type="button"
+              className={`graph__tool${prefs.showPatterns ? ' graph__tool--accent' : ''}`}
+              onClick={() => onPatchPrefs({ showPatterns: !prefs.showPatterns })}
+              aria-pressed={prefs.showPatterns}
+            >
+              Patterns
+            </button>
+          </Tooltip>
 
           {unmappedCount > 0 && (
             <button
@@ -149,75 +145,68 @@ export function AtlasToolbar({
             </button>
           )}
 
-          <div className="lifemap__prefs atlas__more" ref={moreRef}>
-            <button
-              type="button"
-              className={`graph__tool${prefsOpen ? ' graph__tool--accent' : ''}`}
-              onClick={onTogglePrefs}
-              aria-expanded={prefsOpen}
-              aria-haspopup="dialog"
+          <div className="lifemap__prefs atlas__more">
+            {/* Was a bare div dismissed by a document mousedown listener.
+                Escape from one of its checkboxes did nothing, because the
+                view's key handler bails on INPUT, and tabbing past the last
+                row left the panel hanging open over the map. */}
+            <Popover
+              open={prefsOpen}
+              onOpenChange={(o) => (o ? onTogglePrefs() : onClosePrefs())}
+              align="end"
+              trigger={
+                <button
+                  type="button"
+                  className={`graph__tool${prefsOpen ? ' graph__tool--accent' : ''}`}
+                >
+                  More
+                </button>
+              }
             >
-              More
-            </button>
-            {prefsOpen && (
-              <div
-                className="lifemap__prefspanel atlas__prefspanel"
-                role="dialog"
-                aria-label="Atlas more"
-              >
+              <div className="flex flex-col gap-2">
                 <div className="lifemap__prefshead">
                   <span className="lifemap__grouplabel">Display</span>
                   <button type="button" className="lifemap__prefsreset" onClick={onResetPrefs}>
                     Reset
                   </button>
                 </div>
-                <label className="lifemap__prefsrow">
-                  <input
-                    type="checkbox"
-                    checked={prefs.showLabels}
-                    onChange={(e) => onPatchPrefs({ showLabels: e.target.checked })}
-                  />
-                  <span>Show city labels</span>
-                </label>
-                <label className="lifemap__prefsrow">
-                  <input
-                    type="checkbox"
-                    checked={prefs.showArcs}
-                    onChange={(e) => onPatchPrefs({ showArcs: e.target.checked })}
-                  />
-                  <span>Show trip arcs</span>
-                </label>
-                <label className="lifemap__prefsrow">
-                  <input
-                    type="checkbox"
-                    checked={prefs.showPatterns}
-                    onChange={(e) => onPatchPrefs({ showPatterns: e.target.checked })}
-                  />
-                  <span>Show corridor patterns</span>
-                </label>
-                <label className="lifemap__prefsrow">
-                  <input
-                    type="checkbox"
-                    checked={prefs.cluster}
-                    onChange={(e) => onPatchPrefs({ cluster: e.target.checked })}
-                  />
-                  <span>Cluster at low zoom</span>
-                </label>
+                <Checkbox
+                  checked={prefs.showLabels}
+                  onChange={(v) => onPatchPrefs({ showLabels: v })}
+                  label="Show city labels"
+                />
+                <Checkbox
+                  checked={prefs.showArcs}
+                  onChange={(v) => onPatchPrefs({ showArcs: v })}
+                  label="Show trip arcs"
+                />
+                <Checkbox
+                  checked={prefs.showPatterns}
+                  onChange={(v) => onPatchPrefs({ showPatterns: v })}
+                  label="Show corridor patterns"
+                />
+                <Checkbox
+                  checked={prefs.cluster}
+                  onChange={(v) => onPatchPrefs({ cluster: v })}
+                  label="Cluster at low zoom"
+                />
                 <div className="atlas__moreactions">
                   <button type="button" className="graph__tool" onClick={onExportPng}>
                     Export PNG
                   </button>
                 </div>
               </div>
-            )}
+            </Popover>
           </div>
         </div>
       </div>
 
       <div className="atlas__filters">
         <div className="explore-control-band">
-          <span className="explore-control-band__label">Records</span>
-          <div className="lifemap__row" aria-label="Type filters">
+          <span id={recordsLabelId} className="explore-control-band__label">
+            Records
+          </span>
+          <div className="lifemap__row" role="group" aria-labelledby={recordsLabelId}>
             {TYPE_FILTERS.map((f) => (
               <button
                 key={f.label}
@@ -232,8 +221,10 @@ export function AtlasToolbar({
           </div>
         </div>
         <div className="explore-control-band">
-          <span className="explore-control-band__label">Period</span>
-          <div className="lifemap__row" aria-label="Period">
+          <span id={periodLabelId} className="explore-control-band__label">
+            Period
+          </span>
+          <div className="lifemap__row" role="group" aria-labelledby={periodLabelId}>
             <button
               type="button"
               aria-pressed={period === 'all'}
@@ -260,21 +251,27 @@ export function AtlasToolbar({
             </button>
             {period === 'custom' && (
               <span className="atlas__perioddates">
-                <input
-                  type="date"
-                  className="atlas__date"
-                  value={customFrom}
-                  aria-label="From date"
-                  onChange={(e) => onCustomFrom(e.target.value)}
-                />
+                {/* Both ends of the custom period were 21px tall next to 32px
+                    filter buttons, and shrank rather than grew on touch. */}
+                <span className="inline-block w-36">
+                  <Input
+                    type="date"
+                    mono
+                    value={customFrom}
+                    aria-label="From date"
+                    onChange={(e) => onCustomFrom(e.target.value)}
+                  />
+                </span>
                 <span className="u-faint">→</span>
-                <input
-                  type="date"
-                  className="atlas__date"
-                  value={customTo}
-                  aria-label="To date"
-                  onChange={(e) => onCustomTo(e.target.value)}
-                />
+                <span className="inline-block w-36">
+                  <Input
+                    type="date"
+                    mono
+                    value={customTo}
+                    aria-label="To date"
+                    onChange={(e) => onCustomTo(e.target.value)}
+                  />
+                </span>
               </span>
             )}
           </div>
