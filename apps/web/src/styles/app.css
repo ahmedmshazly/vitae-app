@@ -3321,7 +3321,12 @@ button.row {
   text-align: left;
 }
 .rail__capture kbd {
+  /* The keycap sits on the inverted button, so it cannot keep the raised
+     surface it uses everywhere else: that is a dark fill under the dark ink
+     this button inherits, which measured 1.12:1. The border still reads as a
+     keycap. */
   border-color: color-mix(in srgb, var(--ae-accent-ink) 28%, transparent);
+  background: transparent;
   color: inherit;
 }
 .rail__capture:hover {

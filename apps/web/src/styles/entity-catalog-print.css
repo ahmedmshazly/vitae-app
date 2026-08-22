@@ -18,12 +18,15 @@
   box-sizing: border-box;
 }
 
-.ec button,
+/* The reset is for this screen's own bare buttons. `.ec button` outranks
+   `.vt-btn--primary`, so once the toolbars moved onto the shared Button it was
+   painting body ink on the primary fill, which measured 1.17:1. */
+.ec button:not(.vt-btn),
 .ec input {
   font: inherit;
 }
 
-.ec button {
+.ec button:not(.vt-btn) {
   color: inherit;
 }
 
