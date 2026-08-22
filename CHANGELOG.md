@@ -118,6 +118,13 @@ All notable changes are recorded here.
   second record rather than choosing the one the lookup was about to return.
   An answer that has not arrived is not the same as no match, so those rows now
   wait for it, and the field says it is still searching until then.
+- Linking two people who already knew each other wrote a second KNOWS edge
+  beside the first. Every reader takes whichever one the graph lists first, so
+  the person page could show "No favors recorded" over a real ledger, and each
+  warm-intro path through that pair came back twice and pushed the longer paths
+  out of the list. A relationship is one record per pair, so the new fields now
+  fold into the edge that exists, keeping the ones the dialog never showed.
+
 
 ## 1.0.0
 

@@ -15,9 +15,43 @@ async function recomputeKnows(edge: { type: string; src: string; dst: string }):
   await recomputeAndPersistStrength(personId);
 }
 
+/**
+ * The live KNOWS edge for a pair, in whichever direction it was recorded.
+ *
+ * `edgesForNode` rather than the whole graph: this runs on every link.
+ */
+async function knowsBetween(src: string, dst: string) {
+  const edges = await repository.edgesForNode(src);
+  return edges.find(
+    (e) => e.type === 'KNOWS' && (e.src === dst || e.dst === dst) && e.src !== e.dst,
+  );
+}
+
 edgesRouter.post(
   '/',
   asyncHandler(async (req, res) => {
+    // KNOWS is the relationship record for a pair, so there is one of it.
+    // Linking two people who already knew each other used to write a second,
+    // and every reader takes the first one the graph lists: a person page then
+    // showed an empty favor ledger over real favors, and each intro path
+    // through that pair came back twice, crowding out the longer paths. Fold
+    // the new props into the edge that exists instead. Still 201, because the
+    // link the caller asked for does now exist.
+    const body = (req.body ?? {}) as { type?: unknown; src?: unknown; dst?: unknown; props?: unknown };
+    if (body.type === 'KNOWS' && typeof body.src === 'string' && typeof body.dst === 'string') {
+      const existing = await knowsBetween(body.src, body.dst);
+      if (existing) {
+        // Merged, not replaced: the caller sent the fields the dialog showed,
+        // and dropping closeness or favors because a topic was added is the
+        // data loss this whole branch exists to stop.
+        const props = { ...(existing.props ?? {}), ...((body.props ?? {}) as Record<string, unknown>) };
+        const parsed = validateEdgeUpdate(existing.type, { props });
+        if (!parsed.ok) throw new ValidationError('invalid edge update', parsed.errors);
+        const updated = await repository.updateEdge(existing.id, parsed.value, { actor: req.user?.email });
+        await recomputeKnows(updated);
+        return res.status(201).json({ edge: updated });
+      }
+    }
     const edge = await repository.createEdge(req.body, { actor: req.user?.email });
     await recomputeKnows(edge);
     res.status(201).json({ edge });

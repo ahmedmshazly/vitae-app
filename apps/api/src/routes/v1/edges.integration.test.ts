@@ -50,6 +50,54 @@ describe('POST/GET/DELETE /api/v1/edges', () => {
     expect(got.body.edge.type).toBe('KNOWS');
   });
 
+  it('folds a second KNOWS between the same pair into the first', async () => {
+    const { app, token } = await getAuthedApp();
+    const a = await request(app)
+      .post('/api/v1/nodes')
+      .set(authHeader(token))
+      .send(buildNodeCreate({ type: 'person', title: 'Pair Person A' }));
+    const b = await request(app)
+      .post('/api/v1/nodes')
+      .set(authHeader(token))
+      .send(buildNodeCreate({ type: 'person', title: 'Pair Person B' }));
+
+    const first = await request(app)
+      .post('/api/v1/edges')
+      .set(authHeader(token))
+      .send(
+        buildEdgeCreate({
+          type: 'KNOWS',
+          src: a.body.node.id,
+          dst: b.body.node.id,
+          props: { closeness: 4, favors: [{ direction: 'owed_to_me', what: 'intro', settled: false }] },
+        }),
+      );
+    expect(first.status).toBe(201);
+
+    // Same pair, recorded the other way round. Sent the way the Add connection
+    // dialog sends it, carrying only the fields it puts on screen, because that
+    // is what decides whether the rest of the relationship survives. Two KNOWS
+    // edges made every reader pick one of them at random.
+    const second = await request(app)
+      .post('/api/v1/edges')
+      .set(authHeader(token))
+      .send({
+        type: 'KNOWS',
+        src: b.body.node.id,
+        dst: a.body.node.id,
+        props: { topics: ['Business'] },
+        notes_md: '',
+        source: 'manual',
+        confidence: 1,
+      });
+    expect(second.status).toBe(201);
+    expect(second.body.edge.id).toBe(first.body.edge.id);
+    expect(second.body.edge.props.topics).toEqual(['Business']);
+    // …and what the caller did not mention survives.
+    expect(second.body.edge.props.closeness).toBe(4);
+    expect(second.body.edge.props.favors).toHaveLength(1);
+  });
+
   it('rejects an edge with a missing endpoint', async () => {
     const { app, token } = await getAuthedApp();
     const person = await request(app)
