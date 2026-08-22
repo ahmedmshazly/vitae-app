@@ -103,6 +103,11 @@ All notable changes are recorded here.
   underneath it and a node surfacing in the 6px between two buttons came up cut
   into a crescent, reading as a glitch rather than as depth. The strip sits on
   the same ground the canvas already draws its labels on.
+- The people list ran 14px past the right edge of a 390px screen. A row carries
+  the name, the topic chips, the tie strength and the cadence, and the trailing
+  three are held at their natural width, so on a phone there was nowhere for the
+  overflow to go but sideways. The row wraps below 720px: the name takes the
+  first line and the rest fall to a second.
 
 ## 1.0.0
 

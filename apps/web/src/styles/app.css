@@ -703,6 +703,18 @@ button.row {
   text-decoration: none;
   color: inherit;
 }
+@media (max-width: 720px) {
+  /* A phone cannot hold the name, the topic chips, the tie strength and the
+     cadence on one line, and none of the trailing three will shrink, so the
+     list ran 14px past the screen edge. Let them fall to a second line rather
+     than push the page sideways. */
+  .people__link {
+    flex-wrap: wrap;
+  }
+  .people__link > .row__main {
+    flex: 1 0 100%;
+  }
+}
 .people__selectrow {
   opacity: 0.85;
 }
