@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import {
   Button,
   Glyph,
@@ -394,21 +394,27 @@ export function Shell({ children }: { children: ReactNode }) {
             </div>
           )}
 
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={pathname}
-              id="main-content"
-              ref={mainRef}
-              tabIndex={-1}
-              className="content"
-              variants={routeMotion}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
+          {/* Keyed, and deliberately not inside AnimatePresence. `mode="wait"`
+              held the outgoing wrapper on screen until its exit finished, but
+              a wrapper renders whatever `children` is now, and by then that is
+              already the incoming screen. So every navigation mounted the new
+              screen inside the old wrapper, faded it out, destroyed it, and
+              mounted it a second time. Whatever it had done in those 90ms went
+              with it: an open dialog, a typed character, a click that had just
+              landed. The key alone mounts each screen once and still carries
+              it in. */}
+          <motion.div
+            key={pathname}
+            id="main-content"
+            ref={mainRef}
+            tabIndex={-1}
+            className="content"
+            variants={routeMotion}
+            initial="initial"
+            animate="animate"
+          >
+            {children}
+          </motion.div>
         </div>
 
         <div aria-live="polite" aria-atomic="true" className="u-visually-hidden">
