@@ -108,6 +108,10 @@ All notable changes are recorded here.
   three are held at their natural width, so on a phone there was nowhere for the
   overflow to go but sideways. The row wraps below 720px: the name takes the
   first line and the rest fall to a second.
+- The landing page advertised the old interface. Its five captures and both
+  visual baselines were taken before the redesign, under the label "Real
+  interface · fictional demo data". They are fresh captures of the current
+  build against the seeded stack.
 
 ## 1.0.0
 
