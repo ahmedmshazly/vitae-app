@@ -81,6 +81,17 @@ All notable changes are recorded here.
 - A link inside a sentence was told apart from the sentence by its colour alone,
   at 2.41:1 where the rule asks for 3:1. Prose links carry an underline now, so
   the difference is a shape and not only a hue.
+- The topbar controls were painted over the search field. The bar is three grid
+  tracks and the outer two asked for an equal share, which at 1440px came out
+  narrower than the buttons in it; the cluster is right-aligned, so the surplus
+  went leftward across the field. The track is floored at the width of what it
+  holds now, the field yields the exact centre before anything overlaps, and the
+  button labels step aside below 1240px rather than widen the window. The
+  reminders bell had been squeezed to 18px in the same starved track and stands
+  at its full 32px again.
+- The breadcrumb wrapped to a second line inside a 58px bar, because the whole
+  parent trail was one unbreakable run of text. Each part now truncates on its
+  own, and the trail gives way before the page you are on does.
 
 ## 1.0.0
 

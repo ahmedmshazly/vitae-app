@@ -220,11 +220,20 @@
   color: var(--ae-muted);
   font-size: var(--ae-text-md);
 }
-.topbar__crumb .cur {
-  color: var(--ae-fg-strong);
+.topbar__crumb > span {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+/* When the bar is tight the trail gives way before the page you are on does:
+   "Network / Peo… / Profile" still locates you, "Netw… / Pro…" does not. */
+.topbar__crumb > span:not(.cur) {
+  flex: 0 200 auto;
+}
+.topbar__crumb .cur {
+  flex: 0 1 auto;
+  color: var(--ae-fg-strong);
 }
 .topbar__crumb-sep {
   color: var(--ae-faint);
@@ -3365,7 +3374,12 @@ button.row {
 
 .topbar {
   display: grid;
-  grid-template-columns: minmax(150px, 1fr) minmax(240px, 440px) minmax(150px, 1fr);
+  /* The search field sits centred only while the two flanking tracks can stay
+     equal. The right one is floored at the measured width of the buttons in it,
+     never at a guess: when a plain `1fr` share came out narrower than they are,
+     `justify-content: flex-end` sent the surplus leftward and the controls were
+     painted over the search field. The field gives up the exact centre first. */
+  grid-template-columns: minmax(150px, 1fr) minmax(240px, 400px) minmax(max-content, 1fr);
   height: 58px;
   gap: var(--ae-space-4);
   padding: 0 var(--ae-space-5);
@@ -3398,7 +3412,6 @@ button.row {
 }
 .topbar__actions {
   display: flex;
-  min-width: 0;
   align-items: center;
   justify-content: flex-end;
   gap: var(--ae-space-2);
@@ -4009,13 +4022,19 @@ select.input {
   }
 }
 
+@media (max-width: 1240px) {
+  /* Below this the three labelled buttons plus the search field no longer fit
+     the bar without pushing it wider than the window. The glyph, the tooltip
+     and the accessible name all stay. */
+  .topbar__action-label {
+    display: none;
+  }
+}
+
 @media (max-width: 1100px) {
   .topbar {
     grid-template-columns: minmax(120px, 1fr) minmax(180px, 320px) auto;
     padding-inline: var(--ae-space-3);
-  }
-  .topbar__action-label {
-    display: none;
   }
   .workspace-strip {
     grid-template-columns: minmax(0, 1fr) auto;
