@@ -1,12 +1,12 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  Banner,
   Button,
   ConfirmDialog,
   EmptyState,
   EntityGlyph,
-  ErrorState,
   Field,
   Input,
   Modal,
@@ -16,11 +16,11 @@ import {
   RegisterRule,
   Skeleton,
   Section,
-  SkeletonRows,
   StatusTrace,
 } from '@vitae/ui';
 import { tokenizeQuery } from '@vitae/core';
 import { api } from '../lib/api.js';
+import { QueryBoundary } from '../components/QueryBoundary.js';
 import { NEW_ENTITY_MENU_GROUPS, NewEntityMenu } from '../features/forms/NewEntityMenu.js';
 import { useToast } from '../features/Toast.js';
 import { entityHref, entityListHref, typeLabel } from '../lib/entity-href.js';
@@ -48,8 +48,9 @@ export function Collections() {
   const [params, setParams] = useSearchParams();
   const q = params.get('q') ?? '';
   const queryTokens = tokens(q);
+  /** A query the results request will actually run, not just any `?q=`. */
+  const active = q.trim().length > 0;
   const [draft, setDraft] = useState('');
-  const navigate = useNavigate();
   const qc = useQueryClient();
   const { flash } = useToast();
 
@@ -66,7 +67,7 @@ export function Collections() {
   const results = useQuery({
     queryKey: ['collections', q],
     queryFn: () => api.get<{ nodes: NodeLite[] }>(`/nodes?q=${encodeURIComponent(q)}`),
-    enabled: q.trim().length > 0,
+    enabled: active,
   });
 
   function setQuery(next: string) {
@@ -127,12 +128,21 @@ export function Collections() {
       flash(err instanceof Error ? err.message : 'The view could not be deleted.', {
         variant: 'error',
       }),
+    // The dialog used to close in the same tick the request started, so its
+    // busy state could never render and a second press reached a view that
+    // was already going. It closes when the request is actually finished.
+    onSettled: () => setConfirmDeleteView(null),
   });
+
+  /** The one row that is actually going, not every row on the screen. */
+  const deletingViewId = deleteViewM.isPending ? deleteViewM.variables : undefined;
 
   function saveView() {
     const name = viewName.trim();
     if (name) saveViewM.mutate(name);
   }
+
+  const countsError = (counts.error as Error | null)?.message;
 
   return (
     <div className="page explore-library">
@@ -154,7 +164,11 @@ export function Collections() {
               type="button"
               className="coll__chipx"
               onClick={() => removeToken(tok)}
-              aria-label={`remove ${tok}`}
+              aria-label={`Remove filter ${tok}`}
+              // The shared rule sizes this off --ae-control-h-sm (26px), under
+              // the precise-pointer floor. The hit-target token is the right
+              // one and already answers pointer: coarse with 44px.
+              style={{ minWidth: 'var(--ae-hit-target)', minHeight: 'var(--ae-hit-target)' }}
             >
               ×
             </button>
@@ -182,160 +196,216 @@ export function Collections() {
       </form>
 
       <div className="explore-library__trace">
-        {q ? (
+        {active ? (
           <StatusTrace
-            tone={results.isError ? 'danger' : results.isFetching ? 'live' : 'neutral'}
+            tone={results.isError ? 'danger' : results.isFetching || !results.data ? 'live' : 'neutral'}
+            // The boundary below owns the loading label and the failure alert.
+            // Two live regions for one event announce it twice, and the danger
+            // pair interrupted twice.
+            announce={Boolean(results.data) && !results.isFetching && !results.isError}
             label={
               results.isError
                 ? 'Query unavailable'
-                : results.isFetching
-                  ? 'Reading the library'
-                  : `${results.data?.nodes.length ?? 0} matching ${results.data?.nodes.length === 1 ? 'record' : 'records'}`
+                : results.data && !results.isFetching
+                  ? `${results.data.nodes.length} matching ${results.data.nodes.length === 1 ? 'record' : 'records'}`
+                  : 'Reading the library'
             }
             detail={`${queryTokens.length} ${queryTokens.length === 1 ? 'clause' : 'clauses'} · deterministic match`}
           />
         ) : (
           <StatusTrace
-            tone={counts.isError ? 'danger' : counts.isFetching ? 'live' : 'neutral'}
+            tone={counts.isError ? 'danger' : counts.isFetching || !counts.data ? 'live' : 'neutral'}
+            // The count banner is the alert for this failure; the trace keeps
+            // saying it on screen without interrupting a second time.
+            announce={!counts.isError}
             label={
               counts.isError
                 ? 'Library index unavailable'
-                : counts.isFetching
-                  ? 'Reading the library index'
-                  : `${counts.data?.total ?? 0} ${counts.data?.total === 1 ? 'record' : 'records'} indexed`
+                : counts.data && !counts.isFetching
+                  ? `${counts.data.total} ${counts.data.total === 1 ? 'record' : 'records'} indexed`
+                  : 'Reading the library index'
             }
-            detail={`${views.data?.views.length ?? 0} saved ${views.data?.views.length === 1 ? 'view' : 'views'}`}
+            // Coalescing to zero asserted "0 saved views" for the whole pending
+            // phase, and forever after a failure. Say which it is instead.
+            detail={
+              views.isError
+                ? 'saved views unavailable'
+                : views.data
+                  ? `${views.data.views.length} saved ${views.data.views.length === 1 ? 'view' : 'views'}`
+                  : 'saved views loading'
+            }
           />
         )}
       </div>
 
-      {q ? (
+      {active ? (
         <Section title="Matches" meta={results.data?.nodes.length}>
-          {results.isError ? (
-            <ErrorState
-              title="Couldn’t run that query"
-              detail={(results.error as Error | null)?.message}
-              onRetry={() => void results.refetch()}
-            />
-          ) : results.isLoading ? (
-            // Skeletons in the shape of the rows, not a centred spinner.
-            <SkeletonRows rows={5} />
-          ) : (results.data?.nodes.length ?? 0) === 0 ? (
-            <EmptyState
-              glyph="filter"
-              title="No matches"
-              hint="Relax a filter, or check the Trash, deleted records stay recoverable for 30 days."
-              action={
-                <Link className="vt-btn vt-btn--sm" to="/data/trash">
-                  Check Trash
+          <QueryBoundary
+            query={results}
+            skeletonRows={5}
+            loadingLabel="Reading the library"
+            errorTitle="Couldn’t run that query"
+            showRefreshing={false}
+            filtered
+            emptyFiltered={
+              <EmptyState
+                glyph="filter"
+                title="No matches"
+                hint="Relax a filter, or check the Trash, deleted records stay recoverable for 30 days."
+                action={
+                  <Link className="vt-btn vt-btn--sm" to="/data/trash">
+                    Check Trash
+                  </Link>
+                }
+              />
+            }
+          >
+            {(d) =>
+              d.nodes.map((n) => (
+                <Link key={n.id} to={entityHref(n.type, n.id)} className="row">
+                  <EntityGlyph type={n.type} size="sm" accent={n.pinned} />
+                  <div className="row__main">
+                    <div className="row__title">{n.title}</div>
+                    {n.subtitle && <div className="row__sub">{n.subtitle}</div>}
+                  </div>
+                  <ProvenanceChip source={n.source} confidence={n.confidence} />
+                  <Mono className="text-xs text-faint">{n.updated_at.slice(0, 10)}</Mono>
                 </Link>
-              }
-            />
-          ) : (
-            results.data!.nodes.map((n) => (
-              <Link key={n.id} to={entityHref(n.type, n.id)} className="row">
-                <EntityGlyph type={n.type} size="sm" accent={n.pinned} />
-                <div className="row__main">
-                  <div className="row__title">{n.title}</div>
-                  {n.subtitle && <div className="row__sub">{n.subtitle}</div>}
-                </div>
-                <ProvenanceChip source={n.source} confidence={n.confidence} />
-                <Mono className="text-xs text-faint">{n.updated_at.slice(0, 10)}</Mono>
-              </Link>
-            ))
-          )}
+              ))
+            }
+          </QueryBoundary>
         </Section>
       ) : (
         <>
-          {counts.isError ? (
-            <ErrorState
+          {/* A failed tally used to replace every route into the user's own
+              records with an error panel. The register needs no data at all,
+              so the count degrades and the registers stay open. */}
+          {counts.isError && (
+            <Banner
+              tone="danger"
               title="Couldn’t count your records"
-              detail={(counts.error as Error | null)?.message}
-              onRetry={() => void counts.refetch()}
-            />
-          ) : (
-            COLLECTION_TILE_GROUPS.map((group) => (
-              <Section key={group.label} title={group.label}>
-                <div className="explore-library__register">
-                  {group.types.map((type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      className="explore-library__type"
-                      onClick={() => navigate(entityListHref(type))}
-                      aria-label={`Open ${typeLabel(type)} records${counts.data ? `, ${counts.data.counts[type] ?? 0}` : ''}`}
-                    >
-                      <span className="explore-library__type-glyph">
-                        <EntityGlyph type={type} />
-                      </span>
-                      <span className="explore-library__type-copy">
-                        <strong>{typeLabel(type)}</strong>
-                        <span>Open register</span>
-                      </span>
-                      <span className="explore-library__type-count" aria-hidden>
-                        {counts.isLoading ? (
-                          <Skeleton width={20} height={15} />
-                        ) : (
-                          <Mono className="text-md">{counts.data?.counts[type] ?? 0}</Mono>
-                        )}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </Section>
-            ))
+              action={
+                <Button size="sm" onClick={() => void counts.refetch()}>
+                  Retry
+                </Button>
+              }
+            >
+              {countsError ? `${countsError} ` : ''}Every register below still opens.
+            </Banner>
           )}
 
-          {views.isError && (
-            <Section title="Saved views">
-              <ErrorState
-                title="Couldn’t load saved views"
-                detail="The library index is unaffected. Retry to restore the reusable query list."
-                onRetry={() => void views.refetch()}
-              />
-            </Section>
-          )}
-          {(views.data?.views.length ?? 0) > 0 && (
-            <Section title="Saved views" meta={views.data!.views.length}>
-              {views.data!.views.map((v) => (
-                <div key={v.id} className="row explore-library__saved-view">
-                  <button
-                    className="row__main cursor-pointer border-0 bg-transparent p-0 text-left text-ink"
-                    onClick={() => setQuery(v.query)}
+          {COLLECTION_TILE_GROUPS.map((group) => (
+            <Section key={group.label} title={group.label}>
+              <div className="explore-library__register">
+                {group.types.map((type) => (
+                  // A link, not a button: this is the only way into each
+                  // record type from here, and it has to survive a middle
+                  // click, a new tab and a copied address.
+                  <Link
+                    key={type}
+                    to={entityListHref(type)}
+                    className="explore-library__type no-underline"
+                    aria-label={`Open ${typeLabel(type)} records${
+                      counts.data
+                        ? `, ${counts.data.counts[type] ?? 0}`
+                        : counts.isError
+                          ? ', count unavailable'
+                          : ''
+                    }`}
                   >
-                    <div className="row__title">{v.name}</div>
-                    <div className="row__sub u-mono">Lens · {v.query}</div>
-                  </button>
-                  {/* Was a bare × that deleted on click with no confirmation,
-                      no toast and no undo, the only destructive action left
-                      that neither asked nor reported. */}
-                  <Button
-                    size="sm"
-                    variant="danger"
-                    glyph="trash"
-                    aria-label={`Delete view ${v.name}`}
-                    onClick={() => setConfirmDeleteView(v)}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              ))}
+                    <span className="explore-library__type-glyph">
+                      <EntityGlyph type={type} />
+                    </span>
+                    <span className="explore-library__type-copy">
+                      <strong>{typeLabel(type)}</strong>
+                      <span>Open register</span>
+                    </span>
+                    <span className="explore-library__type-count" aria-hidden>
+                      {counts.data ? (
+                        <Mono className="text-md">{counts.data.counts[type] ?? 0}</Mono>
+                      ) : counts.isError ? (
+                        <Mono className="text-md">—</Mono>
+                      ) : (
+                        <Skeleton width={20} height={15} />
+                      )}
+                    </span>
+                  </Link>
+                ))}
+              </div>
             </Section>
-          )}
+          ))}
+
+          {/* The section used to exist only once it already had content, so
+              "still loading" and "you have none" were the same blank stretch
+              of page and the feature was never named to a new user. */}
+          <Section title="Saved views" meta={views.data?.views.length}>
+            <QueryBoundary
+              query={views}
+              skeletonRows={3}
+              loadingLabel="Reading your saved views"
+              errorTitle="Couldn’t load saved views"
+              empty={
+                <EmptyState
+                  glyph="filter"
+                  title="No saved views yet"
+                  hint="Build a query above, then press Save view to pin it here."
+                />
+              }
+            >
+              {(d) =>
+                d.views.map((v) => (
+                  <div key={v.id} className="row explore-library__saved-view">
+                    <button
+                      className="row__main cursor-pointer border-0 bg-transparent p-0 text-left text-ink"
+                      onClick={() => setQuery(v.query)}
+                    >
+                      <div className="row__title">{v.name}</div>
+                      <div className="row__sub u-mono">Lens · {v.query}</div>
+                    </button>
+                    {/* Was a bare × that deleted on click with no confirmation,
+                        no toast and no undo, the only destructive action left
+                        that neither asked nor reported. */}
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      glyph="trash"
+                      // The name carries the state as well as the row. A fixed
+                      // label would have masked the visible "Deleting…" from
+                      // the one reader who cannot see it.
+                      aria-label={
+                        deletingViewId === v.id ? `Deleting view ${v.name}` : `Delete view ${v.name}`
+                      }
+                      disabled={deletingViewId === v.id}
+                      onClick={() => setConfirmDeleteView(v)}
+                    >
+                      {deletingViewId === v.id ? 'Deleting…' : 'Delete'}
+                    </Button>
+                  </div>
+                ))
+              }
+            </QueryBoundary>
+          </Section>
         </>
       )}
       <ConfirmDialog
         open={confirmDeleteView !== null}
-        onOpenChange={(open) => !open && setConfirmDeleteView(null)}
+        onOpenChange={(open) => {
+          // Closing while the request is out would take the only pending
+          // signal off the screen with it.
+          if (!open && !deleteViewM.isPending) setConfirmDeleteView(null);
+        }}
         title={`Delete the view “${confirmDeleteView?.name ?? ''}”?`}
-        body="The records it finds are untouched, only the saved query goes."
+        body={
+          <>
+            The records it finds are untouched, only the saved query goes.
+            {deleteViewM.isPending && <StatusTrace tone="live" label="Deleting the view" />}
+          </>
+        }
         confirmLabel="Delete view"
         destructive
         busy={deleteViewM.isPending}
         onConfirm={() => {
-          const target = confirmDeleteView;
-          setConfirmDeleteView(null);
-          if (target) deleteViewM.mutate(target.id);
+          if (confirmDeleteView) deleteViewM.mutate(confirmDeleteView.id);
         }}
       />
       <Modal

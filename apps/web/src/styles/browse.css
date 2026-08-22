@@ -1,0 +1,222 @@
+/* Search results, the generic browser, repositories and the 404.
+ *
+ * Split out of app.css so a screen's rules sit next to each other rather than
+ * a thousand lines apart. Loaded after app.css, so anything here wins a
+ * specificity tie by source order.
+ */
+
+/* ── Search: the query bar ────────────────────────────────────────────────── */
+/*
+ * The bar itself is now only a layout: the border, the ground and the height
+ * belong to the `Input` primitive inside it. The shape this replaces was a
+ * bordered `.coll__bar` wrapping a borderless `.coll__input` with no height at
+ * all, which meant the one control on the screen that every visit starts with
+ * was the only one in the app not built from the field everything else uses.
+ */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-3);
+  margin-bottom: var(--ae-space-4);
+}
+.search-bar__field {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: center;
+}
+/* Ornament, and marked as such: the field is already labelled "Search query". */
+.search-bar__glyph {
+  position: absolute;
+  left: var(--ae-space-3);
+  display: inline-flex;
+  align-items: center;
+  color: var(--ae-faint);
+  pointer-events: none;
+}
+.search-bar__input {
+  padding-left: calc(var(--ae-space-3) * 2 + 14px);
+}
+.search-bar__timing {
+  flex: none;
+  white-space: nowrap;
+}
+
+/* The parsed clauses, between the bar and the results. */
+.search-clauses {
+  margin-top: var(--ae-space-3);
+  margin-bottom: var(--ae-space-3);
+}
+
+/* ── Search: the filter grammar ───────────────────────────────────────────── */
+.search-grammar__lede {
+  margin-bottom: var(--ae-space-3);
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-sm);
+}
+/*
+ * A ruled register in two columns, not ten bordered cards. Ten boxes at equal
+ * weight is what a list of ten equal things looks like when the list has been
+ * mistaken for a set of panels; the rule does the separating for free and the
+ * examples line up in one mono column you can read down.
+ *
+ * The columns collapse at 900px, which is this app's breakpoint. The grid this
+ * replaces used Tailwind's `md` (768px), a width nothing else on any screen
+ * reacts to, so the grammar changed shape on its own.
+ */
+.search-grammar {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--ae-space-5);
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--ae-border);
+  list-style: none;
+}
+.search-grammar__item {
+  border-bottom: 1px solid var(--ae-border);
+}
+.search-grammar__try {
+  display: grid;
+  grid-template-columns: minmax(0, 15ch) minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--ae-space-3);
+  width: 100%;
+  min-height: var(--ae-hit-target);
+  padding: var(--ae-space-2) 0;
+  border: none;
+  border-radius: var(--ae-radius-sm);
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  transition: color var(--ae-dur) var(--ae-ease);
+}
+.search-grammar__try:hover .search-grammar__example {
+  color: var(--ae-accent);
+}
+.search-grammar__try:focus-visible {
+  outline: none;
+  box-shadow: var(--ae-focus-ring);
+}
+.search-grammar__example {
+  font-size: var(--ae-text-sm);
+  color: var(--ae-fg-strong);
+  transition: color var(--ae-dur) var(--ae-ease);
+}
+.search-grammar__means {
+  font-size: var(--ae-text-sm);
+  color: var(--ae-fg-soft);
+}
+
+@media (max-width: 900px) {
+  .search-grammar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── Lists that used to be a run of sibling divs ──────────────────────────── */
+/*
+ * Search hits, browse records and the repository ledger are all real lists
+ * now, so a screen reader says "list, 12 items" and offers to skip them. The
+ * rows keep their own rules (.vt-row, .row, .data-repo-row); all these need is
+ * the list reset.
+ */
+.search-hits,
+.browse-rows,
+.repo-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ── Repositories: one ledger row ─────────────────────────────────────────── */
+/*
+ * `.data-repo-row` (data-workspace.css) is a three-column grid: index,
+ * checkbox, body. The body used to be the link itself, with the description,
+ * the language, the counts and the provenance chip inside it; they live beside
+ * the link now, which is why the body needs a layout of its own.
+ */
+.repo-row__body {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-3);
+  min-width: 0;
+}
+.repo-row__main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* Block, so the click target is the width of the column rather than the width
+   of the repository's name. */
+.repo-row__link {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ae-fg-strong);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.repo-row__desc {
+  max-width: 72ch;
+  overflow: hidden;
+  color: var(--ae-muted);
+  font-size: var(--ae-text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.repo-row__facts {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  flex: none;
+}
+
+@media (max-width: 900px) {
+  /* The counts are the first thing a narrow row can do without: the language
+     and the provenance are what tell two repositories apart. */
+  .repo-row__count {
+    display: none;
+  }
+}
+
+/* ── Not found ────────────────────────────────────────────────────────────── */
+/*
+ * The way out, as an index of every workspace rather than one button back to
+ * Today. A dead bookmark is usually a person who wanted a place, not the home
+ * page, so the list is built from the same `HUBS` registry the rail is.
+ */
+.notfound-hubs {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--ae-border);
+  border-bottom: 1px solid var(--ae-border);
+  list-style: none;
+}
+.notfound-hubs__glyph {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  color: var(--ae-muted);
+}
+.notfound-hubs__link {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-self: stretch;
+  color: inherit;
+  text-decoration: none;
+}
+.notfound-hubs__link:hover {
+  text-decoration: none;
+}

@@ -73,7 +73,8 @@ describe('person relationship dossier', () => {
     renderPerson();
 
     expect(await screen.findByRole('heading', { name: 'Ada Lovelace' })).toBeInTheDocument();
-    const alert = screen.getByRole('alert');
+    const strength = screen.getByRole('region', { name: 'Relationship strength' });
+    const alert = within(strength).getByRole('alert');
     expect(
       within(alert).getByText('Relationship strength could not be verified'),
     ).toBeInTheDocument();

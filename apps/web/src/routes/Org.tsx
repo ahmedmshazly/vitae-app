@@ -13,6 +13,7 @@ import {
   PageHeader,
   RegisterRule,
   Section,
+  Skeleton,
   SkeletonRows,
   StatusTrace,
   StrengthBar,
@@ -99,16 +100,30 @@ export function Org() {
           title="Couldn’t load this organization"
           detail={(error as Error | null)?.message}
           onRetry={() => void refetch()}
+          retrying={isFetching}
         />
       </div>
     );
   }
   if (isLoading || !data) {
+    // Shaped like the dossier that arrives: a sunken masthead over four fact
+    // cells, then the sections. Five generic rows meant the page changed shape
+    // at the moment the data landed.
     return (
       <div className="page page--network page--organization-dossier">
-        <PageHeader title="Organization" subtitle="Loading…" />
+        <div className="network-dossier network-dossier--organization">
+          <PageHeader title="Organization" subtitle="Loading…" />
+          <div className="network-dossier__facts">
+            {['people', 'affinity', 'roles', 'location'].map((cell) => (
+              <div key={cell} className="grid gap-2">
+                <Skeleton height={11} width="60%" />
+                <Skeleton height={16} width="40%" />
+              </div>
+            ))}
+          </div>
+        </div>
         <RegisterRule />
-        <SkeletonRows rows={5} />
+        <SkeletonRows rows={3} label="Loading organization dossier" />
       </div>
     );
   }
@@ -198,8 +213,8 @@ export function Org() {
           tone="danger"
           title="This organization could not be refreshed"
           action={
-            <Button size="sm" onClick={() => void refetch()}>
-              Retry record
+            <Button size="sm" disabled={isFetching} onClick={() => void refetch()}>
+              {isFetching ? 'Retrying…' : 'Retry record'}
             </Button>
           }
         >
@@ -234,27 +249,36 @@ export function Org() {
             hint="Use Add connection → Related org to record a parent, partner or competitor."
           />
         ) : (
-          org.relatedOrgs.map((r) => (
-            <Link key={r.edgeId} to={entityHref('organization', r.id)} className="row">
-              <EntityGlyph type="organization" size="sm" />
-              <div className="row__main">
-                <div className="row__title">{r.title}</div>
-                <div className="row__sub">
-                  {/* Direction as a word: a bare arrow made the reader work out
-                      which way a parent/subsidiary link pointed. */}
-                  {[
-                    r.direction === 'in'
-                      ? `${orgRelationKindLabel(r.kind)} of this org`
-                      : orgRelationKindLabel(r.kind),
-                    r.note,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')}
-                </div>
-              </div>
-              <Chip mono>{orgRelationKindLabel(r.kind)}</Chip>
-            </Link>
-          ))
+          <ul className="network-rows" aria-label="Related organizations">
+            {org.relatedOrgs.map((r) => (
+              <li key={r.edgeId}>
+                <Link to={entityHref('organization', r.id)} className="row">
+                  <EntityGlyph type="organization" size="sm" />
+                  <div className="row__main">
+                    <div className="row__title">{r.title}</div>
+                    <div className="row__sub">
+                      {/* Direction as a word: a bare arrow made the reader work
+                          out which way a parent/subsidiary link pointed. */}
+                      {[
+                        r.direction === 'in'
+                          ? `${orgRelationKindLabel(r.kind)} of this org`
+                          : orgRelationKindLabel(r.kind),
+                        r.note,
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </div>
+                  </div>
+                  {/* The chip used to repeat the subtitle's own words. It
+                      carries the differentiator instead: which way the link
+                      points. */}
+                  <Chip mono glyph="link">
+                    {r.direction === 'in' ? 'inbound' : 'outbound'}
+                  </Chip>
+                </Link>
+              </li>
+            ))}
+          </ul>
         )}
       </Section>
 
@@ -267,26 +291,37 @@ export function Org() {
               hint="Capture people who work here and Vitae ranks who to ask first."
             />
           ) : (
-            org.inroads.map((i) => (
-              <Link
-                key={i.person.id}
-                to={entityHref('person', i.person.id)}
-                className="row network-inroad"
-              >
-                <Mono className="w-5 text-faint" aria-label={`Rank ${i.rank}`}>
-                  #{i.rank}
-                </Mono>
-                <EntityGlyph type="person" size="sm" />
-                <div className="row__main">
-                  <div className="row__title">{i.person.title}</div>
-                  {i.person.headline && <div className="row__sub">{i.person.headline}</div>}
-                  <div className="network-inroad__reason">Why this inroad · {i.reason}</div>
-                </div>
-                {/* Was accent above 0.6 and muted below, two colours banding a
-                    continuous value. One hue, and the number is always there. */}
-                <StrengthBar value={i.person.strength} label="tie strength" />
-              </Link>
-            ))
+            /* Ordered, because the ranking is the point of this section. */
+            <ol className="network-rows" aria-label="Inroads, strongest first">
+              {org.inroads.map((i) => (
+                <li key={i.person.id}>
+                  <Link to={entityHref('person', i.person.id)} className="row network-inroad">
+                    {/* The marker is drawn rather than rendered by the list,
+                        because the rows are ruled and unbulleted. An aria-label
+                        on a plain span names nothing, so the rank is spoken as
+                        part of the row title instead. */}
+                    <Mono className="w-5 text-faint" aria-hidden="true">
+                      #{i.rank}
+                    </Mono>
+                    <EntityGlyph type="person" size="sm" />
+                    <div className="row__main">
+                      <div className="row__title">
+                        {i.person.title}
+                        <span className="sr-only">
+                          , rank {i.rank} of {org.inroads.length}
+                        </span>
+                      </div>
+                      {i.person.headline && <div className="row__sub">{i.person.headline}</div>}
+                      <div className="network-inroad__reason">Why this inroad · {i.reason}</div>
+                    </div>
+                    {/* Was accent above 0.6 and muted below, two colours banding
+                        a continuous value. One hue, and the number is always
+                        there. */}
+                    <StrengthBar value={i.person.strength} label="tie strength" />
+                  </Link>
+                </li>
+              ))}
+            </ol>
           )}
         </Section>
 
@@ -298,20 +333,24 @@ export function Org() {
               hint="Link a role to record who works here, and which openings you are watching."
             />
           ) : (
-            org.roles.map((r) => (
-              <Link key={r.id} to={entityHref('role', r.id)} className="row">
-                <EntityGlyph type="role" size="sm" />
-                <div className="row__main">
-                  <div className="row__title">{r.title}</div>
-                  <div className="row__sub">{r.holder ?? 'no one on record'}</div>
-                </div>
-                {r.open && (
-                  <Chip tone="accent" mono glyph="role">
-                    open
-                  </Chip>
-                )}
-              </Link>
-            ))
+            <ul className="network-rows" aria-label="Roles">
+              {org.roles.map((r) => (
+                <li key={r.id}>
+                  <Link to={entityHref('role', r.id)} className="row">
+                    <EntityGlyph type="role" size="sm" />
+                    <div className="row__main">
+                      <div className="row__title">{r.title}</div>
+                      <div className="row__sub">{r.holder ?? 'no one on record'}</div>
+                    </div>
+                    {r.open && (
+                      <Chip tone="accent" mono glyph="role">
+                        open
+                      </Chip>
+                    )}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           )}
         </Section>
       </div>

@@ -11,6 +11,7 @@ import {
   EntityGlyph,
   ErrorState,
   FactorChip,
+  Inline,
   Input,
   Mono,
   PageHeader,
@@ -109,6 +110,9 @@ export interface LoggedInteraction {
 
 /** How many rows before the log starts crowding out the rest of the profile. */
 const INTERACTION_PAGE = 10;
+/** Entries shown per profile group, and skills shown, before the group folds. */
+const PROFILE_PAGE = 8;
+const SKILL_PAGE = 24;
 /** Beyond this the rule is a smear, not a scale. */
 const MAX_INTERACTION_TICKS = 40;
 
@@ -207,9 +211,34 @@ export function Person() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [favorNote, setFavorNote] = useState('');
   const [showAllInteractions, setShowAllInteractions] = useState(false);
+  /** Which profile groups the reader has asked to see in full, by group key. */
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const bulk = useBulkEdgeDelete();
   const summaryUnavailable = sum.isError && sum.data === undefined;
   const profileUnavailable = profile.isError && profile.data === undefined;
+
+  /**
+   * The two supporting queries, each of which can fail while still holding a
+   * usable previous answer. They used to raise one `role="alert"` banner each,
+   * so a network blip fired two assertive announcements at once and left two
+   * near-identical Retry buttons to choose between.
+   */
+  const degraded = [
+    {
+      what: 'relationship intelligence',
+      failed: sum.isError && sum.data !== undefined,
+      busy: sum.isFetching,
+      retry: () => void sum.refetch(),
+    },
+    {
+      what: 'profile evidence',
+      failed: profile.isError && profile.data !== undefined,
+      busy: profile.isFetching,
+      retry: () => void profile.refetch(),
+    },
+  ].filter((q) => q.failed);
+  const degradedNames = degraded.map((q) => q.what).join(' and ');
+  const degradedBusy = degraded.some((q) => q.busy);
 
   const addFavor = useMutation({
     mutationFn: (direction: 'owed_to_me' | 'owed_by_me') =>
@@ -267,6 +296,7 @@ export function Person() {
           title="Couldn’t load this person"
           detail={(rec.error as Error | null)?.message}
           onRetry={() => void rec.refetch()}
+          retrying={rec.isFetching}
         />
       </div>
     );
@@ -284,6 +314,11 @@ export function Person() {
   const rel = sum.data?.relationship;
   const favors = sum.data?.favors ?? [];
   const openFavors = favors.filter((f) => !f.settled);
+  /** Past the cadence the user set for this person. */
+  const cadenceOverdue =
+    rel?.cadenceTargetDays != null &&
+    s?.daysSinceLast != null &&
+    s.daysSinceLast > rel.cadenceTargetDays;
 
   const interactions = toInteractionLog(
     edges
@@ -401,40 +436,30 @@ export function Person() {
           tone="danger"
           title="This person could not be refreshed"
           action={
-            <Button size="sm" onClick={() => void rec.refetch()}>
-              Retry record
+            <Button size="sm" disabled={rec.isFetching} onClick={() => void rec.refetch()}>
+              {rec.isFetching ? 'Retrying…' : 'Retry record'}
             </Button>
           }
         >
           Showing the last verified dossier while the latest record is unavailable.
         </Banner>
       )}
-      {sum.isError && sum.data && (
+      {degraded.length > 0 && (
         <Banner
           className="network-secondary-state"
           tone="danger"
-          title="Relationship intelligence is unavailable"
+          title={`Couldn’t refresh ${degradedNames}`}
           action={
-            <Button size="sm" onClick={() => void sum.refetch()}>
-              Retry strength
+            <Button
+              size="sm"
+              disabled={degradedBusy}
+              onClick={() => degraded.forEach((q) => q.retry())}
+            >
+              {degradedBusy ? 'Retrying…' : 'Retry'}
             </Button>
           }
         >
-          Showing the last verified strength, cadence, topics, and favors.
-        </Banner>
-      )}
-      {profile.isError && profile.data && (
-        <Banner
-          className="network-secondary-state"
-          tone="danger"
-          title="Profile evidence is unavailable"
-          action={
-            <Button size="sm" onClick={() => void profile.refetch()}>
-              Retry evidence
-            </Button>
-          }
-        >
-          Showing the last verified career records and skills.
+          Showing the last verified {degradedNames} while the newest answer is unavailable.
         </Banner>
       )}
 
@@ -471,6 +496,7 @@ export function Person() {
                 detail={(sum.error as Error | null)?.message}
                 onRetry={() => void sum.refetch()}
                 retryLabel="Retry strength"
+                retrying={sum.isFetching}
               />
             ) : sum.isLoading ? (
               <SkeletonRows rows={3} label="Loading relationship strength" />
@@ -507,66 +533,86 @@ export function Person() {
                       <small>Recent contact carries more weight.</small>
                     </span>
                   </div>
-                  <div className="stack network-fact-list">
+                  {/* A definition ledger, so every value is programmatically
+                      paired with the label it answers. It was a run of sibling
+                      spans, which a screen reader reads as unrelated text. */}
+                  <dl className="m-0 stack network-fact-list">
                     {rel?.relation && (
                       <div className="spread">
-                        <span className="u-muted">Relation</span>
-                        <Chip>{personRelationLabel(rel.relation)}</Chip>
+                        <dt className="u-muted">Relation</dt>
+                        <dd className="m-0">
+                          <Chip>{personRelationLabel(rel.relation)}</Chip>
+                        </dd>
                       </div>
                     )}
                     <div className="spread">
-                      <span className="u-muted">Closeness</span>
-                      {rel?.edgeId ? (
-                        <button
-                          type="button"
-                          className="person__editable"
-                          // Distinct from the region's own "Edit relationship":
-                          // two controls with the same accessible name in one
-                          // region is ambiguous to anyone navigating by name.
-                          aria-label="Edit closeness"
-                          title="Edit closeness"
-                          onClick={() => setEditingRel(true)}
-                        >
-                          <ClosenessDots value={rel.closeness} />
-                        </button>
-                      ) : (
-                        <ClosenessDots value={rel?.closeness ?? null} />
-                      )}
+                      <dt className="u-muted">Closeness</dt>
+                      <dd className="m-0">
+                        {rel?.edgeId ? (
+                          <button
+                            type="button"
+                            className="person__editable"
+                            // Distinct from the region's own "Edit relationship":
+                            // two controls with the same accessible name in one
+                            // region is ambiguous to anyone navigating by name.
+                            // The rating itself is in the name because an
+                            // aria-label overrides the value the dots state.
+                            aria-label={
+                              rel.closeness != null
+                                ? `Edit closeness, currently ${rel.closeness} of 5`
+                                : 'Edit closeness, not set'
+                            }
+                            title="Edit closeness"
+                            onClick={() => setEditingRel(true)}
+                          >
+                            <ClosenessDots value={rel.closeness} />
+                          </button>
+                        ) : (
+                          <ClosenessDots value={rel?.closeness ?? null} />
+                        )}
+                      </dd>
                     </div>
                     <div className="spread">
-                      <span className="u-muted">Cadence target</span>
-                      <Mono
-                        style={{
-                          color:
-                            rel?.cadenceTargetDays != null &&
-                            s.daysSinceLast != null &&
-                            s.daysSinceLast > rel.cadenceTargetDays
-                              ? 'var(--ae-warning)'
-                              : undefined,
-                        }}
-                      >
-                        {rel?.cadenceTargetDays ? `${rel.cadenceTargetDays}d` : '—'}
-                      </Mono>
+                      <dt className="u-muted">Cadence target</dt>
+                      <dd className="m-0">
+                        {/* Overdue used to be the warning hue on the number and
+                            nothing else, so the most actionable fact on the page
+                            was invisible without colour. */}
+                        <Inline gap={2}>
+                          <Mono>{rel?.cadenceTargetDays ? `${rel.cadenceTargetDays}d` : '—'}</Mono>
+                          {cadenceOverdue && (
+                            <Chip tone="warning" glyph="bell">
+                              overdue
+                            </Chip>
+                          )}
+                        </Inline>
+                      </dd>
                     </div>
                     {s.daysSinceLast != null && (
                       <div className="spread">
-                        <span className="u-muted">Quiet</span>
-                        <Mono>{Math.round(s.daysSinceLast)}d</Mono>
+                        <dt className="u-muted">Quiet</dt>
+                        <dd className="m-0">
+                          <Mono>{Math.round(s.daysSinceLast)}d</Mono>
+                        </dd>
                       </div>
                     )}
                     {s.medianGapDays != null && (
                       <div className="spread">
-                        <span className="u-muted">Median gap</span>
-                        <Mono>{Math.round(s.medianGapDays)}d</Mono>
+                        <dt className="u-muted">Median gap</dt>
+                        <dd className="m-0">
+                          <Mono>{Math.round(s.medianGapDays)}d</Mono>
+                        </dd>
                       </div>
                     )}
                     {rel?.doNotPing && (
                       <div className="spread">
-                        <span className="u-muted">Reconnect</span>
-                        <Chip tone="warning">do not ping</Chip>
+                        <dt className="u-muted">Reconnect</dt>
+                        <dd className="m-0">
+                          <Chip tone="warning">do not ping</Chip>
+                        </dd>
                       </div>
                     )}
-                  </div>
+                  </dl>
                 </div>
               </div>
             ) : (
@@ -586,7 +632,13 @@ export function Person() {
           {/* What this person has actually done - their own records only. */}
           <Section
             title="Profile"
-            meta={profile.data ? `${profile.data.counts.records} records` : '…'}
+            meta={
+              profileUnavailable
+                ? 'unavailable'
+                : profile.data
+                  ? `${profile.data.counts.records} records`
+                  : '…'
+            }
           >
             {profileUnavailable ? (
               <ErrorState
@@ -594,6 +646,7 @@ export function Person() {
                 detail={(profile.error as Error | null)?.message}
                 onRetry={() => void profile.refetch()}
                 retryLabel="Retry evidence"
+                retrying={profile.isFetching}
               />
             ) : profile.isLoading ? (
               <SkeletonRows rows={4} label="Loading profile evidence" />
@@ -607,156 +660,239 @@ export function Person() {
               />
             ) : (
               <div className="stack network-profile-ledger">
-                {(profile.data?.sections ?? []).map((section) => (
-                  <div key={section.type} className="stack network-profile-ledger__group">
-                    <div className="network-profile-ledger__label">
-                      {section.label} <Mono className="u-faint">{section.entries.length}</Mono>
+                {/* Each group is a heading over a real list. It used to be a
+                    plain div over a run of bare links, so the Career/Education/
+                    Skills structure existed only in the pixels. The truncated
+                    tail was inert text; it is a disclosure now. */}
+                {(profile.data?.sections ?? []).map((section) => {
+                  const open = openGroups[section.type] ?? false;
+                  const shown = open ? section.entries : section.entries.slice(0, PROFILE_PAGE);
+                  return (
+                    <div key={section.type} className="stack network-profile-ledger__group">
+                      <h3 className="network-profile-ledger__label">
+                        {section.label} <Mono className="u-faint">{section.entries.length}</Mono>
+                      </h3>
+                      <ul className="network-profile-ledger__entries">
+                        {shown.map((entry) => (
+                          <li key={entry.id}>
+                            <Link
+                              to={entityHref(section.type, entry.id)}
+                              className="spread network-profile-ledger__entry"
+                            >
+                              <span>
+                                {entry.title}
+                                {entry.org ? <span className="u-faint"> · {entry.org}</span> : null}
+                              </span>
+                              <Mono className="u-faint">
+                                {[entry.start_date?.slice(0, 4), entry.end_date?.slice(0, 4)]
+                                  .filter(Boolean)
+                                  .join('–') || '—'}
+                              </Mono>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                      {section.entries.length > PROFILE_PAGE && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          aria-expanded={open}
+                          onClick={() => setOpenGroups((g) => ({ ...g, [section.type]: !open }))}
+                        >
+                          {open
+                            ? `Show first ${PROFILE_PAGE} of ${section.label.toLowerCase()}`
+                            : `Show all ${section.entries.length} of ${section.label.toLowerCase()}`}
+                        </Button>
+                      )}
                     </div>
-                    {section.entries.slice(0, 8).map((entry) => (
-                      <Link
-                        key={entry.id}
-                        to={entityHref(section.type, entry.id)}
-                        className="spread u-link network-profile-ledger__entry"
-                      >
-                        <span>
-                          {entry.title}
-                          {entry.org ? <span className="u-faint"> · {entry.org}</span> : null}
-                        </span>
-                        <Mono className="u-faint">
-                          {[entry.start_date?.slice(0, 4), entry.end_date?.slice(0, 4)]
-                            .filter(Boolean)
-                            .join('–') || '—'}
-                        </Mono>
-                      </Link>
-                    ))}
-                    {section.entries.length > 8 ? (
-                      <span className="network-profile-ledger__more">
-                        + {section.entries.length - 8} more
-                      </span>
-                    ) : null}
-                  </div>
-                ))}
-                {(profile.data?.skills ?? []).length > 0 ? (
-                  <div className="stack network-profile-ledger__group">
-                    <div className="network-profile-ledger__label">
-                      Skills <Mono className="u-faint">{profile.data?.skills.length ?? 0}</Mono>
-                    </div>
-                    <div className="chips">
-                      {(profile.data?.skills ?? []).slice(0, 24).map((s) => (
-                        <Chip key={s.id}>{s.name}</Chip>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
+                  );
+                })}
+                {(profile.data?.skills ?? []).length > 0
+                  ? (() => {
+                      const skills = profile.data?.skills ?? [];
+                      const open = openGroups.skills ?? false;
+                      const shown = open ? skills : skills.slice(0, SKILL_PAGE);
+                      return (
+                        <div className="stack network-profile-ledger__group">
+                          <h3 className="network-profile-ledger__label">
+                            Skills <Mono className="u-faint">{skills.length}</Mono>
+                          </h3>
+                          <ul className="chips network-profile-ledger__skills">
+                            {shown.map((skill) => (
+                              <li key={skill.id}>
+                                <Chip>{skill.name}</Chip>
+                              </li>
+                            ))}
+                          </ul>
+                          {skills.length > SKILL_PAGE && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              aria-expanded={open}
+                              onClick={() => setOpenGroups((g) => ({ ...g, skills: !open }))}
+                            >
+                              {open
+                                ? `Show first ${SKILL_PAGE} skills`
+                                : `Show all ${skills.length} skills`}
+                            </Button>
+                          )}
+                        </div>
+                      );
+                    })()
+                  : null}
               </div>
             )}
           </Section>
 
           {/* Contact + topics */}
           <Section title="Details">
-            <div className="stack network-fact-list">
+            <dl className="m-0 stack network-fact-list">
               <div className="spread">
-                <span className="u-muted">Email</span>
-                <Mono>
-                  {(props.email as string) ?? ((props.emails as string[]) ?? [])[0] ?? '—'}
-                </Mono>
+                <dt className="u-muted">Email</dt>
+                <dd className="m-0">
+                  <Mono>
+                    {(props.email as string) ?? ((props.emails as string[]) ?? [])[0] ?? '—'}
+                  </Mono>
+                </dd>
               </div>
               <div className="spread">
-                <span className="u-muted">Phone</span>
-                <Mono>{(props.phone as string) ?? '—'}</Mono>
+                <dt className="u-muted">Phone</dt>
+                <dd className="m-0">
+                  <Mono>{(props.phone as string) ?? '—'}</Mono>
+                </dd>
               </div>
               <div className="spread">
-                <span className="u-muted">City</span>
-                <Mono>{(props.city as string) ?? '—'}</Mono>
+                <dt className="u-muted">City</dt>
+                <dd className="m-0">
+                  <Mono>{(props.city as string) ?? '—'}</Mono>
+                </dd>
               </div>
-              <div className="spread" style={{ alignItems: 'flex-start' }}>
-                <span className="u-muted">Topics</span>
-                <div className="chips">
+              <div className="spread items-start">
+                <dt className="u-muted">Topics</dt>
+                <dd className="chips m-0">
                   {(rel?.topics ?? []).length === 0 ? (
-                    <span className="u-faint">-</span>
+                    <span className="u-faint">—</span>
                   ) : (
                     (rel?.topics ?? []).map((t) => <Chip key={t}>{t}</Chip>)
                   )}
-                </div>
+                </dd>
               </div>
-            </div>
+            </dl>
           </Section>
 
           {/* Favor ledger */}
+          {/* The ledger reads from the same summary query the strength region
+              guards, and used to render unguarded: while the request was in
+              flight, and permanently after it failed, the header said
+              "balanced" and the body said "No favors recorded" for a person who
+              might owe three. It states only what it has now. */}
           <Section
             title="Favor ledger"
-            meta={openFavors.length ? `${openFavors.length} open` : 'balanced'}
+            meta={
+              summaryUnavailable
+                ? 'unavailable'
+                : sum.isLoading
+                  ? '…'
+                  : openFavors.length
+                    ? `${openFavors.length} open`
+                    : 'balanced'
+            }
           >
-            {favors.length === 0 && (
-              <p className="network-section-note">
-                No favors recorded. Add only a concrete commitment you would be comfortable acting
-                on later.
-              </p>
-            )}
-            {favors.map((f, i) => (
-              <div key={f.id ?? `favor-${i}`} className="row network-favor">
-                {/* Never colour alone: the direction is spelled out. */}
-                <Chip tone={f.direction === 'owed_to_me' ? 'success' : 'warning'}>
-                  {f.direction === 'owed_to_me' ? 'They owe you' : 'You owe them'}
-                </Chip>
-                <div className="row__main">
-                  <div
-                    className="row__title"
-                    style={
-                      f.settled
-                        ? { textDecoration: 'line-through', color: 'var(--ae-faint)' }
-                        : undefined
-                    }
-                  >
-                    {f.what || '(no description)'}
-                  </div>
-                </div>
-                {!f.settled &&
-                  (f.id ? (
-                    <Button
-                      size="sm"
-                      disabled={settleFavor.isPending}
-                      onClick={() => settleFavor.mutate(f.id!)}
-                    >
-                      {settleFavor.isPending && settleFavor.variables === f.id
-                        ? 'Settling…'
-                        : 'Settle'}
-                    </Button>
-                  ) : (
-                    <span
-                      className="font-mono text-xs text-faint"
-                      title="This favor predates the ledger's ids, so there is nothing to address. Re-add it to settle it."
-                    >
-                      not settleable
-                    </span>
-                  ))}
-              </div>
-            ))}
-            <div className="hstack network-favor__composer">
-              <Input
-                className="input"
-                aria-label="Favor description"
-                placeholder="e.g. Owes you an intro to Yara"
-                value={favorNote}
-                onChange={(e) => setFavorNote(e.target.value)}
+            {summaryUnavailable ? (
+              <ErrorState
+                title="The favor ledger could not be verified"
+                detail={(sum.error as Error | null)?.message}
+                onRetry={() => void sum.refetch()}
+                retryLabel="Retry favors"
+                retrying={sum.isFetching}
               />
-              <Button
-                size="sm"
-                disabled={!favorNote.trim() || addFavor.isPending}
-                onClick={() => addFavor.mutate('owed_to_me')}
-              >
-                {addFavor.isPending && addFavor.variables === 'owed_to_me'
-                  ? 'Recording…'
-                  : 'They owe'}
-              </Button>
-              <Button
-                size="sm"
-                disabled={!favorNote.trim() || addFavor.isPending}
-                onClick={() => addFavor.mutate('owed_by_me')}
-              >
-                {addFavor.isPending && addFavor.variables === 'owed_by_me' ? 'Recording…' : 'I owe'}
-              </Button>
-            </div>
+            ) : sum.isLoading ? (
+              <SkeletonRows rows={2} label="Loading favor ledger" />
+            ) : (
+              <>
+                {favors.length === 0 ? (
+                  <p className="network-section-note">
+                    No favors recorded. Add only a concrete commitment you would be comfortable
+                    acting on later.
+                  </p>
+                ) : (
+                  <ul className="network-rows" aria-label="Favors">
+                    {favors.map((f, i) => (
+                      <li key={f.id ?? `favor-${i}`}>
+                        <div className="row network-favor">
+                          {/* Never colour alone: the direction is spelled out. */}
+                          <Chip tone={f.direction === 'owed_to_me' ? 'success' : 'warning'}>
+                            {f.direction === 'owed_to_me' ? 'They owe you' : 'You owe them'}
+                          </Chip>
+                          <div className="row__main">
+                            <div
+                              className={
+                                f.settled ? 'row__title text-faint line-through' : 'row__title'
+                              }
+                            >
+                              {f.what || '(no description)'}
+                            </div>
+                            {!f.settled && !f.id && (
+                              <p className="network-favor__note">
+                                Recorded before the ledger assigned ids, so there is nothing to
+                                address. Re-add it to settle it.
+                              </p>
+                            )}
+                          </div>
+                          {/* A strike-through is not in the accessibility tree,
+                              so a settled favor read exactly like an open one. */}
+                          {f.settled ? (
+                            <Chip tone="success" glyph="check">
+                              settled
+                            </Chip>
+                          ) : f.id ? (
+                            <Button
+                              size="sm"
+                              // Scoped to this row: the shared pending flag
+                              // greyed out every other Settle button too.
+                              disabled={settleFavor.isPending && settleFavor.variables === f.id}
+                              onClick={() => settleFavor.mutate(f.id!)}
+                            >
+                              {settleFavor.isPending && settleFavor.variables === f.id
+                                ? 'Settling…'
+                                : 'Settle'}
+                            </Button>
+                          ) : (
+                            <Chip mono>not settleable</Chip>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className="hstack network-favor__composer">
+                  <Input
+                    aria-label="Favor description"
+                    placeholder="e.g. Owes you an intro to Yara"
+                    value={favorNote}
+                    onChange={(e) => setFavorNote(e.target.value)}
+                  />
+                  <Button
+                    size="sm"
+                    disabled={!favorNote.trim() || addFavor.isPending}
+                    onClick={() => addFavor.mutate('owed_to_me')}
+                  >
+                    {addFavor.isPending && addFavor.variables === 'owed_to_me'
+                      ? 'Recording…'
+                      : 'They owe'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    disabled={!favorNote.trim() || addFavor.isPending}
+                    onClick={() => addFavor.mutate('owed_by_me')}
+                  >
+                    {addFavor.isPending && addFavor.variables === 'owed_by_me'
+                      ? 'Recording…'
+                      : 'I owe'}
+                  </Button>
+                </div>
+              </>
+            )}
           </Section>
         </div>
 
@@ -775,12 +911,12 @@ export function Person() {
               />
             ) : (
               <>
-                <ul className="m-0 list-none p-0">
+                <ul className="network-rows" aria-label="Logged interactions">
                   {shownInteractions.map((i) => (
                     <li key={i.id}>
                       <Link
                         to={entityHref('interaction', i.id)}
-                        className="-mx-2 flex min-h-9 items-center gap-3 rounded-sm border-b border-hairline px-2 py-2 text-ink no-underline last:border-b-0 hover:bg-raised hover:no-underline network-interaction"
+                        className="-mx-2 flex min-h-9 items-center gap-3 rounded-sm px-2 py-2 text-ink no-underline hover:bg-raised hover:no-underline network-interaction"
                       >
                         <EntityGlyph type="interaction" size="sm" />
                         {/* Kind and date were both in the payload and neither
@@ -796,15 +932,19 @@ export function Person() {
                   ))}
                 </ul>
                 {interactions.length > INTERACTION_PAGE && (
-                  <button
-                    type="button"
-                    className="mt-2 min-h-8 text-sm text-muted hover:text-ink-strong"
+                  <Button
+                    className="mt-2"
+                    size="sm"
+                    variant="ghost"
+                    // Was a bare 32px text button with nothing saying whether
+                    // the list was currently truncated.
+                    aria-expanded={showAllInteractions}
                     onClick={() => setShowAllInteractions((v) => !v)}
                   >
                     {showAllInteractions
                       ? 'Show recent only'
                       : `Show all ${interactions.length} interactions`}
-                  </button>
+                  </Button>
                 )}
               </>
             )}

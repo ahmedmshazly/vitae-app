@@ -11,7 +11,9 @@ import {
   Chip,
   EmptyState,
   ErrorState,
+  Field,
   InfoPopover,
+  Input,
   Mono,
   PageHeader,
   ProvenanceChip,
@@ -361,9 +363,10 @@ export function Repositories() {
             onRetry={() => void settings.refetch()}
           />
         ) : settings.isLoading ? (
-          <div role="status" aria-label="Loading GitHub settings">
-            <SkeletonRows rows={3} />
-          </div>
+          // `SkeletonRows` is itself a polite live region with a label. Wrapping
+          // it in a second `role="status"` put two live regions around one
+          // wait, and screen readers announce both.
+          <SkeletonRows rows={3} label="Loading GitHub settings" />
         ) : (
           <div className="data-github-connection">
             <div className="data-github-connection__brief">
@@ -388,13 +391,19 @@ export function Repositories() {
                 if (token.trim() && !saveToken.isPending) saveToken.mutate(token.trim());
               }}
             >
-              <div className="field">
-                <label className="label" htmlFor={tokenId}>
-                  {connection.connected ? 'Replace personal access token' : 'Personal access token'}
-                </label>
-                <input
+              {/* `Field` + `Input`, not a hand-rolled `.field`/`.label`/`.input`
+                  trio. The one-off drew its border from --ae-border-strong,
+                  which is the hairline for *edges*, not for controls: the field
+                  a person is asked to paste a credential into was the faintest
+                  control on the screen. */}
+              <Field
+                label={
+                  connection.connected ? 'Replace personal access token' : 'Personal access token'
+                }
+                htmlFor={tokenId}
+              >
+                <Input
                   id={tokenId}
-                  className="input"
                   type="password"
                   autoComplete="off"
                   spellCheck={false}
@@ -403,7 +412,7 @@ export function Repositories() {
                   onChange={(e) => setToken(e.target.value)}
                   aria-describedby={tokenHelpId}
                 />
-              </div>
+              </Field>
               <div className="data-github-connection__actions">
                 <Button
                   type="submit"
@@ -446,26 +455,33 @@ export function Repositories() {
             detail={(repos.error as Error | null)?.message}
             onRetry={() => void repos.refetch()}
           />
-        ) : repos.isLoading || settings.isLoading ? (
-          <div role="status" aria-label="Loading repositories">
-            <SkeletonRows rows={5} />
-          </div>
+        ) : repos.isLoading ? (
+          // Gated on the repository query alone. It used to wait for Settings
+          // too, so a slow or hanging token check held a list that had already
+          // arrived behind a skeleton, and the ledger reported the state of a
+          // request that has nothing to do with it.
+          <SkeletonRows rows={5} label="Loading repositories" />
         ) : list.length === 0 ? (
           <EmptyState
             glyph="repository"
             title={
               settingsState === 'error'
                 ? 'Repositories unavailable until Settings loads'
-                : connection.connected
+                : settingsState === 'loading' || connection.connected
                   ? 'No repositories yet'
                   : 'Connect GitHub to begin'
             }
             hint={
               settingsState === 'error'
                 ? 'Retry the GitHub settings request above, then sync.'
-                : connection.connected
-                  ? 'Hit “Sync now” to pull your repositories in.'
-                  : 'Add a token above, then sync; your repos and their languages land automatically.'
+                : settingsState === 'loading'
+                  ? // Now that the ledger no longer waits for Settings, it can
+                    // arrive first, and it must not answer a question the token
+                    // check has not answered yet.
+                    'Still checking whether GitHub is connected.'
+                  : connection.connected
+                    ? 'Hit “Sync now” to pull your repositories in.'
+                    : 'Add a token above, then sync; your repos and their languages land automatically.'
             }
             action={
               connection.canSync ? (
@@ -476,51 +492,76 @@ export function Repositories() {
             }
           />
         ) : (
-          <div className="repo-list data-repo-ledger" aria-busy={bulk.deleting}>
+          <div className="data-repo-ledger" aria-busy={bulk.deleting}>
+            {/* Chrome for the ledger, not one of the repositories in it, so it
+                stays outside the list. */}
             <SelectAllRow
               allSelected={allVisibleSelected}
               onToggle={() => bulk.toggleAll(visibleIds, allVisibleSelected)}
             />
-            {list.map((r, index) => {
-              const isSelected = bulk.isSelected(r.id);
-              const name = r.props.full_name ?? r.title;
-              return (
-                <div
-                  key={r.id}
-                  className="row data-repo-row"
-                  data-selected={isSelected || undefined}
-                >
-                  <Mono className="data-ledger-index" aria-hidden>
-                    {String(index + 1).padStart(2, '0')}
-                  </Mono>
-                  <SelectCheckbox
-                    checked={isSelected}
-                    label={`Select ${name}`}
-                    onToggle={() => bulk.toggleOne(r.id)}
-                  />
-                  <Link
-                    to={entityHref('repository', r.id)}
-                    className="people__link data-repo-link"
-                    aria-label={`Open ${name}`}
+            <ul className="repo-rows">
+              {list.map((r, index) => {
+                const isSelected = bulk.isSelected(r.id);
+                const name = r.props.full_name ?? r.title;
+                return (
+                  <li
+                    key={r.id}
+                    className="row data-repo-row"
+                    data-selected={isSelected || undefined}
                   >
-                    <div className="row__main">
-                      <div className="row__title">
-                        {name} {r.props.is_private && <Chip mono>private</Chip>}
+                    <Mono className="data-ledger-index" aria-hidden>
+                      {String(index + 1).padStart(2, '0')}
+                    </Mono>
+                    <SelectCheckbox
+                      checked={isSelected}
+                      label={`Select ${name}`}
+                      onToggle={() => bulk.toggleOne(r.id)}
+                    />
+                    <div className="repo-row__body">
+                      <div className="repo-row__main">
+                        {/*
+                          The link is the name and nothing else now. It used to
+                          wrap the description, the language, the star and fork
+                          counts and the provenance chip, and then name itself
+                          `Open jordan/vitae` with an aria-label, so every one
+                          of those facts was announced as nothing at all: an
+                          aria-label replaces an element's contents in the
+                          accessible name, it does not sit beside them. The
+                          label stays, because `Open jordan/vitae` is the right
+                          name for this link; what changed is that it no longer
+                          has five facts underneath it to erase.
+                        */}
+                        <Link
+                          to={entityHref('repository', r.id)}
+                          className="repo-row__link"
+                          aria-label={`Open ${name}`}
+                        >
+                          {name}
+                        </Link>
+                        {r.props.description && (
+                          <span className="repo-row__desc">{r.props.description}</span>
+                        )}
                       </div>
-                      {r.props.description && <div className="row__sub">{r.props.description}</div>}
+                      <div className="repo-row__facts">
+                        {r.props.is_private && <Chip mono>private</Chip>}
+                        {r.props.primary_language && <Chip mono>{r.props.primary_language}</Chip>}
+                        {typeof r.props.stars === 'number' && r.props.stars > 0 && (
+                          <Mono className="repo-row__count text-xs text-faint">
+                            {r.props.stars} stars
+                          </Mono>
+                        )}
+                        {typeof r.props.forks === 'number' && r.props.forks > 0 && (
+                          <Mono className="repo-row__count text-xs text-faint">
+                            {r.props.forks} forks
+                          </Mono>
+                        )}
+                        <ProvenanceChip source={r.source} />
+                      </div>
                     </div>
-                    {r.props.primary_language && <Chip mono>{r.props.primary_language}</Chip>}
-                    {typeof r.props.stars === 'number' && r.props.stars > 0 && (
-                      <Mono className="u-faint">{r.props.stars} stars</Mono>
-                    )}
-                    {typeof r.props.forks === 'number' && r.props.forks > 0 && (
-                      <Mono className="u-faint">{r.props.forks} forks</Mono>
-                    )}
-                    <ProvenanceChip source={r.source} />
-                  </Link>
-                </div>
-              );
-            })}
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         )}
       </Section>

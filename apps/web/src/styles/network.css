@@ -98,8 +98,26 @@
   gap: var(--ae-space-6);
 }
 
+.network-dossier__evidence,
 .network-dossier__activity {
   min-width: 0;
+}
+
+/* ── Ruled lists ───────────────────────────────────────────────────────── */
+/*
+ * A semantic list whose rows are each the only child of their list item.
+ * `.row` drops its own rule on `:last-child`, and inside an `li` every row is
+ * a last child, so the ruling is restored here and taken off only the row that
+ * really ends the list.
+ */
+.network-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.network-rows > li:not(:last-child) > * {
+  border-bottom: 1px solid var(--ae-border);
 }
 
 .network-strength {
@@ -177,6 +195,24 @@
   font-size: var(--ae-text-sm);
 }
 
+.network-profile-ledger__entries,
+.network-profile-ledger__skills {
+  display: flex;
+  gap: var(--ae-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.network-profile-ledger__entries {
+  flex-direction: column;
+}
+
+.network-profile-ledger__skills {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 .network-profile-ledger__entry {
   min-height: 34px;
   gap: var(--ae-space-3);
@@ -184,18 +220,36 @@
   border-bottom: 1px solid var(--ae-border);
 }
 
+/* Tone only, and no underline: the row link spans a title, an org and a year
+   range, and underlining all three at once reads as damage. The `u-link` class
+   the entry used to carry to suppress it is defined in no stylesheet. */
+.network-profile-ledger__entry,
+.network-profile-ledger__entry:hover {
+  color: var(--ae-fg);
+  text-decoration: none;
+}
+
+.network-profile-ledger__entry:hover {
+  background: var(--ae-surface-raised);
+}
+
 .network-profile-ledger__entry > span:first-child {
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
-.network-profile-ledger__more {
-  color: var(--ae-faint);
-  font-size: var(--ae-text-sm);
-}
-
 .network-favor {
   padding: var(--ae-space-2);
+}
+
+/* Why a favor has no Settle control. It lived in a `title` on a non-focusable
+   span, which no keyboard reaches and most screen readers never read. */
+.network-favor__note {
+  max-width: 60ch;
+  margin: 3px 0 0;
+  color: var(--ae-faint);
+  font-size: var(--ae-text-xs);
+  line-height: var(--ae-leading-normal);
 }
 
 .network-favor__composer {

@@ -8,11 +8,14 @@ import {
   EntityGlyph,
   ErrorState,
   FilterGroup,
+  Glyph,
   InfoPopover,
+  Input,
   Mono,
   PageHeader,
   ProvenanceChip,
   RegisterRule,
+  Row,
   Section,
   SkeletonRows,
   StrengthBar,
@@ -203,45 +206,72 @@ export function SearchResults() {
           a form you cannot read a number off, is decoration. */}
       <RegisterRule />
 
-      {/* A search landmark, so the query bar is a place a screen reader can
-          jump to rather than a stray input in the page flow. */}
-      <div role="search" className="coll__bar">
+      {/*
+        A form, not a `div role="search"`. The landmark was right; the element
+        under it was not. A form submits, so Enter runs the search this instant
+        instead of waiting out the 250ms typing debounce, and the field inside
+        it is the shipped `Input` rather than a borderless one-off that stood
+        22px tall and matched nothing else in the app.
+      */}
+      <form
+        role="search"
+        className="search-bar"
+        onSubmit={(e) => {
+          e.preventDefault();
+          applyQuery(draft);
+        }}
+      >
         <label htmlFor="search-q" className="u-visually-hidden">
           Search query
         </label>
-        <span className="u-faint" aria-hidden>
-          ⌕
+        <span className="search-bar__field">
+          <span className="search-bar__glyph" aria-hidden>
+            <Glyph name="search" size={14} />
+          </span>
+          <Input
+            id="search-q"
+            ref={inputRef}
+            mono
+            className="search-bar__input"
+            autoFocus
+            placeholder="Search titles, notes, documents…"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+          />
         </span>
-        <input
-          id="search-q"
-          ref={inputRef}
-          className="coll__input"
-          autoFocus
-          placeholder="Search titles, notes, documents…"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-        />
         {q && (
-          <Mono className="text-xs text-muted whitespace-nowrap">
+          <Mono className="search-bar__timing text-xs text-muted">
             {searching ? 'searching…' : search.data ? `${search.data.ms} ms` : ''}
           </Mono>
         )}
-      </div>
+      </form>
 
       {parsed && (
-        <div className="chips mt-2 mb-2">
+        <div className="search-clauses chips">
+          {/*
+            Real `Chip`s. These were a hand-built `.coll__chip` with a `×` in a
+            `.coll__chipx` that computed to roughly 8 by 13 pixels: a target a
+            quarter of the identity's floor, sitting one line above invalid
+            clauses that *were* rendered as `Chip`s, so the same row of the same
+            screen spoke two dialects of the same idea.
+          */}
           {ast!.clauses.map((c, i) => (
-            <span key={i} className="coll__chip">
+            <Chip key={`${c.raw}-${i}`} tone="accent" mono>
               {c.field}:{c.value}
               <button
                 type="button"
-                className="coll__chipx"
+                // The system's own remove affordance, which carries the 32/44px
+                // target as a pseudo-element rather than as box size. `Chip`'s
+                // built-in `onRemove` would have been the obvious move, but it
+                // hardcodes the label "Remove", and five chips called "Remove"
+                // are five identical rows in a screen reader's control list.
+                className="vt-chip__x"
                 onClick={() => applyQuery(dropToken(q, c.raw))}
                 aria-label={`Remove filter ${c.raw}`}
               >
-                ×
+                <Glyph name="close" size={12} />
               </button>
-            </span>
+            </Chip>
           ))}
           {/* The reason was a `title` tooltip, which is to say it was invisible
               to keyboards, touch and screen readers alike, the one audience
@@ -256,22 +286,30 @@ export function SearchResults() {
 
       {!q ? (
         <Section title="Filter grammar" meta={SEARCH_GRAMMAR.length}>
-          <p className="mb-3 text-sm text-ink-soft">
+          <p className="search-grammar__lede">
             Type words to search everything, or narrow with a filter. Pick one to try it.
           </p>
-          <div className="grid gap-2 md:grid-cols-2">
+          {/*
+            A ruled register, not ten bordered cards in a two-column grid. The
+            cards drew ten boxes of equal weight for what is really one list of
+            ten equal things, and they reflowed at Tailwind's `md` (768px),
+            which is not one of this app's breakpoints, so the grammar changed
+            shape at a width nothing else on the screen reacts to.
+          */}
+          <ul className="search-grammar">
             {SEARCH_GRAMMAR.map((g) => (
-              <button
-                key={g.field}
-                type="button"
-                className="flex cursor-pointer items-baseline gap-3 rounded border border-hairline bg-surface px-3 py-2 text-left hover:border-strong"
-                onClick={() => applyQuery(g.example)}
-              >
-                <Mono className="text-xs text-ink">{g.example}</Mono>
-                <span className="text-xs text-ink-soft">{g.means}</span>
-              </button>
+              <li key={g.field} className="search-grammar__item">
+                <button
+                  type="button"
+                  className="search-grammar__try"
+                  onClick={() => applyQuery(g.example)}
+                >
+                  <Mono className="search-grammar__example">{g.example}</Mono>
+                  <span className="search-grammar__means">{g.means}</span>
+                </button>
+              </li>
             ))}
-          </div>
+          </ul>
         </Section>
       ) : (
         <Section
@@ -290,7 +328,7 @@ export function SearchResults() {
               onRetry={() => void search.refetch()}
             />
           ) : search.isLoading ? (
-            <SkeletonRows rows={5} />
+            <SkeletonRows rows={5} label="Running your search" />
           ) : hits.length === 0 ? (
             <EmptyState
               glyph="search"
@@ -303,26 +341,37 @@ export function SearchResults() {
             // a count, so narrowing can never empty the list. Offering a filter
             // that matches nothing is the bug; handling its aftermath is not a
             // feature.
-            shown.map((h) => (
-              <Link key={h.id} to={entityHref(h.type, h.id)} className="row">
-                <EntityGlyph type={h.type} size="sm" />
-                <div className="row__main">
-                  <div className="row__title">{h.title}</div>
-                  <div className="row__sub">{rowSubtitle(h)}</div>
-                </div>
-                {h.owner && (
-                  <Chip glyph="person" tone={h.owner.isSelf ? 'accent' : 'default'}>
-                    {h.owner.isSelf ? 'you' : h.owner.title}
-                  </Chip>
-                )}
-                {/* Provenance and date are the whole point of the row: they are
-                    what tells a Sarah Chen you typed from a Sarah Chen a vCard
-                    brought in. */}
-                <ProvenanceChip source={h.source} confidence={h.confidence} />
-                <Mono className="text-xs text-faint">{h.updated_at.slice(0, 10)}</Mono>
-                {top > 0 && <StrengthBar value={h._score / top} label="Relevance, share of the top match" />}
-              </Link>
-            ))
+            <ul className="search-hits">
+              {shown.map((h) => (
+                <Row
+                  key={h.id}
+                  as="li"
+                  interactive
+                  leading={<EntityGlyph type={h.type} size="sm" />}
+                  // Only the title and the subtitle are the link. The whole row
+                  // used to be one `<a>`, so its accessible name was the glyph,
+                  // the title, the subtitle, the owner, the provenance, the
+                  // date and the strength bar's hidden label run together as
+                  // one string, and the facts that tell two identical titles
+                  // apart were unreachable as separate things.
+                  main={(p) => <Link {...p} to={entityHref(h.type, h.id)} />}
+                  title={h.title}
+                  subtitle={rowSubtitle(h)}
+                  meta={<Mono className="text-xs text-faint">{h.updated_at.slice(0, 10)}</Mono>}
+                >
+                  {h.owner && (
+                    <Chip glyph="person" tone={h.owner.isSelf ? 'accent' : 'default'}>
+                      {h.owner.isSelf ? 'you' : h.owner.title}
+                    </Chip>
+                  )}
+                  {/* Provenance and date are the whole point of the row: they are
+                      what tells a Sarah Chen you typed from a Sarah Chen a vCard
+                      brought in. */}
+                  <ProvenanceChip source={h.source} confidence={h.confidence} />
+                  {top > 0 && <StrengthBar value={h._score / top} label="Relevance, share of the top match" />}
+                </Row>
+              ))}
+            </ul>
           )}
         </Section>
       )}
