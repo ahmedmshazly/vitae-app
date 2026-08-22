@@ -69,6 +69,12 @@ ENV TEMPLATES_DIR=/app/templates
 RUN node dist/calibrate.js
 RUN --network=none node dist/calibrate.js --only-cached
 
+# Same npm/tar removal as apps/api/Dockerfile, and for the same CVE. It sits
+# after `npm ci --omit=dev` and after both calibrate runs, which invoke node
+# directly; entrypoint.sh is /bin/sh plus `exec node dist/server.js`, so
+# nothing here needs npm once the dependency tree is installed.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
+
 # Runtime cache lives on tmpfs; the entrypoint seeds it from the image.
 ENV TECTONIC_CACHE_SEED=/app/.tectonic-cache-image
 ENV TECTONIC_CACHE_DIR=/tmp/.tectonic-cache

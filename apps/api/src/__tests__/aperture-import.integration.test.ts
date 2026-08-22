@@ -17,6 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import type { Express } from 'express';
+import { requireSessionToken } from './helpers/app.js';
 
 // Never conditionally skipped: vitest.global-setup.ts refuses to start without
 // Postgres, so an unreachable database fails the run instead of quietly
@@ -91,7 +92,7 @@ d('Aperture bundle import (integration)', () => {
     process.env.AUTH_ENABLE_DEV_LOGIN = 'true';
     const { createApp } = await import('../app.js');
     app = createApp();
-    token = (await request(app).post('/api/v1/auth/dev-login')).body.token;
+    token = requireSessionToken(await request(app).post('/api/v1/auth/dev-login'));
 
     await purgeApertureRecords();
   }, 60_000);

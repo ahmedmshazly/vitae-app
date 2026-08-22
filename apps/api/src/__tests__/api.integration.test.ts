@@ -9,6 +9,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import type { Express } from 'express';
+import { requireSessionToken } from './helpers/app.js';
 
 const d = describe;
 
@@ -21,7 +22,7 @@ d('Vitae API (integration)', () => {
     const { createApp } = await import('../app.js');
     app = createApp();
     const res = await request(app).post('/api/v1/auth/dev-login');
-    token = res.body.token;
+    token = requireSessionToken(res);
   });
 
   afterAll(async () => {
