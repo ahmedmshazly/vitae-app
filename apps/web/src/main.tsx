@@ -49,9 +49,16 @@ import { flashToast } from './features/Toast.js';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: false, staleTime: 5_000, refetchOnWindowFocus: false } },
-  // No mutation may fail silently, anything without a local onError surfaces here.
+  // No mutation may fail silently, anything without a local onError surfaces
+  // here. This net runs alongside a local handler rather than instead of one,
+  // so every mutation that already reported its own failure said the same
+  // sentence twice, in two toasts, stacked. A mutation that names its failure
+  // owns that report.
   mutationCache: new MutationCache({
-    onError: (err) => flashToast(err instanceof Error ? err.message : 'Something went wrong'),
+    onError: (err, _vars, _ctx, mutation) => {
+      if (mutation.options.onError) return;
+      flashToast(err instanceof Error ? err.message : 'Something went wrong');
+    },
   }),
 });
 

@@ -248,8 +248,14 @@ export function Dashboard() {
       }
       return { prev };
     },
-    onError: (_e, _id, ctx) => {
+    onError: (err, _id, ctx) => {
       if (ctx?.prev) qc.setQueryData(['dashboard'], ctx.prev);
+      // The tick sliding back is a change, not an explanation. Owning an
+      // onError opts this mutation out of the app's error toast, so say why
+      // here or the failure passes as a misclick.
+      flash(err instanceof Error ? err.message : 'That habit could not be marked.', {
+        variant: 'error',
+      });
     },
     onSettled: () => void qc.invalidateQueries({ queryKey: ['dashboard'] }),
   });
