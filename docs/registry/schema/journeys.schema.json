@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vitae.invalid/registry/journeys.schema.json",
+  "title": "Vitae journey register",
+  "type": "object",
+  "required": ["note", "status_vocabulary", "journeys"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "note": { "type": "string", "minLength": 1 },
+    "status_vocabulary": { "type": "object", "additionalProperties": { "type": "string" } },
+    "journeys": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "statement", "status", "capabilities", "target", "e2e", "note"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^J[0-9]{1,2}$" },
+          "title": { "type": ["string", "null"], "minLength": 1 },
+          "statement": { "type": ["string", "null"], "minLength": 1 },
+          "status": { "enum": ["verified", "partial", "unknown"] },
+          "capabilities": { "type": "array", "items": { "type": "string", "pattern": "^CAP-[A-Z-]+$" } },
+          "target": { "type": ["string", "null"], "minLength": 1 },
+          "e2e": { "type": "array", "items": { "type": "string", "pattern": "^[^/].*" } },
+          "note": { "type": ["string", "null"], "minLength": 1 }
+        },
+        "allOf": [
+          {
+            "description": "An unknown journey records no statement, no capabilities and no coverage, and must explain the gap.",
+            "if": { "properties": { "status": { "const": "unknown" } } },
+            "then": {
+              "properties": {
+                "title": { "type": "null" }, "statement": { "type": "null" },
+                "capabilities": { "maxItems": 0 }, "e2e": { "maxItems": 0 },
+                "note": { "type": "string" }
+              }
+            }
+          },
+          {
+            "description": "A verified journey must name a statement and the test that proves it.",
+            "if": { "properties": { "status": { "const": "verified" } } },
+            "then": {
+              "properties": {
+                "title": { "type": "string" }, "statement": { "type": "string" },
+                "e2e": { "minItems": 1 }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

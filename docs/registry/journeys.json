@@ -1,0 +1,105 @@
+{
+  "$schema": "./schema/journeys.schema.json",
+  "note": "Curated journey register. Only J1, J4 and J8 are named anywhere in the repository: in the header and test titles of e2e/tests/journeys.spec.ts, in two API integration test titles, and in the continuous-integration step that runs them. The numbering implies five further journeys. They are listed here with status unknown so that the gap is discoverable, and no statement is invented for them. This is DOC-D-029 in docs/observatory/meta/coverage-and-contradictions.md.",
+  "status_vocabulary": {
+    "verified": "Named in the repository and exercised end to end by a browser test that runs in continuous integration.",
+    "partial": "Named in the repository with some steps covered by tests.",
+    "unknown": "Implied by numbering only. No source in the repository states what this journey is."
+  },
+  "journeys": [
+    {
+      "id": "J1",
+      "title": "Capture a person in under a minute",
+      "statement": "From anywhere in the application, the operator opens the capture line, types one line naming a person with an organization, tags, a date and a note, sees the parse previewed as chips, commits it, and finds the new record through the quick-switcher.",
+      "status": "verified",
+      "capabilities": [
+        "CAP-CAPTURE",
+        "CAP-SEARCH"
+      ],
+      "target": "The whole journey completes within sixty seconds.",
+      "e2e": [
+        "e2e/tests/journeys.spec.ts"
+      ],
+      "note": "The sixty-second target is stated in the header of e2e/tests/journeys.spec.ts. The test asserts the steps complete, not the elapsed time, so the target is documented intent rather than an enforced budget."
+    },
+    {
+      "id": "J2",
+      "title": null,
+      "statement": null,
+      "status": "unknown",
+      "capabilities": [],
+      "target": null,
+      "e2e": [],
+      "note": "Implied by the numbering of J1, J4 and J8. No document, test or comment in the repository names this journey. Recorded as a gap rather than reconstructed, because inventing a journey statement would be indistinguishable from inventing a product claim."
+    },
+    {
+      "id": "J3",
+      "title": null,
+      "statement": null,
+      "status": "unknown",
+      "capabilities": [],
+      "target": null,
+      "e2e": [],
+      "note": "Implied by the numbering of J1, J4 and J8. No document, test or comment in the repository names this journey."
+    },
+    {
+      "id": "J4",
+      "title": "Turn a job description into a tailored resume",
+      "statement": "The operator opens the tailoring surface, starts a target session, pastes a job description, lets the parsed keywords score and select evidence against the one-page budget, and compiles a PDF.",
+      "status": "verified",
+      "capabilities": [
+        "CAP-RESUME"
+      ],
+      "target": null,
+      "e2e": [
+        "e2e/tests/journeys.spec.ts"
+      ],
+      "note": null
+    },
+    {
+      "id": "J5",
+      "title": null,
+      "statement": null,
+      "status": "unknown",
+      "capabilities": [],
+      "target": null,
+      "e2e": [],
+      "note": "Implied by the numbering of J1, J4 and J8. No document, test or comment in the repository names this journey."
+    },
+    {
+      "id": "J6",
+      "title": null,
+      "statement": null,
+      "status": "unknown",
+      "capabilities": [],
+      "target": null,
+      "e2e": [],
+      "note": "Implied by the numbering of J1, J4 and J8. No document, test or comment in the repository names this journey."
+    },
+    {
+      "id": "J7",
+      "title": null,
+      "statement": null,
+      "status": "unknown",
+      "capabilities": [],
+      "target": null,
+      "e2e": [],
+      "note": "Implied by the numbering of J1, J4 and J8. No document, test or comment in the repository names this journey."
+    },
+    {
+      "id": "J8",
+      "title": "Recover a deleted record from trash",
+      "statement": "The operator deletes a record, finds it in trash, restores it, and sees the record and the edges hidden with it return intact.",
+      "status": "verified",
+      "capabilities": [
+        "CAP-ORGANIZE",
+        "CAP-DATA-CORE"
+      ],
+      "target": null,
+      "e2e": [
+        "e2e/tests/journeys.spec.ts"
+      ],
+      "note": "Also asserted at the API level by apps/api/src/__tests__/api.integration.test.ts, which records the soft-delete and restore operations."
+    }
+  ]
+}

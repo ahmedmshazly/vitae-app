@@ -1,0 +1,1095 @@
+{
+  "$schema": "./schema/requirements.schema.json",
+  "note": "Curated requirement register. docs/specs/srs.md defines no identifiers, so every statement here is recovered from the code, tests, workflows and roadmap rows that cite the identifier. Identifiers are adopted verbatim and are never renumbered, because renumbering would invalidate live citations across source and continuous integration. Every entry carries review \"needs-review\": the statements are evidenced, but none has been confirmed against an authored specification, because none survives.",
+  "provenance_vocabulary": {
+    "reconstructed": "A statement recovered from at least one citation that names this identifier and describes a single behavior.",
+    "unrecoverable": "The identifier is asserted by a grouped or ranged citation, but no individual statement can be attributed without inventing the split. No statement is recorded."
+  },
+  "implementation_status_vocabulary": {
+    "implemented": "Enforced by shipped code in this repository.",
+    "partial": "Partly enforced, with a stated remainder.",
+    "planned": "Recorded as intent only.",
+    "unknown": "No evidence either way in this repository."
+  },
+  "id_aliases": {
+    "VIS-001": "FR-VIS-001",
+    "VIS-002": "FR-VIS-002",
+    "VIS-003": "FR-VIS-003",
+    "EXP-012": "FR-EXP-012",
+    "EXP-013": "FR-EXP-013",
+    "IMP-001": "FR-IMP-001",
+    "IMP-002": "FR-IMP-002",
+    "IMP-003": "FR-IMP-003",
+    "IMP-004": "FR-IMP-004",
+    "IMP-005": "FR-IMP-005",
+    "IMP-006": "FR-IMP-006"
+  },
+  "alias_note": "docs/ROADMAP.md writes three families without the FR- prefix. VIS and EXP are normalized to FR-VIS and FR-EXP because both families use the prefixed form in source. IMP has no prefixed form anywhere, so FR-IMP is this register inferring the family prefix from its two siblings; the inference is recorded here rather than silently applied.",
+  "families": {
+    "INT": {
+      "title": "Interface and integration requirements",
+      "numbering": "One to three digits, without zero padding, unlike the FR and NFR families.",
+      "note": "Declared explicitly so the citation reader recognizes it. The reader will not accept an open LETTERS-digits pattern, because the repository is full of tokens shaped like one: SHA-256, RFC-822, ISO-8601."
+    }
+  },
+  "unmodelled_markers": [
+    {
+      "marker": "T1, T5",
+      "cited_at": [
+        "apps/api/src/middleware/auth.ts:2",
+        "apps/api/src/services/storage/adapter.ts:2"
+      ],
+      "observation": "T1 is cited beside SRS INT-1 and FR-SET-001 in the authentication middleware; T5 beside SRS INT-5 in the storage adapter. Two members of one shape, each attached to a different subsystem boundary, which suggests a threat or trust-boundary numbering. Two citations still cannot establish what the family asserts, and a single letter followed by a digit cannot be harvested without matching unrelated text throughout the repository. Recorded so the markers are discoverable rather than silently dropped."
+    }
+  ],
+  "numbering_gaps": [
+    {
+      "range": "FR-024",
+      "observation": "No citation anywhere in the repository. A single gap inside an otherwise contiguous FR-001 to FR-027 block."
+    },
+    {
+      "range": "FR-028 to FR-101",
+      "observation": "No citations. The FR-1xx identifiers form a separate later block, so the intervening numbers were most likely never allocated."
+    },
+    {
+      "range": "FR-101, FR-103",
+      "observation": "No citations. FR-102, FR-104 and FR-105 are all performance or scale constraints, which suggests a contiguous FR-1xx performance block whose other members are unallocated or uncited."
+    },
+    {
+      "range": "FR-CAP-006, FR-CAP-007",
+      "observation": "No citations. FR-CAP-008 is cited, so the family extends past the gap."
+    },
+    {
+      "range": "FR-EXP-001 to FR-EXP-009, FR-EXP-011",
+      "observation": "No citations. The lowest cited member of the family is FR-EXP-010."
+    },
+    {
+      "range": "FR-ORG-003, FR-ORG-004, FR-ORG-006",
+      "observation": "No citations. FR-ORG-005, FR-ORG-007 and FR-ORG-008 are cited, so the family extends past the gaps."
+    },
+    {
+      "range": "FR-SET-002, FR-SET-003, FR-SET-005",
+      "observation": "No citations."
+    },
+    {
+      "range": "NFR-REL-001, NFR-REL-002",
+      "observation": "No citations. Only two non-functional identifiers are cited anywhere in the repository, NFR-REL-003 and NFR-MNT-002, so almost the entire non-functional requirement set is unrecovered. The two that survive come from different families, which suggests the original set was organized by quality attribute rather than numbered in one sequence."
+    },
+    {
+      "range": "INT-4",
+      "observation": "No citation. INT-1, INT-2, INT-3, INT-5 and INT-6 are all cited, so the interface family was allocated at least six identifiers and exactly one of them left no trace. INT-3 and INT-5 were invisible until the family was declared to the citation reader, which is why the declaration is recorded in this register rather than hard-coded in the generator."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "FR-001",
+      "capability": "CAP-EXPORT",
+      "kind": "functional",
+      "title": "Full-fidelity export and restore",
+      "statement": "Export must write every collection with its document identity and subcollections intact, so that a restore round-trips the graph without loss. Restore must validate bundle integrity before performing any force-replacement write, and a force restore must prune only what the bundle omits.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-002",
+      "capability": "CAP-DATA-CORE",
+      "kind": "functional",
+      "title": "Related records commit in one transaction",
+      "statement": "A capture, interaction, merge, or import commit that produces several records must write the nodes, edges, revisions, and reminders in a single database transaction. Identifiers are pre-allocated so related records can reference each other inside that commit, and every durable mutation records audit history.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-003",
+      "capability": "CAP-IDENTITY",
+      "kind": "functional",
+      "title": "Merge undo refuses a record edited since the merge",
+      "statement": "Undoing a merge must refuse when any affected record has been edited since the merge was performed, and must report a conflict requiring manual recovery rather than silently destroying the later edit.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-004",
+      "capability": "CAP-OPERATE",
+      "kind": "functional",
+      "title": "Third-party credentials live in a secret store",
+      "statement": "Credentials for third-party services must be read from a secret store or an injected environment variable, never persisted in application data. Postgres keeps only non-secret synchronization settings, and a surface that reports credential presence must report presence, not the value.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-005",
+      "capability": "CAP-OPERATE",
+      "kind": "functional",
+      "title": "Health counts come from aggregate queries",
+      "statement": "The status page is polled about once a minute, so its node and edge counts must come from aggregate queries rather than from loading the tables.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-006",
+      "capability": "CAP-ORGANIZE",
+      "kind": "functional",
+      "title": "The thirty-day trash promise is enforced by a purge",
+      "statement": "A soft-deleted record must be permanently removed once it ages past the retention window, by a scheduled purge with previewable and dry-runnable commands. Rolling back or discarding a staged import is a deletion intent: the raw upload and the parsed rows must be removed, not retained.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-007",
+      "capability": "CAP-PLATFORM",
+      "kind": "functional",
+      "title": "Continuous integration fails loudly rather than skipping",
+      "statement": "Every continuous-integration job must fail rather than skip when its preconditions are missing, and must upload the report and traces needed to diagnose a failure.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-008",
+      "capability": "CAP-IDENTITY",
+      "kind": "functional",
+      "title": "Duplicate candidates require shared evidence",
+      "statement": "A pair may be offered as a duplicate candidate only when the two records share identity, contact, URL or domain, or geography evidence. Opening a screen must not start a full duplicate scan as a side effect.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-009",
+      "capability": "CAP-EXPORT",
+      "kind": "functional",
+      "title": "Export policy checks re-read their referents",
+      "statement": "An export policy decision about a referenced record must re-read that record rather than rely on a value retained from an earlier pass.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-010",
+      "capability": "CAP-PLATFORM",
+      "kind": "functional",
+      "title": "Oversized and malformed bodies map to 413 and 400",
+      "statement": "The request body limit must accommodate a legitimate export or contacts payload of several megabytes, and an oversized or malformed body must produce 413 or 400 carrying a request identifier, never a generic 500. The limit must be applied early enough that a router-local parser cannot bypass it.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-011",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "Final is an invariant, not a label",
+      "statement": "A resume may be marked as sent only when it has been compiled and finalized. A draft must be refused.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-012",
+      "capability": "CAP-EXPORT",
+      "kind": "functional",
+      "title": "Sensitive records are excluded transitively",
+      "statement": "A default export must exclude records marked sensitive and everything that depends on them, not only the sensitive records themselves.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-013",
+      "capability": "CAP-DATA-CORE",
+      "kind": "functional",
+      "title": "Edge endpoint types are enforced on create",
+      "statement": "Edge creation must reject a missing endpoint, and must reject an endpoint whose node type is not permitted for that edge type. The permitted matrix is enforced by the API, not only described by form descriptors.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-014",
+      "capability": "CAP-PLATFORM",
+      "kind": "functional",
+      "title": "Downloads use the authenticated transport",
+      "statement": "A file download must go through the shared API client so that it carries the bearer token and the active data space, rather than issuing a bare fetch.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-015",
+      "capability": "CAP-AUTH",
+      "kind": "functional",
+      "title": "Development sign-in is loopback-only",
+      "statement": "Development sign-in hands any caller a valid owner token, so it must be restricted to loopback requests and must be disabled outside development. The restriction is defence in depth, not the only control.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-016",
+      "capability": "CAP-PLATFORM",
+      "kind": "functional",
+      "title": "Workflow actions are pinned to commit SHAs",
+      "statement": "Continuous-integration actions must be pinned to commit SHAs rather than to moving tags, so that a compromised or retagged action cannot change what runs.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-017",
+      "capability": "CAP-SEARCH",
+      "kind": "functional",
+      "title": "Search invalidation is a generation counter",
+      "statement": "Search index invalidation must be a monotonic generation counter rather than a boolean flag, so that a mutation arriving during a rebuild is not lost.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-018",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "Selection feasibility includes entry overhead",
+      "statement": "Resume selection must budget each candidate at its bullet lines plus its entry overhead, and must report the same cost that the greedy loop budgets with.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-019",
+      "capability": "CAP-PLATFORM",
+      "kind": "functional",
+      "title": "Shared shapes are defined once in the core package",
+      "statement": "A shape used by both the API and the web application must be defined once in the shared core package rather than redefined route-locally.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-020",
+      "capability": "CAP-IMPORT",
+      "kind": "functional",
+      "title": "Unassigned import lines stay retryable",
+      "statement": "An import line that was not assigned to a target creates nothing and must remain retryable with a stated reason. Only a clean run closes a batch, and the raw upload is purged once the batch closes.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-021",
+      "capability": "CAP-EXPORT",
+      "kind": "functional",
+      "title": "Spreadsheet formulas are neutralized in CSV output",
+      "statement": "A value written to CSV that a spreadsheet would interpret as a formula must be neutralized before it is written.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-022",
+      "capability": "CAP-PLATFORM",
+      "kind": "functional",
+      "title": "Overlays are real dialogs",
+      "statement": "An overlay must be a real dialog with an accessible name, a focus trap, dismissal on Escape, and focus restoration, rather than a hand-rolled backdrop element.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-023",
+      "capability": "CAP-PLATFORM",
+      "kind": "functional",
+      "title": "Controls carry programmatic labels",
+      "statement": "Every visual label must be associated with its control, and a row that behaves as a control must be a real button, so that it is reachable by keyboard and announced as actionable.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-025",
+      "capability": "CAP-PLATFORM",
+      "kind": "functional",
+      "title": "Calendar dates are answered in the user timezone",
+      "statement": "Any question about today, overdue, due, a streak, or a snooze target must be answered in the user timezone, which the client sends and the server carries for the life of the request.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-026",
+      "capability": "CAP-OPERATE",
+      "kind": "functional",
+      "title": "Liveness, readiness, shutdown, and outbound deadlines",
+      "statement": "Liveness and readiness must be separate probes, shutdown must stop accepting traffic before letting in-flight requests finish, outbound HTTP must carry a deadline so a stalled connection cannot hold a request open, and every request must be correlated in the access log.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-027",
+      "capability": "CAP-OPERATE",
+      "kind": "functional",
+      "title": "No published fallback signing key",
+      "statement": "The build service signing key is the authentication, so there must be no published fallback value. A published fallback would let any caller sign a request.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-102",
+      "capability": "CAP-PLATFORM",
+      "kind": "functional",
+      "title": "Read the graph once per request",
+      "statement": "When more than one helper in a request needs the whole graph, the request must load it once and thread it, rather than loading it once per helper.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-104",
+      "capability": "CAP-PLATFORM",
+      "kind": "functional",
+      "title": "Per-type counts use one grouped query",
+      "statement": "Live node counts per type must come from a single grouped query.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-105",
+      "capability": "CAP-CLOUD",
+      "kind": "functional",
+      "title": "Export holds a per-workspace lock",
+      "statement": "Export must take a per-workspace lock so that one workspace export cannot block another.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-CAP-001",
+      "capability": "CAP-CAPTURE",
+      "kind": "functional",
+      "title": "Keyboard capture grammar",
+      "statement": "A single capture line must parse deterministically into a plan of linked records, be previewable before commit, and commit as undoable writes.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-CAP-002",
+      "capability": "CAP-CAPTURE",
+      "kind": "functional",
+      "title": "Schema-driven entity forms",
+      "statement": "Every node type must be creatable and editable through a form rendered from a shared descriptor, which reports field-level validation errors without throwing and rejects a record missing a required property.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-CAP-003",
+      "capability": "CAP-CAPTURE",
+      "kind": "functional",
+      "title": "Entry fields offer existing values",
+      "statement": "A form field must be able to offer existing values from the graph as debounced, keyboard-navigable suggestions.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-CAP-004",
+      "capability": "CAP-CAPTURE",
+      "kind": "functional",
+      "title": "Attachments go through a storage adapter",
+      "statement": "Attachments must be stored through the storage abstraction, and delivery must use private, short-lived signed URLs.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-CAP-005",
+      "capability": "CAP-CAPTURE",
+      "kind": "functional",
+      "title": null,
+      "statement": null,
+      "implementation_status": "implemented",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "Asserted only by the grouped citation FR-CAP-001/003/005 in docs/ROADMAP.md, whose row text reads \"grammar + live preview + commit + undo-able writes\". FR-CAP-001 and FR-CAP-003 are pinned individually elsewhere, leaving two unattributed behaviors (\"live preview\" and \"undo-able writes\") for one identifier. The statement cannot be recovered without inventing the split."
+    },
+    {
+      "id": "FR-CAP-008",
+      "capability": "CAP-CAPTURE",
+      "kind": "functional",
+      "title": "Note-append targets the last-viewed record",
+      "statement": "Capture in note-append mode must attach the note to the record the operator viewed most recently.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-CON-001",
+      "capability": "CAP-RELATIONSHIPS",
+      "kind": "functional",
+      "title": "The relationship edge is the record",
+      "statement": "A person-to-person relationship must be editable as a record in its own right, carrying its own properties such as topics. A patch replaces properties wholesale, so the client merges before sending.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-CON-002",
+      "capability": "CAP-RELATIONSHIPS",
+      "kind": "functional",
+      "title": "One-tap interaction logging",
+      "statement": "Logging an interaction must create the interaction node and its relationship edge from a single overlay.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-CON-003",
+      "capability": "CAP-RELATIONSHIPS",
+      "kind": "functional",
+      "title": "An interaction can spawn a follow-up reminder",
+      "statement": "Logging an interaction, or committing a dated capture, must be able to create a follow-up reminder in the same commit.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-CON-004",
+      "capability": "CAP-RELATIONSHIPS",
+      "kind": "functional",
+      "title": "Reconnect lane ordering",
+      "statement": "The dashboard reconnect lane must rank ties by a deterministic spaced-repetition score, presenting the strongest need first.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-CON-005",
+      "capability": "CAP-RELATIONSHIPS",
+      "kind": "functional",
+      "title": null,
+      "statement": null,
+      "implementation_status": "implemented",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "Asserted only by the range citation FR-CON-001..009 in docs/ROADMAP.md, whose row lists five features across nine identifiers. No individual behavior can be attributed to this identifier from any source in the repository."
+    },
+    {
+      "id": "FR-CON-006",
+      "capability": "CAP-RELATIONSHIPS",
+      "kind": "functional",
+      "title": "Contact ranking decomposes into factor chips",
+      "statement": "A who-to-call ranking must decompose exactly into the per-factor contributions the interface displays, so that every rank is explained by name and number rather than by color alone.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-CON-007",
+      "capability": "CAP-RELATIONSHIPS",
+      "kind": "functional",
+      "title": "Ranking weights come from settings",
+      "statement": "The weights that rank contacts must be read from settings rather than fixed in the route.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-CON-008",
+      "capability": "CAP-RELATIONSHIPS",
+      "kind": "functional",
+      "title": "Warm-introduction paths carry per-hop evidence",
+      "statement": "A warm-introduction search must run a deterministic bounded traversal from the operator to a target organization and present each path with its per-hop evidence, scoring a path by the product of its hop strengths so that long weak chains rank below short strong ones.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review",
+      "reconstruction_note": "Recovered by elimination: the identifier appears only inside a grouped citation, and every other identifier in that group is pinned individually elsewhere, leaving exactly one unattributed behavior in the group text. Here the group is FR-CON-006..009 on the network-intelligence row of docs/ROADMAP.md; FR-CON-006, FR-CON-007 and FR-CON-009 are pinned individually, leaving warm-introduction paths with per-hop evidence. The behavior is implemented by packages/core/src/algorithms/graph-paths.ts and apps/api/src/routes/v1/intros.ts."
+    },
+    {
+      "id": "FR-CON-009",
+      "capability": "CAP-RELATIONSHIPS",
+      "kind": "functional",
+      "title": "Tie strength recomputes immediately",
+      "statement": "Logging an interaction must recompute and persist the affected tie strength within the same request rather than deferring it to a batch.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-EXP-010",
+      "capability": "CAP-EXPORT",
+      "kind": "functional",
+      "title": "Full-fidelity export bundle",
+      "statement": "A one-click export must produce a self-describing bundle of JSONL records and a Markdown vault with a checksummed manifest, streamed entry by entry.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-EXP-012",
+      "capability": "CAP-OPERATE",
+      "kind": "functional",
+      "title": "Scheduled off-box backups",
+      "statement": "The deployment must take scheduled encrypted backups to storage held outside the application host.",
+      "implementation_status": "partial",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review",
+      "reconstruction_note": "Split inferred from the order of the two behaviors named in the backup row of docs/ROADMAP.md, which cites EXP-012/013 without the FR- prefix. Status is partial rather than planned because scripts/backup-to-s3.sh exists and is wired to the backup:s3 package script, while docs/ROADMAP.md still records scheduled backups as an unshipped production concern. That contradiction is recorded as DOC-D-028."
+    },
+    {
+      "id": "FR-EXP-013",
+      "capability": "CAP-OPERATE",
+      "kind": "functional",
+      "title": "Periodic restore drill",
+      "statement": "The deployment must rehearse a full restore from a backup on a stated schedule, and the drill must be documented as a runnable procedure.",
+      "implementation_status": "partial",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review",
+      "reconstruction_note": "Split inferred from the order of the two behaviors named in the backup row of docs/ROADMAP.md, which cites EXP-012/013 without the FR- prefix. docs/runbooks/restore-drill.md documents the procedure; whether it is rehearsed on a schedule is an operational fact this repository cannot evidence."
+    },
+    {
+      "id": "FR-IMP-001",
+      "capability": "CAP-IMPORT",
+      "kind": "functional",
+      "title": null,
+      "statement": null,
+      "implementation_status": "implemented",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "Asserted only by the range citation IMP-001..006 in docs/ROADMAP.md, written without the FR- prefix. The row names seven import sources and four lifecycle behaviors across six identifiers, so no individual statement can be attributed. The capability itself is implemented and covered; only the per-identifier split is unrecoverable."
+    },
+    {
+      "id": "FR-IMP-002",
+      "capability": "CAP-IMPORT",
+      "kind": "functional",
+      "title": null,
+      "statement": null,
+      "implementation_status": "implemented",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "Asserted only by the range citation IMP-001..006 in docs/ROADMAP.md, written without the FR- prefix. The row names seven import sources and four lifecycle behaviors across six identifiers, so no individual statement can be attributed. The capability itself is implemented and covered; only the per-identifier split is unrecoverable."
+    },
+    {
+      "id": "FR-IMP-003",
+      "capability": "CAP-IMPORT",
+      "kind": "functional",
+      "title": null,
+      "statement": null,
+      "implementation_status": "implemented",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "Asserted only by the range citation IMP-001..006 in docs/ROADMAP.md, written without the FR- prefix. The row names seven import sources and four lifecycle behaviors across six identifiers, so no individual statement can be attributed. The capability itself is implemented and covered; only the per-identifier split is unrecoverable."
+    },
+    {
+      "id": "FR-IMP-004",
+      "capability": "CAP-IMPORT",
+      "kind": "functional",
+      "title": null,
+      "statement": null,
+      "implementation_status": "implemented",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "Asserted only by the range citation IMP-001..006 in docs/ROADMAP.md, written without the FR- prefix. The row names seven import sources and four lifecycle behaviors across six identifiers, so no individual statement can be attributed. The capability itself is implemented and covered; only the per-identifier split is unrecoverable."
+    },
+    {
+      "id": "FR-IMP-005",
+      "capability": "CAP-IMPORT",
+      "kind": "functional",
+      "title": null,
+      "statement": null,
+      "implementation_status": "implemented",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "Asserted only by the range citation IMP-001..006 in docs/ROADMAP.md, written without the FR- prefix. The row names seven import sources and four lifecycle behaviors across six identifiers, so no individual statement can be attributed. The capability itself is implemented and covered; only the per-identifier split is unrecoverable."
+    },
+    {
+      "id": "FR-IMP-006",
+      "capability": "CAP-IMPORT",
+      "kind": "functional",
+      "title": null,
+      "statement": null,
+      "implementation_status": "implemented",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "Asserted only by the range citation IMP-001..006 in docs/ROADMAP.md, written without the FR- prefix. The row names seven import sources and four lifecycle behaviors across six identifiers, so no individual statement can be attributed. The capability itself is implemented and covered; only the per-identifier split is unrecoverable."
+    },
+    {
+      "id": "FR-ORG-001",
+      "capability": "CAP-ORGANIZE",
+      "kind": "functional",
+      "title": null,
+      "statement": null,
+      "implementation_status": "implemented",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "Asserted only by the grouped citation FR-ORG-001/002/007 in docs/ROADMAP.md, whose row text reads \"Trash + restore + history/revisions\". FR-ORG-002 is pinned individually as restore, leaving two unattributed behaviors for two identifiers with no evidence of which is which."
+    },
+    {
+      "id": "FR-ORG-002",
+      "capability": "CAP-ORGANIZE",
+      "kind": "functional",
+      "title": "Restore revives a record and its hidden edges",
+      "statement": "Restoring a record from trash must also revive the edges that were hidden when it was deleted, so that recovery is lossless.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-ORG-005",
+      "capability": "CAP-ORGANIZE",
+      "kind": "functional",
+      "title": "A query round-trips through a URL",
+      "statement": "A search query and its filter clauses must round-trip through a URL so that a saved view is shareable and reloadable, and saved views can be named and pinned to the navigation.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-ORG-007",
+      "capability": "CAP-ORGANIZE",
+      "kind": "functional",
+      "title": null,
+      "statement": null,
+      "implementation_status": "implemented",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "Asserted only by the grouped citation FR-ORG-001/002/007 in docs/ROADMAP.md, whose row text reads \"Trash + restore + history/revisions\". FR-ORG-002 is pinned individually as restore, leaving two unattributed behaviors for two identifiers with no evidence of which is which."
+    },
+    {
+      "id": "FR-ORG-008",
+      "capability": "CAP-IDENTITY",
+      "kind": "functional",
+      "title": "Identity integrity workflow",
+      "statement": "Duplicate candidates must be presented as a queue, merged on visible evidence, recorded in history with learned aliases, and undoable.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review",
+      "reconstruction_note": "The only citation is the identity-integrity row of docs/ROADMAP.md:22, so the statement is that row restated as a requirement rather than recovered from code. The behavior is implemented: the candidate queue and merge live in apps/api/src/routes/v1/duplicates.ts, and the scoring in packages/core/src/algorithms/dedup.ts. Neither cites the identifier, which is why the attribution is recorded here instead of being inferred silently."
+    },
+    {
+      "id": "FR-RES-001",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": null,
+      "statement": null,
+      "implementation_status": "implemented",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "Asserted only by the range citation FR-RES-001..018 on the resume-engine row of docs/ROADMAP.md, which lists eleven features across eighteen identifiers. Positional mapping would be invention, so no statement is recorded."
+    },
+    {
+      "id": "FR-RES-002",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": null,
+      "statement": null,
+      "implementation_status": "implemented",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "Asserted only by the range citation FR-RES-001..018 on the resume-engine row of docs/ROADMAP.md, which lists eleven features across eighteen identifiers. Positional mapping would be invention, so no statement is recorded."
+    },
+    {
+      "id": "FR-RES-003",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": null,
+      "statement": null,
+      "implementation_status": "implemented",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "Asserted only by the range citation FR-RES-001..018 on the resume-engine row of docs/ROADMAP.md, which lists eleven features across eighteen identifiers. Positional mapping would be invention, so no statement is recorded."
+    },
+    {
+      "id": "FR-RES-004",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "An atom cites its provenance",
+      "statement": "A resume atom must be able to cite the records that evidence it. Provenance is held for review and is never rendered into the compiled document.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-RES-005",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "Job descriptions parse to weighted keywords",
+      "statement": "Pasting a job description must produce a set of weighted keywords deterministically, with no call to an external model.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-RES-006",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "The parsed keyword set is editable",
+      "statement": "The parsed keyword set must be fully editable downstream of the parser: keywords can be added, removed, and reweighted.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-RES-007",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "Atom scoring decomposes exactly",
+      "statement": "Every atom must be scored against the active target as soon as one exists, independently of selection, and the per-keyword contributions shown in the breakdown must sum to the reported relevance exactly.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-RES-008",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "Deterministic selection to a page budget",
+      "statement": "Selection must fill the page budget deterministically, so that identical inputs give identical proposals. Pinned atoms are forced in, a per-role bullet partition constraint applies, and a manual mode lets the operator hand-pick and order the selection instead.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-RES-009",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "Template line model and page-fill meter",
+      "statement": "Each template must carry a line model that estimates how many rendered lines a block of content will occupy, driving a page-fill meter against the one-page budget. The estimate must stay within a stated tolerance of real compiled output, verified by compiling calibration fixtures.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-RES-010",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": null,
+      "statement": null,
+      "implementation_status": "implemented",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "Asserted only by the range citation FR-RES-001..018 on the resume-engine row of docs/ROADMAP.md, which lists eleven features across eighteen identifiers. Positional mapping would be invention, so no statement is recorded."
+    },
+    {
+      "id": "FR-RES-011",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "Build the resume model and render LaTeX",
+      "statement": "Finalizing must assemble the selected evidence into a resume model, render it through the chosen template to LaTeX, and submit it for compilation.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review",
+      "reconstruction_note": "Recovered by elimination: the identifier appears only inside a grouped citation, and every other identifier in that group is pinned individually elsewhere, leaving exactly one unattributed behavior in the group text. Here the group is FR-RES-011/012/013 in apps/api/src/routes/v1/resumes.ts, whose text reads \"Build the resume model, render LaTeX, and compile\"; FR-RES-012 is pinned as LaTeX escaping and FR-RES-013 as compile-service degradation."
+    },
+    {
+      "id": "FR-RES-012",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "User content is escaped before it reaches LaTeX",
+      "statement": "All operator content must be escaped and sanitized before it is written into LaTeX, neutralizing shell-escape and injection attempts. This requirement is security-critical and is verified by property-based fuzzing that the escaped output always compiles.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-RES-013",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "Compilation degrades rather than fails the flow",
+      "statement": "Requests to the compile service must be authenticated by a message authentication code, and an unavailable compile service must degrade the affected step rather than fail the whole flow.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-RES-014",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "One-page fit loop after compile",
+      "statement": "When a compiled document overflows one page, a bounded fit loop must plan and apply reduction steps until it fits or the step cap is reached.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-RES-015",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "Coverage gate on the compiled document",
+      "statement": "Finalizing must extract the text of the compiled PDF and verify that it covers at least ninety-five percent of the selected evidence before the document is accepted.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-RES-016",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": null,
+      "statement": null,
+      "implementation_status": "implemented",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "Asserted only by the range citation FR-RES-001..018 on the resume-engine row of docs/ROADMAP.md, which lists eleven features across eighteen identifiers. Positional mapping would be invention, so no statement is recorded."
+    },
+    {
+      "id": "FR-RES-017",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": null,
+      "statement": null,
+      "implementation_status": "implemented",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "Asserted only by the range citation FR-RES-001..018 on the resume-engine row of docs/ROADMAP.md, which lists eleven features across eighteen identifiers. Positional mapping would be invention, so no statement is recorded."
+    },
+    {
+      "id": "FR-RES-018",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "Marking a resume sent creates the application record",
+      "statement": "Marking a resume as sent must create or link an application node, so that the career pipeline is a consequence of the send rather than a separate manual step.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-RES-019",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "Saved outputs can be recompiled and re-uploaded",
+      "statement": "A saved resume output must be recompilable, re-uploading its PDF and LaTeX source, so that a lost or corrupted artifact can be recovered.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-RES-020",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "Cover letters are stored as structured drafts",
+      "statement": "A cover letter must be storable against a target as structured blocks of hook, body, and closer, each sourced from text or from an atom, with full create, read, update, and delete support.",
+      "implementation_status": "partial",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review",
+      "reconstruction_note": "The model and the generation interface are shipped. docs/ROADMAP.md records LaTeX and PDF compilation of a cover letter as deferred, so the requirement is partially implemented."
+    },
+    {
+      "id": "FR-SET-001",
+      "capability": "CAP-AUTH",
+      "kind": "functional",
+      "title": "Authenticated and allow-listed access",
+      "statement": "Every request must be authenticated against a verified identity and authorized against the configured owner, denying by default. The development sign-in shortcut is available only behind an explicit flag.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-SET-004",
+      "capability": "CAP-PLATFORM",
+      "kind": "functional",
+      "title": "Algorithm constants are editable, validated, versioned settings",
+      "statement": "The tunable constants of the intelligence layer must live in one place and be exposed through a constants editor with validated ranges, versioning, and live preview. Every algorithm reads its constants from that place, so a settings override is a single object spread over the documented defaults. Nothing in the layer is learned.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review",
+      "reconstruction_note": "The phrase \"constants editor, validated ranges, versioned, live preview\" is quoted directly from the original requirement text inside packages/core/src/algorithms/constants.ts, which preserves it verbatim."
+    },
+    {
+      "id": "FR-SET-006",
+      "capability": "CAP-OPERATE",
+      "kind": "functional",
+      "title": "Health page",
+      "statement": "A status route must report the health of the database, storage, and build service, together with live record counts.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-SET-007",
+      "capability": "CAP-EXPORT",
+      "kind": "functional",
+      "title": "Sensitive records are opt-in for export",
+      "statement": "Records marked sensitive must be excluded from an export unless the operator explicitly opts in.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-SRCH-001",
+      "capability": "CAP-SEARCH",
+      "kind": "functional",
+      "title": "Unified ranked full-text search",
+      "statement": "Search must run a single ranked full-text query over record titles, subtitles, notes, and properties, built from live data and scoped to the active data space.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-SRCH-002",
+      "capability": "CAP-SEARCH",
+      "kind": "functional",
+      "title": "Composable filter grammar",
+      "statement": "Search must accept a composable filter query that parses into a clause tree applied on top of the text query, and the parsed clauses must be reflected back to the operator as visible chips.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-SRCH-003",
+      "capability": "CAP-SEARCH",
+      "kind": "functional",
+      "title": "Deterministic ranking",
+      "statement": "Search ranking must be deterministic, combining exact-title bonus, recency, and pinned status.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-SRCH-004",
+      "capability": "CAP-SEARCH",
+      "kind": "functional",
+      "title": "Fuzzy quick-switcher",
+      "statement": "A command palette must offer a fuzzy match over record titles alongside actions, in one list with two lanes.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-VIS-001",
+      "capability": "CAP-EXPLORE",
+      "kind": "functional",
+      "title": "Life map",
+      "statement": "The graph must be explorable as a navigable life map with a keyboard and list equivalent and URL-backed state.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-VIS-002",
+      "capability": "CAP-EXPLORE",
+      "kind": "functional",
+      "title": "Chronograph timeline",
+      "statement": "Career and life records must be explorable on a timeline with a keyboard and list equivalent and URL-backed state.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-VIS-003",
+      "capability": "CAP-EXPLORE",
+      "kind": "functional",
+      "title": "Atlas of places",
+      "statement": "Places in the graph must be explorable on a navigable map with a keyboard and list equivalent and URL-backed state.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-VIS-004",
+      "capability": "CAP-PLATFORM",
+      "kind": "functional",
+      "title": "The Today aggregate is one call",
+      "statement": "The dashboard must assemble its widgets from a single aggregate request rather than one request per widget.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "FR-VIS-005",
+      "capability": "CAP-EXPLORE",
+      "kind": "functional",
+      "title": "Timeline brush feeds a review surface",
+      "statement": "Selecting a range on the timeline must carry that range into a review surface for the records it covers.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review",
+      "reconstruction_note": "Recovered by elimination: the identifier appears only inside a grouped citation, and every other identifier in that group is pinned individually elsewhere, leaving exactly one unattributed behavior in the group text. Here the group is FR-VIS-002/005 in apps/web/src/features/timeline/TimelineView.tsx, whose text reads \"Chronograph, career/life timeline with brush to review\"; FR-VIS-002 is pinned as the chronograph itself by the Explore row of docs/ROADMAP.md, leaving the brush-to-review behavior."
+    },
+    {
+      "id": "NFR-MNT-002",
+      "capability": "CAP-PLATFORM",
+      "kind": "non-functional",
+      "title": "The module boundary is enforced, not merely agreed",
+      "statement": "No workspace outside packages/core may import another workspace's internal modules. The boundary must be machine-enforced so that a violation fails the build rather than depending on review to notice it.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review",
+      "reconstruction_note": "Recovered from the header of eslint.config.js, which names this identifier beside INT-2 and states the rule the configuration enforces. This identifier was missed by the first pass of this register, which read only the source trees; a root-level configuration file carried the sole citation. It was recovered by docs/generated/traceability.json, which reads every tracked file, and it is the reason that generator scans the whole repository rather than a chosen subset."
+    },
+    {
+      "id": "NFR-REL-003",
+      "capability": "CAP-DATA-CORE",
+      "kind": "non-functional",
+      "title": "Multi-document writes are atomic",
+      "statement": "Multi-document writes must go through the transaction boundary so that imports, merges, and resume finalize are atomic. Every mutation is append-only audited, writing the record together with a revision row carrying the full snapshot, the field diff, the operation, and the source. Deletes are soft, and edges to a deleted node are hidden by query filters rather than removed, so that restore is lossless.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review"
+    },
+    {
+      "id": "INT-1",
+      "capability": "CAP-AUTH",
+      "kind": "interface",
+      "title": "Google identity provider integration",
+      "statement": "Vitae authenticates a person against Google through the Firebase Web SDK in the browser and verifies the resulting identity token on the server before any request is served. A development sign-in shortcut may stand in for the provider only when it is explicitly enabled by configuration.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review",
+      "reconstruction_note": "Recovered from three independent citations that each name the identifier and describe one face of the same integration: packages/config/src/env.ts:36 marks the authentication configuration block, apps/web/src/lib/firebase.ts:2 the browser sign-in bootstrap, and apps/api/src/middleware/auth.ts:2 server-side verification. docs/ROADMAP.md:13 pairs the identifier with the same behavior."
+    },
+    {
+      "id": "INT-2",
+      "capability": "CAP-PLATFORM",
+      "kind": "interface",
+      "title": "Vitae is a module that owns its data plane",
+      "statement": "Vitae owns its storage and exposes it only through its own interfaces. No other workspace reaches into Vitae's internals, and Vitae reaches into no other workspace's internals.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review",
+      "reconstruction_note": "Recovered from two citations that agree: eslint.config.js:2 states the rule as enforced, and docs/specs/merge-plan.md:3 states it as architectural intent. The statement recorded here is what both assert; neither is extended by the other."
+    },
+    {
+      "id": "INT-3",
+      "capability": "CAP-PLATFORM",
+      "kind": "interface",
+      "title": "One authoritative palette for the whole interface",
+      "statement": "Every colour, dimension and type decision in the interface resolves to a single declared token set. No screen defines its own palette, so a change to the identity is a change in one file rather than a search across the app.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review",
+      "reconstruction_note": "Recovered from packages/ui/src/styles/tokens.css:2, which names the identifier and calls the file the single authoritative palette. The same header records the 2026-08 Quiet identity and its standing bans, which scripts/check-brand-bans.mjs enforces."
+    },
+    {
+      "id": "INT-5",
+      "capability": "CAP-OPERATE",
+      "kind": "interface",
+      "title": "Attachment storage is reached only through an adapter",
+      "statement": "The application talks to object storage through one interface, so the provider can be replaced by changing a single binding. Uploads are content-addressed so identical bytes are stored once, and delivery is private through short-lived signed URLs rather than public object URLs.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "needs-review",
+      "reconstruction_note": "Recovered from apps/api/src/services/storage/adapter.ts:2, which names the identifier and states the swap requirement, the content-addressing rule and the private-delivery rule in the same header. The dedup clause there cites FR-CAP-004 separately, so it is attributed to that identifier and only summarized here."
+    },
+    {
+      "id": "INT-6",
+      "capability": "CAP-PLATFORM",
+      "kind": "interface",
+      "title": null,
+      "statement": null,
+      "implementation_status": "unknown",
+      "definition_provenance": "unrecoverable",
+      "review": "needs-review",
+      "reconstruction_note": "docs/specs/merge-plan.md:3 is the only citation, and it names INT-6 jointly with INT-2 in a single sentence about owning a data plane. INT-2 is independently pinned by eslint.config.js, but elimination does not apply to a two-member group whose members may state different halves of one sentence: splitting it would invent the division rather than recover it."
+    }
+  ]
+}

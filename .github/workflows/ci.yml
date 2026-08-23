@@ -65,6 +65,10 @@ jobs:
         # test:map runs its own self-test first: the map gate silently passed
         # everything for months, so it must be seen to fail before it is trusted.
         run: pnpm test:map && pnpm test:prose && pnpm test:public && pnpm test:brand
+      - name: Documentation registries, traceability and generated artifacts
+        # docs:check runs its own self-tests first, for the same reason
+        # test:map does: a gate is only trustworthy once seen to fail.
+        run: pnpm docs:check
       - name: Reject high and critical dependency vulnerabilities
         run: pnpm audit --audit-level=high
       - name: Unit + property-fuzz tests (packages/core + testkit)

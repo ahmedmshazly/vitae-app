@@ -1,0 +1,234 @@
+{
+  "$schema": "./schema/capabilities.schema.json",
+  "note": "Curated capability map. Capability rows are recovered from docs/ROADMAP.md, which is the only document that groups requirement identifiers by product area, and reconciled against shipped code. CAP-CLOUD has no ROADMAP row: the hosted control plane shipped without an entry, which is recorded as DOC-D-011 in docs/observatory/meta/coverage-and-contradictions.md.",
+  "status_vocabulary": {
+    "implemented": "Enforced by shipped code in this repository and reachable by a user of a self-hosted install.",
+    "gated": "Shipped in this repository but withheld from the public surface by a build or provisioning gate.",
+    "planned": "Recorded as intent only. No enforcing code in this repository."
+  },
+  "capabilities": [
+    {
+      "id": "CAP-FOUNDATION",
+      "title": "Foundation and toolchain",
+      "summary": "The monorepo, environment schema, emulators, and continuous integration that every other capability is built on.",
+      "status": "implemented",
+      "surfaces": [],
+      "evidence": [
+        "package.json",
+        ".github/workflows/ci.yml",
+        "packages/config/src/env.ts"
+      ]
+    },
+    {
+      "id": "CAP-AUTH",
+      "title": "Identity and access",
+      "summary": "Verified sign-in, a default-deny request gate, and an owner allow-list, with a loopback-only development shortcut.",
+      "status": "implemented",
+      "surfaces": [
+        "/signin"
+      ],
+      "evidence": [
+        "apps/api/src/middleware/auth.ts",
+        "apps/api/src/routes/v1/auth.ts",
+        "apps/web/src/lib/firebase.ts"
+      ]
+    },
+    {
+      "id": "CAP-DATA-CORE",
+      "title": "The typed career graph",
+      "summary": "Typed nodes and typed edges validated per type, written transactionally, versioned by revision, and soft-deleted rather than destroyed.",
+      "status": "implemented",
+      "surfaces": [
+        "/data/record/:id"
+      ],
+      "evidence": [
+        "packages/core/src/schema/envelope.ts",
+        "apps/api/src/db/repository.ts",
+        "apps/api/src/db/migrations"
+      ]
+    },
+    {
+      "id": "CAP-CAPTURE",
+      "title": "Capture",
+      "summary": "A keyboard capture line and schema-driven entity forms that create valid, linked, undoable records.",
+      "status": "implemented",
+      "surfaces": [
+        "/"
+      ],
+      "evidence": [
+        "packages/core/src/algorithms/capture-grammar.ts",
+        "apps/api/src/services/capture.ts",
+        "apps/web/src/features/forms/EntityForm.tsx"
+      ]
+    },
+    {
+      "id": "CAP-ORGANIZE",
+      "title": "Organize, trash, and retention",
+      "summary": "Saved views, revision history, a thirty-day trash with restore, and a purge that makes the retention promise real.",
+      "status": "implemented",
+      "surfaces": [
+        "/data/trash"
+      ],
+      "evidence": [
+        "apps/web/src/routes/Trash.tsx",
+        "apps/api/src/services/retention.ts",
+        "apps/api/src/routes/v1/views.ts"
+      ]
+    },
+    {
+      "id": "CAP-SEARCH",
+      "title": "Search and wayfinding",
+      "summary": "Unified full-text search, a composable filter grammar, and a fuzzy quick-switcher, all scoped to the active data space.",
+      "status": "implemented",
+      "surfaces": [
+        "/data/search"
+      ],
+      "evidence": [
+        "apps/api/src/db/search-index.ts",
+        "packages/core/src/algorithms/filter-grammar.ts",
+        "apps/web/src/features/QuickSwitcher.tsx"
+      ]
+    },
+    {
+      "id": "CAP-RELATIONSHIPS",
+      "title": "Relationship intelligence",
+      "summary": "Typed relationship editing, one-tap interaction logging, Hawkes tie strength, reconnect ordering, and explainable contact ranking with warm-introduction paths.",
+      "status": "implemented",
+      "surfaces": [
+        "/network/ask"
+      ],
+      "evidence": [
+        "packages/core/src/algorithms/tie-strength.ts",
+        "packages/core/src/algorithms/who-to-call.ts",
+        "packages/core/src/algorithms/graph-paths.ts"
+      ]
+    },
+    {
+      "id": "CAP-EXPLORE",
+      "title": "Explore",
+      "summary": "The Life map, the Chronograph timeline, and the Atlas of places, each with a keyboard and list equivalent and URL-backed state.",
+      "status": "implemented",
+      "surfaces": [
+        "/explore/graph",
+        "/explore/timeline",
+        "/explore/atlas"
+      ],
+      "evidence": [
+        "apps/web/src/features/graph/GraphView.tsx",
+        "apps/web/src/features/timeline/TimelineView.tsx",
+        "apps/web/src/features/map/AtlasView.tsx"
+      ]
+    },
+    {
+      "id": "CAP-IMPORT",
+      "title": "Staged import",
+      "summary": "External sources staged into reviewable batches that are idempotent, committable, rollbackable, and attributable to their origin.",
+      "status": "implemented",
+      "surfaces": [
+        "/data/import"
+      ],
+      "evidence": [
+        "apps/api/src/services/imports.ts",
+        "apps/web/src/routes/ImportHub.tsx"
+      ]
+    },
+    {
+      "id": "CAP-IDENTITY",
+      "title": "Identity integrity",
+      "summary": "A duplicate candidate queue scored on shared evidence, an evidence-led merge, learned aliases, merge history, and a conflict-aware undo.",
+      "status": "implemented",
+      "surfaces": [
+        "/data/duplicates"
+      ],
+      "evidence": [
+        "packages/core/src/algorithms/dedup.ts",
+        "apps/api/src/services/duplicates.ts"
+      ]
+    },
+    {
+      "id": "CAP-RESUME",
+      "title": "Resume evidence and tailoring",
+      "summary": "Atoms and variants scored against a parsed job description, selected to a one-page budget, escaped, rendered to LaTeX, compiled, and checked for coverage.",
+      "status": "implemented",
+      "surfaces": [
+        "/career/resume",
+        "/career/tailor"
+      ],
+      "evidence": [
+        "packages/core/src/algorithms/atom-scoring.ts",
+        "packages/core/src/algorithms/selection.ts",
+        "apps/api/src/services/resume.ts",
+        "services/buildsvc"
+      ]
+    },
+    {
+      "id": "CAP-CAREER",
+      "title": "Career tracking",
+      "summary": "Applications as graph records with pipeline overview, linked posting, target, resume, company, referrer, and interview context.",
+      "status": "implemented",
+      "surfaces": [
+        "/career"
+      ],
+      "evidence": [
+        "apps/api/src/routes/v1/applications.ts",
+        "apps/web/src/routes/career/CareerOverview.tsx"
+      ]
+    },
+    {
+      "id": "CAP-EXPORT",
+      "title": "Export and restore",
+      "summary": "A self-describing JSONL and Markdown bundle with checksums and a manifest, and a restore path that validates before it writes.",
+      "status": "implemented",
+      "surfaces": [
+        "/settings/export"
+      ],
+      "evidence": [
+        "apps/api/src/services/export.ts",
+        "apps/api/src/services/restore.ts"
+      ]
+    },
+    {
+      "id": "CAP-OPERATE",
+      "title": "Operate and observe",
+      "summary": "Liveness and readiness probes, a health page, graceful shutdown, a storage adapter, an isolated compile service, and a secret store kept outside application data.",
+      "status": "implemented",
+      "surfaces": [
+        "/status"
+      ],
+      "evidence": [
+        "apps/api/src/middleware/health.ts",
+        "apps/api/src/routes/v1/status.ts",
+        "apps/api/src/services/secrets.ts"
+      ]
+    },
+    {
+      "id": "CAP-CLOUD",
+      "title": "Hosted workspace and billing control plane",
+      "summary": "Server-derived workspace scoping, idempotent workspace bootstrap, a server-owned plan catalog, signed provider webhooks with replay protection, and a lifecycle gate that keeps a locked workspace readable and exportable.",
+      "status": "gated",
+      "surfaces": [
+        "/settings/billing"
+      ],
+      "evidence": [
+        "apps/api/src/middleware/workspace.ts",
+        "apps/api/src/services/control-plane.ts",
+        "apps/api/src/cloud/paddle.ts",
+        "docs/CLOUD-LAUNCH.md"
+      ],
+      "note": "Shipped in the repository and covered by integration tests, but not enabled for the public. The public build gate is VITE_PUBLIC_CLOUD_ENABLED and the server provisioning gate is separate. No hosted service is asserted to be operating."
+    },
+    {
+      "id": "CAP-PLATFORM",
+      "title": "Cross-cutting platform behavior",
+      "summary": "The constraints that hold across every screen and endpoint: request correlation, error mapping, timezone correctness, authenticated transport, accessible overlays, shared contracts, and the performance rules that keep the graph read once.",
+      "status": "implemented",
+      "surfaces": [],
+      "evidence": [
+        "apps/api/src/app.ts",
+        "apps/api/src/middleware/error.ts",
+        "apps/web/src/lib/api.ts",
+        "packages/ui/src/overlay.tsx"
+      ]
+    }
+  ]
+}

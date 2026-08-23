@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vitae.invalid/registry/capabilities.schema.json",
+  "title": "Vitae capability map",
+  "type": "object",
+  "required": ["note", "status_vocabulary", "capabilities"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "note": { "type": "string", "minLength": 1 },
+    "status_vocabulary": { "type": "object", "additionalProperties": { "type": "string" } },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "summary", "status", "surfaces", "evidence"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^CAP-[A-Z-]+$" },
+          "title": { "type": "string", "minLength": 1 },
+          "summary": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["implemented", "gated", "planned"] },
+          "surfaces": {
+            "description": "Canonical application routes through which the capability is reached.",
+            "type": "array",
+            "items": { "type": "string", "pattern": "^/" }
+          },
+          "evidence": {
+            "description": "Repository-relative paths that demonstrate the capability exists.",
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "pattern": "^[^/].*" }
+          },
+          "note": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

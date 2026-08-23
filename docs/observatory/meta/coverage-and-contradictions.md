@@ -12,7 +12,7 @@ sources:
   - docs/specs/srs.md
   - docs/ARCHITECTURE.md
   - GOVERNANCE.md
-verified_at: 2026-08-23
+verified_at: 2026-08-24
 ---
 
 # Documentation coverage and contradiction inventory
@@ -42,6 +42,10 @@ Identifiers are stable. Cite them as `DOC-D-001`.
 ## Severity 1: quality gates that do not hold
 
 ### DOC-D-001 — `pnpm test:map` never reports a missing module
+
+> **Resolved.** What follows is the state before the fix, kept because the record of
+> what was wrong is the point of this document. The fix is in the resolved table at
+> the end.
 
 `colocatedTest()` builds its candidate paths with `String.replace`, which
 returns the **original string** when the pattern does not match:
@@ -91,6 +95,10 @@ git log --format='%h %ad' --date=short -1 -- scripts/check-test-coverage-map.mjs
 ```
 
 ### DOC-D-030 — `pnpm lint` fails on `main`
+
+> **Resolved.** What follows is the state before the fix, kept because the record of
+> what was wrong is the point of this document. The fix is in the resolved table at
+> the end.
 
 `pnpm lint` exits 1 on a clean checkout. CI runs it in the `quality` job, so
 that job cannot pass on any commit. A single rule violation is responsible:
@@ -147,6 +155,10 @@ Absent: `/suggest`, `/letters`, `/settings`, `/habits`,
 Source of truth: `apps/api/src/openapi/mounts.ts`.
 
 ### DOC-D-005 — the requirement spine is severed
+
+> **Resolved.** What follows is the state before the fix, kept because the record of
+> what was wrong is the point of this document. The fix is in the resolved table at
+> the end.
 
 **73** distinct requirement identifiers are cited across API services, core
 algorithms, web routes, tests, and `.github/workflows/ci.yml`. `docs/specs/srs.md`
@@ -230,6 +242,10 @@ The Cloud plane changed all four:
 
 ### DOC-D-012 — the SRS denies a capability the schema implements
 
+> **Resolved.** What follows is the state before the fix, kept because the record of
+> what was wrong is the point of this document. The fix is in the resolved table at
+> the end.
+
 `docs/specs/srs.md:25`: *"Vitae does not provide multi-tenant hosting, social
 networking, behavioural…"*
 
@@ -303,9 +319,10 @@ legal/status pages, `/reference/entities`, and `/welcome`.
 | `DOC-D-024` | `docs/specs/merge-plan.md:12` and `:24` contain a self-referential redirect, `app.vitae.example` to `app.vitae.example` (301), left behind by placeholder scrubbing. | same file |
 | `DOC-D-025` | `packages/core/src/algorithms/graph-paths.ts:102` branches on edge type `INTRODUCED`. `EDGE_TYPES` does not contain it. The branch is unreachable. | `packages/core/src/types.ts` |
 | `DOC-D-026` | `packages/config/package.json` declares no `scripts`, so `pnpm -r typecheck` and `pnpm -r test` silently skip the package. | same file |
-| `DOC-D-027` | `pnpm test:brand` is in `test:all` but absent from `.github/workflows/ci.yml`. Line 65 runs `test:map && test:prose && test:public` only. The brand guard never runs in CI. | `.github/workflows/ci.yml:65` |
+| `DOC-D-027` | **Resolved; see the table at the end.** `pnpm test:brand` is in `test:all` but absent from `.github/workflows/ci.yml`. Line 65 runs `test:map && test:prose && test:public` only. The brand guard never runs in CI. | `.github/workflows/ci.yml:65` |
 | `DOC-D-028` | `docs/DEPLOYMENT.md:142` advises pairing exports with *"managed Postgres backups for short recovery windows"* without stating the window. `docs/runbooks/postgres-restore.md` records that the PITR window is **1 day, not the 7 the design assumed**, because the account is on a Free Tier plan. The operational constraint exists in one document and not the one operators are pointed at first. | both files |
 | `DOC-D-029` | CI names journeys `J1 capture`, `J4 résumé`, `J8 trash/restore`. The numbering implies J2, J3, J5, J6 and J7 exist as product journeys with no executable coverage. No document records which journeys exist or which are covered. | `.github/workflows/ci.yml:319` |
+| `DOC-D-031` | `docs/ROADMAP.md:40` plans backups as a nightly `pg_dump` to R2 with a quarterly restore drill. The shipped system is different in target, mechanism and cadence: `scripts/backup-to-s3.sh` uploads a full export bundle to S3 and is wired to `pnpm backup:s3`. The roadmap row also calls the work unshipped while the script exists, so an operator reading the roadmap would prepare for a database dump that nothing produces. Found by re-checking a claim this document had itself recorded as not upheld. | `docs/ROADMAP.md:40`, `scripts/backup-to-s3.sh:2`, `package.json` |
 
 ---
 
@@ -316,7 +333,7 @@ Recorded so they are not re-investigated.
 | Claim | Finding |
 | --- | --- |
 | `pnpm test:map` currently fails on `billing.ts`, `webhooks/paddle.ts` and `control-plane.ts`. | **False.** The gate passes. Those modules are genuinely unmapped and untested, but the gate cannot report them, which is `DOC-D-001`. The correct finding is more severe than the reported one. |
-| Three documents describe three different backup systems (R2 versus S3, `pg_dump` versus export bundle, planned versus running). | **False.** `docs/DEPLOYMENT.md`, `docs/runbooks/restore-drill.md` and `docs/runbooks/postgres-restore.md` all describe the same export-bundle-to-S3 system implemented by `scripts/backup-to-s3.sh`, which exists and is wired to `pnpm backup:s3`. No document mentions R2. The real defect is narrower and is recorded as `DOC-D-028`. |
+| Three documents describe three different backup systems (R2 versus S3, `pg_dump` versus export bundle, planned versus running). | **Partly upheld, and this entry previously overcorrected.** The three-document part is false: `docs/DEPLOYMENT.md`, `docs/runbooks/restore-drill.md` and `docs/runbooks/postgres-restore.md` all describe the same export-bundle-to-S3 system implemented by `scripts/backup-to-s3.sh`, wired to `pnpm backup:s3`. An earlier revision of this row went on to assert that *no document mentions R2*, which is false: `docs/ROADMAP.md:40` does. The divergence is real, it is two-way rather than three-way, and it is now recorded as `DOC-D-031`. |
 | `docs/merge-plan.md` contains a broken redirect. | **Path wrong.** The file is `docs/specs/merge-plan.md`. The defect itself is real and is recorded as `DOC-D-024`. |
 
 ---
@@ -361,5 +378,8 @@ cannot contain that commit's hash. Resolve a subject with
 | ID | Fixed in | Note |
 | --- | --- | --- |
 | `DOC-D-001` | `fix(testing): let the source-to-test gate fail again` | `colocatedTest()` now rejects a candidate equal to the module's own path. The gate went from 275 walked modules always passing to 18 reported. A self-test in `scripts/check-test-coverage-map.selftest.mjs` runs ahead of every invocation and asserts the gate still fails on an unmapped module, so this defect cannot recur silently. |
+| `DOC-D-005` | `docs(traceability): define every requirement the code cites` | `docs/registry/requirements.json` defines all **98** identifiers the repository cites, and `docs/specs/srs.md` now carries every one of them in a block between generated markers. This entry measured 73 because the pattern it used cannot see 25 of them: five belong to an `INT-*` family that `(FR|NFR)` cannot match, one (`NFR-MNT-002`) is cited only from root-level `eslint.config.js`, outside the searched directories, eight are written under the prefix-less spellings `EXP-*` and `IMP-*` that `docs/ROADMAP.md` uses, and eleven appear only as the continuation of a group or range such as `FR-RES-002/003/010/016/017`. Re-running the command in this entry today returns 110 rather than 98, because the generated register also lists the numbers it records as belonging to nothing; the tooling strips generated regions before reading citations, a hand-run `grep` does not. `pnpm docs:check` now fails when the register, the repository and the document disagree in any direction, and `scripts/check-docs-traceability.selftest.mjs` breaks a fixture twelve ways to prove it can. |
+| `DOC-D-012` | `docs(traceability): define every requirement the code cites` | `docs/specs/srs.md` no longer denies multi-tenant hosting. The replacement states what migration `009-workspace-primary-keys` established, names the workspace boundary as a shipped property of the schema, and says in the document itself that the earlier sentence was corrected rather than repeated, so a reader who remembers the old claim can see it was withdrawn on evidence. |
 | `DOC-D-027` | `fix(testing): let the source-to-test gate fail again` | `pnpm test:brand` added to the `quality` job in `.github/workflows/ci.yml`. |
 | `DOC-D-030` | `fix(testing): let the source-to-test gate fail again` | `let` to `const` in `apps/api/src/services/control-plane.ts:100`. No behaviour change. `pnpm lint` now exits 0 with 40 pre-existing warnings and no errors. |
+| `DOC-D-032` | `docs(traceability): define every requirement the code cites` | Found while editing, not during the audit, so it has no open row above: the stack table in `docs/specs/srs.md` named the web application as *"React 18 and Vite"*, while `apps/web/package.json:29` pins `react: ^19.2.8`. Corrected in the same edit. This is the same fact as `DOC-D-020`, which remains open in its second location, `apps/web/package.json:6`. |
