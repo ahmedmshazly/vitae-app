@@ -4,10 +4,14 @@
  * nor listed in docs/testing/source-test-map.json (with existing test files).
  */
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { dirname, join, relative } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+// VITAE_MAP_ROOT lets the self-test point this gate at a fixture tree. Nothing
+// else sets it, so a normal run always resolves the real repository root.
+const root = process.env.VITAE_MAP_ROOT
+  ? resolve(process.env.VITAE_MAP_ROOT)
+  : join(dirname(fileURLToPath(import.meta.url)), '..');
 const mapPath = join(root, 'docs/testing/source-test-map.json');
 const map = JSON.parse(readFileSync(mapPath, 'utf8'));
 
@@ -75,7 +79,12 @@ function colocatedTest(abs) {
     abs.replace(/\.ts$/, '.test.ts'),
     abs.replace(/\.tsx?$/, '.spec.ts'),
   ];
-  return candidates.find((c) => existsSync(c));
+  // `String.replace` returns the input unchanged when the pattern misses, so a
+  // `.ts` file yields its own path from the two `.tsx` rules, and a `.tsx` file
+  // yields its own path from the `.ts` rule. `walk()` only emits files that
+  // exist, so without this guard every module matches itself, `find` always
+  // succeeds, and the caller never reaches the mapping check at all.
+  return candidates.find((c) => c !== abs && existsSync(c));
 }
 
 const missing = [];

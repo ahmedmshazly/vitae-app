@@ -34,7 +34,7 @@
     "test:resilience": "pnpm --filter @vitae/api exec vitest run src/__tests__/resilience src/services/buildsvc-client.test.ts",
     "test:mutation": "pnpm --filter @vitae/core test:mutation",
     "test:coverage": "pnpm --filter @vitae/core exec vitest run --coverage && pnpm --filter @vitae/testkit test",
-    "test:map": "node scripts/check-test-coverage-map.mjs",
+    "test:map": "node scripts/check-test-coverage-map.selftest.mjs && node scripts/check-test-coverage-map.mjs",
     "test:prose": "node scripts/check-test-prose.mjs",
     "test:public": "node scripts/check-public-release.mjs",
     "test:brand": "node scripts/check-brand-bans.mjs",

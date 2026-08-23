@@ -25,6 +25,19 @@
         "apps/api/src/__tests__/contracts/error-envelope.contract.test.ts"
       ]
     },
+    "apps/api/src/cloud/paddle.ts": {
+      "risk": "critical",
+      "layers": [
+        "unit",
+        "integration",
+        "security"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/cloud.integration.test.ts"
+      ],
+      "note": "Signature verification is imported directly and exercised again through the raw-body webhook route."
+    },
     "apps/api/src/db/migrations/001-initial-schema.ts": {
       "risk": "medium",
       "layers": [
@@ -89,6 +102,52 @@
         "apps/api/src/__tests__/api.integration.test.ts"
       ],
       "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/db/migrations/007-cloud-control-plane.ts": {
+      "risk": "critical",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/cloud.integration.test.ts"
+      ],
+      "note": "The control-plane tables it creates are truncated and repopulated by the Cloud suite before every case."
+    },
+    "apps/api/src/db/migrations/008-billing-event-ordering.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/cloud.integration.test.ts"
+      ],
+      "note": "The provider_updated_at ordering column is what makes the stale-delivery case reject a late event."
+    },
+    "apps/api/src/db/migrations/009-workspace-primary-keys.ts": {
+      "risk": "critical",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/cloud.integration.test.ts",
+        "apps/api/src/db/schema.test.ts"
+      ],
+      "note": "Workspace-keyed identity is proven by cross-workspace isolation; the schema suite writes the same tables through the legacy space path."
+    },
+    "apps/api/src/db/migrations/010-legacy-space-default-workspace.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/db/schema.test.ts",
+        "apps/api/src/routes/v1/cloud.integration.test.ts"
+      ],
+      "note": "The compatibility trigger is what lets the schema suite insert space-only rows with no workspace id."
     },
     "apps/api/src/db/pg.ts": {
       "risk": "medium",
@@ -267,6 +326,18 @@
       ],
       "status": "covered"
     },
+    "apps/api/src/middleware/workspace.ts": {
+      "risk": "critical",
+      "layers": [
+        "integration",
+        "security"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/cloud.integration.test.ts"
+      ],
+      "note": "Tenant scoping and the read-only lifecycle gate are asserted here. Every other API suite runs both functions in single-workspace mode without asserting the boundary."
+    },
     "apps/api/src/openapi/generate.ts": {
       "risk": "medium",
       "layers": [
@@ -297,6 +368,16 @@
       "status": "covered",
       "tests": [
         "apps/api/src/__tests__/contracts/openapi.contract.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/applications.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/applications.integration.test.ts"
       ]
     },
     "apps/api/src/routes/v1/ask.ts": {
@@ -330,6 +411,19 @@
         "apps/api/src/middleware/auth.test.ts"
       ],
       "status": "covered"
+    },
+    "apps/api/src/routes/v1/billing.ts": {
+      "risk": "high",
+      "layers": [
+        "integration",
+        "contract"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/cloud.integration.test.ts",
+        "apps/api/src/__tests__/contracts/openapi.contract.test.ts"
+      ],
+      "note": "Checkout refuses to reach a provider without a server-owned catalog; the contract suite pins both documented operation ids."
     },
     "apps/api/src/routes/v1/capture.ts": {
       "risk": "high",
@@ -595,6 +689,18 @@
         "apps/api/src/routes/v1/views.integration.test.ts"
       ]
     },
+    "apps/api/src/routes/webhooks/paddle.ts": {
+      "risk": "critical",
+      "layers": [
+        "integration",
+        "security"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/cloud.integration.test.ts"
+      ],
+      "note": "Raw-body HMAC acceptance and stale out-of-order delivery are asserted end to end."
+    },
     "apps/api/src/services/buildsvc-client.ts": {
       "risk": "critical",
       "layers": [
@@ -616,6 +722,18 @@
         "apps/api/src/__tests__/api.integration.test.ts"
       ],
       "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/services/control-plane.ts": {
+      "risk": "critical",
+      "layers": [
+        "integration",
+        "security"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/cloud.integration.test.ts"
+      ],
+      "note": "Legacy-graph claim, isolated trial provisioning, and lifecycle enforcement are asserted through the API."
     },
     "apps/api/src/services/crm.ts": {
       "risk": "medium",
@@ -1558,6 +1676,14 @@
         "apps/web/src/lib/motion.test.ts"
       ]
     },
+    "apps/web/src/lib/paddle.ts": {
+      "risk": "high",
+      "layers": [
+        "component"
+      ],
+      "status": "deferred",
+      "exclude_reason": "Billing.test.tsx substitutes a mock for this module, so the checkout script loader and its readiness probe are unproven. Needs a browser-level test against the real provider script."
+    },
     "apps/web/src/lib/runtime.ts": {
       "risk": "medium",
       "layers": [
@@ -1829,6 +1955,38 @@
         "apps/web/src/routes/Trash.states.test.tsx"
       ]
     },
+    "apps/web/src/routes/marketing/CareerEvidence.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "deferred",
+      "exclude_reason": "Marketing page composed for the Cloud release and shipped without a suite. Its plan figures come from CLOUD_PLAN, which MarketingContent.test.ts covers; the page structure, links, and states are unproven."
+    },
+    "apps/web/src/routes/career/ApplicationActions.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/web/src/routes/career/CareerOverview.test.tsx",
+        "apps/web/src/routes/career/ApplicationDossier.test.tsx"
+      ],
+      "note": "Both buttons mount inside their host screens, but the create and edit flows themselves are not asserted."
+    },
+    "apps/web/src/routes/career/application-view.ts": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/career/CareerOverview.test.tsx",
+        "apps/web/src/routes/career/ApplicationDossier.test.tsx"
+      ],
+      "note": "The register, runway, attention, and filtered-empty derivations it owns are asserted through both host screens."
+    },
     "apps/web/src/routes/marketing/Chrome.tsx": {
       "risk": "medium",
       "layers": [
@@ -1838,6 +1996,22 @@
       "status": "deferred",
       "tests": [],
       "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/marketing/CloudAction.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "deferred",
+      "exclude_reason": "Shared call-to-action mounted by four untested marketing pages. Its CLOUD_PLAN input is covered by MarketingContent.test.ts; its own rendering and disabled pre-launch state are not."
+    },
+    "apps/web/src/routes/marketing/HowItWorks.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "deferred",
+      "exclude_reason": "Marketing page composed for the Cloud release and shipped without a suite. Its plan figures come from CLOUD_PLAN, which MarketingContent.test.ts covers; the page structure, links, and states are unproven."
     },
     "apps/web/src/routes/marketing/Landing.tsx": {
       "risk": "medium",
@@ -1857,6 +2031,14 @@
         "apps/web/src/routes/marketing/Manifesto.test.ts"
       ]
     },
+    "apps/web/src/routes/marketing/SecurityOwnership.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "deferred",
+      "exclude_reason": "Marketing page composed for the Cloud release and shipped without a suite. Its plan figures come from CLOUD_PLAN, which MarketingContent.test.ts covers; the page structure, links, and states are unproven."
+    },
     "apps/web/src/routes/marketing/Tour.tsx": {
       "risk": "medium",
       "layers": [
@@ -1865,6 +2047,14 @@
       "tests": [
         "apps/web/src/routes/marketing/Tour.test.ts"
       ]
+    },
+    "apps/web/src/routes/marketing/WarmPaths.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "deferred",
+      "exclude_reason": "Marketing page composed for the Cloud release and shipped without a suite. Its plan figures come from CLOUD_PLAN, which MarketingContent.test.ts covers; the page structure, links, and states are unproven."
     },
     "apps/web/src/routes/reference/EntityCatalog.tsx": {
       "risk": "medium",

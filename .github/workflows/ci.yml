@@ -61,8 +61,10 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm lint
-      - name: Source↔test map, prose, and public-data checks
-        run: pnpm test:map && pnpm test:prose && pnpm test:public
+      - name: Source↔test map, prose, public-data, and brand checks
+        # test:map runs its own self-test first: the map gate silently passed
+        # everything for months, so it must be seen to fail before it is trusted.
+        run: pnpm test:map && pnpm test:prose && pnpm test:public && pnpm test:brand
       - name: Reject high and critical dependency vulnerabilities
         run: pnpm audit --audit-level=high
       - name: Unit + property-fuzz tests (packages/core + testkit)

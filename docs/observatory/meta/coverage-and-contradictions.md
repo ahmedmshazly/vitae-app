@@ -39,7 +39,7 @@ Identifiers are stable. Cite them as `DOC-D-001`.
 
 ---
 
-## Severity 1: a quality gate that cannot fail
+## Severity 1: quality gates that do not hold
 
 ### DOC-D-001 — `pnpm test:map` never reports a missing module
 
@@ -88,6 +88,29 @@ Reproduce:
 ```bash
 node scripts/check-test-coverage-map.mjs   # prints ok
 git log --format='%h %ad' --date=short -1 -- scripts/check-test-coverage-map.mjs
+```
+
+### DOC-D-030 — `pnpm lint` fails on `main`
+
+`pnpm lint` exits 1 on a clean checkout. CI runs it in the `quality` job, so
+that job cannot pass on any commit. A single rule violation is responsible:
+
+```
+apps/api/src/services/control-plane.ts:100:7
+  prefer-const  'graceEndsAt' is never reassigned. Use 'const' instead.
+```
+
+`refreshAccess()` declares `graceEndsAt` with `let` beside `deletionScheduledAt`,
+which genuinely is reassigned through `??=`. Only the first is constant.
+
+The file is from `1e2c502 feat(cloud)`, the same commit as most of `DOC-D-002`.
+The Cloud plane therefore entered the repository past a coverage gate that could
+not fail and a lint gate that was already failing, so neither reported it.
+
+Reproduce:
+
+```bash
+git stash -u && pnpm lint; echo "exit=$?"; git stash pop
 ```
 
 ---
@@ -331,6 +354,12 @@ this inventory.
 
 ### Resolved
 
+Commits are referenced by subject, because a row written before its own commit
+cannot contain that commit's hash. Resolve a subject with
+`git log --oneline --grep '<subject>'`.
+
 | ID | Fixed in | Note |
 | --- | --- | --- |
-| — | — | — |
+| `DOC-D-001` | `fix(testing): let the source-to-test gate fail again` | `colocatedTest()` now rejects a candidate equal to the module's own path. The gate went from 275 walked modules always passing to 18 reported. A self-test in `scripts/check-test-coverage-map.selftest.mjs` runs ahead of every invocation and asserts the gate still fails on an unmapped module, so this defect cannot recur silently. |
+| `DOC-D-027` | `fix(testing): let the source-to-test gate fail again` | `pnpm test:brand` added to the `quality` job in `.github/workflows/ci.yml`. |
+| `DOC-D-030` | `fix(testing): let the source-to-test gate fail again` | `let` to `const` in `apps/api/src/services/control-plane.ts:100`. No behaviour change. `pnpm lint` now exits 0 with 40 pre-existing warnings and no errors. |

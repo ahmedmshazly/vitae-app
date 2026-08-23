@@ -97,7 +97,7 @@ async function recordLifecycleEvent(
 async function refreshAccess(access: WorkspaceAccess): Promise<WorkspaceAccess> {
   const now = nowIso();
   let next: WorkspaceAccessState | null = null;
-  let graceEndsAt = access.graceEndsAt;
+  const graceEndsAt = access.graceEndsAt;
   let deletionScheduledAt = access.deletionScheduledAt;
 
   if (access.accessState === 'trialing' && access.trialEndsAt && access.trialEndsAt <= now) {
