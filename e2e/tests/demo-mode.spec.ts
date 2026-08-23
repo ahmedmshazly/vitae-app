@@ -17,6 +17,16 @@ test('toggle into the demo space and back', async ({ page }) => {
   await page.goto('/resume/tailor');
   await expect(page.getByText('Machine Learning Engineer').first()).toBeVisible({ timeout: 10_000 });
 
+  await page.goto('/intros');
+  const aurora = page
+    .getByRole('region', { name: 'Pursuing' })
+    .getByRole('button', { name: /Aurora Dynamics/ });
+  await aurora.click();
+  const paths = page.getByRole('region', { name: 'Reach Aurora Dynamics' });
+  await expect(paths.locator('article').filter({ hasText: 'chains into' }).first()).toContainText(
+    'Jean-Paul Habimana → Marc Uwimana chains into Aurora Dynamics',
+  );
+
   // Back to real data via the banner link.
   await page.getByRole('button', { name: /back to my data/i }).click();
   await expect(page.getByText(/demo space/i)).toBeHidden({ timeout: 10_000 });

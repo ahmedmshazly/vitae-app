@@ -12,6 +12,16 @@ import { expectNoA11yViolations } from './helpers/a11y';
 const TARGETS = '**/api/v1/intros/targets';
 const PATHS = '**/api/v1/intros/paths*';
 
+interface ApiHop {
+  title: string;
+  viaEdgeType?: string;
+  viaStrength?: number;
+}
+
+interface IntroPathsPayload {
+  paths: Array<{ hops: ApiHop[] }>;
+}
+
 function reach(page: Page) {
   return page.getByRole('region', { name: /^Reach / });
 }
@@ -70,34 +80,61 @@ test('an empty graph invites a first organization', async ({ page }) => {
 
 test('each hop is weighted by its own tie, not by the path’s label', async ({ page }) => {
   await signIn(page);
+  const pathsResponse = page.waitForResponse(
+    (response) => response.url().includes('/api/v1/intros/paths?') && response.status() === 200,
+  );
   await goIntros(page);
+  const { paths } = (await (await pathsResponse).json()) as IntroPathsPayload;
 
-  // A path with hops of different strengths, "knows · 0.18" then "knows · 0.30".
-  const multi = reach(page)
-    .locator('article')
-    .filter({ hasText: 'chains into' })
-    .first();
+  const multi = reach(page).locator('article').filter({ hasText: 'chains into' }).first();
   await expect(multi).toBeVisible();
+  await expect(multi).toContainText('Lina Farouk');
+  await expect(multi).toContainText('Karim Nabil');
+  await expect(multi.getByText('works there', { exact: true })).toBeVisible();
 
-  const lines = await multi.locator('[aria-label="Introduction path"] span[style*="opacity"]').evaluateAll((els) =>
+  const lines = await multi.locator('.network-path__line').evaluateAll((els) =>
     els.map((e) => ({
       bg: getComputedStyle(e).backgroundColor,
       opacity: Number(getComputedStyle(e).opacity),
     })),
   );
-  expect(lines.length).toBeGreaterThan(1);
+  expect(lines).toHaveLength(3);
 
-  // One ink. The three classes this replaced painted accent, accent-soft and
-  // --ae-warning, which tokens.css forbids as a chart series.
   expect(new Set(lines.map((l) => l.bg)).size).toBe(1);
 
-  // …and the weights differ *within one path*. The old markup handed the path's
-  // aggregate label to every edge, so a "knows · 1.00" link on a weak path was
-  // drawn as weak, the colour named the wrong link as the problem.
-  expect(new Set(lines.map((l) => l.opacity)).size).toBeGreaterThan(1);
+  // Earlier journeys can record a real interaction with Lina. The API then
+  // recomputes that tie at full precision, while the label stays rounded for
+  // people. Bind each visual line to the response that supplied it.
+  const apiPath = paths.find((path) =>
+    path.hops.some((hop) => hop.title === 'Lina Farouk') &&
+    path.hops.some((hop) => hop.title === 'Karim Nabil'),
+  );
+  expect(apiPath).toBeDefined();
+  const apiTies =
+    apiPath?.hops.filter((hop) => hop.viaEdgeType === 'knows' && hop.viaStrength != null) ?? [];
+  expect(apiTies).toHaveLength(2);
 
-  // The number is on the label, so the weight is never the only carrier.
-  await expect(multi.getByText(/knows · \d\.\d\d/).first()).toBeVisible();
+  const ties = await multi.locator('.network-path__connector').evaluateAll((els) =>
+    els
+      .map((connector) => {
+        const line = connector.querySelector<HTMLElement>('.network-path__line');
+        return {
+          label: connector.textContent?.trim() ?? '',
+          opacity: Number(line ? getComputedStyle(line).opacity : Number.NaN),
+        };
+      })
+      .filter((tie) => /^knows · \d\.\d\d$/.test(tie.label)),
+  );
+  expect(ties).toHaveLength(apiTies.length);
+
+  expect(ties.map((tie) => tie.label)).toEqual(
+    apiTies.map((tie) => `knows · ${tie.viaStrength!.toFixed(2)}`),
+  );
+  expect(apiTies[1]?.viaStrength).toBeCloseTo(0.3, 2);
+  expect(apiTies[0]?.viaStrength).not.toBeCloseTo(apiTies[1]?.viaStrength ?? Number.NaN, 2);
+  for (const [index, tie] of ties.entries()) {
+    expect(tie.opacity).toBeCloseTo(0.2 + 0.8 * apiTies[index]!.viaStrength!, 3);
+  }
 });
 
 test('the rail shows the facts it orders by', async ({ page }) => {
@@ -161,13 +198,94 @@ test('every path is ranked, and same-named askers stay distinguishable', async (
   expect(new Set(names).size).toBe(names.length);
 });
 
-test('the whole explanation is shown, not the first four of it', async ({ page }) => {
+test('a chained path shows every server evidence factor', async ({ page }) => {
   await signIn(page);
   await goIntros(page);
 
-  // `factors` was sliced to four; the server emits up to five.
-  const chips = reach(page).locator('article').filter({ hasText: 'chains into' }).first().locator('.vt-chip');
-  await expect(chips).toHaveCount(5);
+  const evidence = reach(page)
+    .locator('article')
+    .filter({ hasText: 'chains into' })
+    .first()
+    .locator('[aria-label="Path evidence"]');
+  await expect(evidence.locator('.vt-chip')).toHaveCount(4);
+  await expect(evidence).toContainText('2 hops');
+  await expect(evidence).toContainText('Works there');
+  await expect(evidence).toContainText('Weak tie');
+  await expect(evidence).toContainText('Weak path');
+});
+
+test('path evidence keeps every supplied factor', async ({ page }) => {
+  const target = {
+    id: 'evidence-org',
+    title: 'Evidence Organization',
+    kind: 'company',
+    city: null,
+    stage: null,
+    reach: '2 hops',
+    reachable: true,
+    affinity: 0.5,
+    peopleCount: 2,
+    openRoles: 0,
+  };
+  const factors = ['2 hops', 'Works there', 'Medium tie', 'Medium path', 'Recent introduction'];
+  await page.route(TARGETS, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ targets: [target] }),
+    }),
+  );
+  await page.route(PATHS, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        org: { id: target.id, title: target.title },
+        paths: [
+          {
+            hops: [
+              { nodeId: 'evidence-self', title: 'You', type: 'person' },
+              {
+                nodeId: 'evidence-ari',
+                title: 'Ari Rivera',
+                type: 'person',
+                viaEdgeType: 'knows',
+                viaStrength: 0.5,
+              },
+              {
+                nodeId: 'evidence-bea',
+                title: 'Bea Gomez',
+                type: 'person',
+                viaEdgeType: 'knows',
+                viaStrength: 0.3,
+              },
+              {
+                nodeId: target.id,
+                title: target.title,
+                type: 'organization',
+                viaEdgeType: 'works_at',
+                viaStrength: 0.9,
+              },
+            ],
+            score: 0.135,
+            strengthLabel: 'medium',
+            askerId: 'evidence-ari',
+            askerName: 'Ari Rivera',
+            why: 'Ari Rivera → Bea Gomez chains into Evidence Organization; every factor is visible.',
+            factors,
+          },
+        ],
+      }),
+    }),
+  );
+
+  await signIn(page);
+  await goIntros(page);
+
+  const evidence = reach(page).locator('[aria-label="Path evidence"]');
+  await expect(evidence.locator('.vt-chip')).toHaveCount(factors.length);
+  for (const factor of factors)
+    await expect(evidence.getByText(factor, { exact: true })).toBeVisible();
 });
 
 test('warm intros has no automated a11y violations', async ({ page }) => {
