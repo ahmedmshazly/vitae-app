@@ -124,7 +124,10 @@ All notable changes are recorded here.
   warm-intro path through that pair came back twice and pushed the longer paths
   out of the list. A relationship is one record per pair, so the new fields now
   fold into the edge that exists, keeping the ones the dialog never showed.
-
+- The real and demo sample graphs could only show direct warm introductions,
+  even though the product ranks multi-hop paths. Both now include a recorded
+  peer tie and a contact's actual role, so the Warm paths screen demonstrates
+  the full chain rather than a headline-only affiliation.
 
 ## 1.0.0
 

@@ -70,10 +70,21 @@ async function main() {
   // ── KNOWS edges (the relationships) ────────────────────────────────────────
   const knows = async (dst: string, props: Record<string, unknown>) =>
     repository.createEdge({ type: 'KNOWS', src: self.id, dst, props, source: 'manual' });
+  const peerKnows = async (src: string, dst: string, props: Record<string, unknown>) =>
+    repository.createEdge({ type: 'KNOWS', src, dst, props, source: 'manual' });
   await knows(sarah, { closeness: 4, cadence_target_days: 60, met_via: 'DevFest speaker dinner', topics: ['reinforcement learning', 'hiring'], favors: [{ direction: 'owed_to_me', what: 'intro to her VP', settled: false }] });
   await knows(omar, { closeness: 5, cadence_target_days: 30, topics: ['frontend', 'design systems'] });
   await knows(lina, { closeness: 2, cadence_target_days: 365, met_via: 'DevFest', topics: ['reinforcement learning'] });
   await knows(karim, { closeness: 3, cadence_target_days: 120, topics: ['hiring', 'perception'] });
+
+  // The low-stakes peer tie makes the warm-path screen demonstrate a real
+  // multi-hop ask: Jordan → Lina → Karim → Nile Robotics.
+  await peerKnows(lina, karim, {
+    relation: 'colleague',
+    met_via: 'DevFest research circle',
+    topics: ['reinforcement learning', 'hiring'],
+    strength: 0.3,
+  });
 
   // ── Roles + org links ──────────────────────────────────────────────────────
   const myRole = await repository.createNode({
@@ -92,6 +103,25 @@ async function main() {
   const sarahRole = await repository.createNode({ type: 'role', title: 'Staff SWE', props: { employment_type: 'full_time', seniority: 'staff' }, start_date: '2021-01-01', status: 'active', source: 'manual' });
   await repository.createEdge({ type: 'HELD', src: sarah, dst: sarahRole.id, source: 'manual' });
   await repository.createEdge({ type: 'ROLE_AT', src: sarahRole.id, dst: nile, source: 'manual' });
+
+  // Karim's profile already named Nile; record the role so it can be used as
+  // the concrete affiliation at the end of the peer-to-peer introduction path.
+  const karimRole = await repository.createNode({
+    type: 'role',
+    title: 'Engineering Manager',
+    subtitle: 'Nile Robotics · Perception',
+    props: {
+      employment_type: 'full_time',
+      seniority: 'manager',
+      team: 'Perception',
+      tech_stack: ['Python', 'Kubernetes'],
+    },
+    start_date: '2023-06-01',
+    status: 'active',
+    source: 'manual',
+  });
+  await repository.createEdge({ type: 'HELD', src: karim, dst: karimRole.id, source: 'manual' });
+  await repository.createEdge({ type: 'ROLE_AT', src: karimRole.id, dst: nile, source: 'manual' });
 
   // ── Project + skills ───────────────────────────────────────────────────────
   const proj = await repository.createNode({ type: 'project', title: 'PerceptionBench', props: { kind: 'work', my_role: 'tech lead', status: 'done', outcome: 'Open benchmark for perception inference latency' }, start_date: '2024-03-01', end_date: '2024-11-30', source: 'manual' });

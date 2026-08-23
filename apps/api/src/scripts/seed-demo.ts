@@ -95,6 +95,8 @@ async function main() {
 
   const knows = async (dst: string, props: Record<string, unknown>) =>
     repository.createEdge({ type: 'KNOWS', src: self.id, dst, props, source: 'manual' });
+  const peerKnows = async (src: string, dst: string, props: Record<string, unknown>) =>
+    repository.createEdge({ type: 'KNOWS', src, dst, props, source: 'manual' });
   await knows(priya, { closeness: 4, cadence_target_days: 90, met_via: 'Goodera internship', topics: ['automation', 'referrals'] });
   await knows(fatima, { closeness: 5, cadence_target_days: 30, met_via: 'CMU-Africa research', topics: ['reinforcement learning', 'publications'] });
   await knows(jean, { closeness: 5, cadence_target_days: 14, topics: ['computer vision', 'coursework'] });
@@ -103,6 +105,12 @@ async function main() {
   await knows(omar, { closeness: 2, cadence_target_days: 365, topics: ['inventory system'] });
   await knows(grace, { closeness: 2, cadence_target_days: 60, topics: ['ML engineer role'] });
   await knows(tarek, { closeness: 3, cadence_target_days: 180, met_via: 'DevFest', topics: ['robotics', 'founding'] });
+  await peerKnows(jean, marc, {
+    relation: 'colleague',
+    met_via: 'Deep Learning Indaba',
+    topics: ['data platforms', 'machine learning'],
+    strength: 0.3,
+  });
 
   // ── Roles ───────────────────────────────────────────────────────────────────
   const role = async (title: string, subtitle: string, orgId: string, location: string, start: string, end: string | null, extra: Record<string, unknown> = {}) => {
@@ -123,6 +131,23 @@ async function main() {
   const rNaser = await role('Software Development Intern', 'NaserSalem Motors · Sales systems', nasersalem, 'Sohag, Egypt', '2022-06-01', '2022-08-31', { tech_stack: ['Django', 'PostgreSQL'] });
   const rGoodera = await role('Business Analyst & Automation Intern', 'Goodera · Partnerships data', goodera, 'Remote (India)', '2022-02-01', '2022-06-30', { tech_stack: ['Python', 'Selenium'] });
   const rCmuRa = await role('Graduate Research Assistant', 'CMU-Africa · Adaptive pipelines', cmu, 'Kigali, Rwanda', '2025-08-15', null, { employment_type: 'part_time', tech_stack: ['PyTorch', 'NumPy', 'SciPy'] });
+
+  const marcRole = await repository.createNode({
+    type: 'role',
+    title: 'Data Platform Lead',
+    subtitle: 'Aurora Dynamics · Data Platform',
+    props: {
+      employment_type: 'full_time',
+      seniority: 'lead',
+      team: 'Data Platform',
+      tech_stack: ['Python', 'PostgreSQL'],
+    },
+    start_date: '2024-01-01',
+    status: 'active',
+    source: 'manual',
+  });
+  await repository.createEdge({ type: 'HELD', src: marc, dst: marcRole.id, source: 'manual' });
+  await repository.createEdge({ type: 'ROLE_AT', src: marcRole.id, dst: aurora, source: 'manual' });
 
   for (const [rid, skills] of [
     [rNia, [sPy, sEtl, sViz]],
