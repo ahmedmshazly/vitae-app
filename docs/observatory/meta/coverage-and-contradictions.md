@@ -1,6 +1,7 @@
 ---
 id: META-AUDIT
 title: Documentation coverage and contradiction inventory
+summary: Every defect found while auditing the existing documentation, with the file and line that proves it.
 audience: [maintainer, developer, operator]
 domain: meta
 type: reference

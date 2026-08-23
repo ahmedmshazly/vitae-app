@@ -1478,6 +1478,7 @@
         "scripts/check-docs-coverage.mjs:33",
         "scripts/check-docs-generated.mjs:25",
         "scripts/check-docs-generated.mjs:26",
+        "scripts/check-docs-pages.mjs:43",
         "scripts/check-docs-traceability.mjs:28",
         "scripts/docs/gen-api.mjs:30",
         "scripts/docs/gen-routes.mjs:27",

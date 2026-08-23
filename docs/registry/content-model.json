@@ -1,0 +1,123 @@
+{
+  "$schema": "./schema/content-model.schema.json",
+  "note": "The shape of a documentation page: the vocabularies its metadata may use, the sections its body must carry, and the sections of the corpus it may live in. `scripts/check-docs-pages.mjs` enforces this and the reading surface renders from it, so a status badge and the gate that judges it cannot disagree. A page names the domain of the directory it sits in; the few pages at the corpus root — its entrance and its glossary — are documentation about the documentation, and name `meta`.",
+  "corpus": "docs/observatory",
+  "audiences": {
+    "user": "Someone using Vitae to run their own career work.",
+    "designer": "Someone changing how a surface looks, reads or behaves.",
+    "developer": "Someone changing the code.",
+    "maintainer": "Someone responsible for the shape of the system over time.",
+    "operator": "Someone deploying, migrating, backing up or recovering an instance.",
+    "security": "Someone reviewing trust boundaries, data handling or failure modes."
+  },
+  "domains": {
+    "product": {
+      "order": 1,
+      "title": "Product",
+      "summary": "What Vitae is for, who it serves, and where its boundaries are."
+    },
+    "use": {
+      "order": 2,
+      "title": "Use",
+      "summary": "Working the product: onboarding, tasks, every screen, and what to do when something goes wrong."
+    },
+    "design": {
+      "order": 3,
+      "title": "Design",
+      "summary": "The Quiet Observatory: identity, tokens, patterns, states, motion, accessibility and voice."
+    },
+    "architecture": {
+      "order": 4,
+      "title": "Architecture",
+      "summary": "How the system is put together, from the request lifecycle down to the typed career graph."
+    },
+    "develop": {
+      "order": 5,
+      "title": "Develop",
+      "summary": "Setting up, finding where a change belongs, testing it, and shipping it safely."
+    },
+    "operate": {
+      "order": 6,
+      "title": "Operate",
+      "summary": "Running an instance: deployment, migration, backup, restore, rotation and incident response."
+    },
+    "decisions": {
+      "order": 7,
+      "title": "Decisions",
+      "summary": "The architecture decisions on record, including the ones that have been replaced."
+    },
+    "meta": {
+      "order": 8,
+      "title": "About these documents",
+      "summary": "What this documentation covers, what it does not, and the rules that keep it true."
+    }
+  },
+  "types": {
+    "index": "Leads a reader into a section. Carries no facts of its own that a page below it does not carry.",
+    "explanation": "Builds understanding of something that already exists.",
+    "tutorial": "Takes a newcomer through a first success, start to finish.",
+    "task": "Answers a specific goal someone already has.",
+    "reference": "States facts to be looked up, not read through.",
+    "decision": "Records a choice, its context and its consequences."
+  },
+  "statuses": {
+    "verified": {
+      "label": "Verified",
+      "tone": "positive",
+      "note": "Checked against the code at the revision named in verified_at."
+    },
+    "partial": {
+      "label": "Partly implemented",
+      "tone": "caution",
+      "note": "Some of what this describes ships; the page says which parts do not."
+    },
+    "planned": {
+      "label": "Planned",
+      "tone": "neutral",
+      "note": "Intent, not behaviour. Nothing here is claimed to run today."
+    },
+    "gated": {
+      "label": "Gated",
+      "tone": "neutral",
+      "note": "Implemented but not reachable in a default build; a flag or a launch step holds it closed."
+    },
+    "deprecated": {
+      "label": "Deprecated",
+      "tone": "caution",
+      "note": "Kept so existing links resolve. Points at what replaced it."
+    },
+    "historical": {
+      "label": "Historical",
+      "tone": "neutral",
+      "note": "True when it was written, kept as a record rather than as guidance."
+    },
+    "generated": {
+      "label": "Generated",
+      "tone": "neutral",
+      "note": "Derived from the source by a script. Editing the page by hand will be overwritten."
+    },
+    "needs-review": {
+      "label": "Needs review",
+      "tone": "caution",
+      "note": "Reconstructed from evidence rather than from a record, and not yet confirmed by someone who would know."
+    }
+  },
+  "fields": {
+    "required": ["id", "title", "summary", "audience", "domain", "type", "status"],
+    "optional": [
+      "sources",
+      "requirements",
+      "covers",
+      "verified_at",
+      "supersedes",
+      "superseded_by",
+      "related",
+      "order"
+    ]
+  },
+  "sections": {
+    "explanation": ["In short", "How it works", "Mechanics", "Related"]
+  },
+  "app_routes": [],
+  "app_routes_note": "Paths under /docs that the application serves but no page produces — search, the glossary index, reference catalogs. Every entry must appear in docs/generated/routes.json, so this list cannot promise a destination the router does not mount."
+}

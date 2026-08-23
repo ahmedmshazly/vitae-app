@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vitae.invalid/registry/content-model.schema.json",
+  "title": "Vitae documentation content model",
+  "type": "object",
+  "required": ["note", "corpus", "audiences", "domains", "types", "statuses", "fields", "sections", "app_routes"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "note": { "type": "string", "minLength": 1 },
+    "corpus": {
+      "description": "Repository-relative directory holding the curated pages.",
+      "type": "string",
+      "pattern": "^[^/].*[^/]$"
+    },
+    "audiences": {
+      "description": "Who a page is written for. A page names at least one.",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "domains": {
+      "description": "Sections of the corpus. The key is the directory name under `corpus`.",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["order", "title", "summary"],
+        "additionalProperties": false,
+        "properties": {
+          "order": { "type": "integer", "minimum": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "summary": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "types": {
+      "description": "What kind of reading a page is. Drives the structural rules in `sections`.",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "statuses": {
+      "description": "What a page claims about the code it describes. Rendered as a badge, filtered on in search.",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["label", "tone", "note"],
+        "additionalProperties": false,
+        "properties": {
+          "label": { "type": "string", "minLength": 1 },
+          "tone": { "enum": ["positive", "caution", "neutral"] },
+          "note": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "fields": {
+      "type": "object",
+      "required": ["required", "optional"],
+      "additionalProperties": false,
+      "properties": {
+        "required": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "optional": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "sections": {
+      "description": "Top-level headings a page of a given type must carry, in order. A type with no entry has no structural rule.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "items": { "type": "string", "minLength": 1 }
+      }
+    },
+    "app_routes": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^/docs" }
+    },
+    "app_routes_note": { "type": "string", "minLength": 1 }
+  }
+}

@@ -102,6 +102,35 @@ if (unknown.length === 1 && unknown[0] === '#/properties/a/multipleOf') {
   console.error(`  FAIL  an unsupported keyword is reported rather than ignored: got ${JSON.stringify(unknown)}`);
 }
 
+console.log('numeric and object bounds');
+check('a number below the minimum is reported',
+  { type: 'integer', minimum: 1 }, 0,
+  { expect: 'invalid', mentions: 'below the minimum 1' });
+check('the minimum itself passes',
+  { type: 'integer', minimum: 1 }, 1, { expect: 'valid' });
+check('a number above the maximum is reported',
+  { type: 'number', maximum: 10 }, 10.5,
+  { expect: 'invalid', mentions: 'above the maximum 10' });
+check('a bound on the wrong type is not silently applied',
+  { minimum: 1 }, 'text', { expect: 'valid' });
+check('minProperties counts the keys actually present',
+  { type: 'object', minProperties: 2 }, { a: 1 },
+  { expect: 'invalid', mentions: 'at least 2 properties, got 1' });
+check('minProperties is satisfied exactly',
+  { type: 'object', minProperties: 2 }, { a: 1, b: 2 }, { expect: 'valid' });
+
+const bounded = assertKnownKeywords({
+  type: 'object',
+  minProperties: 1,
+  additionalProperties: { type: 'integer', minimum: 0, maximum: 9 },
+});
+if (bounded.length === 0) {
+  console.log('  ok  bounds keywords are recognised rather than skipped');
+} else {
+  failures += 1;
+  console.error(`  FAIL  bounds keywords are recognised rather than skipped: got ${JSON.stringify(bounded)}`);
+}
+
 if (failures) {
   console.error(`\njson-schema selftest: ${failures} case(s) failed`);
   process.exit(1);

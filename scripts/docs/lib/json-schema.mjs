@@ -6,9 +6,10 @@
  * is the exact failure this documentation work exists to prevent. The subset
  * below is closed and small, so owning it is cheaper than owning a dependency.
  *
- * Supported: type, enum, const, pattern, minLength, required, properties,
- * additionalProperties, propertyNames, items, minItems, maxItems, allOf,
- * if/then/else, and $ref limited to `#/$defs/<name>`.
+ * Supported: type, enum, const, pattern, minLength, minimum, maximum,
+ * required, properties, additionalProperties, propertyNames, minProperties,
+ * items, minItems, maxItems, allOf, if/then/else, and $ref limited to
+ * `#/$defs/<name>`.
  *
  * Anything else in a schema is ignored rather than silently treated as passing,
  * because `assertKnownKeywords` reports it. A typo in a schema is a defect in
@@ -17,9 +18,10 @@
 
 const ANNOTATIONS = new Set(['$schema', '$id', 'title', 'description', '$defs', 'default', 'examples']);
 const KEYWORDS = new Set([
-  'type', 'enum', 'const', 'pattern', 'minLength', 'required', 'properties',
-  'additionalProperties', 'propertyNames', 'items', 'minItems', 'maxItems',
-  'allOf', 'if', 'then', 'else', '$ref',
+  'type', 'enum', 'const', 'pattern', 'minLength', 'minimum', 'maximum',
+  'required', 'properties', 'additionalProperties', 'propertyNames',
+  'minProperties', 'items', 'minItems', 'maxItems', 'allOf', 'if', 'then',
+  'else', '$ref',
 ]);
 
 function typeOf(value) {
@@ -60,6 +62,7 @@ export function assertKnownKeywords(schema, path = '#') {
         continue;
       }
       if (key === 'required' || key === 'enum' || key === 'const' || key === 'type') continue;
+      if (key === 'minimum' || key === 'maximum' || key === 'minProperties') continue;
       if (key === 'properties' || key === 'propertyNames') {
         if (key === 'properties') {
           for (const [name, sub] of Object.entries(child ?? {})) walk(sub, `${at}/properties/${name}`);
@@ -111,6 +114,14 @@ function check(schema, value, path, root, errors) {
       errors.push(`${path}: shorter than ${node.minLength} characters`);
     }
   }
+  if (typeof value === 'number') {
+    if (node.minimum !== undefined && value < node.minimum) {
+      errors.push(`${path}: ${value} is below the minimum ${node.minimum}`);
+    }
+    if (node.maximum !== undefined && value > node.maximum) {
+      errors.push(`${path}: ${value} is above the maximum ${node.maximum}`);
+    }
+  }
   if (Array.isArray(value)) {
     if (node.minItems !== undefined && value.length < node.minItems) {
       errors.push(`${path}: expected at least ${node.minItems} items, got ${value.length}`);
@@ -123,6 +134,9 @@ function check(schema, value, path, root, errors) {
     }
   }
   if (value !== null && typeOf(value) === 'object') {
+    if (node.minProperties !== undefined && Object.keys(value).length < node.minProperties) {
+      errors.push(`${path}: expected at least ${node.minProperties} properties, got ${Object.keys(value).length}`);
+    }
     for (const name of node.required ?? []) {
       if (!Object.hasOwn(value, name)) errors.push(`${path}: missing required property ${name}`);
     }
