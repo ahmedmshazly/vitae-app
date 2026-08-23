@@ -2,6 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { ROUTES, WORKSPACE_NAV, hubForPath, isRouteActive } from './routes.js';
 
 describe('workspace route registry', () => {
+  it('keeps Today under its canonical private address', () => {
+    expect(ROUTES.today.path).toBe('/today');
+    expect(hubForPath('/today')).toBe('today');
+    expect(hubForPath('/')).toBeNull();
+  });
+
   it('resolves canonical detail routes and compatibility addresses to the same hub', () => {
     expect(hubForPath('/network/people/person-1')).toBe('network');
     expect(hubForPath('/people/person-1')).toBe('network');

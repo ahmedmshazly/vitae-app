@@ -43,7 +43,7 @@ test('settings exposes résumé defaults for template, accent, and wording', asy
 test('the résumé workspace stays reachable on narrow viewports', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await signInDemo(page);
-  await page.goto('/');
+  await page.goto('/today');
 
   // The dock carries the six workspaces, not every screen under them. Résumé
   // is Career's, so the route to it is the route the IA describes.

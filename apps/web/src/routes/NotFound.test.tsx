@@ -17,6 +17,6 @@ describe('NotFound', () => {
 
   it('offers a way out', () => {
     renderWithApp(<NotFound />, { route: '/nope' });
-    expect(screen.getByRole('link', { name: 'Go to Today' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Go to Today' })).toHaveAttribute('href', '/today');
   });
 });

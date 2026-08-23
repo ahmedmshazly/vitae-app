@@ -1,165 +1,130 @@
-/** The manifesto: an editorial statement of product intent and boundaries. */
+/** An editorial statement of the promises that shape the product. */
 import { Link } from 'react-router-dom';
-import { MkFoot, MkNav } from './Chrome.js';
+import { MarketingShell } from './Chrome.js';
+import { CloudAction } from './CloudAction.js';
 
-/** Principles the product holds itself to. Kept exportable for truth tests. */
+/** Kept exportable so public commitments remain reviewable in tests. */
 export const MANIFESTO_HOLDINGS = [
   {
-    title: 'The data is yours.',
-    body: "Full export, documented schema, no gates. If we ever make leaving hard, we've failed.",
+    title: 'The record remains yours.',
+    body: 'A career system should make leaving practical: full exports, documented structures, and no paid gate around the archive.',
   },
   {
-    title: 'Provenance on every fact.',
-    body: 'Where a datum came from and how much we trust it is visible, always. Memory deserves footnotes.',
+    title: 'Every conclusion needs a trail.',
+    body: 'Provenance, relationships, source context, and factors belong beside the result. A score without its evidence is only a number asking for faith.',
   },
   {
-    title: 'Scores you can decompose.',
-    body: 'When Vitae ranks someone, it shows the factors and lets you re-weight them. No oracle, no vibes.',
+    title: 'Your professional history is not generated.',
+    body: 'Vitae uses deterministic product logic to help you find and select evidence. It does not hand your graph to a runtime AI provider or invent a career story for you.',
   },
   {
-    title: 'Keyboard first, dark, calm.',
-    body: 'Speed respects your attention. The interface stays quiet so you can come back tomorrow.',
+    title: 'Attention is not the business model.',
+    body: 'No public feed, behavioral advertising, or engagement theater. The product exists to help you make a better next move, then get out of the way.',
   },
 ] as const;
 
 export function Manifesto() {
   return (
-    <div className="mk">
-      <MkNav />
-      <main className="mk-manifesto">
-        <div className="mk__inner">
-          <header className="mk-manifesto__masthead">
+    <MarketingShell mainClassName="mk-manifesto">
+      <div className="mk__inner">
+        <header className="mk-manifesto__masthead">
+          <div>
+            <h1 id="manifesto-heading">A career move deserves more than a document rewritten from memory.</h1>
+            <p>
+              Vitae is for the professional who has done the work, built the relationships, and now
+              needs a calm way to carry that history into the next consequential conversation.
+            </p>
+          </div>
+          <dl className="mk-manifesto__folio" aria-label="Manifesto edition">
+            <div><dt>Edition</dt><dd>02</dd></div>
+            <div><dt>Form</dt><dd>Living ledger</dd></div>
+            <div><dt>Year</dt><dd>2026</dd></div>
+          </dl>
+        </header>
+
+        <article className="mk-manifesto__body" aria-labelledby="manifesto-heading">
+          <section className="mk-manifesto__chapter" aria-labelledby="manifesto-memory">
+            <p className="mk-manifesto__chaptermark" aria-hidden="true">I</p>
             <div>
-              <h1 id="manifesto-heading" className="mk-manifesto__title">
-                A quiet instrument for a loud life.
-              </h1>
-              <p className="mk-manifesto__deck">
-                Software for remembering the connections that made the work—and for acting on them
-                without surrendering the record.
+              <h2 id="manifesto-memory">Memory is relational.</h2>
+              <p>
+                A career is not a sequence of titles. It is the person who introduced you to a team,
+                the project that showed you a capability, the conversation that changed your direction,
+                and the evidence that can still explain why you belong in the next room.
+              </p>
+              <blockquote>The useful fact is rarely the isolated fact. It is the path that explains why it matters now.</blockquote>
+              <p>
+                Most tools scatter that path across a calendar, contact list, résumé, job board, and note archive.
+                Vitae begins with the opposite assumption: one connected career record can be read through many lenses
+                without making you re-enter the same truth.
               </p>
             </div>
-            <dl className="mk-manifesto__folio" aria-label="Manifesto edition">
-              <div>
-                <dt>Edition</dt>
-                <dd>01</dd>
-              </div>
-              <div>
-                <dt>Place</dt>
-                <dd>Cairo</dd>
-              </div>
-              <div>
-                <dt>Year</dt>
-                <dd>2026</dd>
-              </div>
-            </dl>
-          </header>
+          </section>
 
-          <article className="mk-manifesto__body" aria-labelledby="manifesto-heading">
-            <section className="mk-manifesto__chapter" aria-labelledby="manifesto-memory">
-              <p className="mk-manifesto__chaptermark" aria-hidden="true">
-                I
+          <hr className="mk-manifesto__rule" />
+
+          <section className="mk-manifesto__chapter" aria-labelledby="manifesto-instrument">
+            <p className="mk-manifesto__chaptermark" aria-hidden="true">II</p>
+            <div>
+              <h2 id="manifesto-instrument">The record comes before the recommendation.</h2>
+              <p>
+                People, roles, projects, applications, interactions, and achievement evidence enter a typed,
+                versioned network. Warm paths, reconnect work, career output, and exports are views over that
+                record—not fresh silos asking you to reconstruct your life in a new format.
               </p>
-              <div>
-                <h2 id="manifesto-memory">Memory is relational.</h2>
-                <p>
-                  Your life produces more information than anything you have been given to hold it.
-                  Your calendar owns your time. A social network owns your relationships and rents
-                  them back to you. Your résumé is a document rewritten from memory, under deadline,
-                  every time it matters.
-                </p>
-                <blockquote>
-                  The useful fact is rarely the isolated fact. It is the path that explains why it
-                  matters now.
-                </blockquote>
-                <p>
-                  The person you met at dinner introduced you to the team that led to the role that
-                  taught you the skill you are about to be hired for.{' '}
-                  <strong>Nothing else owns that chain.</strong> Vitae begins there: a life is a
-                  network, not a list.
-                </p>
-              </div>
-            </section>
-
-            <hr className="mk-manifesto__rule" />
-
-            <section className="mk-manifesto__chapter" aria-labelledby="manifesto-instrument">
-              <p className="mk-manifesto__chaptermark" aria-hidden="true">
-                II
+              <p>
+                A trusted system should show its working without demanding that you become its operator. Vitae keeps
+                provenance beside facts, factors beside scores, and revisions beside the current record. You can inspect
+                the machinery when it matters and stay focused on the next action when it does not.
               </p>
-              <div>
-                <h2 id="manifesto-instrument">The record comes before the dashboard.</h2>
-                <p>
-                  People, roles, projects, talks, books, trips, habits, and favors enter one typed,
-                  versioned network. The reconnect lane, who-to-call ranking, life map, and
-                  self-compiling résumé are lenses over that network—not new silos asking you to
-                  repeat yourself.
-                </p>
-                <p>
-                  A tool that remembers on your behalf must show its work. Provenance belongs beside
-                  the fact. Ranking factors belong beside the score. Revisions belong beside the
-                  current version. The interface should help you inspect the machinery without
-                  forcing you to operate it.
-                </p>
-              </div>
-            </section>
+            </div>
+          </section>
 
-            <hr className="mk-manifesto__rule" />
+          <hr className="mk-manifesto__rule" />
 
-            <section className="mk-manifesto__chapter" aria-labelledby="manifesto-holdings">
-              <p className="mk-manifesto__chaptermark" aria-hidden="true">
-                III
+          <section className="mk-manifesto__chapter" aria-labelledby="manifesto-holdings">
+            <p className="mk-manifesto__chaptermark" aria-hidden="true">III</p>
+            <div>
+              <h2 id="manifesto-holdings">Four holdings.</h2>
+              <ul className="mk-manifesto__list" aria-label="What Vitae holds itself to">
+                {MANIFESTO_HOLDINGS.map((item) => (
+                  <li key={item.title}>
+                    <strong>{item.title}</strong>
+                    <span>{item.body}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+
+          <hr className="mk-manifesto__rule" />
+
+          <section className="mk-manifesto__chapter" aria-labelledby="manifesto-refusal">
+            <p className="mk-manifesto__chaptermark" aria-hidden="true">IV</p>
+            <div>
+              <h2 id="manifesto-refusal">The system should be quiet enough to use for years.</h2>
+              <p>
+                The serious career work happens when an opportunity arrives, but the foundation is built between
+                those moments: capture a project while it is fresh, remember the context of a relationship, and
+                keep the evidence where you will find it again. The product should feel useful on an ordinary Tuesday,
+                not only impressive in a demo.
               </p>
-              <div>
-                <h2 id="manifesto-holdings">Four holdings.</h2>
-                <ul className="mk-manifesto__list" aria-label="What we hold ourselves to">
-                  {MANIFESTO_HOLDINGS.map((item) => (
-                    <li key={item.title}>
-                      <strong>{item.title}</strong>
-                      <span>{item.body}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </section>
-
-            <hr className="mk-manifesto__rule" />
-
-            <section className="mk-manifesto__chapter" aria-labelledby="manifesto-refusal">
-              <p className="mk-manifesto__chaptermark" aria-hidden="true">
-                IV
+              <p>
+                Vitae Cloud is designed around one private career workspace because the person living the story should
+                remain close to it. The goal is not to make you more visible. It is to make your next move more grounded.
               </p>
-              <div>
-                <h2 id="manifesto-refusal">Attention is not the business model.</h2>
-                <p>
-                  We refuse feeds, followers, and engagement mechanics that farm attention. Vitae
-                  can show habits, cadence, and momentum, but those signals serve your commitments,
-                  not a retention curve. There are <strong>no ads and never will be</strong>; your
-                  records are not inventory.
-                </p>
-                <p>
-                  Vitae is deliberately built for one configured operator. It is self-hosted,
-                  default-deny, and exportable because the owner of a life record should remain the
-                  person living it. The software should feel like a well-made instrument: quiet at
-                  rest, precise in use, and easy to put down.
-                </p>
-              </div>
-            </section>
+            </div>
+          </section>
 
-            <footer className="mk-manifesto__closing">
-              <p className="mk-manifesto__sig">Vitae · built in Cairo · 2026</p>
-              <div className="mk-manifesto__ctas">
-                <Link className="mk-action mk-action--primary mk-action--lg" to="/signin">
-                  Get started
-                </Link>
-                <Link className="mk-action mk-action--lg" to="/tour">
-                  Take the tour
-                </Link>
-              </div>
-            </footer>
-          </article>
-        </div>
-      </main>
-      <MkFoot />
-    </div>
+          <footer className="mk-manifesto__closing">
+            <p>Vitae · a quiet instrument for the work behind the work</p>
+            <div>
+              <CloudAction className="mk-action mk-action--primary mk-action--lg" />
+              <Link className="mk-action mk-action--lg" to="/tour">Take the product tour</Link>
+            </div>
+          </footer>
+        </article>
+      </div>
+    </MarketingShell>
   );
 }

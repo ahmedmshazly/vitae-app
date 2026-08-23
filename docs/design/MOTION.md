@@ -9,7 +9,7 @@ book disagree about product motion, the brand book is right. Section 4 is the on
 and it is an exception by decision, not by reading. The two-register split is a **deliberate
 amendment the product owner approved for this work**: ch.08 states the three durations and the
 4px travel with no marketing carve-out, and this file adds one, scoped to exactly `/welcome`,
-`/tour` and `/manifesto`. Nothing else inherits it, and it reaches timing and travel only.
+`/`, `/tour`, and `/manifesto`. Nothing else inherits it, and it reaches timing and travel only.
 
 **The standing bans hold in both registers, no exception**: gradients on chrome, glow or halo
 shadows, glassmorphism, shimmer sweeps, ambient washes, decorative illustration, any accent
@@ -17,7 +17,7 @@ hue, spring, overshoot, bounce.
 
 | | Product register | Marketing register |
 |---|---|---|
-| Where | Everything under the app shell, and all of `packages/ui` | `/welcome`, `/tour`, `/manifesto` only |
+| Where | Everything under the app shell, and all of `packages/ui` | `/`, `/tour`, `/manifesto` only |
 | Audience | Someone working inside a tool daily | A prospect visiting once |
 | Job | Report a state change | Explain the product |
 | Governed by | ch.08, unamended | ch.08 plus the section 4 amendment |
@@ -143,7 +143,7 @@ group disclosure in `Shell.tsx`, which is inside an `<AnimatePresence>`.
 
 ## 4. The marketing register
 
-`/welcome`, `/tour` and `/manifesto` are read once by someone deciding whether to care. A
+`/`, `/tour` and `/manifesto` are read once by someone deciding whether to care. A
 page that has to explain a product is allowed gestures a tool used daily is not. This is the
 approved amendment named at the top of this file, not a reading of ch.08, and it is written
 down here so it stops being an unwritten exception.

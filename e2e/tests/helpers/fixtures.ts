@@ -29,7 +29,7 @@ export async function ensureQueue(page: Page, min = 1): Promise<number> {
   for (let i = 0; i < min; i += 1) {
     await capture(page, `t E2E queue item ${stamp}-${i} ^today`);
   }
-  await page.goto('/');
+  await page.goto('/today');
   const heading = page.getByRole('heading', { name: /^Needs you/ });
   await expect(heading).toBeVisible();
   return Number((await heading.innerText()).replace(/\D/g, ''));

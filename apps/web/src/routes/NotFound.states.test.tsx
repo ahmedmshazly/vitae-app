@@ -51,7 +51,7 @@ describe('NotFound states', () => {
     renderWithApp(<NotFound />, { route: '/wombat' });
 
     const out = screen.getByRole('link', { name: 'Go to Today' });
-    expect(out).toHaveAttribute('href', '/');
+    expect(out).toHaveAttribute('href', '/today');
     expect(within(out).queryByRole('button')).not.toBeInTheDocument();
   });
 });

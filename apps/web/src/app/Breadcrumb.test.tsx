@@ -7,8 +7,8 @@ import { renderWithApp } from '../test/render.js';
 import { Breadcrumb } from './Breadcrumb.js';
 
 describe('Breadcrumb', () => {
-  it('shows Today on the home route', () => {
-    renderWithApp(<Breadcrumb />, { route: '/' });
+  it('shows Today on the canonical Today route', () => {
+    renderWithApp(<Breadcrumb />, { route: '/today' });
     expect(screen.getByText('Today')).toBeInTheDocument();
   });
 

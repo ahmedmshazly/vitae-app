@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { renderWithApp } from './test/render.js';
-import { App } from './App.js';
+import { App, publicAuthDoorDestination } from './App.js';
 
 const auth = vi.hoisted(() => ({ useAuth: vi.fn() }));
 
@@ -17,7 +17,26 @@ vi.mock('./routes/marketing/Landing.js', () => ({
 }));
 
 describe('public application routes', () => {
-  it('renders the welcome story without waiting for an auth or API decision', async () => {
+  it('carries an explicit valid plan choice from signup to billing', () => {
+    expect(publicAuthDoorDestination('/signup', '?period=monthly', true)).toBe(
+      '/settings/billing?period=monthly',
+    );
+    expect(publicAuthDoorDestination('/signup', '?period=unexpected', true)).toBe(
+      '/settings/billing',
+    );
+    expect(publicAuthDoorDestination('/signup', '?period=monthly', false)).toBe('/today');
+  });
+
+  it('renders the public home without waiting for an auth or API decision', async () => {
+    renderWithApp(<App />, { route: '/' });
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Public welcome' }),
+    ).toBeInTheDocument();
+    expect(auth.useAuth).not.toHaveBeenCalled();
+  });
+
+  it('keeps the legacy welcome address as a client redirect to public home', async () => {
     renderWithApp(<App />, { route: '/welcome' });
 
     expect(

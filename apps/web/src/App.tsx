@@ -1,10 +1,22 @@
 import { lazy, Suspense, type ComponentType, type ReactNode } from 'react';
-import { Navigate, Route, Routes, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import {
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import { AuthProvider, useAuth } from './lib/auth.js';
 import { Shell } from './app/Shell.js';
 import { ToastProvider } from './features/Toast.js';
 import { ErrorBoundary, ShellErrorFallback } from './components/ErrorBoundary.js';
 import { SignIn, SignInSplash } from './routes/SignIn.js';
+import {
+  PublicDocumentPage,
+  PublicGuidePage,
+  PublicRouteMetadata,
+} from './public/PublicDocumentPage.js';
 function lazyNamed(loader: () => Promise<unknown>, exportName: string) {
   return lazy(async () => {
     const module = (await loader()) as Record<string, ComponentType<Record<never, never>>>;
@@ -32,6 +44,7 @@ const Letters = lazyNamed(() => import('./routes/Letters.js'), 'Letters');
 const Templates = lazyNamed(() => import('./routes/Templates.js'), 'Templates');
 const Trash = lazyNamed(() => import('./routes/Trash.js'), 'Trash');
 const Settings = lazyNamed(() => import('./routes/Settings.js'), 'Settings');
+const Billing = lazyNamed(() => import('./routes/Billing.js'), 'Billing');
 const People = lazyNamed(() => import('./routes/People.js'), 'People');
 const Intros = lazyNamed(() => import('./routes/Intros.js'), 'Intros');
 const Orgs = lazyNamed(() => import('./routes/Orgs.js'), 'Orgs');
@@ -62,6 +75,17 @@ const Help = lazyNamed(() => import('./routes/workspaces/WorkspaceHomes.js'), 'H
 const Landing = lazyNamed(() => import('./routes/marketing/Landing.js'), 'Landing');
 const Tour = lazyNamed(() => import('./routes/marketing/Tour.js'), 'Tour');
 const Manifesto = lazyNamed(() => import('./routes/marketing/Manifesto.js'), 'Manifesto');
+const HowItWorks = lazyNamed(() => import('./routes/marketing/HowItWorks.js'), 'HowItWorks');
+const WarmPaths = lazyNamed(() => import('./routes/marketing/WarmPaths.js'), 'WarmPaths');
+const CareerEvidence = lazyNamed(
+  () => import('./routes/marketing/CareerEvidence.js'),
+  'CareerEvidence',
+);
+const Pricing = lazyNamed(() => import('./routes/marketing/Pricing.js'), 'Pricing');
+const SecurityOwnership = lazyNamed(
+  () => import('./routes/marketing/SecurityOwnership.js'),
+  'SecurityOwnership',
+);
 import { Spinner } from '@vitae/ui';
 
 /**
@@ -70,8 +94,54 @@ import { Spinner } from '@vitae/ui';
  * and leaves inside 100ms is worse than no spinner, and this is the first
  * paint a signed-out visitor gets, so it holds the previous frame instead.
  */
-function PublicPage({ children }: { children: ReactNode }) {
-  return <Suspense fallback={null}>{children}</Suspense>;
+function PublicPage({ children, metadataPath }: { children: ReactNode; metadataPath?: string }) {
+  return (
+    <>
+      {metadataPath && <PublicRouteMetadata path={metadataPath} />}
+      <Suspense fallback={null}>{children}</Suspense>
+    </>
+  );
+}
+
+/** Preserve inbound campaign parameters while retiring the old public home address. */
+function LegacyWelcomeRedirect() {
+  const { search, hash } = useLocation();
+  return <Navigate to={{ pathname: '/', search, hash }} replace />;
+}
+
+/** Sign-in is public but authentication itself necessarily owns its own loading state. */
+function PublicAuthDoor({ metadataPath }: { metadataPath: '/signin' | '/signup' }) {
+  return (
+    <>
+      <PublicRouteMetadata path={metadataPath} />
+      <AuthProvider>
+        <PublicAuthDoorContent />
+      </AuthProvider>
+    </>
+  );
+}
+
+/** Carry a deliberate plan choice through account creation without trusting it for price or access. */
+export function publicAuthDoorDestination(
+  pathname: string,
+  search: string,
+  cloudEnabled: boolean,
+): string {
+  if (!cloudEnabled || pathname !== '/signup') return '/today';
+  const period = new URLSearchParams(search).get('period');
+  return period === 'monthly' || period === 'annual'
+    ? `/settings/billing?period=${period}`
+    : '/settings/billing';
+}
+
+function PublicAuthDoorContent() {
+  const { user, workspace, cloudEnabled, loading } = useAuth();
+  const { pathname, search } = useLocation();
+  if (loading) return <SignInSplash />;
+  if (user && (!cloudEnabled || workspace)) {
+    return <Navigate to={publicAuthDoorDestination(pathname, search, cloudEnabled)} replace />;
+  }
+  return <SignIn />;
 }
 
 /** People/orgs keep CRM hubs; generic browse covers every other type. */
@@ -93,17 +163,59 @@ export function App() {
     <Routes>
       {/* These routes are fully public and must never wait on Firebase or the API. */}
       <Route
-        path="/welcome"
+        path="/"
         element={
-          <PublicPage>
+          <PublicPage metadataPath="/">
             <Landing />
+          </PublicPage>
+        }
+      />
+      <Route path="/welcome" element={<LegacyWelcomeRedirect />} />
+      <Route path="/product" element={<Navigate to="/how-it-works" replace />} />
+      <Route
+        path="/how-it-works"
+        element={
+          <PublicPage metadataPath="/how-it-works">
+            <HowItWorks />
+          </PublicPage>
+        }
+      />
+      <Route
+        path="/product/warm-paths"
+        element={
+          <PublicPage metadataPath="/product/warm-paths">
+            <WarmPaths />
+          </PublicPage>
+        }
+      />
+      <Route
+        path="/product/career-evidence"
+        element={
+          <PublicPage metadataPath="/product/career-evidence">
+            <CareerEvidence />
+          </PublicPage>
+        }
+      />
+      <Route
+        path="/pricing"
+        element={
+          <PublicPage metadataPath="/pricing">
+            <Pricing />
+          </PublicPage>
+        }
+      />
+      <Route
+        path="/security-and-ownership"
+        element={
+          <PublicPage metadataPath="/security-and-ownership">
+            <SecurityOwnership />
           </PublicPage>
         }
       />
       <Route
         path="/tour"
         element={
-          <PublicPage>
+          <PublicPage metadataPath="/tour">
             <Tour />
           </PublicPage>
         }
@@ -111,11 +223,22 @@ export function App() {
       <Route
         path="/manifesto"
         element={
-          <PublicPage>
+          <PublicPage metadataPath="/manifesto">
             <Manifesto />
           </PublicPage>
         }
       />
+      <Route path="/resources" element={<PublicDocumentPage />} />
+      <Route path="/guides" element={<PublicDocumentPage />} />
+      <Route path="/guides/:slug" element={<PublicGuidePage />} />
+      <Route path="/changelog" element={<PublicDocumentPage />} />
+      <Route path="/legal/terms" element={<PublicDocumentPage />} />
+      <Route path="/legal/privacy" element={<PublicDocumentPage />} />
+      <Route path="/legal/dpa" element={<PublicDocumentPage />} />
+      <Route path="/legal/subprocessors" element={<PublicDocumentPage />} />
+      <Route path="/status" element={<PublicDocumentPage />} />
+      <Route path="/signin" element={<PublicAuthDoor metadataPath="/signin" />} />
+      <Route path="/signup" element={<PublicAuthDoor metadataPath="/signup" />} />
       <Route
         path="/reference/entities"
         element={
@@ -144,19 +267,18 @@ function AuthGate() {
 }
 
 function AuthGateContent() {
-  const { user, loading } = useAuth();
+  const { user, workspace, cloudEnabled, loading } = useAuth();
   // The splash is the sign-in screen with its controls skeletonised, so
   // resolving auth reveals the door instead of swapping one screen for
   // another. It was a centred full-page spinner, which the book bans.
   if (loading) return <SignInSplash />;
 
-  // Public surface: marketing pages + sign-in are reachable signed-out (and
-  // the tour/manifesto stay reachable signed-in: FirstRun links there).
-  if (!user) {
+  // Every public page is matched before this gate. The remaining wildcard is
+  // the private workspace, so a signed-out deep link returns to public home.
+  if (!user || (cloudEnabled && !workspace)) {
     return (
       <Routes>
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="*" element={<Navigate to="/welcome" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );
   }
@@ -181,8 +303,8 @@ function AuthedApp() {
               }
             >
               <Routes>
-                <Route path="/signin" element={<Navigate to="/" replace />} />
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/" element={<Navigate to="/today" replace />} />
+                <Route path="/today" element={<Dashboard />} />
 
                 {/* Canonical task-led workspaces. Compatibility routes remain
                     mounted below so bookmarks and shared record links survive. */}
@@ -217,6 +339,7 @@ function AuthedApp() {
                 <Route path="/settings/profile" element={<Settings />} />
                 <Route path="/settings/preferences" element={<Settings />} />
                 <Route path="/settings/system" element={<Settings />} />
+                <Route path="/settings/billing" element={<Billing />} />
                 <Route path="/help" element={<Help />} />
 
                 {/* Stable legacy addresses. */}

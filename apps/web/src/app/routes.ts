@@ -26,7 +26,7 @@ export interface HubEntry extends RouteEntry {
 }
 
 export const ROUTES = {
-  today: { path: '/', label: 'Today', glyph: 'today', hub: 'today', end: true },
+  today: { path: '/today', label: 'Today', glyph: 'today', hub: 'today', end: true },
   planner: { path: '/today/planner', label: 'Planner', glyph: 'calendar', hub: 'today' },
 
   network: { path: '/network', label: 'Network', glyph: 'person', hub: 'network', end: true },
@@ -132,6 +132,12 @@ export const ROUTES = {
     hub: 'settings',
   },
   settingsSystem: { path: '/settings/system', label: 'System', glyph: 'graph', hub: 'settings' },
+  settingsBilling: {
+    path: '/settings/billing',
+    label: 'Billing & access',
+    glyph: 'export',
+    hub: 'settings',
+  },
 } as const satisfies Record<string, RouteEntry>;
 
 export type RouteId = keyof typeof ROUTES;
@@ -177,7 +183,7 @@ export const WORKSPACE_NAV: Record<HubId, RouteEntry[]> = {
 
 /** Resolve both canonical paths and every supported compatibility URL. */
 export function hubForPath(pathname: string): HubId | null {
-  if (pathname === '/' || pathname.startsWith('/today/')) return 'today';
+  if (pathname === '/today' || pathname.startsWith('/today/')) return 'today';
   if (
     pathname.startsWith('/network') ||
     pathname.startsWith('/people') ||

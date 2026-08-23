@@ -4,6 +4,18 @@
   "installCommand": "corepack enable && pnpm install --frozen-lockfile",
   "buildCommand": "pnpm --filter @vitae/web build",
   "outputDirectory": "apps/web/dist",
+  "redirects": [
+    {
+      "source": "/welcome",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/product",
+      "destination": "/how-it-works",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
@@ -11,6 +23,18 @@
     }
   ],
   "headers": [
+    {
+      "source": "/robots.txt",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=300, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=300, must-revalidate" }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [

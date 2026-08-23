@@ -11,7 +11,7 @@ import { expectNoA11yViolations } from './helpers/a11y';
 test('skip link is the first tab stop and jumps focus to main content', async ({ page }) => {
   await signIn(page);
   // Fresh navigation for a clean, known focus state before the first Tab.
-  await page.goto('/');
+  await page.goto('/today');
 
   const skipLink = page.getByRole('link', { name: 'Skip to content' });
   // Auth restoration is asynchronous after a full reload. Wait until the shell

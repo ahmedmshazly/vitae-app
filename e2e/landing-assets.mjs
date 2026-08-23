@@ -56,7 +56,10 @@ await page.goto(`${BASE}/explore/graph`);
 await page.waitForTimeout(3000);
 await shot('graph');
 
-await page.goto(`${BASE}/`);
+// `/` is now the public acquisition surface. App-internal navigation uses the
+// explicit Today route so this deterministic asset script cannot accidentally
+// photograph marketing chrome instead of the actual record form.
+await page.goto(`${BASE}/today`);
 await page.waitForTimeout(1200);
 await page.getByRole('button', { name: 'New record (n)' }).click();
 await page.getByRole('menuitem', { name: 'person', exact: true }).click();

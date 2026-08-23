@@ -44,6 +44,7 @@ function crumbFor(pathname: string): Crumb {
     [ROUTES.settingsProfile.path]: { parent: 'Settings', leaf: 'Profile', glyph: 'person' },
     [ROUTES.settingsPreferences.path]: { parent: 'Settings', leaf: 'Preferences', glyph: 'adjust' },
     [ROUTES.settingsSystem.path]: { parent: 'Settings', leaf: 'System', glyph: 'graph' },
+    [ROUTES.settingsBilling.path]: { parent: 'Settings', leaf: 'Billing & access', glyph: 'export' },
     '/help': { parent: '', leaf: 'Help & shortcuts', glyph: 'ask' },
 
     // Compatibility addresses keep the labels their existing tests and saved

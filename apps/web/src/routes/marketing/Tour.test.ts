@@ -1,41 +1,45 @@
 import { describe, expect, it } from 'vitest';
-import { NODE_TYPES } from '@vitae/core';
 import { adjacentTourImages, TOUR_STOPS } from './Tour.js';
 
 describe('TOUR_STOPS', () => {
-  it('walks five product surfaces in order', () => {
+  it('walks the seven-stop capture-to-career loop in order', () => {
     expect(TOUR_STOPS.map((s) => s.key)).toEqual([
       '01 · CAPTURE',
-      '02 · TODAY',
-      '03 · PEOPLE',
-      '04 · GRAPH',
-      '05 · DEPTH',
+      '02 · RECORD',
+      '03 · CONNECT',
+      '04 · DECIDE',
+      '05 · EVIDENCE',
+      '06 · MOVE',
+      '07 · KEEP',
     ]);
   });
 
-  it('describes Today momentum as a score, not a ring or flame theatre', () => {
-    const today = TOUR_STOPS.find((s) => s.key.includes('TODAY'));
-    expect(today).toBeDefined();
-    expect(today!.body).toMatch(/momentum score/i);
-    expect(today!.body).not.toMatch(/momentum ring/i);
-    expect(today!.body).not.toMatch(/flame/i);
-    expect(today!.alt).toMatch(/momentum score/i);
+  it('labels non-screenshot stages as workflow ledgers', () => {
+    const ledgers = TOUR_STOPS.filter((stop) => stop.kind === 'ledger');
+    expect(ledgers).toHaveLength(3);
+    expect(ledgers.map((stop) => stop.note)).toEqual([
+      expect.stringMatching(/illustrative route/i),
+      expect.stringMatching(/no generated career claims/i),
+      expect.stringMatching(/export/i),
+    ]);
   });
 
-  it('points each stop at a real landing screenshot', () => {
-    for (const stop of TOUR_STOPS) {
+  it('points every framed stop at a real landing screenshot', () => {
+    for (const stop of TOUR_STOPS.filter((item) => item.kind === 'frame')) {
       expect(stop.img).toMatch(/^\/landing\/.+\.png$/);
+      expect(stop.alt).toBeTruthy();
     }
   });
 
   it('preloads only the neighboring captures', () => {
-    expect(adjacentTourImages(0)).toEqual(['/landing/today.png']);
-    expect(adjacentTourImages(2)).toEqual(['/landing/today.png', '/landing/graph.png']);
-    expect(adjacentTourImages(4)).toEqual(['/landing/graph.png']);
+    expect(adjacentTourImages(0)).toEqual(['/landing/form.png']);
+    expect(adjacentTourImages(2)).toEqual(['/landing/form.png']);
+    expect(adjacentTourImages(3)).toEqual(['/landing/graph.png']);
+    expect(adjacentTourImages(6)).toEqual(['/landing/today.png']);
   });
 
-  it('derives structured-form coverage from the canonical catalog', () => {
-    const depth = TOUR_STOPS.find((stop) => stop.key.includes('DEPTH'));
-    expect(depth?.body).toContain(`All ${NODE_TYPES.length} record types`);
+  it('keeps the warm-path stop explicit about human judgment', () => {
+    const decide = TOUR_STOPS.find((stop) => stop.key.includes('DECIDE'));
+    expect(decide?.body).toMatch(/not an automatic recommendation/i);
   });
 });

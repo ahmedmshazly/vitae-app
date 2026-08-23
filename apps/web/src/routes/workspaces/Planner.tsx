@@ -96,7 +96,7 @@ export function Planner() {
         title="Planner"
         subtitle="Reminders, tasks, and dated evidence on one honest timeline."
         actions={
-          <Link className="planner__back" to="/">
+          <Link className="planner__back" to="/today">
             Return to Today
           </Link>
         }

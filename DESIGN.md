@@ -117,9 +117,11 @@ Query parameters are addressable state, not hidden UI state: network intelligenc
 library and saved views use `q`, and list filters belong in the URL when the screen already follows
 that convention. Use `entityHref` for record links. Keep graph and map dependencies route-lazy.
 
-Public `/welcome`, `/tour`, `/manifesto`, and `/reference/entities` routes do not wait on auth or
-the API. The marketing shell is editorial and uses real product captures labelled “Real interface
-· fictional demo data”; do not fabricate screenshots, endorsements, or commercial claims.
+Public `/`, `/tour`, `/manifesto`, `/guides`, `/resources`, legal/status pages, and
+`/reference/entities` routes do not wait on auth or the API. `/welcome` is a legacy redirect to
+`/`. The marketing shell is editorial and uses real product captures labelled “Real interface
+· fictional demo data”; do not fabricate screenshots, endorsements, commercial claims, legal terms,
+or operating-status claims. Hosted Cloud CTAs remain pre-launch until their release gate is enabled.
 
 `/reference/entities` is deliberately standalone and stays that way. The entity catalog and its
 observatory are generated from the same type constants the API validates against: they describe the

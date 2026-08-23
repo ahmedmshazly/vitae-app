@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Vitae</title>
+  <desc id="desc">A quiet, private career record for deliberate next moves.</desc>
+  <rect width="1200" height="630" fill="#0f0f0f"/>
+  <g fill="none" stroke="#fafaf8" stroke-width="2">
+    <path opacity=".22" d="M410 142 568 102 718 170 848 110 1012 182 1078 300 954 414 776 372 627 466 458 388 332 474 205 370 276 250Z"/>
+    <path opacity=".36" d="M276 250 458 388 568 102M410 142 627 466M718 170 776 372M848 110 954 414M1012 182 776 372M1078 300 848 110M205 370 332 474 458 388"/>
+    <path opacity=".58" d="M568 102 718 170 848 110M458 388 627 466 776 372 954 414M276 250 410 142"/>
+  </g>
+  <g fill="#fafaf8">
+    <circle cx="410" cy="142" r="6" opacity=".56"/>
+    <circle cx="568" cy="102" r="9"/>
+    <circle cx="718" cy="170" r="6" opacity=".72"/>
+    <circle cx="848" cy="110" r="6" opacity=".44"/>
+    <circle cx="1012" cy="182" r="7" opacity=".7"/>
+    <circle cx="1078" cy="300" r="5" opacity=".42"/>
+    <circle cx="954" cy="414" r="8" opacity=".76"/>
+    <circle cx="776" cy="372" r="6" opacity=".62"/>
+    <circle cx="627" cy="466" r="10"/>
+    <circle cx="458" cy="388" r="6" opacity=".5"/>
+    <circle cx="332" cy="474" r="7" opacity=".66"/>
+    <circle cx="205" cy="370" r="5" opacity=".45"/>
+    <circle cx="276" cy="250" r="8" opacity=".74"/>
+  </g>
+  <g fill="#fafaf8" font-family="Instrument Sans, Arial, sans-serif">
+    <text x="74" y="490" font-size="78" font-weight="600" letter-spacing="-2">Vitae</text>
+    <text x="78" y="546" font-size="30" fill="#a3a3a0">A private career record for deliberate next moves.</text>
+  </g>
+</svg>

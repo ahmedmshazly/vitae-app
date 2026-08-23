@@ -1,444 +1,438 @@
-/** The public acquisition story: capture a fact, connect its context, use it. */
-import type { ReactNode } from 'react';
+/** The public career-move story: capture, connect, decide, move. */
+import { useRef, useState, type KeyboardEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useReducedMotion } from 'motion/react';
 import { EDGE_TYPES, NODE_TYPES, SOURCE_TYPES } from '@vitae/core';
-import { Glyph, Kbd } from '@vitae/ui';
-import { MkFoot, MkNav, ProductFrame, PUBLIC_SOURCE_URL } from './Chrome.js';
+import { Glyph } from '@vitae/ui';
+import { publicLaunchConfig } from '../../public/site.js';
+import { CLOUD_PLAN } from './MarketingContent.js';
+import { MarketingShell, ProductFrame } from './Chrome.js';
+import { CloudAction } from './CloudAction.js';
 
-const QUIET_EASE = [0.32, 0.72, 0, 1] as const;
+export const OPPORTUNITY_STORAGE_KEY = 'vitae:marketing:opportunity-route';
 
-/** Product facts derive from the shared vocabulary so marketing cannot drift. */
+export const OPPORTUNITY_ROUTES = [
+  {
+    key: 'reach',
+    label: 'Reach the right person',
+    title: 'Make the next ask with a real route behind it.',
+    body: 'Name the organization, inspect the people and ties you recorded, and choose an introduction request that respects the relationship.',
+    image: '/landing/person.png',
+    imageAlt:
+      'Vitae person record showing relationship strength, interaction history, reconnect cadence, and favor ledger',
+    imageLabel: 'Relationship ledger · inspect the context before the ask',
+    route: '/product/warm-paths',
+    routeLabel: 'See how warm paths work',
+    evidence: ['Named destination', 'Visible relationship hops', 'A bounded next ask'],
+  },
+  {
+    key: 'evidence',
+    label: 'Bring forward the right work',
+    title: 'Use the work you can actually stand behind.',
+    body: 'Keep achievement evidence connected to the roles, projects, skills, and source context that make a career claim defensible.',
+    image: '/landing/form.png',
+    imageAlt:
+      'Vitae structured person form with sectioned fields and contextual connections',
+    imageLabel: 'Structured record · depth when the moment allows',
+    route: '/product/career-evidence',
+    routeLabel: 'See career evidence',
+    evidence: ['Observed contribution', 'Supporting records', 'Target-specific selection'],
+  },
+  {
+    key: 'move',
+    label: 'Prepare a deliberate move',
+    title: 'Turn career memory into a calm next action.',
+    body: 'Bring people, applications, reminders, and career work into one daily view so a promising opportunity does not start from a blank page.',
+    image: '/landing/today.png',
+    imageAlt:
+      'Vitae Today view with reconnect lane, application pipeline, momentum score, and habits',
+    imageLabel: 'Today · a daily operating view for the career record',
+    route: '/how-it-works',
+    routeLabel: 'Walk through the workflow',
+    evidence: ['A concrete target', 'A connected record', 'One useful next action'],
+  },
+] as const;
+
+export type OpportunityRouteKey = (typeof OPPORTUNITY_ROUTES)[number]['key'];
+
+/** Product facts derive from shared vocabulary so public copy cannot drift. */
 export const LANDING_FACTS: Array<{ num: string; label: string }> = [
-  { num: String(NODE_TYPES.length), label: 'record types with structured forms' },
-  { num: String(EDGE_TYPES.length), label: 'typed connection kinds' },
+  { num: String(NODE_TYPES.length), label: 'structured record types' },
+  { num: String(EDGE_TYPES.length), label: 'explicit connection kinds' },
   { num: String(SOURCE_TYPES.length), label: 'provenance sources' },
   { num: '0', label: 'runtime AI calls' },
 ];
 
-function Reveal({
-  children,
-  delay = 0,
-  gesture = 'rise',
-}: {
-  children: ReactNode;
-  delay?: number;
-  gesture?: 'rise' | 'fade' | 'uncover';
-}) {
-  const reduced = useReducedMotion();
-  if (reduced) return <>{children}</>;
+export function opportunityRouteFor(value: string | null | undefined): OpportunityRouteKey | null {
+  return OPPORTUNITY_ROUTES.some((route) => route.key === value)
+    ? (value as OpportunityRouteKey)
+    : null;
+}
 
-  const initial =
-    gesture === 'fade'
-      ? { opacity: 1 }
-      : gesture === 'uncover'
-        ? { opacity: 1, clipPath: 'inset(0 0 4px 0)' }
-        : { opacity: 1, y: 4 };
+function rememberedOpportunityRoute(): OpportunityRouteKey | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return opportunityRouteFor(window.localStorage.getItem(OPPORTUNITY_STORAGE_KEY));
+  } catch {
+    return null;
+  }
+}
+
+function OpportunityRoutePanel() {
+  const [activeKey, setActiveKey] = useState<OpportunityRouteKey>(
+    () => rememberedOpportunityRoute() ?? 'reach',
+  );
+  const [restoredChoice] = useState(() => rememberedOpportunityRoute() !== null);
+  const routeRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const activeIndex = OPPORTUNITY_ROUTES.findIndex((route) => route.key === activeKey);
+  const active = OPPORTUNITY_ROUTES[activeIndex]!;
+
+  function chooseRoute(key: OpportunityRouteKey) {
+    setActiveKey(key);
+    try {
+      window.localStorage.setItem(OPPORTUNITY_STORAGE_KEY, key);
+    } catch {
+      // Selection remains useful when storage is disabled or unavailable.
+    }
+  }
+
+  function onRouteKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    const current = OPPORTUNITY_ROUTES.findIndex((route) => route.key === activeKey);
+    let next: number | null = null;
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (current + 1) % OPPORTUNITY_ROUTES.length;
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (current - 1 + OPPORTUNITY_ROUTES.length) % OPPORTUNITY_ROUTES.length;
+    if (event.key === 'Home') next = 0;
+    if (event.key === 'End') next = OPPORTUNITY_ROUTES.length - 1;
+    if (next === null) return;
+    event.preventDefault();
+    chooseRoute(OPPORTUNITY_ROUTES[next]!.key);
+    routeRefs.current[next]?.focus();
+  }
 
   return (
-    <motion.div
-      initial={initial}
-      whileInView={{ opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)' }}
-      viewport={{ once: true, margin: '-72px' }}
-      transition={{ duration: 0.22, ease: QUIET_EASE, delay }}
-    >
-      {children}
-    </motion.div>
+    <section className="mk-route" aria-labelledby="opportunity-route-heading">
+      <div className="mk-route__head">
+        <h2 id="opportunity-route-heading">Choose the pressure you are under.</h2>
+        <p>
+          Vitae starts from the career question in front of you, then traces back to the records
+          that can make the answer useful.
+        </p>
+      </div>
+      <div
+        className="mk-route__chooser"
+        role="tablist"
+        aria-label="Career opportunity"
+        onKeyDown={onRouteKeyDown}
+      >
+        {OPPORTUNITY_ROUTES.map((route, index) => (
+          <button
+            key={route.key}
+            ref={(node) => { routeRefs.current[index] = node; }}
+            id={`opportunity-tab-${route.key}`}
+            className={`mk-route__choice${route.key === activeKey ? ' mk-route__choice--active' : ''}`}
+            type="button"
+            role="tab"
+            aria-selected={route.key === activeKey}
+            aria-controls={`opportunity-panel-${route.key}`}
+            tabIndex={route.key === activeKey ? 0 : -1}
+            onClick={() => chooseRoute(route.key)}
+          >
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            {route.label}
+          </button>
+        ))}
+      </div>
+      <div
+        id={`opportunity-panel-${active.key}`}
+        className="mk-route__panel"
+        role="tabpanel"
+        aria-labelledby={`opportunity-tab-${active.key}`}
+        tabIndex={0}
+      >
+        <div className="mk-route__copy">
+          <p className="mk-route__status" role="status">
+            {restoredChoice ? `Continuing: ${active.label}` : `Selected: ${active.label}`}
+          </p>
+          <h3>{active.title}</h3>
+          <p>{active.body}</p>
+          <ol className="mk-route__evidence" aria-label={`${active.label} evidence trail`}>
+            {active.evidence.map((item, index) => (
+              <li key={item}>
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                {item}
+              </li>
+            ))}
+          </ol>
+          <Link className="mk-text-link" to={active.route}>
+            {active.routeLabel} <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+        <ProductFrame
+          src={active.image}
+          alt={active.imageAlt}
+          label={active.imageLabel}
+          eager
+        />
+      </div>
+    </section>
+  );
+}
+
+function RouteTrace() {
+  return (
+    <ol className="mk-trace" aria-label="Vitae opportunity route">
+      <li>
+        <span>01</span>
+        <strong>Capture</strong>
+        <p>Save the person, work, or moment while it is still specific.</p>
+      </li>
+      <li>
+        <span>02</span>
+        <strong>Connect</strong>
+        <p>Keep the relationship, source, and supporting records adjacent.</p>
+      </li>
+      <li>
+        <span>03</span>
+        <strong>Decide</strong>
+        <p>Inspect the route or evidence before taking the next step.</p>
+      </li>
+      <li>
+        <span>04</span>
+        <strong>Move</strong>
+        <p>Make an ask, tailor an output, or set the next action.</p>
+      </li>
+    </ol>
   );
 }
 
 export function Landing() {
-  return (
-    <div className="mk">
-      <MkNav />
+  const cloudEnabled = publicLaunchConfig.cloudEnabled;
 
-      <main>
-        <section className="mk-hero" aria-labelledby="landing-heading">
-          <div className="mk__inner mk-hero__layout">
+  return (
+    <MarketingShell>
+      <section className="mk-hero mk-hero--route" aria-labelledby="landing-heading">
+        <div className="mk__inner">
+          <div className="mk-hero__layout">
             <div className="mk-hero__copy">
-              <p className="mk-hero__brand">Vitae</p>
-              <h1 id="landing-heading" className="mk-hero__title">
-                Your life, as a living network.
+              <h1 id="landing-heading">
+                When the right role arrives, your career should already be in order.
               </h1>
               <p className="mk-hero__sub">
-                Capture people, work, and moments while they are fresh. Vitae keeps the context
-                between them—and turns it into your next useful action.
+                Vitae connects the people, work, and evidence behind your next move—so a warm
+                introduction, credible résumé, or important conversation starts with a record you
+                can inspect.
               </p>
               <div className="mk-hero__ctas">
-                <Link className="mk-action mk-action--primary mk-action--lg" to="/signin">
-                  Get started
-                </Link>
-                <Link className="mk-action mk-action--lg" to="/tour">
-                  Take the tour
+                <CloudAction className="mk-action mk-action--primary mk-action--lg" />
+                <Link className="mk-action mk-action--lg" to="/how-it-works">
+                  See how Vitae works
                 </Link>
               </div>
-              <ul className="mk-hero__proof" aria-label="Product boundaries">
-                <li>Self-hosted</li>
-                <li>One configured operator</li>
-                <li>No runtime AI</li>
-              </ul>
+              <p className="mk-hero__quiet-note">
+                For a private career record. No ads. No runtime AI guessing.
+              </p>
             </div>
-
-            <div className="mk-hero__frame">
-              <ProductFrame
-                src="/landing/today.png"
-                alt="Vitae Today dashboard with momentum score, reconnect lane, pipeline and habits"
-                label="Today · daily operating view"
-                eager
-              />
-            </div>
+            <OpportunityRoutePanel />
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section
-          className="mk-section mk-section--story"
-          id="product"
-          aria-labelledby="story-heading"
-        >
-          <div className="mk__inner">
-            <Reveal>
-              <header className="mk-section__head">
-                <h2 id="story-heading" className="mk-section__title">
-                  A sentence becomes a network.
-                </h2>
-                <p className="mk-section__lede">
-                  Fast capture does not flatten the story. A deterministic grammar separates the
-                  record, its context, and its provenance before anything is saved.
-                </p>
-              </header>
-            </Reveal>
+      <section className="mk-section mk-section--trace" aria-labelledby="trace-heading">
+        <div className="mk__inner">
+          <div className="mk-section__intro mk-section__intro--split">
+            <h2 id="trace-heading">A twenty-minute opportunity should not require a career archaeology project.</h2>
+            <p>
+              Vitae is built for the moment a role, referral, or serious conversation appears. It
+              gives that moment a trace back through the work and relationships you already know.
+            </p>
+          </div>
+          <RouteTrace />
+        </div>
+      </section>
 
-            <Reveal gesture="fade">
-              <div className="mk-capture-line" aria-label="Example capture and parsed result">
+      <section className="mk-section mk-section--inset" aria-labelledby="record-heading">
+        <div className="mk__inner">
+          <div className="mk-section__intro mk-section__intro--split">
+            <h2 id="record-heading">The career record comes before the career output.</h2>
+            <p>
+              Capture quickly when context is fresh. Add depth later with structured fields,
+              explicit connections, sources, revisions, and a visible reason for every conclusion.
+            </p>
+          </div>
+          <div className="mk-compare">
+            <div className="mk-compare__copy">
+              <div className="mk-command" aria-label="Example quick capture">
                 <code>p Lina Farouk @@DevFest #ml &gt; met at the speaker dinner</code>
-                <span className="mk-capture-line__key">
-                  <Kbd>⌘K</Kbd> then Enter
-                </span>
+                <span>Capture → inspect → save</span>
               </div>
-              <ol className="mk-story__steps">
+              <ol className="mk-ledger" aria-label="What the capture preserves">
                 <li>
-                  <span className="mk-story__verb">Capture</span>
-                  <strong>Person · Lina Farouk</strong>
-                  <span>A typed person record, ready to enrich.</span>
+                  <span>01</span>
+                  <div>
+                    <strong>Record the fact</strong>
+                    <p>A person, organization, project, event, or other typed record begins as a clear claim.</p>
+                  </div>
                 </li>
                 <li>
-                  <span className="mk-story__verb">Connect</span>
-                  <strong>Organization · DevFest</strong>
-                  <span>The tag and note stay attached as context.</span>
+                  <span>02</span>
+                  <div>
+                    <strong>Keep the context</strong>
+                    <p>Tags, source, note, date, and connections remain visible instead of dissolving into a note pile.</p>
+                  </div>
                 </li>
                 <li>
-                  <span className="mk-story__verb">Accumulate</span>
-                  <strong>One inspectable life map</strong>
-                  <span>Every hop comes from a connection you recorded.</span>
+                  <span>03</span>
+                  <div>
+                    <strong>Reuse it when it matters</strong>
+                    <p>The same records power relationship intelligence, career evidence, daily planning, and exports.</p>
+                  </div>
                 </li>
               </ol>
-            </Reveal>
-
-            <div className="mk-story__frames">
-              <Reveal gesture="uncover">
-                <div className="mk-story__frame">
-                  <ProductFrame
-                    src="/landing/capture.png"
-                    alt="The command capture bar parsing a person, organization, tag, and note"
-                    label="Capture · parsed before save"
-                  />
-                  <p>
-                    Preview chips show exactly what the grammar understood. Nothing is inferred by a
-                    model and nothing is hidden behind a confidence-free guess.
-                  </p>
-                </div>
-              </Reveal>
-              <Reveal gesture="uncover" delay={0.08}>
-                <div className="mk-story__frame">
-                  <ProductFrame
-                    src="/landing/graph.png"
-                    alt="The life map showing connected people, work, skills, and events"
-                    label="Life map · the accumulated network"
-                  />
-                  <p>
-                    Drag, zoom, inspect a neighborhood, and expand from any record. The map is a
-                    view over your ledger—not a second copy of it.
-                  </p>
-                </div>
-              </Reveal>
             </div>
-
-            <Reveal>
-              <dl className="mk-strip" aria-label="Product facts">
-                {LANDING_FACTS.map((fact) => (
-                  <div key={fact.label} className="mk-strip__cell">
-                    <dt className="mk-strip__num">{fact.num}</dt>
-                    <dd className="mk-strip__label">{fact.label}</dd>
-                  </div>
-                ))}
-              </dl>
-            </Reveal>
+            <ProductFrame
+              src="/landing/capture.png"
+              alt="Vitae command capture parsing a person, organization, tag, and note before save"
+              label="Capture · parsed before save"
+            />
           </div>
-        </section>
-
-        <section className="mk-section" aria-labelledby="depth-heading">
-          <div className="mk__inner">
-            <Reveal>
-              <header className="mk-section__head">
-                <h2 id="depth-heading" className="mk-section__title">
-                  Keep the texture. Lose the scavenger hunt.
-                </h2>
-                <p className="mk-section__lede">
-                  Relationships, evidence, and history stay legible at the moment you need them.
-                  Fast entry and deep editing share the same records.
-                </p>
-              </header>
-            </Reveal>
-
-            <div className="mk-feature">
-              <Reveal>
-                <div className="mk-feature__copy">
-                  <h3 className="mk-feature__title">Know why a relationship needs attention.</h3>
-                  <p className="mk-feature__body">
-                    Closeness, reconnect cadence, interactions, topics, and favors sit together. A
-                    relationship score is decomposable, so the number never becomes an oracle.
-                  </p>
-                  <ul className="mk-feature__list">
-                    <li>Cadence and quiet time are visible per person.</li>
-                    <li>Favor entries preserve direction and balance.</li>
-                    <li>Connection records carry their own fields and provenance.</li>
-                  </ul>
-                </div>
-              </Reveal>
-              <Reveal gesture="uncover" delay={0.08}>
-                <ProductFrame
-                  src="/landing/person.png"
-                  alt="A person profile with relationship strength, cadence, interactions, and favor ledger"
-                  label="Person · relationship ledger"
-                />
-              </Reveal>
-            </div>
-
-            <div className="mk-feature mk-feature--flip">
-              <Reveal>
-                <div className="mk-feature__copy">
-                  <h3 className="mk-feature__title">Add depth when the moment allows.</h3>
-                  <p className="mk-feature__body">
-                    Every one of the {NODE_TYPES.length} record types has a sectioned, validated
-                    form. Inline connection editors let you enrich context without leaving the
-                    record.
-                  </p>
-                  <ul className="mk-feature__list">
-                    <li>Dates, source, confidence, and sensitivity are first-class fields.</li>
-                    <li>
-                      LinkedIn, vCard, calendar, bookmark, and CSV imports stage before commit.
-                    </li>
-                    <li>Every write creates a revision; deleted records remain recoverable.</li>
-                  </ul>
-                </div>
-              </Reveal>
-              <Reveal gesture="uncover" delay={0.08}>
-                <ProductFrame
-                  src="/landing/form.png"
-                  alt="A structured person form with sections, validation, and contextual fields"
-                  label="Structured form · depth on demand"
-                />
-              </Reveal>
-            </div>
-          </div>
-        </section>
-
-        <section className="mk-section" aria-labelledby="outcomes-heading">
-          <div className="mk__inner mk-outcomes__layout">
-            <Reveal>
-              <header className="mk-section__head mk-section__head--sticky">
-                <h2 id="outcomes-heading" className="mk-section__title">
-                  Your history should answer back.
-                </h2>
-                <p className="mk-section__lede">
-                  The ledger earns its keep by turning already-captured evidence into decisions and
-                  outputs—deterministically, with the reasoning left visible.
-                </p>
-              </header>
-            </Reveal>
-
-            <div className="mk-outcomes">
-              <Reveal>
-                <article className="mk-outcome">
-                  <span className="mk-outcome__glyph" aria-hidden="true">
-                    <Glyph name="ask" size={18} />
-                  </span>
-                  <div>
-                    <h3>Ask the network</h3>
-                    <p>
-                      Rank who to call for a referral, introduction, or conversation. Every result
-                      exposes its factors and weights.
-                    </p>
-                  </div>
-                </article>
-              </Reveal>
-              <Reveal delay={0.06}>
-                <article className="mk-outcome">
-                  <span className="mk-outcome__glyph" aria-hidden="true">
-                    <Glyph name="resume" size={18} />
-                  </span>
-                  <div>
-                    <h3>Compile a résumé</h3>
-                    <p>
-                      Parse a job description, select verified achievement atoms, budget one page,
-                      and compile an ATS-oriented LaTeX PDF.
-                    </p>
-                  </div>
-                </article>
-              </Reveal>
-              <Reveal delay={0.12}>
-                <article className="mk-outcome">
-                  <span className="mk-outcome__glyph" aria-hidden="true">
-                    <Glyph name="export" size={18} />
-                  </span>
-                  <div>
-                    <h3>Leave with everything</h3>
-                    <p>
-                      Export one JSONL file per collection, an Obsidian-compatible Markdown vault,
-                      and a checksum manifest. Saved views can leave as CSV.
-                    </p>
-                  </div>
-                </article>
-              </Reveal>
-            </div>
-          </div>
-        </section>
-
-        <section
-          className="mk-section mk-section--selfhost"
-          id="self-host"
-          aria-labelledby="selfhost-heading"
-        >
-          <span id="pricing" className="mk-anchor-legacy" aria-hidden="true" />
-          <div className="mk__inner mk-selfhost">
-            <Reveal>
-              <div className="mk-selfhost__copy">
-                <h2 id="selfhost-heading" className="mk-section__title">
-                  A system you can run yourself.
-                </h2>
-                <p className="mk-section__lede">
-                  Vitae is Apache-2.0 licensed, single-operator software. Run it on infrastructure
-                  you control, configure the one owner identity, and keep recovery procedures close.
-                </p>
-                <div className="mk-selfhost__actions">
-                  <a className="mk-action mk-action--primary" href={PUBLIC_SOURCE_URL}>
-                    Find source on GitHub
-                  </a>
-                  <Link className="mk-action" to="/tour">
-                    Tour the interface
-                  </Link>
-                  <Link className="mk-text-link" to="/manifesto">
-                    Read the operating principles →
-                  </Link>
-                </div>
+          <dl className="mk-facts" aria-label="Vitae product facts">
+            {LANDING_FACTS.map((fact) => (
+              <div key={fact.label}>
+                <dt>{fact.num}</dt>
+                <dd>{fact.label}</dd>
               </div>
-            </Reveal>
+            ))}
+          </dl>
+        </div>
+      </section>
 
-            <Reveal gesture="fade" delay={0.08}>
-              <dl className="mk-selfhost__facts">
-                <div>
-                  <dt>Access model</dt>
-                  <dd>One configured operator; every request denied by default.</dd>
-                </div>
-                <div>
-                  <dt>Durable store</dt>
-                  <dd>PostgreSQL 17 behind route, service, and repository boundaries.</dd>
-                </div>
-                <div>
-                  <dt>Portability</dt>
-                  <dd>Checksummed JSONL and Markdown-vault backup with documented restore.</dd>
-                </div>
-                <div>
-                  <dt>Computation</dt>
-                  <dd>
-                    Deterministic TypeScript algorithms; no graph data sent to an AI provider.
-                  </dd>
-                </div>
-              </dl>
-            </Reveal>
-          </div>
-        </section>
-
-        <section className="mk-section" aria-labelledby="questions-heading">
-          <div className="mk__inner mk-faq__layout">
-            <Reveal>
-              <header className="mk-section__head">
-                <h2 id="questions-heading" className="mk-section__title">
-                  Straight answers.
-                </h2>
-                <p className="mk-section__lede">
-                  Vitae is intentionally narrow about ownership, automation, and where your data
-                  lives.
-                </p>
-              </header>
-            </Reveal>
-            <Reveal gesture="fade">
-              <div className="mk-faq">
-                <details>
-                  <summary>Who can see my data?</summary>
-                  <p>
-                    The configured operator. Production access requires a verified identity matching
-                    the owner email, and the API denies other requests by default. Vitae has no
-                    social feed, behavioral advertising, or telemetry-based profiling.
-                  </p>
-                </details>
-                <details>
-                  <summary>Can I get my data out?</summary>
-                  <p>
-                    Yes. A full export contains identity-preserving JSONL, an Obsidian-compatible
-                    Markdown vault, and SHA-256 checksums. Saved views can also be exported as CSV.
-                  </p>
-                </details>
-                <details>
-                  <summary>Do I have to learn the capture grammar?</summary>
-                  <p>
-                    No. The command grammar is the fast lane. All {NODE_TYPES.length} record types
-                    have structured forms, and connections have visual editors. Use the path that
-                    fits the moment.
-                  </p>
-                </details>
-                <details>
-                  <summary>Does Vitae send my graph to an AI model?</summary>
-                  <p>
-                    No. Capture parsing, relationship scoring, ranking, job-description parsing, and
-                    résumé selection run as deterministic algorithms without a runtime AI provider.
-                  </p>
-                </details>
-                <details>
-                  <summary>How do I get started?</summary>
-                  <p>
-                    Clone the repository, configure one owner identity, and follow the quick start.
-                    The seed records are fictional, so you can inspect the complete product before
-                    adding your own history.
-                  </p>
-                </details>
-              </div>
-            </Reveal>
-          </div>
-        </section>
-
-        <section className="mk-cta" aria-labelledby="closing-heading">
-          <div className="mk__inner">
-            <h2 id="closing-heading" className="mk-cta__title">
-              Keep the next thing you will wish you remembered.
-            </h2>
-            <p className="mk-cta__sub">
-              Start with one person, one project, or one conversation. The network gains shape
-              through use.
+      <section className="mk-section" aria-labelledby="outcomes-heading">
+        <div className="mk__inner mk-outcomes-layout">
+          <div className="mk-section__intro mk-section__intro--sticky">
+            <h2 id="outcomes-heading">What becomes easier when the evidence remains connected.</h2>
+            <p>
+              Vitae does not try to manufacture a professional identity. It helps you retrieve,
+              assess, and use the history you can defend.
             </p>
-            <div className="mk-cta__actions">
-              <Link className="mk-action mk-action--primary mk-action--lg" to="/signin">
-                Get started
-              </Link>
-              <Link className="mk-action mk-action--lg" to="/manifesto">
-                Read the manifesto
-              </Link>
-            </div>
           </div>
-        </section>
-      </main>
+          <div className="mk-outcome-ledger">
+            <article>
+              <span className="mk-outcome-ledger__glyph" aria-hidden="true">
+                <Glyph name="ask" size={19} />
+              </span>
+              <div>
+                <p>RELATIONSHIP INTELLIGENCE</p>
+                <h3>See the human route before you ask.</h3>
+                <span>
+                  Warm paths expose the recorded people and connection types behind a possible
+                  introduction. A path is inspectable context, never an automatic recommendation.
+                </span>
+                <Link to="/product/warm-paths">Explore warm paths <span aria-hidden="true">→</span></Link>
+              </div>
+            </article>
+            <article>
+              <span className="mk-outcome-ledger__glyph" aria-hidden="true">
+                <Glyph name="resume" size={19} />
+              </span>
+              <div>
+                <p>CAREER EVIDENCE</p>
+                <h3>Tailor from claims you can trace.</h3>
+                <span>
+                  Match a target to reviewed achievement atoms, keep the selection visible, and
+                  compile an ATS-safe PDF from your own evidence.
+                </span>
+                <Link to="/product/career-evidence">Explore career evidence <span aria-hidden="true">→</span></Link>
+              </div>
+            </article>
+            <article>
+              <span className="mk-outcome-ledger__glyph" aria-hidden="true">
+                <Glyph name="export" size={19} />
+              </span>
+              <div>
+                <p>OWNERSHIP</p>
+                <h3>Leave with the record, not a dead export.</h3>
+                <span>
+                  Export identity-preserving JSONL, an Obsidian-compatible Markdown vault, and a
+                  checksum manifest whenever you need a copy outside Vitae.
+                </span>
+                <Link to="/security-and-ownership">See ownership details <span aria-hidden="true">→</span></Link>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
 
-      <MkFoot />
-    </div>
+      <section className="mk-section mk-section--pricing-bridge" aria-labelledby="pricing-bridge-heading">
+        <div className="mk__inner mk-pricing-bridge">
+          <div>
+            <h2 id="pricing-bridge-heading">One private workspace. The full career system.</h2>
+            <p>
+              {CLOUD_PLAN.name} is designed for one person who wants the relationship context,
+              career evidence, and export path in the same place.
+            </p>
+          </div>
+          <div className="mk-pricing-bridge__plan">
+            <p>{cloudEnabled ? CLOUD_PLAN.trial : 'Planned launch price · Cloud is not open yet'}</p>
+            <strong>{CLOUD_PLAN.monthly.price}<small>{CLOUD_PLAN.monthly.suffix}</small></strong>
+            <Link className="mk-action mk-action--primary" to="/pricing">
+              {cloudEnabled ? 'See pricing and trial terms' : 'See planned pricing'}
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="mk-section mk-section--faq" aria-labelledby="questions-heading">
+        <div className="mk__inner mk-faq-layout">
+          <div className="mk-section__intro">
+            <h2 id="questions-heading">The questions that should be answered before you trust a career system.</h2>
+          </div>
+          <div className="mk-faq">
+            <details>
+              <summary>Does Vitae invent résumé claims or outreach messages?</summary>
+              <p>
+                No. Vitae uses deterministic parsing, scoring, and compilation. It helps you select
+                and inspect your own evidence; it does not send your graph to a runtime AI provider
+                or invent career history for you.
+              </p>
+            </details>
+            <details>
+              <summary>Can I see why a warm path or score appeared?</summary>
+              <p>
+                Yes. Relationship and introduction views keep the records, connection types, and
+                factors visible. The result is evidence to judge, not an opaque instruction.
+              </p>
+            </details>
+            <details>
+              <summary>Can I leave with my records?</summary>
+              <p>
+                Yes. Full exports include JSONL collections, a Markdown vault, and a checksum
+                manifest. Saved views can also leave as CSV.
+              </p>
+            </details>
+            <details>
+              <summary>Is Vitae for a team, recruiter, or social network?</summary>
+              <p>
+                No. Vitae Cloud Individual is for one career-minded person maintaining a private
+                professional record. It is deliberately not a team CRM, recruiting system, or social feed.
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section className="mk-closing" aria-labelledby="closing-heading">
+        <div className="mk__inner mk-closing__layout">
+          <div>
+            <h2 id="closing-heading">Keep the next career conversation from starting at zero.</h2>
+            <p>Begin with the person, project, or opportunity already on your mind.</p>
+          </div>
+          <div className="mk-closing__actions">
+            <CloudAction className="mk-action mk-action--primary mk-action--lg" />
+            <Link className="mk-action mk-action--lg" to="/guides/first-career-record">
+              Read the first-record guide
+            </Link>
+          </div>
+        </div>
+      </section>
+    </MarketingShell>
   );
 }

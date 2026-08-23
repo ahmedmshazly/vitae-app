@@ -62,7 +62,7 @@ export function NotFound() {
         title="No page at this address"
         hint="It may have been renamed, or the record it pointed at may have been deleted."
         action={
-          <Link to="/" className="vt-btn vt-btn--primary">
+          <Link to="/today" className="vt-btn vt-btn--primary">
             Go to Today
           </Link>
         }

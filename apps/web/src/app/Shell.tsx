@@ -195,7 +195,7 @@ export function Shell({ children }: { children: ReactNode }) {
         </a>
 
         <nav className="rail" aria-label="Primary">
-          <Link className="rail__brand" to="/" aria-label="Vitae, go to Today">
+          <Link className="rail__brand" to="/today" aria-label="Vitae, go to Today">
             {compactRail ? <LogoMark size={27} /> : <LogoHorizontal markSize={24} />}
           </Link>
 

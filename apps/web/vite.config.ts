@@ -5,6 +5,8 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import { getPublicLaunchConfig } from './src/public/site.js';
+import { publicSeoArtifacts } from './vite.public-seo.js';
 
 const ENV_DIRECTORY = '../../';
 
@@ -36,6 +38,13 @@ function assertHostedConfiguration(env: Record<string, string>): void {
       `Refusing hosted web build with missing or local-only configuration: ${invalid.join(', ')}`,
     );
   }
+
+  const cloud = getPublicLaunchConfig(env);
+  if (cloud.cloudRequested && !cloud.cloudEnabled) {
+    throw new Error(
+      `Refusing public Cloud build with incomplete launch configuration: ${cloud.missingLaunchRequirements.join(', ')}`,
+    );
+  }
 }
 
 export default defineConfig(({ mode }) => {
@@ -54,6 +63,7 @@ export default defineConfig(({ mode }) => {
       // silently skipped.
       react({ babel: { plugins: [['babel-plugin-react-compiler', {}]] } }),
       tailwindcss(),
+      publicSeoArtifacts(env),
     ],
     // The monorepo keeps a single .env at the repo root (see .env.example); without
     // this Vite would look only in apps/web and every VITE_* var would be undefined.
