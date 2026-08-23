@@ -40,6 +40,7 @@ const OWNER = 'owner@example.com';
 /** A decoded Firebase token as the companion project would issue it. */
 function decoded(overrides: Record<string, unknown> = {}) {
   return {
+    uid: 'trusted-firebase-uid',
     email: OWNER,
     email_verified: true,
     firebase: { sign_in_provider: 'google.com' },
@@ -94,6 +95,11 @@ describe('cross-project Firebase tokens', () => {
 
   it('rejects an unverified email', async () => {
     verifyTrusted.mockResolvedValue(decoded({ email_verified: false }));
+    expect((await runGate()).status).toBe(401);
+  });
+
+  it('rejects a verified token without a stable Firebase uid', async () => {
+    verifyTrusted.mockResolvedValue(decoded({ uid: undefined, sub: undefined }));
     expect((await runGate()).status).toBe(401);
   });
 

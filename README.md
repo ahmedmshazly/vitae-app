@@ -1,13 +1,14 @@
 # Vitae
 
-Vitae is a self-hosted life and career system. It stores people, roles,
-projects, conversations, ideas, and artifacts in a typed, versioned graph. It
-also builds tailored, ATS-safe resumes from that data without calling a model
-at runtime.
+Vitae is a life and career system. It stores people, roles, projects,
+conversations, ideas, and artifacts in a typed, versioned graph. It also builds
+tailored, ATS-safe resumes from that data without calling a model at runtime.
 
-The project is built for one operator who may keep records about many people.
-It is not a multi-tenant service and it does not send the graph to an AI
-provider.
+The checked-in source project is self-hosted and single-operator. Vitae Cloud
+is a separately gated hosted-release track; it is not open for public accounts
+until its tenant isolation, billing, support, legal, backup, and deletion
+controls have been verified. See the [Cloud launch guide](docs/CLOUD-LAUNCH.md)
+for the exact release boundary.
 
 ## What it does
 
@@ -75,6 +76,7 @@ sign-in shortcut. Disable it outside local development.
 | Operations | [Runbooks](docs/runbooks/README.md) |
 | Testing | [Testing guide](docs/testing/README.md) |
 | Data handling | [Privacy and sample data](docs/PRIVACY.md) |
+| Hosted Cloud release | [Cloud launch guide](docs/CLOUD-LAUNCH.md) |
 | Security reporting | [Security policy](SECURITY.md) |
 | Compatibility and releases | [Release policy](RELEASE.md) and [changelog](CHANGELOG.md) |
 | Contributing | [Contributor guide](CONTRIBUTING.md) |

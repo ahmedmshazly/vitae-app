@@ -19,6 +19,7 @@
     "@fontsource/source-serif-4": "^5.2.9",
     "@fontsource/space-grotesk": "^5.2.10",
     "@hookform/resolvers": "^5.4.0",
+    "@paddle/paddle-js": "^1.6.4",
     "@tanstack/react-query": "^5.62.11",
     "@vitae/core": "workspace:*",
     "@vitae/ui": "workspace:*",

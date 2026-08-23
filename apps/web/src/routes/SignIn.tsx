@@ -10,7 +10,7 @@
  * card, because the card only existed to hold the blobs off the text.
  */
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button, Glyph, LogoStacked, RegisterRule, Skeleton } from '@vitae/ui';
 import { useAuth } from '../lib/auth.js';
 
@@ -20,7 +20,10 @@ import { useAuth } from '../lib/auth.js';
 type Pending = 'google' | 'dev' | null;
 
 export function SignIn() {
-  const { signInDev, signInGoogle, devLoginEnabled, googleEnabled } = useAuth();
+  const { signInDev, signInGoogle, devLoginEnabled, googleEnabled, cloudEnabled, accountError } =
+    useAuth();
+  const { pathname } = useLocation();
+  const isSignup = pathname === '/signup';
   const [pending, setPending] = useState<Pending>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,10 +47,14 @@ export function SignIn() {
       ) : (
         <>
           <div className="signin__door-head">
-            <h2 className="u-display text-md text-ink-strong">Sign in</h2>
+            <h2 className="u-display text-md text-ink-strong">
+              {cloudEnabled && isSignup ? 'Start your 14-day trial' : 'Sign in'}
+            </h2>
             <p className="signin__door-copy">
               {googleEnabled
-                ? 'Use the Google account configured as the owner of this instance.'
+                ? cloudEnabled
+                  ? 'Use a verified Google account. Vitae prepares one private workspace and does not ask for a card to begin.'
+                  : 'Use the Google account configured as the owner of this instance.'
                 : 'Use the local developer shortcut enabled for this build.'}
             </p>
           </div>
@@ -86,7 +93,7 @@ export function SignIn() {
           </div>
 
           {/* Never colour alone: the tone carries a glyph and the word "Failed". */}
-          {error && (
+          {(error || accountError) && (
             <p
               role="alert"
               aria-live="assertive"
@@ -94,14 +101,18 @@ export function SignIn() {
             >
               <Glyph name="close" size={14} className="mt-0.5 shrink-0" />
               <span>
-                <strong className="font-semibold">Sign-in failed.</strong> {error}
+                <strong className="font-semibold">
+                  {error ? 'Sign-in failed.' : 'Workspace setup needs attention.'}
+                </strong>{' '}
+                {error ?? accountError}
               </span>
             </p>
           )}
 
           <p className="signin__access-note">
-            This is a single-owner system. Verified accounts that do not match the configured owner
-            email are denied.
+            {cloudEnabled
+              ? 'One private workspace. Your account never selects or shares another person’s records.'
+              : 'This is a single-owner system. Verified accounts that do not match the configured owner email are denied.'}
           </p>
         </>
       )}
@@ -120,7 +131,7 @@ export function SignInSplash() {
     <SignInLayout>
       <div className="signin__door-head">
         <h2 className="u-display text-md text-ink-strong">Sign in</h2>
-        <p className="signin__door-copy">Checking this browser for an existing owner session.</p>
+        <p className="signin__door-copy">Checking this browser for an existing session.</p>
       </div>
       <div className="signin__providers" role="status" aria-label="Checking your session">
         <Skeleton height={44} />
@@ -136,7 +147,7 @@ function NoWayIn() {
     <>
       <div className="signin__door-head">
         <h2 className="u-display text-md text-ink-strong">No way in</h2>
-        <p className="signin__door-copy">This build cannot authenticate its configured operator.</p>
+        <p className="signin__door-copy">This build cannot authenticate an account yet.</p>
       </div>
       <p role="alert" className="flex items-start gap-2 text-sm text-danger">
         <Glyph name="close" size={14} className="mt-0.5 shrink-0" />
@@ -158,6 +169,9 @@ function NoWayIn() {
  * two stack and the hairline turns horizontal.
  */
 function SignInLayout({ children }: { children: React.ReactNode }) {
+  const { cloudEnabled } = useAuth();
+  const { pathname } = useLocation();
+  const isSignup = pathname === '/signup';
   return (
     <main className="signin grid min-h-screen lg:grid-cols-[1fr_26rem]">
       {/* Content is centred within its own column, not pinned to the page
@@ -171,10 +185,12 @@ function SignInLayout({ children }: { children: React.ReactNode }) {
           <div className="signin__register mt-6">
             <RegisterRule />
           </div>
-          <h1 className="signin__claim">Keep the whole story—not just the latest document.</h1>
+          <h1 className="signin__claim">
+            Turn the career you have lived into the next role you can reach.
+          </h1>
           <p className="signin__identity-copy">
-            Vitae is a private, self-hosted system for one working life: people, evidence, and
-            moments connected in a ledger you can inspect and export.
+            Vitae keeps the people, work evidence, and next decisions behind a considered career
+            move connected in a private record you can inspect and export.
           </p>
           <ol className="signin__ledger" aria-label="How Vitae turns memory into action">
             <li>
@@ -196,10 +212,30 @@ function SignInLayout({ children }: { children: React.ReactNode }) {
       <div className="signin__door flex flex-col justify-center gap-4 border-t border-hairline p-6 lg:border-t-0 lg:border-l lg:p-12">
         {children}
         <p className="signin__foot mt-4 border-t border-hairline pt-4 text-xs leading-normal text-faint">
-          <span className="signin__instance">Single-owner · self-hosted · default-deny</span>
+          <span className="signin__instance">
+            {cloudEnabled
+              ? 'Private workspace · evidence first · exportable'
+              : 'Single-owner · self-hosted · default-deny'}
+          </span>
           <br />
-          New here? <Link to="/tour">Take the tour</Link> ·{' '}
-          <Link to="/welcome">What is Vitae?</Link>
+          {cloudEnabled ? (
+            <>
+              {isSignup ? (
+                <>
+                  Already have a workspace? <Link to="/signin">Sign in</Link>
+                </>
+              ) : (
+                <>
+                  New here? <Link to="/signup">Start a 14-day trial</Link>
+                </>
+              )}{' '}
+              · <Link to="/tour">Take the tour</Link>
+            </>
+          ) : (
+            <>
+              New here? <Link to="/tour">Take the tour</Link> · <Link to="/">What is Vitae?</Link>
+            </>
+          )}
         </p>
       </div>
     </main>

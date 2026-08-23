@@ -37,7 +37,7 @@ import {
 } from '@vitae/core';
 import { db } from './pg.js';
 import type { Database, TableName } from './schema.js';
-import { currentSpace } from './space.js';
+import { currentSpace, currentWorkspaceId } from './space.js';
 import { bumpWriteGeneration } from './write-signal.js';
 import { newId, nowIso, shallowDiff, stripUndefined } from './util.js';
 
@@ -82,6 +82,11 @@ export class Repository {
     return currentSpace();
   }
 
+  /** A server-derived partition; never read from a browser-controlled header. */
+  private get workspaceId(): string {
+    return currentWorkspaceId();
+  }
+
   allocateId(): string {
     return newId();
   }
@@ -123,7 +128,7 @@ export class Repository {
     };
     await tx
       .insertInto('nodes')
-      .values({ space: this.space, id, data: this.clean(record) })
+      .values({ space: this.space, workspace_id: this.workspaceId, id, data: this.clean(record) })
       .execute();
     await this.writeRevision(tx, 'node', id, 1, meta.op ?? 'create', record, undefined, value.source, meta.actor);
     return record;
@@ -138,6 +143,7 @@ export class Repository {
       .selectFrom('nodes')
       .select('data')
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where('id', '=', id)
       .executeTakeFirst();
     if (!row) return null;
@@ -176,6 +182,7 @@ export class Repository {
       .updateTable('nodes')
       .set({ data: this.clean(merged) })
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where('id', '=', before.id)
       .execute();
     const diff = shallowDiff(before as never, merged as never);
@@ -210,7 +217,11 @@ export class Repository {
   async listNodes(
     params: { type?: string; includeArchived?: boolean; includeDeleted?: boolean; limit?: number } = {},
   ): Promise<NodeRecord[]> {
-    let q = db.selectFrom('nodes').select('data').where('space', '=', this.space);
+    let q = db
+      .selectFrom('nodes')
+      .select('data')
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId);
     if (params.type) q = q.where('type', '=', params.type);
     if (!params.includeDeleted) q = q.where('deleted_at', 'is', null);
     if (!params.includeArchived) q = q.where('archived_at', 'is', null);
@@ -231,6 +242,7 @@ export class Repository {
       .selectFrom('nodes')
       .select('data')
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where(sql<boolean>`data -> 'identity_keys' @> ${JSON.stringify([key.toLowerCase()])}::jsonb`)
       .limit(5)
       .execute();
@@ -249,6 +261,7 @@ export class Repository {
       .selectFrom('nodes')
       .select('data')
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where('deleted_at', 'is', null)
       .execute();
     return rows.map((r) => r.data as NodeRecord);
@@ -259,6 +272,7 @@ export class Repository {
       .selectFrom('nodes')
       .select('data')
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where('deleted_at', 'is not', null)
       .execute();
     return rows.map((r) => r.data as NodeRecord);
@@ -270,6 +284,7 @@ export class Repository {
       .selectFrom('nodes')
       .select('data')
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where('deleted_at', '<', cutoff)
       .execute();
     return rows.map((r) => r.data as NodeRecord);
@@ -310,6 +325,7 @@ export class Repository {
         .selectFrom('nodes')
         .select(['id', 'type', 'deleted_at'])
         .where('space', '=', this.space)
+        .where('workspace_id', '=', this.workspaceId)
         .where('id', 'in', wanted.map(([, id]) => id))
         .execute();
       const found = new Map(rows.map((r) => [r.id, r]));
@@ -353,7 +369,10 @@ export class Repository {
       deleted_at: null,
       rev: 1,
     };
-    await tx.insertInto('edges').values({ space: this.space, id, data: this.clean(record) }).execute();
+    await tx
+      .insertInto('edges')
+      .values({ space: this.space, workspace_id: this.workspaceId, id, data: this.clean(record) })
+      .execute();
     await this.writeRevision(tx, 'edge', id, 1, meta.op ?? 'create', record, undefined, value.source, meta.actor);
     return record;
   }
@@ -379,6 +398,7 @@ export class Repository {
       .selectFrom('edges')
       .select('data')
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where('id', '=', id)
       .executeTakeFirst();
     if (!row) return null;
@@ -418,6 +438,7 @@ export class Repository {
       .updateTable('edges')
       .set({ data: this.clean(merged) })
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where('id', '=', before.id)
       .execute();
     const diff = shallowDiff(before as never, merged as never);
@@ -442,6 +463,7 @@ export class Repository {
       .selectFrom('edges')
       .select('data')
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where((eb) => eb.or([eb('src', '=', nodeId), eb('dst', '=', nodeId)]));
     if (!opts.includeDeleted) q = q.where('deleted_at', 'is', null);
     const rows = await q.execute();
@@ -458,6 +480,7 @@ export class Repository {
       .selectFrom('edges')
       .select('data')
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where('deleted_at', 'is', null)
       .execute();
     return rows.map((r) => r.data as EdgeRecord);
@@ -468,6 +491,7 @@ export class Repository {
       .selectFrom('edges')
       .select('data')
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where('deleted_at', '<', cutoff)
       .execute();
     return rows.map((r) => r.data as EdgeRecord);
@@ -479,6 +503,7 @@ export class Repository {
     const res = await db
       .deleteFrom('edges')
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where('id', 'in', [...ids])
       .executeTakeFirst();
     return Number(res.numDeletedRows ?? 0);
@@ -489,6 +514,7 @@ export class Repository {
     const res = await db
       .deleteFrom('nodes')
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where('id', 'in', [...ids])
       .executeTakeFirst();
     return Number(res.numDeletedRows ?? 0);
@@ -500,9 +526,13 @@ export class Repository {
   async liveCounts(): Promise<{ nodes: number; edges: number }> {
     const [nodes, edges] = await Promise.all([
       db.selectFrom('nodes').select(db.fn.countAll<number>().as('n'))
-        .where('space', '=', this.space).where('deleted_at', 'is', null).executeTakeFirstOrThrow(),
+        .where('space', '=', this.space)
+        .where('workspace_id', '=', this.workspaceId)
+        .where('deleted_at', 'is', null).executeTakeFirstOrThrow(),
       db.selectFrom('edges').select(db.fn.countAll<number>().as('n'))
-        .where('space', '=', this.space).where('deleted_at', 'is', null).executeTakeFirstOrThrow(),
+        .where('space', '=', this.space)
+        .where('workspace_id', '=', this.workspaceId)
+        .where('deleted_at', 'is', null).executeTakeFirstOrThrow(),
     ]);
     return { nodes: Number(nodes.n), edges: Number(edges.n) };
   }
@@ -516,6 +546,7 @@ export class Repository {
       .selectFrom('nodes')
       .select(['type', db.fn.countAll<number>().as('n')])
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where('deleted_at', 'is', null)
       .groupBy('type')
       .execute();
@@ -549,6 +580,7 @@ export class Repository {
       .insertInto('revisions')
       .values({
         space: this.space,
+        workspace_id: this.workspaceId,
         id,
         data: this.clean({
           id,
@@ -591,6 +623,7 @@ export class Repository {
       .selectFrom('revisions')
       .select('data')
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where('subject_id', '=', subjectId)
       .orderBy('rev', 'asc')
       .execute();
@@ -619,11 +652,12 @@ export class Repository {
       .insertInto('meta')
       .values({
         space: this.space,
+        workspace_id: this.workspaceId,
         id: 'search_generation',
         data: { generation: 1, updated_at: nowIso() },
       })
       .onConflict((oc) =>
-        oc.columns(['space', 'id']).doUpdateSet({
+        oc.columns(['workspace_id', 'id']).doUpdateSet({
           data: sql`jsonb_build_object(
             'generation', COALESCE((meta.data->>'generation')::bigint, 0) + 1,
             'updated_at', ${nowIso()}::text
@@ -644,6 +678,7 @@ export class Repository {
       .selectFrom(table)
       .select('data')
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where('id', '=', id)
       .executeTakeFirst();
     return row ? (row.data as T) : null;
@@ -658,8 +693,8 @@ export class Repository {
   ): Promise<void> {
     await conn
       .insertInto(table)
-      .values({ space: this.space, id, data: this.clean(data), ...extra } as never)
-      .onConflict((oc) => oc.columns(['space', 'id']).doUpdateSet({ data: this.clean(data) } as never))
+      .values({ space: this.space, workspace_id: this.workspaceId, id, data: this.clean(data), ...extra } as never)
+      .onConflict((oc) => oc.columns(['workspace_id', 'id']).doUpdateSet({ data: this.clean(data) } as never))
       .execute();
   }
 
@@ -693,26 +728,40 @@ export class Repository {
       WITH updated AS (
         UPDATE ${sql.raw(table)}
            SET data = ${sql.raw(table)}.data || ${clean}::jsonb
-         WHERE space = ${this.space} AND id = ${id}
+         WHERE space = ${this.space} AND workspace_id = ${this.workspaceId} AND id = ${id}
         RETURNING 1
       )
-      INSERT INTO ${sql.raw(table)} (space, id, data)
-      SELECT ${this.space}, ${id}, ${clean}::jsonb
+      INSERT INTO ${sql.raw(table)} (space, workspace_id, id, data)
+      SELECT ${this.space}, ${this.workspaceId}, ${id}, ${clean}::jsonb
        WHERE NOT EXISTS (SELECT 1 FROM updated)
     `.execute(conn);
   }
 
   async docDelete(table: TableName, id: string, conn: Db = db): Promise<void> {
-    await conn.deleteFrom(table).where('space', '=', this.space).where('id', '=', id).execute();
+    await conn
+      .deleteFrom(table)
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
+      .where('id', '=', id)
+      .execute();
   }
 
   async docList<T = Record<string, unknown>>(table: TableName, conn: Db = db): Promise<T[]> {
-    const rows = await conn.selectFrom(table).select('data').where('space', '=', this.space).execute();
+    const rows = await conn
+      .selectFrom(table)
+      .select('data')
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
+      .execute();
     return rows.map((r) => r.data as T);
   }
 
   async docQuery<T = Record<string, unknown>>(table: TableName, filters: DocFilter, conn: Db = db): Promise<T[]> {
-    let q = conn.selectFrom(table).select('data').where('space', '=', this.space);
+    let q = conn
+      .selectFrom(table)
+      .select('data')
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId);
     for (const [col, value] of Object.entries(filters)) {
       q = value === null ? q.where(col as never, 'is', null) : q.where(col as never, '=', value as never);
     }
@@ -721,7 +770,11 @@ export class Repository {
   }
 
   async docCount(table: TableName, filters: DocFilter = {}): Promise<number> {
-    let q = db.selectFrom(table).select(db.fn.countAll<number>().as('n')).where('space', '=', this.space);
+    let q = db
+      .selectFrom(table)
+      .select(db.fn.countAll<number>().as('n'))
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId);
     for (const [col, value] of Object.entries(filters)) {
       q = value === null ? q.where(col as never, 'is', null) : q.where(col as never, '=', value as never);
     }
@@ -745,19 +798,24 @@ export class Repository {
         .values(
           rows.slice(i, i + CHUNK).map((r) => ({
             space: this.space,
+            workspace_id: this.workspaceId,
             id: r.id,
             data: this.clean(r.data),
             ...r.extra,
           })) as never,
         )
-        .onConflict((oc) => oc.columns(['space', 'id']).doUpdateSet({ data: sql`excluded.data` } as never))
+        .onConflict((oc) => oc.columns(['workspace_id', 'id']).doUpdateSet({ data: sql`excluded.data` } as never))
         .execute();
     }
   }
 
   /** Remove every row of a table in the active space (restore --force). */
   async docTruncate(table: TableName): Promise<void> {
-    await db.deleteFrom(table).where('space', '=', this.space).execute();
+    await db
+      .deleteFrom(table)
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
+      .execute();
   }
 
   /**
@@ -773,6 +831,7 @@ export class Repository {
     const res = await db
       .deleteFrom(table)
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where(column as never, 'in', [...values] as never)
       .executeTakeFirst();
     return Number(res.numDeletedRows ?? 0);
@@ -785,6 +844,7 @@ export class Repository {
       .selectFrom(table)
       .select('id')
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where(column as never, 'in', [...values] as never)
       .execute();
     return rows.map((r) => r.id);
@@ -796,6 +856,7 @@ export class Repository {
       .selectFrom(table)
       .select('id')
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where(column as never, '<', cutoff as never)
       .execute();
     return rows.map((r) => r.id);
@@ -816,6 +877,7 @@ export class Repository {
       .selectFrom(table)
       .select(['id', 'data'])
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .orderBy('id', 'asc')
       .limit(opts.limit ?? 500);
     if (opts.after) q = q.where('id', '>', opts.after);
@@ -832,6 +894,7 @@ export class Repository {
     const res = await db
       .deleteFrom(table)
       .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
       .where('id', 'in', [...ids])
       .executeTakeFirst();
     return Number(res.numDeletedRows ?? 0);

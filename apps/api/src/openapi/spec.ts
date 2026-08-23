@@ -24,19 +24,21 @@ function errorResponse(description: string) {
   };
 }
 
-const secured = [{ bearerAuth: [] }];
+const secured: NonNullable<OperationObject['security']> = [{ bearerAuth: [] }];
 
 function op(
   operationId: string,
   summary: string,
   opts: {
     tags?: string[];
-    security?: typeof secured | [];
+    security?: OperationObject['security'];
+    includeUnauthorized?: boolean;
     requestBody?: OperationObject['requestBody'];
     responses?: OperationObject['responses'];
     parameters?: OperationObject['parameters'];
   } = {},
 ): OperationObject {
+  const responses = opts.responses ?? { '200': { description: 'OK' } };
   return {
     operationId,
     summary,
@@ -45,10 +47,10 @@ function op(
     parameters: opts.parameters,
     requestBody: opts.requestBody,
     responses: {
-      ...(opts.responses ?? {
-        '200': { description: 'OK' },
-      }),
-      '401': errorResponse('Unauthorized (default-deny)'),
+      ...responses,
+      ...(opts.includeUnauthorized === false || Object.hasOwn(responses, '401')
+        ? {}
+        : { '401': errorResponse('Unauthorized (default-deny)') }),
       default: errorResponse('Error'),
     },
   };
@@ -111,37 +113,106 @@ function detailedPaths(): PathsObject {
         responses: { '200': { description: 'Logged out' } },
       }),
     },
+    '/auth/bootstrap': {
+      post: op('authBootstrap', 'Create or resume a private Cloud workspace', {
+        tags: ['auth'],
+        responses: {
+          '200': {
+            description: 'Existing Cloud workspace resumed',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/BootstrapResponse' },
+              },
+            },
+          },
+          '201': {
+            description: 'Private Cloud workspace created',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/BootstrapResponse' },
+              },
+            },
+          },
+          '409': errorResponse('Cloud is disabled, enrollment is not ready, or identity ownership conflicts'),
+        },
+      }),
+    },
     '/auth/me': {
-      get: op('authMe', 'Current user (null when anonymous)', {
+      get: op('authMe', 'Current session and server-derived Cloud workspace', {
         tags: ['auth'],
         security: [],
+        includeUnauthorized: false,
         responses: {
           '200': {
             description: 'Auth status',
             content: {
               'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    user: {
-                      oneOf: [
-                        { type: 'null' },
-                        {
-                          type: 'object',
-                          properties: {
-                            email: { type: 'string' },
-                            via: { type: 'string' },
-                          },
-                        },
-                      ],
-                    },
-                    self: { nullable: true },
-                    devLoginEnabled: { type: 'boolean' },
-                  },
-                },
+                schema: { $ref: '#/components/schemas/AuthMeResponse' },
               },
             },
           },
+        },
+      }),
+    },
+    '/billing': {
+      get: op('getBilling', 'Cloud plan, access lifecycle, and provider state', {
+        tags: ['billing'],
+        responses: {
+          '200': {
+            description: 'Cloud billing state for the resolved workspace',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/BillingResponse' },
+              },
+            },
+          },
+          '404': errorResponse('Cloud billing is disabled'),
+          '409': errorResponse('Workspace bootstrap is required'),
+        },
+      }),
+    },
+    '/billing/checkout': {
+      post: op('createBillingCheckout', 'Create a provider checkout transaction', {
+        tags: ['billing'],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/BillingCheckoutRequest' },
+            },
+          },
+        },
+        responses: {
+          '201': {
+            description: 'Provider transaction created; access still changes only after a verified webhook',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/BillingCheckoutResponse' },
+              },
+            },
+          },
+          '404': errorResponse('Cloud billing is disabled'),
+          '409': errorResponse('Workspace bootstrap is required'),
+          '422': errorResponse('Billing period is invalid'),
+          '503': errorResponse('Billing provider is not configured'),
+        },
+      }),
+    },
+    '/billing/portal': {
+      post: op('createBillingPortal', 'Create a provider-managed billing portal session', {
+        tags: ['billing'],
+        responses: {
+          '200': {
+            description: 'Provider billing portal URL',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/BillingPortalResponse' },
+              },
+            },
+          },
+          '404': errorResponse('Cloud billing is disabled'),
+          '409': errorResponse('Workspace bootstrap or completed checkout is required'),
+          '503': errorResponse('Billing provider is not configured'),
         },
       }),
     },
@@ -413,14 +484,16 @@ export function buildOpenApiDocument(): OpenAPIObject {
       title: 'Vitae API',
       version: '1.0.0',
       description:
-        'Private single-user life & career OS REST surface. All `/api/v1` routes are default-deny except auth helpers. Errors use `{ error: { code, message, details?, request_id } }`. Cookie session and Bearer JWT are equivalent.',
+        'Private career-system REST surface. All `/api/v1` routes are default-deny except explicit auth helpers. Hosted Cloud requests resolve an authenticated member workspace on the server. Errors use `{ error: { code, message, details?, request_id } }`. Cookie session and Bearer JWT are equivalent.',
     },
     servers: [
       { url: 'http://localhost:4000/api/v1', description: 'Local API' },
-      { url: 'http://localhost:4000', description: 'Local origin (for /health)' },
+      { url: 'http://localhost:4000', description: 'Local origin (for health and provider webhooks)' },
     ],
     tags: [
       { name: 'auth' },
+      { name: 'billing' },
+      { name: 'webhooks' },
       { name: 'nodes' },
       { name: 'edges' },
       { name: 'capture' },
@@ -432,6 +505,36 @@ export function buildOpenApiDocument(): OpenAPIObject {
     ],
     paths: {
       ...paths,
+      // Provider webhooks live outside `/api/v1`: they authenticate with an
+      // HMAC over the untouched raw request body, not a user session.
+      '/webhooks/paddle': {
+        servers: [{ url: 'http://localhost:4000' }],
+        post: op('paddleWebhook', 'Receive a signed Paddle billing event', {
+          tags: ['webhooks'],
+          security: [{ paddleWebhookSignature: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/PaddleWebhookEvent' },
+              },
+            },
+          },
+          responses: {
+            '200': {
+              description: 'Event was recorded; duplicate delivery is safe',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/PaddleWebhookResponse' },
+                },
+              },
+            },
+            '400': errorResponse('Webhook body or payload is invalid'),
+            '401': errorResponse('Webhook signature is invalid'),
+            '404': errorResponse('Cloud billing is disabled'),
+          },
+        }),
+      },
       // Liveness lives outside /api/v1; documented against the origin server.
       '/health': {
         servers: [{ url: 'http://localhost:4000' }],
@@ -469,8 +572,160 @@ export function buildOpenApiDocument(): OpenAPIObject {
           description:
             'Owner session JWT from Google or POST /auth/dev-login. Cookie session is equivalent.',
         },
+        paddleWebhookSignature: {
+          type: 'apiKey',
+          in: 'header',
+          name: 'paddle-signature',
+          description:
+            'Paddle HMAC header for the exact raw JSON bytes. The server rejects re-serialized or unsigned payloads.',
+        },
       },
       schemas: {
+        AuthUser: {
+          type: 'object',
+          required: ['uid', 'email', 'emailVerified', 'via'],
+          properties: {
+            uid: { type: 'string', description: 'Immutable authenticated provider user ID.' },
+            email: { type: 'string', format: 'email' },
+            emailVerified: { type: 'boolean' },
+            via: { type: 'string', enum: ['google', 'dev'] },
+          },
+        },
+        WorkspaceAccess: {
+          type: 'object',
+          required: ['id', 'role', 'accessState', 'trialEndsAt', 'graceEndsAt', 'deletionScheduledAt'],
+          properties: {
+            id: { type: 'string' },
+            role: { type: 'string', enum: ['owner', 'member'] },
+            accessState: {
+              type: 'string',
+              enum: ['trialing', 'active', 'past_due', 'read_only', 'deletion_pending'],
+            },
+            trialEndsAt: { type: ['string', 'null'], format: 'date-time' },
+            graceEndsAt: { type: ['string', 'null'], format: 'date-time' },
+            deletionScheduledAt: { type: ['string', 'null'], format: 'date-time' },
+          },
+        },
+        SelfProfile: {
+          type: 'object',
+          required: ['id', 'title'],
+          properties: {
+            id: { type: 'string' },
+            title: { type: 'string' },
+          },
+        },
+        AuthMeResponse: {
+          type: 'object',
+          required: ['user', 'workspace', 'self', 'cloudEnabled', 'devLoginEnabled'],
+          properties: {
+            user: {
+              oneOf: [{ type: 'null' }, { $ref: '#/components/schemas/AuthUser' }],
+            },
+            workspace: {
+              oneOf: [{ type: 'null' }, { $ref: '#/components/schemas/WorkspaceAccess' }],
+              description: 'Null outside Cloud mode or before an account has been bootstrapped.',
+            },
+            self: {
+              oneOf: [{ type: 'null' }, { $ref: '#/components/schemas/SelfProfile' }],
+            },
+            cloudEnabled: { type: 'boolean' },
+            devLoginEnabled: { type: 'boolean' },
+          },
+        },
+        BootstrapResponse: {
+          type: 'object',
+          required: ['user', 'workspace', 'self', 'created', 'claimedLegacy'],
+          properties: {
+            user: { $ref: '#/components/schemas/AuthUser' },
+            workspace: { $ref: '#/components/schemas/WorkspaceAccess' },
+            self: { $ref: '#/components/schemas/SelfProfile' },
+            created: { type: 'boolean' },
+            claimedLegacy: { type: 'boolean' },
+          },
+        },
+        BillingAccess: {
+          type: 'object',
+          required: ['state', 'trialEndsAt', 'graceEndsAt', 'deletionScheduledAt'],
+          properties: {
+            state: {
+              type: 'string',
+              enum: ['trialing', 'active', 'past_due', 'read_only', 'deletion_pending'],
+            },
+            trialEndsAt: { type: ['string', 'null'], format: 'date-time' },
+            graceEndsAt: { type: ['string', 'null'], format: 'date-time' },
+            deletionScheduledAt: { type: ['string', 'null'], format: 'date-time' },
+          },
+        },
+        BillingSubscription: {
+          type: 'object',
+          required: ['status', 'billingPeriod', 'currentPeriodEndsAt', 'cancelAtPeriodEnd'],
+          properties: {
+            status: { type: ['string', 'null'] },
+            billingPeriod: { type: ['string', 'null'], enum: ['monthly', 'annual', null] },
+            currentPeriodEndsAt: { type: ['string', 'null'], format: 'date-time' },
+            cancelAtPeriodEnd: { type: 'boolean' },
+          },
+        },
+        BillingResponse: {
+          type: 'object',
+          required: ['plan', 'access', 'customer', 'subscription'],
+          properties: {
+            plan: { type: 'string', const: 'cloud_individual' },
+            access: { $ref: '#/components/schemas/BillingAccess' },
+            customer: {
+              type: 'object',
+              required: ['configured', 'provider'],
+              properties: {
+                configured: { type: 'boolean' },
+                provider: { type: 'string', const: 'paddle' },
+              },
+            },
+            subscription: {
+              oneOf: [{ type: 'null' }, { $ref: '#/components/schemas/BillingSubscription' }],
+            },
+          },
+        },
+        BillingCheckoutRequest: {
+          type: 'object',
+          additionalProperties: false,
+          required: ['billingPeriod'],
+          properties: {
+            billingPeriod: { type: 'string', enum: ['monthly', 'annual'] },
+          },
+        },
+        BillingCheckoutResponse: {
+          type: 'object',
+          required: ['transactionId'],
+          properties: {
+            transactionId: { type: 'string', description: 'Opaque provider transaction identifier.' },
+          },
+        },
+        BillingPortalResponse: {
+          type: 'object',
+          required: ['url'],
+          properties: {
+            url: { type: 'string', format: 'uri' },
+          },
+        },
+        PaddleWebhookEvent: {
+          type: 'object',
+          required: ['event_id', 'event_type'],
+          properties: {
+            event_id: { type: 'string' },
+            event_type: { type: 'string' },
+            occurred_at: { type: ['string', 'null'], format: 'date-time' },
+            data: { type: 'object', additionalProperties: true },
+          },
+          additionalProperties: true,
+        },
+        PaddleWebhookResponse: {
+          type: 'object',
+          required: ['ok', 'duplicate'],
+          properties: {
+            ok: { type: 'boolean', const: true },
+            duplicate: { type: 'boolean' },
+          },
+        },
         ApplicationStatus: {
           type: 'string',
           enum: [

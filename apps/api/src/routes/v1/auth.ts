@@ -3,6 +3,14 @@ import { Router } from 'express';
 import { env } from '../../env.js';
 import { asyncHandler, HttpError } from '../../middleware/error.js';
 import { issueDevToken } from '../../middleware/auth.js';
+import { cloudEnabled } from '../../cloud/config.js';
+import { runInWorkspace } from '../../db/space.js';
+import {
+  IdentityConflictError,
+  bootstrapPersonalWorkspace,
+  ensureWorkspaceSelf,
+  resolveWorkspaceForUser,
+} from '../../services/control-plane.js';
 
 export const authRouter: Router = Router();
 
@@ -52,6 +60,37 @@ authRouter.post('/logout', (_req, res) => {
 });
 
 /**
+ * Idempotent Cloud enrollment. Auth has already verified a Firebase UID; this
+ * endpoint is deliberately not public even though `/me` is, because it creates
+ * a private workspace and starts a trial.
+ */
+authRouter.post(
+  '/bootstrap',
+  asyncHandler(async (req, res) => {
+    if (!cloudEnabled()) {
+      throw new HttpError(409, 'SELF_HOSTED_MODE', 'Cloud account creation is not enabled for this installation.');
+    }
+    if (!req.user) throw new HttpError(401, 'UNAUTHENTICATED', 'Sign-in required.');
+    try {
+      const result = await bootstrapPersonalWorkspace(req.user);
+      const self = await runInWorkspace(result.workspace.id, () => ensureWorkspaceSelf(req.user!));
+      res.status(result.created ? 201 : 200).json({
+        user: req.user,
+        workspace: result.workspace,
+        self,
+        created: result.created,
+        claimedLegacy: result.claimedLegacy,
+      });
+    } catch (error) {
+      if (error instanceof IdentityConflictError) {
+        throw new HttpError(409, 'IDENTITY_CONFLICT', 'This account cannot be enrolled automatically.');
+      }
+      throw error;
+    }
+  }),
+);
+
+/**
  * Who am I (the gate has already verified the token).
  *
  * `self` is the `is_self` person node subject pickers use for "That's me".
@@ -61,17 +100,33 @@ authRouter.get(
   '/me',
   asyncHandler(async (req, res) => {
     let self: { id: string; title: string } | null = null;
+    let workspace: Awaited<ReturnType<typeof resolveWorkspaceForUser>> = null;
     if (req.user) {
       try {
-        const { getSelf } = await import('../../services/self.js');
-        const node = await getSelf();
-        if (node) self = { id: node.id, title: node.title };
+        if (cloudEnabled()) {
+          workspace = await resolveWorkspaceForUser(req.user.uid);
+          if (workspace) {
+            const { getSelf } = await import('../../services/self.js');
+            const node = await runInWorkspace(workspace.id, () => getSelf());
+            if (node) self = { id: node.id, title: node.title };
+          }
+        } else {
+          const { getSelf } = await import('../../services/self.js');
+          const node = await getSelf();
+          if (node) self = { id: node.id, title: node.title };
+        }
       } catch {
         // Auth must not fail when the graph/db is degraded. The owner check
         // already passed; leave self null until the graph is up.
         self = null;
       }
     }
-    res.json({ user: req.user ?? null, self, devLoginEnabled: env.AUTH_ENABLE_DEV_LOGIN });
+    res.json({
+      user: req.user ?? null,
+      workspace,
+      self,
+      cloudEnabled: cloudEnabled(),
+      devLoginEnabled: env.AUTH_ENABLE_DEV_LOGIN,
+    });
   }),
 );

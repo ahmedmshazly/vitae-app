@@ -1,5 +1,10 @@
 # Deploying Vitae
 
+> This guide documents the self-hosted deployment currently supported by the
+> repository. It does not authorize a public multi-tenant Cloud launch. See
+> [the Cloud launch guide](CLOUD-LAUNCH.md) for the separate hosted-service
+> release gate.
+
 Vitae has three deployable parts: a static React web application, an Express
 API, and an internal LaTeX build service. This guide uses Vercel for the web
 application and a Docker host for the API and compiler. Those are examples, not

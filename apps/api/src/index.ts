@@ -2,8 +2,10 @@
 import { env } from './env.js';
 import { createApp } from './app.js';
 import { setReady } from './middleware/health.js';
-import { runInSpace, type Space } from './db/space.js';
+import { runInSpace, runInWorkspace, type Space } from './db/space.js';
 import { purgeExpiredTrash } from './services/retention.js';
+import { cloudEnabled } from './cloud/config.js';
+import { activeWorkspaceIds } from './services/control-plane.js';
 
 const app = createApp();
 const port = env.API_PORT;
@@ -22,6 +24,19 @@ let purgeJob: Promise<void> | null = null;
 function runPurge(): Promise<void> {
   if (purgeJob) return purgeJob;
   purgeJob = (async () => {
+    if (cloudEnabled()) {
+      for (const workspaceId of await activeWorkspaceIds()) {
+        try {
+          const summary = await runInWorkspace(workspaceId, () => purgeExpiredTrash());
+          if (summary.nodes || summary.edges) {
+            console.log(`[purge] workspace ${workspaceId}: ${summary.nodes} nodes, ${summary.edges} edges past retention`);
+          }
+        } catch (err) {
+          console.error(`[purge] workspace ${workspaceId} failed:`, err);
+        }
+      }
+      return;
+    }
     for (const space of ['real', 'demo'] as Space[]) {
       try {
         const summary = await runInSpace(space, () => purgeExpiredTrash());

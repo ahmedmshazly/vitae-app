@@ -29,10 +29,12 @@ import { importsRouter } from './imports.js';
 import { duplicatesRouter } from './duplicates.js';
 import { retentionRouter } from './retention.js';
 import { placesRouter } from './places.js';
+import { billingRouter } from './billing.js';
 
 export const v1Router: Router = Router();
 
 v1Router.use('/auth', authRouter);
+v1Router.use('/billing', billingRouter);
 v1Router.use('/nodes', nodesRouter);
 v1Router.use('/edges', edgesRouter);
 v1Router.use('/capture', captureRouter);

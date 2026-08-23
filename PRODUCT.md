@@ -14,7 +14,7 @@ Vitae turns a person's scattered career and life records into a private, connect
 
 ## Positioning
 
-Vitae is a self-hosted living career graph: structured records and explicit relationships feed deterministic discovery, relationship intelligence, and ATS-safe LaTeX resume generation without runtime AI-provider calls. Every recommendation remains traceable to the user's own evidence.
+Vitae is an evidence-led living career graph: structured records and explicit relationships feed deterministic discovery, relationship intelligence, and ATS-safe LaTeX resume generation without runtime AI-provider calls. Every recommendation remains traceable to the user's own evidence. The checked-in source product is self-hosted today; a hosted Cloud release must satisfy the explicit release boundary below before it accepts customer data.
 
 ## Operating Context
 
@@ -27,6 +27,7 @@ The product is used as a long-lived personal workspace on desktop and mobile web
 - Search, graph, timeline, map, relationship intelligence, introductions, imports, duplicate resolution, exports, trash, resume evidence, tailoring, compilation, letters, and templates already exist.
 - Job applications are represented as graph nodes connected to target organizations, referrers, interviews, and resume variants.
 - The product is single-operator and self-hosted; privacy, local ownership, deterministic behavior, and data portability are durable constraints.
+- A future Cloud release is one private workspace per verified person at launch, not a team CRM, recruiter tool, or general social network. It remains disabled until server-derived workspace isolation, subscription lifecycle enforcement, legal publication, backup/restore checks, and deletion/export rehearsals are complete.
 - Runtime product behavior must not depend on external AI providers.
 - Heavy graph and map libraries must remain route-lazy, and generated resumes must remain ATS-safe.
 
@@ -41,6 +42,22 @@ The product name is Vitae. Its established identity is "Quiet": dark, focused, h
 - Logo and favicon assets plus real product captures live in `apps/web/public/`.
 - The running application, typed schema, tests, and route implementations are the authority for supported functionality.
 - No customer logos, testimonials, prices, benchmark claims, or third-party endorsements are available and none should be invented.
+
+## Cloud Release Boundary
+
+Vitae Cloud is designed for the experienced professional preparing a deliberate
+career move: someone who already has meaningful work and relationships, but
+needs those facts connected before an opportunity arrives. The planned launch
+offer is one complete personal workspace with a 14-day no-card trial, a
+transparent monthly or annual subscription, and a 30-day read-only export
+window after non-renewal. This is a launch specification, not a claim that the
+service is currently operating.
+
+The browser must not advertise a live trial or checkout unless the server
+authorizes provisioning, every durable record is workspace-scoped, billing
+webhooks are verified and idempotent, public legal/support information is
+reviewed, and backup, restore, export, deletion, and incident procedures have
+been rehearsed. See [the Cloud launch guide](docs/CLOUD-LAUNCH.md).
 
 ## Product Principles
 

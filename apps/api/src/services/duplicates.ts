@@ -24,7 +24,7 @@ import { createHash } from 'node:crypto';
 import { repository } from '../db/repository.js';
 import { newId, nowIso } from '../db/util.js';
 import { loadGraph, type Graph } from './crm.js';
-import { currentSpace, type Space } from '../db/space.js';
+import { currentWorkspaceId } from '../db/space.js';
 
 /** Email domains feed the org_domain comparator alongside org names. */
 export function emailDomains(emails: string[]): string[] {
@@ -349,7 +349,7 @@ async function computeDuplicates(): Promise<DupPair[]> {
   return pairs.sort((a, b) => b.weight - a.weight);
 }
 
-const scanPromises = new Map<Space, Promise<DupPair[]>>();
+const scanPromises = new Map<string, Promise<DupPair[]>>();
 const SCAN_CACHE_MS = 5 * 60 * 1000;
 const SCAN_LEASE_MS = 60 * 1000;
 const DEDUP_MODEL_VERSION = 2;
@@ -385,8 +385,8 @@ async function waitForPublishedRun(): Promise<DupPair[]> {
 
 /** Leased, generation-isolated persisted scan; one writer across all instances. */
 export function scanDuplicates(): Promise<DupPair[]> {
-  const space = currentSpace();
-  const existing = scanPromises.get(space);
+  const workspaceId = currentWorkspaceId();
+  const existing = scanPromises.get(workspaceId);
   if (existing) return existing;
   const runId = newId();
   const scanPromise = (async () => {
@@ -451,9 +451,9 @@ export function scanDuplicates(): Promise<DupPair[]> {
     });
     throw error;
   }).finally(() => {
-    scanPromises.delete(space);
+    scanPromises.delete(workspaceId);
   });
-  scanPromises.set(space, scanPromise);
+  scanPromises.set(workspaceId, scanPromise);
   return scanPromise;
 }
 

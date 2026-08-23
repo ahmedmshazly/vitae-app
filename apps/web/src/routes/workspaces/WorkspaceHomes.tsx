@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Glyph, PageHeader, RegisterRule, type GlyphName } from '@vitae/ui';
+import { useAuth } from '../../lib/auth.js';
 
 interface WorkspaceAction {
   href: string;
@@ -239,6 +240,7 @@ export function DataHome() {
 }
 
 export function SettingsHome() {
+  const { cloudEnabled } = useAuth();
   return (
     <WorkspaceHome
       eyebrow="Workspace controls"
@@ -271,6 +273,18 @@ export function SettingsHome() {
           detail: 'Service health, build status, identity integrity, and backup links.',
           accent: 'career',
         },
+        ...(cloudEnabled
+          ? [
+              {
+                href: '/settings/billing',
+                glyph: 'export' as const,
+                eyebrow: 'Account',
+                title: 'Billing & access',
+                detail: 'See trial or subscription status, manage billing, and keep the export path visible.',
+                accent: 'data' as const,
+              },
+            ]
+          : []),
         {
           href: '/help',
           glyph: 'ask',

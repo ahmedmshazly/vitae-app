@@ -5,12 +5,14 @@ import cors from 'cors';
 import { env } from './env.js';
 import { authGate } from './middleware/auth.js';
 import { spaceMiddleware } from './db/space.js';
+import { entitlementGate, workspaceMiddleware } from './middleware/workspace.js';
 import { timezoneMiddleware } from './db/timezone.js';
 import { cspNonce, securityHeaders } from './middleware/security.js';
 import { errorHandler } from './middleware/error.js';
 import { livenessHandler, readinessHandler } from './middleware/health.js';
 import { requestContext, runtimeMetrics } from './middleware/request-context.js';
 import { v1Router } from './routes/v1/index.js';
+import { paddleWebhookHandler } from './routes/webhooks/paddle.js';
 
 /**
  * Uploads are posted as JSON text (no multipart), and a LinkedIn connections
@@ -42,6 +44,10 @@ export function createApp(): Express {
       credentials: true,
     }),
   );
+  // Must be registered before any JSON parser. Paddle signs the raw bytes,
+  // not a re-serialized object, and this endpoint is intentionally outside the
+  // default-deny app API because provider requests have no user session.
+  app.post('/webhooks/paddle', express.raw({ type: 'application/json', limit: '1mb' }), paddleWebhookHandler);
   app.use('/api/v1/imports', express.json({ limit: IMPORT_BODY_LIMIT }));
   app.use(express.json({ limit: DEFAULT_BODY_LIMIT }));
   app.use(cookieParser());
@@ -54,6 +60,11 @@ export function createApp(): Express {
 
   // Default-deny gate in front of everything under /api.
   app.use('/api', authGate);
+  // Cloud mode resolves a member workspace after identity verification. In
+  // self-host mode this is a no-op and `spaceMiddleware` retains its legacy
+  // real/demo behavior for scripts and local development.
+  app.use('/api', workspaceMiddleware);
+  app.use('/api', entitlementGate);
   app.get('/api/v1/metrics', (_req, res) => res.json(runtimeMetrics()));
   app.use('/api/v1', v1Router);
 

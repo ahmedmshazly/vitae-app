@@ -7,6 +7,7 @@
  */
 export const V1_MOUNT_PREFIXES = [
   '/auth',
+  '/billing',
   '/nodes',
   '/edges',
   '/capture',

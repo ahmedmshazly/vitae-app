@@ -20,7 +20,7 @@ import {
   type NodeRecord,
 } from '@vitae/core';
 import { repository } from '../db/repository.js';
-import { currentSpace, type Space } from '../db/space.js';
+import { currentWorkspaceId } from '../db/space.js';
 
 /**
  * The minimum a graph must expose for ownership to be resolvable.
@@ -111,20 +111,20 @@ export function skillIdsFor(personId: string, graph: OwnableGraph, owned: Set<st
 
 // ── the reserved owner ───────────────────────────────────────────────────────
 
-// Cached per data space, like services/self.ts, demo and real each have their own.
-const cachedPlaceholderId = new Map<Space, string | null>();
+// Cached per durable workspace, like services/self.ts.
+const cachedPlaceholderId = new Map<string, string | null>();
 
 /** The reserved "Unattributed" person, if it exists yet. */
 export async function getPlaceholder(): Promise<NodeRecord | null> {
-  const space = currentSpace();
-  const cached = cachedPlaceholderId.get(space);
+  const workspaceId = currentWorkspaceId();
+  const cached = cachedPlaceholderId.get(workspaceId);
   if (cached) {
     const n = await repository.getNode(cached);
     if (n) return n;
-    cachedPlaceholderId.delete(space);
+    cachedPlaceholderId.delete(workspaceId);
   }
   const found = await repository.findByIdentityKey(PLACEHOLDER_IDENTITY_KEY);
-  cachedPlaceholderId.set(space, found?.id ?? null);
+  cachedPlaceholderId.set(workspaceId, found?.id ?? null);
   return found;
 }
 
@@ -152,7 +152,7 @@ export async function ensurePlaceholder(meta: { actor?: string } = {}): Promise<
     },
     { actor: meta.actor ?? 'system' },
   );
-  cachedPlaceholderId.set(currentSpace(), created.id);
+  cachedPlaceholderId.set(currentWorkspaceId(), created.id);
   return created;
 }
 

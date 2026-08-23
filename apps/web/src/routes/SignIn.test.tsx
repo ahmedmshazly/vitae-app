@@ -15,6 +15,8 @@ const auth = {
   signInGoogle: vi.fn(),
   devLoginEnabled: true,
   googleEnabled: true,
+  cloudEnabled: false,
+  accountError: null as string | null,
 };
 vi.mock('../lib/auth.js', () => ({ useAuth: () => auth }));
 
@@ -32,6 +34,8 @@ beforeEach(() => {
   auth.signInGoogle = vi.fn().mockResolvedValue(undefined);
   auth.devLoginEnabled = true;
   auth.googleEnabled = true;
+  auth.cloudEnabled = false;
+  auth.accountError = null;
 });
 
 describe('SignIn, which ways in are offered', () => {
@@ -73,6 +77,22 @@ describe('SignIn, which ways in are offered', () => {
     expect(alert).toHaveTextContent('No sign-in method is configured.');
     // A build problem, so it names the thing to check rather than a Retry.
     expect(alert).toHaveTextContent('VITE_FIREBASE_');
+  });
+
+  it('turns the signup route into a clear Cloud trial door when Cloud is enabled', () => {
+    auth.cloudEnabled = true;
+    render(
+      <MemoryRouter
+        initialEntries={['/signup']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <SignIn />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Start your 14-day trial' })).toBeInTheDocument();
+    expect(screen.getByText(/one private workspace and does not ask for a card/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Sign in' })).toBeInTheDocument();
   });
 });
 

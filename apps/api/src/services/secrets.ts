@@ -29,6 +29,8 @@ import {
 } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { cloudEnabled, LEGACY_WORKSPACE_ID } from '../cloud/config.js';
+import { currentWorkspaceId } from '../db/space.js';
 
 export type SecretName = 'github_pat';
 
@@ -37,6 +39,15 @@ const ENV_VAR: Record<SecretName, string> = {
 };
 
 export type SecretSource = 'env' | 'file' | 'none';
+
+/**
+ * The historical GitHub PAT is an installation-owner secret. Until a future
+ * workspace-scoped OAuth integration exists, never expose or mutate it from a
+ * hosted customer workspace.
+ */
+function canUseInstallationSecret(): boolean {
+  return !cloudEnabled() || currentWorkspaceId() === LEGACY_WORKSPACE_ID;
+}
 
 function secretsDir(): string {
   if (process.env.VITAE_SECRETS_DIR) return resolve(process.env.VITAE_SECRETS_DIR);
@@ -58,12 +69,14 @@ export class SecretStoreError extends Error {
 
 /** Where a secret would be read from, without reading it. */
 export function secretSource(name: SecretName): SecretSource {
+  if (!canUseInstallationSecret()) return 'none';
   if (process.env[ENV_VAR[name]]) return 'env';
   if (existsSync(secretPath(name))) return 'file';
   return 'none';
 }
 
 export function getSecret(name: SecretName): string | null {
+  if (!canUseInstallationSecret()) return null;
   const fromEnv = process.env[ENV_VAR[name]];
   if (fromEnv) return fromEnv.trim();
   const path = secretPath(name);
@@ -78,6 +91,9 @@ export function getSecret(name: SecretName): string | null {
  * a competing copy to disk would defeat the point.
  */
 export function setSecret(name: SecretName, value: string): void {
+  if (!canUseInstallationSecret()) {
+    throw new SecretStoreError('Workspace-scoped GitHub connections are not configured for this Cloud deployment.');
+  }
   if (process.env[ENV_VAR[name]]) {
     throw new SecretStoreError(
       `${ENV_VAR[name]} is provided by the deployment's secret manager, rotate it there, not through the API.`,
@@ -105,6 +121,7 @@ export function setSecret(name: SecretName, value: string): void {
 }
 
 export function deleteSecret(name: SecretName): void {
+  if (!canUseInstallationSecret()) return;
   const path = secretPath(name);
   if (existsSync(path)) rmSync(path);
 }

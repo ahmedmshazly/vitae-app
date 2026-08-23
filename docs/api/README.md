@@ -6,18 +6,40 @@ Regenerate with `pnpm openapi` after changing
 `apps/api/src/openapi/mounts.ts`). `pnpm test:contract` fails if the checked-in
 JSON drifts from `buildOpenApiDocument()`.
 
-All endpoints require the owner session (cookie or `Authorization: Bearer
-<token>`) except `POST /auth/dev-login`, `POST /auth/logout`, and `GET /health`.
-Errors are `{ "error": { "code", "message", "details?", "request_id" } }`.
+All `/api/v1` endpoints require the authenticated session (cookie or
+`Authorization: Bearer <token>`) except `POST /auth/dev-login`,
+`POST /auth/logout`, and `GET /auth/me`. In hosted Cloud mode, the server also
+resolves the member workspace before graph routes run. `POST /webhooks/paddle`
+lives at the origin, not under `/api/v1`; it accepts only a signed raw provider
+payload. Errors are `{ "error": { "code", "message", "details?", "request_id" } }`.
 Requests/responses are JSON unless noted.
 
 ## Auth
 
-| Method | Path              | Body → Result                                                |
-| ------ | ----------------- | ------------------------------------------------------------ |
-| POST   | `/auth/dev-login` | → `{ token, user }`; sets httpOnly session cookie (dev only) |
-| POST   | `/auth/logout`    | → `{ ok }`                                                   |
-| GET    | `/auth/me`        | → `{ user, devLoginEnabled }`                                |
+| Method | Path              | Body → Result                                                                                         |
+| ------ | ----------------- | ----------------------------------------------------------------------------------------------------- |
+| POST   | `/auth/dev-login` | → local development session cookie (dev only)                                                        |
+| POST   | `/auth/logout`    | → `{ ok }`                                                                                           |
+| GET    | `/auth/me`        | public session probe → `{ user, workspace, self, cloudEnabled, devLoginEnabled }`                   |
+| POST   | `/auth/bootstrap` | verified Cloud session → idempotently creates or resumes the server-selected private workspace       |
+
+## Cloud billing
+
+Cloud endpoints are launch-gated and operate only on the workspace selected by
+the authenticated server session. The client receives an opaque provider
+transaction ID; access changes only after a verified webhook is recorded.
+
+| Method | Path                | Body → Result                                                               |
+| ------ | ------------------- | --------------------------------------------------------------------------- |
+| GET    | `/billing`          | plan, access lifecycle, provider configuration, and subscription status    |
+| POST   | `/billing/checkout` | `{ billingPeriod: "monthly" or "annual" }` → `{ transactionId }`         |
+| POST   | `/billing/portal`   | → `{ url }` for the provider-managed billing portal                        |
+
+## Provider webhooks
+
+| Method | Origin path        | Notes                                                                                 |
+| ------ | ------------------ | ------------------------------------------------------------------------------------- |
+| POST   | `/webhooks/paddle` | Raw `application/json`; requires the `paddle-signature` HMAC header; replay is safe |
 
 ## Nodes & edges
 

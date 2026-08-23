@@ -1,17 +1,21 @@
 /**
- * Data spaces: "real" (the owner's graph) vs "demo" (a self-contained sample
- * dataset). The active space is carried per-request via AsyncLocalStorage and
- * resolved lazily by repository accessors, so every request routes to the
- * matching Postgres data space when the client sends `x-vitae-space: demo`.
- * Scripts (seeds, tests) opt in with runInSpace()
- * or the VITAE_SPACE env var.
+ * Legacy data spaces: "real" (the owner's graph) vs "demo" (a self-contained
+ * sample dataset). Hosted Cloud traffic uses a separate, server-derived
+ * `workspaceId`; `space` survives so existing self-host scripts and fixtures
+ * retain their stable contract while the database is migrated in place.
  */
 import { AsyncLocalStorage } from 'node:async_hooks';
 import type { NextFunction, Request, Response } from 'express';
+import { LEGACY_WORKSPACE_ID, SYSTEM_DEMO_WORKSPACE_ID, cloudEnabled } from '../cloud/config.js';
 
 export type Space = 'real' | 'demo';
 
-const als = new AsyncLocalStorage<{ space: Space }>();
+export interface WorkspaceContext {
+  space: Space;
+  workspaceId: string;
+}
+
+const als = new AsyncLocalStorage<WorkspaceContext>();
 
 const envDefault = (): Space => (process.env.VITAE_SPACE === 'demo' ? 'demo' : 'real');
 
@@ -19,12 +23,42 @@ export function currentSpace(): Space {
   return als.getStore()?.space ?? envDefault();
 }
 
-export function runInSpace<T>(space: Space, fn: () => T): T {
-  return als.run({ space }, fn);
+/**
+ * Always returns a durable partition, including for legacy scripts. New Cloud
+ * request middleware supplies a verified member workspace; legacy code maps
+ * the old binary space into its backfilled control-plane workspace.
+ */
+export function currentWorkspaceId(): string {
+  const context = als.getStore();
+  if (context) return context.workspaceId;
+  return envDefault() === 'demo' ? SYSTEM_DEMO_WORKSPACE_ID : LEGACY_WORKSPACE_ID;
 }
 
-/** Express middleware: pin the request's space from the `x-vitae-space` header. */
+export function runInSpace<T>(space: Space, fn: () => T): T {
+  return als.run(
+    {
+      space,
+      workspaceId: space === 'demo' ? SYSTEM_DEMO_WORKSPACE_ID : LEGACY_WORKSPACE_ID,
+    },
+    fn,
+  );
+}
+
+/** Run work inside a member-selected Cloud workspace. */
+export function runInWorkspace<T>(workspaceId: string, fn: () => T): T {
+  return als.run({ space: 'real', workspaceId }, fn);
+}
+
+/**
+ * Self-host compatibility middleware. Cloud requests deliberately ignore this
+ * browser-controlled header: workspaceMiddleware resolves their partition
+ * only after authentication and membership verification.
+ */
 export function spaceMiddleware(req: Request, _res: Response, next: NextFunction): void {
+  if (cloudEnabled()) {
+    als.run({ space: 'real', workspaceId: LEGACY_WORKSPACE_ID }, next);
+    return;
+  }
   const space: Space = req.header('x-vitae-space') === 'demo' ? 'demo' : 'real';
-  als.run({ space }, next);
+  runInSpace(space, next);
 }

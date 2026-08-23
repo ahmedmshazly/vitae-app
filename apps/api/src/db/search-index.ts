@@ -11,7 +11,7 @@
 import FlexSearchPkg from 'flexsearch';
 import { parseFilterQuery, trigramSimilarity, type NodeRecord } from '@vitae/core';
 import { repository } from './repository.js';
-import { currentSpace, type Space } from './space.js';
+import { currentWorkspaceId } from './space.js';
 
 // FlexSearch ships an awkward CJS/ESM default; normalize it.
 const FlexSearch = (FlexSearchPkg as unknown as { Document?: unknown }).Document
@@ -202,25 +202,25 @@ class SearchIndex {
   }
 }
 
-// One index per data space (real vs demo) so demo mode never leaks into, or
-// reads stale results from, the real graph. Resolved per call via ALS.
-const instances = new Map<Space, SearchIndex>();
-function indexForSpace(): SearchIndex {
-  const space = currentSpace();
-  let idx = instances.get(space);
+// One index per durable workspace; all calls resolve the server-derived key
+// through ALS, so a tenant never reuses another tenant's cached graph.
+const instances = new Map<string, SearchIndex>();
+function indexForWorkspace(): SearchIndex {
+  const workspaceId = currentWorkspaceId();
+  let idx = instances.get(workspaceId);
   if (!idx) {
     idx = new SearchIndex();
-    instances.set(space, idx);
+    instances.set(workspaceId, idx);
   }
   return idx;
 }
 
 export const searchIndex = {
-  markDirty: (): void => indexForSpace().markDirty(),
-  ensureBuilt: (): Promise<void> => indexForSpace().ensureBuilt(),
-  search: (rawQuery: string, opts: { limit?: number } = {}): Promise<SearchHit[]> => indexForSpace().search(rawQuery, opts),
+  markDirty: (): void => indexForWorkspace().markDirty(),
+  ensureBuilt: (): Promise<void> => indexForWorkspace().ensureBuilt(),
+  search: (rawQuery: string, opts: { limit?: number } = {}): Promise<SearchHit[]> => indexForWorkspace().search(rawQuery, opts),
   quickSwitch: (
     query: string,
     opts: { limit?: number; types?: string[] } = {},
-  ): Promise<SearchHit[]> => indexForSpace().quickSwitch(query, opts),
+  ): Promise<SearchHit[]> => indexForWorkspace().quickSwitch(query, opts),
 };

@@ -11,13 +11,92 @@
  * the only writable copy of a field, so the indexed column beside it can never
  * disagree with the document.
  */
-import type { GeneratedAlways, Insertable, Selectable } from 'kysely';
+import type { Generated, GeneratedAlways, Insertable, Selectable } from 'kysely';
 
 /** The three columns every table shares. `data` is the whole record. */
 export interface DocTable<T = Record<string, unknown>> {
   space: 'real' | 'demo';
+  /**
+   * Server-selected workspace partition. `space` remains during the staged
+   * migration so self-hosted real/demo scripts retain their stable contract;
+   * application reads and writes additionally scope by this value.
+   */
+  workspace_id: Generated<string>;
   id: string;
   data: T;
+}
+
+export interface UserTable {
+  id: string;
+  email: string;
+  email_verified: boolean;
+  provider: string;
+  created_at: Generated<string>;
+  updated_at: Generated<string>;
+}
+
+export interface WorkspaceTable {
+  id: string;
+  kind: string;
+  state: string;
+  owner_user_id: string | null;
+  created_at: Generated<string>;
+  updated_at: Generated<string>;
+}
+
+export interface WorkspaceMemberTable {
+  workspace_id: string;
+  user_id: string;
+  role: string;
+  created_at: Generated<string>;
+}
+
+export interface WorkspaceLifecycleTable {
+  workspace_id: string;
+  access_state: string;
+  trial_ends_at: string | null;
+  grace_ends_at: string | null;
+  deletion_scheduled_at: string | null;
+  updated_at: Generated<string>;
+}
+
+export interface BillingCustomerTable {
+  workspace_id: string;
+  provider: string;
+  provider_customer_id: string | null;
+  created_at: Generated<string>;
+  updated_at: Generated<string>;
+}
+
+export interface BillingSubscriptionTable {
+  workspace_id: string;
+  provider: string;
+  provider_subscription_id: string | null;
+  provider_status: string | null;
+  billing_period: string | null;
+  current_period_ends_at: string | null;
+  provider_updated_at: string | null;
+  cancel_at_period_end: boolean;
+  raw: Record<string, unknown>;
+  updated_at: Generated<string>;
+}
+
+export interface BillingEventTable {
+  provider_event_id: string;
+  provider: string;
+  event_type: string;
+  workspace_id: string | null;
+  payload: Record<string, unknown>;
+  received_at: Generated<string>;
+  processed_at: string | null;
+}
+
+export interface WorkspaceLifecycleEventTable {
+  id: string;
+  workspace_id: string;
+  kind: string;
+  details: Record<string, unknown>;
+  created_at: Generated<string>;
 }
 
 export interface NodeTable extends DocTable {
@@ -119,6 +198,14 @@ interface MetaRunTable extends DocTable {
 }
 
 export interface Database {
+  users: UserTable;
+  workspaces: WorkspaceTable;
+  workspace_members: WorkspaceMemberTable;
+  workspace_lifecycles: WorkspaceLifecycleTable;
+  billing_customers: BillingCustomerTable;
+  billing_subscriptions: BillingSubscriptionTable;
+  billing_events: BillingEventTable;
+  workspace_lifecycle_events: WorkspaceLifecycleEventTable;
   nodes: NodeTable;
   edges: EdgeTable;
   revisions: RevisionTable;
@@ -171,6 +258,18 @@ export const TABLES = [
   'habit_checks',
   'dedup_dismissals',
   'dedup_aliases',
+] as const satisfies ReadonlyArray<keyof Database>;
+
+/** Control-plane tables deliberately stay out of legacy graph seed/truncate loops. */
+export const CONTROL_TABLES = [
+  'users',
+  'workspaces',
+  'workspace_members',
+  'workspace_lifecycles',
+  'billing_customers',
+  'billing_subscriptions',
+  'billing_events',
+  'workspace_lifecycle_events',
 ] as const satisfies ReadonlyArray<keyof Database>;
 
 export type TableName = keyof Database;

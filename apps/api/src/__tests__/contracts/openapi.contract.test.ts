@@ -40,6 +40,33 @@ describe('OpenAPI document', () => {
     expect(summary?.properties?.source).toEqual({ type: 'string', enum: [...SOURCE_TYPES] });
   });
 
+  it('documents Cloud enrollment, billing handoff, and signed provider delivery', () => {
+    const doc = buildOpenApiDocument();
+    const paths = doc.paths as Record<string, { get?: Record<string, unknown>; post?: Record<string, unknown> }>;
+
+    expect(paths['/auth/bootstrap']?.post).toMatchObject({
+      operationId: 'authBootstrap',
+      security: [{ bearerAuth: [] }],
+    });
+    expect(paths['/auth/me']?.get).toMatchObject({
+      operationId: 'authMe',
+      security: [],
+    });
+    expect(paths['/billing']?.get?.operationId).toBe('getBilling');
+    expect(paths['/billing/checkout']?.post?.operationId).toBe('createBillingCheckout');
+    expect(paths['/billing/portal']?.post?.operationId).toBe('createBillingPortal');
+    expect(paths['/webhooks/paddle']).toMatchObject({ servers: [{ url: 'http://localhost:4000' }] });
+    expect(paths['/webhooks/paddle']?.post).toMatchObject({
+      operationId: 'paddleWebhook',
+      security: [{ paddleWebhookSignature: [] }],
+    });
+    expect(doc.components?.securitySchemes?.paddleWebhookSignature).toMatchObject({
+      type: 'apiKey',
+      in: 'header',
+      name: 'paddle-signature',
+    });
+  });
+
   it('matches the checked-in docs/api/openapi.json (run pnpm openapi to refresh)', () => {
     const generated = buildOpenApiDocument();
     const committed = JSON.parse(readFileSync(committedPath, 'utf8')) as unknown;

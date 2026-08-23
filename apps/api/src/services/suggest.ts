@@ -17,7 +17,7 @@
  */
 import type { SuggestKind } from '@vitae/core';
 import { repository } from '../db/repository.js';
-import { currentSpace, type Space } from '../db/space.js';
+import { currentWorkspaceId } from '../db/space.js';
 import { writeGeneration } from '../db/write-signal.js';
 
 export interface SuggestValue {
@@ -50,7 +50,7 @@ interface ValueIndex {
  */
 const TTL_MS = 120_000;
 
-const cache = new Map<Space, ValueIndex>();
+const cache = new Map<string, ValueIndex>();
 
 /** Drop the memoised index. Exposed for tests and for out-of-band mutations. */
 export function invalidateSuggestCache(): void {
@@ -123,12 +123,12 @@ async function build(): Promise<ValueIndex> {
 }
 
 async function indexFor(): Promise<ValueIndex> {
-  const space = currentSpace();
-  const hit = cache.get(space);
+  const workspaceId = currentWorkspaceId();
+  const hit = cache.get(workspaceId);
   // Reuse only while the graph has not moved and the snapshot is not stale.
   if (hit && hit.generation === writeGeneration() && Date.now() - hit.builtAt < TTL_MS) return hit;
   const fresh = await build();
-  cache.set(space, fresh);
+  cache.set(workspaceId, fresh);
   return fresh;
 }
 

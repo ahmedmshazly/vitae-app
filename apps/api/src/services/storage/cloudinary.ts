@@ -6,6 +6,7 @@
  */
 import { v2 as cloudinary } from 'cloudinary';
 import { env } from '../../env.js';
+import { currentWorkspaceId } from '../../db/space.js';
 import type { StorageAdapter, StoredObject } from './adapter.js';
 
 // The SDK auto-reads CLOUDINARY_URL from process.env; make it explicit + private.
@@ -23,7 +24,9 @@ export class CloudinaryStorage implements StorageAdapter {
 
   async upload(input: { data: Buffer; filename: string; mime: string; sha256: string }): Promise<StoredObject> {
     if (!ensureConfigured()) throw new Error('Cloudinary is not configured (set CLOUDINARY_URL).');
-    const publicId = `${this.folder}/${input.sha256.slice(0, 2)}/${input.sha256}`;
+    // Content-addressed IDs may deduplicate within one owner but must never
+    // cross Cloud workspaces: a shared hash is still an information leak.
+    const publicId = `${this.folder}/${currentWorkspaceId()}/${input.sha256.slice(0, 2)}/${input.sha256}`;
     const isImage = input.mime.startsWith('image/');
     const result = await new Promise<Record<string, unknown>>((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(

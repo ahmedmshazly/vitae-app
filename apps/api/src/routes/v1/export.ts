@@ -7,22 +7,22 @@ import { repository } from '../../db/repository.js';
 import { nowIso } from '../../db/util.js';
 import { searchIndex } from '../../db/search-index.js';
 import { createZipArchive } from '../../lib/create-zip-archive.js';
-import { currentSpace, type Space } from '../../db/space.js';
+import { currentWorkspaceId } from '../../db/space.js';
 
 export const exportRouter: Router = Router();
 
 const STATUS_DOC = 'export_status';
-// FR-105: per-space lock so demo and real exports do not block each other.
+// FR-105: per-workspace lock so Cloud exports do not block each other.
 // Process-local; cross-instance serialization would need a shared lease.
-const exportActive = new Set<Space>();
+const exportActive = new Set<string>();
 
 /** One-click full export → ZIP streamed entry by entry (SRS FR-EXP-010). */
 exportRouter.post(
   '/',
   asyncHandler(async (req, res) => {
-    const space = currentSpace();
-    if (exportActive.has(space)) throw new HttpError(409, 'EXPORT_IN_PROGRESS', 'Another export is already running.');
-    exportActive.add(space);
+    const workspaceId = currentWorkspaceId();
+    if (exportActive.has(workspaceId)) throw new HttpError(409, 'EXPORT_IN_PROGRESS', 'Another export is already running.');
+    exportActive.add(workspaceId);
     res.setHeader('Content-Type', 'application/zip');
     res.setHeader('Content-Disposition', `attachment; filename="vitae-export-${Date.now()}.zip"`);
     const archive = createZipArchive({ zlib: { level: 9 } });
@@ -50,7 +50,7 @@ exportRouter.post(
         counts: next.value.counts,
       });
     } finally {
-      exportActive.delete(space);
+      exportActive.delete(workspaceId);
     }
   }),
 );
