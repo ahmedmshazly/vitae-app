@@ -2,23 +2,24 @@
 #
 # Deploy the API (and buildsvc) to the production VM.
 #
-#   ./scripts/deploy-api.sh          # pull + rebuild + restart, then verify
+#   ./scripts/deploy-api.sh          # pull + build + migrate + restart, then verify
 #   ./scripts/deploy-api.sh --check  # report what is deployed, change nothing
 #
 # Production is one VM running caddy + api + buildsvc from
-# deploy/compose.prod.yml at /opt/vitae. Postgres is the system of record and
-# lives outside this VM, so the VM is disposable and this only moves code.
+# deploy/compose.prod.yml at the explicit VITAE_APP_DIR. Postgres is the system
+# of record and lives outside this VM, so the VM is disposable and this only
+# moves code.
 #
 # The SPA is not here: Vercel builds it from main on push.
 #
-# See docs/DEPLOYMENT.md §7.
+# See docs/DEPLOYMENT.md.
 set -euo pipefail
 
 HOST="${VITAE_HOST:-}"
 SSH_KEY="${VITAE_SSH_KEY:-}"
 KNOWN_HOSTS="${VITAE_KNOWN_HOSTS:-${HOME}/.ssh/known_hosts}"
 HOST_KEY_NAME="${VITAE_HOST_KEY_NAME:-${HOST#*@}}"
-APP_DIR="${VITAE_APP_DIR:-/opt/vitae}"
+APP_DIR="${VITAE_APP_DIR:-}"
 HEALTH_URL="${VITAE_HEALTH_URL:-}"
 BRANCH="${VITAE_BRANCH:-main}"
 
@@ -28,6 +29,11 @@ step() { printf '\n\033[1m▸ %s\033[0m\n' "$1"; }
 die()  { printf '\033[31m✗ %s\033[0m\n' "$1" >&2; exit 1; }
 
 [ -n "$HOST" ] || die "set VITAE_HOST (e.g. ubuntu@api.vitae.example.com)"
+[ -n "$APP_DIR" ] || die "set VITAE_APP_DIR (the absolute path to the deployed checkout)"
+case "$APP_DIR" in
+  /*) ;;
+  *) die "VITAE_APP_DIR must be an absolute path" ;;
+esac
 [ -n "$HEALTH_URL" ] || die "set VITAE_HEALTH_URL (e.g. https://api.vitae.example.com/health)"
 command -v ssh        >/dev/null || die "ssh not found"
 command -v ssh-keygen >/dev/null || die "ssh-keygen not found"
@@ -41,7 +47,7 @@ SSH=(
   -o StrictHostKeyChecking=yes
   -o "UserKnownHostsFile=$KNOWN_HOSTS"
 )
-[ -n "$SSH_KEY" ] && SSH+=(-i "$SSH_KEY")
+[ -n "$SSH_KEY" ] && SSH+=(-o IdentitiesOnly=yes -i "$SSH_KEY")
 SSH+=("$HOST")
 
 case "${1:-}" in
@@ -57,8 +63,6 @@ if [ "${1:-}" = "--check" ]; then
   exit 0
 fi
 
-[ -z "$(git status --porcelain)" ] || die "working tree is dirty, commit or stash first"
-
 step "Deploying ${BRANCH} to ${HOST}:${APP_DIR}"
 "${SSH[@]}" bash -seuo pipefail <<REMOTE
   cd "${APP_DIR}"
@@ -70,8 +74,14 @@ step "Deploying ${BRANCH} to ${HOST}:${APP_DIR}"
   git checkout --quiet "${BRANCH}"
   git merge --ff-only "origin/${BRANCH}"
   git log --oneline -1
-  # --build because the API image bakes the source: a pull alone changes nothing.
-  docker compose -f deploy/compose.prod.yml up -d --build
+  # The API image bakes the source. Build it before migrating so the migration
+  # runner and the image that will serve traffic use the same release.
+  docker compose -f deploy/compose.prod.yml build api buildsvc
+  docker compose -f deploy/compose.prod.yml run --rm --no-deps api ./node_modules/.bin/tsx src/scripts/migrate.ts
+  # A changed tag alone is not enough for every Compose version to replace an
+  # existing container. Force the two source-bearing services to recreate;
+  # Caddy stays at the edge and resumes proxying once API health is restored.
+  docker compose -f deploy/compose.prod.yml up -d --force-recreate api buildsvc
 REMOTE
 
 step "Waiting for readiness"

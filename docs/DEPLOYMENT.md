@@ -101,6 +101,24 @@ version:
 pnpm --filter @vitae/api migrate
 ```
 
+For the documented production VM, use the guarded helper rather than running
+the individual Docker commands by hand. It fetches and fast-forwards the
+remote checkout, builds the API and compiler images, applies migrations from
+the new API image, then force-recreates those two services before waiting for
+readiness. The checkout path is deliberately required: a deployment must never
+guess which directory on a host holds production code.
+
+```bash
+VITAE_HOST=ubuntu@api.example.com \
+VITAE_SSH_KEY=/path/to/deployment-key.pem \
+VITAE_APP_DIR=/absolute/path/to/vitae \
+VITAE_HEALTH_URL=https://api.example.com/health \
+./scripts/deploy-api.sh
+```
+
+Use `./scripts/deploy-api.sh --check` for a read-only report of the remote
+revision, service state, and liveness endpoint.
+
 Then verify the release:
 
 - `GET /health` returns `200`.
