@@ -1,0 +1,2745 @@
+{
+  "modules": [
+    {
+      "id": "aho-corasick",
+      "module": "packages/core/src/algorithms/aho-corasick.ts",
+      "title": "Token-level Aho-Corasick automaton (SRS §10.2: \"Aho-Corasick alias matching\").",
+      "description": "Token-level Aho-Corasick automaton (SRS §10.2: \"Aho-Corasick alias matching\"). Matches multi-word skill aliases against a token stream in a single linear pass, which is how the JD parser finds every dictionary term (e.g. \"reinforcement learning\", \"node.js\") without O(patterns × text) scanning.",
+      "pure": true,
+      "kind": "data",
+      "exports": [
+        {
+          "name": "ACMatch",
+          "kind": "interface",
+          "line": 16,
+          "doc": null,
+          "source": "packages/core/src/algorithms/aho-corasick.ts:16"
+        },
+        {
+          "name": "AhoCorasick",
+          "kind": "class",
+          "line": 26,
+          "doc": null,
+          "source": "packages/core/src/algorithms/aho-corasick.ts:26"
+        }
+      ],
+      "constants": [],
+      "requirements": [],
+      "tests": [
+        "packages/core/src/algorithms/aho-corasick.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "packages/core/src/algorithms/aho-corasick.test.ts",
+          "symbol": "AhoCorasick",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/jd-parser.ts",
+          "symbol": "AhoCorasick",
+          "test": false
+        }
+      ],
+      "consumer_count": {
+        "product": 1,
+        "test": 1
+      }
+    },
+    {
+      "id": "atom-scoring",
+      "module": "packages/core/src/algorithms/atom-scoring.ts",
+      "title": "Atom scoring against a parsed target (SRS §10.4-B, FR-RES-007).",
+      "description": "Atom scoring against a parsed target (SRS §10.4-B, FR-RES-007). s(atom) = ( Σ_k weight_k · hit_k(atom) ) · recency(atom) · metricBonus(atom) where hit_k = 1.0 for a skill-tag match, 0.6 for a stemmed text match, 0 otherwise; recency = max(exp(−yearsSinceEnd / 8), 0.35); metricBonus = 1 + 0.15·min(metricCount, 2). Every atom's score decomposes EXACTLY into the per-keyword contributions shown in the breakdown popover (FR-RES-007).",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "KeywordHit",
+          "kind": "interface",
+          "line": 17,
+          "doc": null,
+          "source": "packages/core/src/algorithms/atom-scoring.ts:17"
+        },
+        {
+          "name": "AtomScore",
+          "kind": "interface",
+          "line": 25,
+          "doc": null,
+          "source": "packages/core/src/algorithms/atom-scoring.ts:25"
+        },
+        {
+          "name": "defaultVariantText",
+          "kind": "function",
+          "line": 35,
+          "doc": "Return the default (or first) variant text of an atom.",
+          "source": "packages/core/src/algorithms/atom-scoring.ts:35"
+        },
+        {
+          "name": "recencyFactor",
+          "kind": "function",
+          "line": 50,
+          "doc": null,
+          "source": "packages/core/src/algorithms/atom-scoring.ts:50"
+        },
+        {
+          "name": "metricBonus",
+          "kind": "function",
+          "line": 58,
+          "doc": null,
+          "source": "packages/core/src/algorithms/atom-scoring.ts:58"
+        },
+        {
+          "name": "scoreAtom",
+          "kind": "function",
+          "line": 62,
+          "doc": null,
+          "source": "packages/core/src/algorithms/atom-scoring.ts:62"
+        },
+        {
+          "name": "scoreAtoms",
+          "kind": "function",
+          "line": 101,
+          "doc": null,
+          "source": "packages/core/src/algorithms/atom-scoring.ts:101"
+        }
+      ],
+      "constants": [
+        "SELECTION"
+      ],
+      "requirements": [
+        "FR-RES-007"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/atom-scoring.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/routes/v1/atoms.ts",
+          "symbol": "scoreAtoms",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "symbol": "AtomScore",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "symbol": "scoreAtoms",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/atom-scoring.test.ts",
+          "symbol": "scoreAtom",
+          "test": true
+        }
+      ],
+      "consumer_count": {
+        "product": 3,
+        "test": 1
+      }
+    },
+    {
+      "id": "capture-grammar",
+      "module": "packages/core/src/algorithms/capture-grammar.ts",
+      "title": "The quick-add capture grammar (SRS §5.1, FR-CAP-001).",
+      "description": "The quick-add capture grammar (SRS §5.1, FR-CAP-001). A deterministic tokenizer + rule set that turns a single line like p Lina Farouk @@DevFest Cairo #ml ^fri !p1 > met at the speaker dinner into a structured plan (person + org stub + tag + date + note) that the UI previews as chips and commits on Enter. No AI, pure parsing.",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "PrimaryKind",
+          "kind": "type",
+          "line": 33,
+          "doc": null,
+          "source": "packages/core/src/algorithms/capture-grammar.ts:33"
+        },
+        {
+          "name": "CaptureChip",
+          "kind": "interface",
+          "line": 35,
+          "doc": null,
+          "source": "packages/core/src/algorithms/capture-grammar.ts:35"
+        },
+        {
+          "name": "CapturePlan",
+          "kind": "interface",
+          "line": 41,
+          "doc": null,
+          "source": "packages/core/src/algorithms/capture-grammar.ts:41"
+        },
+        {
+          "name": "parseCapture",
+          "kind": "function",
+          "line": 59,
+          "doc": "Parse a capture line into a plan.",
+          "source": "packages/core/src/algorithms/capture-grammar.ts:59"
+        },
+        {
+          "name": "parseDateToken",
+          "kind": "function",
+          "line": 161,
+          "doc": "Parse a `^date` token to an ISO date and a human label.",
+          "source": "packages/core/src/algorithms/capture-grammar.ts:161"
+        }
+      ],
+      "constants": [],
+      "requirements": [
+        "FR-CAP-001"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/capture-grammar.test.ts",
+        "packages/core/src/algorithms/capture-grammar.property.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/routes/v1/capture.ts",
+          "symbol": "parseCapture",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/capture.ts",
+          "symbol": "CapturePlan",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/capture.ts",
+          "symbol": "parseCapture",
+          "test": false
+        },
+        {
+          "file": "apps/web/src/features/QuickAdd.tsx",
+          "symbol": "CapturePlan",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/capture-grammar.property.test.ts",
+          "symbol": "parseCapture",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/capture-grammar.property.test.ts",
+          "symbol": "parseDateToken",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/capture-grammar.test.ts",
+          "symbol": "parseCapture",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/capture-grammar.test.ts",
+          "symbol": "parseDateToken",
+          "test": true
+        }
+      ],
+      "consumer_count": {
+        "product": 4,
+        "test": 4
+      }
+    },
+    {
+      "id": "composer",
+      "module": "packages/core/src/algorithms/composer.ts",
+      "title": "Deterministic outreach composer (reference genDraft, user decision: no LLM).",
+      "description": "Deterministic outreach composer (reference genDraft, user decision: no LLM). A tone × ask-kind template matrix filled with real relationship facts. Pure and snapshot-testable; the API layer supplies the facts.",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "ComposerKind",
+          "kind": "type",
+          "line": 7,
+          "doc": "Deterministic outreach composer (reference genDraft, user decision: no LLM).",
+          "source": "packages/core/src/algorithms/composer.ts:7"
+        },
+        {
+          "name": "ComposerTone",
+          "kind": "type",
+          "line": 8,
+          "doc": null,
+          "source": "packages/core/src/algorithms/composer.ts:8"
+        },
+        {
+          "name": "ComposeInput",
+          "kind": "interface",
+          "line": 10,
+          "doc": null,
+          "source": "packages/core/src/algorithms/composer.ts:10"
+        },
+        {
+          "name": "composeDraft",
+          "kind": "function",
+          "line": 71,
+          "doc": "Compose a plain-text draft.",
+          "source": "packages/core/src/algorithms/composer.ts:71"
+        }
+      ],
+      "constants": [],
+      "requirements": [],
+      "tests": [
+        "packages/core/src/algorithms/composer.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/routes/v1/composer.ts",
+          "symbol": "composeDraft",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/composer.ts",
+          "symbol": "ComposerKind",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/composer.ts",
+          "symbol": "ComposerTone",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/composer.test.ts",
+          "symbol": "composeDraft",
+          "test": true
+        }
+      ],
+      "consumer_count": {
+        "product": 3,
+        "test": 1
+      }
+    },
+    {
+      "id": "constants",
+      "module": "packages/core/src/algorithms/constants.ts",
+      "title": "Tie-strength model (SRS §10.7.1).",
+      "description": "Tie-strength model (SRS §10.7.1).",
+      "pure": true,
+      "kind": "data",
+      "exports": [
+        {
+          "name": "TIE_STRENGTH",
+          "kind": "object",
+          "line": 11,
+          "doc": "Tie-strength model (SRS §10.7.1).",
+          "source": "packages/core/src/algorithms/constants.ts:11"
+        },
+        {
+          "name": "WHO_TO_CALL_WEIGHTS",
+          "kind": "object",
+          "line": 40,
+          "doc": "Who-to-call ranking weights (SRS §10.4-A / §10.7.3).",
+          "source": "packages/core/src/algorithms/constants.ts:40"
+        },
+        {
+          "name": "AFFILIATION",
+          "kind": "object",
+          "line": 51,
+          "doc": "Affiliation sub-scores.",
+          "source": "packages/core/src/algorithms/constants.ts:51"
+        },
+        {
+          "name": "GEO",
+          "kind": "object",
+          "line": 53,
+          "doc": "Geography sub-scores.",
+          "source": "packages/core/src/algorithms/constants.ts:53"
+        },
+        {
+          "name": "RECIPROCITY",
+          "kind": "object",
+          "line": 55,
+          "doc": "Reciprocity adjustments.",
+          "source": "packages/core/src/algorithms/constants.ts:55"
+        },
+        {
+          "name": "PAGERANK",
+          "kind": "object",
+          "line": 58,
+          "doc": "Personalized PageRank (SRS §10.7.3).",
+          "source": "packages/core/src/algorithms/constants.ts:58"
+        },
+        {
+          "name": "BM25F",
+          "kind": "object",
+          "line": 87,
+          "doc": "BM25F JD parsing (SRS §10.7.4).",
+          "source": "packages/core/src/algorithms/constants.ts:87"
+        },
+        {
+          "name": "SELECTION",
+          "kind": "object",
+          "line": 105,
+          "doc": "Atom scoring + submodular selection (SRS §10.7.5).",
+          "source": "packages/core/src/algorithms/constants.ts:105"
+        },
+        {
+          "name": "DEDUP",
+          "kind": "object",
+          "line": 130,
+          "doc": "Fellegi-Sunter record-linkage m/u probabilities per field (SRS §10.7.6).",
+          "source": "packages/core/src/algorithms/constants.ts:130"
+        },
+        {
+          "name": "Constants",
+          "kind": "type",
+          "line": 143,
+          "doc": null,
+          "source": "packages/core/src/algorithms/constants.ts:143"
+        }
+      ],
+      "constants": [
+        "AFFILIATION",
+        "BM25F",
+        "DEDUP",
+        "GEO",
+        "PAGERANK",
+        "RECIPROCITY",
+        "SELECTION",
+        "TIE_STRENGTH",
+        "WHO_TO_CALL_WEIGHTS"
+      ],
+      "requirements": [],
+      "tests": [],
+      "consumers": [
+        {
+          "file": "apps/api/src/services/crm.ts",
+          "symbol": "PAGERANK",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/settings.ts",
+          "symbol": "WHO_TO_CALL_WEIGHTS",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/atom-scoring.ts",
+          "symbol": "SELECTION",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/dedup.ts",
+          "symbol": "DEDUP",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/jd-parser.ts",
+          "symbol": "BM25F",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/pagerank.ts",
+          "symbol": "PAGERANK",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/reconnect.ts",
+          "symbol": "TIE_STRENGTH",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/selection.ts",
+          "symbol": "SELECTION",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/tie-strength.ts",
+          "symbol": "TIE_STRENGTH",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/who-to-call.ts",
+          "symbol": "AFFILIATION",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/who-to-call.ts",
+          "symbol": "GEO",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/who-to-call.ts",
+          "symbol": "RECIPROCITY",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/who-to-call.ts",
+          "symbol": "WHO_TO_CALL_WEIGHTS",
+          "test": false
+        }
+      ],
+      "consumer_count": {
+        "product": 13,
+        "test": 0
+      }
+    },
+    {
+      "id": "dedup",
+      "module": "packages/core/src/algorithms/dedup.ts",
+      "title": "Probabilistic record linkage, the Fellegi-Sunter model (SRS §5.3, §10.7.6).",
+      "description": "Probabilistic record linkage, the Fellegi-Sunter model (SRS §5.3, §10.7.6). The standard framework for linkage without shared identifiers [Fellegi & Sunter 1969; Asher 2020]. Each compared field contributes a log₂ match weight: agreement: log₂(m / u) disagreement: log₂((1−m) / (1−u)) with two refinements: • Approximate comparators [DuVall 2010; Li 2014], the agreement weight scales with trigram / Jaro-Winkler similarity instead of binary agree, interpolating from the disagreement weight below a per-field threshold. • Missing-at-random [Li 2021], an absent field contributes 0, not disagreement. The summed weight is partitioned by two thresholds into non-match / possible / probable. Possible AND probable go to the duplicates QUEUE (auto-merge never happens, SRS §4.7); the per-field breakdown is shown as match evidence, so \"why matched\" decomposes exactly, the same explainability contract as ranking.",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "Verdict",
+          "kind": "type",
+          "line": 25,
+          "doc": null,
+          "source": "packages/core/src/algorithms/dedup.ts:25"
+        },
+        {
+          "name": "FieldComparison",
+          "kind": "interface",
+          "line": 27,
+          "doc": null,
+          "source": "packages/core/src/algorithms/dedup.ts:27"
+        },
+        {
+          "name": "FieldWeight",
+          "kind": "interface",
+          "line": 36,
+          "doc": null,
+          "source": "packages/core/src/algorithms/dedup.ts:36"
+        },
+        {
+          "name": "PairScore",
+          "kind": "interface",
+          "line": 42,
+          "doc": null,
+          "source": "packages/core/src/algorithms/dedup.ts:42"
+        },
+        {
+          "name": "MatchSignalKind",
+          "kind": "type",
+          "line": 48,
+          "doc": null,
+          "source": "packages/core/src/algorithms/dedup.ts:48"
+        },
+        {
+          "name": "MatchSignal",
+          "kind": "interface",
+          "line": 60,
+          "doc": null,
+          "source": "packages/core/src/algorithms/dedup.ts:60"
+        },
+        {
+          "name": "EntityMatchInput",
+          "kind": "interface",
+          "line": 70,
+          "doc": null,
+          "source": "packages/core/src/algorithms/dedup.ts:70"
+        },
+        {
+          "name": "EntityMatchResult",
+          "kind": "interface",
+          "line": 80,
+          "doc": null,
+          "source": "packages/core/src/algorithms/dedup.ts:80"
+        },
+        {
+          "name": "normalizeArabic",
+          "kind": "function",
+          "line": 106,
+          "doc": "Stable, intentionally conservative Arabic folding for identity comparison.",
+          "source": "packages/core/src/algorithms/dedup.ts:106"
+        },
+        {
+          "name": "transliterateArabic",
+          "kind": "function",
+          "line": 115,
+          "doc": "Transliteration is supporting evidence only; callers never treat it as identity.",
+          "source": "packages/core/src/algorithms/dedup.ts:115"
+        },
+        {
+          "name": "canonicalPersonName",
+          "kind": "function",
+          "line": 126,
+          "doc": null,
+          "source": "packages/core/src/algorithms/dedup.ts:126"
+        },
+        {
+          "name": "canonicalOrganizationName",
+          "kind": "function",
+          "line": 131,
+          "doc": null,
+          "source": "packages/core/src/algorithms/dedup.ts:131"
+        },
+        {
+          "name": "canonicalCountryCode",
+          "kind": "function",
+          "line": 186,
+          "doc": null,
+          "source": "packages/core/src/algorithms/dedup.ts:186"
+        },
+        {
+          "name": "canonicalCountryName",
+          "kind": "function",
+          "line": 191,
+          "doc": null,
+          "source": "packages/core/src/algorithms/dedup.ts:191"
+        },
+        {
+          "name": "compareEntities",
+          "kind": "function",
+          "line": 205,
+          "doc": "Explainable, type-aware entity linkage.",
+          "source": "packages/core/src/algorithms/dedup.ts:205"
+        },
+        {
+          "name": "scorePair",
+          "kind": "function",
+          "line": 300,
+          "doc": "Score a candidate pair from its field comparisons (SRS §10.7.6).",
+          "source": "packages/core/src/algorithms/dedup.ts:300"
+        },
+        {
+          "name": "PersonLike",
+          "kind": "interface",
+          "line": 336,
+          "doc": null,
+          "source": "packages/core/src/algorithms/dedup.ts:336"
+        },
+        {
+          "name": "comparePersons",
+          "kind": "function",
+          "line": 344,
+          "doc": null,
+          "source": "packages/core/src/algorithms/dedup.ts:344"
+        }
+      ],
+      "constants": [
+        "DEDUP"
+      ],
+      "requirements": [],
+      "tests": [
+        "packages/core/src/algorithms/dedup.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/routes/v1/nodes.ts",
+          "symbol": "canonicalCountryCode",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/nodes.ts",
+          "symbol": "canonicalCountryName",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "symbol": "canonicalCountryCode",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "symbol": "canonicalOrganizationName",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "symbol": "canonicalPersonName",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "symbol": "compareEntities",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "symbol": "EntityMatchInput",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "symbol": "MatchSignal",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "symbol": "compareEntities",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "symbol": "comparePersons",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "symbol": "PairScore",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "symbol": "scorePair",
+          "test": false
+        },
+        {
+          "file": "apps/web/src/routes/Duplicates.tsx",
+          "symbol": "MatchSignal",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/dedup.test.ts",
+          "symbol": "canonicalCountryCode",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/dedup.test.ts",
+          "symbol": "canonicalOrganizationName",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/dedup.test.ts",
+          "symbol": "canonicalPersonName",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/dedup.test.ts",
+          "symbol": "compareEntities",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/dedup.test.ts",
+          "symbol": "comparePersons",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/dedup.test.ts",
+          "symbol": "scorePair",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/metamorphic.test.ts",
+          "symbol": "compareEntities",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/metamorphic.test.ts",
+          "symbol": "comparePersons",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/metamorphic.test.ts",
+          "symbol": "scorePair",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/fixtures/golden/golden.test.ts",
+          "symbol": "compareEntities",
+          "test": true
+        }
+      ],
+      "consumer_count": {
+        "product": 13,
+        "test": 10
+      }
+    },
+    {
+      "id": "filter-grammar",
+      "module": "packages/core/src/algorithms/filter-grammar.ts",
+      "title": "Search filter grammar (SRS FR-SRCH-002).",
+      "description": "Search filter grammar (SRS FR-SRCH-002). Parses a composable query like type:link shared_by:\"Omar\" after:2025-01-01 transformer into an AST of typed clauses + free text. This is the deterministic \"ask\" layer (A2, not natural language). Unknown tokens degrade gracefully to text search with a hint rather than erroring, and the AST round-trips through a URL so saved views are shareable (FR-ORG-005).",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "FILTER_FIELDS",
+          "kind": "array",
+          "line": 12,
+          "doc": "Search filter grammar (SRS FR-SRCH-002).",
+          "source": "packages/core/src/algorithms/filter-grammar.ts:12"
+        },
+        {
+          "name": "FilterField",
+          "kind": "type",
+          "line": 25,
+          "doc": null,
+          "source": "packages/core/src/algorithms/filter-grammar.ts:25"
+        },
+        {
+          "name": "FilterClause",
+          "kind": "interface",
+          "line": 27,
+          "doc": null,
+          "source": "packages/core/src/algorithms/filter-grammar.ts:27"
+        },
+        {
+          "name": "FilterAst",
+          "kind": "interface",
+          "line": 33,
+          "doc": null,
+          "source": "packages/core/src/algorithms/filter-grammar.ts:33"
+        },
+        {
+          "name": "tokenizeQuery",
+          "kind": "function",
+          "line": 55,
+          "doc": "Tokenize a query respecting double-quoted values.",
+          "source": "packages/core/src/algorithms/filter-grammar.ts:55"
+        },
+        {
+          "name": "parseFilterQuery",
+          "kind": "function",
+          "line": 78,
+          "doc": null,
+          "source": "packages/core/src/algorithms/filter-grammar.ts:78"
+        },
+        {
+          "name": "astToQueryString",
+          "kind": "function",
+          "line": 110,
+          "doc": "Serialize an AST back to a query string (stable order, for URLs/saved views).",
+          "source": "packages/core/src/algorithms/filter-grammar.ts:110"
+        }
+      ],
+      "constants": [],
+      "requirements": [
+        "FR-ORG-005",
+        "FR-SRCH-002"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/filter-grammar.test.ts",
+        "packages/core/src/algorithms/filter-grammar.property.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/db/search-index.ts",
+          "symbol": "parseFilterQuery",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/search.ts",
+          "symbol": "parseFilterQuery",
+          "test": false
+        },
+        {
+          "file": "apps/web/src/routes/Collections.tsx",
+          "symbol": "tokenizeQuery",
+          "test": false
+        },
+        {
+          "file": "apps/web/src/routes/SearchResults.test.ts",
+          "symbol": "FILTER_FIELDS",
+          "test": true
+        },
+        {
+          "file": "apps/web/src/routes/SearchResults.test.ts",
+          "symbol": "parseFilterQuery",
+          "test": true
+        },
+        {
+          "file": "apps/web/src/routes/SearchResults.tsx",
+          "symbol": "tokenizeQuery",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/filter-grammar.property.test.ts",
+          "symbol": "astToQueryString",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/filter-grammar.property.test.ts",
+          "symbol": "FILTER_FIELDS",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/filter-grammar.property.test.ts",
+          "symbol": "FilterClause",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/filter-grammar.property.test.ts",
+          "symbol": "FilterField",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/filter-grammar.property.test.ts",
+          "symbol": "parseFilterQuery",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/filter-grammar.test.ts",
+          "symbol": "astToQueryString",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/filter-grammar.test.ts",
+          "symbol": "parseFilterQuery",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/metamorphic.test.ts",
+          "symbol": "astToQueryString",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/metamorphic.test.ts",
+          "symbol": "parseFilterQuery",
+          "test": true
+        }
+      ],
+      "consumer_count": {
+        "product": 4,
+        "test": 11
+      }
+    },
+    {
+      "id": "fit-loop",
+      "module": "packages/core/src/algorithms/fit-loop.ts",
+      "title": "One-page enforcement after compile (SRS FR-RES-014).",
+      "description": "One-page enforcement after compile (SRS FR-RES-014). Selection already budgets by line estimate; this loop reacts to the real Tectonic page count. Each iteration prefers a concise-variant swap (same coverage, fewer lines), then drops the lowest-scoring unpinned atom. Cap three iterations; leftover overflow is handed back for manual trim.",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "FitAction",
+          "kind": "type",
+          "line": 11,
+          "doc": null,
+          "source": "packages/core/src/algorithms/fit-loop.ts:11"
+        },
+        {
+          "name": "FitCandidate",
+          "kind": "interface",
+          "line": 13,
+          "doc": null,
+          "source": "packages/core/src/algorithms/fit-loop.ts:13"
+        },
+        {
+          "name": "FitStep",
+          "kind": "interface",
+          "line": 21,
+          "doc": null,
+          "source": "packages/core/src/algorithms/fit-loop.ts:21"
+        },
+        {
+          "name": "FitDecision",
+          "kind": "interface",
+          "line": 26,
+          "doc": null,
+          "source": "packages/core/src/algorithms/fit-loop.ts:26"
+        },
+        {
+          "name": "planFitStep",
+          "kind": "function",
+          "line": 36,
+          "doc": "Next trim step, or null when only pinned atoms remain (manual trim).",
+          "source": "packages/core/src/algorithms/fit-loop.ts:36"
+        },
+        {
+          "name": "applyFitStep",
+          "kind": "function",
+          "line": 57,
+          "doc": null,
+          "source": "packages/core/src/algorithms/fit-loop.ts:57"
+        }
+      ],
+      "constants": [],
+      "requirements": [
+        "FR-RES-014"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/fit-loop.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "symbol": "applyFitStep",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "symbol": "FitDecision",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "symbol": "planFitStep",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/fit-loop.test.ts",
+          "symbol": "applyFitStep",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/fit-loop.test.ts",
+          "symbol": "FitCandidate",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/fit-loop.test.ts",
+          "symbol": "planFitStep",
+          "test": true
+        }
+      ],
+      "consumer_count": {
+        "product": 3,
+        "test": 3
+      }
+    },
+    {
+      "id": "graph-paths",
+      "module": "packages/core/src/algorithms/graph-paths.ts",
+      "title": "Warm-intro path finding (reference P: intros).",
+      "description": "Warm-intro path finding (reference P: intros). Deterministic bounded search from self to a target organization over the social layer of the life graph. Model: hops traverse KNOWS (person↔person, weight = tie strength) and affiliation chains person -HELD-> role -ROLE_AT-> org (collapsed to one person→org hop with a fixed weight). An introduction edge (INTRODUCED) also counts. Path score = product of hop strengths, so long weak chains rank below short strong ones. Results are sorted by score, deterministically tie-broken by path node ids.",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "PathGraphNode",
+          "kind": "interface",
+          "line": 13,
+          "doc": "Warm-intro path finding (reference P: intros).",
+          "source": "packages/core/src/algorithms/graph-paths.ts:13"
+        },
+        {
+          "name": "PathGraphEdge",
+          "kind": "interface",
+          "line": 19,
+          "doc": null,
+          "source": "packages/core/src/algorithms/graph-paths.ts:19"
+        },
+        {
+          "name": "PathHop",
+          "kind": "interface",
+          "line": 27,
+          "doc": null,
+          "source": "packages/core/src/algorithms/graph-paths.ts:27"
+        },
+        {
+          "name": "IntroPath",
+          "kind": "interface",
+          "line": 36,
+          "doc": null,
+          "source": "packages/core/src/algorithms/graph-paths.ts:36"
+        },
+        {
+          "name": "FindPathsOptions",
+          "kind": "interface",
+          "line": 41,
+          "doc": null,
+          "source": "packages/core/src/algorithms/graph-paths.ts:41"
+        },
+        {
+          "name": "findIntroPaths",
+          "kind": "function",
+          "line": 67,
+          "doc": "Find up to `maxPaths` simple paths self → … → targetOrg, ranked by the product of hop strengths.",
+          "source": "packages/core/src/algorithms/graph-paths.ts:67"
+        }
+      ],
+      "constants": [],
+      "requirements": [],
+      "tests": [
+        "packages/core/src/algorithms/graph-paths.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/routes/v1/intros.ts",
+          "symbol": "findIntroPaths",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/intros.ts",
+          "symbol": "PathGraphEdge",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/intros.ts",
+          "symbol": "PathGraphNode",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/graph-paths.test.ts",
+          "symbol": "findIntroPaths",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/graph-paths.test.ts",
+          "symbol": "PathGraphEdge",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/graph-paths.test.ts",
+          "symbol": "PathGraphNode",
+          "test": true
+        }
+      ],
+      "consumer_count": {
+        "product": 3,
+        "test": 3
+      }
+    },
+    {
+      "id": "jd-parser",
+      "module": "packages/core/src/algorithms/jd-parser.ts",
+      "title": "Job-description parsing (SRS §10.2, upgraded to BM25F per §10.7.4).",
+      "description": "Job-description parsing (SRS §10.2, upgraded to BM25F per §10.7.4). Pipeline: normalize → segment lines & classify sections by header regex → Aho-Corasick alias matching (dictionary skills) + novel n-gram candidates → BM25F structured-document term weighting [Robertson & Zaragoza 2009]: tf̃(t) = Σ_fields w_field · tf_{t,field} / (1 − b + b·(len_field/avglen_field)) weight(t) = idf(t) · tf̃ / (k1 + tf̃) Section (field) weights act on term frequency BEFORE a single shared saturation, so a keyword repeated 9× is not 9× more important, JDs of different lengths are comparable, and generic terms self-deprecate as the stored-JD corpus grows. Output is a weighted keyword set with evidence spans, fully editable downstream (FR-RES-006). Deterministic, no AI.",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "JdSection",
+          "kind": "type",
+          "line": 22,
+          "doc": null,
+          "source": "packages/core/src/algorithms/jd-parser.ts:22"
+        },
+        {
+          "name": "SkillAlias",
+          "kind": "interface",
+          "line": 24,
+          "doc": null,
+          "source": "packages/core/src/algorithms/jd-parser.ts:24"
+        },
+        {
+          "name": "JdCorpus",
+          "kind": "interface",
+          "line": 31,
+          "doc": null,
+          "source": "packages/core/src/algorithms/jd-parser.ts:31"
+        },
+        {
+          "name": "ParseJdOptions",
+          "kind": "interface",
+          "line": 38,
+          "doc": null,
+          "source": "packages/core/src/algorithms/jd-parser.ts:38"
+        },
+        {
+          "name": "JD_PARSER_VERSION",
+          "kind": "const",
+          "line": 45,
+          "doc": null,
+          "source": "packages/core/src/algorithms/jd-parser.ts:45"
+        },
+        {
+          "name": "DEFAULT_JD_CORPUS",
+          "kind": "object",
+          "line": 48,
+          "doc": "A small shipped prior so generic terms self-deprecate before the corpus grows.",
+          "source": "packages/core/src/algorithms/jd-parser.ts:48"
+        },
+        {
+          "name": "parseJd",
+          "kind": "function",
+          "line": 157,
+          "doc": null,
+          "source": "packages/core/src/algorithms/jd-parser.ts:157"
+        }
+      ],
+      "constants": [
+        "BM25F"
+      ],
+      "requirements": [
+        "FR-RES-006"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/jd-parser.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "symbol": "parseJd",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "symbol": "SkillAlias",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/jd-parser.test.ts",
+          "symbol": "parseJd",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/jd-parser.test.ts",
+          "symbol": "SkillAlias",
+          "test": true
+        }
+      ],
+      "consumer_count": {
+        "product": 2,
+        "test": 2
+      }
+    },
+    {
+      "id": "latex-escape",
+      "module": "packages/core/src/algorithms/latex-escape.ts",
+      "title": "Per-character escape map.",
+      "description": "Per-character escape map. Single-pass so characters introduced by an escape (e.g. the `{}` in `\\textbackslash{}`) are never reprocessed. Naive sequential `String.replace` is unsafe for that reason.",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "escapeLatex",
+          "kind": "function",
+          "line": 50,
+          "doc": "Escape a raw string for safe inclusion in LaTeX.",
+          "source": "packages/core/src/algorithms/latex-escape.ts:50"
+        },
+        {
+          "name": "escapeInline",
+          "kind": "function",
+          "line": 61,
+          "doc": "Escape an inline field (name, org, dates): additionally collapse newlines to spaces so a multi-line paste cannot break a single-line template slot.",
+          "source": "packages/core/src/algorithms/latex-escape.ts:61"
+        },
+        {
+          "name": "renderInlineMarkdown",
+          "kind": "function",
+          "line": 74,
+          "doc": "Render whitelisted mini-markdown to LaTeX.",
+          "source": "packages/core/src/algorithms/latex-escape.ts:74"
+        },
+        {
+          "name": "isSafeHref",
+          "kind": "function",
+          "line": 131,
+          "doc": "May this string be used as an \\href target?",
+          "source": "packages/core/src/algorithms/latex-escape.ts:131"
+        },
+        {
+          "name": "escapeUrl",
+          "kind": "function",
+          "line": 145,
+          "doc": "Escape a URL for use as the FIRST argument of hyperref's \\href{url}{text}.",
+          "source": "packages/core/src/algorithms/latex-escape.ts:145"
+        },
+        {
+          "name": "assertNoUnresolvedTokens",
+          "kind": "function",
+          "line": 155,
+          "doc": "Assert that a rendered template has no unresolved «guillemet» tokens.",
+          "source": "packages/core/src/algorithms/latex-escape.ts:155"
+        }
+      ],
+      "constants": [],
+      "requirements": [],
+      "tests": [
+        "packages/core/src/algorithms/latex-escape.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "symbol": "assertNoUnresolvedTokens",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "symbol": "escapeInline",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/template-renderers.ts",
+          "symbol": "escapeInline",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/template-renderers.ts",
+          "symbol": "escapeUrl",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/template-renderers.ts",
+          "symbol": "isSafeHref",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/template-renderers.ts",
+          "symbol": "renderInlineMarkdown",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/latex-escape.test.ts",
+          "symbol": "assertNoUnresolvedTokens",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/latex-escape.test.ts",
+          "symbol": "escapeInline",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/latex-escape.test.ts",
+          "symbol": "escapeLatex",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/latex-escape.test.ts",
+          "symbol": "escapeUrl",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/latex-escape.test.ts",
+          "symbol": "isSafeHref",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/latex-escape.test.ts",
+          "symbol": "renderInlineMarkdown",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/metamorphic.test.ts",
+          "symbol": "escapeLatex",
+          "test": true
+        }
+      ],
+      "consumer_count": {
+        "product": 6,
+        "test": 7
+      }
+    },
+    {
+      "id": "line-model",
+      "module": "packages/core/src/algorithms/line-model.ts",
+      "title": "Template line model (SRS §6.6, FR-RES-009).",
+      "description": "Template line model (SRS §6.6, FR-RES-009). Estimates how many rendered lines a piece of content will occupy on the page, from per-template constants (chars/line, lines/page, entry/section overheads) calibrated against a real compile in CI. This drives the live page meter and the knapsack budget in atom selection, the résumé engine can fit content to one page BEFORE paying for a LaTeX compile.",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "estimateLines",
+          "kind": "function",
+          "line": 12,
+          "doc": "Estimate wrapped lines for a single text string under a line model.",
+          "source": "packages/core/src/algorithms/line-model.ts:12"
+        },
+        {
+          "name": "EntryGroup",
+          "kind": "interface",
+          "line": 19,
+          "doc": null,
+          "source": "packages/core/src/algorithms/line-model.ts:19"
+        },
+        {
+          "name": "estimateSectionLines",
+          "kind": "function",
+          "line": 27,
+          "doc": "Estimate lines for a whole section = section overhead + each entry.",
+          "source": "packages/core/src/algorithms/line-model.ts:27"
+        },
+        {
+          "name": "PageEstimate",
+          "kind": "interface",
+          "line": 37,
+          "doc": null,
+          "source": "packages/core/src/algorithms/line-model.ts:37"
+        },
+        {
+          "name": "estimatePages",
+          "kind": "function",
+          "line": 47,
+          "doc": "Estimate total pages against the one-page budget (SRS FR-RES-009 meter).",
+          "source": "packages/core/src/algorithms/line-model.ts:47"
+        }
+      ],
+      "constants": [],
+      "requirements": [
+        "FR-RES-009"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/line-model.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "symbol": "estimateLines",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/resume-model.ts",
+          "symbol": "estimateLines",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "symbol": "estimateLines",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/line-model.test.ts",
+          "symbol": "estimateLines",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/line-model.test.ts",
+          "symbol": "estimatePages",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/line-model.test.ts",
+          "symbol": "estimateSectionLines",
+          "test": true
+        }
+      ],
+      "consumer_count": {
+        "product": 3,
+        "test": 3
+      }
+    },
+    {
+      "id": "pagerank",
+      "module": "packages/core/src/algorithms/pagerank.ts",
+      "title": "Personalized PageRank over the typed life graph (SRS §10.7.3).",
+      "description": "Personalized PageRank over the typed life graph (SRS §10.7.3). PPR is the principled generalization of ad-hoc \"shared org / 2-hop\" heuristics for social/organizational proximity [Kloumann 2016]. We run power iteration from a seed distribution (the self node, optionally averaged with a target-org node) over a graph whose edges carry per-type transition weights (KNOWS·closeness > WORKED_ON > ATTENDED …). Computed nightly and cached on person nodes; at A5 scale (≤50k nodes) this is well under a second.",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "GraphEdge",
+          "kind": "interface",
+          "line": 13,
+          "doc": null,
+          "source": "packages/core/src/algorithms/pagerank.ts:13"
+        },
+        {
+          "name": "PageRankOptions",
+          "kind": "interface",
+          "line": 21,
+          "doc": null,
+          "source": "packages/core/src/algorithms/pagerank.ts:21"
+        },
+        {
+          "name": "personalizedPageRank",
+          "kind": "function",
+          "line": 33,
+          "doc": "@param nodes all node ids in the graph @param edges directed edges (undirected relations should be supplied both ways) @param seeds seed node ids → mass; normalized internally (the teleport set)",
+          "source": "packages/core/src/algorithms/pagerank.ts:33"
+        }
+      ],
+      "constants": [
+        "PAGERANK"
+      ],
+      "requirements": [],
+      "tests": [
+        "packages/core/src/algorithms/pagerank.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/services/crm.ts",
+          "symbol": "GraphEdge",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/crm.ts",
+          "symbol": "personalizedPageRank",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/pagerank.test.ts",
+          "symbol": "personalizedPageRank",
+          "test": true
+        }
+      ],
+      "consumer_count": {
+        "product": 2,
+        "test": 1
+      }
+    },
+    {
+      "id": "reconnect",
+      "module": "packages/core/src/algorithms/reconnect.ts",
+      "title": "Reconnect scheduling (SRS §10.7.2).",
+      "description": "Reconnect scheduling (SRS §10.7.2). Relationship decay under silence is the Ebbinghaus forgetting curve; the MEMORIZE result [Tabibian 2019] proves the optimal review intensity under exponential forgetting is proportional to (1 − recall probability). Transferred to ties: reconnect_priority = (closeness / 5) · (1 − min(R / 3, 1)) The most valuable AND most-decayed ties surface first; a freshly-contacted close friend drops off the lane automatically. Both terms are shown as chips.",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "ReconnectInput",
+          "kind": "interface",
+          "line": 16,
+          "doc": null,
+          "source": "packages/core/src/algorithms/reconnect.ts:16"
+        },
+        {
+          "name": "ReconnectScore",
+          "kind": "interface",
+          "line": 25,
+          "doc": null,
+          "source": "packages/core/src/algorithms/reconnect.ts:25"
+        },
+        {
+          "name": "reconnectPriority",
+          "kind": "function",
+          "line": 32,
+          "doc": null,
+          "source": "packages/core/src/algorithms/reconnect.ts:32"
+        },
+        {
+          "name": "rankReconnect",
+          "kind": "function",
+          "line": 46,
+          "doc": "Rank ties for the dashboard Reconnect lane (SRS FR-CON-004), highest first.",
+          "source": "packages/core/src/algorithms/reconnect.ts:46"
+        }
+      ],
+      "constants": [
+        "TIE_STRENGTH"
+      ],
+      "requirements": [],
+      "tests": [
+        "packages/core/src/algorithms/reconnect.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/services/crm.ts",
+          "symbol": "rankReconnect",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/metamorphic.test.ts",
+          "symbol": "rankReconnect",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/metamorphic.test.ts",
+          "symbol": "ReconnectInput",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/reconnect.test.ts",
+          "symbol": "rankReconnect",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/reconnect.test.ts",
+          "symbol": "reconnectPriority",
+          "test": true
+        }
+      ],
+      "consumer_count": {
+        "product": 1,
+        "test": 4
+      }
+    },
+    {
+      "id": "selection",
+      "module": "packages/core/src/algorithms/selection.ts",
+      "title": "Résumé atom selection as budgeted submodular maximization (SRS §10.7.5, FR-RES-008/014).",
+      "description": "Résumé atom selection as budgeted submodular maximization (SRS §10.7.5, FR-RES-008/014). Selecting bullets to fill a one-page budget is exactly the formulation that made extractive summarization tractable with a guarantee [Lin & Bilmes 2010; Sviridenko 2003]. Objective (monotone submodular, diminishing returns per keyword): F(S) = Σ_k w_k·(1 − e^{−λ·cov_k(S)}) + μ·Σ_{a∈S} quality(a) cov_k(S) = Σ_{a∈S} hit_k(a). The saturating exponential means the third bullet proving \"Python\" adds far less than the first, so the optimizer diversifies coverage across the JD rather than stacking redundant bullets. Constraints: knapsack (Σ lines ≤ budget), partition (≤ maxBullets per owner, roles reverse-chron), pinned forced in, blocked excluded. Algorithm: cost-benefit greedy (argmax marginal-gain ÷ line-cost), compared against the best single atom, the (1−1/e)/2 approximation safeguard. The concise variant is a lower-cost item for the same coverage, so the fit loop is a special case (swap-to-concise) of the same optimizer. Deterministic tiebreaks preserve \"identical inputs → identical proposal\".",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "SelectableVariant",
+          "kind": "interface",
+          "line": 26,
+          "doc": null,
+          "source": "packages/core/src/algorithms/selection.ts:26"
+        },
+        {
+          "name": "SelectableAtom",
+          "kind": "interface",
+          "line": 33,
+          "doc": null,
+          "source": "packages/core/src/algorithms/selection.ts:33"
+        },
+        {
+          "name": "SelectionEntry",
+          "kind": "interface",
+          "line": 49,
+          "doc": null,
+          "source": "packages/core/src/algorithms/selection.ts:49"
+        },
+        {
+          "name": "SelectionDecision",
+          "kind": "interface",
+          "line": 57,
+          "doc": null,
+          "source": "packages/core/src/algorithms/selection.ts:57"
+        },
+        {
+          "name": "SelectionResult",
+          "kind": "interface",
+          "line": 63,
+          "doc": null,
+          "source": "packages/core/src/algorithms/selection.ts:63"
+        },
+        {
+          "name": "SelectOptions",
+          "kind": "interface",
+          "line": 73,
+          "doc": null,
+          "source": "packages/core/src/algorithms/selection.ts:73"
+        },
+        {
+          "name": "resolveVariant",
+          "kind": "function",
+          "line": 88,
+          "doc": "Resolve wording: per-atom override → global preferred emphasis → first variant.",
+          "source": "packages/core/src/algorithms/selection.ts:88"
+        },
+        {
+          "name": "selectAtoms",
+          "kind": "function",
+          "line": 108,
+          "doc": null,
+          "source": "packages/core/src/algorithms/selection.ts:108"
+        },
+        {
+          "name": "selectManual",
+          "kind": "function",
+          "line": 224,
+          "doc": "Manual selection (FR-RES-008 manual mode): the user hand-picks and orders atoms; we keep their order verbatim, resolve each atom's variant (preferred emphasis → default), and reuse the same coverage math so the report is comparable with auto mode.",
+          "source": "packages/core/src/algorithms/selection.ts:224"
+        }
+      ],
+      "constants": [
+        "SELECTION"
+      ],
+      "requirements": [
+        "FR-RES-008",
+        "FR-RES-014"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/selection.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "symbol": "SelectableAtom",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "symbol": "selectAtoms",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "symbol": "selectManual",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/fit-loop.test.ts",
+          "symbol": "SelectionEntry",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/fit-loop.ts",
+          "symbol": "SelectionEntry",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/selection.test.ts",
+          "symbol": "SelectableAtom",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/selection.test.ts",
+          "symbol": "selectAtoms",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/selection.test.ts",
+          "symbol": "selectManual",
+          "test": true
+        }
+      ],
+      "consumer_count": {
+        "product": 4,
+        "test": 4
+      }
+    },
+    {
+      "id": "streaks",
+      "module": "packages/core/src/algorithms/streaks.ts",
+      "title": "Habit streaks (SRS Today view): pure date arithmetic over a set of checked days.",
+      "description": "Habit streaks (SRS Today view): pure date arithmetic over a set of checked days. All dates are ISO `YYYY-MM-DD` strings; \"today\" is passed in so the function stays deterministic and testable.",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "StreakResult",
+          "kind": "interface",
+          "line": 7,
+          "doc": "Habit streaks (SRS Today view): pure date arithmetic over a set of checked days.",
+          "source": "packages/core/src/algorithms/streaks.ts:7"
+        },
+        {
+          "name": "computeStreak",
+          "kind": "function",
+          "line": 26,
+          "doc": null,
+          "source": "packages/core/src/algorithms/streaks.ts:26"
+        }
+      ],
+      "constants": [],
+      "requirements": [],
+      "tests": [
+        "packages/core/src/algorithms/streaks.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/routes/v1/dashboard.ts",
+          "symbol": "computeStreak",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/habits.ts",
+          "symbol": "computeStreak",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/streaks.test.ts",
+          "symbol": "computeStreak",
+          "test": true
+        }
+      ],
+      "consumer_count": {
+        "product": 2,
+        "test": 1
+      }
+    },
+    {
+      "id": "text",
+      "module": "packages/core/src/algorithms/text.ts",
+      "title": "A conservative English stoplist for novel-term suggestion (SRS §10.2).",
+      "description": "A conservative English stoplist for novel-term suggestion (SRS §10.2).",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "STOPWORDS",
+          "kind": "const",
+          "line": 7,
+          "doc": "A conservative English stoplist for novel-term suggestion (SRS §10.2).",
+          "source": "packages/core/src/algorithms/text.ts:7"
+        },
+        {
+          "name": "normalizeForMatch",
+          "kind": "function",
+          "line": 24,
+          "doc": "Normalize text for matching: NFC-normalize, lowercase, and collapse anything that is not a word character while DELIBERATELY preserving the technical characters `+ # .` so \"C++\", \"C#\", \".NET\", and \"Node.js\" survive (SRS §10.2).",
+          "source": "packages/core/src/algorithms/text.ts:24"
+        },
+        {
+          "name": "tokenize",
+          "kind": "function",
+          "line": 34,
+          "doc": "Split normalized text into tokens, keeping technical tokens intact.",
+          "source": "packages/core/src/algorithms/text.ts:34"
+        },
+        {
+          "name": "ngrams",
+          "kind": "function",
+          "line": 44,
+          "doc": "Contiguous n-grams (as space-joined strings) for n in [minN, maxN].",
+          "source": "packages/core/src/algorithms/text.ts:44"
+        },
+        {
+          "name": "stem",
+          "kind": "function",
+          "line": 58,
+          "doc": "A small, deterministic suffix stemmer (a trimmed Porter).",
+          "source": "packages/core/src/algorithms/text.ts:58"
+        },
+        {
+          "name": "trigrams",
+          "kind": "function",
+          "line": 85,
+          "doc": "Character trigrams (with word-boundary padding) as a set.",
+          "source": "packages/core/src/algorithms/text.ts:85"
+        },
+        {
+          "name": "trigramSimilarity",
+          "kind": "function",
+          "line": 93,
+          "doc": "Sørensen-Dice trigram similarity in [0,1]: Postgres `pg_trgm`-style.",
+          "source": "packages/core/src/algorithms/text.ts:93"
+        },
+        {
+          "name": "jaroWinkler",
+          "kind": "function",
+          "line": 108,
+          "doc": "Jaro-Winkler string similarity in [0,1] (SRS §10.7.6 approximate comparator).",
+          "source": "packages/core/src/algorithms/text.ts:108"
+        }
+      ],
+      "constants": [],
+      "requirements": [],
+      "tests": [
+        "packages/core/src/algorithms/text.test.ts",
+        "packages/core/src/algorithms/text.property.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/db/search-index.ts",
+          "symbol": "trigramSimilarity",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/crm.ts",
+          "symbol": "normalizeForMatch",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "symbol": "normalizeForMatch",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "symbol": "normalizeForMatch",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "symbol": "trigramSimilarity",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/atom-scoring.ts",
+          "symbol": "stem",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/atom-scoring.ts",
+          "symbol": "tokenize",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/dedup.ts",
+          "symbol": "jaroWinkler",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/dedup.ts",
+          "symbol": "normalizeForMatch",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/dedup.ts",
+          "symbol": "trigramSimilarity",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/jd-parser.ts",
+          "symbol": "ngrams",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/jd-parser.ts",
+          "symbol": "normalizeForMatch",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/jd-parser.ts",
+          "symbol": "STOPWORDS",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/jd-parser.ts",
+          "symbol": "tokenize",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/text.property.test.ts",
+          "symbol": "jaroWinkler",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/text.property.test.ts",
+          "symbol": "normalizeForMatch",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/text.property.test.ts",
+          "symbol": "stem",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/text.property.test.ts",
+          "symbol": "tokenize",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/text.property.test.ts",
+          "symbol": "trigramSimilarity",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/text.test.ts",
+          "symbol": "jaroWinkler",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/text.test.ts",
+          "symbol": "ngrams",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/text.test.ts",
+          "symbol": "normalizeForMatch",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/text.test.ts",
+          "symbol": "stem",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/text.test.ts",
+          "symbol": "tokenize",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/text.test.ts",
+          "symbol": "trigramSimilarity",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/who-to-call.ts",
+          "symbol": "normalizeForMatch",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/who-to-call.ts",
+          "symbol": "stem",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/who-to-call.ts",
+          "symbol": "tokenize",
+          "test": false
+        }
+      ],
+      "consumer_count": {
+        "product": 17,
+        "test": 11
+      }
+    },
+    {
+      "id": "tie-strength",
+      "module": "packages/core/src/algorithms/tie-strength.ts",
+      "title": "Relationship tie-strength (SRS §10.3, upgraded per §10.7.1).",
+      "description": "Relationship tie-strength (SRS §10.3, upgraded per §10.7.1). Tie strength is two-dimensional [Marsden & Campbell 1984; Gilbert & Karahalios 2009]: self-reported *closeness* plus interaction *intensity*. The intensity term is the conditional intensity of a Hawkes-type self-exciting point process with an exponential kernel, the standard model for bursty human communication [Masuda 2012; Halpin & De Boeck 2013]: R(t) = Σᵢ w(kindᵢ) · exp( −(t − tᵢ) / τ ) (τ = 90 days) scaled by a temporal-regularity multiplier (distinct contact days beat raw volume [Ureña-Carrión 2020]) and combined with closeness: strength = clamp( 0.45·(closeness/5) + 0.55·min(R/3, 1), 0, 1 ) Decay uses per-tie adaptive thresholds (multiples of the tie's own median inter-contact gap [Navarro 2017]), with the user's cadence_target as an override. Everything here is deterministic and fully decomposed into the `factors` object shown on the person page.",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "InteractionEvent",
+          "kind": "interface",
+          "line": 24,
+          "doc": null,
+          "source": "packages/core/src/algorithms/tie-strength.ts:24"
+        },
+        {
+          "name": "TieInput",
+          "kind": "interface",
+          "line": 30,
+          "doc": null,
+          "source": "packages/core/src/algorithms/tie-strength.ts:30"
+        },
+        {
+          "name": "TieStatus",
+          "kind": "type",
+          "line": 40,
+          "doc": null,
+          "source": "packages/core/src/algorithms/tie-strength.ts:40"
+        },
+        {
+          "name": "TieStrength",
+          "kind": "interface",
+          "line": 42,
+          "doc": null,
+          "source": "packages/core/src/algorithms/tie-strength.ts:42"
+        },
+        {
+          "name": "computeTieStrength",
+          "kind": "function",
+          "line": 74,
+          "doc": "Compute the full tie-strength decomposition for one relationship.",
+          "source": "packages/core/src/algorithms/tie-strength.ts:74"
+        }
+      ],
+      "constants": [
+        "TIE_STRENGTH"
+      ],
+      "requirements": [],
+      "tests": [
+        "packages/core/src/algorithms/tie-strength.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/services/crm.ts",
+          "symbol": "computeTieStrength",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/crm.ts",
+          "symbol": "InteractionEvent",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/tie-strength.test.ts",
+          "symbol": "computeTieStrength",
+          "test": true
+        }
+      ],
+      "consumer_count": {
+        "product": 2,
+        "test": 1
+      }
+    },
+    {
+      "id": "who-to-call",
+      "module": "packages/core/src/algorithms/who-to-call.ts",
+      "title": "\"Who should I call?\" ranking (SRS §10.4-A, upgraded per §10.7.3).",
+      "description": "\"Who should I call?\" ranking (SRS §10.4-A, upgraded per §10.7.3). This is the expert-finding task [Balog 2006/2012]: rank people by aggregating the relevance of their associated evidence. The score is a linear weighted sum that decomposes EXACTLY into the reason chips the UI shows (FR-CON-006): S = 2.0·affiliation + 1.6·topic + 1.2·strength + 0.6·geo + 0.4·reciprocity + 0.8·graph(PPR) + 1.0·pinned where `topic` is a normalized BM25 score of the intent terms over each person's evidence text (KNOWS.topics ∪ skills ∪ shared project/interaction text), and `graph` is the person's Personalized-PageRank proximity to self. `do_not_contact` people are excluded; ties break by last interaction desc.",
+      "pure": true,
+      "kind": "algorithm",
+      "exports": [
+        {
+          "name": "Intent",
+          "kind": "interface",
+          "line": 19,
+          "doc": null,
+          "source": "packages/core/src/algorithms/who-to-call.ts:19"
+        },
+        {
+          "name": "FavorEntry",
+          "kind": "interface",
+          "line": 29,
+          "doc": null,
+          "source": "packages/core/src/algorithms/who-to-call.ts:29"
+        },
+        {
+          "name": "CandidatePerson",
+          "kind": "interface",
+          "line": 34,
+          "doc": null,
+          "source": "packages/core/src/algorithms/who-to-call.ts:34"
+        },
+        {
+          "name": "EvidenceItem",
+          "kind": "interface",
+          "line": 53,
+          "doc": null,
+          "source": "packages/core/src/algorithms/who-to-call.ts:53"
+        },
+        {
+          "name": "FactorChip",
+          "kind": "interface",
+          "line": 59,
+          "doc": null,
+          "source": "packages/core/src/algorithms/who-to-call.ts:59"
+        },
+        {
+          "name": "RankedPerson",
+          "kind": "interface",
+          "line": 66,
+          "doc": null,
+          "source": "packages/core/src/algorithms/who-to-call.ts:66"
+        },
+        {
+          "name": "RankOptions",
+          "kind": "interface",
+          "line": 161,
+          "doc": null,
+          "source": "packages/core/src/algorithms/who-to-call.ts:161"
+        },
+        {
+          "name": "whoToCall",
+          "kind": "function",
+          "line": 167,
+          "doc": null,
+          "source": "packages/core/src/algorithms/who-to-call.ts:167"
+        }
+      ],
+      "constants": [
+        "AFFILIATION",
+        "GEO",
+        "RECIPROCITY",
+        "WHO_TO_CALL_WEIGHTS"
+      ],
+      "requirements": [
+        "FR-CON-006"
+      ],
+      "tests": [
+        "packages/core/src/algorithms/who-to-call.test.ts"
+      ],
+      "consumers": [
+        {
+          "file": "apps/api/src/routes/v1/ask.ts",
+          "symbol": "Intent",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/crm.ts",
+          "symbol": "CandidatePerson",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/crm.ts",
+          "symbol": "Intent",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/crm.ts",
+          "symbol": "RankedPerson",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/crm.ts",
+          "symbol": "RankOptions",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/crm.ts",
+          "symbol": "whoToCall",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/algorithms/metamorphic.test.ts",
+          "symbol": "CandidatePerson",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/metamorphic.test.ts",
+          "symbol": "whoToCall",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/who-to-call.test.ts",
+          "symbol": "CandidatePerson",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/who-to-call.test.ts",
+          "symbol": "whoToCall",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/fixtures/golden/golden.test.ts",
+          "symbol": "CandidatePerson",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/fixtures/golden/golden.test.ts",
+          "symbol": "Intent",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/fixtures/golden/golden.test.ts",
+          "symbol": "whoToCall",
+          "test": true
+        }
+      ],
+      "consumer_count": {
+        "product": 6,
+        "test": 7
+      }
+    }
+  ],
+  "constants": [
+    {
+      "name": "TIE_STRENGTH",
+      "description": "Tie-strength model (SRS §10.7.1).",
+      "requirements": [],
+      "source": "packages/core/src/algorithms/constants.ts:11",
+      "values": [
+        {
+          "path": "tauDays",
+          "value": "90",
+          "doc": "Exponential-kernel decay time constant, in days (Hawkes intensity).",
+          "line": 13
+        },
+        {
+          "path": "kindWeights.meeting",
+          "value": "1.0",
+          "doc": null,
+          "line": 16
+        },
+        {
+          "path": "kindWeights.coffee",
+          "value": "1.0",
+          "doc": null,
+          "line": 17
+        },
+        {
+          "path": "kindWeights.call",
+          "value": "0.8",
+          "doc": null,
+          "line": 18
+        },
+        {
+          "path": "kindWeights.video",
+          "value": "0.8",
+          "doc": null,
+          "line": 19
+        },
+        {
+          "path": "kindWeights.encounter",
+          "value": "0.5",
+          "doc": null,
+          "line": 20
+        },
+        {
+          "path": "kindWeights.message",
+          "value": "0.35",
+          "doc": null,
+          "line": 21
+        },
+        {
+          "path": "kindWeights.email",
+          "value": "0.35",
+          "doc": null,
+          "line": 22
+        },
+        {
+          "path": "kindWeights.outreach",
+          "value": "0.25",
+          "doc": null,
+          "line": 23
+        },
+        {
+          "path": "kindWeights.comment",
+          "value": "0.15",
+          "doc": null,
+          "line": 24
+        },
+        {
+          "path": "regularityCoeff",
+          "value": "0.2",
+          "doc": "Temporal-regularity multiplier: 1 + coeff·min(distinctDays/window, 1).",
+          "line": 27
+        },
+        {
+          "path": "regularityWindowDays",
+          "value": "90",
+          "doc": null,
+          "line": 28
+        },
+        {
+          "path": "regularityDistinctDaysTarget",
+          "value": "12",
+          "doc": null,
+          "line": 29
+        },
+        {
+          "path": "closenessWeight",
+          "value": "0.45",
+          "doc": "strength = closenessWeight·(closeness/5) + intensityWeight·min(R/rNorm, 1).",
+          "line": 31
+        },
+        {
+          "path": "intensityWeight",
+          "value": "0.55",
+          "doc": null,
+          "line": 32
+        },
+        {
+          "path": "rNorm",
+          "value": "3",
+          "doc": null,
+          "line": 33
+        },
+        {
+          "path": "decayingGapMultiplier",
+          "value": "3",
+          "doc": "Adaptive decay thresholds as multiples of the per-tie median gap.",
+          "line": 35
+        },
+        {
+          "path": "dormantGapMultiplier",
+          "value": "8",
+          "doc": null,
+          "line": 36
+        }
+      ]
+    },
+    {
+      "name": "WHO_TO_CALL_WEIGHTS",
+      "description": "Who-to-call ranking weights (SRS §10.4-A / §10.7.3).",
+      "requirements": [],
+      "source": "packages/core/src/algorithms/constants.ts:40",
+      "values": [
+        {
+          "path": "affiliation",
+          "value": "2.0",
+          "doc": null,
+          "line": 41
+        },
+        {
+          "path": "topic",
+          "value": "1.6",
+          "doc": null,
+          "line": 42
+        },
+        {
+          "path": "strength",
+          "value": "1.2",
+          "doc": null,
+          "line": 43
+        },
+        {
+          "path": "geo",
+          "value": "0.6",
+          "doc": null,
+          "line": 44
+        },
+        {
+          "path": "reciprocity",
+          "value": "0.4",
+          "doc": null,
+          "line": 45
+        },
+        {
+          "path": "graph",
+          "value": "0.8",
+          "doc": null,
+          "line": 46
+        },
+        {
+          "path": "pinned",
+          "value": "1.0",
+          "doc": null,
+          "line": 47
+        }
+      ]
+    },
+    {
+      "name": "AFFILIATION",
+      "description": "Affiliation sub-scores.",
+      "requirements": [],
+      "source": "packages/core/src/algorithms/constants.ts:51",
+      "values": [
+        {
+          "path": "current",
+          "value": "1.0",
+          "doc": null,
+          "line": 51
+        },
+        {
+          "path": "past",
+          "value": "0.6",
+          "doc": null,
+          "line": 51
+        }
+      ]
+    },
+    {
+      "name": "GEO",
+      "description": "Geography sub-scores.",
+      "requirements": [],
+      "source": "packages/core/src/algorithms/constants.ts:53",
+      "values": [
+        {
+          "path": "sameCity",
+          "value": "1.0",
+          "doc": null,
+          "line": 53
+        },
+        {
+          "path": "sameCountry",
+          "value": "0.5",
+          "doc": null,
+          "line": 53
+        }
+      ]
+    },
+    {
+      "name": "RECIPROCITY",
+      "description": "Reciprocity adjustments.",
+      "requirements": [],
+      "source": "packages/core/src/algorithms/constants.ts:55",
+      "values": [
+        {
+          "path": "unsettledOwedToMe",
+          "value": "0.5",
+          "doc": null,
+          "line": 55
+        },
+        {
+          "path": "askedRecently",
+          "value": "-0.5",
+          "doc": null,
+          "line": 55
+        },
+        {
+          "path": "recentDays",
+          "value": "30",
+          "doc": null,
+          "line": 55
+        }
+      ]
+    },
+    {
+      "name": "PAGERANK",
+      "description": "Personalized PageRank (SRS §10.7.3).",
+      "requirements": [],
+      "source": "packages/core/src/algorithms/constants.ts:58",
+      "values": [
+        {
+          "path": "alpha",
+          "value": "0.15",
+          "doc": null,
+          "line": 59
+        },
+        {
+          "path": "maxIterations",
+          "value": "50",
+          "doc": null,
+          "line": 60
+        },
+        {
+          "path": "tolerance",
+          "value": "1e-6",
+          "doc": null,
+          "line": 61
+        },
+        {
+          "path": "edgeWeights.KNOWS",
+          "value": "3.0",
+          "doc": null,
+          "line": 64
+        },
+        {
+          "path": "edgeWeights.WORKED_ON",
+          "value": "2.0",
+          "doc": null,
+          "line": 65
+        },
+        {
+          "path": "edgeWeights.ROLE_AT",
+          "value": "1.5",
+          "doc": null,
+          "line": 66
+        },
+        {
+          "path": "edgeWeights.HELD",
+          "value": "1.5",
+          "doc": null,
+          "line": 67
+        },
+        {
+          "path": "edgeWeights.FOUNDED",
+          "value": "2.2",
+          "doc": null,
+          "line": 68
+        },
+        {
+          "path": "edgeWeights.STUDIED_AT",
+          "value": "1.4",
+          "doc": null,
+          "line": 69
+        },
+        {
+          "path": "edgeWeights.REPORTS_TO",
+          "value": "1.8",
+          "doc": null,
+          "line": 70
+        },
+        {
+          "path": "edgeWeights.PART_OF",
+          "value": "1.2",
+          "doc": null,
+          "line": 71
+        },
+        {
+          "path": "edgeWeights.ATTENDED",
+          "value": "1.0",
+          "doc": null,
+          "line": 72
+        },
+        {
+          "path": "edgeWeights.USES_SKILL",
+          "value": "0.8",
+          "doc": null,
+          "line": 73
+        },
+        {
+          "path": "edgeWeights.AUTHORED",
+          "value": "0.8",
+          "doc": null,
+          "line": 74
+        },
+        {
+          "path": "edgeWeights.WITH",
+          "value": "1.0",
+          "doc": null,
+          "line": 75
+        },
+        {
+          "path": "edgeWeights.ABOUT",
+          "value": "0.5",
+          "doc": null,
+          "line": 76
+        },
+        {
+          "path": "edgeWeights.RELATES_TO",
+          "value": "0.5",
+          "doc": null,
+          "line": 77
+        },
+        {
+          "path": "edgeWeights.MEMBER_OF",
+          "value": "1.2",
+          "doc": null,
+          "line": 78
+        },
+        {
+          "path": "edgeWeights.ORG_RELATED",
+          "value": "1.2",
+          "doc": null,
+          "line": 79
+        },
+        {
+          "path": "edgeWeights.FOLLOWS",
+          "value": "0.4",
+          "doc": null,
+          "line": 80
+        },
+        {
+          "path": "edgeWeights.EARNED",
+          "value": "1.0",
+          "doc": null,
+          "line": 81
+        },
+        {
+          "path": "edgeWeights.COMPLETED",
+          "value": "0.9",
+          "doc": null,
+          "line": 82
+        }
+      ]
+    },
+    {
+      "name": "BM25F",
+      "description": "BM25F JD parsing (SRS §10.7.4).",
+      "requirements": [],
+      "source": "packages/core/src/algorithms/constants.ts:87",
+      "values": [
+        {
+          "path": "k1",
+          "value": "1.2",
+          "doc": null,
+          "line": 88
+        },
+        {
+          "path": "b",
+          "value": "0.75",
+          "doc": null,
+          "line": 89
+        },
+        {
+          "path": "sectionWeights.title",
+          "value": "1.5",
+          "doc": null,
+          "line": 92
+        },
+        {
+          "path": "sectionWeights.requirements",
+          "value": "1.0",
+          "doc": null,
+          "line": 93
+        },
+        {
+          "path": "sectionWeights.responsibilities",
+          "value": "0.7",
+          "doc": null,
+          "line": 94
+        },
+        {
+          "path": "sectionWeights.nice_to_have",
+          "value": "0.4",
+          "doc": null,
+          "line": 95
+        },
+        {
+          "path": "sectionWeights.about",
+          "value": "0.2",
+          "doc": null,
+          "line": 96
+        },
+        {
+          "path": "maxKeywords",
+          "value": "40",
+          "doc": null,
+          "line": 98
+        },
+        {
+          "path": "minGram",
+          "value": "1",
+          "doc": "n-gram sizes to consider for phrase matching.",
+          "line": 100
+        },
+        {
+          "path": "maxGram",
+          "value": "3",
+          "doc": null,
+          "line": 101
+        }
+      ]
+    },
+    {
+      "name": "SELECTION",
+      "description": "Atom scoring + submodular selection (SRS §10.7.5).",
+      "requirements": [],
+      "source": "packages/core/src/algorithms/constants.ts:105",
+      "values": [
+        {
+          "path": "skillHit",
+          "value": "1.0",
+          "doc": "Per-keyword hit strength.",
+          "line": 107
+        },
+        {
+          "path": "textHit",
+          "value": "0.6",
+          "doc": null,
+          "line": 108
+        },
+        {
+          "path": "recencyTauYears",
+          "value": "8",
+          "doc": "Recency: exp(-yearsSinceEnd / recencyTau), floored.",
+          "line": 110
+        },
+        {
+          "path": "recencyFloor",
+          "value": "0.35",
+          "doc": null,
+          "line": 111
+        },
+        {
+          "path": "metricCoeff",
+          "value": "0.15",
+          "doc": "Metric bonus: 1 + metricCoeff·min(metricCount, metricCap).",
+          "line": 113
+        },
+        {
+          "path": "metricCap",
+          "value": "2",
+          "doc": null,
+          "line": 114
+        },
+        {
+          "path": "lambda",
+          "value": "1",
+          "doc": "Submodular coverage saturation rate λ and quality weight μ.",
+          "line": 116
+        },
+        {
+          "path": "mu",
+          "value": "0.5",
+          "doc": null,
+          "line": 117
+        },
+        {
+          "path": "minBulletsPerRole",
+          "value": "2",
+          "doc": "Bullets-per-included-role partition constraint (SRS FR-RES-008).",
+          "line": 119
+        },
+        {
+          "path": "maxBulletsPerRole",
+          "value": "4",
+          "doc": null,
+          "line": 120
+        },
+        {
+          "path": "maxFitIterations",
+          "value": "3",
+          "doc": "One-page fit loop cap (SRS FR-RES-014).",
+          "line": 122
+        }
+      ]
+    },
+    {
+      "name": "DEDUP",
+      "description": "Fellegi-Sunter record-linkage m/u probabilities per field (SRS §10.7.6).",
+      "requirements": [],
+      "source": "packages/core/src/algorithms/constants.ts:130",
+      "values": [
+        {
+          "path": "fields.email.m",
+          "value": "0.95",
+          "doc": null,
+          "line": 132
+        },
+        {
+          "path": "fields.email.u",
+          "value": "0.0001",
+          "doc": null,
+          "line": 132
+        },
+        {
+          "path": "fields.name_trigram.m",
+          "value": "0.9",
+          "doc": null,
+          "line": 133
+        },
+        {
+          "path": "fields.name_trigram.u",
+          "value": "0.02",
+          "doc": null,
+          "line": 133
+        },
+        {
+          "path": "fields.org_domain.m",
+          "value": "0.92",
+          "doc": null,
+          "line": 134
+        },
+        {
+          "path": "fields.org_domain.u",
+          "value": "0.001",
+          "doc": null,
+          "line": 134
+        },
+        {
+          "path": "fields.shared_event.m",
+          "value": "0.7",
+          "doc": null,
+          "line": 135
+        },
+        {
+          "path": "fields.shared_event.u",
+          "value": "0.05",
+          "doc": null,
+          "line": 135
+        },
+        {
+          "path": "fields.phone.m",
+          "value": "0.93",
+          "doc": null,
+          "line": 136
+        },
+        {
+          "path": "fields.phone.u",
+          "value": "0.0005",
+          "doc": null,
+          "line": 136
+        },
+        {
+          "path": "possibleThreshold",
+          "value": "4",
+          "doc": "Two thresholds (in summed log2 weight) partition the pair space.",
+          "line": 139
+        },
+        {
+          "path": "probableThreshold",
+          "value": "10",
+          "doc": null,
+          "line": 140
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "modules": 19,
+    "exported_symbols": 122,
+    "constant_groups": 9,
+    "constant_values": 87,
+    "untested": [],
+    "unused_in_product": [],
+    "impure": []
+  }
+}

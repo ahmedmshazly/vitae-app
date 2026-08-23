@@ -1,0 +1,2349 @@
+{
+  "keys": [
+    {
+      "name": "APERTURE_ORIGIN",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [
+        "url()"
+      ],
+      "section": "Companion app (Aperture)",
+      "description": "Browser origin allowed to call this API in addition to WEB_ORIGIN.",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:53",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "https://aperture.example.com",
+        "commented": true,
+        "source": ".env.example:61"
+      }
+    },
+    {
+      "name": "API_DOMAIN",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "deploy/Caddyfile:3",
+      "reads": [
+        "deploy/Caddyfile:3",
+        "deploy/compose.prod.yml:24"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "API_PORT",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "coerce.number",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": "4000",
+      "constraints": [
+        "int()",
+        "positive()"
+      ],
+      "section": "Runtime",
+      "description": null,
+      "requirements": [],
+      "source": "packages/config/src/env.ts:17",
+      "reads": [
+        "scripts/ci-local.sh:247",
+        "scripts/ci-local.sh:274",
+        "scripts/ci-local.sh:278",
+        "scripts/ci-local.sh:289",
+        "scripts/ci-local.sh:300",
+        "scripts/ci-local.sh:304"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "4000",
+        "commented": false,
+        "source": ".env.example:8"
+      }
+    },
+    {
+      "name": "AUTH_ENABLE_DEV_LOGIN",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "enum",
+      "parsed_as": "boolean",
+      "enum_values": [
+        "true",
+        "false",
+        "1",
+        "0"
+      ],
+      "required": false,
+      "default": "false",
+      "constraints": [],
+      "section": "Auth (SRS INT-1 / FR-SET-001)",
+      "description": "Enables the \"Developer sign-in\" shortcut on /signin (dev only).",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:38",
+      "reads": [
+        "apps/api/src/__tests__/helpers/app.ts:55"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "true",
+        "commented": false,
+        "source": ".env.example:49"
+      }
+    },
+    {
+      "name": "BACKUP_DAY",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "LaTeX build service (SRS §8.4)",
+      "description": null,
+      "requirements": [],
+      "source": "scripts/backup-to-s3.sh:33",
+      "reads": [
+        "scripts/backup-to-s3.sh:33",
+        "scripts/restore-from-s3.sh:114",
+        "scripts/restore-from-s3.sh:42",
+        "scripts/restore-from-s3.sh:45",
+        "scripts/restore-from-s3.sh:49",
+        "scripts/restore-from-s3.sh:50",
+        "scripts/restore-from-s3.sh:54",
+        "scripts/restore-from-s3.sh:59"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "2026-07-16",
+        "commented": true,
+        "source": ".env.example:116"
+      }
+    },
+    {
+      "name": "BACKUP_EXPORT_CMD",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/backup-to-s3.sh:62",
+      "reads": [
+        "scripts/backup-to-s3.sh:101",
+        "scripts/backup-to-s3.sh:62",
+        "scripts/backup-to-s3.sh:63",
+        "scripts/backup-to-s3.sh:76",
+        "scripts/backup-to-s3.sh:99"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "BACKUP_MIN_NODES",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/backup-to-s3.sh:37",
+      "reads": [
+        "scripts/backup-to-s3.sh:141",
+        "scripts/backup-to-s3.sh:37"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "BACKUP_S3_URI",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "LaTeX build service (SRS §8.4)",
+      "description": "── Off-box backups (scripts/backup-to-s3.sh; see docs/runbooks/restore-drill.md) S3 URI prefix for automated full exports (includeSensitive). IAM least privilege on …/exports/* only. Prefer GHA OIDC or an EC2 instance role; no keys in git.",
+      "requirements": [],
+      "source": "scripts/backup-to-s3.sh:49",
+      "reads": [
+        "scripts/backup-to-s3.sh:49",
+        "scripts/backup-to-s3.sh:91",
+        "scripts/restore-from-s3.sh:19",
+        "scripts/restore-from-s3.sh:24"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "s3://vitae-backups/prod",
+        "commented": true,
+        "source": ".env.example:115"
+      }
+    },
+    {
+      "name": "BACKUP_SSE_KMS_KEY_ID",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "LaTeX build service (SRS §8.4)",
+      "description": "Uploads are server-side encrypted (SSE-S3/AES256) by default; set a KMS CMK to use SSE-KMS instead. IAM must allow kms:GenerateDataKey/Decrypt on the key.",
+      "requirements": [],
+      "source": "scripts/backup-to-s3.sh:42",
+      "reads": [
+        "scripts/backup-to-s3.sh:42",
+        "scripts/backup-to-s3.sh:43"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "",
+        "commented": true,
+        "source": ".env.example:121"
+      }
+    },
+    {
+      "name": "BUILDSVC_HMAC_SECRET",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": "dev-buildsvc-secret",
+      "constraints": [
+        "min(8)"
+      ],
+      "section": "LaTeX build service (SRS §8.4)",
+      "description": "Shared secret for HMAC-SHA256 request signing (SRS T4). Must match buildsvc. This secret IS the compiler's authentication. buildsvc refuses to start without it and rejects the published development defaults in production. node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\"",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:81",
+      "reads": [
+        "deploy/compose.prod.yml:69",
+        "services/buildsvc/src/server.ts:40"
+      ],
+      "read_by": [
+        "buildsvc",
+        "deploy"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "change-me-to-a-shared-secret",
+        "commented": false,
+        "source": ".env.example:101"
+      }
+    },
+    {
+      "name": "BUILDSVC_HOST",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "services/buildsvc/src/server.ts:25",
+      "reads": [
+        "services/buildsvc/src/server.ts:25"
+      ],
+      "read_by": [
+        "buildsvc"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "BUILDSVC_URL",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": "http://localhost:8787",
+      "constraints": [
+        "url()"
+      ],
+      "section": "LaTeX build service (SRS §8.4)",
+      "description": "LaTeX build service (SRS §8.4)",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:80",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "http://localhost:8787",
+        "commented": false,
+        "source": ".env.example:96"
+      }
+    },
+    {
+      "name": "CI",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "e2e/playwright.config.ts:37",
+      "reads": [],
+      "read_by": [
+        "e2e"
+      ],
+      "read_via": "process.env",
+      "test_only": true,
+      "surface": "tooling",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "CLOUDINARY_FOLDER",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": "vitae",
+      "constraints": [],
+      "section": "Storage: Cloudinary (SRS T5; owner-provided)",
+      "description": "Folder prefix for all Vitae uploads.",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:77",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "vitae",
+        "commented": false,
+        "source": ".env.example:93"
+      }
+    },
+    {
+      "name": "CLOUDINARY_URL",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [
+        "startsWith(cloudinary://)"
+      ],
+      "section": "Storage: Cloudinary (SRS T5; owner-provided)",
+      "description": "Storage: Cloudinary (SRS T5)",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:76",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "cloudinary://your_key:your_secret@your_cloud",
+        "commented": false,
+        "source": ".env.example:91"
+      }
+    },
+    {
+      "name": "CONFIRM",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "LaTeX build service (SRS §8.4)",
+      "description": null,
+      "requirements": [],
+      "source": "scripts/restore-from-s3.sh:22",
+      "reads": [
+        "scripts/restore-from-s3.sh:101",
+        "scripts/restore-from-s3.sh:22"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "YES",
+        "commented": true,
+        "source": ".env.example:118"
+      }
+    },
+    {
+      "name": "DATABASE_CA_CERT",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [
+        "min(1)"
+      ],
+      "section": "Postgres: the data plane (ADR 0005)",
+      "description": "PEM bundle for verifying the database's TLS certificate. Required whenever DATABASE_URL is not localhost: RDS certificates are signed by an Amazon CA that Node does not trust by default, and the alternative to supplying it is `rejectUnauthorized: false`, which accepts any certificate at all.",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:73",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "",
+        "commented": true,
+        "source": ".env.example:70"
+      }
+    },
+    {
+      "name": "DATABASE_POOL_MAX",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "coerce.number",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": "10",
+      "constraints": [
+        "int()",
+        "positive()"
+      ],
+      "section": null,
+      "description": "Single-user workload; a large pool would only hold RDS connections idle.",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:66",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "DATABASE_URL",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": "postgresql://vitae:vitae@127.0.0.1:5433/vitae",
+      "constraints": [
+        "url()"
+      ],
+      "section": "Postgres: the data plane (ADR 0005)",
+      "description": "Postgres, the data plane (ADR 0005). The default points at the local compose service; production supplies the RDS endpoint and is refused at boot if it is still carrying this default (see assertSafeCombination).",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:64",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "postgresql://vitae:vitae@127.0.0.1:5433/vitae",
+        "commented": false,
+        "source": ".env.example:66"
+      }
+    },
+    {
+      "name": "DRY_RUN",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "LaTeX build service (SRS §8.4)",
+      "description": null,
+      "requirements": [],
+      "source": "scripts/backup-to-s3.sh:31",
+      "reads": [
+        "scripts/backup-to-s3.sh:170",
+        "scripts/backup-to-s3.sh:31",
+        "scripts/backup-to-s3.sh:48",
+        "scripts/backup-to-s3.sh:68",
+        "scripts/backup-to-s3.sh:72",
+        "scripts/backup-to-s3.sh:94",
+        "scripts/restore-from-s3.sh:21",
+        "scripts/restore-from-s3.sh:90"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "1",
+        "commented": true,
+        "source": ".env.example:117"
+      }
+    },
+    {
+      "name": "E2E_API_BASE_URL",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "e2e/tests/helpers/api.ts:10",
+      "reads": [],
+      "read_by": [
+        "e2e"
+      ],
+      "read_via": "process.env",
+      "test_only": true,
+      "surface": "tooling",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "E2E_BASE_URL",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "e2e/landing-assets.mjs:11",
+      "reads": [],
+      "read_by": [
+        "e2e"
+      ],
+      "read_via": "process.env",
+      "test_only": true,
+      "surface": "tooling",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "EXPORT_OUT",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/scripts/export-bundle.ts:36",
+      "reads": [
+        "apps/api/src/scripts/export-bundle.ts:36",
+        "scripts/backup-to-s3.sh:89"
+      ],
+      "read_by": [
+        "api",
+        "deploy"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "FIREBASE_AUTH_EMULATOR_HOST",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Firebase: AUTH ONLY (ADR 0005)",
+      "description": "When set, the Admin SDK talks to the local Auth emulator instead of prod.",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:59",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "127.0.0.1:9099",
+        "commented": false,
+        "source": ".env.example:78"
+      }
+    },
+    {
+      "name": "FIREBASE_PROJECT_ID",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": true,
+      "default": null,
+      "constraints": [
+        "min(1)"
+      ],
+      "section": "Firebase: AUTH ONLY (ADR 0005)",
+      "description": "Firebase: AUTH ONLY (ADR 0005). Sign-in stayed on Firebase when the data plane moved to Postgres, because `verifyIdToken` is free, unmetered, and was never the constraint. There is no Firestore here any more.",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:58",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "vitae-local",
+        "commented": false,
+        "source": ".env.example:76"
+      }
+    },
+    {
+      "name": "FORCE",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/restore-from-s3.sh:23",
+      "reads": [
+        "scripts/restore-from-s3.sh:23",
+        "scripts/restore-from-s3.sh:81"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "GITHUB_PAT",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "LaTeX build service (SRS §8.4)",
+      "description": "Third-party credentials come from the deployment's secret manager, never from application data (FR-004). Optional: the file-backed secret store in `.secrets/` backs local/self-hosted installs.",
+      "requirements": [
+        "FR-004"
+      ],
+      "source": "packages/config/src/env.ts:86",
+      "reads": [
+        "apps/api/src/services/secrets.ts:38"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "",
+        "commented": true,
+        "source": ".env.example:108"
+      }
+    },
+    {
+      "name": "GOOGLE_APPLICATION_CREDENTIALS",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/firebase.ts:20",
+      "reads": [
+        "apps/api/src/firebase.ts:20",
+        "apps/api/src/firebase.ts:22"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "INCLUDE_SENSITIVE",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/scripts/export-bundle.ts:46",
+      "reads": [
+        "apps/api/src/scripts/export-bundle.ts:46"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "KEEP_LOCAL",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/backup-to-s3.sh:32",
+      "reads": [
+        "scripts/backup-to-s3.sh:32",
+        "scripts/backup-to-s3.sh:72"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "NODE_ENV",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "enum",
+      "parsed_as": null,
+      "enum_values": [
+        "development",
+        "test",
+        "production"
+      ],
+      "required": false,
+      "default": "development",
+      "constraints": [],
+      "section": "Runtime",
+      "description": null,
+      "requirements": [],
+      "source": "packages/config/src/env.ts:16",
+      "reads": [
+        "services/buildsvc/src/server.ts:48"
+      ],
+      "read_by": [
+        "buildsvc"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "development",
+        "commented": false,
+        "source": ".env.example:7"
+      }
+    },
+    {
+      "name": "OUT_DIR",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "e2e/landing-assets.mjs:13",
+      "reads": [],
+      "read_by": [
+        "e2e"
+      ],
+      "read_via": "process.env",
+      "test_only": true,
+      "surface": "tooling",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "OWNER_EMAIL",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": true,
+      "default": null,
+      "constraints": [
+        "email()"
+      ],
+      "section": "Auth (SRS INT-1 / FR-SET-001)",
+      "description": "Auth (SRS INT-1 / FR-SET-001)",
+      "requirements": [
+        "FR-SET-001",
+        "INT-1"
+      ],
+      "source": "packages/config/src/env.ts:37",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "owner@example.com",
+        "commented": false,
+        "source": ".env.example:47"
+      }
+    },
+    {
+      "name": "PADDLE_API_KEY",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Hosted Cloud control plane",
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/cloud/config.ts:43",
+      "reads": [
+        "apps/api/src/cloud/config.ts:43"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "pdl_sdbx_apikey_your_server_secret",
+        "commented": true,
+        "source": ".env.example:39"
+      }
+    },
+    {
+      "name": "PADDLE_ENVIRONMENT",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Hosted Cloud control plane",
+      "description": "Paddle server credentials and server-owned price IDs. Put these only in the deployment secret manager, never in a VITE_ variable or committed .env file.",
+      "requirements": [],
+      "source": "apps/api/src/cloud/config.ts:22",
+      "reads": [
+        "apps/api/src/cloud/config.ts:22"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "sandbox",
+        "commented": false,
+        "source": ".env.example:38"
+      }
+    },
+    {
+      "name": "PADDLE_PRICE_CLOUD_ANNUAL",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Hosted Cloud control plane",
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/cloud/config.ts:31",
+      "reads": [
+        "apps/api/src/cloud/config.ts:31",
+        "apps/api/src/cloud/config.ts:34"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "computed",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "pri_your_annual_price",
+        "commented": true,
+        "source": ".env.example:42"
+      }
+    },
+    {
+      "name": "PADDLE_PRICE_CLOUD_MONTHLY",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Hosted Cloud control plane",
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/cloud/config.ts:31",
+      "reads": [
+        "apps/api/src/cloud/config.ts:31",
+        "apps/api/src/cloud/config.ts:33"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "pri_your_monthly_price",
+        "commented": true,
+        "source": ".env.example:41"
+      }
+    },
+    {
+      "name": "PADDLE_WEBHOOK_SECRET",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Hosted Cloud control plane",
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/cloud/config.ts:47",
+      "reads": [
+        "apps/api/src/cloud/config.ts:47"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "pdl_ntfset_your_webhook_secret",
+        "commented": true,
+        "source": ".env.example:40"
+      }
+    },
+    {
+      "name": "PORT",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "services/buildsvc/src/server.ts:21",
+      "reads": [
+        "services/buildsvc/src/server.ts:21"
+      ],
+      "read_by": [
+        "buildsvc"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "PUBLIC_APP_URL",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Hosted Cloud control plane",
+      "description": "Canonical browser origin used by provider return links and account messaging.",
+      "requirements": [],
+      "source": "apps/api/src/cloud/config.ts:51",
+      "reads": [
+        "apps/api/src/cloud/config.ts:51"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "https://app.example.com",
+        "commented": true,
+        "source": ".env.example:35"
+      }
+    },
+    {
+      "name": "SESSION_SECRET",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": true,
+      "default": null,
+      "constraints": [
+        "min(16, SESSION_SECRET must be at least 16 chars)"
+      ],
+      "section": "Auth (SRS INT-1 / FR-SET-001)",
+      "description": "32+ byte random string used to sign dev-login session tokens.",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:39",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "change-me-to-a-long-random-string",
+        "commented": false,
+        "source": ".env.example:51"
+      }
+    },
+    {
+      "name": "SHOT_DIR",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "e2e/aurora-shots.mjs:6",
+      "reads": [],
+      "read_by": [
+        "e2e"
+      ],
+      "read_via": "process.env",
+      "test_only": true,
+      "surface": "tooling",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "TEMPLATES_DIR",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/services/resume.ts:40",
+      "reads": [
+        "apps/api/src/services/resume.ts:40",
+        "services/buildsvc/src/calibrate.ts:23"
+      ],
+      "read_by": [
+        "api",
+        "buildsvc"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "TRUSTED_FIREBASE_PROJECT_ID",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [
+        "min(1)"
+      ],
+      "section": "Companion app (Aperture)",
+      "description": "A second Firebase project whose ID tokens are also accepted: the companion app (Aperture) signs in the same human against its own project, and a Firebase token is scoped to the project that issued it. This widens which identity provider can prove \"I am the owner\"; it does not widen *who* the owner is. The OWNER_EMAIL check still gates every request, and the cross-project path additionally demands a verified email from a Google sign-in. Unset = the feature is off.",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:51",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "companion-production",
+        "commented": true,
+        "source": ".env.example:59"
+      }
+    },
+    {
+      "name": "TZ",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/db/timezone.ts:18",
+      "reads": [
+        "apps/api/src/db/timezone.ts:18"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_APP_DIR",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/deploy-api.sh:22",
+      "reads": [
+        "scripts/deploy-api.sh:22"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_BRANCH",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/deploy-api.sh:24",
+      "reads": [
+        "scripts/deploy-api.sh:24"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_CI_DATABASE_URL",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/ci-local.sh:209",
+      "reads": [
+        "scripts/ci-local.sh:209"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_CLOUD_ENABLED",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Hosted Cloud control plane",
+      "description": "Keep false for every self-hosted installation. Enable only with the complete launch checklist in docs/CLOUD-LAUNCH.md and a tested staging lifecycle.",
+      "requirements": [],
+      "source": "apps/api/src/cloud/config.ts:18",
+      "reads": [
+        "apps/api/src/cloud/config.ts:18"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "false",
+        "commented": false,
+        "source": ".env.example:33"
+      }
+    },
+    {
+      "name": "VITAE_DOCS_ROOT",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/check-docs-coverage.mjs:32",
+      "reads": [
+        "scripts/check-docs-coverage.mjs:32",
+        "scripts/check-docs-coverage.mjs:33",
+        "scripts/check-docs-generated.mjs:25",
+        "scripts/check-docs-generated.mjs:26",
+        "scripts/check-docs-traceability.mjs:28",
+        "scripts/docs/gen-api.mjs:30",
+        "scripts/docs/gen-routes.mjs:27",
+        "scripts/docs/gen-srs.mjs:21",
+        "scripts/docs/gen-srs.mjs:22",
+        "scripts/docs/gen-traceability.mjs:26",
+        "scripts/docs/gen-traceability.mjs:27"
+      ],
+      "read_by": [
+        "scripts"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "tooling",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_E2E_BROWSERS",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "e2e/playwright.config.ts:12",
+      "reads": [],
+      "read_by": [
+        "e2e"
+      ],
+      "read_via": "process.env",
+      "test_only": true,
+      "surface": "tooling",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_E2E_TESTS",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/ci-local.sh:298",
+      "reads": [
+        "scripts/ci-local.sh:298",
+        "scripts/ci-local.sh:301"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_HEALTH_URL",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/deploy-api.sh:23",
+      "reads": [
+        "scripts/deploy-api.sh:23"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_HOST",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/deploy-api.sh:18",
+      "reads": [
+        "scripts/deploy-api.sh:18"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_HOST_KEY_NAME",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/deploy-api.sh:21",
+      "reads": [
+        "scripts/deploy-api.sh:21"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_KNOWN_HOSTS",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/deploy-api.sh:20",
+      "reads": [
+        "scripts/deploy-api.sh:20"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_MAP_ROOT",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/check-test-coverage-map.mjs:12",
+      "reads": [
+        "scripts/check-test-coverage-map.mjs:12",
+        "scripts/check-test-coverage-map.mjs:13"
+      ],
+      "read_by": [
+        "scripts"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "tooling",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_REQUIRE_BUDGETS",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/check-web-budgets.mjs:16",
+      "reads": [
+        "scripts/check-web-budgets.mjs:16"
+      ],
+      "read_by": [
+        "scripts"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "tooling",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_REQUIRE_TEST_LAYERS",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/test-layer-stub.mjs:9",
+      "reads": [
+        "scripts/test-layer-stub.mjs:9"
+      ],
+      "read_by": [
+        "scripts"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "tooling",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_SECRETS_DIR",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "LaTeX build service (SRS §8.4)",
+      "description": "Where the file-backed secret store lives (default: <repo root>/.secrets).",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:87",
+      "reads": [
+        "apps/api/src/services/secrets.ts:53"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "",
+        "commented": true,
+        "source": ".env.example:110"
+      }
+    },
+    {
+      "name": "VITAE_SPACE",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/db/space.ts:20",
+      "reads": [
+        "apps/api/src/db/space.ts:20"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_SSH_KEY",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/deploy-api.sh:19",
+      "reads": [
+        "scripts/deploy-api.sh:19"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITE_API_BASE_URL",
+      "scope": "web-build",
+      "declared_in": "ImportMetaEnv",
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": true,
+      "default": null,
+      "constraints": [],
+      "section": "Runtime",
+      "description": "Public base URL of the API, consumed by the web app at build time.",
+      "requirements": [],
+      "source": "apps/web/src/vite-env.d.ts:4",
+      "reads": [
+        "apps/web/src/lib/api.ts:7"
+      ],
+      "read_by": [
+        "web"
+      ],
+      "read_via": "import.meta.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "http://localhost:4000/api/v1",
+        "commented": false,
+        "source": ".env.example:11"
+      }
+    },
+    {
+      "name": "VITE_FIREBASE_API_KEY",
+      "scope": "web-build",
+      "declared_in": "ImportMetaEnv",
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": true,
+      "default": null,
+      "constraints": [],
+      "section": "Firebase: AUTH ONLY (ADR 0005)",
+      "description": "Web SDK config (emulator-safe placeholders are fine for local dev).",
+      "requirements": [],
+      "source": "apps/web/src/vite-env.d.ts:5",
+      "reads": [
+        "apps/web/src/lib/firebase.ts:21"
+      ],
+      "read_by": [
+        "web"
+      ],
+      "read_via": "import.meta.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "demo-api-key",
+        "commented": false,
+        "source": ".env.example:80"
+      }
+    },
+    {
+      "name": "VITE_FIREBASE_AUTH_DOMAIN",
+      "scope": "web-build",
+      "declared_in": "ImportMetaEnv",
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": true,
+      "default": null,
+      "constraints": [],
+      "section": "Firebase: AUTH ONLY (ADR 0005)",
+      "description": null,
+      "requirements": [],
+      "source": "apps/web/src/vite-env.d.ts:6",
+      "reads": [
+        "apps/web/src/lib/firebase.ts:22"
+      ],
+      "read_by": [
+        "web"
+      ],
+      "read_via": "import.meta.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "vitae-local.firebaseapp.com",
+        "commented": false,
+        "source": ".env.example:81"
+      }
+    },
+    {
+      "name": "VITE_FIREBASE_AUTH_EMULATOR_HOST",
+      "scope": "web-build",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Firebase: AUTH ONLY (ADR 0005)",
+      "description": "Where the Web SDK reaches the Auth emulator when USE_EMULATOR is true. The emulator serves its own Google account chooser, so \"Continue with Google\" works locally. Sign in as OWNER_EMAIL or the API's owner check rejects you.",
+      "requirements": [],
+      "source": "apps/web/src/lib/firebase.ts:36",
+      "reads": [
+        "apps/web/src/lib/firebase.ts:36"
+      ],
+      "read_by": [
+        "web"
+      ],
+      "read_via": "import.meta.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "http://127.0.0.1:9099",
+        "commented": false,
+        "source": ".env.example:87"
+      }
+    },
+    {
+      "name": "VITE_FIREBASE_PROJECT_ID",
+      "scope": "web-build",
+      "declared_in": "ImportMetaEnv",
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": true,
+      "default": null,
+      "constraints": [],
+      "section": "Firebase: AUTH ONLY (ADR 0005)",
+      "description": null,
+      "requirements": [],
+      "source": "apps/web/src/vite-env.d.ts:7",
+      "reads": [
+        "apps/web/src/lib/firebase.ts:23"
+      ],
+      "read_by": [
+        "web"
+      ],
+      "read_via": "import.meta.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "vitae-local",
+        "commented": false,
+        "source": ".env.example:82"
+      }
+    },
+    {
+      "name": "VITE_FIREBASE_USE_EMULATOR",
+      "scope": "web-build",
+      "declared_in": "ImportMetaEnv",
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": true,
+      "default": null,
+      "constraints": [],
+      "section": "Firebase: AUTH ONLY (ADR 0005)",
+      "description": null,
+      "requirements": [],
+      "source": "apps/web/src/vite-env.d.ts:8",
+      "reads": [
+        "apps/web/src/lib/firebase.ts:34"
+      ],
+      "read_by": [
+        "web"
+      ],
+      "read_via": "import.meta.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "true",
+        "commented": false,
+        "source": ".env.example:83"
+      }
+    },
+    {
+      "name": "VITE_PADDLE_CLIENT_TOKEN",
+      "scope": "web-build",
+      "declared_in": "ImportMetaEnv",
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Public Cloud launch gate",
+      "description": "Public Paddle client token, scoped to checkout only. Never use an API key here.",
+      "requirements": [],
+      "source": "apps/web/src/vite-env.d.ts:16",
+      "reads": [
+        "apps/web/src/lib/paddle.ts:16"
+      ],
+      "read_by": [
+        "web"
+      ],
+      "read_via": "import.meta.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "test_your_paddle_client_token",
+        "commented": true,
+        "source": ".env.example:28"
+      }
+    },
+    {
+      "name": "VITE_PUBLIC_CLOUD_ENABLED",
+      "scope": "web-build",
+      "declared_in": "ImportMetaEnv",
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Public Cloud launch gate",
+      "description": "The marketing site stays pre-launch and unindexed unless every public legal value below is explicitly configured. These are public identifiers, never billing keys or provider secrets. The API has a separate, stricter release gate for provisioning and billing.",
+      "requirements": [],
+      "source": "apps/web/src/vite-env.d.ts:10",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "false",
+        "commented": false,
+        "source": ".env.example:21"
+      }
+    },
+    {
+      "name": "VITE_PUBLIC_LEGAL_ENTITY_NAME",
+      "scope": "web-build",
+      "declared_in": "ImportMetaEnv",
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Public Cloud launch gate",
+      "description": null,
+      "requirements": [],
+      "source": "apps/web/src/vite-env.d.ts:13",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "Example, Inc.",
+        "commented": true,
+        "source": ".env.example:24"
+      }
+    },
+    {
+      "name": "VITE_PUBLIC_LEGAL_TERMS_VERSION",
+      "scope": "web-build",
+      "declared_in": "ImportMetaEnv",
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Public Cloud launch gate",
+      "description": null,
+      "requirements": [],
+      "source": "apps/web/src/vite-env.d.ts:14",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "2026-08-23",
+        "commented": true,
+        "source": ".env.example:25"
+      }
+    },
+    {
+      "name": "VITE_PUBLIC_REPOSITORY_URL",
+      "scope": "web-build",
+      "declared_in": "ImportMetaEnv",
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Runtime",
+      "description": "Optional canonical source link for the public site. When omitted, the site uses a neutral GitHub source-discovery query and publishes no maintainer ID.",
+      "requirements": [],
+      "source": "apps/web/src/vite-env.d.ts:9",
+      "reads": [
+        "apps/web/src/routes/marketing/Chrome.tsx:9"
+      ],
+      "read_by": [
+        "web"
+      ],
+      "read_via": "import.meta.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "https://github.com/your-org/vitae",
+        "commented": true,
+        "source": ".env.example:14"
+      }
+    },
+    {
+      "name": "VITE_PUBLIC_SITE_URL",
+      "scope": "web-build",
+      "declared_in": "ImportMetaEnv",
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Public Cloud launch gate",
+      "description": null,
+      "requirements": [],
+      "source": "apps/web/src/vite-env.d.ts:11",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "https://app.example.com",
+        "commented": true,
+        "source": ".env.example:22"
+      }
+    },
+    {
+      "name": "VITE_PUBLIC_SUPPORT_EMAIL",
+      "scope": "web-build",
+      "declared_in": "ImportMetaEnv",
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Public Cloud launch gate",
+      "description": null,
+      "requirements": [],
+      "source": "apps/web/src/vite-env.d.ts:12",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "support@example.com",
+        "commented": true,
+        "source": ".env.example:23"
+      }
+    },
+    {
+      "name": "WARMED_MANIFEST_PATH",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "services/buildsvc/src/calibrate.ts:24",
+      "reads": [
+        "services/buildsvc/src/calibrate.ts:24",
+        "services/buildsvc/src/server.ts:139"
+      ],
+      "read_by": [
+        "buildsvc"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "WEB_ORIGIN",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": "http://localhost:5173",
+      "constraints": [
+        "min(1)"
+      ],
+      "section": null,
+      "description": "Comma-separated browser origins allowed by CORS (primary web + aliases).",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:19",
+      "reads": [
+        "apps/api/src/cloud/config.ts:51"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    }
+  ],
+  "sections": [
+    "Auth (SRS INT-1 / FR-SET-001)",
+    "Companion app (Aperture)",
+    "Firebase: AUTH ONLY (ADR 0005)",
+    "Hosted Cloud control plane",
+    "LaTeX build service (SRS §8.4)",
+    "Postgres: the data plane (ADR 0005)",
+    "Public Cloud launch gate",
+    "Runtime",
+    "Storage: Cloudinary (SRS T5; owner-provided)"
+  ],
+  "summary": {
+    "total": 77,
+    "by_scope": {
+      "server": 45,
+      "deploy": 19,
+      "web-build": 13
+    },
+    "declared": 31,
+    "validated": 19,
+    "server_unvalidated": [
+      "BUILDSVC_HOST",
+      "EXPORT_OUT",
+      "GOOGLE_APPLICATION_CREDENTIALS",
+      "INCLUDE_SENSITIVE",
+      "PADDLE_API_KEY",
+      "PADDLE_ENVIRONMENT",
+      "PADDLE_PRICE_CLOUD_ANNUAL",
+      "PADDLE_PRICE_CLOUD_MONTHLY",
+      "PADDLE_WEBHOOK_SECRET",
+      "PORT",
+      "PUBLIC_APP_URL",
+      "TEMPLATES_DIR",
+      "TZ",
+      "VITAE_CLOUD_ENABLED",
+      "VITAE_SPACE",
+      "WARMED_MANIFEST_PATH"
+    ],
+    "undocumented": [
+      "API_DOMAIN",
+      "BACKUP_EXPORT_CMD",
+      "BACKUP_MIN_NODES",
+      "BUILDSVC_HOST",
+      "DATABASE_POOL_MAX",
+      "EXPORT_OUT",
+      "FORCE",
+      "GOOGLE_APPLICATION_CREDENTIALS",
+      "INCLUDE_SENSITIVE",
+      "KEEP_LOCAL",
+      "PORT",
+      "TEMPLATES_DIR",
+      "TZ",
+      "VITAE_APP_DIR",
+      "VITAE_BRANCH",
+      "VITAE_CI_DATABASE_URL",
+      "VITAE_E2E_TESTS",
+      "VITAE_HEALTH_URL",
+      "VITAE_HOST",
+      "VITAE_HOST_KEY_NAME",
+      "VITAE_KNOWN_HOSTS",
+      "VITAE_SPACE",
+      "VITAE_SSH_KEY",
+      "WARMED_MANIFEST_PATH",
+      "WEB_ORIGIN"
+    ],
+    "example_only": [
+      "GCLOUD_PROJECT",
+      "WEB_PORT"
+    ],
+    "tooling_only": [
+      "CI",
+      "E2E_API_BASE_URL",
+      "E2E_BASE_URL",
+      "OUT_DIR",
+      "SHOT_DIR",
+      "VITAE_DOCS_ROOT",
+      "VITAE_E2E_BROWSERS",
+      "VITAE_MAP_ROOT",
+      "VITAE_REQUIRE_BUDGETS",
+      "VITAE_REQUIRE_TEST_LAYERS"
+    ]
+  }
+}

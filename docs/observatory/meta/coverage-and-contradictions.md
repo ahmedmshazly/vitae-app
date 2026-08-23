@@ -121,6 +121,35 @@ Reproduce:
 git stash -u && pnpm lint; echo "exit=$?"; git stash pop
 ```
 
+### DOC-D-035 — an entire package's tests never run
+
+`packages/ui` declares `"test": "vitest run"` and contains **226 cases across
+nine files**. Nothing runs them.
+
+`.github/workflows/ci.yml` invokes tests at lines 67, 75, 77, 79, 81, 184, 192,
+194, 200 and 326. Every one of them names either a specific script or a specific
+workspace: `@vitae/core` and `@vitae/testkit` through `test:unit`, `@vitae/web`
+through `test:web`, `@vitae/api` by filter at line 200, `@vitae/e2e` by filter at
+line 326. `@vitae/ui` appears in none of them. `test:all` does not include it
+either. A recursive `pnpm test` exists at `package.json:21` and would run the
+package, but no gate calls it.
+
+This is the most depended-on code in the repository. Counting production
+importers only, `packages/ui/src/index.ts` has **102** dependents,
+`components.tsx` 79, `feedback.tsx` 65, `overlay.tsx` 51. A regression in the
+design system reaches nearly every screen, and no automated check would see it.
+
+Unlike `DOC-D-001`, no gate is broken here. The tests pass. They are simply not
+wired to anything, which is why nothing reported the gap: there is no failing
+signal to notice, only a missing one.
+
+Reproduce:
+
+```bash
+node -e "console.log(require('./docs/generated/tests.json').summary.workspaces_absent_from_ci)"
+pnpm --filter @vitae/ui test   # 226 pass, run by no gate
+```
+
 ---
 
 ## Severity 2: reference surfaces that under-report reality
@@ -318,11 +347,17 @@ legal/status pages, `/reference/entities`, and `/welcome`.
 | `DOC-D-023` | `docs/ARCHITECTURE.md:6` cites `constitution.md` as *"the non-negotiable principles"*. The file does not exist. ADR 0002 and ADR 0003 cite it too. | absence |
 | `DOC-D-024` | `docs/specs/merge-plan.md:12` and `:24` contain a self-referential redirect, `app.vitae.example` to `app.vitae.example` (301), left behind by placeholder scrubbing. | same file |
 | `DOC-D-025` | `packages/core/src/algorithms/graph-paths.ts:102` branches on edge type `INTRODUCED`. `EDGE_TYPES` does not contain it. The branch is unreachable. | `packages/core/src/types.ts` |
-| `DOC-D-026` | `packages/config/package.json` declares no `scripts`, so `pnpm -r typecheck` and `pnpm -r test` silently skip the package. | same file |
+| `DOC-D-026` | `packages/config/package.json` declares no `scripts`, so `pnpm -r typecheck` and `pnpm -r test` silently skip the package. **Partly corrected by `DOC-D-039`:** the package is skipped as a unit, but its source *is* type-checked, transitively, by every consumer that imports it. The `pnpm -r test` half stands — it has no tests. | same file |
 | `DOC-D-027` | **Resolved; see the table at the end.** `pnpm test:brand` is in `test:all` but absent from `.github/workflows/ci.yml`. Line 65 runs `test:map && test:prose && test:public` only. The brand guard never runs in CI. | `.github/workflows/ci.yml:65` |
 | `DOC-D-028` | `docs/DEPLOYMENT.md:142` advises pairing exports with *"managed Postgres backups for short recovery windows"* without stating the window. `docs/runbooks/postgres-restore.md` records that the PITR window is **1 day, not the 7 the design assumed**, because the account is on a Free Tier plan. The operational constraint exists in one document and not the one operators are pointed at first. | both files |
 | `DOC-D-029` | CI names journeys `J1 capture`, `J4 résumé`, `J8 trash/restore`. The numbering implies J2, J3, J5, J6 and J7 exist as product journeys with no executable coverage. No document records which journeys exist or which are covered. | `.github/workflows/ci.yml:319` |
 | `DOC-D-031` | `docs/ROADMAP.md:40` plans backups as a nightly `pg_dump` to R2 with a quarterly restore drill. The shipped system is different in target, mechanism and cadence: `scripts/backup-to-s3.sh` uploads a full export bundle to S3 and is wired to `pnpm backup:s3`. The roadmap row also calls the work unshipped while the script exists, so an operator reading the roadmap would prepare for a database dump that nothing produces. Found by re-checking a claim this document had itself recorded as not upheld. | `docs/ROADMAP.md:40`, `scripts/backup-to-s3.sh:2`, `package.json` |
+| `DOC-D-033` | `apps/api/src/middleware/auth.ts:35` lists `/^\/health$/` as a public path. `authGate` is mounted at `/api` (`apps/api/src/app.ts:62`) and matches against `req.baseUrl + req.path` (`auth.ts:127`), which therefore always begins `/api`. The pattern can never match. `/health` is reachable without authentication because `app.ts:58` registers it four lines *above* the gate, not because it is declared public. A security page that presented `PUBLIC_PATHS` as the list of unauthenticated routes would be describing a mechanism that does not govern the route it names. | `apps/api/src/middleware/auth.ts:35,127`, `apps/api/src/app.ts:58,62` |
+| `DOC-D-034` | Five production modules totalling **1,601 lines** are imported only by their own tests: `apps/web/src/components/ListToolbar.tsx` (275), `apps/web/src/lib/format-date.ts` (372), `apps/web/src/lib/selection.ts` (217), `apps/web/src/lib/unsaved-changes.tsx` (288), `packages/ui/src/combobox.tsx` (449). Each is tested and passing; nothing in the product reaches any of them. Documenting them as behaviour a user can observe would assert functionality the application does not expose, so the corpus must treat them as unreferenced code rather than as features. | `docs/generated/atlas-summary.json`, `summary.consumed_only_by_tests` |
+| `DOC-D-036` | Four design tokens are declared and never consumed: `--ae-data-idea`, `--ae-data-practice` and `--ae-data-other` (`packages/ui/src/styles/tokens.css:177-180`), and `--ae-trace-current` (`:57`). The `--ae-data-*` family is referenced by literal name throughout `apps/web/src/styles/`, never assembled from a variable, so these four are genuinely unreferenced rather than dynamically constructed the way `--ae-viz-N` is. A token catalog must show them as declared-unused rather than as part of the working palette. | `docs/generated/tokens.json`, `summary.unused` |
+| `DOC-D-037` | Four `@vitae/ui` exports have no importer outside the package: `Card`, `Combobox`, `HelpTip`, `Toast`. `Toast` is the one that looks used and is not — `apps/web/src/features/Toast.tsx` imports `ToastProvider` from the library and exports a `ToastProvider` of its own (`:89`), so 31 modules depend on the application's toast while the library's `Toast` component has no consumer at all. A component catalog that counted name matches would report the opposite. | `docs/generated/components.json`, `summary.unused` |
+| `DOC-D-038` | `packages/ui/src/forms.tsx:34` applies `vt-fld--error` to a field wrapper whenever the field carries an error. No stylesheet defines `.vt-fld--error`. `.vt-fld`, `.vt-fld__label`, `.vt-fld__help`, `.vt-fld__req` and `.vt-fld__error` all exist, so the error *message* is styled while the error *state of the container* renders nothing at all. Two further classes have no rule: `.vt-info`, whose children `__title`, `__body`, `__shortcut` and `__shortcuts` are each styled, and `.vt-cbx__input`, which sits inside the component `DOC-D-037` records as having no consumer. | `docs/generated/components.json`, `summary.unstyled_classes`; `packages/ui/src/forms.tsx:34` |
+| `DOC-D-039` | `@vitae/e2e` is type-checked by nothing. It declares neither `typecheck` nor `build`, and no workspace imports it, so its **250 cases** — the entire browser acceptance suite — are compiled only at the moment Playwright runs a file. Verified by appending `const x: number = 'a'` to `e2e/tests/helpers/a11y.ts`: `pnpm typecheck` and `pnpm build` both exit 0. The same probe corrects `DOC-D-026` — placed in `packages/config/src/env.ts` it **is** reported, and the root `pnpm typecheck` exits 2, because that package publishes TypeScript source through its `exports` map and each consumer's compiler follows it. Config is checked as a side effect of being imported; e2e is not checked anywhere. `services/buildsvc` also declares no `typecheck`, but `"build": "tsc"` covers it through `pnpm build` at `.github/workflows/ci.yml:98`. | measured; `docs/generated/packages.json`, `summary.workspace_typecheck` |
 
 ---
 

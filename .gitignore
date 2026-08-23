@@ -72,3 +72,9 @@ docs/seeds/
 /*.pdf
 /snapshots/
 
+
+# The per-symbol engineering atlas is rebuilt by `pnpm docs:gen` on demand. Its
+# summary is tracked so the reference surface and the drift gates have a
+# committed baseline; the full index is ~3 MB of per-symbol detail that would
+# churn on every rename and make diffs unreadable.
+docs/generated/atlas.json

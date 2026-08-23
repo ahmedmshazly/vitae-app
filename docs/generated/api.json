@@ -1,0 +1,4122 @@
+{
+  "generated_by": "scripts/docs/gen-api.mjs",
+  "note": "Derived from the Express routers, not from docs/api/openapi.json. Do not edit by hand.",
+  "totals": {
+    "endpoints": 135,
+    "mounts": 33,
+    "declared_mount_prefixes": 33,
+    "public_endpoints": 3,
+    "outside_auth_gate": 3,
+    "blocked_when_read_only": 70,
+    "documented_in_openapi": 46,
+    "undocumented_in_openapi": 89,
+    "openapi_operations": 52,
+    "documented_but_not_registered": 6,
+    "endpoints_with_tests": 128,
+    "endpoints_citing_requirements": 27
+  },
+  "gates": {
+    "auth": "/api",
+    "entitlement": "/api",
+    "workspace": "/api"
+  },
+  "mounts": [
+    {
+      "prefix": "/applications",
+      "router": "applicationsRouter",
+      "source": "apps/api/src/routes/v1/applications.ts",
+      "endpoints": 2
+    },
+    {
+      "prefix": "/ask",
+      "router": "askRouter",
+      "source": "apps/api/src/routes/v1/ask.ts",
+      "endpoints": 4
+    },
+    {
+      "prefix": "/atoms",
+      "router": "atomsRouter",
+      "source": "apps/api/src/routes/v1/atoms.ts",
+      "endpoints": 6
+    },
+    {
+      "prefix": "/auth",
+      "router": "authRouter",
+      "source": "apps/api/src/routes/v1/auth.ts",
+      "endpoints": 4
+    },
+    {
+      "prefix": "/billing",
+      "router": "billingRouter",
+      "source": "apps/api/src/routes/v1/billing.ts",
+      "endpoints": 3
+    },
+    {
+      "prefix": "/capture",
+      "router": "captureRouter",
+      "source": "apps/api/src/routes/v1/capture.ts",
+      "endpoints": 2
+    },
+    {
+      "prefix": "/composer",
+      "router": "composerRouter",
+      "source": "apps/api/src/routes/v1/composer.ts",
+      "endpoints": 2
+    },
+    {
+      "prefix": "/dashboard",
+      "router": "dashboardRouter",
+      "source": "apps/api/src/routes/v1/dashboard.ts",
+      "endpoints": 1
+    },
+    {
+      "prefix": "/duplicates",
+      "router": "duplicatesRouter",
+      "source": "apps/api/src/routes/v1/duplicates.ts",
+      "endpoints": 9
+    },
+    {
+      "prefix": "/edges",
+      "router": "edgesRouter",
+      "source": "apps/api/src/routes/v1/edges.ts",
+      "endpoints": 5
+    },
+    {
+      "prefix": "/export",
+      "router": "exportRouter",
+      "source": "apps/api/src/routes/v1/export.ts",
+      "endpoints": 4
+    },
+    {
+      "prefix": "/graph",
+      "router": "graphRouter",
+      "source": "apps/api/src/routes/v1/explore.ts",
+      "endpoints": 2
+    },
+    {
+      "prefix": "/habits",
+      "router": "habitsRouter",
+      "source": "apps/api/src/routes/v1/habits.ts",
+      "endpoints": 3
+    },
+    {
+      "prefix": "/imports",
+      "router": "importsRouter",
+      "source": "apps/api/src/routes/v1/imports.ts",
+      "endpoints": 8
+    },
+    {
+      "prefix": "/interactions",
+      "router": "interactionsRouter",
+      "source": "apps/api/src/routes/v1/interactions.ts",
+      "endpoints": 2
+    },
+    {
+      "prefix": "/intros",
+      "router": "introsRouter",
+      "source": "apps/api/src/routes/v1/intros.ts",
+      "endpoints": 2
+    },
+    {
+      "prefix": "/letters",
+      "router": "lettersRouter",
+      "source": "apps/api/src/routes/v1/letters.ts",
+      "endpoints": 6
+    },
+    {
+      "prefix": "/map",
+      "router": "mapRouter",
+      "source": "apps/api/src/routes/v1/explore.ts",
+      "endpoints": 1
+    },
+    {
+      "prefix": "/nodes",
+      "router": "nodesRouter",
+      "source": "apps/api/src/routes/v1/nodes.ts",
+      "endpoints": 9
+    },
+    {
+      "prefix": "/orgs",
+      "router": "orgsRouter",
+      "source": "apps/api/src/routes/v1/orgs.ts",
+      "endpoints": 2
+    },
+    {
+      "prefix": "/people",
+      "router": "peopleRouter",
+      "source": "apps/api/src/routes/v1/people.ts",
+      "endpoints": 3
+    },
+    {
+      "prefix": "/people/:personId/favors",
+      "router": "favorsRouter",
+      "source": "apps/api/src/routes/v1/favors.ts",
+      "endpoints": 3
+    },
+    {
+      "prefix": "/places",
+      "router": "placesRouter",
+      "source": "apps/api/src/routes/v1/places.ts",
+      "endpoints": 5
+    },
+    {
+      "prefix": "/reminders",
+      "router": "remindersRouter",
+      "source": "apps/api/src/routes/v1/reminders.ts",
+      "endpoints": 4
+    },
+    {
+      "prefix": "/resumes",
+      "router": "resumesRouter",
+      "source": "apps/api/src/routes/v1/resumes.ts",
+      "endpoints": 16
+    },
+    {
+      "prefix": "/retention",
+      "router": "retentionRouter",
+      "source": "apps/api/src/routes/v1/retention.ts",
+      "endpoints": 2
+    },
+    {
+      "prefix": "/search",
+      "router": "searchRouter",
+      "source": "apps/api/src/routes/v1/search.ts",
+      "endpoints": 2
+    },
+    {
+      "prefix": "/settings",
+      "router": "settingsRouter",
+      "source": "apps/api/src/routes/v1/settings.ts",
+      "endpoints": 4
+    },
+    {
+      "prefix": "/status",
+      "router": "statusRouter",
+      "source": "apps/api/src/routes/v1/status.ts",
+      "endpoints": 1
+    },
+    {
+      "prefix": "/suggest",
+      "router": "suggestRouter",
+      "source": "apps/api/src/routes/v1/suggest.ts",
+      "endpoints": 1
+    },
+    {
+      "prefix": "/targets",
+      "router": "targetsRouter",
+      "source": "apps/api/src/routes/v1/targets.ts",
+      "endpoints": 8
+    },
+    {
+      "prefix": "/timeline",
+      "router": "timelineRouter",
+      "source": "apps/api/src/routes/v1/explore.ts",
+      "endpoints": 2
+    },
+    {
+      "prefix": "/views",
+      "router": "viewsRouter",
+      "source": "apps/api/src/routes/v1/views.ts",
+      "endpoints": 3
+    }
+  ],
+  "declared_but_unmounted_prefixes": [],
+  "mounted_but_undeclared_prefixes": [],
+  "routers_never_mounted": [],
+  "endpoints": [
+    {
+      "id": "GET /api/v1/applications",
+      "slug": "get-api-v1-applications",
+      "method": "GET",
+      "path": "/api/v1/applications",
+      "express_path": "/api/v1/applications",
+      "mount": "/applications",
+      "source": "apps/api/src/routes/v1/applications.ts:272",
+      "summary": "The complete application runway, including terminal outcomes.",
+      "requirements": [],
+      "request_schemas": [
+        "applicationListResponseSchema",
+        "applicationStatusSchema"
+      ],
+      "services": [],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 422,
+          "code": "VALIDATION"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/applications.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/applications/{id}",
+      "slug": "get-api-v1-applications-id",
+      "method": "GET",
+      "path": "/api/v1/applications/{id}",
+      "express_path": "/api/v1/applications/:id",
+      "mount": "/applications",
+      "source": "apps/api/src/routes/v1/applications.ts:319",
+      "summary": "One application with every linked artifact and relationship the graph has.",
+      "requirements": [],
+      "request_schemas": [
+        "applicationDetailResponseSchema"
+      ],
+      "services": [],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/applications.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/ask/history",
+      "slug": "get-api-v1-ask-history",
+      "method": "GET",
+      "path": "/api/v1/ask/history",
+      "express_path": "/api/v1/ask/history",
+      "mount": "/ask",
+      "source": "apps/api/src/routes/v1/ask.ts:50",
+      "summary": "Recent asks, the recall chips on the Ask page.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/ask.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/ask/people",
+      "slug": "post-api-v1-ask-people",
+      "method": "POST",
+      "path": "/api/v1/ask/people",
+      "express_path": "/api/v1/ask/people",
+      "mount": "/ask",
+      "source": "apps/api/src/routes/v1/ask.ts:14",
+      "summary": "Who should I call? (SRS FR-CON-006/007). Weights come from settings.",
+      "requirements": [
+        "FR-CON-006",
+        "FR-CON-007"
+      ],
+      "request_schemas": [],
+      "services": [
+        "askWhoToCall",
+        "getSettings"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/ask.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/ask/people/{id}/strength",
+      "slug": "get-api-v1-ask-people-id-strength",
+      "method": "GET",
+      "path": "/api/v1/ask/people/{id}/strength",
+      "express_path": "/api/v1/ask/people/:id/strength",
+      "mount": "/ask",
+      "source": "apps/api/src/routes/v1/ask.ts:67",
+      "summary": "Tie-strength decomposition for a person (SRS §10.3, person page).",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "personStrength"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/ask.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/ask/reconnect",
+      "slug": "get-api-v1-ask-reconnect",
+      "method": "GET",
+      "path": "/api/v1/ask/reconnect",
+      "express_path": "/api/v1/ask/reconnect",
+      "mount": "/ask",
+      "source": "apps/api/src/routes/v1/ask.ts:59",
+      "summary": "Dashboard Reconnect lane (SRS FR-CON-004).",
+      "requirements": [
+        "FR-CON-004"
+      ],
+      "request_schemas": [],
+      "services": [
+        "reconnectLane"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/ask.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/atoms",
+      "slug": "get-api-v1-atoms",
+      "method": "GET",
+      "path": "/api/v1/atoms",
+      "express_path": "/api/v1/atoms",
+      "mount": "/atoms",
+      "source": "apps/api/src/routes/v1/atoms.ts:103",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "buildOwnerIndex",
+        "getSelf",
+        "getTarget",
+        "loadGraph",
+        "ownedIdsFor"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/atoms.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/atoms",
+      "slug": "post-api-v1-atoms",
+      "method": "POST",
+      "path": "/api/v1/atoms",
+      "express_path": "/api/v1/atoms",
+      "mount": "/atoms",
+      "source": "apps/api/src/routes/v1/atoms.ts:241",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [
+        "atomAggregateInputSchema"
+      ],
+      "services": [],
+      "success_status": 201,
+      "errors": [
+        {
+          "status": 422,
+          "code": "VALIDATION"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/atoms.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "DELETE /api/v1/atoms/{id}",
+      "slug": "delete-api-v1-atoms-id",
+      "method": "DELETE",
+      "path": "/api/v1/atoms/{id}",
+      "express_path": "/api/v1/atoms/:id",
+      "mount": "/atoms",
+      "source": "apps/api/src/routes/v1/atoms.ts:393",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/atoms.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "PATCH /api/v1/atoms/{id}",
+      "slug": "patch-api-v1-atoms-id",
+      "method": "PATCH",
+      "path": "/api/v1/atoms/{id}",
+      "express_path": "/api/v1/atoms/:id",
+      "mount": "/atoms",
+      "source": "apps/api/src/routes/v1/atoms.ts:289",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [
+        "atomAggregateInputSchema"
+      ],
+      "services": [],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        },
+        {
+          "status": 409,
+          "code": "REV_CONFLICT"
+        },
+        {
+          "status": 422,
+          "code": "VALIDATION"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/atoms.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/atoms/{id}/duplicate",
+      "slug": "post-api-v1-atoms-id-duplicate",
+      "method": "POST",
+      "path": "/api/v1/atoms/{id}/duplicate",
+      "express_path": "/api/v1/atoms/:id/duplicate",
+      "mount": "/atoms",
+      "source": "apps/api/src/routes/v1/atoms.ts:409",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [
+        "atomAggregateInputSchema"
+      ],
+      "services": [],
+      "success_status": 201,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/atoms.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/atoms/{id}/restore",
+      "slug": "post-api-v1-atoms-id-restore",
+      "method": "POST",
+      "path": "/api/v1/atoms/{id}/restore",
+      "express_path": "/api/v1/atoms/:id/restore",
+      "mount": "/atoms",
+      "source": "apps/api/src/routes/v1/atoms.ts:401",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/atoms.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/auth/bootstrap",
+      "slug": "post-api-v1-auth-bootstrap",
+      "method": "POST",
+      "path": "/api/v1/auth/bootstrap",
+      "express_path": "/api/v1/auth/bootstrap",
+      "mount": "/auth",
+      "source": "apps/api/src/routes/v1/auth.ts:67",
+      "summary": "Idempotent Cloud enrollment. Auth has already verified a Firebase UID; this endpoint is deliberately not public even though `/me` is, because it creates a private workspace and starts a trial.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "bootstrapPersonalWorkspace",
+        "ensureWorkspaceSelf"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 401,
+          "code": "UNAUTHENTICATED"
+        },
+        {
+          "status": 409,
+          "code": "IDENTITY_CONFLICT"
+        },
+        {
+          "status": 409,
+          "code": "SELF_HOSTED_MODE"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/auth.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/auth/dev-login",
+      "slug": "post-api-v1-auth-dev-login",
+      "method": "POST",
+      "path": "/api/v1/auth/dev-login",
+      "express_path": "/api/v1/auth/dev-login",
+      "mount": "/auth",
+      "source": "apps/api/src/routes/v1/auth.ts:29",
+      "summary": "Developer sign-in shortcut (SRS FR-SET-001, behind AUTH_ENABLE_DEV_LOGIN).",
+      "requirements": [
+        "FR-SET-001"
+      ],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 403,
+          "code": "DEV_LOGIN_DISABLED"
+        },
+        {
+          "status": 403,
+          "code": "DEV_LOGIN_REMOTE"
+        }
+      ],
+      "auth": "public",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/auth.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/auth/logout",
+      "slug": "post-api-v1-auth-logout",
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "express_path": "/api/v1/auth/logout",
+      "mount": "/auth",
+      "source": "apps/api/src/routes/v1/auth.ts:57",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "public",
+      "entitlement": "allowed-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/auth.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/auth/me",
+      "slug": "get-api-v1-auth-me",
+      "method": "GET",
+      "path": "/api/v1/auth/me",
+      "express_path": "/api/v1/auth/me",
+      "mount": "/auth",
+      "source": "apps/api/src/routes/v1/auth.ts:99",
+      "summary": "Who am I (the gate has already verified the token). `self` is the `is_self` person node subject pickers use for \"That's me\". Memoised per data space. Null when signed out or before self exists.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "resolveWorkspaceForUser"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "public",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/auth.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/billing",
+      "slug": "get-api-v1-billing",
+      "method": "GET",
+      "path": "/api/v1/billing",
+      "express_path": "/api/v1/billing",
+      "mount": "/billing",
+      "source": "apps/api/src/routes/v1/billing.ts:17",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/billing/checkout",
+      "slug": "post-api-v1-billing-checkout",
+      "method": "POST",
+      "path": "/api/v1/billing/checkout",
+      "express_path": "/api/v1/billing/checkout",
+      "mount": "/billing",
+      "source": "apps/api/src/routes/v1/billing.ts:54",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [
+        "z"
+      ],
+      "services": [],
+      "success_status": 201,
+      "errors": [
+        {
+          "status": 422,
+          "code": "VALIDATION"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "allowed-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/billing/portal",
+      "slug": "post-api-v1-billing-portal",
+      "method": "POST",
+      "path": "/api/v1/billing/portal",
+      "express_path": "/api/v1/billing/portal",
+      "mount": "/billing",
+      "source": "apps/api/src/routes/v1/billing.ts:73",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "allowed-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/capture",
+      "slug": "post-api-v1-capture",
+      "method": "POST",
+      "path": "/api/v1/capture",
+      "express_path": "/api/v1/capture",
+      "mount": "/capture",
+      "source": "apps/api/src/routes/v1/capture.ts:18",
+      "summary": "Commit a capture line into linked records (SRS FR-CAP-001).",
+      "requirements": [
+        "FR-CAP-001"
+      ],
+      "request_schemas": [],
+      "services": [
+        "commitCapture"
+      ],
+      "success_status": 201,
+      "errors": [
+        {
+          "status": 400,
+          "code": "EMPTY"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/capture.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/capture/preview",
+      "slug": "post-api-v1-capture-preview",
+      "method": "POST",
+      "path": "/api/v1/capture/preview",
+      "express_path": "/api/v1/capture/preview",
+      "mount": "/capture",
+      "source": "apps/api/src/routes/v1/capture.ts:9",
+      "summary": "Live preview, parse only, no writes (drives the ⌘K chip preview).",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/capture.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/composer/draft",
+      "slug": "post-api-v1-composer-draft",
+      "method": "POST",
+      "path": "/api/v1/composer/draft",
+      "express_path": "/api/v1/composer/draft",
+      "mount": "/composer",
+      "source": "apps/api/src/routes/v1/composer.ts:40",
+      "summary": "Build a draft server-side from live relationship data.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "getSettings"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 400,
+          "code": "BAD_REQUEST"
+        },
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/composer.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/composer/send",
+      "slug": "post-api-v1-composer-send",
+      "method": "POST",
+      "path": "/api/v1/composer/send",
+      "express_path": "/api/v1/composer/send",
+      "mount": "/composer",
+      "source": "apps/api/src/routes/v1/composer.ts:74",
+      "summary": "\"Send\" = log an outreach interaction + queue a follow-up reminder (+7d).",
+      "requirements": [
+        "FR-002",
+        "FR-025"
+      ],
+      "request_schemas": [],
+      "services": [
+        "recomputeAndPersistStrength"
+      ],
+      "success_status": 201,
+      "errors": [
+        {
+          "status": 400,
+          "code": "BAD_REQUEST"
+        },
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/composer.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/dashboard",
+      "slug": "get-api-v1-dashboard",
+      "method": "GET",
+      "path": "/api/v1/dashboard",
+      "express_path": "/api/v1/dashboard",
+      "mount": "/dashboard",
+      "source": "apps/api/src/routes/v1/dashboard.ts:20",
+      "summary": "Dashboard \"Today\" aggregate (SRS FR-VIS-004). One call, several widgets.",
+      "requirements": [
+        "FR-004",
+        "FR-025",
+        "FR-102",
+        "FR-VIS-004"
+      ],
+      "request_schemas": [],
+      "services": [
+        "buildOwnerIndex",
+        "getSelf",
+        "githubToken",
+        "loadGraph",
+        "loadScorableAtoms",
+        "ownableFrom",
+        "reconnectLane"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/dashboard.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/duplicates",
+      "slug": "get-api-v1-duplicates",
+      "method": "GET",
+      "path": "/api/v1/duplicates",
+      "express_path": "/api/v1/duplicates",
+      "mount": "/duplicates",
+      "source": "apps/api/src/routes/v1/duplicates.ts:23",
+      "summary": "Candidate pairs (possible + probable), dismissed ones excluded.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "scanDuplicateClusters",
+        "scanDuplicates"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/duplicates.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/duplicates/aliases",
+      "slug": "get-api-v1-duplicates-aliases",
+      "method": "GET",
+      "path": "/api/v1/duplicates/aliases",
+      "express_path": "/api/v1/duplicates/aliases",
+      "mount": "/duplicates",
+      "source": "apps/api/src/routes/v1/duplicates.ts:31",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "listDedupAliases"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/duplicates.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "DELETE /api/v1/duplicates/aliases/{id}",
+      "slug": "delete-api-v1-duplicates-aliases-id",
+      "method": "DELETE",
+      "path": "/api/v1/duplicates/aliases/{id}",
+      "express_path": "/api/v1/duplicates/aliases/:id",
+      "mount": "/duplicates",
+      "source": "apps/api/src/routes/v1/duplicates.ts:38",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "deleteDedupAlias"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/duplicates.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/duplicates/check",
+      "slug": "post-api-v1-duplicates-check",
+      "method": "POST",
+      "path": "/api/v1/duplicates/check",
+      "express_path": "/api/v1/duplicates/check",
+      "mount": "/duplicates",
+      "source": "apps/api/src/routes/v1/duplicates.ts:69",
+      "summary": "Fast, read-only check used by live entity forms and diagnostics.",
+      "requirements": [],
+      "request_schemas": [
+        "checkSchema"
+      ],
+      "services": [
+        "checkDuplicateDraft"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 422,
+          "code": "VALIDATION"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/duplicates.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/duplicates/dismiss",
+      "slug": "post-api-v1-duplicates-dismiss",
+      "method": "POST",
+      "path": "/api/v1/duplicates/dismiss",
+      "express_path": "/api/v1/duplicates/dismiss",
+      "mount": "/duplicates",
+      "source": "apps/api/src/routes/v1/duplicates.ts:78",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "dismissPair"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 422,
+          "code": "VALIDATION"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/duplicates.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/duplicates/merge",
+      "slug": "post-api-v1-duplicates-merge",
+      "method": "POST",
+      "path": "/api/v1/duplicates/merge",
+      "express_path": "/api/v1/duplicates/merge",
+      "mount": "/duplicates",
+      "source": "apps/api/src/routes/v1/duplicates.ts:88",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "mergePair"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 422,
+          "code": "VALIDATION"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/duplicates.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/duplicates/merges",
+      "slug": "get-api-v1-duplicates-merges",
+      "method": "GET",
+      "path": "/api/v1/duplicates/merges",
+      "express_path": "/api/v1/duplicates/merges",
+      "mount": "/duplicates",
+      "source": "apps/api/src/routes/v1/duplicates.ts:102",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "listMerges"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/duplicates.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/duplicates/merges/{id}/undo",
+      "slug": "post-api-v1-duplicates-merges-id-undo",
+      "method": "POST",
+      "path": "/api/v1/duplicates/merges/{id}/undo",
+      "express_path": "/api/v1/duplicates/merges/:id/undo",
+      "mount": "/duplicates",
+      "source": "apps/api/src/routes/v1/duplicates.ts:113",
+      "summary": "Undo a merge. FR-003: a record edited since the merge makes undo a conflict (409 MERGE_CONFLICT with the offending ids), never a silent overwrite.",
+      "requirements": [
+        "FR-003"
+      ],
+      "request_schemas": [],
+      "services": [
+        "undoMerge"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 409,
+          "code": "MERGE_CONFLICT"
+        },
+        {
+          "status": 409,
+          "code": "UNDO_FAILED"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/duplicates.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/duplicates/rescan",
+      "slug": "post-api-v1-duplicates-rescan",
+      "method": "POST",
+      "path": "/api/v1/duplicates/rescan",
+      "express_path": "/api/v1/duplicates/rescan",
+      "mount": "/duplicates",
+      "source": "apps/api/src/routes/v1/duplicates.ts:46",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "invalidateDuplicateScan",
+        "scanDuplicateClusters"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/duplicates.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/edges",
+      "slug": "post-api-v1-edges",
+      "method": "POST",
+      "path": "/api/v1/edges",
+      "express_path": "/api/v1/edges",
+      "mount": "/edges",
+      "source": "apps/api/src/routes/v1/edges.ts:30",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 201,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/edges.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "DELETE /api/v1/edges/{id}",
+      "slug": "delete-api-v1-edges-id",
+      "method": "DELETE",
+      "path": "/api/v1/edges/{id}",
+      "express_path": "/api/v1/edges/:id",
+      "mount": "/edges",
+      "source": "apps/api/src/routes/v1/edges.ts:84",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/edges.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/edges/{id}",
+      "slug": "get-api-v1-edges-id",
+      "method": "GET",
+      "path": "/api/v1/edges/{id}",
+      "express_path": "/api/v1/edges/:id",
+      "mount": "/edges",
+      "source": "apps/api/src/routes/v1/edges.ts:61",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/edges.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "PATCH /api/v1/edges/{id}",
+      "slug": "patch-api-v1-edges-id",
+      "method": "PATCH",
+      "path": "/api/v1/edges/{id}",
+      "express_path": "/api/v1/edges/:id",
+      "mount": "/edges",
+      "source": "apps/api/src/routes/v1/edges.ts:70",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/edges.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/edges/{id}/restore",
+      "slug": "post-api-v1-edges-id-restore",
+      "method": "POST",
+      "path": "/api/v1/edges/{id}/restore",
+      "express_path": "/api/v1/edges/:id/restore",
+      "mount": "/edges",
+      "source": "apps/api/src/routes/v1/edges.ts:93",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/edges.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/export",
+      "slug": "post-api-v1-export",
+      "method": "POST",
+      "path": "/api/v1/export",
+      "express_path": "/api/v1/export",
+      "mount": "/export",
+      "source": "apps/api/src/routes/v1/export.ts:20",
+      "summary": "One-click full export → ZIP streamed entry by entry (SRS FR-EXP-010).",
+      "requirements": [
+        "FR-EXP-010"
+      ],
+      "request_schemas": [],
+      "services": [
+        "exportEntries"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 409,
+          "code": "EXPORT_IN_PROGRESS"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "allowed-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/export.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/export/manifest",
+      "slug": "get-api-v1-export-manifest",
+      "method": "GET",
+      "path": "/api/v1/export/manifest",
+      "express_path": "/api/v1/export/manifest",
+      "mount": "/export",
+      "source": "apps/api/src/routes/v1/export.ts:103",
+      "summary": "Preview the manifest without downloading, drains the stream, keeps nothing.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "exportEntries"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/export.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/export/status",
+      "slug": "get-api-v1-export-status",
+      "method": "GET",
+      "path": "/api/v1/export/status",
+      "express_path": "/api/v1/export/status",
+      "mount": "/export",
+      "source": "apps/api/src/routes/v1/export.ts:58",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/export.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/export/views/{id}.csv",
+      "slug": "get-api-v1-export-views-id-csv",
+      "method": "GET",
+      "path": "/api/v1/export/views/{id}.csv",
+      "express_path": "/api/v1/export/views/:id.csv",
+      "mount": "/export",
+      "source": "apps/api/src/routes/v1/export.ts:80",
+      "summary": "Saved view → CSV (SRS FR-EXP); a targeted extract beside the full ZIP.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/export.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/graph",
+      "slug": "get-api-v1-graph",
+      "method": "GET",
+      "path": "/api/v1/graph",
+      "express_path": "/api/v1/graph",
+      "mount": "/graph",
+      "source": "apps/api/src/routes/v1/explore.ts:16",
+      "summary": "Graph explorer neighborhood (reference P: graph). ?focus=&depth=&types=a,b",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "graphView"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/explore.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/graph/path",
+      "slug": "get-api-v1-graph-path",
+      "method": "GET",
+      "path": "/api/v1/graph/path",
+      "express_path": "/api/v1/graph/path",
+      "mount": "/graph",
+      "source": "apps/api/src/routes/v1/explore.ts:30",
+      "summary": "Shortest path between two nodes for Path mode. ?from=&to=&maxDepth=",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "findGraphPath"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/explore.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/habits",
+      "slug": "get-api-v1-habits",
+      "method": "GET",
+      "path": "/api/v1/habits",
+      "express_path": "/api/v1/habits",
+      "mount": "/habits",
+      "source": "apps/api/src/routes/v1/habits.ts:11",
+      "summary": "Habits are nodes (type 'habit'); checks live in habit_checks as one doc per day.",
+      "requirements": [
+        "FR-025"
+      ],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/habits.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/habits",
+      "slug": "post-api-v1-habits",
+      "method": "POST",
+      "path": "/api/v1/habits",
+      "express_path": "/api/v1/habits",
+      "mount": "/habits",
+      "source": "apps/api/src/routes/v1/habits.ts:42",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 201,
+      "errors": [
+        {
+          "status": 400,
+          "code": "BAD_REQUEST"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/habits.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/habits/{id}/toggle",
+      "slug": "post-api-v1-habits-id-toggle",
+      "method": "POST",
+      "path": "/api/v1/habits/{id}/toggle",
+      "express_path": "/api/v1/habits/:id/toggle",
+      "mount": "/habits",
+      "source": "apps/api/src/routes/v1/habits.ts:56",
+      "summary": "Toggle a day's check (defaults to today). Doc id habitId_date makes it idempotent.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 400,
+          "code": "BAD_REQUEST"
+        },
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/habits.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/imports",
+      "slug": "get-api-v1-imports",
+      "method": "GET",
+      "path": "/api/v1/imports",
+      "express_path": "/api/v1/imports",
+      "mount": "/imports",
+      "source": "apps/api/src/routes/v1/imports.ts:33",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "listBatches"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/imports.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/imports",
+      "slug": "post-api-v1-imports",
+      "method": "POST",
+      "path": "/api/v1/imports",
+      "express_path": "/api/v1/imports",
+      "mount": "/imports",
+      "source": "apps/api/src/routes/v1/imports.ts:41",
+      "summary": "Stage an upload: parse + dedupe-check, nothing written to the graph yet.",
+      "requirements": [],
+      "request_schemas": [
+        "stageSchema"
+      ],
+      "services": [
+        "stageImport"
+      ],
+      "success_status": 201,
+      "errors": [
+        {
+          "status": 422,
+          "code": "INVALID_IMPORT_CONTENT"
+        },
+        {
+          "status": 422,
+          "code": "VALIDATION"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/imports.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/imports/{id}",
+      "slug": "get-api-v1-imports-id",
+      "method": "GET",
+      "path": "/api/v1/imports/{id}",
+      "express_path": "/api/v1/imports/:id",
+      "mount": "/imports",
+      "source": "apps/api/src/routes/v1/imports.ts:72",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "getBatch"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/imports.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/imports/{id}/commit",
+      "slug": "post-api-v1-imports-id-commit",
+      "method": "POST",
+      "path": "/api/v1/imports/{id}/commit",
+      "express_path": "/api/v1/imports/:id/commit",
+      "mount": "/imports",
+      "source": "apps/api/src/routes/v1/imports.ts:92",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "commitImport"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/imports.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/imports/{id}/discard",
+      "slug": "post-api-v1-imports-id-discard",
+      "method": "POST",
+      "path": "/api/v1/imports/{id}/discard",
+      "express_path": "/api/v1/imports/:id/discard",
+      "mount": "/imports",
+      "source": "apps/api/src/routes/v1/imports.ts:110",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "discardImport"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/imports.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/imports/{id}/rollback",
+      "slug": "post-api-v1-imports-id-rollback",
+      "method": "POST",
+      "path": "/api/v1/imports/{id}/rollback",
+      "express_path": "/api/v1/imports/:id/rollback",
+      "mount": "/imports",
+      "source": "apps/api/src/routes/v1/imports.ts:101",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "rollbackImport"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/imports.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "PATCH /api/v1/imports/{id}/rows/{rowId}",
+      "slug": "patch-api-v1-imports-id-rows-rowId",
+      "method": "PATCH",
+      "path": "/api/v1/imports/{id}/rows/{rowId}",
+      "express_path": "/api/v1/imports/:id/rows/:rowId",
+      "mount": "/imports",
+      "source": "apps/api/src/routes/v1/imports.ts:82",
+      "summary": "Flip a staged row between accept/skip; optionally patch its payload.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "setRowDecision"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 422,
+          "code": "VALIDATION"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/imports.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/imports/github/sync",
+      "slug": "post-api-v1-imports-github-sync",
+      "method": "POST",
+      "path": "/api/v1/imports/github/sync",
+      "express_path": "/api/v1/imports/github/sync",
+      "mount": "/imports",
+      "source": "apps/api/src/routes/v1/imports.ts:61",
+      "summary": "Direct GitHub sync: PAT comes from settings, never from the request.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "githubSync"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 400,
+          "code": "NOT_CONFIGURED"
+        },
+        {
+          "status": 502,
+          "code": "GITHUB_UNAUTHORIZED"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/imports.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/interactions",
+      "slug": "post-api-v1-interactions",
+      "method": "POST",
+      "path": "/api/v1/interactions",
+      "express_path": "/api/v1/interactions",
+      "mount": "/interactions",
+      "source": "apps/api/src/routes/v1/interactions.ts:22",
+      "summary": "One-tap interaction logger (SRS FR-CON-002/003): create the interaction node, a WITH edge to the person, any follow-up reminders, and immediately recompute that person's strength. FR-002: the node, edge, revisions, and reminders commit in ONE transaction. Previously each was a separate write, so a mid-sequence failure could leave an interaction with no edge (invisible to the person page, but counted by CRM) or reminders with no interaction.",
+      "requirements": [
+        "FR-002",
+        "FR-025",
+        "FR-102",
+        "FR-CON-002",
+        "FR-CON-003",
+        "FR-CON-009"
+      ],
+      "request_schemas": [],
+      "services": [
+        "loadGraph",
+        "personStrength",
+        "recomputeAndPersistStrength"
+      ],
+      "success_status": 201,
+      "errors": [
+        {
+          "status": 400,
+          "code": "BAD_REQUEST"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/interactions.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "DELETE /api/v1/interactions/{id}",
+      "slug": "delete-api-v1-interactions-id",
+      "method": "DELETE",
+      "path": "/api/v1/interactions/{id}",
+      "express_path": "/api/v1/interactions/:id",
+      "mount": "/interactions",
+      "source": "apps/api/src/routes/v1/interactions.ts:122",
+      "summary": "Undo a just-logged interaction: soft-delete it and re-derive strength.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "recomputeAndPersistStrength"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/interactions.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/intros/paths",
+      "slug": "get-api-v1-intros-paths",
+      "method": "GET",
+      "path": "/api/v1/intros/paths",
+      "express_path": "/api/v1/intros/paths",
+      "mount": "/intros",
+      "source": "apps/api/src/routes/v1/intros.ts:79",
+      "summary": "Ranked warm-intro paths into one org.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "getSelf"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 400,
+          "code": "BAD_REQUEST"
+        },
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/intros.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/intros/targets",
+      "slug": "get-api-v1-intros-targets",
+      "method": "GET",
+      "path": "/api/v1/intros/targets",
+      "express_path": "/api/v1/intros/targets",
+      "mount": "/intros",
+      "source": "apps/api/src/routes/v1/intros.ts:36",
+      "summary": "Intro targets: organizations worth reaching, annotated with your current application stage (if any) and reach (hop count of the best path).",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "getSelf",
+        "orgsOverview"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/intros.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/letters",
+      "slug": "get-api-v1-letters",
+      "method": "GET",
+      "path": "/api/v1/letters",
+      "express_path": "/api/v1/letters",
+      "mount": "/letters",
+      "source": "apps/api/src/routes/v1/letters.ts:17",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "listLetters"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/letters.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/letters",
+      "slug": "post-api-v1-letters",
+      "method": "POST",
+      "path": "/api/v1/letters",
+      "express_path": "/api/v1/letters",
+      "mount": "/letters",
+      "source": "apps/api/src/routes/v1/letters.ts:29",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "createLetter"
+      ],
+      "success_status": 201,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/letters.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "DELETE /api/v1/letters/{id}",
+      "slug": "delete-api-v1-letters-id",
+      "method": "DELETE",
+      "path": "/api/v1/letters/{id}",
+      "express_path": "/api/v1/letters/:id",
+      "mount": "/letters",
+      "source": "apps/api/src/routes/v1/letters.ts:56",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "setLetterDeleted"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/letters.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/letters/{id}",
+      "slug": "get-api-v1-letters-id",
+      "method": "GET",
+      "path": "/api/v1/letters/{id}",
+      "express_path": "/api/v1/letters/:id",
+      "mount": "/letters",
+      "source": "apps/api/src/routes/v1/letters.ts:37",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "getLetter"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/letters.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "PATCH /api/v1/letters/{id}",
+      "slug": "patch-api-v1-letters-id",
+      "method": "PATCH",
+      "path": "/api/v1/letters/{id}",
+      "express_path": "/api/v1/letters/:id",
+      "mount": "/letters",
+      "source": "apps/api/src/routes/v1/letters.ts:48",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "updateLetter"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/letters.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/letters/{id}/restore",
+      "slug": "post-api-v1-letters-id-restore",
+      "method": "POST",
+      "path": "/api/v1/letters/{id}/restore",
+      "express_path": "/api/v1/letters/:id/restore",
+      "mount": "/letters",
+      "source": "apps/api/src/routes/v1/letters.ts:64",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "setLetterDeleted"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/letters.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/map",
+      "slug": "get-api-v1-map",
+      "method": "GET",
+      "path": "/api/v1/map",
+      "express_path": "/api/v1/map",
+      "mount": "/map",
+      "source": "apps/api/src/routes/v1/explore.ts:67",
+      "summary": "City pins & clusters (Atlas). ?from=&to= period filter.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "mapView"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/explore.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/metrics",
+      "slug": "get-api-v1-metrics",
+      "method": "GET",
+      "path": "/api/v1/metrics",
+      "express_path": "/api/v1/metrics",
+      "mount": null,
+      "source": "apps/api/src/app.ts:68",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/nodes",
+      "slug": "get-api-v1-nodes",
+      "method": "GET",
+      "path": "/api/v1/nodes",
+      "express_path": "/api/v1/nodes",
+      "mount": "/nodes",
+      "source": "apps/api/src/routes/v1/nodes.ts:33",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "buildOwnerIndex",
+        "loadGraph"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/nodes.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/nodes",
+      "slug": "post-api-v1-nodes",
+      "method": "POST",
+      "path": "/api/v1/nodes",
+      "express_path": "/api/v1/nodes",
+      "mount": "/nodes",
+      "source": "apps/api/src/routes/v1/nodes.ts:87",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [
+        "subjectSchema"
+      ],
+      "services": [
+        "invalidateDuplicateScan"
+      ],
+      "success_status": 201,
+      "errors": [
+        {
+          "status": 400,
+          "code": "NO_SUBJECT"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/nodes.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "DELETE /api/v1/nodes/{id}",
+      "slug": "delete-api-v1-nodes-id",
+      "method": "DELETE",
+      "path": "/api/v1/nodes/{id}",
+      "express_path": "/api/v1/nodes/:id",
+      "mount": "/nodes",
+      "source": "apps/api/src/routes/v1/nodes.ts:239",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "invalidateDuplicateScan"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/nodes.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/nodes/{id}",
+      "slug": "get-api-v1-nodes-id",
+      "method": "GET",
+      "path": "/api/v1/nodes/{id}",
+      "express_path": "/api/v1/nodes/:id",
+      "mount": "/nodes",
+      "source": "apps/api/src/routes/v1/nodes.ts:189",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/nodes.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "PATCH /api/v1/nodes/{id}",
+      "slug": "patch-api-v1-nodes-id",
+      "method": "PATCH",
+      "path": "/api/v1/nodes/{id}",
+      "express_path": "/api/v1/nodes/:id",
+      "mount": "/nodes",
+      "source": "apps/api/src/routes/v1/nodes.ts:223",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "invalidateDuplicateScan"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/nodes.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/nodes/{id}/archive",
+      "slug": "post-api-v1-nodes-id-archive",
+      "method": "POST",
+      "path": "/api/v1/nodes/{id}/archive",
+      "express_path": "/api/v1/nodes/:id/archive",
+      "mount": "/nodes",
+      "source": "apps/api/src/routes/v1/nodes.ts:259",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "invalidateDuplicateScan"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/nodes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/nodes/{id}/restore",
+      "slug": "post-api-v1-nodes-id-restore",
+      "method": "POST",
+      "path": "/api/v1/nodes/{id}/restore",
+      "express_path": "/api/v1/nodes/:id/restore",
+      "mount": "/nodes",
+      "source": "apps/api/src/routes/v1/nodes.ts:249",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "invalidateDuplicateScan"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/nodes.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/nodes/{id}/revisions",
+      "slug": "get-api-v1-nodes-id-revisions",
+      "method": "GET",
+      "path": "/api/v1/nodes/{id}/revisions",
+      "express_path": "/api/v1/nodes/:id/revisions",
+      "mount": "/nodes",
+      "source": "apps/api/src/routes/v1/nodes.ts:271",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/nodes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/nodes/counts",
+      "slug": "get-api-v1-nodes-counts",
+      "method": "GET",
+      "path": "/api/v1/nodes/counts",
+      "express_path": "/api/v1/nodes/counts",
+      "mount": "/nodes",
+      "source": "apps/api/src/routes/v1/nodes.ts:79",
+      "summary": "Live node counts per type, the Collections tiles. FR-104: per-type aggregation counts instead of loading the whole collection to tally it.",
+      "requirements": [
+        "FR-104"
+      ],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/nodes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/orgs",
+      "slug": "get-api-v1-orgs",
+      "method": "GET",
+      "path": "/api/v1/orgs",
+      "express_path": "/api/v1/orgs",
+      "mount": "/orgs",
+      "source": "apps/api/src/routes/v1/orgs.ts:8",
+      "summary": "Organizations list with affinity + inroad counts (reference P: orgs).",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "orgsOverview"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/orgs.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/orgs/{id}",
+      "slug": "get-api-v1-orgs-id",
+      "method": "GET",
+      "path": "/api/v1/orgs/{id}",
+      "express_path": "/api/v1/orgs/:id",
+      "mount": "/orgs",
+      "source": "apps/api/src/routes/v1/orgs.ts:16",
+      "summary": "Org profile: affinity, ranked inroads, linked roles (reference P: org).",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "orgProfile"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/orgs.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/people",
+      "slug": "get-api-v1-people",
+      "method": "GET",
+      "path": "/api/v1/people",
+      "express_path": "/api/v1/people",
+      "mount": "/people",
+      "source": "apps/api/src/routes/v1/people.ts:10",
+      "summary": "People list with live tie-strengths (reference P: people).",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "peopleList"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/people.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/people/{id}/profile",
+      "slug": "get-api-v1-people-id-profile",
+      "method": "GET",
+      "path": "/api/v1/people/{id}/profile",
+      "express_path": "/api/v1/people/:id/profile",
+      "mount": "/people",
+      "source": "apps/api/src/routes/v1/people.ts:61",
+      "summary": "The records this person owns, grouped the way a CV reads. Distinct from `/summary`, which answers \"what is my relationship with them\". This answers \"what have they done\", and it is the surface that makes the imported profiles useful instead of merely present.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "personProfile"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/people.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/people/{id}/summary",
+      "slug": "get-api-v1-people-id-summary",
+      "method": "GET",
+      "path": "/api/v1/people/{id}/summary",
+      "express_path": "/api/v1/people/:id/summary",
+      "mount": "/people",
+      "source": "apps/api/src/routes/v1/people.ts:21",
+      "summary": "One-call person summary for the profile page: strength decomposition, relationship props (closeness/cadence/topics/met), and the favor ledger.",
+      "requirements": [
+        "FR-102",
+        "FR-CON-001"
+      ],
+      "request_schemas": [],
+      "services": [
+        "findKnowsEdge",
+        "loadGraph",
+        "personStrength"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/people.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/people/{personId}/favors",
+      "slug": "get-api-v1-people-personId-favors",
+      "method": "GET",
+      "path": "/api/v1/people/{personId}/favors",
+      "express_path": "/api/v1/people/:personId/favors",
+      "mount": "/people/:personId/favors",
+      "source": "apps/api/src/routes/v1/favors.ts:54",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/favors.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/people/{personId}/favors",
+      "slug": "post-api-v1-people-personId-favors",
+      "method": "POST",
+      "path": "/api/v1/people/{personId}/favors",
+      "express_path": "/api/v1/people/:personId/favors",
+      "mount": "/people/:personId/favors",
+      "source": "apps/api/src/routes/v1/favors.ts:68",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 201,
+      "errors": [
+        {
+          "status": 400,
+          "code": "BAD_REQUEST"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/favors.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "PATCH /api/v1/people/{personId}/favors/{favorId}",
+      "slug": "patch-api-v1-people-personId-favors-favorId",
+      "method": "PATCH",
+      "path": "/api/v1/people/{personId}/favors/{favorId}",
+      "express_path": "/api/v1/people/:personId/favors/:favorId",
+      "mount": "/people/:personId/favors",
+      "source": "apps/api/src/routes/v1/favors.ts:96",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/favors.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/places/registry",
+      "slug": "get-api-v1-places-registry",
+      "method": "GET",
+      "path": "/api/v1/places/registry",
+      "express_path": "/api/v1/places/registry",
+      "mount": "/places",
+      "source": "apps/api/src/routes/v1/places.ts:45",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "getPlaceRegistry"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/places.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/places/resolve",
+      "slug": "post-api-v1-places-resolve",
+      "method": "POST",
+      "path": "/api/v1/places/resolve",
+      "express_path": "/api/v1/places/resolve",
+      "mount": "/places",
+      "source": "apps/api/src/routes/v1/places.ts:60",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "upsertPlaceResolve"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 400,
+          "code": "BAD_REQUEST"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/places.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/places/reverse",
+      "slug": "get-api-v1-places-reverse",
+      "method": "GET",
+      "path": "/api/v1/places/reverse",
+      "express_path": "/api/v1/places/reverse",
+      "mount": "/places",
+      "source": "apps/api/src/routes/v1/places.ts:29",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "nominatimReverse"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 400,
+          "code": "BAD_REQUEST"
+        },
+        {
+          "status": 502,
+          "code": "GEOCODER_UNAVAILABLE"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/places.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/places/search",
+      "slug": "get-api-v1-places-search",
+      "method": "GET",
+      "path": "/api/v1/places/search",
+      "express_path": "/api/v1/places/search",
+      "mount": "/places",
+      "source": "apps/api/src/routes/v1/places.ts:13",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "nominatimSearch"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 502,
+          "code": "GEOCODER_UNAVAILABLE"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/places.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/places/suggest-merges",
+      "slug": "get-api-v1-places-suggest-merges",
+      "method": "GET",
+      "path": "/api/v1/places/suggest-merges",
+      "express_path": "/api/v1/places/suggest-merges",
+      "mount": "/places",
+      "source": "apps/api/src/routes/v1/places.ts:52",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "suggestMerges"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/places.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/reminders",
+      "slug": "get-api-v1-reminders",
+      "method": "GET",
+      "path": "/api/v1/reminders",
+      "express_path": "/api/v1/reminders",
+      "mount": "/reminders",
+      "source": "apps/api/src/routes/v1/reminders.ts:9",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/reminders.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/reminders/{id}/done",
+      "slug": "post-api-v1-reminders-id-done",
+      "method": "POST",
+      "path": "/api/v1/reminders/{id}/done",
+      "express_path": "/api/v1/reminders/:id/done",
+      "mount": "/reminders",
+      "source": "apps/api/src/routes/v1/reminders.ts:21",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/reminders.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/reminders/{id}/reopen",
+      "slug": "post-api-v1-reminders-id-reopen",
+      "method": "POST",
+      "path": "/api/v1/reminders/{id}/reopen",
+      "express_path": "/api/v1/reminders/:id/reopen",
+      "mount": "/reminders",
+      "source": "apps/api/src/routes/v1/reminders.ts:29",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/reminders.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/reminders/{id}/snooze",
+      "slug": "post-api-v1-reminders-id-snooze",
+      "method": "POST",
+      "path": "/api/v1/reminders/{id}/snooze",
+      "express_path": "/api/v1/reminders/:id/snooze",
+      "mount": "/reminders",
+      "source": "apps/api/src/routes/v1/reminders.ts:37",
+      "summary": null,
+      "requirements": [
+        "FR-025"
+      ],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/reminders.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/resumes",
+      "slug": "get-api-v1-resumes",
+      "method": "GET",
+      "path": "/api/v1/resumes",
+      "express_path": "/api/v1/resumes",
+      "mount": "/resumes",
+      "source": "apps/api/src/routes/v1/resumes.ts:1055",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "listTargets"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "DELETE /api/v1/resumes/{id}",
+      "slug": "delete-api-v1-resumes-id",
+      "method": "DELETE",
+      "path": "/api/v1/resumes/{id}",
+      "express_path": "/api/v1/resumes/:id",
+      "mount": "/resumes",
+      "source": "apps/api/src/routes/v1/resumes.ts:947",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/resumes/{id}",
+      "slug": "get-api-v1-resumes-id",
+      "method": "GET",
+      "path": "/api/v1/resumes/{id}",
+      "express_path": "/api/v1/resumes/:id",
+      "mount": "/resumes",
+      "source": "apps/api/src/routes/v1/resumes.ts:627",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "getTarget"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/resumes/{id}/artifacts/{kind}",
+      "slug": "get-api-v1-resumes-id-artifacts-kind",
+      "method": "GET",
+      "path": "/api/v1/resumes/{id}/artifacts/{kind}",
+      "express_path": "/api/v1/resumes/:id/artifacts/:kind",
+      "mount": "/resumes",
+      "source": "apps/api/src/routes/v1/resumes.ts:645",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        },
+        {
+          "status": 409,
+          "code": "ARTIFACT_UNAVAILABLE"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/resumes/{id}/duplicate",
+      "slug": "post-api-v1-resumes-id-duplicate",
+      "method": "POST",
+      "path": "/api/v1/resumes/{id}/duplicate",
+      "express_path": "/api/v1/resumes/:id/duplicate",
+      "mount": "/resumes",
+      "source": "apps/api/src/routes/v1/resumes.ts:909",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 201,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/resumes/{id}/mark-sent",
+      "slug": "post-api-v1-resumes-id-mark-sent",
+      "method": "POST",
+      "path": "/api/v1/resumes/{id}/mark-sent",
+      "express_path": "/api/v1/resumes/:id/mark-sent",
+      "mount": "/resumes",
+      "source": "apps/api/src/routes/v1/resumes.ts:999",
+      "summary": "Mark a résumé as sent → create/link an application node (SRS FR-RES-018). FR-011: `final` is an invariant, not a label. Only a résumé that passed the one-page and ≥95%-coverage gate at finalize time can be sent, otherwise a draft that failed those checks could become a real application. `sent` is also terminal: re-sending would spawn duplicate application nodes.",
+      "requirements": [
+        "FR-011",
+        "FR-RES-018"
+      ],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        },
+        {
+          "status": 409,
+          "code": "ALREADY_SENT"
+        },
+        {
+          "status": 409,
+          "code": "NOT_FINAL"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/resumes/{id}/reexport",
+      "slug": "post-api-v1-resumes-id-reexport",
+      "method": "POST",
+      "path": "/api/v1/resumes/{id}/reexport",
+      "express_path": "/api/v1/resumes/:id/reexport",
+      "mount": "/resumes",
+      "source": "apps/api/src/routes/v1/resumes.ts:680",
+      "summary": "Recompile a saved output and (re)upload PDF/TeX to Cloudinary (FR-RES-019 recovery). Older outputs finalized before storage was wired, or during a storage outage, keep their selection/config, this fills in private artifacts without a full Tailor pass. When the stored selection is empty (legacy seed rows), re-run tailor first.",
+      "requirements": [
+        "FR-RES-019"
+      ],
+      "request_schemas": [
+        "Date"
+      ],
+      "services": [
+        "buildFullModel",
+        "compileResume",
+        "getTarget",
+        "loadGraph",
+        "loadTemplate",
+        "tailor"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        },
+        {
+          "status": 503,
+          "code": "STORAGE_UNAVAILABLE"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/resumes/{id}/restore",
+      "slug": "post-api-v1-resumes-id-restore",
+      "method": "POST",
+      "path": "/api/v1/resumes/{id}/restore",
+      "express_path": "/api/v1/resumes/:id/restore",
+      "mount": "/resumes",
+      "source": "apps/api/src/routes/v1/resumes.ts:969",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/resumes/{id}/set-base",
+      "slug": "post-api-v1-resumes-id-set-base",
+      "method": "POST",
+      "path": "/api/v1/resumes/{id}/set-base",
+      "express_path": "/api/v1/resumes/:id/set-base",
+      "mount": "/resumes",
+      "source": "apps/api/src/routes/v1/resumes.ts:894",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        },
+        {
+          "status": 409,
+          "code": "NOT_FINAL"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/resumes/compile",
+      "slug": "post-api-v1-resumes-compile",
+      "method": "POST",
+      "path": "/api/v1/resumes/compile",
+      "express_path": "/api/v1/resumes/compile",
+      "mount": "/resumes",
+      "source": "apps/api/src/routes/v1/resumes.ts:236",
+      "summary": "Build the résumé model, render LaTeX, and compile (SRS FR-RES-011/012/013).",
+      "requirements": [
+        "FR-RES-011",
+        "FR-RES-012",
+        "FR-RES-013"
+      ],
+      "request_schemas": [
+        "Date"
+      ],
+      "services": [
+        "compileResume"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/resumes/finalize",
+      "slug": "post-api-v1-resumes-finalize",
+      "method": "POST",
+      "path": "/api/v1/resumes/finalize",
+      "express_path": "/api/v1/resumes/finalize",
+      "mount": "/resumes",
+      "source": "apps/api/src/routes/v1/resumes.ts:266",
+      "summary": "Finalize: one-page fit loop (FR-RES-014) + ≥95% coverage gate (FR-RES-015).",
+      "requirements": [
+        "FR-RES-014",
+        "FR-RES-015"
+      ],
+      "request_schemas": [
+        "Date"
+      ],
+      "services": [
+        "buildFullModel",
+        "compileResume",
+        "loadGraph",
+        "loadScorableAtoms"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/resumes/model",
+      "slug": "post-api-v1-resumes-model",
+      "method": "POST",
+      "path": "/api/v1/resumes/model",
+      "express_path": "/api/v1/resumes/model",
+      "mount": "/resumes",
+      "source": "apps/api/src/routes/v1/resumes.ts:226",
+      "summary": "Assemble the résumé model for the visual editor, no LaTeX, no compile.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/resumes/overview",
+      "slug": "get-api-v1-resumes-overview",
+      "method": "GET",
+      "path": "/api/v1/resumes/overview",
+      "express_path": "/api/v1/resumes/overview",
+      "mount": "/resumes",
+      "source": "apps/api/src/routes/v1/resumes.ts:577",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/resumes/tailor",
+      "slug": "post-api-v1-resumes-tailor",
+      "method": "POST",
+      "path": "/api/v1/resumes/tailor",
+      "express_path": "/api/v1/resumes/tailor",
+      "mount": "/resumes",
+      "source": "apps/api/src/routes/v1/resumes.ts:138",
+      "summary": "Score atoms + select to the page budget, auto (knapsack) or manual (SRS FR-RES-007/008/009).",
+      "requirements": [
+        "FR-RES-007",
+        "FR-RES-008",
+        "FR-RES-009"
+      ],
+      "request_schemas": [],
+      "services": [
+        "tailor"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 400,
+          "code": "BAD_REQUEST"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/resumes/templates",
+      "slug": "get-api-v1-resumes-templates",
+      "method": "GET",
+      "path": "/api/v1/resumes/templates",
+      "express_path": "/api/v1/resumes/templates",
+      "mount": "/resumes",
+      "source": "apps/api/src/routes/v1/resumes.ts:106",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "getSettings",
+        "listTemplates"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "PATCH /api/v1/resumes/templates/default",
+      "slug": "patch-api-v1-resumes-templates-default",
+      "method": "PATCH",
+      "path": "/api/v1/resumes/templates/default",
+      "express_path": "/api/v1/resumes/templates/default",
+      "mount": "/resumes",
+      "source": "apps/api/src/routes/v1/resumes.ts:123",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "getSettings",
+        "listTemplates",
+        "patchSettings"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 422,
+          "code": "VALIDATION"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/resumes.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/retention/preview",
+      "slug": "get-api-v1-retention-preview",
+      "method": "GET",
+      "path": "/api/v1/retention/preview",
+      "express_path": "/api/v1/retention/preview",
+      "mount": "/retention",
+      "source": "apps/api/src/routes/v1/retention.ts:9",
+      "summary": "What the next purge would remove (FR-006), powers the Trash retention notice.",
+      "requirements": [
+        "FR-006"
+      ],
+      "request_schemas": [],
+      "services": [
+        "purgeExpiredTrash"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/retention.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/retention/purge",
+      "slug": "post-api-v1-retention-purge",
+      "method": "POST",
+      "path": "/api/v1/retention/purge",
+      "express_path": "/api/v1/retention/purge",
+      "mount": "/retention",
+      "source": "apps/api/src/routes/v1/retention.ts:18",
+      "summary": "Purge on demand. Idempotent; the scheduler calls the same code path.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "purgeExpiredTrash"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/retention.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/search",
+      "slug": "get-api-v1-search",
+      "method": "GET",
+      "path": "/api/v1/search",
+      "express_path": "/api/v1/search",
+      "mount": "/search",
+      "source": "apps/api/src/routes/v1/search.ts:11",
+      "summary": "Unified FTS + filter grammar (SRS FR-SRCH-001/002/003).",
+      "requirements": [
+        "FR-SRCH-001",
+        "FR-SRCH-002",
+        "FR-SRCH-003"
+      ],
+      "request_schemas": [],
+      "services": [
+        "buildOwnerIndex",
+        "loadGraph"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/search.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/search/switch",
+      "slug": "get-api-v1-search-switch",
+      "method": "GET",
+      "path": "/api/v1/search/switch",
+      "express_path": "/api/v1/search/switch",
+      "mount": "/search",
+      "source": "apps/api/src/routes/v1/search.ts:43",
+      "summary": "⌘P fuzzy quick-switcher (SRS FR-SRCH-004).",
+      "requirements": [
+        "FR-SRCH-004"
+      ],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/search.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/settings",
+      "slug": "get-api-v1-settings",
+      "method": "GET",
+      "path": "/api/v1/settings",
+      "express_path": "/api/v1/settings",
+      "mount": "/settings",
+      "source": "apps/api/src/routes/v1/settings.ts:8",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "getSettings",
+        "publicSettings"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/settings.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "PATCH /api/v1/settings",
+      "slug": "patch-api-v1-settings",
+      "method": "PATCH",
+      "path": "/api/v1/settings",
+      "express_path": "/api/v1/settings",
+      "mount": "/settings",
+      "source": "apps/api/src/routes/v1/settings.ts:15",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "patchSettings",
+        "publicSettings"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 400,
+          "code": "BAD_REQUEST"
+        },
+        {
+          "status": 422,
+          "code": "VALIDATION"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/settings.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "DELETE /api/v1/settings/github-token",
+      "slug": "delete-api-v1-settings-github-token",
+      "method": "DELETE",
+      "path": "/api/v1/settings/github-token",
+      "express_path": "/api/v1/settings/github-token",
+      "mount": "/settings",
+      "source": "apps/api/src/routes/v1/settings.ts:72",
+      "summary": "Disconnect GitHub: drop the credential, keep the imported records.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "deleteSecret",
+        "patchSettings"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/settings.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/settings/github-token",
+      "slug": "post-api-v1-settings-github-token",
+      "method": "POST",
+      "path": "/api/v1/settings/github-token",
+      "express_path": "/api/v1/settings/github-token",
+      "mount": "/settings",
+      "source": "apps/api/src/routes/v1/settings.ts:54",
+      "summary": "Write-only PAT endpoint. The token goes to the secret store, never into application data (FR-004). When the deployment injects GITHUB_PAT from a secret manager the store is read-only and rotation belongs there, so this returns 409 rather than keeping a second, divergent copy.",
+      "requirements": [
+        "FR-004"
+      ],
+      "request_schemas": [],
+      "services": [
+        "patchSettings",
+        "setSecret"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 400,
+          "code": "BAD_REQUEST"
+        },
+        {
+          "status": 409,
+          "code": "SECRET_READ_ONLY"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/settings.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/status",
+      "slug": "get-api-v1-status",
+      "method": "GET",
+      "path": "/api/v1/status",
+      "express_path": "/api/v1/status",
+      "mount": "/status",
+      "source": "apps/api/src/routes/v1/status.ts:18",
+      "summary": "/status health page (SRS FR-SET-006): DB, storage, build-svc, counts. FR-005: counts come from aggregate queries, not from loading both tables. The Shell polls this every 60s, so the original implementation read the entire database once a minute per open client, at the stated ceiling, ~300k documents/minute.",
+      "requirements": [
+        "FR-005",
+        "FR-SET-006"
+      ],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/status.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/suggest/values",
+      "slug": "get-api-v1-suggest-values",
+      "method": "GET",
+      "path": "/api/v1/suggest/values",
+      "express_path": "/api/v1/suggest/values",
+      "mount": "/suggest",
+      "source": "apps/api/src/routes/v1/suggest.ts:24",
+      "summary": "Existing values for a form field (FR-CAP-003). Two sources: ?kind=city a curated pool that crosses types ?type=organization&prop=industry this field's own previous values The second needs no curation, so every text field in the app gets suggestions without anything being wired per field. `type` may name a node or an edge type, the vocabularies are disjoint (`organization` vs `KNOWS`), so one parameter is unambiguous. An unrecognised kind, or a field nothing has been typed into yet, returns an empty list rather than an error: that is the ordinary first case, and the input has to stay usable regardless. Scanning and caching live in services/suggest.ts, this route only parses.",
+      "requirements": [
+        "FR-CAP-003"
+      ],
+      "request_schemas": [],
+      "services": [
+        "isSuggestKind",
+        "suggestValues"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/suggest.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/targets",
+      "slug": "get-api-v1-targets",
+      "method": "GET",
+      "path": "/api/v1/targets",
+      "express_path": "/api/v1/targets",
+      "mount": "/targets",
+      "source": "apps/api/src/routes/v1/targets.ts:18",
+      "summary": "All targets, newest activity first, the Tailor's session list.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "listTargets"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/targets.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/targets",
+      "slug": "post-api-v1-targets",
+      "method": "POST",
+      "path": "/api/v1/targets",
+      "express_path": "/api/v1/targets",
+      "mount": "/targets",
+      "source": "apps/api/src/routes/v1/targets.ts:36",
+      "summary": "Paste a JD → parsed weighted keywords (SRS FR-RES-005).",
+      "requirements": [
+        "FR-RES-005"
+      ],
+      "request_schemas": [
+        "targetCreateSchema"
+      ],
+      "services": [
+        "createTarget"
+      ],
+      "success_status": 201,
+      "errors": [
+        {
+          "status": 422,
+          "code": "VALIDATION"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/targets.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "DELETE /api/v1/targets/{id}",
+      "slug": "delete-api-v1-targets-id",
+      "method": "DELETE",
+      "path": "/api/v1/targets/{id}",
+      "express_path": "/api/v1/targets/:id",
+      "mount": "/targets",
+      "source": "apps/api/src/routes/v1/targets.ts:111",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "getTarget",
+        "setTargetDeleted"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/targets.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/targets/{id}",
+      "slug": "get-api-v1-targets-id",
+      "method": "GET",
+      "path": "/api/v1/targets/{id}",
+      "express_path": "/api/v1/targets/:id",
+      "mount": "/targets",
+      "source": "apps/api/src/routes/v1/targets.ts:67",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "getTarget"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/targets.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "PATCH /api/v1/targets/{id}",
+      "slug": "patch-api-v1-targets-id",
+      "method": "PATCH",
+      "path": "/api/v1/targets/{id}",
+      "express_path": "/api/v1/targets/:id",
+      "mount": "/targets",
+      "source": "apps/api/src/routes/v1/targets.ts:47",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [
+        "targetCreateSchema"
+      ],
+      "services": [
+        "getTarget",
+        "updateTarget"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        },
+        {
+          "status": 422,
+          "code": "VALIDATION"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/targets.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "PATCH /api/v1/targets/{id}/draft",
+      "slug": "patch-api-v1-targets-id-draft",
+      "method": "PATCH",
+      "path": "/api/v1/targets/{id}/draft",
+      "express_path": "/api/v1/targets/:id/draft",
+      "mount": "/targets",
+      "source": "apps/api/src/routes/v1/targets.ts:77",
+      "summary": "Save the Tailor workspace draft (mode, selection, section config…).",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "getTarget",
+        "updateTargetDraft"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 400,
+          "code": "BAD_REQUEST"
+        },
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/targets.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "PATCH /api/v1/targets/{id}/keywords",
+      "slug": "patch-api-v1-targets-id-keywords",
+      "method": "PATCH",
+      "path": "/api/v1/targets/{id}/keywords",
+      "express_path": "/api/v1/targets/:id/keywords",
+      "mount": "/targets",
+      "source": "apps/api/src/routes/v1/targets.ts:91",
+      "summary": "Edit the parsed keyword set (add/remove/reweight: SRS FR-RES-006).",
+      "requirements": [
+        "FR-RES-006"
+      ],
+      "request_schemas": [
+        "parsedJdSchema"
+      ],
+      "services": [
+        "updateTargetKeywords"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 422,
+          "code": "VALIDATION"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/targets.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/targets/{id}/restore",
+      "slug": "post-api-v1-targets-id-restore",
+      "method": "POST",
+      "path": "/api/v1/targets/{id}/restore",
+      "express_path": "/api/v1/targets/:id/restore",
+      "mount": "/targets",
+      "source": "apps/api/src/routes/v1/targets.ts:121",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "getTarget",
+        "setTargetDeleted"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/targets.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/timeline",
+      "slug": "get-api-v1-timeline",
+      "method": "GET",
+      "path": "/api/v1/timeline",
+      "express_path": "/api/v1/timeline",
+      "mount": "/timeline",
+      "source": "apps/api/src/routes/v1/explore.ts:45",
+      "summary": "Multi-lane timeline (reference P: timeline).",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "timelineView"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/explore.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/timeline/review",
+      "slug": "get-api-v1-timeline-review",
+      "method": "GET",
+      "path": "/api/v1/timeline/review",
+      "express_path": "/api/v1/timeline/review",
+      "mount": "/timeline",
+      "source": "apps/api/src/routes/v1/explore.ts:53",
+      "summary": "Brush → review digest. ?from=YYYY-MM-DD&to=YYYY-MM-DD",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "timelineReview"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/explore.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/views",
+      "slug": "get-api-v1-views",
+      "method": "GET",
+      "path": "/api/v1/views",
+      "express_path": "/api/v1/views",
+      "mount": "/views",
+      "source": "apps/api/src/routes/v1/views.ts:15",
+      "summary": "Saved views, named filter queries pinned to the nav (SRS FR-ORG-005).",
+      "requirements": [
+        "FR-ORG-005"
+      ],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/views.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/views",
+      "slug": "post-api-v1-views",
+      "method": "POST",
+      "path": "/api/v1/views",
+      "express_path": "/api/v1/views",
+      "mount": "/views",
+      "source": "apps/api/src/routes/v1/views.ts:24",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [
+        "createSchema"
+      ],
+      "services": [],
+      "success_status": 201,
+      "errors": [
+        {
+          "status": 400,
+          "code": "INVALID"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/views.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "DELETE /api/v1/views/{id}",
+      "slug": "delete-api-v1-views-id",
+      "method": "DELETE",
+      "path": "/api/v1/views/{id}",
+      "express_path": "/api/v1/views/:id",
+      "mount": "/views",
+      "source": "apps/api/src/routes/v1/views.ts:35",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/views.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /health",
+      "slug": "get-health",
+      "method": "GET",
+      "path": "/health",
+      "express_path": "/health",
+      "mount": null,
+      "source": "apps/api/src/app.ts:58",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "outside-auth-gate",
+      "entitlement": "outside-entitlement-gate",
+      "handler": "livenessHandler",
+      "handler_source": "apps/api/src/middleware/health.ts",
+      "tests": [],
+      "openapi": true
+    },
+    {
+      "id": "GET /ready",
+      "slug": "get-ready",
+      "method": "GET",
+      "path": "/ready",
+      "express_path": "/ready",
+      "mount": null,
+      "source": "apps/api/src/app.ts:59",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "outside-auth-gate",
+      "entitlement": "outside-entitlement-gate",
+      "handler": "readinessHandler",
+      "handler_source": "apps/api/src/middleware/health.ts",
+      "tests": [],
+      "openapi": false
+    },
+    {
+      "id": "POST /webhooks/paddle",
+      "slug": "post-webhooks-paddle",
+      "method": "POST",
+      "path": "/webhooks/paddle",
+      "express_path": "/webhooks/paddle",
+      "mount": null,
+      "source": "apps/api/src/app.ts:50",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "outside-auth-gate",
+      "entitlement": "outside-entitlement-gate",
+      "handler": "paddleWebhookHandler",
+      "handler_source": "apps/api/src/routes/webhooks/paddle.ts",
+      "tests": [],
+      "openapi": true
+    }
+  ],
+  "undocumented_in_openapi": [
+    "GET /api/v1/ask/history",
+    "POST /api/v1/ask/people",
+    "GET /api/v1/ask/people/{id}/strength",
+    "GET /api/v1/ask/reconnect",
+    "POST /api/v1/atoms",
+    "DELETE /api/v1/atoms/{id}",
+    "PATCH /api/v1/atoms/{id}",
+    "POST /api/v1/atoms/{id}/duplicate",
+    "POST /api/v1/atoms/{id}/restore",
+    "POST /api/v1/composer/draft",
+    "POST /api/v1/composer/send",
+    "GET /api/v1/duplicates/aliases",
+    "DELETE /api/v1/duplicates/aliases/{id}",
+    "POST /api/v1/duplicates/check",
+    "POST /api/v1/duplicates/dismiss",
+    "POST /api/v1/duplicates/merge",
+    "GET /api/v1/duplicates/merges",
+    "POST /api/v1/duplicates/merges/{id}/undo",
+    "POST /api/v1/duplicates/rescan",
+    "GET /api/v1/edges/{id}",
+    "POST /api/v1/edges/{id}/restore",
+    "GET /api/v1/export/status",
+    "GET /api/v1/export/views/{id}.csv",
+    "GET /api/v1/graph/path",
+    "POST /api/v1/habits",
+    "POST /api/v1/habits/{id}/toggle",
+    "POST /api/v1/imports",
+    "GET /api/v1/imports/{id}",
+    "POST /api/v1/imports/{id}/commit",
+    "POST /api/v1/imports/{id}/discard",
+    "POST /api/v1/imports/{id}/rollback",
+    "PATCH /api/v1/imports/{id}/rows/{rowId}",
+    "POST /api/v1/imports/github/sync",
+    "POST /api/v1/interactions",
+    "DELETE /api/v1/interactions/{id}",
+    "GET /api/v1/intros/paths",
+    "GET /api/v1/intros/targets",
+    "POST /api/v1/letters",
+    "DELETE /api/v1/letters/{id}",
+    "GET /api/v1/letters/{id}",
+    "PATCH /api/v1/letters/{id}",
+    "POST /api/v1/letters/{id}/restore",
+    "GET /api/v1/metrics",
+    "POST /api/v1/nodes/{id}/archive",
+    "GET /api/v1/nodes/{id}/revisions",
+    "GET /api/v1/nodes/counts",
+    "GET /api/v1/orgs/{id}",
+    "GET /api/v1/people/{id}/profile",
+    "GET /api/v1/people/{id}/summary",
+    "POST /api/v1/people/{personId}/favors",
+    "PATCH /api/v1/people/{personId}/favors/{favorId}",
+    "GET /api/v1/places/registry",
+    "POST /api/v1/places/resolve",
+    "GET /api/v1/places/reverse",
+    "GET /api/v1/places/search",
+    "GET /api/v1/places/suggest-merges",
+    "POST /api/v1/reminders/{id}/done",
+    "POST /api/v1/reminders/{id}/reopen",
+    "POST /api/v1/reminders/{id}/snooze",
+    "DELETE /api/v1/resumes/{id}",
+    "GET /api/v1/resumes/{id}",
+    "GET /api/v1/resumes/{id}/artifacts/{kind}",
+    "POST /api/v1/resumes/{id}/duplicate",
+    "POST /api/v1/resumes/{id}/mark-sent",
+    "POST /api/v1/resumes/{id}/reexport",
+    "POST /api/v1/resumes/{id}/restore",
+    "POST /api/v1/resumes/{id}/set-base",
+    "POST /api/v1/resumes/compile",
+    "POST /api/v1/resumes/finalize",
+    "POST /api/v1/resumes/model",
+    "GET /api/v1/resumes/overview",
+    "POST /api/v1/resumes/tailor",
+    "GET /api/v1/resumes/templates",
+    "PATCH /api/v1/resumes/templates/default",
+    "PATCH /api/v1/settings",
+    "DELETE /api/v1/settings/github-token",
+    "POST /api/v1/settings/github-token",
+    "GET /api/v1/suggest/values",
+    "POST /api/v1/targets",
+    "DELETE /api/v1/targets/{id}",
+    "GET /api/v1/targets/{id}",
+    "PATCH /api/v1/targets/{id}",
+    "PATCH /api/v1/targets/{id}/draft",
+    "PATCH /api/v1/targets/{id}/keywords",
+    "POST /api/v1/targets/{id}/restore",
+    "GET /api/v1/timeline/review",
+    "POST /api/v1/views",
+    "DELETE /api/v1/views/{id}",
+    "GET /ready"
+  ],
+  "documented_but_not_registered": [
+    "GET /ask",
+    "GET /composer",
+    "GET /interactions",
+    "GET /intros",
+    "GET /places",
+    "GET /suggest"
+  ]
+}

@@ -1,0 +1,702 @@
+{
+  "packages": [
+    {
+      "name": "@vitae/api",
+      "dir": "apps/api",
+      "description": "Vitae REST API: Express + Postgres, /api/v1.",
+      "version": "1.0.0",
+      "private": true,
+      "type": "module",
+      "entry": "dist/index.js",
+      "scripts": [
+        "audit:graph",
+        "backfill:subjects",
+        "dev",
+        "export:bundle",
+        "load:bundle",
+        "migrate",
+        "openapi",
+        "purge",
+        "restore",
+        "seed",
+        "seed:demo",
+        "start",
+        "test",
+        "tidy:import",
+        "typecheck"
+      ],
+      "missing_fleet_scripts": [
+        "build",
+        "lint"
+      ],
+      "depends_on": [
+        "@vitae/config",
+        "@vitae/core"
+      ],
+      "dev_depends_on": [
+        "@vitae/testkit"
+      ],
+      "external_dependencies": [
+        {
+          "name": "archiver",
+          "range": "^7.0.1"
+        },
+        {
+          "name": "cloudinary",
+          "range": "^2.5.1"
+        },
+        {
+          "name": "cookie-parser",
+          "range": "^1.4.7"
+        },
+        {
+          "name": "cors",
+          "range": "^2.8.5"
+        },
+        {
+          "name": "dotenv",
+          "range": "^16.4.7"
+        },
+        {
+          "name": "express",
+          "range": "^4.21.2"
+        },
+        {
+          "name": "firebase-admin",
+          "range": "^13.0.2"
+        },
+        {
+          "name": "flexsearch",
+          "range": "^0.7.43"
+        },
+        {
+          "name": "helmet",
+          "range": "^8.0.0"
+        },
+        {
+          "name": "jsonwebtoken",
+          "range": "^9.0.2"
+        },
+        {
+          "name": "kysely",
+          "range": "^0.29.4"
+        },
+        {
+          "name": "openapi3-ts",
+          "range": "4.6.1"
+        },
+        {
+          "name": "pg",
+          "range": "^8.22.0"
+        },
+        {
+          "name": "tsx",
+          "range": "^4.19.2"
+        },
+        {
+          "name": "uuid",
+          "range": "^11.0.5"
+        },
+        {
+          "name": "zod",
+          "range": "^3.24.1"
+        }
+      ],
+      "source_files": 106,
+      "test_files": 52,
+      "source_lines": 19539,
+      "exports": 366,
+      "dependents": [],
+      "imported_by": [],
+      "unused_manifest_deps": [],
+      "undeclared_imports": [],
+      "workspace_typecheck": "direct",
+      "layer": 1
+    },
+    {
+      "name": "@vitae/web",
+      "dir": "apps/web",
+      "description": "Vitae web app: React 18 + Vite SPA.",
+      "version": "1.0.0",
+      "private": true,
+      "type": "module",
+      "entry": null,
+      "scripts": [
+        "build",
+        "dev",
+        "preview",
+        "test",
+        "typecheck"
+      ],
+      "missing_fleet_scripts": [
+        "lint"
+      ],
+      "depends_on": [
+        "@vitae/core",
+        "@vitae/ui"
+      ],
+      "dev_depends_on": [],
+      "external_dependencies": [
+        {
+          "name": "@antv/g6",
+          "range": "5.1.1"
+        },
+        {
+          "name": "@fontsource-variable/instrument-sans",
+          "range": "^5.2.8"
+        },
+        {
+          "name": "@fontsource/ibm-plex-mono",
+          "range": "^5.2.7"
+        },
+        {
+          "name": "@fontsource/ibm-plex-sans",
+          "range": "^5.2.8"
+        },
+        {
+          "name": "@fontsource/source-serif-4",
+          "range": "^5.2.9"
+        },
+        {
+          "name": "@fontsource/space-grotesk",
+          "range": "^5.2.10"
+        },
+        {
+          "name": "@hookform/resolvers",
+          "range": "^5.4.0"
+        },
+        {
+          "name": "@paddle/paddle-js",
+          "range": "^1.6.4"
+        },
+        {
+          "name": "@tanstack/react-query",
+          "range": "^5.62.11"
+        },
+        {
+          "name": "firebase",
+          "range": "^12.16.0"
+        },
+        {
+          "name": "maplibre-gl",
+          "range": "^6.0.0"
+        },
+        {
+          "name": "motion",
+          "range": "^12.42.2"
+        },
+        {
+          "name": "react",
+          "range": "^19.2.8"
+        },
+        {
+          "name": "react-dom",
+          "range": "^19.2.8"
+        },
+        {
+          "name": "react-force-graph-2d",
+          "range": "^1.29.1"
+        },
+        {
+          "name": "react-hook-form",
+          "range": "^7.81.0"
+        },
+        {
+          "name": "react-router-dom",
+          "range": "^6.28.1"
+        },
+        {
+          "name": "zod",
+          "range": "^3.24.1"
+        }
+      ],
+      "source_files": 157,
+      "test_files": 146,
+      "source_lines": 41720,
+      "exports": 635,
+      "dependents": [],
+      "imported_by": [],
+      "unused_manifest_deps": [],
+      "undeclared_imports": [],
+      "workspace_typecheck": "direct",
+      "layer": 1
+    },
+    {
+      "name": "@vitae/config",
+      "dir": "packages/config",
+      "description": null,
+      "version": "1.0.0",
+      "private": true,
+      "type": "module",
+      "entry": {
+        "./env": "./src/env.ts"
+      },
+      "scripts": [],
+      "missing_fleet_scripts": [
+        "typecheck",
+        "test",
+        "build",
+        "lint"
+      ],
+      "depends_on": [],
+      "dev_depends_on": [],
+      "external_dependencies": [
+        {
+          "name": "zod",
+          "range": "^3.24.1"
+        }
+      ],
+      "source_files": 1,
+      "test_files": 0,
+      "source_lines": 166,
+      "exports": 3,
+      "dependents": [
+        "@vitae/api"
+      ],
+      "imported_by": [
+        "@vitae/api"
+      ],
+      "unused_manifest_deps": [],
+      "undeclared_imports": [],
+      "workspace_typecheck": "transitive",
+      "layer": 0
+    },
+    {
+      "name": "@vitae/core",
+      "dir": "packages/core",
+      "description": "Shared domain: Zod schemas + the deterministic §10.7 algorithms.",
+      "version": "1.0.0",
+      "private": true,
+      "type": "module",
+      "entry": "./src/index.ts",
+      "scripts": [
+        "build",
+        "test",
+        "test:mutation",
+        "test:watch",
+        "typecheck"
+      ],
+      "missing_fleet_scripts": [
+        "lint"
+      ],
+      "depends_on": [],
+      "dev_depends_on": [],
+      "external_dependencies": [
+        {
+          "name": "zod",
+          "range": "^3.24.1"
+        }
+      ],
+      "source_files": 46,
+      "test_files": 42,
+      "source_lines": 8246,
+      "exports": 430,
+      "dependents": [
+        "@vitae/api",
+        "@vitae/web",
+        "@vitae/testkit"
+      ],
+      "imported_by": [
+        "@vitae/api",
+        "@vitae/testkit",
+        "@vitae/web"
+      ],
+      "unused_manifest_deps": [],
+      "undeclared_imports": [],
+      "workspace_typecheck": "direct",
+      "layer": 0
+    },
+    {
+      "name": "@vitae/testkit",
+      "dir": "packages/testkit",
+      "description": "Shared deterministic factories, clocks, and fixtures for Vitae tests.",
+      "version": "1.0.0",
+      "private": true,
+      "type": "module",
+      "entry": {
+        ".": "./src/index.ts",
+        "./clock": "./src/clock.ts",
+        "./ids": "./src/ids.ts",
+        "./factories": "./src/factories.ts"
+      },
+      "scripts": [
+        "test",
+        "typecheck"
+      ],
+      "missing_fleet_scripts": [
+        "build",
+        "lint"
+      ],
+      "depends_on": [
+        "@vitae/core"
+      ],
+      "dev_depends_on": [],
+      "external_dependencies": [],
+      "source_files": 5,
+      "test_files": 2,
+      "source_lines": 187,
+      "exports": 15,
+      "dependents": [
+        "@vitae/api"
+      ],
+      "imported_by": [
+        "@vitae/api"
+      ],
+      "unused_manifest_deps": [],
+      "undeclared_imports": [],
+      "workspace_typecheck": "direct",
+      "layer": 1
+    },
+    {
+      "name": "@vitae/ui",
+      "dir": "packages/ui",
+      "description": "Vitae design system: tokens, primitives, and entity glyphs.",
+      "version": "1.0.0",
+      "private": true,
+      "type": "module",
+      "entry": {
+        ".": "./src/index.ts",
+        "./styles/tokens.css": "./src/styles/tokens.css",
+        "./styles/base.css": "./src/styles/base.css",
+        "./styles/components.css": "./src/styles/components.css",
+        "./styles/layout.css": "./src/styles/layout.css",
+        "./styles/toast.css": "./src/styles/toast.css"
+      },
+      "scripts": [
+        "test",
+        "typecheck"
+      ],
+      "missing_fleet_scripts": [
+        "build",
+        "lint"
+      ],
+      "depends_on": [],
+      "dev_depends_on": [],
+      "external_dependencies": [
+        {
+          "name": "@radix-ui/react-checkbox",
+          "range": "^1.3.7"
+        },
+        {
+          "name": "@radix-ui/react-dialog",
+          "range": "^1.1.19"
+        },
+        {
+          "name": "@radix-ui/react-dropdown-menu",
+          "range": "^2.1.20"
+        },
+        {
+          "name": "@radix-ui/react-popover",
+          "range": "^1.1.19"
+        },
+        {
+          "name": "@radix-ui/react-select",
+          "range": "^2.3.3"
+        },
+        {
+          "name": "@radix-ui/react-toast",
+          "range": "^1.2.23"
+        },
+        {
+          "name": "@radix-ui/react-tooltip",
+          "range": "^1.2.12"
+        },
+        {
+          "name": "class-variance-authority",
+          "range": "^0.7.1"
+        },
+        {
+          "name": "clsx",
+          "range": "^2.1.1"
+        },
+        {
+          "name": "tailwind-merge",
+          "range": "^3.3.1"
+        }
+      ],
+      "source_files": 15,
+      "test_files": 9,
+      "source_lines": 3801,
+      "exports": 156,
+      "dependents": [
+        "@vitae/web"
+      ],
+      "imported_by": [
+        "@vitae/web"
+      ],
+      "unused_manifest_deps": [],
+      "undeclared_imports": [],
+      "workspace_typecheck": "direct",
+      "layer": 0
+    },
+    {
+      "name": "@vitae/buildsvc",
+      "dir": "services/buildsvc",
+      "description": "Vitae LaTeX build service: Tectonic + poppler, HMAC-gated, no egress.",
+      "version": "1.0.0",
+      "private": true,
+      "type": "module",
+      "entry": null,
+      "scripts": [
+        "build",
+        "calibrate",
+        "start"
+      ],
+      "missing_fleet_scripts": [
+        "typecheck",
+        "test",
+        "lint"
+      ],
+      "depends_on": [],
+      "dev_depends_on": [],
+      "external_dependencies": [
+        {
+          "name": "express",
+          "range": "^4.21.2"
+        }
+      ],
+      "source_files": 2,
+      "test_files": 0,
+      "source_lines": 470,
+      "exports": 0,
+      "dependents": [],
+      "imported_by": [],
+      "unused_manifest_deps": [],
+      "undeclared_imports": [],
+      "workspace_typecheck": "none",
+      "layer": 0
+    },
+    {
+      "name": "@vitae/e2e",
+      "dir": "e2e",
+      "description": null,
+      "version": "1.0.0",
+      "private": true,
+      "type": "module",
+      "entry": null,
+      "scripts": [
+        "install-browsers",
+        "test"
+      ],
+      "missing_fleet_scripts": [
+        "typecheck",
+        "build",
+        "lint"
+      ],
+      "depends_on": [],
+      "dev_depends_on": [],
+      "external_dependencies": [],
+      "source_files": 0,
+      "test_files": 52,
+      "source_lines": 0,
+      "exports": 0,
+      "dependents": [],
+      "imported_by": [],
+      "unused_manifest_deps": [],
+      "undeclared_imports": [],
+      "workspace_typecheck": "none",
+      "layer": 0
+    }
+  ],
+  "side_effect_imports": [
+    {
+      "file": "apps/api/src/scripts/audit-graph.ts",
+      "imports": [
+        "../env.js"
+      ]
+    },
+    {
+      "file": "apps/api/src/scripts/backfill-subjects.ts",
+      "imports": [
+        "../env.js"
+      ]
+    },
+    {
+      "file": "apps/api/src/scripts/commit-aperture-bundle.ts",
+      "imports": [
+        "../env.js"
+      ]
+    },
+    {
+      "file": "apps/api/src/scripts/export-bundle.ts",
+      "imports": [
+        "../env.js"
+      ]
+    },
+    {
+      "file": "apps/api/src/scripts/load-bundle.ts",
+      "imports": [
+        "../env.js"
+      ]
+    },
+    {
+      "file": "apps/api/src/scripts/migrate.ts",
+      "imports": [
+        "../env.js"
+      ]
+    },
+    {
+      "file": "apps/api/src/scripts/probe-resume.ts",
+      "imports": [
+        "../env.js"
+      ]
+    },
+    {
+      "file": "apps/api/src/scripts/purge.ts",
+      "imports": [
+        "../env.js"
+      ]
+    },
+    {
+      "file": "apps/api/src/scripts/restore.ts",
+      "imports": [
+        "../env.js"
+      ]
+    },
+    {
+      "file": "apps/api/src/scripts/seed-demo.ts",
+      "imports": [
+        "../env.js"
+      ]
+    },
+    {
+      "file": "apps/api/src/scripts/seed.ts",
+      "imports": [
+        "../env.js"
+      ]
+    },
+    {
+      "file": "apps/api/src/scripts/tidy-import.ts",
+      "imports": [
+        "../env.js"
+      ]
+    },
+    {
+      "file": "apps/web/src/components/BulkBar.tsx",
+      "imports": [
+        "../styles/bulk-bar.css"
+      ]
+    },
+    {
+      "file": "apps/web/src/features/map/AtlasCanvas.tsx",
+      "imports": [
+        "maplibre-gl/dist/maplibre-gl.css"
+      ]
+    },
+    {
+      "file": "apps/web/src/main.tsx",
+      "imports": [
+        "@fontsource-variable/instrument-sans",
+        "@fontsource/ibm-plex-sans/400.css",
+        "@fontsource/ibm-plex-sans/500.css",
+        "@fontsource/ibm-plex-sans/600.css",
+        "@fontsource/ibm-plex-sans/700.css",
+        "@fontsource/ibm-plex-mono/400.css",
+        "@fontsource/ibm-plex-mono/500.css",
+        "@fontsource/ibm-plex-mono/600.css",
+        "@fontsource/source-serif-4/400.css",
+        "@fontsource/source-serif-4/600.css",
+        "@fontsource/source-serif-4/400-italic.css",
+        "./styles/theme.css",
+        "@vitae/ui/styles/tokens.css",
+        "@vitae/ui/styles/base.css",
+        "@vitae/ui/styles/components.css",
+        "@vitae/ui/styles/layout.css",
+        "@vitae/ui/styles/toast.css",
+        "./styles/app.css",
+        "./styles/network.css",
+        "./styles/dedup.css",
+        "./styles/data-workspace.css",
+        "./styles/explore-workspace.css",
+        "./styles/tailor.css",
+        "./styles/browse.css",
+        "./styles/data-tools.css",
+        "./styles/resume-paper.css",
+        "./styles/marketing.css"
+      ]
+    },
+    {
+      "file": "apps/web/src/routes/reference/EntityCatalog.tsx",
+      "imports": [
+        "../../styles/entity-catalog-print.css",
+        "../../styles/entity-observatory.css"
+      ]
+    },
+    {
+      "file": "apps/web/src/test/setup.ts",
+      "imports": [
+        "@testing-library/jest-dom/vitest"
+      ]
+    },
+    {
+      "file": "apps/web/src/test/vitest-axe.d.ts",
+      "imports": [
+        "vitest"
+      ]
+    },
+    {
+      "file": "packages/ui/src/test/setup.ts",
+      "imports": [
+        "@testing-library/jest-dom/vitest"
+      ]
+    }
+  ],
+  "summary": {
+    "packages": 8,
+    "source_files": 332,
+    "test_files": 303,
+    "source_lines": 74129,
+    "layers": 2,
+    "cyclic": [],
+    "workspace_typecheck": {
+      "direct": [
+        "@vitae/api",
+        "@vitae/web",
+        "@vitae/core",
+        "@vitae/testkit",
+        "@vitae/ui"
+      ],
+      "transitive": [
+        "@vitae/config"
+      ],
+      "none": [
+        "@vitae/buildsvc",
+        "@vitae/e2e"
+      ]
+    },
+    "untested": [
+      "@vitae/config",
+      "@vitae/buildsvc"
+    ],
+    "skipped_by": {
+      "typecheck": [
+        "@vitae/config",
+        "@vitae/buildsvc",
+        "@vitae/e2e"
+      ],
+      "test": [
+        "@vitae/config",
+        "@vitae/buildsvc"
+      ],
+      "build": [
+        "@vitae/api",
+        "@vitae/config",
+        "@vitae/testkit",
+        "@vitae/ui",
+        "@vitae/e2e"
+      ],
+      "lint": [
+        "@vitae/api",
+        "@vitae/web",
+        "@vitae/config",
+        "@vitae/core",
+        "@vitae/testkit",
+        "@vitae/ui",
+        "@vitae/buildsvc",
+        "@vitae/e2e"
+      ]
+    },
+    "unused_manifest_deps": [],
+    "undeclared_imports": []
+  }
+}

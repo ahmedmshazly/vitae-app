@@ -1,0 +1,4070 @@
+{
+  "components": [
+    {
+      "name": "Banner",
+      "module": "layout.tsx",
+      "source": "packages/ui/src/layout.tsx:395",
+      "section": "Banner",
+      "doc": null,
+      "props": [],
+      "defaults": {
+        "tone": "'info'"
+      },
+      "classes": [
+        "vt-banner",
+        "vt-banner__action",
+        "vt-banner__body",
+        "vt-banner__glyph",
+        "vt-banner__text",
+        "vt-banner__title",
+        "vt-banner__x"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-label",
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/components/QueryBoundary.tsx",
+        "apps/web/src/features/Composer.tsx",
+        "apps/web/src/features/InteractionLogger.tsx",
+        "apps/web/src/features/map/PlaceResolvePanel.tsx",
+        "apps/web/src/routes/Ask.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Intros.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/Org.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/Templates.tsx",
+        "apps/web/src/routes/reference/EntityCatalog.tsx",
+        "apps/web/src/routes/tailor/PreviewPane.tsx"
+      ],
+      "uses": 15,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/layout.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Button",
+      "module": "components.tsx",
+      "source": "packages/ui/src/components.tsx:41",
+      "section": "Button",
+      "doc": "Ref-forwarding so it can anchor Radix triggers (Dropdown/Popover asChild).",
+      "props": [],
+      "defaults": {
+        "variant": "'default'",
+        "size": "'md'"
+      },
+      "classes": [],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/app/Shell.tsx",
+        "apps/web/src/components/BulkBar.tsx",
+        "apps/web/src/components/ErrorBoundary.tsx",
+        "apps/web/src/components/ListToolbar.tsx",
+        "apps/web/src/components/QueryBoundary.tsx",
+        "apps/web/src/features/BulkEdgeDelete.tsx",
+        "apps/web/src/features/BulkNodeDelete.tsx",
+        "apps/web/src/features/Composer.tsx",
+        "apps/web/src/features/FirstRun.tsx",
+        "apps/web/src/features/InteractionLogger.tsx",
+        "apps/web/src/features/RemindersDrawer.tsx",
+        "apps/web/src/features/forms/AddConnection.tsx",
+        "apps/web/src/features/forms/ConnectionComposer.tsx",
+        "apps/web/src/features/forms/ConnectionRow.tsx",
+        "apps/web/src/features/forms/EntityForm.tsx",
+        "apps/web/src/features/forms/KnowsEditor.tsx",
+        "apps/web/src/features/forms/NewEntityMenu.tsx",
+        "apps/web/src/features/forms/NewNodeButton.tsx",
+        "apps/web/src/features/forms/NodeFormDialog.tsx",
+        "apps/web/src/features/forms/SubjectPicker.tsx",
+        "apps/web/src/features/graph/GraphDisplayPrefs.tsx",
+        "apps/web/src/features/graph/GraphPeek.tsx",
+        "apps/web/src/features/map/AtlasCompareDock.tsx",
+        "apps/web/src/features/map/AtlasCorridorDock.tsx",
+        "apps/web/src/features/map/AtlasDossier.tsx",
+        "apps/web/src/features/map/PlaceResolvePanel.tsx",
+        "apps/web/src/features/timeline/TimelineReview.tsx",
+        "apps/web/src/lib/unsaved-changes.tsx",
+        "apps/web/src/routes/Ask.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/Billing.tsx",
+        "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Dashboard.tsx",
+        "apps/web/src/routes/Duplicates.tsx",
+        "apps/web/src/routes/ExportPage.tsx",
+        "apps/web/src/routes/ImportHub.tsx",
+        "apps/web/src/routes/Intros.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/Org.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/People.tsx",
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/Record.tsx",
+        "apps/web/src/routes/Repositories.tsx",
+        "apps/web/src/routes/ResumeHub.tsx",
+        "apps/web/src/routes/Settings.tsx",
+        "apps/web/src/routes/SignIn.tsx",
+        "apps/web/src/routes/Templates.tsx",
+        "apps/web/src/routes/Trash.tsx",
+        "apps/web/src/routes/career/ApplicationActions.tsx",
+        "apps/web/src/routes/career/ApplicationDossier.tsx",
+        "apps/web/src/routes/career/CareerOverview.tsx",
+        "apps/web/src/routes/marketing/Tour.tsx",
+        "apps/web/src/routes/reference/EntityCatalog.tsx",
+        "apps/web/src/routes/reference/EntityObservatoryControls.tsx",
+        "apps/web/src/routes/reference/EntityObservatoryGraph.tsx",
+        "apps/web/src/routes/reference/EntityObservatoryMatrix.tsx",
+        "apps/web/src/routes/tailor/PreviewPane.tsx",
+        "apps/web/src/routes/tailor/SelectionPane.tsx",
+        "apps/web/src/routes/tailor/TargetRail.tsx",
+        "packages/ui/src/overlay.tsx"
+      ],
+      "uses": 61,
+      "tested": true,
+      "styled_in": [],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Card",
+      "module": "layout.tsx",
+      "source": "packages/ui/src/layout.tsx:236",
+      "section": "Card",
+      "doc": null,
+      "props": [],
+      "defaults": {},
+      "classes": [
+        "vt-card",
+        "vt-card--interactive",
+        "vt-card__actions",
+        "vt-card__head",
+        "vt-card__title"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [],
+      "uses": 0,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/layout.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "ChargeRing",
+      "module": "components.tsx",
+      "source": "packages/ui/src/components.tsx:362",
+      "section": "ChargeRing (reconnect lane: \"relationship charge\", reference arc())",
+      "doc": "Circular arc showing 1 − quiet/cadence: full = fresh, empty = overdue. Magnitude, so it is a sequential scale: one hue (the accent) stepping down in opacity, never a hue ramp. The three off-token blues and browns this used to fade through read as *categories* rather than as less-of-the-same, and none of them were tokens. The arc length carries the value on its own, the caller is still expected to print the number beside it.",
+      "props": [
+        {
+          "name": "quiet",
+          "type": "number",
+          "optional": false,
+          "doc": "Days since last interaction."
+        },
+        {
+          "name": "cadence",
+          "type": "number",
+          "optional": false,
+          "doc": "Cadence target in days."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "size": "56"
+      },
+      "classes": [
+        "vt-charge",
+        "vt-charge__inner"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/routes/Dashboard.tsx"
+      ],
+      "uses": 1,
+      "tested": false,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Checkbox",
+      "module": "forms.tsx",
+      "source": "packages/ui/src/forms.tsx:203",
+      "section": "Checkbox (Radix)",
+      "doc": null,
+      "props": [
+        {
+          "name": "checked",
+          "type": "boolean",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "onChange",
+          "type": "(checked: boolean) => void",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "label",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "align",
+          "type": "'center' | 'start'",
+          "optional": true,
+          "doc": "Where the box sits against the label. Default centres it, which reads well for a one-line label and badly for a wrapped paragraph, so multi-line labels pass 'start' to keep the box on the first line."
+        }
+      ],
+      "defaults": {},
+      "classes": [
+        "vt-check",
+        "vt-check--start",
+        "vt-check__box",
+        "vt-check__label",
+        "vt-check__mark"
+      ],
+      "wraps_radix": [
+        "checkbox"
+      ],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/components/BulkBar.tsx",
+        "apps/web/src/features/BulkNodeDelete.tsx",
+        "apps/web/src/features/forms/EdgeSubEditorRow.tsx",
+        "apps/web/src/features/forms/FieldRenderer.tsx",
+        "apps/web/src/features/forms/KnowsEditor.tsx",
+        "apps/web/src/features/graph/GraphDisplayPrefs.tsx",
+        "apps/web/src/features/map/AtlasToolbar.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/reference/EntityObservatoryControls.tsx",
+        "apps/web/src/routes/tailor/SelectionPane.tsx",
+        "apps/web/src/routes/tailor/TargetRail.tsx"
+      ],
+      "uses": 11,
+      "tested": true,
+      "styled_in": [
+        "apps/web/src/styles/entity-observatory.css",
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Chip",
+      "module": "components.tsx",
+      "source": "packages/ui/src/components.tsx:63",
+      "section": "Chip",
+      "doc": null,
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "glyph",
+          "type": "GlyphName",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "tone",
+          "type": "'default' | 'accent' | 'success' | 'warning' | 'danger'",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "mono",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "onRemove",
+          "type": "() => void",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "style",
+          "type": "CSSProperties",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "tone": "'default'"
+      },
+      "classes": [
+        "vt-chip",
+        "vt-chip--mono",
+        "vt-chip--removable",
+        "vt-chip__x"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-label"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/components/ListToolbar.tsx",
+        "apps/web/src/features/Composer.tsx",
+        "apps/web/src/features/QuickAdd.tsx",
+        "apps/web/src/features/forms/AddConnection.tsx",
+        "apps/web/src/features/forms/ConnectionComposer.tsx",
+        "apps/web/src/features/forms/ConnectionRow.tsx",
+        "apps/web/src/features/graph/GraphPeek.tsx",
+        "apps/web/src/features/map/AtlasDossier.tsx",
+        "apps/web/src/features/timeline/TimelineReview.tsx",
+        "apps/web/src/routes/Ask.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/Billing.tsx",
+        "apps/web/src/routes/Browse.tsx",
+        "apps/web/src/routes/Dashboard.tsx",
+        "apps/web/src/routes/Duplicates.tsx",
+        "apps/web/src/routes/ImportHub.tsx",
+        "apps/web/src/routes/Intros.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/Org.tsx",
+        "apps/web/src/routes/Orgs.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/People.tsx",
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/Record.tsx",
+        "apps/web/src/routes/Repositories.tsx",
+        "apps/web/src/routes/ResumeHub.tsx",
+        "apps/web/src/routes/SearchResults.tsx",
+        "apps/web/src/routes/Settings.tsx",
+        "apps/web/src/routes/Templates.tsx",
+        "apps/web/src/routes/Trash.tsx",
+        "apps/web/src/routes/career/ApplicationDossier.tsx",
+        "apps/web/src/routes/career/CareerOverview.tsx",
+        "apps/web/src/routes/tailor/DocumentPane.tsx",
+        "apps/web/src/routes/tailor/PreviewPane.tsx",
+        "apps/web/src/routes/tailor/ScoreBreakdown.tsx",
+        "apps/web/src/routes/tailor/SelectionPane.tsx",
+        "apps/web/src/routes/tailor/TargetRail.tsx"
+      ],
+      "uses": 37,
+      "tested": false,
+      "styled_in": [
+        "apps/web/src/styles/resume-paper.css",
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "ChipGroup",
+      "module": "layout.tsx",
+      "source": "packages/ui/src/layout.tsx:341",
+      "section": "Stack / Inline / Spread / ChipGroup",
+      "doc": "A wrapping run of chips. This is `.chips`.",
+      "props": [],
+      "defaults": {
+        "gap": "2"
+      },
+      "classes": [
+        "vt-chipgroup"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/Composer.tsx"
+      ],
+      "uses": 1,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/layout.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "ClosenessDots",
+      "module": "components.tsx",
+      "source": "packages/ui/src/components.tsx:480",
+      "section": "ClosenessDots (1-5 declared closeness)",
+      "doc": "Closeness as a row of dots. The dots used to carry the whole reading in one colour channel, with the number itself only in a `title` on a span, which is not a reliable place to put anything. The dots are decoration now and the value is stated in text: visible where there is room for it, and spoken either way.",
+      "props": [
+        {
+          "name": "value",
+          "type": "number | null",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "showValue",
+          "type": "boolean",
+          "optional": true,
+          "doc": "Print the count beside the dots as well as announcing it."
+        }
+      ],
+      "defaults": {
+        "max": "5",
+        "showValue": "false"
+      },
+      "classes": [
+        "vt-closeness",
+        "vt-closeness__dot",
+        "vt-closeness__dot--on",
+        "vt-closeness__dots",
+        "vt-closeness__value"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/routes/Person.tsx"
+      ],
+      "uses": 1,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Combobox",
+      "module": "combobox.tsx",
+      "source": "packages/ui/src/combobox.tsx:121",
+      "section": null,
+      "doc": null,
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "optional": false,
+          "doc": "Accessible name for the input and its list. Required: an unnamed control is announced as \"edit blank\". Match the visible label when there is one."
+        },
+        {
+          "name": "items",
+          "type": "ComboboxItem[]",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "query",
+          "type": "string",
+          "optional": false,
+          "doc": "The current text. Owned by the caller, this component never edits it."
+        },
+        {
+          "name": "onQueryChange",
+          "type": "(query: string) => void",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "onSelect",
+          "type": "(item: ComboboxItem) => void",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "value",
+          "type": "string | null",
+          "optional": true,
+          "doc": "The chosen item's value, marked with a check and the word \"Selected\"."
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": true,
+          "doc": "Controlled popup state. Omit to let the component own it."
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "doc": "A search is in flight. Announced, and never mistaken for \"no results\"."
+        },
+        {
+          "name": "error",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "The search failed. Rendered as an alert, not as an empty list."
+        },
+        {
+          "name": "emptyMessage",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Shown when a typed query matched nothing. Pass `null` to show nothing."
+        },
+        {
+          "name": "loadingMessage",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "mono",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "autoFocus",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "openOnFocus",
+          "type": "boolean",
+          "optional": true,
+          "doc": "Open the list when the input takes focus. Default true."
+        },
+        {
+          "name": "keepOpenOnSelect",
+          "type": "boolean",
+          "optional": true,
+          "doc": "Stay open after a pick, for inputs that collect several values."
+        },
+        {
+          "name": "side",
+          "type": "'top' | 'bottom'",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "align",
+          "type": "'start' | 'center' | 'end'",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "inputRef",
+          "type": "Ref<HTMLInputElement>",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "onInputKeyDown",
+          "type": "(event: KeyboardEvent<HTMLInputElement>) => void",
+          "optional": true,
+          "doc": "Runs before the built-in key handling. Call `preventDefault()` to take a key over entirely (a tag input claiming Backspace, say)."
+        }
+      ],
+      "defaults": {
+        "emptyMessage": "'No matches.'",
+        "loadingMessage": "'Searching…'",
+        "openOnFocus": "true",
+        "side": "'bottom'",
+        "align": "'start'"
+      },
+      "classes": [
+        "vt-cbx",
+        "vt-cbx__anchor",
+        "vt-cbx__input",
+        "vt-cbx__list",
+        "vt-cbx__msg",
+        "vt-cbx__msg-word",
+        "vt-cbx__opt",
+        "vt-cbx__opt--create",
+        "vt-cbx__opt--disabled",
+        "vt-cbx__opt--on",
+        "vt-cbx__opt-desc",
+        "vt-cbx__opt-flag",
+        "vt-cbx__opt-label",
+        "vt-cbx__opt-text",
+        "vt-cbx__panel",
+        "vt-inp",
+        "vt-inp--invalid"
+      ],
+      "wraps_radix": [
+        "popover"
+      ],
+      "aria": [
+        "aria-activedescendant",
+        "aria-autocomplete",
+        "aria-busy",
+        "aria-controls",
+        "aria-disabled",
+        "aria-expanded",
+        "aria-hidden",
+        "aria-invalid",
+        "aria-label",
+        "aria-selected",
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [],
+      "uses": 0,
+      "tested": true,
+      "styled_in": [
+        "apps/web/src/styles/network.css",
+        "packages/ui/src/styles/combobox.css",
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": [
+        "vt-cbx__input"
+      ]
+    },
+    {
+      "name": "CommandOverlay",
+      "module": "overlay.tsx",
+      "source": "packages/ui/src/overlay.tsx:102",
+      "section": "CommandOverlay",
+      "doc": null,
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": false,
+          "doc": "Accessible name for the dialog (announced on open)."
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "doc": "Extra class on the panel (e.g. 'overlay--wide')."
+        }
+      ],
+      "defaults": {},
+      "classes": [
+        "vt-overlay",
+        "vt-palette"
+      ],
+      "wraps_radix": [
+        "dialog"
+      ],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/QuickAdd.tsx",
+        "apps/web/src/features/QuickSwitcher.tsx"
+      ],
+      "uses": 2,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/combobox.css",
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "ConfirmDialog",
+      "module": "overlay.tsx",
+      "source": "packages/ui/src/overlay.tsx:205",
+      "section": "ConfirmDialog",
+      "doc": null,
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "body",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "confirmLabel",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "cancelLabel",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "destructive",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "onConfirm",
+          "type": "() => void",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "busy",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "confirmLabel": "'Confirm'",
+        "cancelLabel": "'Cancel'"
+      },
+      "classes": [
+        "vt-btn--danger-fill",
+        "vt-modal__confirm-body"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/BulkEdgeDelete.tsx",
+        "apps/web/src/features/BulkNodeDelete.tsx",
+        "apps/web/src/features/forms/ConnectionRow.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/Org.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/Record.tsx",
+        "apps/web/src/routes/Trash.tsx",
+        "apps/web/src/routes/reference/EntityObservatoryControls.tsx"
+      ],
+      "uses": 12,
+      "tested": false,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Disclosure",
+      "module": "layout.tsx",
+      "source": "packages/ui/src/layout.tsx:444",
+      "section": "Disclosure",
+      "doc": null,
+      "props": [],
+      "defaults": {
+        "defaultOpen": "false"
+      },
+      "classes": [
+        "vt-disclosure",
+        "vt-disclosure__chev",
+        "vt-disclosure__head",
+        "vt-disclosure__label",
+        "vt-disclosure__panel",
+        "vt-disclosure__trigger"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-controls",
+        "aria-expanded"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/timeline/TimelineReview.tsx",
+        "apps/web/src/routes/reference/EntityCatalogDetails.tsx",
+        "apps/web/src/routes/reference/EntityObservatoryControls.tsx"
+      ],
+      "uses": 3,
+      "tested": true,
+      "styled_in": [
+        "apps/web/src/styles/entity-catalog-print.css",
+        "apps/web/src/styles/entity-observatory.css",
+        "packages/ui/src/styles/layout.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "DotGrid",
+      "module": "components.tsx",
+      "source": "packages/ui/src/components.tsx:439",
+      "section": "DotGrid (habit streaks: 30-day grid)",
+      "doc": null,
+      "props": [
+        {
+          "name": "days",
+          "type": "boolean[]",
+          "optional": false,
+          "doc": "Oldest → newest; true = checked."
+        },
+        {
+          "name": "color",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "recentWindow",
+          "type": "number",
+          "optional": true,
+          "doc": "Highlight the most recent N days in full color; older checked days dim."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "doc": "What the grid counts, e.g. \"Deep work\". Without it the grid stays hidden from assistive tech, which is what it was before, a silent 30 dots."
+        }
+      ],
+      "defaults": {
+        "color": "'var(--ae-accent)'",
+        "recentWindow": "12"
+      },
+      "classes": [
+        "vt-dotgrid",
+        "vt-dotgrid__dot"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-hidden",
+        "aria-label",
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/routes/Dashboard.tsx"
+      ],
+      "uses": 1,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "EmptyState",
+      "module": "feedback.tsx",
+      "source": "packages/ui/src/feedback.tsx:83",
+      "section": "EmptyState",
+      "doc": null,
+      "props": [
+        {
+          "name": "glyph",
+          "type": "GlyphName",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "hint",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "detail",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Compatibility alias for hint in task-oriented workspace states."
+        },
+        {
+          "name": "action",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "glyph": "'dot'"
+      },
+      "classes": [
+        "vt-empty",
+        "vt-empty__action",
+        "vt-empty__glyph",
+        "vt-empty__hint",
+        "vt-empty__title"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/graph/GraphPeek.tsx",
+        "apps/web/src/features/graph/GraphSearch.tsx",
+        "apps/web/src/features/graph/GraphView.tsx",
+        "apps/web/src/features/map/AtlasList.tsx",
+        "apps/web/src/features/map/AtlasView.tsx",
+        "apps/web/src/features/timeline/TimelineList.tsx",
+        "apps/web/src/features/timeline/TimelineReview.tsx",
+        "apps/web/src/features/timeline/TimelineView.tsx",
+        "apps/web/src/routes/Ask.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/Browse.tsx",
+        "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Dashboard.tsx",
+        "apps/web/src/routes/Duplicates.tsx",
+        "apps/web/src/routes/ExportPage.tsx",
+        "apps/web/src/routes/ImportHub.tsx",
+        "apps/web/src/routes/Intros.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/NotFound.tsx",
+        "apps/web/src/routes/Org.tsx",
+        "apps/web/src/routes/Orgs.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/People.tsx",
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/Record.tsx",
+        "apps/web/src/routes/Repositories.tsx",
+        "apps/web/src/routes/SearchResults.tsx",
+        "apps/web/src/routes/Settings.tsx",
+        "apps/web/src/routes/Templates.tsx",
+        "apps/web/src/routes/Trash.tsx",
+        "apps/web/src/routes/career/ApplicationDossier.tsx",
+        "apps/web/src/routes/career/CareerOverview.tsx",
+        "apps/web/src/routes/reference/EntityCatalog.tsx",
+        "apps/web/src/routes/tailor/SelectionPane.tsx",
+        "apps/web/src/routes/tailor/Tailor.tsx",
+        "apps/web/src/routes/tailor/TargetRail.tsx",
+        "apps/web/src/routes/workspaces/Planner.tsx"
+      ],
+      "uses": 37,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "EntityGlyph",
+      "module": "components.tsx",
+      "source": "packages/ui/src/components.tsx:208",
+      "section": "Entity glyph tile",
+      "doc": null,
+      "props": [
+        {
+          "name": "type",
+          "type": "string",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "accent",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "size",
+          "type": "'sm' | 'md'",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "glyph",
+          "type": "GlyphName",
+          "optional": true,
+          "doc": "Override the glyph for something that isn't a node type, a reminder, a saved view. Without it the type map falls back to 'dot' and the tile's title lies about what the row is."
+        }
+      ],
+      "defaults": {
+        "size": "'md'"
+      },
+      "classes": [
+        "vt-glyph",
+        "vt-glyph--accent",
+        "vt-glyph--sm"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/components/EntityPicker.tsx",
+        "apps/web/src/features/QuickSwitcher.tsx",
+        "apps/web/src/features/forms/AddConnection.tsx",
+        "apps/web/src/features/forms/ConnectionComposer.tsx",
+        "apps/web/src/features/forms/ConnectionRow.tsx",
+        "apps/web/src/features/forms/EdgeSubEditorRow.tsx",
+        "apps/web/src/features/forms/SubjectPicker.tsx",
+        "apps/web/src/features/graph/GraphPeek.tsx",
+        "apps/web/src/features/map/AtlasDossier.tsx",
+        "apps/web/src/routes/Ask.tsx",
+        "apps/web/src/routes/Browse.tsx",
+        "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Dashboard.tsx",
+        "apps/web/src/routes/Intros.tsx",
+        "apps/web/src/routes/Org.tsx",
+        "apps/web/src/routes/Orgs.tsx",
+        "apps/web/src/routes/People.tsx",
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/SearchResults.tsx",
+        "apps/web/src/routes/Trash.tsx",
+        "apps/web/src/routes/career/CareerOverview.tsx",
+        "apps/web/src/routes/workspaces/Planner.tsx"
+      ],
+      "uses": 22,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "ErrorState",
+      "module": "feedback.tsx",
+      "source": "packages/ui/src/feedback.tsx:120",
+      "section": "ErrorState",
+      "doc": null,
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "detail",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "onRetry",
+          "type": "() => void",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "retryLabel",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "retrying",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "action",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "A second way out, beside Retry: reload the page, go somewhere that still works, open the readable twin of a canvas that failed. Callers were rebuilding `vt-error` by hand to get one, which forks the role, the heading and the spacing along with it."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "title": "'Something went wrong'",
+        "retryLabel": "'Retry'",
+        "retrying": "false"
+      },
+      "classes": [
+        "vt-error",
+        "vt-error__actions",
+        "vt-error__title"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/components/ErrorBoundary.tsx",
+        "apps/web/src/components/QueryBoundary.tsx",
+        "apps/web/src/features/Composer.tsx",
+        "apps/web/src/features/RemindersDrawer.tsx",
+        "apps/web/src/features/graph/GraphPeek.tsx",
+        "apps/web/src/features/graph/GraphView.tsx",
+        "apps/web/src/features/map/AtlasCanvas.tsx",
+        "apps/web/src/features/map/AtlasView.tsx",
+        "apps/web/src/features/map/PlaceResolvePanel.tsx",
+        "apps/web/src/features/timeline/TimelineReview.tsx",
+        "apps/web/src/features/timeline/TimelineView.tsx",
+        "apps/web/src/routes/Ask.tsx",
+        "apps/web/src/routes/Billing.tsx",
+        "apps/web/src/routes/Dashboard.tsx",
+        "apps/web/src/routes/Duplicates.tsx",
+        "apps/web/src/routes/ExportPage.tsx",
+        "apps/web/src/routes/ImportHub.tsx",
+        "apps/web/src/routes/Intros.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/Org.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/Record.tsx",
+        "apps/web/src/routes/Repositories.tsx",
+        "apps/web/src/routes/ResumeHub.tsx",
+        "apps/web/src/routes/SearchResults.tsx",
+        "apps/web/src/routes/Settings.tsx",
+        "apps/web/src/routes/Templates.tsx",
+        "apps/web/src/routes/Trash.tsx",
+        "apps/web/src/routes/career/ApplicationDossier.tsx",
+        "apps/web/src/routes/career/CareerOverview.tsx",
+        "apps/web/src/routes/reference/EntityCatalog.tsx",
+        "apps/web/src/routes/reference/EntityObservatoryGraph.tsx",
+        "apps/web/src/routes/tailor/DocumentPane.tsx",
+        "apps/web/src/routes/tailor/PreviewPane.tsx",
+        "apps/web/src/routes/tailor/TargetRail.tsx",
+        "apps/web/src/routes/workspaces/Planner.tsx"
+      ],
+      "uses": 37,
+      "tested": true,
+      "styled_in": [
+        "apps/web/src/styles/explore-workspace.css",
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "FactorBar",
+      "module": "components.tsx",
+      "source": "packages/ui/src/components.tsx:273",
+      "section": "FactorBar (score decomposition, FR-CON-006)",
+      "doc": null,
+      "props": [
+        {
+          "name": "parts",
+          "type": "FactorPart[]",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "scale",
+          "type": "number",
+          "optional": false,
+          "doc": "Denominator for widths. Pass the best score in the set so bars compare across rows instead of each stretching to its own maximum."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": false,
+          "doc": "Names the whole bar for assistive tech, e.g. \"Score 1.84\"."
+        }
+      ],
+      "defaults": {},
+      "classes": [
+        "vt-factorbar",
+        "vt-factorbar__seg"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-label",
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/routes/Ask.tsx"
+      ],
+      "uses": 1,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "FactorChip",
+      "module": "components.tsx",
+      "source": "packages/ui/src/components.tsx:157",
+      "section": "Factor chip (score decomposition, explainability, FR-CON-006)",
+      "doc": null,
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "value",
+          "type": "number",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "detail",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {},
+      "classes": [
+        "vt-factor",
+        "vt-factor__label",
+        "vt-factor__value"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/tailor/ScoreBreakdown.tsx"
+      ],
+      "uses": 2,
+      "tested": false,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Field",
+      "module": "forms.tsx",
+      "source": "packages/ui/src/forms.tsx:32",
+      "section": "Field wrapper (label + help + error)",
+      "doc": null,
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "htmlFor",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "help",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "error",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        }
+      ],
+      "defaults": {},
+      "classes": [
+        "vt-fld",
+        "vt-fld--error",
+        "vt-fld__error",
+        "vt-fld__help",
+        "vt-fld__label",
+        "vt-fld__req"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/Composer.tsx",
+        "apps/web/src/features/InteractionLogger.tsx",
+        "apps/web/src/features/forms/AddConnection.tsx",
+        "apps/web/src/features/forms/ConnectionComposer.tsx",
+        "apps/web/src/features/forms/ConnectionRow.tsx",
+        "apps/web/src/features/forms/EntityForm.tsx",
+        "apps/web/src/features/forms/FieldRenderer.tsx",
+        "apps/web/src/features/forms/KnowsEditor.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/ImportHub.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/Repositories.tsx",
+        "apps/web/src/routes/Settings.tsx",
+        "apps/web/src/routes/reference/EntityObservatoryControls.tsx",
+        "apps/web/src/routes/tailor/PreviewPane.tsx"
+      ],
+      "uses": 16,
+      "tested": false,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": [
+        "vt-fld--error"
+      ]
+    },
+    {
+      "name": "FilterGroup",
+      "module": "components.tsx",
+      "source": "packages/ui/src/components.tsx:111",
+      "section": "FilterGroup",
+      "doc": null,
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "optional": false,
+          "doc": "Names the set, e.g. \"Filter people\". Announced before the buttons."
+        },
+        {
+          "name": "options",
+          "type": "ReadonlyArray<{ key: K; label: string }>",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "value",
+          "type": "K",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "onChange",
+          "type": "(key: K) => void",
+          "optional": false,
+          "doc": null
+        }
+      ],
+      "defaults": {},
+      "classes": [
+        "vt-filters",
+        "vt-filters__opt",
+        "vt-filters__opt--on"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-label",
+        "aria-pressed",
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/components/EntityPicker.tsx",
+        "apps/web/src/components/ListToolbar.tsx",
+        "apps/web/src/features/Composer.tsx",
+        "apps/web/src/features/InteractionLogger.tsx",
+        "apps/web/src/features/graph/GraphDisplayPrefs.tsx",
+        "apps/web/src/routes/People.tsx",
+        "apps/web/src/routes/SearchResults.tsx"
+      ],
+      "uses": 7,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Glyph",
+      "module": "glyphs.tsx",
+      "source": "packages/ui/src/glyphs.tsx:184",
+      "section": null,
+      "doc": null,
+      "props": [
+        {
+          "name": "name",
+          "type": "GlyphName",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "strokeWidth",
+          "type": "number",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "style",
+          "type": "CSSProperties",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "'aria-hidden'",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "size": "18",
+        "strokeWidth": "1.6",
+        "ariaHidden": "true"
+      },
+      "classes": [],
+      "wraps_radix": [],
+      "aria": [
+        "aria-hidden",
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/app/Breadcrumb.tsx",
+        "apps/web/src/app/Shell.tsx",
+        "apps/web/src/components/ListToolbar.tsx",
+        "apps/web/src/features/GettingStarted.tsx",
+        "apps/web/src/features/QuickAdd.tsx",
+        "apps/web/src/features/QuickSwitcher.tsx",
+        "apps/web/src/features/RemindersDrawer.tsx",
+        "apps/web/src/features/forms/NodeFormDialog.tsx",
+        "apps/web/src/features/graph/GraphPeek.tsx",
+        "apps/web/src/features/map/PlaceResolvePanel.tsx",
+        "apps/web/src/lib/unsaved-changes.tsx",
+        "apps/web/src/routes/Dashboard.tsx",
+        "apps/web/src/routes/Duplicates.tsx",
+        "apps/web/src/routes/ExportPage.tsx",
+        "apps/web/src/routes/ImportHub.tsx",
+        "apps/web/src/routes/NotFound.tsx",
+        "apps/web/src/routes/SearchResults.tsx",
+        "apps/web/src/routes/SignIn.tsx",
+        "apps/web/src/routes/career/ApplicationDossier.tsx",
+        "apps/web/src/routes/marketing/CareerEvidence.tsx",
+        "apps/web/src/routes/marketing/Chrome.tsx",
+        "apps/web/src/routes/marketing/Landing.tsx",
+        "apps/web/src/routes/marketing/Pricing.tsx",
+        "apps/web/src/routes/marketing/SecurityOwnership.tsx",
+        "apps/web/src/routes/marketing/WarmPaths.tsx",
+        "apps/web/src/routes/workspaces/WorkspaceHomes.tsx",
+        "packages/ui/src/combobox.tsx",
+        "packages/ui/src/components.tsx",
+        "packages/ui/src/feedback.tsx",
+        "packages/ui/src/forms.tsx",
+        "packages/ui/src/layout.tsx",
+        "packages/ui/src/overlay.tsx",
+        "packages/ui/src/toast.tsx"
+      ],
+      "uses": 33,
+      "tested": false,
+      "styled_in": [],
+      "unstyled_classes": []
+    },
+    {
+      "name": "HelpTip",
+      "module": "overlay.tsx",
+      "source": "packages/ui/src/overlay.tsx:352",
+      "section": "HelpTip",
+      "doc": null,
+      "props": [
+        {
+          "name": "content",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "side",
+          "type": "'top' | 'bottom' | 'left' | 'right'",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "doc": "Accessible label for the trigger (defaults to \"More information\")."
+        }
+      ],
+      "defaults": {
+        "side": "'top'",
+        "label": "'More information'"
+      },
+      "classes": [
+        "vt-helptip"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-label"
+      ],
+      "renders_jsx": true,
+      "used_by": [],
+      "uses": 0,
+      "tested": false,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "InfoPopover",
+      "module": "overlay.tsx",
+      "source": "packages/ui/src/overlay.tsx:379",
+      "section": "InfoPopover",
+      "doc": null,
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "shortcuts",
+          "type": "InfoPopoverShortcut[]",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "triggerLabel",
+          "type": "string",
+          "optional": true,
+          "doc": "Trigger label; defaults to a \"How this works\" pill."
+        }
+      ],
+      "defaults": {
+        "triggerLabel": "'How this works'"
+      },
+      "classes": [
+        "vt-info",
+        "vt-info-trigger",
+        "vt-info__body",
+        "vt-info__shortcut",
+        "vt-info__shortcuts",
+        "vt-info__title",
+        "vt-kbd"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/graph/GraphToolbar.tsx",
+        "apps/web/src/routes/Ask.tsx",
+        "apps/web/src/routes/Dashboard.tsx",
+        "apps/web/src/routes/Duplicates.tsx",
+        "apps/web/src/routes/ExportPage.tsx",
+        "apps/web/src/routes/ImportHub.tsx",
+        "apps/web/src/routes/Intros.tsx",
+        "apps/web/src/routes/Repositories.tsx",
+        "apps/web/src/routes/ResumeHub.tsx",
+        "apps/web/src/routes/SearchResults.tsx",
+        "apps/web/src/routes/Settings.tsx",
+        "apps/web/src/routes/Templates.tsx",
+        "apps/web/src/routes/Trash.tsx",
+        "apps/web/src/routes/tailor/Tailor.tsx"
+      ],
+      "uses": 14,
+      "tested": false,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": [
+        "vt-info"
+      ]
+    },
+    {
+      "name": "Inline",
+      "module": "layout.tsx",
+      "source": "packages/ui/src/layout.tsx:289",
+      "section": "Stack / Inline / Spread / ChipGroup",
+      "doc": "Horizontal flow. This is `.hstack`.",
+      "props": [],
+      "defaults": {
+        "gap": "2"
+      },
+      "classes": [
+        "vt-inline",
+        "vt-inline--wrap"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/components/ListToolbar.tsx",
+        "apps/web/src/features/Composer.tsx",
+        "apps/web/src/features/forms/ConnectionRow.tsx",
+        "apps/web/src/features/forms/KnowsEditor.tsx",
+        "apps/web/src/features/forms/SubjectPicker.tsx",
+        "apps/web/src/features/graph/GraphPathfinder.tsx",
+        "apps/web/src/features/graph/GraphPeek.tsx",
+        "apps/web/src/features/graph/GraphToolbar.tsx",
+        "apps/web/src/lib/unsaved-changes.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/Person.tsx"
+      ],
+      "uses": 11,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/layout.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Input",
+      "module": "forms.tsx",
+      "source": "packages/ui/src/forms.tsx:60",
+      "section": "Input / Textarea",
+      "doc": null,
+      "props": [],
+      "defaults": {},
+      "classes": [
+        "vt-inp",
+        "vt-inp--invalid"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-invalid"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/components/ListToolbar.tsx",
+        "apps/web/src/features/InteractionLogger.tsx",
+        "apps/web/src/features/forms/EdgeSubEditorRow.tsx",
+        "apps/web/src/features/forms/EntityForm.tsx",
+        "apps/web/src/features/forms/FieldRenderer.tsx",
+        "apps/web/src/features/forms/KnowsEditor.tsx",
+        "apps/web/src/features/forms/SuggestTextInput.tsx",
+        "apps/web/src/features/map/AtlasToolbar.tsx",
+        "apps/web/src/features/map/PlaceResolvePanel.tsx",
+        "apps/web/src/routes/Ask.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Intros.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/Repositories.tsx",
+        "apps/web/src/routes/SearchResults.tsx",
+        "apps/web/src/routes/Settings.tsx",
+        "apps/web/src/routes/career/CareerOverview.tsx",
+        "apps/web/src/routes/reference/EntityObservatoryControls.tsx",
+        "apps/web/src/routes/tailor/PreviewPane.tsx",
+        "apps/web/src/routes/tailor/TargetRail.tsx"
+      ],
+      "uses": 23,
+      "tested": true,
+      "styled_in": [
+        "apps/web/src/styles/network.css",
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Kbd",
+      "module": "components.tsx",
+      "source": "packages/ui/src/components.tsx:171",
+      "section": "Kbd",
+      "doc": null,
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        }
+      ],
+      "defaults": {},
+      "classes": [
+        "vt-kbd"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/app/Shell.tsx",
+        "apps/web/src/features/FirstRun.tsx",
+        "apps/web/src/features/QuickAdd.tsx",
+        "apps/web/src/features/QuickSwitcher.tsx",
+        "apps/web/src/routes/reference/EntityObservatoryControls.tsx"
+      ],
+      "uses": 5,
+      "tested": false,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "LogoHorizontal",
+      "module": "brand.tsx",
+      "source": "packages/ui/src/brand.tsx:55",
+      "section": null,
+      "doc": "Horizontal lockup: mark + \"Vitae\" wordmark (IBM Plex Mono 500, caps, 0.26em tracking, the .u-display treatment). Wordmark is real text so it uses the self-hosted font and stays crisp at any density.",
+      "props": [
+        {
+          "name": "markSize",
+          "type": "number",
+          "optional": true,
+          "doc": "Height of the mark; the wordmark scales with it."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "style",
+          "type": "CSSProperties",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "markSize": "28"
+      },
+      "classes": [],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/app/Shell.tsx",
+        "apps/web/src/routes/marketing/Chrome.tsx"
+      ],
+      "uses": 2,
+      "tested": false,
+      "styled_in": [],
+      "unstyled_classes": []
+    },
+    {
+      "name": "LogoMark",
+      "module": "brand.tsx",
+      "source": "packages/ui/src/brand.tsx:25",
+      "section": null,
+      "doc": "The primary mark. One ink, never coloured, stretched, or rotated.",
+      "props": [
+        {
+          "name": "size",
+          "type": "number",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "style",
+          "type": "CSSProperties",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "size": "28"
+      },
+      "classes": [],
+      "wraps_radix": [],
+      "aria": [
+        "aria-hidden",
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/app/Shell.tsx"
+      ],
+      "uses": 1,
+      "tested": false,
+      "styled_in": [],
+      "unstyled_classes": []
+    },
+    {
+      "name": "LogoStacked",
+      "module": "brand.tsx",
+      "source": "packages/ui/src/brand.tsx:73",
+      "section": null,
+      "doc": "Stacked lockup for sign-in / empty states. Achromatic like everything else.",
+      "props": [
+        {
+          "name": "markSize",
+          "type": "number",
+          "optional": true,
+          "doc": "Height of the mark; the wordmark scales with it."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "style",
+          "type": "CSSProperties",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "markSize": "56"
+      },
+      "classes": [],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/routes/SignIn.tsx"
+      ],
+      "uses": 1,
+      "tested": false,
+      "styled_in": [],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Menu",
+      "module": "overlay.tsx",
+      "source": "packages/ui/src/overlay.tsx:286",
+      "section": "Menu (dropdown with grouped items, keyboard nav from Radix)",
+      "doc": null,
+      "props": [
+        {
+          "name": "trigger",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "groups",
+          "type": "MenuGroup[]",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "onSelect",
+          "type": "(key: string) => void",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "align",
+          "type": "'start' | 'center' | 'end'",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "columns",
+          "type": "boolean",
+          "optional": true,
+          "doc": "Lay groups out side-by-side (wide catalogs like the 28-type picker)."
+        }
+      ],
+      "defaults": {
+        "align": "'end'"
+      },
+      "classes": [
+        "vt-menu",
+        "vt-menu__group",
+        "vt-menu__item",
+        "vt-menu__label"
+      ],
+      "wraps_radix": [
+        "dropdown-menu"
+      ],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/forms/NewEntityMenu.tsx"
+      ],
+      "uses": 1,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Meter",
+      "module": "components.tsx",
+      "source": "packages/ui/src/components.tsx:304",
+      "section": "Meter (résumé page-fill, FR-RES-009)",
+      "doc": null,
+      "props": [
+        {
+          "name": "used",
+          "type": "number",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "budget",
+          "type": "number",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "unit",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "unit": "'lines'"
+      },
+      "classes": [
+        "vt-meter",
+        "vt-meter__fill",
+        "vt-meter__fill--over",
+        "vt-meter__fill--warn",
+        "vt-meter__label",
+        "vt-meter__track"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-label",
+        "aria-valuemax",
+        "aria-valuemin",
+        "aria-valuenow",
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/routes/tailor/SelectionPane.tsx"
+      ],
+      "uses": 1,
+      "tested": false,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Modal",
+      "module": "overlay.tsx",
+      "source": "packages/ui/src/overlay.tsx:27",
+      "section": "Modal",
+      "doc": null,
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "size",
+          "type": "'sm' | 'md' | 'lg'",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "footer",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "titleAccessory",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Extra content beside the title (chips, provenance)."
+        }
+      ],
+      "defaults": {
+        "size": "'md'"
+      },
+      "classes": [
+        "vt-modal",
+        "vt-modal__body",
+        "vt-modal__desc",
+        "vt-modal__foot",
+        "vt-modal__head",
+        "vt-modal__title",
+        "vt-modal__x",
+        "vt-overlay"
+      ],
+      "wraps_radix": [
+        "dialog"
+      ],
+      "aria": [
+        "aria-label",
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/Composer.tsx",
+        "apps/web/src/features/FirstRun.tsx",
+        "apps/web/src/features/InteractionLogger.tsx",
+        "apps/web/src/features/forms/AddConnection.tsx",
+        "apps/web/src/features/forms/NodeFormDialog.tsx",
+        "apps/web/src/lib/unsaved-changes.tsx",
+        "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Duplicates.tsx"
+      ],
+      "uses": 8,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/components.css",
+        "packages/ui/src/styles/toast.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "MoneyField",
+      "module": "forms.tsx",
+      "source": "packages/ui/src/forms.tsx:372",
+      "section": "MoneyField ({amount, currency, period?})",
+      "doc": null,
+      "props": [
+        {
+          "name": "value",
+          "type": "Record<string, unknown> | undefined",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "onChange",
+          "type": "(value: Record<string, unknown> | undefined) => void",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "amountKey",
+          "type": "string",
+          "optional": true,
+          "doc": "Key of the numeric part (role.comp uses 'base')."
+        },
+        {
+          "name": "withPeriod",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "amountKey": "'amount'"
+      },
+      "classes": [
+        "vt-money",
+        "vt-money__ccy"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/forms/FieldRenderer.tsx"
+      ],
+      "uses": 1,
+      "tested": false,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Mono",
+      "module": "components.tsx",
+      "source": "packages/ui/src/components.tsx:185",
+      "section": "Mono value",
+      "doc": "Monospace, tabular text, the identity's face for data. Spreads the rest of its props onto the span. It used to accept only `children`, `className` and `style`, so a caller adding `role=\"status\"` or an `aria-label` had it silently dropped, the same trap Select had, and the reason `Input` and `Textarea` spread theirs. A primitive that quietly discards an accessibility attribute is worse than one that refuses it.",
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        }
+      ],
+      "defaults": {},
+      "classes": [],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/components/BulkBar.tsx",
+        "apps/web/src/components/EntityPicker.tsx",
+        "apps/web/src/components/ListToolbar.tsx",
+        "apps/web/src/features/GettingStarted.tsx",
+        "apps/web/src/features/QuickSwitcher.tsx",
+        "apps/web/src/features/RemindersDrawer.tsx",
+        "apps/web/src/features/graph/GraphPeek.tsx",
+        "apps/web/src/features/map/AtlasCompareDock.tsx",
+        "apps/web/src/features/map/AtlasCorridorDock.tsx",
+        "apps/web/src/features/map/AtlasDossier.tsx",
+        "apps/web/src/features/map/AtlasList.tsx",
+        "apps/web/src/features/map/UnmappedDock.tsx",
+        "apps/web/src/features/timeline/TimelineList.tsx",
+        "apps/web/src/features/timeline/TimelineReview.tsx",
+        "apps/web/src/routes/Ask.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/Billing.tsx",
+        "apps/web/src/routes/Browse.tsx",
+        "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Dashboard.tsx",
+        "apps/web/src/routes/Duplicates.tsx",
+        "apps/web/src/routes/ExportPage.tsx",
+        "apps/web/src/routes/ImportHub.tsx",
+        "apps/web/src/routes/Intros.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/NotFound.tsx",
+        "apps/web/src/routes/Org.tsx",
+        "apps/web/src/routes/Orgs.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/People.tsx",
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/Record.tsx",
+        "apps/web/src/routes/Repositories.tsx",
+        "apps/web/src/routes/ResumeHub.tsx",
+        "apps/web/src/routes/SearchResults.tsx",
+        "apps/web/src/routes/Settings.tsx",
+        "apps/web/src/routes/Templates.tsx",
+        "apps/web/src/routes/Trash.tsx",
+        "apps/web/src/routes/career/ApplicationDossier.tsx",
+        "apps/web/src/routes/career/CareerOverview.tsx",
+        "apps/web/src/routes/reference/EntityCatalog.tsx",
+        "apps/web/src/routes/reference/EntityObservatoryMatrix.tsx",
+        "apps/web/src/routes/tailor/PreviewPane.tsx",
+        "apps/web/src/routes/tailor/ScoreBreakdown.tsx",
+        "apps/web/src/routes/tailor/SelectionPane.tsx",
+        "apps/web/src/routes/tailor/Tailor.tsx",
+        "apps/web/src/routes/tailor/TargetRail.tsx",
+        "apps/web/src/routes/workspaces/Planner.tsx"
+      ],
+      "uses": 48,
+      "tested": false,
+      "styled_in": [],
+      "unstyled_classes": []
+    },
+    {
+      "name": "PageHeader",
+      "module": "overlay.tsx",
+      "source": "packages/ui/src/overlay.tsx:422",
+      "section": "PageHeader",
+      "doc": null,
+      "props": [
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "subtitle",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "help",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Pass an <InfoPopover/> (or any node) for contextual help."
+        },
+        {
+          "name": "actions",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Primary action(s), right-aligned (e.g. a \"New résumé\" button)."
+        }
+      ],
+      "defaults": {},
+      "classes": [
+        "vt-pagehead",
+        "vt-pagehead__actions",
+        "vt-pagehead__main",
+        "vt-pagehead__sub",
+        "vt-pagehead__title",
+        "vt-pagehead__titlerow"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/routes/Ask.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/Billing.tsx",
+        "apps/web/src/routes/Browse.tsx",
+        "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Dashboard.tsx",
+        "apps/web/src/routes/Duplicates.tsx",
+        "apps/web/src/routes/ExportPage.tsx",
+        "apps/web/src/routes/ImportHub.tsx",
+        "apps/web/src/routes/Intros.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/NotFound.tsx",
+        "apps/web/src/routes/Org.tsx",
+        "apps/web/src/routes/Orgs.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/People.tsx",
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/Record.tsx",
+        "apps/web/src/routes/Repositories.tsx",
+        "apps/web/src/routes/ResumeHub.tsx",
+        "apps/web/src/routes/SearchResults.tsx",
+        "apps/web/src/routes/Settings.tsx",
+        "apps/web/src/routes/Templates.tsx",
+        "apps/web/src/routes/Trash.tsx",
+        "apps/web/src/routes/career/ApplicationDossier.tsx",
+        "apps/web/src/routes/career/CareerOverview.tsx",
+        "apps/web/src/routes/tailor/Tailor.tsx",
+        "apps/web/src/routes/workspaces/Planner.tsx",
+        "apps/web/src/routes/workspaces/WorkspaceHomes.tsx"
+      ],
+      "uses": 29,
+      "tested": true,
+      "styled_in": [
+        "apps/web/src/styles/app.css",
+        "apps/web/src/styles/data-workspace.css",
+        "apps/web/src/styles/explore-workspace.css",
+        "apps/web/src/styles/network.css",
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Popover",
+      "module": "overlay.tsx",
+      "source": "packages/ui/src/overlay.tsx:327",
+      "section": "Popover",
+      "doc": null,
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "trigger",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "side",
+          "type": "'top' | 'bottom' | 'left' | 'right'",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "align",
+          "type": "'start' | 'center' | 'end'",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "wide",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "side": "'bottom'",
+        "align": "'start'"
+      },
+      "classes": [
+        "vt-popover",
+        "vt-popover--wide"
+      ],
+      "wraps_radix": [
+        "popover"
+      ],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/RemindersDrawer.tsx",
+        "apps/web/src/features/forms/ConnectionRow.tsx",
+        "apps/web/src/features/graph/GraphDisplayPrefs.tsx",
+        "apps/web/src/features/map/AtlasToolbar.tsx",
+        "apps/web/src/routes/tailor/ScoreBreakdown.tsx"
+      ],
+      "uses": 5,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/combobox.css",
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "ProvenanceChip",
+      "module": "components.tsx",
+      "source": "packages/ui/src/components.tsx:140",
+      "section": "Provenance chip (SRS §4.2 provenance, design DNA)",
+      "doc": null,
+      "props": [
+        {
+          "name": "source",
+          "type": "string",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "confidence",
+          "type": "number",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "confidence": "1"
+      },
+      "classes": [
+        "vt-prov"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/routes/Browse.tsx",
+        "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Dashboard.tsx",
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/Record.tsx",
+        "apps/web/src/routes/Repositories.tsx",
+        "apps/web/src/routes/SearchResults.tsx",
+        "apps/web/src/routes/career/ApplicationDossier.tsx"
+      ],
+      "uses": 8,
+      "tested": false,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Rating",
+      "module": "forms.tsx",
+      "source": "packages/ui/src/forms.tsx:296",
+      "section": "Rating (1-5 dots: ClosenessDots visual language, interactive)",
+      "doc": null,
+      "props": [
+        {
+          "name": "value",
+          "type": "number | undefined",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "onChange",
+          "type": "(value: number | undefined) => void",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "max": "5",
+        "label": "'rating'"
+      },
+      "classes": [
+        "vt-rating",
+        "vt-rating__dot",
+        "vt-rating__dot--hover",
+        "vt-rating__dot--on"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-checked",
+        "aria-label",
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/forms/EdgeSubEditorRow.tsx",
+        "apps/web/src/features/forms/FieldRenderer.tsx",
+        "apps/web/src/features/forms/KnowsEditor.tsx"
+      ],
+      "uses": 3,
+      "tested": false,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "RegisterRule",
+      "module": "overlay.tsx",
+      "source": "packages/ui/src/overlay.tsx:494",
+      "section": "RegisterRule",
+      "doc": null,
+      "props": [
+        {
+          "name": "ticks",
+          "type": "RegisterTick[]",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "activeIndex",
+          "type": "number",
+          "optional": true,
+          "doc": "Index into `ticks` that is \"here\". Only this tick takes the accent."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "doc": "What the ticks mean, e.g. \"Days of this week\". Required when ticks exist."
+        }
+      ],
+      "defaults": {},
+      "classes": [
+        "vt-register",
+        "vt-register__tick",
+        "vt-register__tick--on"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-label",
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/routes/Ask.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/Billing.tsx",
+        "apps/web/src/routes/Browse.tsx",
+        "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Dashboard.tsx",
+        "apps/web/src/routes/Duplicates.tsx",
+        "apps/web/src/routes/ExportPage.tsx",
+        "apps/web/src/routes/ImportHub.tsx",
+        "apps/web/src/routes/Intros.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/NotFound.tsx",
+        "apps/web/src/routes/Org.tsx",
+        "apps/web/src/routes/Orgs.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/People.tsx",
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/Record.tsx",
+        "apps/web/src/routes/Repositories.tsx",
+        "apps/web/src/routes/ResumeHub.tsx",
+        "apps/web/src/routes/SearchResults.tsx",
+        "apps/web/src/routes/Settings.tsx",
+        "apps/web/src/routes/SignIn.tsx",
+        "apps/web/src/routes/Templates.tsx",
+        "apps/web/src/routes/Trash.tsx",
+        "apps/web/src/routes/career/ApplicationDossier.tsx",
+        "apps/web/src/routes/career/CareerOverview.tsx",
+        "apps/web/src/routes/tailor/Tailor.tsx",
+        "apps/web/src/routes/workspaces/Planner.tsx",
+        "apps/web/src/routes/workspaces/WorkspaceHomes.tsx"
+      ],
+      "uses": 30,
+      "tested": true,
+      "styled_in": [
+        "apps/web/src/styles/app.css",
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Row",
+      "module": "layout.tsx",
+      "source": "packages/ui/src/layout.tsx:123",
+      "section": "Row",
+      "doc": null,
+      "props": [],
+      "defaults": {
+        "as": "'div'"
+      },
+      "classes": [
+        "vt-row",
+        "vt-row--interactive",
+        "vt-row--selected",
+        "vt-row__actions",
+        "vt-row__flag",
+        "vt-row__leading",
+        "vt-row__main",
+        "vt-row__meta",
+        "vt-row__sub",
+        "vt-row__title"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/forms/ConnectionRow.tsx",
+        "apps/web/src/routes/SearchResults.tsx"
+      ],
+      "uses": 2,
+      "tested": true,
+      "styled_in": [
+        "apps/web/src/styles/app.css",
+        "apps/web/src/styles/browse.css",
+        "packages/ui/src/styles/layout.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Section",
+      "module": "overlay.tsx",
+      "source": "packages/ui/src/overlay.tsx:454",
+      "section": "Section",
+      "doc": null,
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "meta",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Rendered in mono beside the title, a count, a total."
+        },
+        {
+          "name": "actions",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Right-aligned controls for this region only."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        }
+      ],
+      "defaults": {},
+      "classes": [
+        "vt-section",
+        "vt-section__actions",
+        "vt-section__head"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-labelledby"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/routes/Ask.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/Billing.tsx",
+        "apps/web/src/routes/Browse.tsx",
+        "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Dashboard.tsx",
+        "apps/web/src/routes/Duplicates.tsx",
+        "apps/web/src/routes/ExportPage.tsx",
+        "apps/web/src/routes/ImportHub.tsx",
+        "apps/web/src/routes/Intros.tsx",
+        "apps/web/src/routes/NotFound.tsx",
+        "apps/web/src/routes/Org.tsx",
+        "apps/web/src/routes/Orgs.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/People.tsx",
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/Record.tsx",
+        "apps/web/src/routes/Repositories.tsx",
+        "apps/web/src/routes/ResumeHub.tsx",
+        "apps/web/src/routes/SearchResults.tsx",
+        "apps/web/src/routes/Settings.tsx",
+        "apps/web/src/routes/Templates.tsx",
+        "apps/web/src/routes/Trash.tsx",
+        "apps/web/src/routes/career/ApplicationDossier.tsx",
+        "apps/web/src/routes/career/CareerOverview.tsx"
+      ],
+      "uses": 25,
+      "tested": true,
+      "styled_in": [
+        "apps/web/src/styles/app.css",
+        "apps/web/src/styles/data-workspace.css",
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Select",
+      "module": "forms.tsx",
+      "source": "packages/ui/src/forms.tsx:134",
+      "section": "Select (Radix: portal, keyboard-first)",
+      "doc": null,
+      "props": [
+        {
+          "name": "value",
+          "type": "string | undefined",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "onChange",
+          "type": "(value: string | undefined) => void",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "options",
+          "type": "SelectOptionItem[]",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "mono",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "doc": "Names the control for assistive tech. Radix renders the trigger as a `<button role=\"combobox\">`, and a `<label for>` does not name a button, so a Select used on its own had no accessible name (axe: `button-name`). Required when no visible label sits beside it in the accessibility tree."
+        },
+        {
+          "name": "'aria-label'",
+          "type": "string",
+          "optional": true,
+          "doc": "Forwarded to the trigger. Input and Textarea spread rest props; Select used to drop them, so `aria-label=\"Status filter\"` looked labelled in source and was unlabeled in the browser."
+        },
+        {
+          "name": "'aria-labelledby'",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "placeholder": "'Select…'",
+        "clearable": "true"
+      },
+      "classes": [
+        "vt-inp--invalid",
+        "vt-sel",
+        "vt-sel__check",
+        "vt-sel__chev",
+        "vt-sel__content",
+        "vt-sel__item",
+        "vt-sel__viewport"
+      ],
+      "wraps_radix": [
+        "select"
+      ],
+      "aria": [
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/components/ListToolbar.tsx",
+        "apps/web/src/features/forms/AddConnection.tsx",
+        "apps/web/src/features/forms/ConnectionComposer.tsx",
+        "apps/web/src/features/forms/EdgeSubEditorRow.tsx",
+        "apps/web/src/features/forms/FieldRenderer.tsx",
+        "apps/web/src/features/forms/KnowsEditor.tsx",
+        "apps/web/src/routes/Ask.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/ImportHub.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/Settings.tsx",
+        "apps/web/src/routes/career/CareerOverview.tsx",
+        "apps/web/src/routes/tailor/PreviewPane.tsx",
+        "apps/web/src/routes/tailor/SelectionPane.tsx",
+        "apps/web/src/routes/tailor/TargetRail.tsx"
+      ],
+      "uses": 16,
+      "tested": true,
+      "styled_in": [
+        "apps/web/src/styles/data-tools.css",
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Sheet",
+      "module": "overlay.tsx",
+      "source": "packages/ui/src/overlay.tsx:170",
+      "section": "Sheet (right-side panel)",
+      "doc": null,
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "footer",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "wide",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {},
+      "classes": [
+        "vt-modal__foot",
+        "vt-modal__head",
+        "vt-modal__title",
+        "vt-modal__x",
+        "vt-overlay",
+        "vt-sheet",
+        "vt-sheet--wide",
+        "vt-sheet__body"
+      ],
+      "wraps_radix": [
+        "dialog"
+      ],
+      "aria": [
+        "aria-label"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/app/Shell.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/marketing/Chrome.tsx"
+      ],
+      "uses": 5,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/components.css",
+        "packages/ui/src/styles/toast.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Skeleton",
+      "module": "feedback.tsx",
+      "source": "packages/ui/src/feedback.tsx:17",
+      "section": "Skeleton",
+      "doc": null,
+      "props": [
+        {
+          "name": "width",
+          "type": "number | string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "height",
+          "type": "number | string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "round",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "style",
+          "type": "CSSProperties",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "width": "'100%'",
+        "height": "14"
+      },
+      "classes": [
+        "vt-skel",
+        "vt-skel--round"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/QuickSwitcher.tsx",
+        "apps/web/src/features/forms/NodeFormDialog.tsx",
+        "apps/web/src/features/forms/SubjectPicker.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Org.tsx",
+        "apps/web/src/routes/ResumeHub.tsx",
+        "apps/web/src/routes/SignIn.tsx",
+        "apps/web/src/routes/Templates.tsx",
+        "apps/web/src/routes/reference/EntityCatalog.tsx",
+        "apps/web/src/routes/tailor/DocumentPane.tsx",
+        "apps/web/src/routes/tailor/PreviewPane.tsx"
+      ],
+      "uses": 12,
+      "tested": true,
+      "styled_in": [
+        "apps/web/src/styles/resume-paper.css",
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "SkeletonRows",
+      "module": "feedback.tsx",
+      "source": "packages/ui/src/feedback.tsx:47",
+      "section": "Skeleton",
+      "doc": null,
+      "props": [
+        {
+          "name": "rows",
+          "type": "number",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "count",
+          "type": "number",
+          "optional": true,
+          "doc": "Compatibility alias used by workspace skeletons. `rows` wins."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "doc": "What is being waited for, in the user's words."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "count": "6",
+        "label": "'Loading'"
+      },
+      "classes": [
+        "vt-skel-rows",
+        "vt-skel-rows__lines",
+        "vt-skel-rows__row"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-label",
+        "aria-live",
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/components/QueryBoundary.tsx",
+        "apps/web/src/features/RemindersDrawer.tsx",
+        "apps/web/src/features/graph/GraphView.tsx",
+        "apps/web/src/features/map/AtlasView.tsx",
+        "apps/web/src/features/map/PlaceResolvePanel.tsx",
+        "apps/web/src/features/timeline/TimelineView.tsx",
+        "apps/web/src/routes/Ask.tsx",
+        "apps/web/src/routes/Billing.tsx",
+        "apps/web/src/routes/Dashboard.tsx",
+        "apps/web/src/routes/Duplicates.tsx",
+        "apps/web/src/routes/ExportPage.tsx",
+        "apps/web/src/routes/ImportHub.tsx",
+        "apps/web/src/routes/Intros.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/Org.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/Record.tsx",
+        "apps/web/src/routes/Repositories.tsx",
+        "apps/web/src/routes/ResumeHub.tsx",
+        "apps/web/src/routes/SearchResults.tsx",
+        "apps/web/src/routes/Settings.tsx",
+        "apps/web/src/routes/Trash.tsx",
+        "apps/web/src/routes/career/ApplicationDossier.tsx",
+        "apps/web/src/routes/career/CareerOverview.tsx",
+        "apps/web/src/routes/tailor/PreviewPane.tsx",
+        "apps/web/src/routes/tailor/TargetRail.tsx",
+        "apps/web/src/routes/workspaces/Planner.tsx"
+      ],
+      "uses": 28,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "SkeletonText",
+      "module": "feedback.tsx",
+      "source": "packages/ui/src/feedback.tsx:28",
+      "section": "Skeleton",
+      "doc": "N stacked text lines, the last one shorter.",
+      "props": [
+        {
+          "name": "lines",
+          "type": "number",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "lines": "3"
+      },
+      "classes": [
+        "vt-skel-text"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/Composer.tsx"
+      ],
+      "uses": 1,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Spinner",
+      "module": "components.tsx",
+      "source": "packages/ui/src/components.tsx:340",
+      "section": "Spinner",
+      "doc": null,
+      "props": [],
+      "defaults": {},
+      "classes": [
+        "vt-spinner"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-label",
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/features/forms/NodeFormDialog.tsx"
+      ],
+      "uses": 2,
+      "tested": false,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Spread",
+      "module": "layout.tsx",
+      "source": "packages/ui/src/layout.tsx:316",
+      "section": "Stack / Inline / Spread / ChipGroup",
+      "doc": "Two ends of a line, space between. This is `.spread`.",
+      "props": [],
+      "defaults": {
+        "gap": "2"
+      },
+      "classes": [
+        "vt-spread"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/components/ListToolbar.tsx",
+        "apps/web/src/features/Composer.tsx",
+        "apps/web/src/features/forms/KnowsEditor.tsx",
+        "apps/web/src/features/graph/GraphDisplayPrefs.tsx",
+        "apps/web/src/features/graph/GraphSearch.tsx"
+      ],
+      "uses": 5,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/layout.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Stack",
+      "module": "layout.tsx",
+      "source": "packages/ui/src/layout.tsx:267",
+      "section": "Stack / Inline / Spread / ChipGroup",
+      "doc": "Vertical flow. This is `.stack`.",
+      "props": [],
+      "defaults": {
+        "gap": "3"
+      },
+      "classes": [
+        "vt-stack"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/InteractionLogger.tsx",
+        "apps/web/src/features/forms/AddConnection.tsx",
+        "apps/web/src/features/graph/GraphDisplayPrefs.tsx",
+        "apps/web/src/routes/Atoms.tsx"
+      ],
+      "uses": 4,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/layout.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "StatusTrace",
+      "module": "feedback.tsx",
+      "source": "packages/ui/src/feedback.tsx:167",
+      "section": "StatusTrace",
+      "doc": "A compact textual + visual state signal for the Living Ledger. The line and node echo a record moving through a trace, but the label is always present and carries the meaning. Its motion runs once when the state mounts; it never loops, pulses, or pretends that idle work is progressing.",
+      "props": [
+        {
+          "name": "label",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": "Short state text: \"Refreshing records\", \"Draft saved\"."
+        },
+        {
+          "name": "detail",
+          "type": "ReactNode",
+          "optional": true,
+          "doc": "Optional evidence, timestamp, or stage counter."
+        },
+        {
+          "name": "tone",
+          "type": "StatusTraceTone",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "announce",
+          "type": "boolean",
+          "optional": true,
+          "doc": "Set false when a surrounding live region already announces the state."
+        }
+      ],
+      "defaults": {
+        "tone": "'neutral'",
+        "announce": "true"
+      },
+      "classes": [
+        "vt-status-trace",
+        "vt-status-trace__label",
+        "vt-status-trace__mark",
+        "vt-status-trace__node"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-live",
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/components/EntityPicker.tsx",
+        "apps/web/src/components/QueryBoundary.tsx",
+        "apps/web/src/features/Composer.tsx",
+        "apps/web/src/features/QuickAdd.tsx",
+        "apps/web/src/features/forms/AddConnection.tsx",
+        "apps/web/src/features/forms/ConnectionRow.tsx",
+        "apps/web/src/features/forms/KnowsEditor.tsx",
+        "apps/web/src/features/forms/SubjectPicker.tsx",
+        "apps/web/src/features/forms/SuggestTagInput.tsx",
+        "apps/web/src/features/forms/SuggestTextInput.tsx",
+        "apps/web/src/features/graph/GraphPeek.tsx",
+        "apps/web/src/features/graph/GraphToolbar.tsx",
+        "apps/web/src/features/map/AtlasCanvas.tsx",
+        "apps/web/src/features/map/AtlasCompareDock.tsx",
+        "apps/web/src/features/map/AtlasDossier.tsx",
+        "apps/web/src/features/map/AtlasToolbar.tsx",
+        "apps/web/src/features/map/AtlasView.tsx",
+        "apps/web/src/features/timeline/TimelineReview.tsx",
+        "apps/web/src/features/timeline/TimelineToolbar.tsx",
+        "apps/web/src/features/timeline/TimelineView.tsx",
+        "apps/web/src/routes/Ask.tsx",
+        "apps/web/src/routes/Billing.tsx",
+        "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Duplicates.tsx",
+        "apps/web/src/routes/ExportPage.tsx",
+        "apps/web/src/routes/ImportHub.tsx",
+        "apps/web/src/routes/Intros.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/NotFound.tsx",
+        "apps/web/src/routes/Org.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/Repositories.tsx",
+        "apps/web/src/routes/Settings.tsx",
+        "apps/web/src/routes/Templates.tsx",
+        "apps/web/src/routes/Trash.tsx",
+        "apps/web/src/routes/career/ApplicationDossier.tsx",
+        "apps/web/src/routes/career/CareerOverview.tsx",
+        "apps/web/src/routes/reference/EntityCatalog.tsx",
+        "apps/web/src/routes/reference/EntityObservatoryGraph.tsx",
+        "apps/web/src/routes/tailor/DocumentPane.tsx",
+        "apps/web/src/routes/tailor/PreviewPane.tsx",
+        "apps/web/src/routes/tailor/SelectionPane.tsx",
+        "apps/web/src/routes/tailor/TargetRail.tsx"
+      ],
+      "uses": 44,
+      "tested": true,
+      "styled_in": [
+        "apps/web/src/styles/data-workspace.css",
+        "apps/web/src/styles/explore-workspace.css",
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "StrengthBar",
+      "module": "components.tsx",
+      "source": "packages/ui/src/components.tsx:238",
+      "section": "StrengthBar",
+      "doc": null,
+      "props": [
+        {
+          "name": "value",
+          "type": "number",
+          "optional": false,
+          "doc": "0-1."
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": false,
+          "doc": "What the number means, e.g. \"tie strength\". Kept short and free of the row's subject: the row already announces who it is, so repeating the name in every cell is verbose to a screen reader, and it made the name match twice for any test querying by text."
+        }
+      ],
+      "defaults": {},
+      "classes": [
+        "vt-strength",
+        "vt-strength__fill",
+        "vt-strength__track"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/routes/Org.tsx",
+        "apps/web/src/routes/Orgs.tsx",
+        "apps/web/src/routes/People.tsx",
+        "apps/web/src/routes/SearchResults.tsx"
+      ],
+      "uses": 4,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "StrengthDonut",
+      "module": "components.tsx",
+      "source": "packages/ui/src/components.tsx:400",
+      "section": "StrengthDonut (person page, strength with decomposition ring)",
+      "doc": null,
+      "props": [
+        {
+          "name": "strength",
+          "type": "number",
+          "optional": false,
+          "doc": "0..1 overall tie strength."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "size": "104"
+      },
+      "classes": [
+        "vt-donut",
+        "vt-donut__center",
+        "vt-donut__label"
+      ],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/routes/Person.tsx"
+      ],
+      "uses": 1,
+      "tested": false,
+      "styled_in": [
+        "apps/web/src/styles/network.css",
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "StringListField",
+      "module": "forms.tsx",
+      "source": "packages/ui/src/forms.tsx:335",
+      "section": "StringListField (ordered free-text rows)",
+      "doc": null,
+      "props": [
+        {
+          "name": "value",
+          "type": "string[]",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "onChange",
+          "type": "(value: string[]) => void",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "mono",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "addLabel",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "addLabel": "'Add'"
+      },
+      "classes": [
+        "vt-strlist",
+        "vt-strlist__add",
+        "vt-strlist__row",
+        "vt-strlist__x"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-label"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/forms/FieldRenderer.tsx"
+      ],
+      "uses": 1,
+      "tested": false,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Tabs",
+      "module": "layout.tsx",
+      "source": "packages/ui/src/layout.tsx:530",
+      "section": "Tabs",
+      "doc": "A tab strip with the roles and the keyboard the pattern requires: one tab stop for the whole strip (roving tabindex), arrows to move between tabs, Home/End to reach the ends. The six hand-rolled strips in the app were runs of plain buttons, so a keyboard user tabbed through every one of them and a screen reader was never told which was current. Selection follows focus, which is the right choice when the panel is already rendered and switching costs nothing.",
+      "props": [],
+      "defaults": {},
+      "classes": [
+        "vt-tabs",
+        "vt-tabs__list",
+        "vt-tabs__panel",
+        "vt-tabs__tab"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-controls",
+        "aria-label",
+        "aria-labelledby",
+        "aria-selected",
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/routes/reference/EntityCatalog.tsx"
+      ],
+      "uses": 1,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/layout.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "TagInput",
+      "module": "forms.tsx",
+      "source": "packages/ui/src/forms.tsx:230",
+      "section": "TagInput (chips + Enter/comma/paste, Backspace pops)",
+      "doc": null,
+      "props": [
+        {
+          "name": "value",
+          "type": "string[]",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "onChange",
+          "type": "(value: string[]) => void",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "mono",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "optional": true,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "placeholder": "'Add…'"
+      },
+      "classes": [
+        "vt-tags",
+        "vt-tags__input",
+        "vt-tags__tag",
+        "vt-tags__x"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-label"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/forms/EdgeSubEditorRow.tsx",
+        "apps/web/src/features/forms/FieldRenderer.tsx",
+        "apps/web/src/features/forms/KnowsEditor.tsx"
+      ],
+      "uses": 3,
+      "tested": false,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Textarea",
+      "module": "forms.tsx",
+      "source": "packages/ui/src/forms.tsx:78",
+      "section": "Input / Textarea",
+      "doc": null,
+      "props": [],
+      "defaults": {
+        "autoGrow": "true"
+      },
+      "classes": [
+        "vt-inp",
+        "vt-inp--area",
+        "vt-inp--invalid"
+      ],
+      "wraps_radix": [],
+      "aria": [
+        "aria-invalid"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/Composer.tsx",
+        "apps/web/src/features/forms/EntityForm.tsx",
+        "apps/web/src/features/forms/FieldRenderer.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/ImportHub.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/Settings.tsx",
+        "apps/web/src/routes/tailor/PreviewPane.tsx",
+        "apps/web/src/routes/tailor/TargetRail.tsx"
+      ],
+      "uses": 9,
+      "tested": false,
+      "styled_in": [
+        "apps/web/src/styles/data-tools.css",
+        "apps/web/src/styles/network.css",
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Toast",
+      "module": "toast.tsx",
+      "source": "packages/ui/src/toast.tsx:172",
+      "section": "Toast (presentational item)",
+      "doc": null,
+      "props": [
+        {
+          "name": "message",
+          "type": "string",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "variant",
+          "type": "ToastVariant",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "action",
+          "type": "ToastActionSpec",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "duration",
+          "type": "number",
+          "optional": true,
+          "doc": "Milliseconds before auto dismiss. Radix pauses this on hover and focus."
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "swipeAxis",
+          "type": "'x' | 'y'",
+          "optional": true,
+          "doc": "Which axis the swipe offset follows; set by the provider."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "optional": true,
+          "doc": "Compatibility hook for an application migrating an existing selector."
+        },
+        {
+          "name": "announcementMode",
+          "type": "ToastAnnouncementMode",
+          "optional": true,
+          "doc": "Provider-controlled compatibility mode; prefer the default Radix announcer."
+        }
+      ],
+      "defaults": {
+        "variant": "'status'",
+        "swipeAxis": "'x'",
+        "announcementMode": "'radix'"
+      },
+      "classes": [
+        "vt-toast",
+        "vt-toast__action",
+        "vt-toast__body",
+        "vt-toast__glyph",
+        "vt-toast__msg",
+        "vt-toast__row",
+        "vt-toast__word",
+        "vt-toast__x"
+      ],
+      "wraps_radix": [
+        "toast"
+      ],
+      "aria": [
+        "aria-atomic",
+        "aria-label",
+        "aria-live",
+        "role"
+      ],
+      "renders_jsx": true,
+      "used_by": [],
+      "uses": 0,
+      "tested": false,
+      "styled_in": [
+        "packages/ui/src/styles/toast.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "ToastProvider",
+      "module": "toast.tsx",
+      "source": "packages/ui/src/toast.tsx:259",
+      "section": "ToastProvider",
+      "doc": null,
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "swipeDirection",
+          "type": "ToastSwipeDirection",
+          "optional": true,
+          "doc": "Direction a pointer swipe dismisses in. Defaults to the viewport corner."
+        },
+        {
+          "name": "itemClassName",
+          "type": "string",
+          "optional": true,
+          "doc": "Applied to every toast while a host app migrates legacy selectors."
+        },
+        {
+          "name": "announcementMode",
+          "type": "ToastAnnouncementMode",
+          "optional": true,
+          "doc": "`radix` uses Radix's delayed, portalled announcer. `item` keeps legacy role=status/alert selectors on the visible item while preserving the queue, focus pause, hotkey, and swipe behavior."
+        }
+      ],
+      "defaults": {
+        "swipeDirection": "'right'",
+        "announcementMode": "'radix'"
+      },
+      "classes": [
+        "vt-toast-viewport"
+      ],
+      "wraps_radix": [
+        "toast"
+      ],
+      "aria": [
+        "aria-live",
+        "aria-relevant"
+      ],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/features/Toast.tsx",
+        "apps/web/src/test/render.tsx"
+      ],
+      "uses": 3,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/toast.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "Tooltip",
+      "module": "overlay.tsx",
+      "source": "packages/ui/src/overlay.tsx:251",
+      "section": "Tooltip",
+      "doc": null,
+      "props": [
+        {
+          "name": "content",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        },
+        {
+          "name": "side",
+          "type": "'top' | 'bottom' | 'left' | 'right'",
+          "optional": true,
+          "doc": null
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        }
+      ],
+      "defaults": {
+        "side": "'top'"
+      },
+      "classes": [
+        "vt-tooltip",
+        "vt-tooltip__arrow"
+      ],
+      "wraps_radix": [
+        "tooltip"
+      ],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/app/Shell.tsx",
+        "apps/web/src/features/graph/GraphToolbar.tsx",
+        "apps/web/src/features/map/AtlasToolbar.tsx"
+      ],
+      "uses": 3,
+      "tested": true,
+      "styled_in": [
+        "packages/ui/src/styles/components.css"
+      ],
+      "unstyled_classes": []
+    },
+    {
+      "name": "TooltipProvider",
+      "module": "overlay.tsx",
+      "source": "packages/ui/src/overlay.tsx:243",
+      "section": "Tooltip",
+      "doc": null,
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        }
+      ],
+      "defaults": {},
+      "classes": [],
+      "wraps_radix": [
+        "tooltip"
+      ],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/app/Shell.tsx"
+      ],
+      "uses": 1,
+      "tested": true,
+      "styled_in": [],
+      "unstyled_classes": []
+    }
+  ],
+  "hooks": [
+    {
+      "name": "useAnimatedNumber",
+      "module": "use-animated-number.ts",
+      "source": "packages/ui/src/use-animated-number.ts:165",
+      "section": null,
+      "doc": "The value to render right now, easing toward `target` whenever `target` changes. Returns `target` verbatim on first render, under reduced motion, where the document reports no --ae-dur, and anywhere requestAnimationFrame is missing: a value appearing is not a value changing, and there is nothing to report.",
+      "props": [],
+      "defaults": {},
+      "classes": [],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": false,
+      "used_by": [],
+      "uses": 0,
+      "tested": true
+    },
+    {
+      "name": "useDebounced",
+      "module": "forms.tsx",
+      "source": "packages/ui/src/forms.tsx:414",
+      "section": "useDebounced (shared helper for pickers/search)",
+      "doc": null,
+      "props": [],
+      "defaults": {},
+      "classes": [],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/components/EntityPicker.tsx",
+        "apps/web/src/features/forms/SuggestTagInput.tsx",
+        "apps/web/src/features/forms/SuggestTextInput.tsx"
+      ],
+      "uses": 3,
+      "tested": false
+    },
+    {
+      "name": "useReducedMotion",
+      "module": "use-reduced-motion.ts",
+      "source": "packages/ui/src/use-reduced-motion.ts:68",
+      "section": null,
+      "doc": "True while the user has asked the system for reduced motion. Re-renders when the preference changes, if the platform lets us hear about it.",
+      "props": [],
+      "defaults": {},
+      "classes": [],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": false,
+      "used_by": [
+        "apps/web/src/lib/motion.ts",
+        "packages/ui/src/use-animated-number.ts"
+      ],
+      "uses": 2,
+      "tested": true
+    },
+    {
+      "name": "useToast",
+      "module": "toast.tsx",
+      "source": "packages/ui/src/toast.tsx:150",
+      "section": null,
+      "doc": "Fire a toast. Must be called under a <ToastProvider>.",
+      "props": [],
+      "defaults": {},
+      "classes": [],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/features/BulkEdgeDelete.tsx",
+        "apps/web/src/features/BulkNodeDelete.tsx",
+        "apps/web/src/features/Composer.tsx",
+        "apps/web/src/features/InteractionLogger.tsx",
+        "apps/web/src/features/QuickAdd.tsx",
+        "apps/web/src/features/RemindersDrawer.tsx",
+        "apps/web/src/features/Toast.tsx",
+        "apps/web/src/features/forms/AddConnection.tsx",
+        "apps/web/src/features/forms/ConnectionRow.tsx",
+        "apps/web/src/features/forms/KnowsEditor.tsx",
+        "apps/web/src/features/forms/NodeFormDialog.tsx",
+        "apps/web/src/features/graph/GraphView.tsx",
+        "apps/web/src/features/map/AtlasView.tsx",
+        "apps/web/src/routes/Atoms.tsx",
+        "apps/web/src/routes/Billing.tsx",
+        "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Dashboard.tsx",
+        "apps/web/src/routes/Duplicates.tsx",
+        "apps/web/src/routes/ExportPage.tsx",
+        "apps/web/src/routes/ImportHub.tsx",
+        "apps/web/src/routes/Letters.tsx",
+        "apps/web/src/routes/Org.tsx",
+        "apps/web/src/routes/Outputs.tsx",
+        "apps/web/src/routes/Person.tsx",
+        "apps/web/src/routes/Record.tsx",
+        "apps/web/src/routes/Repositories.tsx",
+        "apps/web/src/routes/Settings.tsx",
+        "apps/web/src/routes/Templates.tsx",
+        "apps/web/src/routes/Trash.tsx"
+      ],
+      "uses": 29,
+      "tested": true
+    }
+  ],
+  "summary": {
+    "components": 60,
+    "hooks": 4,
+    "modules": {
+      "layout.tsx": 9,
+      "components.tsx": 16,
+      "forms.tsx": 9,
+      "combobox.tsx": 1,
+      "overlay.tsx": 13,
+      "feedback.tsx": 6,
+      "glyphs.tsx": 1,
+      "brand.tsx": 3,
+      "toast.tsx": 2
+    },
+    "with_props": 47,
+    "radix_backed": [
+      "Checkbox",
+      "Combobox",
+      "CommandOverlay",
+      "Menu",
+      "Modal",
+      "Popover",
+      "Select",
+      "Sheet",
+      "Toast",
+      "ToastProvider",
+      "Tooltip",
+      "TooltipProvider"
+    ],
+    "undocumented": [
+      "Combobox",
+      "Glyph"
+    ],
+    "unused": [
+      "Card",
+      "Combobox",
+      "HelpTip",
+      "Toast"
+    ],
+    "untested": [
+      "ChargeRing",
+      "Chip",
+      "ConfirmDialog",
+      "FactorChip",
+      "Field",
+      "Glyph",
+      "HelpTip",
+      "InfoPopover",
+      "Kbd",
+      "LogoHorizontal",
+      "LogoMark",
+      "LogoStacked",
+      "Meter",
+      "MoneyField",
+      "Mono",
+      "ProvenanceChip",
+      "Rating",
+      "Spinner",
+      "StrengthDonut",
+      "StringListField",
+      "TagInput",
+      "Textarea",
+      "Toast"
+    ],
+    "unstyled_classes": [
+      "vt-cbx__input",
+      "vt-fld--error",
+      "vt-info"
+    ]
+  }
+}

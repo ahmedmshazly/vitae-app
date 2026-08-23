@@ -1,0 +1,6599 @@
+{
+  "tests": [
+    {
+      "file": "apps/api/src/__tests__/aperture-import.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 289
+    },
+    {
+      "file": "apps/api/src/__tests__/api.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 37,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/app.js"
+      ],
+      "requirements": [
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-010",
+        "FR-011",
+        "FR-012",
+        "FR-013",
+        "FR-021",
+        "FR-CAP-002",
+        "FR-CAP-003",
+        "FR-RES-020"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 1658
+    },
+    {
+      "file": "apps/api/src/__tests__/contracts/error-envelope.contract.test.ts",
+      "package": "@vitae/api",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "API error envelope contract"
+      ],
+      "subjects": [
+        "../helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test:contract",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 66
+    },
+    {
+      "file": "apps/api/src/__tests__/contracts/openapi.contract.test.ts",
+      "package": "@vitae/api",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "OpenAPI document"
+      ],
+      "subjects": [
+        "../../openapi/mounts.js",
+        "../../openapi/spec.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test:contract",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 76
+    },
+    {
+      "file": "apps/api/src/__tests__/resilience/database-unavailable.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "database unavailability"
+      ],
+      "subjects": [
+        "../helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test:resilience",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 38
+    },
+    {
+      "file": "apps/api/src/__tests__/resume-render.test.ts",
+      "package": "@vitae/api",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "renderTemplate (cobalt)",
+        "renderTemplate (onyx)"
+      ],
+      "subjects": [
+        "../services/resume-model.js",
+        "../services/resume.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 126
+    },
+    {
+      "file": "apps/api/src/__tests__/resume-scope.test.ts",
+      "package": "@vitae/api",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "the résumé contains only the owner’s records"
+      ],
+      "subjects": [
+        "../services/resume-model.js",
+        "../services/resume.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 167
+    },
+    {
+      "file": "apps/api/src/__tests__/security/http-hardening.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "HTTP security hardening"
+      ],
+      "subjects": [
+        "../helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test:security",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 69
+    },
+    {
+      "file": "apps/api/src/cloud/config.test.ts",
+      "package": "@vitae/api",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Cloud commercial configuration"
+      ],
+      "subjects": [
+        "./config.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 12
+    },
+    {
+      "file": "apps/api/src/db/schema.test.ts",
+      "package": "@vitae/api",
+      "cases": 13,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "jsonb document storage",
+        "generated columns",
+        "docMerge",
+        "identity keys",
+        "data spaces",
+        "import subcollections"
+      ],
+      "subjects": [
+        "./pg.js",
+        "./repository.js",
+        "./schema.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 250
+    },
+    {
+      "file": "apps/api/src/db/space.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "runInSpace / currentSpace",
+        "x-vitae-space header"
+      ],
+      "subjects": [
+        "../__tests__/helpers/app.js",
+        "./space.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 68
+    },
+    {
+      "file": "apps/api/src/middleware/auth.test.ts",
+      "package": "@vitae/api",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "cross-project Firebase tokens"
+      ],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test:security",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 116
+    },
+    {
+      "file": "apps/api/src/middleware/error.test.ts",
+      "package": "@vitae/api",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "errorHandler",
+        "asyncHandler"
+      ],
+      "subjects": [
+        "../db/repository.js",
+        "./error.js",
+        "./request-context.js"
+      ],
+      "requirements": [
+        "FR-010"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 83
+    },
+    {
+      "file": "apps/api/src/middleware/request-context.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "requestContext"
+      ],
+      "subjects": [
+        "./request-context.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 70
+    },
+    {
+      "file": "apps/api/src/middleware/security.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "cspNonce",
+        "securityHeaders"
+      ],
+      "subjects": [
+        "./security.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test:security",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 51
+    },
+    {
+      "file": "apps/api/src/routes/v1/applications.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "application routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 135
+    },
+    {
+      "file": "apps/api/src/routes/v1/ask.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "ask routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 48
+    },
+    {
+      "file": "apps/api/src/routes/v1/atoms.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "atoms routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 107
+    },
+    {
+      "file": "apps/api/src/routes/v1/auth.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "/api/v1/auth"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 44
+    },
+    {
+      "file": "apps/api/src/routes/v1/capture.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "POST /api/v1/capture"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 58
+    },
+    {
+      "file": "apps/api/src/routes/v1/cloud.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Vitae Cloud control plane"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js",
+        "../../cloud/config.js",
+        "../../cloud/paddle.js",
+        "../../db/pg.js",
+        "../../db/schema.js",
+        "../../env.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 210
+    },
+    {
+      "file": "apps/api/src/routes/v1/composer.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "composer routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 43
+    },
+    {
+      "file": "apps/api/src/routes/v1/dashboard.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "dashboard route"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 34
+    },
+    {
+      "file": "apps/api/src/routes/v1/duplicates.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "duplicates merge/undo"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [
+        "FR-002",
+        "FR-003"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 85
+    },
+    {
+      "file": "apps/api/src/routes/v1/edges.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "POST/GET/DELETE /api/v1/edges"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 146
+    },
+    {
+      "file": "apps/api/src/routes/v1/explore.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "explore routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 132
+    },
+    {
+      "file": "apps/api/src/routes/v1/export.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "export routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [
+        "FR-001",
+        "FR-012",
+        "FR-021"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 89
+    },
+    {
+      "file": "apps/api/src/routes/v1/favors.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "favors routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 51
+    },
+    {
+      "file": "apps/api/src/routes/v1/habits.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "habits routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 53
+    },
+    {
+      "file": "apps/api/src/routes/v1/imports.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "imports routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 35
+    },
+    {
+      "file": "apps/api/src/routes/v1/interactions.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "interactions routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [
+        "FR-002"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 44
+    },
+    {
+      "file": "apps/api/src/routes/v1/intros.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "intros routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 132
+    },
+    {
+      "file": "apps/api/src/routes/v1/letters.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "letters routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [
+        "FR-RES-020"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 63
+    },
+    {
+      "file": "apps/api/src/routes/v1/nodes.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "POST/GET /api/v1/nodes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 84
+    },
+    {
+      "file": "apps/api/src/routes/v1/orgs.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "orgs routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 40
+    },
+    {
+      "file": "apps/api/src/routes/v1/people.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "people routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 48
+    },
+    {
+      "file": "apps/api/src/routes/v1/places.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "places routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 55
+    },
+    {
+      "file": "apps/api/src/routes/v1/reminders.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "reminders routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 63
+    },
+    {
+      "file": "apps/api/src/routes/v1/resumes.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "résumé routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [
+        "FR-011"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 66
+    },
+    {
+      "file": "apps/api/src/routes/v1/retention.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "GET/POST /api/v1/retention"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js",
+        "../../db/repository.js",
+        "../../services/retention.js"
+      ],
+      "requirements": [
+        "FR-006"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 73
+    },
+    {
+      "file": "apps/api/src/routes/v1/search.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "GET /api/v1/search"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 48
+    },
+    {
+      "file": "apps/api/src/routes/v1/settings.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "settings routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 34
+    },
+    {
+      "file": "apps/api/src/routes/v1/status.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "status route"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 28
+    },
+    {
+      "file": "apps/api/src/routes/v1/suggest.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "suggest routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [
+        "FR-CAP-003"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 35
+    },
+    {
+      "file": "apps/api/src/routes/v1/targets.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "targets routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 59
+    },
+    {
+      "file": "apps/api/src/routes/v1/views.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "views routes"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 37
+    },
+    {
+      "file": "apps/api/src/services/buildsvc-client.test.ts",
+      "package": "@vitae/api",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "buildsvc compile client"
+      ],
+      "subjects": [],
+      "requirements": [
+        "FR-RES-013"
+      ],
+      "run_by": [
+        "test:api",
+        "test:resilience",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 65
+    },
+    {
+      "file": "apps/api/src/services/crm.test.ts",
+      "package": "@vitae/api",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "peopleList"
+      ],
+      "subjects": [
+        "./crm.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 58
+    },
+    {
+      "file": "apps/api/src/services/restore.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "restoreBundle"
+      ],
+      "subjects": [],
+      "requirements": [
+        "FR-001"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 24
+    },
+    {
+      "file": "apps/api/src/services/secrets.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "secrets store"
+      ],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 48
+    },
+    {
+      "file": "apps/api/src/services/subjects.test.ts",
+      "package": "@vitae/api",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "buildOwnerIndex",
+        "skillIdsFor"
+      ],
+      "subjects": [
+        "./subjects.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 138
+    },
+    {
+      "file": "apps/api/src/services/suggest.test.ts",
+      "package": "@vitae/api",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "suggestValues",
+        "read cost"
+      ],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 151
+    },
+    {
+      "file": "apps/web/src/App.public.test.tsx",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "public application routes"
+      ],
+      "subjects": [
+        "./App.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 48
+    },
+    {
+      "file": "apps/web/src/App.test.tsx",
+      "package": "@vitae/web",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "public reference routing"
+      ],
+      "subjects": [
+        "./App.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 20
+    },
+    {
+      "file": "apps/web/src/app/Breadcrumb.test.tsx",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Breadcrumb"
+      ],
+      "subjects": [
+        "./Breadcrumb.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 27
+    },
+    {
+      "file": "apps/web/src/app/commands.test.ts",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "matchCommand",
+        "buildCommands"
+      ],
+      "subjects": [
+        "./commands.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 44
+    },
+    {
+      "file": "apps/web/src/app/routes.test.ts",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "workspace route registry"
+      ],
+      "subjects": [
+        "./routes.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 36
+    },
+    {
+      "file": "apps/web/src/app/Shell.test.tsx",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Shell"
+      ],
+      "subjects": [
+        "./Shell.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 104
+    },
+    {
+      "file": "apps/web/src/components/BulkBar.test.tsx",
+      "package": "@vitae/web",
+      "cases": 20,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "BulkBar",
+        "chrome"
+      ],
+      "subjects": [
+        "./BulkBar.js",
+        "@vitae/ui"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 298
+    },
+    {
+      "file": "apps/web/src/components/EntityPicker.test.tsx",
+      "package": "@vitae/web",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "EntityPicker"
+      ],
+      "subjects": [
+        "./EntityPicker.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 126
+    },
+    {
+      "file": "apps/web/src/components/ErrorBoundary.test.tsx",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "ErrorBoundary"
+      ],
+      "subjects": [
+        "./ErrorBoundary.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 83
+    },
+    {
+      "file": "apps/web/src/components/ListToolbar.test.tsx",
+      "package": "@vitae/web",
+      "cases": 16,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "countLabel",
+        "ListToolbar accessibility",
+        "ListToolbar and the URL",
+        "ListToolbar query box"
+      ],
+      "subjects": [
+        "../lib/list-params.js",
+        "./ListToolbar.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 239
+    },
+    {
+      "file": "apps/web/src/components/QueryBoundary.test.tsx",
+      "package": "@vitae/web",
+      "cases": 34,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "QueryBoundary states",
+        "QueryBoundary empties",
+        "QueryBoundary degraded secondary queries",
+        "QueryBoundary box",
+        "QueryBoundary motion",
+        "QueryBoundary with real query results",
+        "keepLastResults"
+      ],
+      "subjects": [
+        "../lib/motion.js",
+        "./QueryBoundary.js",
+        "@vitae/ui"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 689
+    },
+    {
+      "file": "apps/web/src/features/BulkEdgeDelete.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "bulk unlink says which connections survived",
+        "the unlink bar behaves like the delete bar"
+      ],
+      "subjects": [
+        "../components/BulkBar.js",
+        "./BulkEdgeDelete.js",
+        "./BulkNodeDelete.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 166
+    },
+    {
+      "file": "apps/web/src/features/BulkNodeDelete.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "bulk delete says which records did not move",
+        "the selection bar is reachable and out of the way",
+        "the row control is a checkbox everywhere it appears"
+      ],
+      "subjects": [
+        "../components/BulkBar.js",
+        "../lib/api.js",
+        "./BulkNodeDelete.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 209
+    },
+    {
+      "file": "apps/web/src/features/Composer.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 10,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Composer states"
+      ],
+      "subjects": [
+        "./Composer.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 238
+    },
+    {
+      "file": "apps/web/src/features/Composer.test.tsx",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Composer"
+      ],
+      "subjects": [
+        "./Composer.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 63
+    },
+    {
+      "file": "apps/web/src/features/FirstRun.test.tsx",
+      "package": "@vitae/web",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "FirstRun"
+      ],
+      "subjects": [
+        "./FirstRun.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 25
+    },
+    {
+      "file": "apps/web/src/features/forms/AddConnection.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "AddConnection reports a refused link where it happened",
+        "AddConnection names its own controls"
+      ],
+      "subjects": [
+        "./AddConnection.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 157
+    },
+    {
+      "file": "apps/web/src/features/forms/AddConnection.test.tsx",
+      "package": "@vitae/web",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "AddConnection"
+      ],
+      "subjects": [
+        "./AddConnection.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 33
+    },
+    {
+      "file": "apps/web/src/features/forms/ConnectionComposer.test.ts",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "creation-form connection coverage"
+      ],
+      "subjects": [
+        "./ConnectionComposer.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 36
+    },
+    {
+      "file": "apps/web/src/features/forms/ConnectionRow.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 10,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "a failed unlink stays on screen",
+        "a failed property save stays on screen",
+        "the row actions are reachable without a pointer"
+      ],
+      "subjects": [
+        "./ConnectionRow.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 197
+    },
+    {
+      "file": "apps/web/src/features/forms/ConnectionRow.test.tsx",
+      "package": "@vitae/web",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "ConnectionRow"
+      ],
+      "subjects": [
+        "./ConnectionRow.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 43
+    },
+    {
+      "file": "apps/web/src/features/forms/EdgeSubEditorRow.test.tsx",
+      "package": "@vitae/web",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "EdgeSubEditorRow"
+      ],
+      "subjects": [
+        "./EdgeSubEditorRow.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 50
+    },
+    {
+      "file": "apps/web/src/features/forms/EntityForm.test.tsx",
+      "package": "@vitae/web",
+      "cases": 10,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "EntityForm, title-only submit is never a silent no-op",
+        "EntityForm, subject-bearing types demand an owner",
+        "EntityForm, a type with no required props submits on title alone",
+        "EntityForm, validation waits for the user",
+        "EntityForm, who owns the buttons"
+      ],
+      "subjects": [
+        "./EntityForm.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 167
+    },
+    {
+      "file": "apps/web/src/features/forms/FieldRenderer.test.tsx",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "FieldRenderer"
+      ],
+      "subjects": [
+        "./FieldRenderer.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 81
+    },
+    {
+      "file": "apps/web/src/features/forms/InlinePropInput.test.ts",
+      "package": "@vitae/web",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "InlinePropInput covers every widget the edge descriptors use"
+      ],
+      "subjects": [
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 124
+    },
+    {
+      "file": "apps/web/src/features/forms/KnowsEditor.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "KnowsEditor says when the relationship did not change",
+        "KnowsEditor names the controls a label cannot reach",
+        "KnowsEditor stays inside the panel it sits in"
+      ],
+      "subjects": [
+        "./KnowsEditor.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 107
+    },
+    {
+      "file": "apps/web/src/features/forms/KnowsEditor.test.tsx",
+      "package": "@vitae/web",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "KnowsEditor"
+      ],
+      "subjects": [
+        "./KnowsEditor.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 49
+    },
+    {
+      "file": "apps/web/src/features/forms/NewEntityMenu.test.ts",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "+ New entity menu coverage"
+      ],
+      "subjects": [
+        "./NewEntityMenu.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 17
+    },
+    {
+      "file": "apps/web/src/features/forms/NewNodeButton.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "NewNodeButton"
+      ],
+      "subjects": [
+        "./NewNodeButton.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 39
+    },
+    {
+      "file": "apps/web/src/features/forms/NodeFormDialog.test.tsx",
+      "package": "@vitae/web",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "NodeFormDialog, loading an edit",
+        "NodeFormDialog, a rejected save",
+        "NodeFormDialog, the actions live in the footer"
+      ],
+      "subjects": [
+        "../Toast.js",
+        "./NodeFormDialog.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 138
+    },
+    {
+      "file": "apps/web/src/features/forms/SubjectPicker.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "SubjectPicker says why the shortcut is missing",
+        "SubjectPicker stays inside the form it sits in"
+      ],
+      "subjects": [
+        "./SubjectPicker.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 142
+    },
+    {
+      "file": "apps/web/src/features/forms/SubjectPicker.test.tsx",
+      "package": "@vitae/web",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "SubjectPicker"
+      ],
+      "subjects": [
+        "./SubjectPicker.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 52
+    },
+    {
+      "file": "apps/web/src/features/forms/SuggestTagInput.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "SuggestTagInput reports what it could not do",
+        "SuggestTagInput keeps the combobox contract"
+      ],
+      "subjects": [
+        "./SuggestTagInput.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 132
+    },
+    {
+      "file": "apps/web/src/features/forms/SuggestTagInput.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "SuggestTagInput"
+      ],
+      "subjects": [
+        "./SuggestTagInput.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 48
+    },
+    {
+      "file": "apps/web/src/features/forms/SuggestTextInput.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "SuggestTextInput reports what it could not do",
+        "SuggestTextInput will not mint a duplicate",
+        "SuggestTextInput keeps the combobox contract"
+      ],
+      "subjects": [
+        "./SuggestTextInput.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 157
+    },
+    {
+      "file": "apps/web/src/features/forms/SuggestTextInput.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "SuggestTextInput"
+      ],
+      "subjects": [
+        "./SuggestTextInput.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 62
+    },
+    {
+      "file": "apps/web/src/features/GettingStarted.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "GettingStarted"
+      ],
+      "subjects": [
+        "./GettingStarted.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 44
+    },
+    {
+      "file": "apps/web/src/features/graph/constants.test.ts",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "shortTypeLabel"
+      ],
+      "subjects": [
+        "./constants.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 16
+    },
+    {
+      "file": "apps/web/src/features/graph/displayPrefs.test.ts",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "graph displayPrefs"
+      ],
+      "subjects": [
+        "./displayPrefs.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 40
+    },
+    {
+      "file": "apps/web/src/features/graph/GraphDisplayPrefs.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "GraphDisplayPrefsPanel"
+      ],
+      "subjects": [
+        "./GraphDisplayPrefs.js",
+        "./displayPrefs.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 98
+    },
+    {
+      "file": "apps/web/src/features/graph/GraphDisplayPrefs.test.tsx",
+      "package": "@vitae/web",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "GraphDisplayPrefsPanel"
+      ],
+      "subjects": [
+        "./GraphDisplayPrefs.js",
+        "./displayPrefs.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 47
+    },
+    {
+      "file": "apps/web/src/features/graph/GraphPathfinder.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "GraphPathfinder endpoints"
+      ],
+      "subjects": [
+        "./GraphPathfinder.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 70
+    },
+    {
+      "file": "apps/web/src/features/graph/GraphPathfinder.test.tsx",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "trailAfterJump",
+        "GraphPathfinder"
+      ],
+      "subjects": [
+        "./GraphPathfinder.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 66
+    },
+    {
+      "file": "apps/web/src/features/graph/GraphPeek.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 11,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "GraphPeek dossier",
+        "PathStory"
+      ],
+      "subjects": [
+        "../../lib/graph-palette.js",
+        "./GraphPeek.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 181
+    },
+    {
+      "file": "apps/web/src/features/graph/GraphPeek.test.tsx",
+      "package": "@vitae/web",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "GraphPeek",
+        "PathStory"
+      ],
+      "subjects": [
+        "../../lib/graph-palette.js",
+        "./GraphPeek.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 100
+    },
+    {
+      "file": "apps/web/src/features/graph/GraphSearch.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "GraphSearch combobox",
+        "ConnectedList"
+      ],
+      "subjects": [
+        "./GraphSearch.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 143
+    },
+    {
+      "file": "apps/web/src/features/graph/GraphSearch.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "GraphSearch"
+      ],
+      "subjects": [
+        "./GraphSearch.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 42
+    },
+    {
+      "file": "apps/web/src/features/graph/GraphToolbar.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 10,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "GraphToolbar trace",
+        "GraphToolbar control bands"
+      ],
+      "subjects": [
+        "../../lib/graph-palette.js",
+        "./GraphToolbar.js",
+        "@vitae/ui"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 132
+    },
+    {
+      "file": "apps/web/src/features/graph/GraphToolbar.test.tsx",
+      "package": "@vitae/web",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "GraphToolbar"
+      ],
+      "subjects": [
+        "../../lib/graph-palette.js",
+        "./GraphToolbar.js",
+        "@vitae/ui"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 67
+    },
+    {
+      "file": "apps/web/src/features/graph/types.test.ts",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "linkEndId",
+        "hashStr"
+      ],
+      "subjects": [
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 18
+    },
+    {
+      "file": "apps/web/src/features/InteractionLogger.test.tsx",
+      "package": "@vitae/web",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "InteractionLogger"
+      ],
+      "subjects": [
+        "./InteractionLogger.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 101
+    },
+    {
+      "file": "apps/web/src/features/map/AtlasCanvas.error.test.tsx",
+      "package": "@vitae/web",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "AtlasCanvas failure path"
+      ],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 223
+    },
+    {
+      "file": "apps/web/src/features/map/AtlasCanvas.test.ts",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "atlas map layers"
+      ],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 44
+    },
+    {
+      "file": "apps/web/src/features/map/AtlasCompareDock.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "AtlasCompareDock states"
+      ],
+      "subjects": [
+        "./AtlasCompareDock.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 70
+    },
+    {
+      "file": "apps/web/src/features/map/AtlasDossier.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "AtlasDossier states"
+      ],
+      "subjects": [
+        "./AtlasDossier.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 83
+    },
+    {
+      "file": "apps/web/src/features/map/AtlasToolbar.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "AtlasToolbar states"
+      ],
+      "subjects": [
+        "./AtlasToolbar.js",
+        "./displayPrefs.js",
+        "@vitae/ui"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 87
+    },
+    {
+      "file": "apps/web/src/features/map/geo.test.ts",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "spreadCollidingPins"
+      ],
+      "subjects": [
+        "./geo.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 33
+    },
+    {
+      "file": "apps/web/src/features/map/PlaceResolvePanel.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "PlaceResolvePanel states"
+      ],
+      "subjects": [
+        "../../lib/api.js",
+        "./PlaceResolvePanel.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 122
+    },
+    {
+      "file": "apps/web/src/features/QuickAdd.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "QuickAdd"
+      ],
+      "subjects": [
+        "./QuickAdd.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 56
+    },
+    {
+      "file": "apps/web/src/features/QuickSwitcher.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "QuickSwitcher keyboard"
+      ],
+      "subjects": [
+        "./QuickSwitcher.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 74
+    },
+    {
+      "file": "apps/web/src/features/RemindersDrawer.test.tsx",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "RemindersDrawer"
+      ],
+      "subjects": [
+        "./RemindersDrawer.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 62
+    },
+    {
+      "file": "apps/web/src/features/timeline/displayPrefs.test.ts",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "timeline displayPrefs"
+      ],
+      "subjects": [
+        "./displayPrefs.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 41
+    },
+    {
+      "file": "apps/web/src/features/timeline/TimelineCanvas.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "TimelineCanvas keyboard",
+        "TimelineCanvas structure"
+      ],
+      "subjects": [
+        "../../lib/graph-palette.js",
+        "./TimelineCanvas.js",
+        "./displayPrefs.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 191
+    },
+    {
+      "file": "apps/web/src/features/timeline/TimelineCanvas.test.ts",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "itemLabel"
+      ],
+      "subjects": [
+        "./TimelineCanvas.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 49
+    },
+    {
+      "file": "apps/web/src/features/timeline/TimelineList.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "TimelineList"
+      ],
+      "subjects": [
+        "./TimelineList.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 77
+    },
+    {
+      "file": "apps/web/src/features/timeline/TimelineReview.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "TimelineReviewDock states"
+      ],
+      "subjects": [
+        "./TimelineReview.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 83
+    },
+    {
+      "file": "apps/web/src/features/timeline/TimelineReview.test.tsx",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "reviewToMarkdown",
+        "TimelineReviewDock"
+      ],
+      "subjects": [
+        "./TimelineReview.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 76
+    },
+    {
+      "file": "apps/web/src/features/timeline/TimelineToolbar.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "TimelineToolbar"
+      ],
+      "subjects": [
+        "./TimelineToolbar.js",
+        "./displayPrefs.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 67
+    },
+    {
+      "file": "apps/web/src/features/Toast.test.tsx",
+      "package": "@vitae/web",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Toast compatibility adapter"
+      ],
+      "subjects": [
+        "./Toast.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 121
+    },
+    {
+      "file": "apps/web/src/lib/accent-palette.test.ts",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "accentName",
+        "accentLabel",
+        "DEFAULT_ACCENT"
+      ],
+      "subjects": [
+        "./accent-palette.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 32
+    },
+    {
+      "file": "apps/web/src/lib/entity-href.test.ts",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "entityHref",
+        "entityListHref",
+        "typeLabel"
+      ],
+      "subjects": [
+        "./entity-href.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 27
+    },
+    {
+      "file": "apps/web/src/lib/format-date.test.ts",
+      "package": "@vitae/web",
+      "cases": 35,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "formatDate",
+        "a Date object",
+        "formatDateTime",
+        "formatTime",
+        "formatRelative",
+        "formatRelative across a daylight-saving change",
+        "formatYear",
+        "formatRange",
+        "the empty value",
+        "displayTimezone"
+      ],
+      "subjects": [
+        "./format-date.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 336
+    },
+    {
+      "file": "apps/web/src/lib/graph-palette.test.ts",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "withAlpha"
+      ],
+      "subjects": [
+        "./graph-palette.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 35
+    },
+    {
+      "file": "apps/web/src/lib/list-params.test.ts",
+      "package": "@vitae/web",
+      "cases": 28,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "list-params encoding",
+        "useListParams"
+      ],
+      "subjects": [
+        "./list-params.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 379
+    },
+    {
+      "file": "apps/web/src/lib/motion.test.ts",
+      "package": "@vitae/web",
+      "cases": 31,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "motion hooks",
+        "motion hooks, preference set to reduce",
+        "reduced motion",
+        "stagger cap",
+        "easing"
+      ],
+      "subjects": [
+        "./motion.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 337
+    },
+    {
+      "file": "apps/web/src/lib/runtime.test.ts",
+      "package": "@vitae/web",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "browser runtime safety"
+      ],
+      "subjects": [
+        "./runtime.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 13
+    },
+    {
+      "file": "apps/web/src/lib/selection.test.ts",
+      "package": "@vitae/web",
+      "cases": 28,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "useSelection"
+      ],
+      "subjects": [
+        "./selection.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 342
+    },
+    {
+      "file": "apps/web/src/lib/unsaved-changes.test.tsx",
+      "package": "@vitae/web",
+      "cases": 34,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "useUnsavedChanges, closing a dialog",
+        "useUnsavedChanges, in-app navigation",
+        "useUnsavedChanges, browser unload",
+        "useUnsavedChanges, browser Back",
+        "useUnsavedChanges, links it must not touch",
+        "useUnsavedChanges, the options and what it returns"
+      ],
+      "subjects": [
+        "./unsaved-changes.js",
+        "@vitae/ui"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 521
+    },
+    {
+      "file": "apps/web/src/lib/use-server-draft.test.ts",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "useServerDraft"
+      ],
+      "subjects": [
+        "./use-server-draft.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 46
+    },
+    {
+      "file": "apps/web/src/public/PublicDocumentPage.test.tsx",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "public document pages"
+      ],
+      "subjects": [
+        "./PublicDocumentPage.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 56
+    },
+    {
+      "file": "apps/web/src/public/seo.test.ts",
+      "package": "@vitae/web",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "public SEO artifacts"
+      ],
+      "subjects": [
+        "./seo.js",
+        "./site.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 95
+    },
+    {
+      "file": "apps/web/src/public/site.test.ts",
+      "package": "@vitae/web",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "public launch registry"
+      ],
+      "subjects": [
+        "../routes/marketing/MarketingContent.js",
+        "./site.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 68
+    },
+    {
+      "file": "apps/web/src/routes/Ask.test.ts",
+      "package": "@vitae/web",
+      "cases": 19,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "intentIsAskable",
+        "intent round-trip",
+        "network intelligence links",
+        "factorLabel",
+        "factorExplanation",
+        "matchedTheAsk"
+      ],
+      "subjects": [
+        "./Ask.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 160
+    },
+    {
+      "file": "apps/web/src/routes/Atoms.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 12,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Atoms states"
+      ],
+      "subjects": [
+        "./Atoms.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 201
+    },
+    {
+      "file": "apps/web/src/routes/Billing.test.tsx",
+      "package": "@vitae/web",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "billing access language",
+        "Billing"
+      ],
+      "subjects": [
+        "./Billing.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 106
+    },
+    {
+      "file": "apps/web/src/routes/Browse.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Browse states"
+      ],
+      "subjects": [
+        "./Browse.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 119
+    },
+    {
+      "file": "apps/web/src/routes/career/ApplicationDossier.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Application dossier"
+      ],
+      "subjects": [
+        "./ApplicationDossier.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 127
+    },
+    {
+      "file": "apps/web/src/routes/career/CareerOverview.test.tsx",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Career application overview"
+      ],
+      "subjects": [
+        "./CareerOverview.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 157
+    },
+    {
+      "file": "apps/web/src/routes/Collections.actions.test.tsx",
+      "package": "@vitae/web",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Library query actions"
+      ],
+      "subjects": [
+        "./Collections.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 36
+    },
+    {
+      "file": "apps/web/src/routes/Collections.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 13,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Library states"
+      ],
+      "subjects": [
+        "./Collections.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 263
+    },
+    {
+      "file": "apps/web/src/routes/Collections.test.ts",
+      "package": "@vitae/web",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Collections tile coverage"
+      ],
+      "subjects": [
+        "./Collections.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 11
+    },
+    {
+      "file": "apps/web/src/routes/Dashboard.queue.test.ts",
+      "package": "@vitae/web",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "buildQueue",
+        "weekTicks"
+      ],
+      "subjects": [
+        "./Dashboard.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 136
+    },
+    {
+      "file": "apps/web/src/routes/Dashboard.test.tsx",
+      "package": "@vitae/web",
+      "cases": 9,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Today, the four states",
+        "Today, mutations",
+        "Today, the register rule"
+      ],
+      "subjects": [
+        "./Dashboard.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 158
+    },
+    {
+      "file": "apps/web/src/routes/Duplicates.audit.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "duplicate audit survivor invariant"
+      ],
+      "subjects": [
+        "./Duplicates.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 152
+    },
+    {
+      "file": "apps/web/src/routes/Duplicates.test.ts",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "clusterHeading"
+      ],
+      "subjects": [
+        "./Duplicates.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 25
+    },
+    {
+      "file": "apps/web/src/routes/ExportPage.test.ts",
+      "package": "@vitae/web",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "formatLastExport"
+      ],
+      "subjects": [
+        "./ExportPage.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 11
+    },
+    {
+      "file": "apps/web/src/routes/ImportHub.test.ts",
+      "package": "@vitae/web",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "sourceStatus"
+      ],
+      "subjects": [
+        "./ImportHub.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 56
+    },
+    {
+      "file": "apps/web/src/routes/Intros.test.ts",
+      "package": "@vitae/web",
+      "cases": 13,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "edgeLabel",
+        "edgeWeight",
+        "targetFacts",
+        "network intelligence links"
+      ],
+      "subjects": [
+        "./Intros.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 110
+    },
+    {
+      "file": "apps/web/src/routes/Letters.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Letters states"
+      ],
+      "subjects": [
+        "./Letters.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 101
+    },
+    {
+      "file": "apps/web/src/routes/marketing/Landing.test.ts",
+      "package": "@vitae/web",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "LANDING_FACTS"
+      ],
+      "subjects": [
+        "./Landing.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 31
+    },
+    {
+      "file": "apps/web/src/routes/marketing/Manifesto.test.ts",
+      "package": "@vitae/web",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "MANIFESTO_HOLDINGS"
+      ],
+      "subjects": [
+        "./Manifesto.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 33
+    },
+    {
+      "file": "apps/web/src/routes/marketing/MarketingContent.test.ts",
+      "package": "@vitae/web",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "CLOUD_PLAN"
+      ],
+      "subjects": [
+        "./MarketingContent.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 15
+    },
+    {
+      "file": "apps/web/src/routes/marketing/Pricing.test.ts",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "priceForBillingPeriod"
+      ],
+      "subjects": [
+        "./MarketingContent.js",
+        "./Pricing.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 15
+    },
+    {
+      "file": "apps/web/src/routes/marketing/Tour.test.ts",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "TOUR_STOPS"
+      ],
+      "subjects": [
+        "./Tour.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 46
+    },
+    {
+      "file": "apps/web/src/routes/NotFound.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "NotFound states"
+      ],
+      "subjects": [
+        "../app/routes.js",
+        "./NotFound.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 58
+    },
+    {
+      "file": "apps/web/src/routes/NotFound.test.tsx",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "NotFound"
+      ],
+      "subjects": [
+        "./NotFound.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 23
+    },
+    {
+      "file": "apps/web/src/routes/Org.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Org states"
+      ],
+      "subjects": [
+        "./Org.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 125
+    },
+    {
+      "file": "apps/web/src/routes/Org.test.tsx",
+      "package": "@vitae/web",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "organization dossier intelligence links",
+        "organization dossier screen"
+      ],
+      "subjects": [
+        "./Org.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 89
+    },
+    {
+      "file": "apps/web/src/routes/Orgs.a11y.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Organizations a11y"
+      ],
+      "subjects": [
+        "./Orgs.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test:a11y",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 34
+    },
+    {
+      "file": "apps/web/src/routes/Orgs.test.tsx",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Organizations directory states"
+      ],
+      "subjects": [
+        "./Orgs.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 56
+    },
+    {
+      "file": "apps/web/src/routes/Outputs.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 15,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Outputs states"
+      ],
+      "subjects": [
+        "./Outputs.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 309
+    },
+    {
+      "file": "apps/web/src/routes/People.a11y.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "People a11y"
+      ],
+      "subjects": [
+        "./People.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test:a11y",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 34
+    },
+    {
+      "file": "apps/web/src/routes/People.test.tsx",
+      "package": "@vitae/web",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "People directory states"
+      ],
+      "subjects": [
+        "./People.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 80
+    },
+    {
+      "file": "apps/web/src/routes/Person.log.test.ts",
+      "package": "@vitae/web",
+      "cases": 9,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "toInteractionLog",
+        "interactionTicks"
+      ],
+      "subjects": [
+        "./Person.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 91
+    },
+    {
+      "file": "apps/web/src/routes/Person.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 10,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Person states"
+      ],
+      "subjects": [
+        "./Person.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 266
+    },
+    {
+      "file": "apps/web/src/routes/Person.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "person relationship dossier"
+      ],
+      "subjects": [
+        "./Person.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 104
+    },
+    {
+      "file": "apps/web/src/routes/Record.test.ts",
+      "package": "@vitae/web",
+      "cases": 9,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "humanizeKey",
+        "shownProps",
+        "revisionTicks"
+      ],
+      "subjects": [
+        "./Record.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 81
+    },
+    {
+      "file": "apps/web/src/routes/reference/EntityCatalog.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 9,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "EntityCatalog, reported states"
+      ],
+      "subjects": [
+        "./EntityCatalog.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 151
+    },
+    {
+      "file": "apps/web/src/routes/reference/EntityCatalog.test.tsx",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "EntityCatalog observatory"
+      ],
+      "subjects": [
+        "./EntityCatalog.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 115
+    },
+    {
+      "file": "apps/web/src/routes/reference/EntityCatalogAtlas.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "EntityCatalogAtlas states"
+      ],
+      "subjects": [
+        "./EntityCatalogAtlas.js",
+        "./entityCatalogModel.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 73
+    },
+    {
+      "file": "apps/web/src/routes/reference/EntityCatalogDetails.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "EntityCatalogDetails states"
+      ],
+      "subjects": [
+        "./EntityCatalogDetails.js",
+        "./entityCatalogModel.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 159
+    },
+    {
+      "file": "apps/web/src/routes/reference/entityCatalogModel.test.ts",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "entity catalog model"
+      ],
+      "subjects": [
+        "./entityCatalogModel.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 100
+    },
+    {
+      "file": "apps/web/src/routes/reference/EntityCatalogOverview.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "EntityCatalogOverview states"
+      ],
+      "subjects": [
+        "./EntityCatalogOverview.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 103
+    },
+    {
+      "file": "apps/web/src/routes/reference/EntityObservatoryControls.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "the observatory cockpit drawer"
+      ],
+      "subjects": [
+        "./EntityObservatoryControls.js",
+        "./entityObservatoryModel.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 75
+    },
+    {
+      "file": "apps/web/src/routes/reference/EntityObservatoryMatrix.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "the relation matrix"
+      ],
+      "subjects": [
+        "./EntityObservatoryMatrix.js",
+        "./entityObservatoryModel.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 128
+    },
+    {
+      "file": "apps/web/src/routes/reference/entityObservatoryModel.test.ts",
+      "package": "@vitae/web",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "entity observatory model"
+      ],
+      "subjects": [
+        "./entityObservatoryModel.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 113
+    },
+    {
+      "file": "apps/web/src/routes/Repositories.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Repositories states"
+      ],
+      "subjects": [
+        "./Repositories.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 132
+    },
+    {
+      "file": "apps/web/src/routes/Repositories.test.ts",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "githubConnectionState",
+        "formatLastSync"
+      ],
+      "subjects": [
+        "./Repositories.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 50
+    },
+    {
+      "file": "apps/web/src/routes/SearchResults.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 9,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Search route states"
+      ],
+      "subjects": [
+        "./SearchResults.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 144
+    },
+    {
+      "file": "apps/web/src/routes/SearchResults.test.ts",
+      "package": "@vitae/web",
+      "cases": 10,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "search filter grammar help",
+        "dropToken",
+        "rowSubtitle"
+      ],
+      "subjects": [
+        "./SearchResults.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 74
+    },
+    {
+      "file": "apps/web/src/routes/Settings.a11y.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Settings a11y"
+      ],
+      "subjects": [
+        "./Settings.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test:a11y",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 55
+    },
+    {
+      "file": "apps/web/src/routes/Settings.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 13,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Settings load states",
+        "Settings system health",
+        "Settings profile editor",
+        "Settings résumé defaults",
+        "Settings taxonomy editor",
+        "Settings ranking constants",
+        "Settings GitHub panel",
+        "Settings sub-views"
+      ],
+      "subjects": [
+        "./Settings.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 238
+    },
+    {
+      "file": "apps/web/src/routes/Settings.test.ts",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "statusCheckDetail",
+        "formatGithubSync"
+      ],
+      "subjects": [
+        "./Settings.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 22
+    },
+    {
+      "file": "apps/web/src/routes/SignIn.test.tsx",
+      "package": "@vitae/web",
+      "cases": 10,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "SignIn, which ways in are offered",
+        "SignIn, pending and failure",
+        "SignInSplash"
+      ],
+      "subjects": [
+        "./SignIn.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 170
+    },
+    {
+      "file": "apps/web/src/routes/tailor/DocumentPane.test.tsx",
+      "package": "@vitae/web",
+      "cases": 10,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "DocumentPane"
+      ],
+      "subjects": [
+        "./DocumentPane.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 182
+    },
+    {
+      "file": "apps/web/src/routes/tailor/PreviewPane.test.tsx",
+      "package": "@vitae/web",
+      "cases": 10,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "PreviewPane"
+      ],
+      "subjects": [
+        "./PreviewPane.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 196
+    },
+    {
+      "file": "apps/web/src/routes/tailor/SelectionPane.test.tsx",
+      "package": "@vitae/web",
+      "cases": 9,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "SelectionPane"
+      ],
+      "subjects": [
+        "./SelectionPane.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 142
+    },
+    {
+      "file": "apps/web/src/routes/tailor/TargetRail.test.tsx",
+      "package": "@vitae/web",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "TargetRail"
+      ],
+      "subjects": [
+        "./TargetRail.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 121
+    },
+    {
+      "file": "apps/web/src/routes/Templates.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 9,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Templates states"
+      ],
+      "subjects": [
+        "./Templates.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 181
+    },
+    {
+      "file": "apps/web/src/routes/Templates.test.ts",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "calibrationSummary"
+      ],
+      "subjects": [
+        "./Templates.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 76
+    },
+    {
+      "file": "apps/web/src/routes/Trash.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Trash route states"
+      ],
+      "subjects": [
+        "./Trash.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 69
+    },
+    {
+      "file": "apps/web/src/routes/Trash.test.ts",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "daysUntilPurge",
+        "purgeUrgency"
+      ],
+      "subjects": [
+        "./Trash.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 25
+    },
+    {
+      "file": "apps/web/src/routes/workspaces/Planner.test.tsx",
+      "package": "@vitae/web",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Planner states"
+      ],
+      "subjects": [
+        "./Planner.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 82
+    },
+    {
+      "file": "apps/web/src/routes/workspaces/WorkspaceHomes.test.tsx",
+      "package": "@vitae/web",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Workspace home semantics"
+      ],
+      "subjects": [
+        "./WorkspaceHomes.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 29
+    },
+    {
+      "file": "apps/web/src/styles/network.test.ts",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Network screen-family stylesheet"
+      ],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 34
+    },
+    {
+      "file": "apps/web/src/test/render.test.tsx",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "renderWithApp"
+      ],
+      "subjects": [
+        "./render.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 18
+    },
+    {
+      "file": "e2e/playwright.config.ts",
+      "package": "@vitae/e2e",
+      "cases": 0,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [],
+      "requirements": [
+        "FR-007"
+      ],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 53
+    },
+    {
+      "file": "e2e/tests/ask.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 10,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 208
+    },
+    {
+      "file": "e2e/tests/atlas.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 114
+    },
+    {
+      "file": "e2e/tests/atoms.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth",
+        "./helpers/toast"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 132
+    },
+    {
+      "file": "e2e/tests/collections.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/api.js",
+        "./helpers/auth",
+        "./helpers/toast"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 197
+    },
+    {
+      "file": "e2e/tests/connections.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/auth.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 54
+    },
+    {
+      "file": "e2e/tests/demo-mode.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 34
+    },
+    {
+      "file": "e2e/tests/directories.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 160
+    },
+    {
+      "file": "e2e/tests/document-editor.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 43
+    },
+    {
+      "file": "e2e/tests/duplicates.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 175
+    },
+    {
+      "file": "e2e/tests/entity-catalog.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 54
+    },
+    {
+      "file": "e2e/tests/entity-form.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth",
+        "./helpers/toast"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 130
+    },
+    {
+      "file": "e2e/tests/exploration.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 184
+    },
+    {
+      "file": "e2e/tests/export.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 113
+    },
+    {
+      "file": "e2e/tests/forms.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 97
+    },
+    {
+      "file": "e2e/tests/foundation.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 36
+    },
+    {
+      "file": "e2e/tests/graph.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 153
+    },
+    {
+      "file": "e2e/tests/helpers/a11y.ts",
+      "package": "@vitae/e2e",
+      "cases": 0,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 40
+    },
+    {
+      "file": "e2e/tests/helpers/api.ts",
+      "package": "@vitae/e2e",
+      "cases": 0,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 60
+    },
+    {
+      "file": "e2e/tests/helpers/auth.ts",
+      "package": "@vitae/e2e",
+      "cases": 0,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 34
+    },
+    {
+      "file": "e2e/tests/helpers/controls.ts",
+      "package": "@vitae/e2e",
+      "cases": 0,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 21
+    },
+    {
+      "file": "e2e/tests/helpers/fixtures.ts",
+      "package": "@vitae/e2e",
+      "cases": 0,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./api.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 150
+    },
+    {
+      "file": "e2e/tests/helpers/toast.ts",
+      "package": "@vitae/e2e",
+      "cases": 0,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 15
+    },
+    {
+      "file": "e2e/tests/import.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 165
+    },
+    {
+      "file": "e2e/tests/intros.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 11,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 297
+    },
+    {
+      "file": "e2e/tests/journeys.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 108
+    },
+    {
+      "file": "e2e/tests/landing.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 67
+    },
+    {
+      "file": "e2e/tests/letters.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 108
+    },
+    {
+      "file": "e2e/tests/manifesto.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 54
+    },
+    {
+      "file": "e2e/tests/negative.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/api.js",
+        "./helpers/auth.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 65
+    },
+    {
+      "file": "e2e/tests/org.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/api.js",
+        "./helpers/auth",
+        "./helpers/fixtures",
+        "./helpers/toast"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 177
+    },
+    {
+      "file": "e2e/tests/outputs.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 134
+    },
+    {
+      "file": "e2e/tests/overlays.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 11,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 226
+    },
+    {
+      "file": "e2e/tests/person.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth",
+        "./helpers/fixtures"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 147
+    },
+    {
+      "file": "e2e/tests/record.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/api",
+        "./helpers/auth",
+        "./helpers/toast"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 181
+    },
+    {
+      "file": "e2e/tests/repositories.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth",
+        "./helpers/toast"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 210
+    },
+    {
+      "file": "e2e/tests/resume-full.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 60
+    },
+    {
+      "file": "e2e/tests/resume-hub.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth",
+        "./helpers/controls"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 126
+    },
+    {
+      "file": "e2e/tests/search.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 12,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth",
+        "./helpers/fixtures"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 160
+    },
+    {
+      "file": "e2e/tests/settings.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth",
+        "./helpers/toast"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 190
+    },
+    {
+      "file": "e2e/tests/shell.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 229
+    },
+    {
+      "file": "e2e/tests/signin.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 147
+    },
+    {
+      "file": "e2e/tests/sweep.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 25
+    },
+    {
+      "file": "e2e/tests/tailor-wording.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/auth",
+        "./helpers/controls"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 42
+    },
+    {
+      "file": "e2e/tests/tailor.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 143
+    },
+    {
+      "file": "e2e/tests/target-lifecycle.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/auth",
+        "./helpers/controls"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 67
+    },
+    {
+      "file": "e2e/tests/templates.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/api.js",
+        "./helpers/auth",
+        "./helpers/toast"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 234
+    },
+    {
+      "file": "e2e/tests/timeline.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth",
+        "./helpers/fixtures"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 162
+    },
+    {
+      "file": "e2e/tests/today.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 9,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth",
+        "./helpers/fixtures",
+        "./helpers/toast"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 186
+    },
+    {
+      "file": "e2e/tests/tour.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 72
+    },
+    {
+      "file": "e2e/tests/trash.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 114
+    },
+    {
+      "file": "e2e/tests/visual-baselines.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test:visual",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 36
+    },
+    {
+      "file": "packages/core/src/algorithms/aho-corasick.test.ts",
+      "package": "@vitae/core",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "AhoCorasick (token-level)"
+      ],
+      "subjects": [
+        "./aho-corasick.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 33
+    },
+    {
+      "file": "packages/core/src/algorithms/atom-scoring.test.ts",
+      "package": "@vitae/core",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "scoreAtom (SRS §10.4-B)"
+      ],
+      "subjects": [
+        "../schema/resume.js",
+        "./atom-scoring.js"
+      ],
+      "requirements": [
+        "FR-RES-007"
+      ],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 88
+    },
+    {
+      "file": "packages/core/src/algorithms/capture-grammar.property.test.ts",
+      "package": "@vitae/core",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "property: capture grammar"
+      ],
+      "subjects": [
+        "./capture-grammar.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:property",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 59
+    },
+    {
+      "file": "packages/core/src/algorithms/capture-grammar.test.ts",
+      "package": "@vitae/core",
+      "cases": 12,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "parseCapture (SRS §5.1)",
+        "parseDateToken"
+      ],
+      "subjects": [
+        "./capture-grammar.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 77
+    },
+    {
+      "file": "packages/core/src/algorithms/composer.test.ts",
+      "package": "@vitae/core",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "composeDraft"
+      ],
+      "subjects": [
+        "./composer.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 44
+    },
+    {
+      "file": "packages/core/src/algorithms/dedup.test.ts",
+      "package": "@vitae/core",
+      "cases": 10,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Fellegi-Sunter dedup (SRS §10.7.6)",
+        "type-aware entity linkage"
+      ],
+      "subjects": [
+        "./dedup.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 93
+    },
+    {
+      "file": "packages/core/src/algorithms/filter-grammar.property.test.ts",
+      "package": "@vitae/core",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "property: filter grammar round-trip"
+      ],
+      "subjects": [
+        "./filter-grammar.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:property",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 84
+    },
+    {
+      "file": "packages/core/src/algorithms/filter-grammar.test.ts",
+      "package": "@vitae/core",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "parseFilterQuery (SRS FR-SRCH-002)"
+      ],
+      "subjects": [
+        "./filter-grammar.js"
+      ],
+      "requirements": [
+        "FR-SRCH-002"
+      ],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 69
+    },
+    {
+      "file": "packages/core/src/algorithms/fit-loop.test.ts",
+      "package": "@vitae/core",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "planFitStep (FR-RES-014)",
+        "applyFitStep"
+      ],
+      "subjects": [
+        "./fit-loop.js",
+        "./selection.js"
+      ],
+      "requirements": [
+        "FR-RES-014"
+      ],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 71
+    },
+    {
+      "file": "packages/core/src/algorithms/graph-paths.test.ts",
+      "package": "@vitae/core",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "findIntroPaths"
+      ],
+      "subjects": [
+        "./graph-paths.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 59
+    },
+    {
+      "file": "packages/core/src/algorithms/jd-parser.test.ts",
+      "package": "@vitae/core",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "parseJd (BM25F, SRS §10.7.4)"
+      ],
+      "subjects": [
+        "./jd-parser.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 70
+    },
+    {
+      "file": "packages/core/src/algorithms/latex-escape.test.ts",
+      "package": "@vitae/core",
+      "cases": 18,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "escapeLatex",
+        "escapeInline",
+        "escapeUrl",
+        "isSafeHref",
+        "renderInlineMarkdown",
+        "assertNoUnresolvedTokens",
+        "property: escaping is always safe and compiles (SRS FR-RES-012 fuzz)"
+      ],
+      "subjects": [
+        "./latex-escape.js"
+      ],
+      "requirements": [
+        "FR-RES-012"
+      ],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 155
+    },
+    {
+      "file": "packages/core/src/algorithms/line-model.test.ts",
+      "package": "@vitae/core",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "line-model (SRS §6.6, FR-RES-009)"
+      ],
+      "subjects": [
+        "../schema/resume.js",
+        "./line-model.js"
+      ],
+      "requirements": [
+        "FR-RES-009"
+      ],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 38
+    },
+    {
+      "file": "packages/core/src/algorithms/metamorphic.test.ts",
+      "package": "@vitae/core",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "metamorphic: whoToCall",
+        "metamorphic: dedup",
+        "metamorphic: filter grammar",
+        "metamorphic: reconnect ranking",
+        "metamorphic: latex escape"
+      ],
+      "subjects": [
+        "./dedup.js",
+        "./filter-grammar.js",
+        "./latex-escape.js",
+        "./reconnect.js",
+        "./who-to-call.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:property",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 154
+    },
+    {
+      "file": "packages/core/src/algorithms/pagerank.test.ts",
+      "package": "@vitae/core",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "personalizedPageRank (SRS §10.7.3)"
+      ],
+      "subjects": [
+        "./pagerank.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 49
+    },
+    {
+      "file": "packages/core/src/algorithms/reconnect.test.ts",
+      "package": "@vitae/core",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "reconnect (spaced-repetition, SRS §10.7.2)"
+      ],
+      "subjects": [
+        "./reconnect.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 25
+    },
+    {
+      "file": "packages/core/src/algorithms/selection.test.ts",
+      "package": "@vitae/core",
+      "cases": 17,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "selectAtoms (budgeted submodular greedy, SRS §10.7.5)",
+        "selectManual (hand-picked ordered selection)",
+        "entry overhead accounting"
+      ],
+      "subjects": [
+        "../schema/resume.js",
+        "./selection.js"
+      ],
+      "requirements": [
+        "FR-018",
+        "FR-RES-008"
+      ],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 211
+    },
+    {
+      "file": "packages/core/src/algorithms/streaks.test.ts",
+      "package": "@vitae/core",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "computeStreak"
+      ],
+      "subjects": [
+        "./streaks.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 50
+    },
+    {
+      "file": "packages/core/src/algorithms/text.property.test.ts",
+      "package": "@vitae/core",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "property: text utilities"
+      ],
+      "subjects": [
+        "./text.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:property",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 44
+    },
+    {
+      "file": "packages/core/src/algorithms/text.test.ts",
+      "package": "@vitae/core",
+      "cases": 11,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "normalizeForMatch",
+        "tokenize",
+        "ngrams",
+        "stem",
+        "trigramSimilarity",
+        "jaroWinkler"
+      ],
+      "subjects": [
+        "./text.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 60
+    },
+    {
+      "file": "packages/core/src/algorithms/tie-strength.test.ts",
+      "package": "@vitae/core",
+      "cases": 9,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "computeTieStrength (Hawkes kernel, SRS §10.7.1)"
+      ],
+      "subjects": [
+        "./tie-strength.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 107
+    },
+    {
+      "file": "packages/core/src/algorithms/who-to-call.test.ts",
+      "package": "@vitae/core",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "whoToCall (SRS §10.4-A / §10.7.3)"
+      ],
+      "subjects": [
+        "./who-to-call.js"
+      ],
+      "requirements": [
+        "FR-CON-006"
+      ],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 125
+    },
+    {
+      "file": "packages/core/src/cloud/individual-plan.test.ts",
+      "package": "@vitae/core",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "CLOUD_INDIVIDUAL_PLAN"
+      ],
+      "subjects": [
+        "./individual-plan.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 26
+    },
+    {
+      "file": "packages/core/src/fixtures/golden/golden.test.ts",
+      "package": "@vitae/core",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "golden corpus: whoToCall",
+        "golden corpus: dedup pairs"
+      ],
+      "subjects": [
+        "../../algorithms/dedup.js",
+        "../../algorithms/who-to-call.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:property",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 54
+    },
+    {
+      "file": "packages/core/src/forms/connection-options.test.ts",
+      "package": "@vitae/core",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "connectionOptionsFor",
+        "connection label helpers"
+      ],
+      "subjects": [
+        "./connection-options.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 70
+    },
+    {
+      "file": "packages/core/src/forms/descriptors.test.ts",
+      "package": "@vitae/core",
+      "cases": 14,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "form descriptors stay honest against the Zod schemas"
+      ],
+      "subjects": [
+        "../schema/edge-props.js",
+        "../schema/node-props.js",
+        "../types.js",
+        "./edge-forms.js",
+        "./node-forms.js",
+        "./subjects.js"
+      ],
+      "requirements": [
+        "FR-013"
+      ],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 240
+    },
+    {
+      "file": "packages/core/src/forms/subjects.test.ts",
+      "package": "@vitae/core",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "subjectEdgeFor",
+        "isSubjectBearing",
+        "subjectAssignment"
+      ],
+      "subjects": [
+        "./subjects.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 60
+    },
+    {
+      "file": "packages/core/src/importers/csv.test.ts",
+      "package": "@vitae/core",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "parseCsv (RFC 4180)",
+        "parseCsvRecords",
+        "normalizeHeader"
+      ],
+      "subjects": [
+        "./csv.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 49
+    },
+    {
+      "file": "packages/core/src/importers/ics.test.ts",
+      "package": "@vitae/core",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "parseIcs"
+      ],
+      "subjects": [
+        "./ics.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 51
+    },
+    {
+      "file": "packages/core/src/importers/linkedin.test.ts",
+      "package": "@vitae/core",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "parseLinkedInDate",
+        "parseLinkedInPositions",
+        "parseLinkedInEducation",
+        "parseLinkedInSkills",
+        "parseLinkedInConnections"
+      ],
+      "subjects": [
+        "./linkedin.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 54
+    },
+    {
+      "file": "packages/core/src/importers/netscape-bookmarks.test.ts",
+      "package": "@vitae/core",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "parseNetscapeBookmarks"
+      ],
+      "subjects": [
+        "./netscape-bookmarks.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 40
+    },
+    {
+      "file": "packages/core/src/importers/vcard.test.ts",
+      "package": "@vitae/core",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "parseVcards"
+      ],
+      "subjects": [
+        "./vcard.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 63
+    },
+    {
+      "file": "packages/core/src/places/index.test.ts",
+      "package": "@vitae/core",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "normalizePlaceKey",
+        "STATIC_PLACE_ALIASES",
+        "fuzzyPlaceMatches"
+      ],
+      "subjects": [
+        "./index.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 43
+    },
+    {
+      "file": "packages/core/src/schema/application.test.ts",
+      "package": "@vitae/core",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Career application read models"
+      ],
+      "subjects": [
+        "./application.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 98
+    },
+    {
+      "file": "packages/core/src/schema/bundle.test.ts",
+      "package": "@vitae/core",
+      "cases": 12,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "vitae.graph.bundle/1",
+        "a bundle produced by Aperture"
+      ],
+      "subjects": [
+        "../forms/edge-forms.js",
+        "./bundle.js",
+        "./node-props.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 170
+    },
+    {
+      "file": "packages/core/src/schema/edge-props.relations.test.ts",
+      "package": "@vitae/core",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "person and org relation props"
+      ],
+      "subjects": [
+        "./edge-props.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 33
+    },
+    {
+      "file": "packages/core/src/schema/envelope.test.ts",
+      "package": "@vitae/core",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "identityKey",
+        "nodeCreateEnvelope",
+        "nodeUpdateEnvelope"
+      ],
+      "subjects": [
+        "./envelope.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 42
+    },
+    {
+      "file": "packages/core/src/schema/node-props.test.ts",
+      "package": "@vitae/core",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "long-tail node props schemas (SRS §4.3.9-11, 16-17, 22-28)"
+      ],
+      "subjects": [
+        "./validate.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 74
+    },
+    {
+      "file": "packages/core/src/schema/resume-workspace.test.ts",
+      "package": "@vitae/core",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "résumé workspace schemas"
+      ],
+      "subjects": [
+        "./resume.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 99
+    },
+    {
+      "file": "packages/core/src/schema/template-gallery.test.ts",
+      "package": "@vitae/core",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "template gallery schema"
+      ],
+      "subjects": [
+        "./resume.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 51
+    },
+    {
+      "file": "packages/core/src/schema/template-wording.test.ts",
+      "package": "@vitae/core",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "resumeConfig wording fields"
+      ],
+      "subjects": [
+        "./resume.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 24
+    },
+    {
+      "file": "packages/core/src/schema/validate.test.ts",
+      "package": "@vitae/core",
+      "cases": 18,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "validateNodeCreate (envelope + per-type props)",
+        "validateEdgeCreate",
+        "validateNodeUpdate",
+        "validateEdgeUpdate",
+        "validateEdgeCreate result shape"
+      ],
+      "subjects": [
+        "./validate.js"
+      ],
+      "requirements": [
+        "FR-CAP-002"
+      ],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 130
+    },
+    {
+      "file": "packages/testkit/src/clock.test.ts",
+      "package": "@vitae/testkit",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "fixedClock"
+      ],
+      "subjects": [
+        "./clock.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:unit",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 19
+    },
+    {
+      "file": "packages/testkit/src/factories.test.ts",
+      "package": "@vitae/testkit",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "testkit factories"
+      ],
+      "subjects": [
+        "./clock.js",
+        "./factories.js",
+        "./ids.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:unit",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 44
+    },
+    {
+      "file": "packages/ui/src/combobox.test.tsx",
+      "package": "@vitae/ui",
+      "cases": 42,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Combobox ARIA",
+        "Combobox keyboard",
+        "Combobox states",
+        "Combobox pointer",
+        "Combobox layering",
+        "combobox.css"
+      ],
+      "subjects": [
+        "./combobox.js",
+        "./overlay.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test"
+      ],
+      "run_in_ci": false,
+      "lines": 643
+    },
+    {
+      "file": "packages/ui/src/components.test.tsx",
+      "package": "@vitae/ui",
+      "cases": 31,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Button",
+        "DotGrid",
+        "EntityGlyph",
+        "FilterGroup",
+        "StrengthBar",
+        "FactorBar",
+        "ClosenessDots"
+      ],
+      "subjects": [
+        "./components.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test"
+      ],
+      "run_in_ci": false,
+      "lines": 254
+    },
+    {
+      "file": "packages/ui/src/feedback.test.tsx",
+      "package": "@vitae/ui",
+      "cases": 11,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Skeleton",
+        "SkeletonRows",
+        "EmptyState",
+        "ErrorState",
+        "StatusTrace"
+      ],
+      "subjects": [
+        "./feedback.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test"
+      ],
+      "run_in_ci": false,
+      "lines": 109
+    },
+    {
+      "file": "packages/ui/src/forms.test.tsx",
+      "package": "@vitae/ui",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Select",
+        "Checkbox",
+        "Select: the clear sentinel"
+      ],
+      "subjects": [
+        "./forms.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test"
+      ],
+      "run_in_ci": false,
+      "lines": 94
+    },
+    {
+      "file": "packages/ui/src/layout.test.tsx",
+      "package": "@vitae/ui",
+      "cases": 54,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Row",
+        "Card",
+        "Stack, Inline, Spread, ChipGroup",
+        "Banner",
+        "Disclosure",
+        "Tabs",
+        "layout.css"
+      ],
+      "subjects": [
+        "./layout.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test"
+      ],
+      "run_in_ci": false,
+      "lines": 710
+    },
+    {
+      "file": "packages/ui/src/overlay.test.tsx",
+      "package": "@vitae/ui",
+      "cases": 19,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Modal",
+        "CommandOverlay",
+        "Tooltip",
+        "Popover",
+        "Menu",
+        "RegisterRule",
+        "Section"
+      ],
+      "subjects": [
+        "./overlay.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test"
+      ],
+      "run_in_ci": false,
+      "lines": 286
+    },
+    {
+      "file": "packages/ui/src/toast.test.tsx",
+      "package": "@vitae/ui",
+      "cases": 26,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "ToastProvider",
+        "Toast variants",
+        "Toast announcements",
+        "Toast duration",
+        "Toast swipe",
+        "toast.css",
+        "Toast teardown",
+        "Toast actions",
+        "useToast"
+      ],
+      "subjects": [
+        "./toast.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test"
+      ],
+      "run_in_ci": false,
+      "lines": 466
+    },
+    {
+      "file": "packages/ui/src/use-animated-number.test.ts",
+      "package": "@vitae/ui",
+      "cases": 27,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "useAnimatedNumber",
+        "readDurationToken",
+        "a component that animates a number, in an ordinary component test",
+        "easeFraction"
+      ],
+      "subjects": [
+        "./use-animated-number.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test"
+      ],
+      "run_in_ci": false,
+      "lines": 393
+    },
+    {
+      "file": "packages/ui/src/use-reduced-motion.test.ts",
+      "package": "@vitae/ui",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "useReducedMotion"
+      ],
+      "subjects": [
+        "./use-reduced-motion.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test"
+      ],
+      "run_in_ci": false,
+      "lines": 140
+    }
+  ],
+  "summary": {
+    "files": 303,
+    "cases": 1869,
+    "skipped": 0,
+    "todo": 0,
+    "by_package": {
+      "@vitae/api": 195,
+      "@vitae/web": 918,
+      "@vitae/e2e": 250,
+      "@vitae/core": 273,
+      "@vitae/testkit": 7,
+      "@vitae/ui": 226
+    },
+    "by_script": {
+      "test": 303,
+      "test:web": 146,
+      "test:api": 52,
+      "test:e2e": 52,
+      "test:unit": 44,
+      "test:coverage": 44,
+      "test:core": 42,
+      "test:mutation": 42,
+      "test:property": 5,
+      "test:security": 3,
+      "test:a11y": 3,
+      "test:contract": 2,
+      "test:resilience": 2,
+      "test:visual": 1
+    },
+    "unreachable": [],
+    "ci_scripts": [
+      "test:a11y",
+      "test:brand",
+      "test:contract",
+      "test:map",
+      "test:performance",
+      "test:property",
+      "test:prose",
+      "test:public",
+      "test:resilience",
+      "test:security",
+      "test:unit",
+      "test:web"
+    ],
+    "ci_filtered_workspaces": [
+      "@vitae/api",
+      "@vitae/e2e",
+      "@vitae/web"
+    ],
+    "workspaces_absent_from_ci": [
+      "@vitae/ui"
+    ],
+    "cases_absent_from_ci": 226,
+    "files_absent_from_ci": [
+      "packages/ui/src/combobox.test.tsx",
+      "packages/ui/src/components.test.tsx",
+      "packages/ui/src/feedback.test.tsx",
+      "packages/ui/src/forms.test.tsx",
+      "packages/ui/src/layout.test.tsx",
+      "packages/ui/src/overlay.test.tsx",
+      "packages/ui/src/toast.test.tsx",
+      "packages/ui/src/use-animated-number.test.ts",
+      "packages/ui/src/use-reduced-motion.test.ts"
+    ],
+    "empty": [
+      "e2e/playwright.config.ts",
+      "e2e/tests/helpers/a11y.ts",
+      "e2e/tests/helpers/api.ts",
+      "e2e/tests/helpers/auth.ts",
+      "e2e/tests/helpers/controls.ts",
+      "e2e/tests/helpers/fixtures.ts",
+      "e2e/tests/helpers/toast.ts"
+    ],
+    "with_skips": [],
+    "requirements_proven": 22,
+    "requirements_unproven": [
+      "FR-004",
+      "FR-005",
+      "FR-008",
+      "FR-009",
+      "FR-014",
+      "FR-015",
+      "FR-016",
+      "FR-017",
+      "FR-019",
+      "FR-020",
+      "FR-022",
+      "FR-023",
+      "FR-025",
+      "FR-026",
+      "FR-027",
+      "FR-102",
+      "FR-104",
+      "FR-105",
+      "FR-CAP-001",
+      "FR-CAP-004",
+      "FR-CAP-005",
+      "FR-CAP-008",
+      "FR-CON-001",
+      "FR-CON-002",
+      "FR-CON-003",
+      "FR-CON-004",
+      "FR-CON-005",
+      "FR-CON-007",
+      "FR-CON-008",
+      "FR-CON-009",
+      "FR-EXP-010",
+      "FR-EXP-012",
+      "FR-EXP-013",
+      "FR-IMP-001",
+      "FR-IMP-002",
+      "FR-IMP-003",
+      "FR-IMP-004",
+      "FR-IMP-005",
+      "FR-IMP-006",
+      "FR-ORG-001",
+      "FR-ORG-002",
+      "FR-ORG-005",
+      "FR-ORG-007",
+      "FR-ORG-008",
+      "FR-RES-001",
+      "FR-RES-002",
+      "FR-RES-003",
+      "FR-RES-004",
+      "FR-RES-005",
+      "FR-RES-006",
+      "FR-RES-010",
+      "FR-RES-011",
+      "FR-RES-015",
+      "FR-RES-016",
+      "FR-RES-017",
+      "FR-RES-018",
+      "FR-RES-019",
+      "FR-SET-001",
+      "FR-SET-004",
+      "FR-SET-006",
+      "FR-SET-007",
+      "FR-SRCH-001",
+      "FR-SRCH-003",
+      "FR-SRCH-004",
+      "FR-VIS-001",
+      "FR-VIS-002",
+      "FR-VIS-003",
+      "FR-VIS-004",
+      "FR-VIS-005",
+      "INT-1",
+      "INT-2",
+      "INT-3",
+      "INT-5",
+      "INT-6",
+      "NFR-MNT-002",
+      "NFR-REL-003"
+    ]
+  }
+}

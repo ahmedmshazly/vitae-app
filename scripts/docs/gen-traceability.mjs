@@ -28,8 +28,28 @@ const root = process.env.VITAE_DOCS_ROOT
   : join(dirname(fileURLToPath(import.meta.url)), '../..');
 const OUT = 'docs/generated/traceability.json';
 
-/** Files whose content is an identifier list rather than a use of identifiers. */
-const SELF_REFERENTIAL = [/^docs\/registry\//, /^docs\/generated\//];
+/**
+ * Files that talk about identifiers rather than use them.
+ *
+ * The registries are the obvious case: they define the ids, so reading them
+ * back as citations would make every requirement cite itself. The
+ * documentation toolchain is the case that actually caused damage. Its doc
+ * comments explain the identifier grammar by naming real identifiers —
+ * `citations.mjs` documents the families using `FR-RES-009` and `FR-SRCH-001`,
+ * and the selftests feed the parser `FR-012` because a parser must be shown to
+ * find it — and a scan that reads them credits eight requirements to files
+ * that implement none of them. Seven moved from documents-only to
+ * implemented-untested on exactly that evidence before this rule existed.
+ *
+ * A mention inside the machinery that reads citations proves something about
+ * the machinery, never about the product.
+ */
+const SELF_REFERENTIAL = [
+  /^docs\/registry\//,
+  /^docs\/generated\//,
+  /^scripts\/docs\//,
+  /\.selftest\.[cm]?js$/,
+];
 /** Text formats worth reading. Anything else is data, lockfile, or binary. */
 const READABLE = /\.(ts|tsx|js|jsx|mjs|cjs|md|yml|yaml|sql|sh|css|json|tex)$/;
 /** Large generated files that cite nothing and cost time to read. */

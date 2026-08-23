@@ -1,0 +1,5034 @@
+{
+  "tables": [
+    {
+      "name": "atom_skills",
+      "interface": "AtomSkillTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "atom_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:142"
+        },
+        {
+          "name": "skill_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:143"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/routes/v1/atoms.ts",
+          "method": "docDelete",
+          "access": "repository",
+          "line": 349,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/atoms.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 109,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/atoms.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 458,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/atoms.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 415,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 583,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 467,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 155,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 56,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 106,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:214",
+      "reads": 5,
+      "writes": 5
+    },
+    {
+      "name": "atom_variants",
+      "interface": "AtomVariantTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "atom_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:132"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/routes/v1/atoms.ts",
+          "method": "docDelete",
+          "access": "repository",
+          "line": 348,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/atoms.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 108,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/atoms.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 456,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/atoms.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 414,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 582,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 463,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 151,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 55,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 852,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 105,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:213",
+      "reads": 5,
+      "writes": 6
+    },
+    {
+      "name": "atoms",
+      "interface": "AtomTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "owner_node",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:127"
+        },
+        {
+          "name": "source_ref",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:128"
+        },
+        {
+          "name": "deleted_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:129"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/routes/v1/atoms.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 413,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/atoms.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 107,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/atoms.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 454,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/dashboard.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 31,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 581,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 449,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 148,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 226,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 54,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 1136,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 1140,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 1133,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/letters.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 26,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 104,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docDeleteMany",
+          "access": "repository",
+          "line": 161,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docIdsOlderThan",
+          "access": "repository",
+          "line": 74,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docIdsWhereIn",
+          "access": "repository",
+          "line": 91,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:212",
+      "reads": 12,
+      "writes": 6
+    },
+    {
+      "name": "attachments",
+      "interface": "AttachmentTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "subject_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:177"
+        },
+        {
+          "name": "gc_pending",
+          "type": "GeneratedAlways<boolean | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:178"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "method": "docDelete",
+          "access": "repository",
+          "line": 860,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 816,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 859,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 634,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 66,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/restore.ts",
+          "method": "docMerge",
+          "access": "repository",
+          "line": 248,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docDeleteMany",
+          "access": "repository",
+          "line": 160,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 135,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docIdsWhereIn",
+          "access": "repository",
+          "line": 112,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docMerge",
+          "access": "repository",
+          "line": 148,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 138,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:222",
+      "reads": 6,
+      "writes": 6
+    },
+    {
+      "name": "billing_customers",
+      "interface": "BillingCustomerTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "workspace_id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:64"
+        },
+        {
+          "name": "provider",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:65"
+        },
+        {
+          "name": "provider_customer_id",
+          "type": "string | null",
+          "writable": true,
+          "generated": false,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:66"
+        },
+        {
+          "name": "created_at",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:67"
+        },
+        {
+          "name": "updated_at",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:68"
+        }
+      ],
+      "requirements": [],
+      "created_in": "007-cloud-control-plane",
+      "altered_in": [],
+      "indexes": [
+        {
+          "name": "billing_customers_provider_customer",
+          "table": "billing_customers",
+          "unique": true,
+          "partial": true,
+          "method": "btree",
+          "definition": "CREATE UNIQUE INDEX billing_customers_provider_customer ON billing_customers (provider, provider_customer_id) WHERE provider_customer_id IS NOT NULL",
+          "migration": "007-cloud-control-plane",
+          "source": "apps/api/src/db/migrations/007-cloud-control-plane.ts:104"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/cloud/paddle.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 283,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/cloud/paddle.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 120,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/billing.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 22,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/control-plane.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 265,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:205",
+      "reads": 2,
+      "writes": 2
+    },
+    {
+      "name": "billing_events",
+      "interface": "BillingEventTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "provider_event_id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:85"
+        },
+        {
+          "name": "provider",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:86"
+        },
+        {
+          "name": "event_type",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:87"
+        },
+        {
+          "name": "workspace_id",
+          "type": "string | null",
+          "writable": true,
+          "generated": false,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:88"
+        },
+        {
+          "name": "payload",
+          "type": "Record<string, unknown>",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:89"
+        },
+        {
+          "name": "received_at",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:90"
+        },
+        {
+          "name": "processed_at",
+          "type": "string | null",
+          "writable": true,
+          "generated": false,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:91"
+        }
+      ],
+      "requirements": [],
+      "created_in": "007-cloud-control-plane",
+      "altered_in": [],
+      "indexes": [
+        {
+          "name": "billing_events_workspace_received",
+          "table": "billing_events",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX billing_events_workspace_received ON billing_events (workspace_id, received_at DESC)",
+          "migration": "007-cloud-control-plane",
+          "source": "apps/api/src/db/migrations/007-cloud-control-plane.ts:141"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/cloud/paddle.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 221,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/cloud/paddle.ts",
+          "method": "updateTable",
+          "access": "query-builder",
+          "line": 334,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:207",
+      "reads": 0,
+      "writes": 2
+    },
+    {
+      "name": "billing_subscriptions",
+      "interface": "BillingSubscriptionTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "workspace_id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:72"
+        },
+        {
+          "name": "provider",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:73"
+        },
+        {
+          "name": "provider_subscription_id",
+          "type": "string | null",
+          "writable": true,
+          "generated": false,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:74"
+        },
+        {
+          "name": "provider_status",
+          "type": "string | null",
+          "writable": true,
+          "generated": false,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:75"
+        },
+        {
+          "name": "billing_period",
+          "type": "string | null",
+          "writable": true,
+          "generated": false,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:76"
+        },
+        {
+          "name": "current_period_ends_at",
+          "type": "string | null",
+          "writable": true,
+          "generated": false,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:77"
+        },
+        {
+          "name": "provider_updated_at",
+          "type": "string | null",
+          "writable": true,
+          "generated": false,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:78"
+        },
+        {
+          "name": "cancel_at_period_end",
+          "type": "boolean",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:79"
+        },
+        {
+          "name": "raw",
+          "type": "Record<string, unknown>",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:80"
+        },
+        {
+          "name": "updated_at",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:81"
+        }
+      ],
+      "requirements": [],
+      "created_in": "007-cloud-control-plane",
+      "altered_in": [
+        "008-billing-event-ordering"
+      ],
+      "indexes": [
+        {
+          "name": "billing_subscriptions_provider_subscription",
+          "table": "billing_subscriptions",
+          "unique": true,
+          "partial": true,
+          "method": "btree",
+          "definition": "CREATE UNIQUE INDEX billing_subscriptions_provider_subscription ON billing_subscriptions (provider, provider_subscription_id) WHERE provider_subscription_id IS NOT NULL",
+          "migration": "007-cloud-control-plane",
+          "source": "apps/api/src/db/migrations/007-cloud-control-plane.ts:124"
+        },
+        {
+          "name": "billing_subscriptions_provider_updated",
+          "table": "billing_subscriptions",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX billing_subscriptions_provider_updated ON billing_subscriptions (workspace_id, provider_updated_at DESC)",
+          "migration": "008-billing-event-ordering",
+          "source": "apps/api/src/db/migrations/008-billing-event-ordering.ts:10"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/cloud/paddle.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 291,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/cloud/paddle.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 267,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/billing.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 27,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:206",
+      "reads": 2,
+      "writes": 1
+    },
+    {
+      "name": "dedup_aliases",
+      "interface": "DedupAliasTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "type",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:185"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/__tests__/api.integration.test.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 1511,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/__tests__/api.integration.test.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 1488,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "method": "docDelete",
+          "access": "repository",
+          "line": 797,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 540,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 696,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 508,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 75,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:232",
+      "reads": 3,
+      "writes": 3
+    },
+    {
+      "name": "dedup_dismissals",
+      "interface": "DedupDismissalTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "a",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:138"
+        },
+        {
+          "name": "b",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:139"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "002-retention-columns",
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [
+        {
+          "name": "dedup_dismissals_a",
+          "table": "dedup_dismissals",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX dedup_dismissals_a ON dedup_dismissals (space, a)",
+          "migration": "002-retention-columns",
+          "source": "apps/api/src/db/migrations/002-retention-columns.ts:29"
+        },
+        {
+          "name": "dedup_dismissals_b",
+          "table": "dedup_dismissals",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX dedup_dismissals_b ON dedup_dismissals (space, b)",
+          "migration": "002-retention-columns",
+          "source": "apps/api/src/db/migrations/002-retention-columns.ts:30"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 294,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 559,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 72,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:231",
+      "reads": 2,
+      "writes": 2
+    },
+    {
+      "name": "edges",
+      "interface": "EdgeTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "type",
+          "type": "GeneratedAlways<string>",
+          "writable": false,
+          "generated": true,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:113"
+        },
+        {
+          "name": "src",
+          "type": "GeneratedAlways<string>",
+          "writable": false,
+          "generated": true,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:114"
+        },
+        {
+          "name": "dst",
+          "type": "GeneratedAlways<string>",
+          "writable": false,
+          "generated": true,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:115"
+        },
+        {
+          "name": "updated_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:116"
+        },
+        {
+          "name": "deleted_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:117"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [
+        {
+          "name": "edges_dst",
+          "table": "edges",
+          "unique": false,
+          "partial": true,
+          "method": "btree",
+          "definition": "CREATE INDEX edges_dst ON edges (space, dst, type) WHERE deleted_at IS NULL",
+          "migration": "001-initial-schema",
+          "source": "apps/api/src/db/migrations/001-initial-schema.ts:127"
+        },
+        {
+          "name": "edges_src",
+          "table": "edges",
+          "unique": false,
+          "partial": true,
+          "method": "btree",
+          "definition": "CREATE INDEX edges_src ON edges (space, src, type) WHERE deleted_at IS NULL",
+          "migration": "001-initial-schema",
+          "source": "apps/api/src/db/migrations/001-initial-schema.ts:126"
+        },
+        {
+          "name": "edges_type",
+          "table": "edges",
+          "unique": false,
+          "partial": true,
+          "method": "btree",
+          "definition": "CREATE INDEX edges_type ON edges (space, type) WHERE deleted_at IS NULL",
+          "migration": "001-initial-schema",
+          "source": "apps/api/src/db/migrations/001-initial-schema.ts:128"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "deleteFrom",
+          "access": "query-builder",
+          "line": 503,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 372,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 532,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "updateTable",
+          "access": "query-builder",
+          "line": 437,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 356,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 53,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:210",
+      "reads": 3,
+      "writes": 4
+    },
+    {
+      "name": "habit_checks",
+      "interface": "HabitCheckTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "habit_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:135"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "002-retention-columns",
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [
+        {
+          "name": "habit_checks_habit",
+          "table": "habit_checks",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX habit_checks_habit ON habit_checks (space, habit_id)",
+          "migration": "002-retention-columns",
+          "source": "apps/api/src/db/migrations/002-retention-columns.ts:21"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/routes/v1/dashboard.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 30,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/habits.ts",
+          "method": "docDelete",
+          "access": "repository",
+          "line": 71,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/habits.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 68,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/habits.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 17,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/habits.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 74,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 372,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 256,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 71,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:230",
+      "reads": 4,
+      "writes": 5
+    },
+    {
+      "name": "import_raw_chunks",
+      "interface": "ImportChildTable",
+      "description": "Former Firestore subcollections; the parent id is a real foreign key now.",
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "import_id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:193"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/db/migrations/004-child-table-keys.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 21,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/migrations/009-workspace-primary-keys.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 43,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docBulkPut",
+          "access": "repository",
+          "line": 622,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docDeleteMany",
+          "access": "repository",
+          "line": 543,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docIdsWhereIn",
+          "access": "repository",
+          "line": 542,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:226",
+      "reads": 3,
+      "writes": 4
+    },
+    {
+      "name": "import_rows",
+      "interface": "ImportChildTable",
+      "description": "Former Firestore subcollections; the parent id is a real foreign key now.",
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "import_id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:193"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/db/migrations/004-child-table-keys.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 20,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/migrations/009-workspace-primary-keys.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 42,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/schema.test.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 243,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/db/schema.test.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 237,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docBulkPut",
+          "access": "repository",
+          "line": 630,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 669,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docMerge",
+          "access": "repository",
+          "line": 1073,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 650,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:225",
+      "reads": 4,
+      "writes": 4
+    },
+    {
+      "name": "imports",
+      "interface": "ImportTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "status",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:188"
+        },
+        {
+          "name": "created_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:189"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/__tests__/aperture-import.integration.test.ts",
+          "method": "docDeleteMany",
+          "access": "repository",
+          "line": 58,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/__tests__/aperture-import.integration.test.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 57,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/db/schema.test.ts",
+          "method": "deleteFrom",
+          "access": "query-builder",
+          "line": 235,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/db/schema.test.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 229,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 68,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 656,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 661,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docMerge",
+          "access": "repository",
+          "line": 1153,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 614,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docDeleteMany",
+          "access": "repository",
+          "line": 166,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 75,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:224",
+      "reads": 4,
+      "writes": 4
+    },
+    {
+      "name": "letters",
+      "interface": "LetterTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "target_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:158"
+        },
+        {
+          "name": "resume_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:159"
+        },
+        {
+          "name": "status",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:160"
+        },
+        {
+          "name": "updated_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:161"
+        },
+        {
+          "name": "deleted_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:162"
+        }
+      ],
+      "requirements": [],
+      "created_in": "006-letters",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [
+        {
+          "name": "letters_live_updated",
+          "table": "letters",
+          "unique": false,
+          "partial": true,
+          "method": "btree",
+          "definition": "CREATE INDEX letters_live_updated ON letters (space, updated_at DESC) WHERE deleted_at IS NULL",
+          "migration": "006-letters",
+          "source": "apps/api/src/db/migrations/006-letters.ts:30"
+        },
+        {
+          "name": "letters_resume",
+          "table": "letters",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX letters_resume ON letters (space, resume_id)",
+          "migration": "006-letters",
+          "source": "apps/api/src/db/migrations/006-letters.ts:26"
+        },
+        {
+          "name": "letters_status_updated",
+          "table": "letters",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX letters_status_updated ON letters (space, status, updated_at DESC)",
+          "migration": "006-letters",
+          "source": "apps/api/src/db/migrations/006-letters.ts:27"
+        },
+        {
+          "name": "letters_target",
+          "table": "letters",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX letters_target ON letters (space, target_id)",
+          "migration": "006-letters",
+          "source": "apps/api/src/db/migrations/006-letters.ts:25"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 61,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/letters.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 134,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/letters.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 38,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/letters.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 142,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:217",
+      "reads": 3,
+      "writes": 2
+    },
+    {
+      "name": "merges",
+      "interface": "MergeTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "keep_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:181"
+        },
+        {
+          "name": "drop_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:182"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 725,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 803,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "method": "docMerge",
+          "access": "repository",
+          "line": 798,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 694,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 67,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:223",
+      "reads": 3,
+      "writes": 3
+    },
+    {
+      "name": "meta",
+      "interface": "DocTable",
+      "description": "The three columns every table shares.",
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:26"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 651,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/schema.test.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 171,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/db/schema.test.ts",
+          "method": "docMerge",
+          "access": "repository",
+          "line": 181,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/db/schema.test.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 168,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/db/search-index.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 61,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/ask.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 53,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/ask.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 40,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/export.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 61,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/export.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 48,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 1061,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 901,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/status.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 26,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 597,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/tidy-import.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 520,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 445,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "method": "docMerge",
+          "access": "repository",
+          "line": 550,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 70,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/places.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 57,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/places.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 172,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/settings.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 87,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/settings.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 118,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:228",
+      "reads": 8,
+      "writes": 11
+    },
+    {
+      "name": "meta_runs",
+      "interface": "MetaRunTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "meta_id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:196"
+        },
+        {
+          "name": "run_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:197"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "003-meta-run-id",
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [
+        {
+          "name": "meta_runs_run",
+          "table": "meta_runs",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX meta_runs_run ON meta_runs (space, meta_id, run_id)",
+          "migration": "003-meta-run-id",
+          "source": "apps/api/src/db/migrations/003-meta-run-id.ts:18"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/db/migrations/004-child-table-keys.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 22,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/migrations/009-workspace-primary-keys.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 44,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/schema.test.ts",
+          "method": "docBulkPut",
+          "access": "repository",
+          "line": 182,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/db/schema.test.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 186,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/scripts/tidy-import.ts",
+          "method": "docDelete",
+          "access": "repository",
+          "line": 256,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/tidy-import.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 521,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/tidy-import.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 210,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "method": "docBulkPut",
+          "access": "repository",
+          "line": 422,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/duplicates.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 369,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:229",
+      "reads": 4,
+      "writes": 5
+    },
+    {
+      "name": "nodes",
+      "interface": "NodeTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "type",
+          "type": "GeneratedAlways<string>",
+          "writable": false,
+          "generated": true,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:103"
+        },
+        {
+          "name": "title",
+          "type": "GeneratedAlways<string>",
+          "writable": false,
+          "generated": true,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:104"
+        },
+        {
+          "name": "updated_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:105"
+        },
+        {
+          "name": "deleted_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:106"
+        },
+        {
+          "name": "archived_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:107"
+        },
+        {
+          "name": "merged_into",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:108"
+        },
+        {
+          "name": "sensitivity",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:109"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [
+        {
+          "name": "nodes_identity_keys",
+          "table": "nodes",
+          "unique": false,
+          "partial": false,
+          "method": "gin",
+          "definition": "CREATE INDEX nodes_identity_keys ON nodes USING gin ((data -> 'identity_keys') jsonb_path_ops)",
+          "migration": "001-initial-schema",
+          "source": "apps/api/src/db/migrations/001-initial-schema.ts:105"
+        },
+        {
+          "name": "nodes_live_type_updated",
+          "table": "nodes",
+          "unique": false,
+          "partial": true,
+          "method": "btree",
+          "definition": "CREATE INDEX nodes_live_type_updated ON nodes (space, type, updated_at DESC) WHERE deleted_at IS NULL",
+          "migration": "001-initial-schema",
+          "source": "apps/api/src/db/migrations/001-initial-schema.ts:94"
+        },
+        {
+          "name": "nodes_live_updated",
+          "table": "nodes",
+          "unique": false,
+          "partial": true,
+          "method": "btree",
+          "definition": "CREATE INDEX nodes_live_updated ON nodes (space, updated_at DESC) WHERE deleted_at IS NULL",
+          "migration": "001-initial-schema",
+          "source": "apps/api/src/db/migrations/001-initial-schema.ts:98"
+        },
+        {
+          "name": "nodes_merged_into",
+          "table": "nodes",
+          "unique": false,
+          "partial": true,
+          "method": "btree",
+          "definition": "CREATE INDEX nodes_merged_into ON nodes (space, merged_into) WHERE merged_into IS NOT NULL",
+          "migration": "001-initial-schema",
+          "source": "apps/api/src/db/migrations/001-initial-schema.ts:111"
+        },
+        {
+          "name": "nodes_props",
+          "table": "nodes",
+          "unique": false,
+          "partial": false,
+          "method": "gin",
+          "definition": "CREATE INDEX nodes_props ON nodes USING gin ((data -> 'props') jsonb_path_ops)",
+          "migration": "001-initial-schema",
+          "source": "apps/api/src/db/migrations/001-initial-schema.ts:109"
+        },
+        {
+          "name": "nodes_title_trgm",
+          "table": "nodes",
+          "unique": false,
+          "partial": false,
+          "method": "gin",
+          "definition": "CREATE INDEX nodes_title_trgm ON nodes USING gin (title gin_trgm_ops)",
+          "migration": "001-initial-schema",
+          "source": "apps/api/src/db/migrations/001-initial-schema.ts:110"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/__tests__/api.integration.test.ts",
+          "method": "docCount",
+          "access": "repository",
+          "line": 1655,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "deleteFrom",
+          "access": "query-builder",
+          "line": 514,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 129,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 545,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "updateTable",
+          "access": "query-builder",
+          "line": 181,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/schema.test.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 206,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/db/schema.test.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 222,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/db/schema.test.ts",
+          "method": "updateTable",
+          "access": "query-builder",
+          "line": 137,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 52,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/restore.integration.test.ts",
+          "method": "docCount",
+          "access": "repository",
+          "line": 21,
+          "test": true
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:209",
+      "reads": 2,
+      "writes": 4
+    },
+    {
+      "name": "reminders",
+      "interface": "ReminderTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "status",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:165"
+        },
+        {
+          "name": "due_on",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:166"
+        },
+        {
+          "name": "subject_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:167"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/routes/v1/composer.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 108,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/dashboard.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 28,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/interactions.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 78,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/reminders.ts",
+          "method": "docMerge",
+          "access": "repository",
+          "line": 42,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/reminders.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 12,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/capture.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 174,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 63,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:219",
+      "reads": 3,
+      "writes": 5
+    },
+    {
+      "name": "resumes",
+      "interface": "ResumeTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "target_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:151"
+        },
+        {
+          "name": "template_key",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:152"
+        },
+        {
+          "name": "status",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:153"
+        },
+        {
+          "name": "created_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:154"
+        },
+        {
+          "name": "deleted_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:155"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "005-resume-workspace-indexes",
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [
+        {
+          "name": "resumes_live_created",
+          "table": "resumes",
+          "unique": false,
+          "partial": true,
+          "method": "btree",
+          "definition": "CREATE INDEX resumes_live_created ON resumes (space, created_at DESC) WHERE deleted_at IS NULL",
+          "migration": "005-resume-workspace-indexes",
+          "source": "apps/api/src/db/migrations/005-resume-workspace-indexes.ts:35"
+        },
+        {
+          "name": "resumes_status_created",
+          "table": "resumes",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX resumes_status_created ON resumes (space, status, created_at DESC)",
+          "migration": "005-resume-workspace-indexes",
+          "source": "apps/api/src/db/migrations/005-resume-workspace-indexes.ts:31"
+        },
+        {
+          "name": "resumes_target",
+          "table": "resumes",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX resumes_target ON resumes (space, target_id)",
+          "migration": "005-resume-workspace-indexes",
+          "source": "apps/api/src/db/migrations/005-resume-workspace-indexes.ts:30"
+        },
+        {
+          "name": "resumes_template",
+          "table": "resumes",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX resumes_template ON resumes (space, template_key)",
+          "migration": "005-resume-workspace-indexes",
+          "source": "apps/api/src/db/migrations/005-resume-workspace-indexes.ts:34"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/routes/v1/applications.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 331,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/dashboard.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 29,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 1004,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 1059,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "method": "docMerge",
+          "access": "repository",
+          "line": 1039,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 977,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 648,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 59,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/letters.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 19,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:216",
+      "reads": 6,
+      "writes": 4
+    },
+    {
+      "name": "revisions",
+      "interface": "RevisionTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "subject_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:121"
+        },
+        {
+          "name": "subject_kind",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:122"
+        },
+        {
+          "name": "rev",
+          "type": "GeneratedAlways<number | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:123"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 579,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 622,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 57,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docDeleteMany",
+          "access": "repository",
+          "line": 158,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docIdsWhereIn",
+          "access": "repository",
+          "line": 111,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:211",
+      "reads": 3,
+      "writes": 3
+    },
+    {
+      "name": "saved_views",
+      "interface": "DocTable",
+      "description": "The three columns every table shares.",
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:26"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/__tests__/api.integration.test.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 1507,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/__tests__/api.integration.test.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 1497,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/routes/v1/export.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 83,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/views.ts",
+          "method": "docDelete",
+          "access": "repository",
+          "line": 38,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/views.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 18,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/views.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 30,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 592,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 69,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:227",
+      "reads": 3,
+      "writes": 4
+    },
+    {
+      "name": "taggings",
+      "interface": "TaggingTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "tag_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:173"
+        },
+        {
+          "name": "subject_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:174"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/capture.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 162,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 272,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 65,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 1050,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:221",
+      "reads": 2,
+      "writes": 3
+    },
+    {
+      "name": "tags",
+      "interface": "TagTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "name",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:170"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/capture.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 158,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/capture.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 138,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 64,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 1303,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/imports.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 1300,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:220",
+      "reads": 3,
+      "writes": 3
+    },
+    {
+      "name": "targets",
+      "interface": "TargetTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "status",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:146"
+        },
+        {
+          "name": "updated_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:147"
+        },
+        {
+          "name": "deleted_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:148"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "005-resume-workspace-indexes",
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [
+        {
+          "name": "targets_live_updated",
+          "table": "targets",
+          "unique": false,
+          "partial": true,
+          "method": "btree",
+          "definition": "CREATE INDEX targets_live_updated ON targets (space, updated_at DESC) WHERE deleted_at IS NULL",
+          "migration": "005-resume-workspace-indexes",
+          "source": "apps/api/src/db/migrations/005-resume-workspace-indexes.ts:18"
+        },
+        {
+          "name": "targets_status_updated",
+          "table": "targets",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX targets_status_updated ON targets (space, status, updated_at DESC)",
+          "migration": "005-resume-workspace-indexes",
+          "source": "apps/api/src/db/migrations/005-resume-workspace-indexes.ts:15"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/routes/v1/applications.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 328,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 1016,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/resumes.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 584,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docMerge",
+          "access": "repository",
+          "line": 642,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 58,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 287,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 195,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "method": "docMerge",
+          "access": "repository",
+          "line": 203,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/resume.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 296,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:215",
+      "reads": 6,
+      "writes": 4
+    },
+    {
+      "name": "templates",
+      "interface": "DocTable",
+      "description": "The three columns every table shares.",
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:26"
+        }
+      ],
+      "requirements": [],
+      "created_in": "001-initial-schema",
+      "altered_in": [
+        "007-cloud-control-plane",
+        "009-workspace-primary-keys",
+        "010-legacy-space-default-workspace"
+      ],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 62,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:218",
+      "reads": 1,
+      "writes": 1
+    },
+    {
+      "name": "users",
+      "interface": "UserTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:30"
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:31"
+        },
+        {
+          "name": "email_verified",
+          "type": "boolean",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:32"
+        },
+        {
+          "name": "provider",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:33"
+        },
+        {
+          "name": "created_at",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:34"
+        },
+        {
+          "name": "updated_at",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:35"
+        }
+      ],
+      "requirements": [],
+      "created_in": "007-cloud-control-plane",
+      "altered_in": [],
+      "indexes": [
+        {
+          "name": "users_email_lower",
+          "table": "users",
+          "unique": true,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE UNIQUE INDEX users_email_lower ON users ((lower(email)))",
+          "migration": "007-cloud-control-plane",
+          "source": "apps/api/src/db/migrations/007-cloud-control-plane.ts:60"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/control-plane.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 182,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/control-plane.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 175,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:201",
+      "reads": 1,
+      "writes": 1
+    },
+    {
+      "name": "workspace_lifecycle_events",
+      "interface": "WorkspaceLifecycleEventTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:95"
+        },
+        {
+          "name": "workspace_id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:96"
+        },
+        {
+          "name": "kind",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:97"
+        },
+        {
+          "name": "details",
+          "type": "Record<string, unknown>",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:98"
+        },
+        {
+          "name": "created_at",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:99"
+        }
+      ],
+      "requirements": [],
+      "created_in": "007-cloud-control-plane",
+      "altered_in": [],
+      "indexes": [
+        {
+          "name": "workspace_lifecycle_events_workspace_created",
+          "table": "workspace_lifecycle_events",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX workspace_lifecycle_events_workspace_created ON workspace_lifecycle_events (workspace_id, created_at DESC)",
+          "migration": "007-cloud-control-plane",
+          "source": "apps/api/src/db/migrations/007-cloud-control-plane.ts:152"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/control-plane.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 271,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:208",
+      "reads": 0,
+      "writes": 1
+    },
+    {
+      "name": "workspace_lifecycles",
+      "interface": "WorkspaceLifecycleTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "workspace_id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:55"
+        },
+        {
+          "name": "access_state",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:56"
+        },
+        {
+          "name": "trial_ends_at",
+          "type": "string | null",
+          "writable": true,
+          "generated": false,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:57"
+        },
+        {
+          "name": "grace_ends_at",
+          "type": "string | null",
+          "writable": true,
+          "generated": false,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:58"
+        },
+        {
+          "name": "deletion_scheduled_at",
+          "type": "string | null",
+          "writable": true,
+          "generated": false,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:59"
+        },
+        {
+          "name": "updated_at",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:60"
+        }
+      ],
+      "requirements": [],
+      "created_in": "007-cloud-control-plane",
+      "altered_in": [],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/cloud/paddle.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 250,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/cloud.integration.test.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 35,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/routes/v1/cloud.integration.test.ts",
+          "method": "updateTable",
+          "access": "query-builder",
+          "line": 113,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/services/control-plane.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 244,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/control-plane.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 324,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/control-plane.ts",
+          "method": "updateTable",
+          "access": "query-builder",
+          "line": 336,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:204",
+      "reads": 2,
+      "writes": 2
+    },
+    {
+      "name": "workspace_members",
+      "interface": "WorkspaceMemberTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "workspace_id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:48"
+        },
+        {
+          "name": "user_id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:49"
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:50"
+        },
+        {
+          "name": "created_at",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:51"
+        }
+      ],
+      "requirements": [],
+      "created_in": "007-cloud-control-plane",
+      "altered_in": [],
+      "indexes": [
+        {
+          "name": "workspace_members_user",
+          "table": "workspace_members",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX workspace_members_user ON workspace_members (user_id, workspace_id)",
+          "migration": "007-cloud-control-plane",
+          "source": "apps/api/src/db/migrations/007-cloud-control-plane.ts:82"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/control-plane.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 257,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:203",
+      "reads": 0,
+      "writes": 1
+    },
+    {
+      "name": "workspaces",
+      "interface": "WorkspaceTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:39"
+        },
+        {
+          "name": "kind",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:40"
+        },
+        {
+          "name": "state",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:41"
+        },
+        {
+          "name": "owner_user_id",
+          "type": "string | null",
+          "writable": true,
+          "generated": false,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:42"
+        },
+        {
+          "name": "created_at",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:43"
+        },
+        {
+          "name": "updated_at",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:44"
+        }
+      ],
+      "requirements": [],
+      "created_in": "007-cloud-control-plane",
+      "altered_in": [],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/cloud/paddle.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 218,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/cloud.integration.test.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 28,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/services/control-plane.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 240,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/control-plane.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 221,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/control-plane.ts",
+          "method": "updateTable",
+          "access": "query-builder",
+          "line": 234,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:202",
+      "reads": 2,
+      "writes": 2
+    }
+  ],
+  "migrations": [
+    {
+      "id": "001-initial-schema",
+      "file": "apps/api/src/db/migrations/001-initial-schema.ts",
+      "title": "The initial Postgres schema (ADR 0005), replacing Firestore.",
+      "description": "The initial Postgres schema (ADR 0005), replacing Firestore. ## Why every table is `data jsonb` plus generated columns The obvious port is a typed column per field. It was rejected because the risk here is not query performance, it is *fidelity*: the export bundle must round-trip byte-identically or the migration silently loses data, and a hand-written codec across 21 collections is 21 chances to drop a field. The repository already writes whole documents: `stageNodeUpdate` merges the patch into the record and `set`s all of it, never a partial UPDATE, so a single `jsonb` column matches the existing write model exactly and is lossless by construction. Reads are `JSON.parse` for free (node-postgres hands back a parsed object). The queryable fields are then GENERATED ALWAYS ... STORED columns derived from `data`. They cannot drift from the document because Postgres computes them, and they index like any ordinary column, so the joins and WHERE clauses that Firestore could not do are available: SELECT e.data FROM edges e JOIN nodes n ON n.space = e.space AND n.id = e.src WHERE e.space = $1 AND e.type = 'HELD' AND n.deleted_at IS NULL; ## Timestamps stay TEXT `nowIso()` writes ISO-8601 UTC with milliseconds. Those strings sort lexicographically in exactly timestamp order, so `ORDER BY updated_at DESC` and `deleted_at < $cutoff` behave identically to today. Converting to `timestamptz` would buy date arithmetic we do not do, and cost a formatting round-trip that could silently reshape every timestamp in the database. ## Data spaces `demo` is a `space` column (part of every primary key), injected by one query helper. A forgotten filter is a missing-column error rather than a silent data leak.",
+      "requirements": [],
+      "creates": [
+        "atom_skills",
+        "atom_variants",
+        "atoms",
+        "attachments",
+        "dedup_aliases",
+        "dedup_dismissals",
+        "edges",
+        "habit_checks",
+        "import_raw_chunks",
+        "import_rows",
+        "imports",
+        "merges",
+        "meta",
+        "meta_runs",
+        "nodes",
+        "reminders",
+        "resumes",
+        "revisions",
+        "saved_views",
+        "taggings",
+        "tags",
+        "targets",
+        "templates"
+      ],
+      "alters": [],
+      "indexes": [
+        "nodes_live_type_updated",
+        "nodes_live_updated",
+        "nodes_identity_keys",
+        "nodes_props",
+        "nodes_title_trgm",
+        "nodes_merged_into",
+        "edges_src",
+        "edges_dst",
+        "edges_type"
+      ],
+      "extensions": [
+        "pg_trgm"
+      ],
+      "reversible": true
+    },
+    {
+      "id": "002-retention-columns",
+      "file": "apps/api/src/db/migrations/002-retention-columns.ts",
+      "title": "Generated columns the retention sweep filters on.",
+      "description": "Generated columns the retention sweep filters on. `purgeExpiredTrash` deletes every dependent record of a purged node, habit checks, dedup dismissals, by matching a foreign id inside the document. Without these columns those become unindexed jsonb probes, which is fine at today's size and wrong as soon as it is not. Split from 001 rather than folded into it: 001 is already applied, and rewriting an applied migration means the schema on a developer's machine depends on when they last reset it.",
+      "requirements": [],
+      "creates": [],
+      "alters": [
+        "dedup_dismissals",
+        "habit_checks"
+      ],
+      "indexes": [
+        "habit_checks_habit",
+        "dedup_dismissals_a",
+        "dedup_dismissals_b"
+      ],
+      "extensions": [],
+      "reversible": true
+    },
+    {
+      "id": "003-meta-run-id",
+      "file": "apps/api/src/db/migrations/003-meta-run-id.ts",
+      "title": "`run_id` on meta_runs, for the duplicate-scan results.",
+      "description": "`run_id` on meta_runs, for the duplicate-scan results. Firestore modelled a scan as `meta/dedup_scan/runs/{runId}/results/{pair}`. two levels of subcollection. `meta_runs` flattens that: the journal rows and the scan results both hang off a meta document, and `run_id` is what separates one scan's results from the previous one's so a superseded run can be read or discarded as a unit.",
+      "requirements": [],
+      "creates": [],
+      "alters": [
+        "meta_runs"
+      ],
+      "indexes": [
+        "meta_runs_run"
+      ],
+      "extensions": [],
+      "reversible": true
+    },
+    {
+      "id": "004-child-table-keys",
+      "file": "apps/api/src/db/migrations/004-child-table-keys.ts",
+      "title": "Make child tables key on (space, id) like every other table.",
+      "description": "Make child tables key on (space, id) like every other table. 001 gave `import_rows`, `import_raw_chunks`, and `meta_runs` a composite key of (space, parent_id, id), mirroring the Firestore path they came from. That reads naturally and is wrong in one specific way: the repository's document helpers upsert with `ON CONFLICT (space, id)`, and Postgres requires the conflict target to match a unique constraint, so every staged import would have failed at runtime with \"no unique or exclusion constraint matching the ON CONFLICT specification\". Row ids are already globally unique (UUIDs, or derived hashes), so the parent adds nothing to identity. It stays as an indexed foreign key, which is what actually carries the cascade.",
+      "requirements": [],
+      "creates": [],
+      "alters": [],
+      "indexes": [],
+      "extensions": [],
+      "reversible": true
+    },
+    {
+      "id": "005-resume-workspace-indexes",
+      "file": "apps/api/src/db/migrations/005-resume-workspace-indexes.ts",
+      "title": "Add query columns for the résumé studio without changing document storage.",
+      "description": "Add query columns for the résumé studio without changing document storage. Existing rows remain valid: absent JSON keys simply generate NULL.",
+      "requirements": [],
+      "creates": [],
+      "alters": [
+        "resumes",
+        "targets"
+      ],
+      "indexes": [
+        "targets_status_updated",
+        "targets_live_updated",
+        "resumes_target",
+        "resumes_status_created",
+        "resumes_template",
+        "resumes_live_created"
+      ],
+      "extensions": [],
+      "reversible": true
+    },
+    {
+      "id": "006-letters",
+      "file": "apps/api/src/db/migrations/006-letters.ts",
+      "title": "Cover letters table (SRS FR-RES-020 / §4.5).",
+      "description": "Cover letters table (SRS FR-RES-020 / §4.5). Generation UI is deferred; this migration only stands up durable storage so later compile/export work can attach without another schema break. Marked optional in export bundles so older backups remain restorable.",
+      "requirements": [
+        "FR-RES-020"
+      ],
+      "creates": [
+        "letters"
+      ],
+      "alters": [],
+      "indexes": [
+        "letters_target",
+        "letters_resume",
+        "letters_status_updated",
+        "letters_live_updated"
+      ],
+      "extensions": [],
+      "reversible": true
+    },
+    {
+      "id": "007-cloud-control-plane",
+      "file": "apps/api/src/db/migrations/007-cloud-control-plane.ts",
+      "title": "Cloud control plane and workspace partitioning.",
+      "description": "Cloud control plane and workspace partitioning. The original `space` column separates one self-hosted owner's real graph from an internal demo. It cannot safely represent customer tenancy: a browser chose it with a request header and it has only two values. This migration keeps that legacy compatibility surface while adding a server-selected `workspace_id` to every durable graph table. Existing data is moved without rewriting its JSON documents: real rows are assigned to the claimable legacy workspace and demo rows to an unassigned system workspace. The application only enters multi-tenant mode when its server flag is enabled, so self-hosted installations continue to work while the hosted rollout is prepared.",
+      "requirements": [],
+      "creates": [
+        "billing_customers",
+        "billing_events",
+        "billing_subscriptions",
+        "users",
+        "workspace_lifecycle_events",
+        "workspace_lifecycles",
+        "workspace_members",
+        "workspaces"
+      ],
+      "alters": [
+        "atom_skills",
+        "atom_variants",
+        "atoms",
+        "attachments",
+        "dedup_aliases",
+        "dedup_dismissals",
+        "edges",
+        "habit_checks",
+        "import_raw_chunks",
+        "import_rows",
+        "imports",
+        "letters",
+        "merges",
+        "meta",
+        "meta_runs",
+        "nodes",
+        "reminders",
+        "resumes",
+        "revisions",
+        "saved_views",
+        "taggings",
+        "tags",
+        "targets",
+        "templates"
+      ],
+      "indexes": [
+        "users_email_lower",
+        "workspace_members_user",
+        "billing_customers_provider_customer",
+        "billing_subscriptions_provider_subscription",
+        "billing_events_workspace_received",
+        "workspace_lifecycle_events_workspace_created"
+      ],
+      "extensions": [],
+      "reversible": true
+    },
+    {
+      "id": "008-billing-event-ordering",
+      "file": "apps/api/src/db/migrations/008-billing-event-ordering.ts",
+      "title": "Provider timestamps make webhook processing monotonic across retries and delayed delivery.",
+      "description": "Provider timestamps make webhook processing monotonic across retries and delayed delivery.",
+      "requirements": [],
+      "creates": [],
+      "alters": [
+        "billing_subscriptions"
+      ],
+      "indexes": [
+        "billing_subscriptions_provider_updated"
+      ],
+      "extensions": [],
+      "reversible": true
+    },
+    {
+      "id": "009-workspace-primary-keys",
+      "file": "apps/api/src/db/migrations/009-workspace-primary-keys.ts",
+      "title": "Make the workspace key the actual document identity.",
+      "description": "Make the workspace key the actual document identity. Migration 007 added a unique `(workspace_id, id)` index, but leaving the historical `(space, id)` primary key in place would still make singleton documents such as `meta/search_generation` collide between two Cloud workspaces. This promotes the tenant key to every table's primary key and replaces the old child foreign keys with the workspace-aware ones introduced in 007.",
+      "requirements": [],
+      "creates": [],
+      "alters": [
+        "atom_skills",
+        "atom_variants",
+        "atoms",
+        "attachments",
+        "dedup_aliases",
+        "dedup_dismissals",
+        "edges",
+        "habit_checks",
+        "import_raw_chunks",
+        "import_rows",
+        "imports",
+        "letters",
+        "merges",
+        "meta",
+        "meta_runs",
+        "nodes",
+        "reminders",
+        "resumes",
+        "revisions",
+        "saved_views",
+        "taggings",
+        "tags",
+        "targets",
+        "templates"
+      ],
+      "indexes": [],
+      "extensions": [],
+      "reversible": true
+    },
+    {
+      "id": "010-legacy-space-default-workspace",
+      "file": "apps/api/src/db/migrations/010-legacy-space-default-workspace.ts",
+      "title": "Preserve direct legacy `space` inserts while primary keys become workspace based.",
+      "description": "Preserve direct legacy `space` inserts while primary keys become workspace based. Repository writes always pass an explicit workspace id; this trigger only repairs old scripts/tests that insert a `demo` row and rely on the old column default.",
+      "requirements": [],
+      "creates": [],
+      "alters": [
+        "atom_skills",
+        "atom_variants",
+        "atoms",
+        "attachments",
+        "dedup_aliases",
+        "dedup_dismissals",
+        "edges",
+        "habit_checks",
+        "import_raw_chunks",
+        "import_rows",
+        "imports",
+        "letters",
+        "merges",
+        "meta",
+        "meta_runs",
+        "nodes",
+        "reminders",
+        "resumes",
+        "revisions",
+        "saved_views",
+        "taggings",
+        "tags",
+        "targets",
+        "templates"
+      ],
+      "indexes": [],
+      "extensions": [],
+      "reversible": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "billing_customers_provider_customer",
+      "table": "billing_customers",
+      "unique": true,
+      "partial": true,
+      "method": "btree",
+      "definition": "CREATE UNIQUE INDEX billing_customers_provider_customer ON billing_customers (provider, provider_customer_id) WHERE provider_customer_id IS NOT NULL",
+      "migration": "007-cloud-control-plane",
+      "source": "apps/api/src/db/migrations/007-cloud-control-plane.ts:104"
+    },
+    {
+      "name": "billing_events_workspace_received",
+      "table": "billing_events",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX billing_events_workspace_received ON billing_events (workspace_id, received_at DESC)",
+      "migration": "007-cloud-control-plane",
+      "source": "apps/api/src/db/migrations/007-cloud-control-plane.ts:141"
+    },
+    {
+      "name": "billing_subscriptions_provider_subscription",
+      "table": "billing_subscriptions",
+      "unique": true,
+      "partial": true,
+      "method": "btree",
+      "definition": "CREATE UNIQUE INDEX billing_subscriptions_provider_subscription ON billing_subscriptions (provider, provider_subscription_id) WHERE provider_subscription_id IS NOT NULL",
+      "migration": "007-cloud-control-plane",
+      "source": "apps/api/src/db/migrations/007-cloud-control-plane.ts:124"
+    },
+    {
+      "name": "billing_subscriptions_provider_updated",
+      "table": "billing_subscriptions",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX billing_subscriptions_provider_updated ON billing_subscriptions (workspace_id, provider_updated_at DESC)",
+      "migration": "008-billing-event-ordering",
+      "source": "apps/api/src/db/migrations/008-billing-event-ordering.ts:10"
+    },
+    {
+      "name": "dedup_dismissals_a",
+      "table": "dedup_dismissals",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX dedup_dismissals_a ON dedup_dismissals (space, a)",
+      "migration": "002-retention-columns",
+      "source": "apps/api/src/db/migrations/002-retention-columns.ts:29"
+    },
+    {
+      "name": "dedup_dismissals_b",
+      "table": "dedup_dismissals",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX dedup_dismissals_b ON dedup_dismissals (space, b)",
+      "migration": "002-retention-columns",
+      "source": "apps/api/src/db/migrations/002-retention-columns.ts:30"
+    },
+    {
+      "name": "edges_dst",
+      "table": "edges",
+      "unique": false,
+      "partial": true,
+      "method": "btree",
+      "definition": "CREATE INDEX edges_dst ON edges (space, dst, type) WHERE deleted_at IS NULL",
+      "migration": "001-initial-schema",
+      "source": "apps/api/src/db/migrations/001-initial-schema.ts:127"
+    },
+    {
+      "name": "edges_src",
+      "table": "edges",
+      "unique": false,
+      "partial": true,
+      "method": "btree",
+      "definition": "CREATE INDEX edges_src ON edges (space, src, type) WHERE deleted_at IS NULL",
+      "migration": "001-initial-schema",
+      "source": "apps/api/src/db/migrations/001-initial-schema.ts:126"
+    },
+    {
+      "name": "edges_type",
+      "table": "edges",
+      "unique": false,
+      "partial": true,
+      "method": "btree",
+      "definition": "CREATE INDEX edges_type ON edges (space, type) WHERE deleted_at IS NULL",
+      "migration": "001-initial-schema",
+      "source": "apps/api/src/db/migrations/001-initial-schema.ts:128"
+    },
+    {
+      "name": "habit_checks_habit",
+      "table": "habit_checks",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX habit_checks_habit ON habit_checks (space, habit_id)",
+      "migration": "002-retention-columns",
+      "source": "apps/api/src/db/migrations/002-retention-columns.ts:21"
+    },
+    {
+      "name": "letters_live_updated",
+      "table": "letters",
+      "unique": false,
+      "partial": true,
+      "method": "btree",
+      "definition": "CREATE INDEX letters_live_updated ON letters (space, updated_at DESC) WHERE deleted_at IS NULL",
+      "migration": "006-letters",
+      "source": "apps/api/src/db/migrations/006-letters.ts:30"
+    },
+    {
+      "name": "letters_resume",
+      "table": "letters",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX letters_resume ON letters (space, resume_id)",
+      "migration": "006-letters",
+      "source": "apps/api/src/db/migrations/006-letters.ts:26"
+    },
+    {
+      "name": "letters_status_updated",
+      "table": "letters",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX letters_status_updated ON letters (space, status, updated_at DESC)",
+      "migration": "006-letters",
+      "source": "apps/api/src/db/migrations/006-letters.ts:27"
+    },
+    {
+      "name": "letters_target",
+      "table": "letters",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX letters_target ON letters (space, target_id)",
+      "migration": "006-letters",
+      "source": "apps/api/src/db/migrations/006-letters.ts:25"
+    },
+    {
+      "name": "meta_runs_run",
+      "table": "meta_runs",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX meta_runs_run ON meta_runs (space, meta_id, run_id)",
+      "migration": "003-meta-run-id",
+      "source": "apps/api/src/db/migrations/003-meta-run-id.ts:18"
+    },
+    {
+      "name": "nodes_identity_keys",
+      "table": "nodes",
+      "unique": false,
+      "partial": false,
+      "method": "gin",
+      "definition": "CREATE INDEX nodes_identity_keys ON nodes USING gin ((data -> 'identity_keys') jsonb_path_ops)",
+      "migration": "001-initial-schema",
+      "source": "apps/api/src/db/migrations/001-initial-schema.ts:105"
+    },
+    {
+      "name": "nodes_live_type_updated",
+      "table": "nodes",
+      "unique": false,
+      "partial": true,
+      "method": "btree",
+      "definition": "CREATE INDEX nodes_live_type_updated ON nodes (space, type, updated_at DESC) WHERE deleted_at IS NULL",
+      "migration": "001-initial-schema",
+      "source": "apps/api/src/db/migrations/001-initial-schema.ts:94"
+    },
+    {
+      "name": "nodes_live_updated",
+      "table": "nodes",
+      "unique": false,
+      "partial": true,
+      "method": "btree",
+      "definition": "CREATE INDEX nodes_live_updated ON nodes (space, updated_at DESC) WHERE deleted_at IS NULL",
+      "migration": "001-initial-schema",
+      "source": "apps/api/src/db/migrations/001-initial-schema.ts:98"
+    },
+    {
+      "name": "nodes_merged_into",
+      "table": "nodes",
+      "unique": false,
+      "partial": true,
+      "method": "btree",
+      "definition": "CREATE INDEX nodes_merged_into ON nodes (space, merged_into) WHERE merged_into IS NOT NULL",
+      "migration": "001-initial-schema",
+      "source": "apps/api/src/db/migrations/001-initial-schema.ts:111"
+    },
+    {
+      "name": "nodes_props",
+      "table": "nodes",
+      "unique": false,
+      "partial": false,
+      "method": "gin",
+      "definition": "CREATE INDEX nodes_props ON nodes USING gin ((data -> 'props') jsonb_path_ops)",
+      "migration": "001-initial-schema",
+      "source": "apps/api/src/db/migrations/001-initial-schema.ts:109"
+    },
+    {
+      "name": "nodes_title_trgm",
+      "table": "nodes",
+      "unique": false,
+      "partial": false,
+      "method": "gin",
+      "definition": "CREATE INDEX nodes_title_trgm ON nodes USING gin (title gin_trgm_ops)",
+      "migration": "001-initial-schema",
+      "source": "apps/api/src/db/migrations/001-initial-schema.ts:110"
+    },
+    {
+      "name": "resumes_live_created",
+      "table": "resumes",
+      "unique": false,
+      "partial": true,
+      "method": "btree",
+      "definition": "CREATE INDEX resumes_live_created ON resumes (space, created_at DESC) WHERE deleted_at IS NULL",
+      "migration": "005-resume-workspace-indexes",
+      "source": "apps/api/src/db/migrations/005-resume-workspace-indexes.ts:35"
+    },
+    {
+      "name": "resumes_status_created",
+      "table": "resumes",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX resumes_status_created ON resumes (space, status, created_at DESC)",
+      "migration": "005-resume-workspace-indexes",
+      "source": "apps/api/src/db/migrations/005-resume-workspace-indexes.ts:31"
+    },
+    {
+      "name": "resumes_target",
+      "table": "resumes",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX resumes_target ON resumes (space, target_id)",
+      "migration": "005-resume-workspace-indexes",
+      "source": "apps/api/src/db/migrations/005-resume-workspace-indexes.ts:30"
+    },
+    {
+      "name": "resumes_template",
+      "table": "resumes",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX resumes_template ON resumes (space, template_key)",
+      "migration": "005-resume-workspace-indexes",
+      "source": "apps/api/src/db/migrations/005-resume-workspace-indexes.ts:34"
+    },
+    {
+      "name": "targets_live_updated",
+      "table": "targets",
+      "unique": false,
+      "partial": true,
+      "method": "btree",
+      "definition": "CREATE INDEX targets_live_updated ON targets (space, updated_at DESC) WHERE deleted_at IS NULL",
+      "migration": "005-resume-workspace-indexes",
+      "source": "apps/api/src/db/migrations/005-resume-workspace-indexes.ts:18"
+    },
+    {
+      "name": "targets_status_updated",
+      "table": "targets",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX targets_status_updated ON targets (space, status, updated_at DESC)",
+      "migration": "005-resume-workspace-indexes",
+      "source": "apps/api/src/db/migrations/005-resume-workspace-indexes.ts:15"
+    },
+    {
+      "name": "users_email_lower",
+      "table": "users",
+      "unique": true,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE UNIQUE INDEX users_email_lower ON users ((lower(email)))",
+      "migration": "007-cloud-control-plane",
+      "source": "apps/api/src/db/migrations/007-cloud-control-plane.ts:60"
+    },
+    {
+      "name": "workspace_lifecycle_events_workspace_created",
+      "table": "workspace_lifecycle_events",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX workspace_lifecycle_events_workspace_created ON workspace_lifecycle_events (workspace_id, created_at DESC)",
+      "migration": "007-cloud-control-plane",
+      "source": "apps/api/src/db/migrations/007-cloud-control-plane.ts:152"
+    },
+    {
+      "name": "workspace_members_user",
+      "table": "workspace_members",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX workspace_members_user ON workspace_members (user_id, workspace_id)",
+      "migration": "007-cloud-control-plane",
+      "source": "apps/api/src/db/migrations/007-cloud-control-plane.ts:82"
+    }
+  ],
+  "summary": {
+    "tables": 32,
+    "columns": 199,
+    "indexes": 30,
+    "partial_indexes": 11,
+    "migrations": 10,
+    "irreversible": [],
+    "extensions": [
+      "pg_trgm"
+    ],
+    "untraced": [],
+    "unmodelled_in_kysely": [],
+    "never_queried": []
+  }
+}

@@ -113,3 +113,18 @@ export function isTestPath(rel) {
     || /\.(test|spec)\.[cm]?[jt]sx?$/.test(rel)
     || /^e2e\/tests\//.test(rel);
 }
+
+/**
+ * Turn a parsed requirements registry into the options `citationsIn` wants.
+ *
+ * Every generator needs the same two fields, and the shapes differ from the
+ * argument names: `families` is an object in the registry and an array here.
+ * Deriving it in each generator is how one of them ends up reading citations
+ * with a different vocabulary from the gate that checks them.
+ */
+export function optionsFrom(registry) {
+  return {
+    aliases: registry.id_aliases ?? {},
+    families: Object.keys(registry.families ?? {}).sort(),
+  };
+}
