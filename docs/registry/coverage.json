@@ -1,0 +1,214 @@
+{
+  "note": "What the documentation must account for, and what it does not account for yet. Regenerate the ratchet with `node scripts/check-docs-coverage.mjs --update`; it may shrink and never grow.",
+  "catalogs": {
+    "route": {
+      "artifact": "docs/generated/routes.json",
+      "collection": "routes",
+      "id_field": "path",
+      "exclude_when": {
+        "wildcard": [
+          true
+        ],
+        "redirect_to": [
+          "*"
+        ]
+      },
+      "note": "Canonical screens. Redirects and the catch-all forward to a screen rather than being one."
+    },
+    "endpoint": {
+      "artifact": "docs/generated/api.json",
+      "collection": "endpoints",
+      "id_field": "id"
+    },
+    "algorithm": {
+      "artifact": "docs/generated/algorithms.json",
+      "collection": "modules",
+      "id_field": "id"
+    },
+    "config": {
+      "artifact": "docs/generated/config.json",
+      "collection": "keys",
+      "id_field": "name"
+    },
+    "package": {
+      "artifact": "docs/generated/packages.json",
+      "collection": "packages",
+      "id_field": "name"
+    },
+    "table": {
+      "artifact": "docs/generated/database.json",
+      "collection": "tables",
+      "id_field": "name"
+    },
+    "migration": {
+      "artifact": "docs/generated/database.json",
+      "collection": "migrations",
+      "id_field": "id"
+    },
+    "component": {
+      "artifact": "docs/generated/components.json",
+      "collection": "components",
+      "id_field": "name"
+    },
+    "token": {
+      "artifact": "docs/generated/tokens.json",
+      "collection": "tokens",
+      "id_field": "name"
+    }
+  },
+  "filesystem_catalogs": {
+    "runbook": {
+      "glob": "docs/runbooks/*.md",
+      "exclude": [
+        "docs/runbooks/README.md"
+      ],
+      "note": "Tracked runbooks only. An untracked file in the working tree is somebody's work in progress, not a published procedure."
+    },
+    "template": {
+      "glob": "templates/*",
+      "directories": true,
+      "note": "Resume template families."
+    }
+  },
+  "requires_prose": {
+    "route": "A screen a person can open needs an explanation of what it is for, not only an entry in a route table.",
+    "algorithm": "A deterministic algorithm needs its inputs, formula, constants and limits explained; a symbol index cannot carry that.",
+    "package": "A package needs a statement of what it owns and what may depend on it.",
+    "runbook": "An operational procedure is only useful if it is reachable from the documentation that describes the system it operates.",
+    "template": "A resume template family needs its layout, constraints and build path documented."
+  },
+  "generated_reference_only": {
+    "endpoint": "Covered by the generated API catalog: method, path, mount, schemas, gates and tests, derived from the routers.",
+    "config": "Covered by the generated configuration catalog, derived from the environment schema and its readers.",
+    "table": "Covered by the generated database catalog, derived from the migrations.",
+    "migration": "Covered by the generated migration catalog, including what each one creates and alters.",
+    "component": "Covered by the generated component catalog, derived from the design-system source.",
+    "token": "Covered by the generated token catalog, derived from the stylesheets."
+  },
+  "undocumented": {
+    "route": [
+      "/",
+      "/ask/people",
+      "/browse/:type",
+      "/career",
+      "/career/applications",
+      "/career/applications/:id",
+      "/career/resume",
+      "/career/resume/evidence",
+      "/career/resume/letters",
+      "/career/resume/outputs",
+      "/career/resume/tailor",
+      "/career/resume/templates",
+      "/changelog",
+      "/collections",
+      "/data",
+      "/data/exports",
+      "/data/identity",
+      "/data/imports",
+      "/data/sources/github",
+      "/data/trash",
+      "/explore",
+      "/explore/atlas",
+      "/explore/graph",
+      "/explore/library",
+      "/explore/timeline",
+      "/export",
+      "/graph",
+      "/guides",
+      "/guides/:slug",
+      "/help",
+      "/how-it-works",
+      "/import",
+      "/import/duplicates",
+      "/intros",
+      "/legal/dpa",
+      "/legal/privacy",
+      "/legal/subprocessors",
+      "/legal/terms",
+      "/manifesto",
+      "/map",
+      "/n/:id",
+      "/network",
+      "/network/intelligence",
+      "/network/organizations",
+      "/network/organizations/:id",
+      "/network/people",
+      "/network/people/:id",
+      "/orgs",
+      "/orgs/:id",
+      "/people",
+      "/people/:id",
+      "/pricing",
+      "/product/career-evidence",
+      "/product/warm-paths",
+      "/reference/entities",
+      "/repositories",
+      "/resources",
+      "/resume",
+      "/resume/atoms",
+      "/resume/letters",
+      "/resume/outputs",
+      "/resume/tailor",
+      "/resume/templates",
+      "/search",
+      "/security-and-ownership",
+      "/settings",
+      "/settings/billing",
+      "/settings/preferences",
+      "/settings/profile",
+      "/settings/system",
+      "/signin",
+      "/signup",
+      "/status",
+      "/timeline",
+      "/today",
+      "/today/planner",
+      "/tour",
+      "/trash",
+      "/welcome"
+    ],
+    "algorithm": [
+      "aho-corasick",
+      "atom-scoring",
+      "capture-grammar",
+      "composer",
+      "constants",
+      "dedup",
+      "filter-grammar",
+      "fit-loop",
+      "graph-paths",
+      "jd-parser",
+      "latex-escape",
+      "line-model",
+      "pagerank",
+      "reconnect",
+      "selection",
+      "streaks",
+      "text",
+      "tie-strength",
+      "who-to-call"
+    ],
+    "package": [
+      "@vitae/api",
+      "@vitae/buildsvc",
+      "@vitae/config",
+      "@vitae/core",
+      "@vitae/e2e",
+      "@vitae/testkit",
+      "@vitae/ui",
+      "@vitae/web"
+    ],
+    "runbook": [
+      "docs/runbooks/bump-tectonic.md",
+      "docs/runbooks/postgres-restore.md",
+      "docs/runbooks/restore-drill.md",
+      "docs/runbooks/rotate-secrets.md",
+      "docs/runbooks/run-emulators.md"
+    ],
+    "template": [
+      "templates/argon",
+      "templates/cobalt",
+      "templates/onyx"
+    ]
+  }
+}
