@@ -113,16 +113,16 @@ helpers (~50+).
 | Export | `routes/v1/export.integration.test.ts` |
 | Resumes (focused) | `routes/v1/resumes.integration.test.ts` |
 | Imports / duplicates | `imports.integration.test.ts`, `duplicates.integration.test.ts` |
-| Targets / atoms / letters | `targets|atoms|letters.integration.test.ts` |
+| Targets / atoms / letters | `targets\|atoms\|letters.integration.test.ts` |
 | Dashboard / suggest / interactions | focused route suites |
-| Explore / views / settings | `explore|views|settings.integration.test.ts` |
+| Explore / views / settings | `explore\|views\|settings.integration.test.ts` |
 | Restore corruption | `services/restore.integration.test.ts` |
 | Space | `db/space.integration.test.ts` |
 | Secrets | `services/secrets.test.ts` |
 | Error / request-context | `middleware/error.test.ts`, `middleware/request-context.test.ts` |
 | Error envelope contract | `__tests__/contracts/error-envelope.contract.test.ts` |
 | OpenAPI contract | `__tests__/contracts/openapi.contract.test.ts` — mount inventory + drift vs `docs/api/openapi.json` (`pnpm openapi` / `pnpm test:contract`) |
-| Thin CRM/ops routes | `ask|composer|favors|habits|intros|orgs|people|places|reminders|status.integration.test.ts` |
+| Thin CRM/ops routes | `ask\|composer\|favors\|habits\|intros\|orgs\|people\|places\|reminders\|status.integration.test.ts` |
 | Shared helper | `__tests__/helpers/app.ts` (`ensureSelfPerson`, `createKnowsPerson`) + `@vitae/testkit` factories |
 
 High-risk API modules and the monolith-backed route-split wave are `covered`.

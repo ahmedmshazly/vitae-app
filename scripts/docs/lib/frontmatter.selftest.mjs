@@ -63,10 +63,12 @@ check('comments and blank lines are ignored',
   frontmatter(page('# why this page exists\n\nid: X  # trailing note')).data, { id: 'X' });
 check('the body starts after the closing fence',
   frontmatter(page('id: X', '\n# Heading\n\nText.\n')).body, '# Heading\n\nText.\n');
-check('the body line number points at the real first body line',
-  frontmatter(page('id: X\ntitle: Y')).bodyLine, 5);
+check('the body line number counts the blank lines the body strips',
+  frontmatter(page('id: X\ntitle: Y')).bodyLine, 6);
 check('a byte-order mark does not hide the opening fence',
   frontmatter(`\uFEFF${page('id: X')}`).data, { id: 'X' });
+check('bodyLine points at the first body line when it follows immediately',
+  frontmatter('---\nid: X\n---\n# Heading\n').bodyLine, 4);
 check('--- inside the body does not end the block early',
   frontmatter(page('id: X', '\nAbove.\n\n---\n\nBelow.\n')).data, { id: 'X' });
 

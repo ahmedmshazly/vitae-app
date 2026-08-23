@@ -98,7 +98,7 @@ transaction ID; access changes only after a verified webhook is recorded.
 ## Ops
 
 | GET | `/dashboard` | aggregate for the Today screen; `counts` splits `myRecords` / `allRecords` / `unownedRecords` |
-| GET | `/reminders` · POST `/reminders/:id/done|snooze` | |
+| GET | `/reminders` · POST `/reminders/:id/done\|snooze` | |
 | POST | `/export` | streamed ZIP (JSONL + vault + manifest) |
 | GET | `/export/manifest` | preview counts + checksums |
 | GET | `/status` | DB / storage / build-svc health + counts |

@@ -97,9 +97,16 @@ export function frontmatter(text, { file = '<input>' } = {}) {
 
   // A key that took the block-list branch but got no items is an empty value,
   // not an empty list — `verified_at:` with nothing after it means unknown.
+  const rest = lines.slice(end + 1).join('\n');
+  const body = rest.replace(/^\n+/, '');
   return {
     data,
-    body: lines.slice(end + 1).join('\n').replace(/^\n+/, ''),
-    bodyLine: end + 2,
+    body,
+    // Blank lines between the block and the first heading are dropped from the
+    // body, so the starting line has to move with them. A `bodyLine` that
+    // ignored the strip would put every line the body parser reports one row
+    // early, and a checker that names the wrong line is worse than one that
+    // names no line at all.
+    bodyLine: end + 2 + /^\n*/.exec(rest)[0].length,
   };
 }
