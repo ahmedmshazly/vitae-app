@@ -1,0 +1,164 @@
+{
+  "$schema": "../schema/diagram.schema.json",
+  "id": "DGM-APPLICATION-LIFECYCLE",
+  "title": "A job application, from draft to outcome",
+  "summary": "The eight statuses an application record can hold, the pipeline the Career workspace presents, and the three that close it. The enum is enforced; the ordering is not.",
+  "kind": "state",
+  "note": "Read the arrows as the route the interface offers, not as a rule the server keeps. An application is an ordinary graph node: its status is a required enum on `applicationProps` (packages/core/src/schema/node-props.ts:192), and the only writer is the generic node patch (apps/api/src/routes/v1/nodes.ts:223), which validates the value against the enum and nothing else. There is no transition table, no guard, and no server-side rejection of a jump from `draft` straight to `accepted`. `GET /applications` is a read-only projection over the graph (apps/api/src/routes/v1/applications.ts:272) and never writes a status. Two facts follow. First, the ordering shown here lives entirely in the browser, as `PIPELINE_STAGES` and `OUTCOME_STAGES` (apps/web/src/routes/career/application-view.ts:3-4). Second, a legacy record with no readable status is read as `draft` rather than failing the workspace (apps/api/src/routes/v1/applications.ts:67). Note also that a job posting carries its own separate status vocabulary — watching, interested, applied, closed, passed (packages/core/src/schema/node-props.ts:185) — which this machine does not govern; and that `CAP-CAREER` is the capability these records belong to, for which docs/registry/requirements.json records no requirement at all.",
+  "sources": [
+    "packages/core/src/schema/application.ts",
+    "packages/core/src/schema/node-props.ts",
+    "packages/core/src/forms/node-forms.ts",
+    "apps/api/src/routes/v1/applications.ts",
+    "apps/api/src/routes/v1/applications.integration.test.ts",
+    "apps/api/src/routes/v1/nodes.ts",
+    "apps/web/src/routes/career/application-view.ts",
+    "apps/web/src/routes/career/CareerOverview.tsx",
+    "apps/web/src/routes/career/ApplicationDossier.tsx",
+    "docs/registry/requirements.json"
+  ],
+  "states": [
+    {
+      "id": "draft",
+      "label": "Draft",
+      "initial": true,
+      "note": "The record exists but nothing has been sent. Also the fallback the API reads for a record whose stored status it cannot parse (apps/api/src/routes/v1/applications.ts:67), so a pre-schema bundle stays readable instead of breaking the whole workspace."
+    },
+    {
+      "id": "applied",
+      "label": "Applied",
+      "note": "Submitted. `applied_on` is a separate optional date field, not derived from the status, so the two can disagree."
+    },
+    {
+      "id": "screening",
+      "label": "Screening",
+      "note": "Recruiter or resume screen. Counted as active: it is not in `CLOSED_STATUSES`."
+    },
+    {
+      "id": "interview",
+      "label": "Interview",
+      "note": "Interview rounds are separate `interview` nodes joined by `INTERVIEW_FOR` edges, each with its own outcome enum — scheduled, passed, failed, pending, cancelled (packages/core/src/schema/node-props.ts:228). A failed round does not move the application; a person does."
+    },
+    {
+      "id": "offer",
+      "label": "Offer",
+      "note": "An offer is on the table. Still open — the decision has not been recorded."
+    },
+    {
+      "id": "accepted",
+      "label": "Accepted",
+      "terminal": true,
+      "note": "Closed. Counted out of `active` and out of `needs_attention`, so an overdue next step on an accepted application stops nagging."
+    },
+    {
+      "id": "rejected",
+      "label": "Rejected",
+      "terminal": true,
+      "note": "Closed by the other side. Sorted below every open application in the list."
+    },
+    {
+      "id": "withdrawn",
+      "label": "Withdrawn",
+      "terminal": true,
+      "note": "Closed by you. The enum does not distinguish withdrawing before a reply from withdrawing after an offer."
+    }
+  ],
+  "transitions": [
+    {
+      "from": "draft",
+      "to": "applied",
+      "label": "Submit the application",
+      "note": "Set on the record through the application form's status select; `applied_on` and `next_step_date` are filled in the same dialog.",
+      "source": "packages/core/src/forms/node-forms.ts:736"
+    },
+    {
+      "from": "applied",
+      "to": "screening",
+      "label": "They replied and a screen is scheduled",
+      "source": "packages/core/src/forms/node-forms.ts:736"
+    },
+    {
+      "from": "screening",
+      "to": "interview",
+      "label": "Passed the screen; interview rounds begin",
+      "source": "packages/core/src/forms/node-forms.ts:736"
+    },
+    {
+      "from": "interview",
+      "to": "interview",
+      "label": "Another round",
+      "note": "Nothing in the status changes between rounds. The round is a new `interview` node joined by an `INTERVIEW_FOR` edge; the dossier lists them in stage order and surfaces the next one whose outcome is not cancelled, passed or failed.",
+      "source": "apps/api/src/routes/v1/applications.ts:127"
+    },
+    {
+      "from": "interview",
+      "to": "offer",
+      "label": "An offer arrives",
+      "source": "packages/core/src/forms/node-forms.ts:736"
+    },
+    {
+      "from": "offer",
+      "to": "accepted",
+      "label": "Accept the offer",
+      "note": "The only transition into `accepted` the interface's own stage ordering suggests.",
+      "source": "apps/web/src/routes/career/application-view.ts:4"
+    },
+    {
+      "from": "applied",
+      "to": "rejected",
+      "label": "Rejected without a screen",
+      "note": "`rejected` is one of the three statuses the API treats as closed, which is what removes it from the active count and the attention count.",
+      "source": "apps/api/src/routes/v1/applications.ts:24"
+    },
+    {
+      "from": "screening",
+      "to": "rejected",
+      "label": "Rejected after the screen",
+      "source": "apps/api/src/routes/v1/applications.ts:24"
+    },
+    {
+      "from": "interview",
+      "to": "rejected",
+      "label": "Rejected after interviews",
+      "source": "apps/api/src/routes/v1/applications.ts:24"
+    },
+    {
+      "from": "offer",
+      "to": "rejected",
+      "label": "Offer pulled",
+      "note": "The enum has no separate value for a rescinded offer; `rejected` absorbs it.",
+      "source": "apps/api/src/routes/v1/applications.ts:24"
+    },
+    {
+      "from": "draft",
+      "to": "withdrawn",
+      "label": "Abandon before applying",
+      "source": "apps/api/src/routes/v1/applications.ts:24"
+    },
+    {
+      "from": "applied",
+      "to": "withdrawn",
+      "label": "Withdraw after applying",
+      "source": "apps/api/src/routes/v1/applications.ts:24"
+    },
+    {
+      "from": "screening",
+      "to": "withdrawn",
+      "label": "Withdraw during screening",
+      "source": "apps/api/src/routes/v1/applications.ts:24"
+    },
+    {
+      "from": "interview",
+      "to": "withdrawn",
+      "label": "Withdraw during interviews",
+      "source": "apps/api/src/routes/v1/applications.ts:24"
+    },
+    {
+      "from": "offer",
+      "to": "withdrawn",
+      "label": "Decline the offer",
+      "note": "Declining and withdrawing share one value, so the list cannot tell an offer you turned down from an application you dropped.",
+      "source": "apps/api/src/routes/v1/applications.ts:24"
+    }
+  ]
+}

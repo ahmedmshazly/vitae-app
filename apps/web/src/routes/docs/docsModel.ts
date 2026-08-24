@@ -115,6 +115,137 @@ export type DocsAlign = 'left' | 'center' | 'right' | null;
 /** Callout tones are GitHub's alert vocabulary, which the parser accepts. */
 export type DocsCalloutTone = 'note' | 'tip' | 'important' | 'warning' | 'caution';
 
+/**
+ * A diagram, as declared in `docs/registry/diagrams` and folded into the page.
+ *
+ * Four shapes share one type because they share one promise: every field a
+ * renderer draws is a field a table can print, so the accessible equivalent is
+ * produced from the same data rather than written alongside it and allowed to
+ * drift. A field that only a picture could carry does not exist here.
+ */
+export type DocsDiagramKind = 'sequence' | 'state' | 'topology' | 'lanes';
+
+export interface DocsDiagramActor {
+  id: string;
+  label: string;
+  note?: string;
+}
+
+export interface DocsDiagramStep {
+  from: string;
+  to: string;
+  label: string;
+  kind?: 'call' | 'return' | 'refusal' | 'aside';
+  note?: string;
+  source?: string;
+}
+
+export interface DocsDiagramState {
+  id: string;
+  label: string;
+  note?: string;
+  initial?: boolean;
+  terminal?: boolean;
+  /** Declared by the code, reached by nothing. The dead state is the finding. */
+  unreachable?: boolean;
+}
+
+export interface DocsDiagramTransition {
+  from: string;
+  to: string;
+  label: string;
+  note?: string;
+  source?: string;
+}
+
+export interface DocsDiagramZone {
+  id: string;
+  label: string;
+  trust: 'untrusted' | 'edge' | 'trusted' | 'external';
+  note?: string;
+}
+
+export interface DocsDiagramNode {
+  id: string;
+  label: string;
+  zone: string;
+  note?: string;
+  source?: string;
+}
+
+export interface DocsDiagramLink {
+  from: string;
+  to: string;
+  label: string;
+  carries?: string;
+  note?: string;
+}
+
+export interface DocsDiagramLane {
+  id: string;
+  label: string;
+  note?: string;
+}
+
+export interface DocsDiagramPhase {
+  id: string;
+  lane: string;
+  label: string;
+  note?: string;
+  route?: string;
+  /** Test files that exercise this phase. An empty list is a real answer. */
+  covered_by?: readonly string[];
+}
+
+export interface DocsDiagramSpec {
+  id: string;
+  title: string;
+  summary: string;
+  kind: DocsDiagramKind;
+  sources: readonly string[];
+  requirements?: readonly string[];
+  note?: string;
+  actors?: readonly DocsDiagramActor[];
+  steps?: readonly DocsDiagramStep[];
+  states?: readonly DocsDiagramState[];
+  transitions?: readonly DocsDiagramTransition[];
+  zones?: readonly DocsDiagramZone[];
+  nodes?: readonly DocsDiagramNode[];
+  links?: readonly DocsDiagramLink[];
+  lanes?: readonly DocsDiagramLane[];
+  phases?: readonly DocsDiagramPhase[];
+}
+
+/** How a step's kind reads in words, since an arrow style is not a label. */
+export const DOCS_STEP_KIND: Record<NonNullable<DocsDiagramStep['kind']>, string> = {
+  call: 'Calls',
+  return: 'Returns',
+  refusal: 'Refuses',
+  aside: 'Aside',
+};
+
+/**
+ * Where a state sits in its machine, in words.
+ *
+ * "Nothing reaches this" is the one worth having: a state the code declares and
+ * no path sets is a defect the diagram exists to report, and it comes first
+ * because it outranks being an end state.
+ */
+export function docsStatePosition(state: DocsDiagramState): string {
+  if (state.unreachable) return 'Nothing reaches this';
+  if (state.initial) return 'Starts here';
+  if (state.terminal) return 'Ends here';
+  return 'In progress';
+}
+
+/** How a trust zone reads in words, since a border is not a label. */
+export const DOCS_TRUST: Record<DocsDiagramZone['trust'], string> = {
+  untrusted: 'Untrusted',
+  edge: 'Edge',
+  trusted: 'Trusted',
+  external: 'External',
+};
+
 export type DocsBlock =
   | { type: 'heading'; level: number; id: string; text: string; children: readonly DocsInline[] }
   | { type: 'paragraph'; children: readonly DocsInline[] }
@@ -129,7 +260,12 @@ export type DocsBlock =
       head: readonly (readonly DocsInline[])[];
       rows: readonly (readonly (readonly DocsInline[])[])[];
     }
-  | { type: 'figure'; src: string; caption: string };
+  | { type: 'figure'; src: string; caption: string }
+  | { type: 'diagram'; id: string; spec: DocsDiagramSpec }
+  // An algorithm a reader can drive. The identifier names a module in
+  // `docs/generated/algorithms.json`; the surface holds the code that renders
+  // it, because the algorithm itself is imported and run rather than described.
+  | { type: 'explainer'; id: string };
 
 export interface DocsHeading {
   level: number;

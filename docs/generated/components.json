@@ -1037,6 +1037,7 @@
         "apps/web/src/routes/career/ApplicationDossier.tsx",
         "apps/web/src/routes/career/CareerOverview.tsx",
         "apps/web/src/routes/docs/DocsApp.tsx",
+        "apps/web/src/routes/docs/DocsReference.tsx",
         "apps/web/src/routes/docs/DocsSearch.tsx",
         "apps/web/src/routes/reference/EntityCatalog.tsx",
         "apps/web/src/routes/tailor/SelectionPane.tsx",
@@ -1044,7 +1045,7 @@
         "apps/web/src/routes/tailor/TargetRail.tsx",
         "apps/web/src/routes/workspaces/Planner.tsx"
       ],
-      "uses": 39,
+      "uses": 40,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/components.css"
@@ -2698,9 +2699,11 @@
       "renders_jsx": true,
       "used_by": [
         "apps/web/src/features/forms/ConnectionRow.tsx",
-        "apps/web/src/routes/SearchResults.tsx"
+        "apps/web/src/routes/SearchResults.tsx",
+        "apps/web/src/routes/docs/DocsReference.tsx",
+        "apps/web/src/routes/docs/docsContent.ts"
       ],
-      "uses": 2,
+      "uses": 4,
       "tested": true,
       "styled_in": [
         "apps/web/src/styles/app.css",
@@ -3055,12 +3058,13 @@
         "apps/web/src/routes/docs/DocsApp.tsx",
         "apps/web/src/routes/docs/DocsCommandPalette.tsx",
         "apps/web/src/routes/docs/DocsPage.tsx",
+        "apps/web/src/routes/docs/DocsReference.tsx",
         "apps/web/src/routes/docs/DocsSearch.tsx",
         "apps/web/src/routes/reference/EntityCatalog.tsx",
         "apps/web/src/routes/tailor/DocumentPane.tsx",
         "apps/web/src/routes/tailor/PreviewPane.tsx"
       ],
-      "uses": 16,
+      "uses": 17,
       "tested": true,
       "styled_in": [
         "apps/web/src/styles/resume-paper.css",

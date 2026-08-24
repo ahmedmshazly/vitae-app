@@ -3191,6 +3191,51 @@
       "lines": 81
     },
     {
+      "file": "apps/web/src/routes/docs/DocsDiagram.test.tsx",
+      "package": "@vitae/web",
+      "cases": 11,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "a diagram and its words"
+      ],
+      "subjects": [
+        "./DocsDiagram.js",
+        "./docsModel.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 193
+    },
+    {
+      "file": "apps/web/src/routes/docs/DocsExplainer.test.tsx",
+      "package": "@vitae/web",
+      "cases": 13,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "which algorithms have a worked example",
+        "how close a relationship is judged to be",
+        "what counts as a word",
+        "making text safe to compile"
+      ],
+      "subjects": [
+        "./DocsExplainer.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 162
+    },
+    {
       "file": "apps/web/src/routes/docs/docsModel.test.ts",
       "package": "@vitae/web",
       "cases": 17,
@@ -3237,6 +3282,53 @@
       ],
       "run_in_ci": true,
       "lines": 159
+    },
+    {
+      "file": "apps/web/src/routes/docs/docsReference.test.ts",
+      "package": "@vitae/web",
+      "cases": 19,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "showing a value a reader did not write",
+        "what a row can be searched by",
+        "narrowing a catalog",
+        "counting facet values",
+        "what an expanded row shows",
+        "the specs against the artifacts they read"
+      ],
+      "subjects": [
+        "./docsReference.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 181
+    },
+    {
+      "file": "apps/web/src/routes/docs/DocsReference.test.tsx",
+      "package": "@vitae/web",
+      "cases": 13,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "the reference entrance",
+        "one catalog"
+      ],
+      "subjects": [
+        "./DocsApp.js",
+        "./docsModel.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 212
     },
     {
       "file": "apps/web/src/routes/docs/docsSearch.test.ts",
@@ -6692,21 +6784,21 @@
     }
   ],
   "summary": {
-    "files": 314,
-    "cases": 2020,
+    "files": 318,
+    "cases": 2076,
     "skipped": 0,
     "todo": 0,
     "by_package": {
       "@vitae/api": 195,
-      "@vitae/web": 1062,
+      "@vitae/web": 1118,
       "@vitae/e2e": 257,
       "@vitae/core": 273,
       "@vitae/testkit": 7,
       "@vitae/ui": 226
     },
     "by_script": {
-      "test": 314,
-      "test:web": 156,
+      "test": 318,
+      "test:web": 160,
       "test:e2e": 53,
       "test:api": 52,
       "test:unit": 44,

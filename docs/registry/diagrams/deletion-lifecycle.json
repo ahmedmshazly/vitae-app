@@ -1,0 +1,124 @@
+{
+  "$schema": "../schema/diagram.schema.json",
+  "id": "DGM-DELETION-LIFECYCLE",
+  "title": "A record's path through trash to permanent removal",
+  "summary": "Deletion is a timestamp, not a removal: thirty days recoverable, then a hard purge that takes the record's history, its dependents and the edges that touched it.",
+  "kind": "state",
+  "requirements": ["FR-006", "FR-ORG-002"],
+  "note": "Archiving is a different axis and is not in this machine. `POST /nodes/:id/archive` sets `archived_at`, which hides a record from working views without putting it in trash and without starting any clock (apps/api/src/db/repository.ts:201). Two mechanics are worth naming because they are quieter than they look. First, deleting a node does not cascade to its edges at all: the edges stay live in the table and simply stop resolving in any view that hydrates both endpoints, which is why restoring the node brings them back intact with no un-cascade step (FR-ORG-002 holds by construction, not by compensation). The graph refuses to attach a *new* edge to a deleted node, so trash cannot accumulate fresh connections (apps/api/src/db/repository.ts:334). Second, the purge is idempotent and runs from three places against the same code path — a daily interval inside the running API process (apps/api/src/index.ts:56), `POST /api/v1/retention/purge`, and the command-line purge script — and `GET /api/v1/retention/preview` is the same function with `dryRun`, which is what lets the Trash screen state what the next run would remove rather than guess.",
+  "sources": [
+    "apps/api/src/db/repository.ts",
+    "apps/api/src/routes/v1/nodes.ts",
+    "apps/api/src/routes/v1/edges.ts",
+    "apps/api/src/routes/v1/retention.ts",
+    "apps/api/src/services/retention.ts",
+    "apps/api/src/services/duplicates.ts",
+    "apps/api/src/services/restore.ts",
+    "apps/api/src/services/storage/cloudinary.ts",
+    "apps/api/src/index.ts",
+    "apps/api/src/scripts/purge.ts",
+    "apps/web/src/routes/Trash.tsx",
+    "e2e/tests/trash.spec.ts",
+    "e2e/tests/journeys.spec.ts",
+    "apps/api/src/__tests__/api.integration.test.ts"
+  ],
+  "states": [
+    {
+      "id": "live",
+      "label": "Live",
+      "initial": true,
+      "note": "`deleted_at` is null. Every read that does not ask for deleted records filters on this column in SQL rather than after the fact, so a page of results can never come back short."
+    },
+    {
+      "id": "trashed",
+      "label": "In trash",
+      "note": "`deleted_at` carries the moment of deletion and a revision records the `delete` operation with its actor. The record is listed in Trash with the whole days remaining before purge, and edges that touched it stay in the table but stop resolving in views that need both endpoints."
+    },
+    {
+      "id": "merged_away",
+      "label": "Merged away",
+      "note": "The losing side of a duplicate merge. It carries both `merged_into` — pointing at the survivor — and `deleted_at`, so it is subject to the same retention clock as anything in trash, while lookups by identity key follow the pointer to the survivor instead of returning nothing."
+    },
+    {
+      "id": "purge_due",
+      "label": "Past retention",
+      "note": "`deleted_at` is older than the 30-day cutoff. Nothing has been removed yet — this is the set the next purge will take, and the set `GET /api/v1/retention/preview` reports without deleting."
+    },
+    {
+      "id": "blob_gc_pending",
+      "label": "Blob deletion pending",
+      "note": "Attachments only. When the object-store delete fails, the purge keeps the attachment's metadata row and stamps it `gc_pending` with the error and the attempt time, deliberately making the metadata the durable garbage-collection outbox. A blob still referenced by an attachment that is NOT being purged is skipped rather than deleted, so shared bytes survive."
+    },
+    {
+      "id": "purged",
+      "label": "Purged",
+      "terminal": true,
+      "note": "Hard-deleted, with everything that only existed to describe it: revisions, reminders, taggings, attachments, habit checks, merge ledger rows, dedup dismissals, atoms and atom variants and atom skills, and — for a node — every edge that touched it, live or not. Audit history for records that still exist is untouched. Nothing in the running system brings a purged record back; the only route is a restore from an export bundle taken before the purge, which writes documents back under their original identifiers."
+    }
+  ],
+  "transitions": [
+    {
+      "from": "live",
+      "to": "trashed",
+      "label": "DELETE /api/v1/nodes/:id or /api/v1/edges/:id",
+      "note": "A soft delete: the record is updated with a deletion timestamp, its revision counter bumps, and a `delete` revision is written with the acting email. The search index is marked dirty and the duplicate scan cache is invalidated in the same request.",
+      "source": "apps/api/src/routes/v1/nodes.ts:239"
+    },
+    {
+      "from": "trashed",
+      "to": "live",
+      "label": "POST /api/v1/nodes/:id/restore",
+      "note": "Clears the timestamp and writes a `restore` revision. The edges hidden with the record resolve again because they were never deleted.",
+      "source": "apps/api/src/routes/v1/nodes.ts:249"
+    },
+    {
+      "from": "live",
+      "to": "merged_away",
+      "label": "POST /api/v1/duplicates/merge",
+      "note": "One transaction: the survivor absorbs the chosen fields, the loser's edges are rewired, and the loser gets `merged_into` and `deleted_at` together. An already-merged record cannot be merged again. Exact pre-images are stored so the undo can replay rather than guess.",
+      "source": "apps/api/src/services/duplicates.ts:675"
+    },
+    {
+      "from": "merged_away",
+      "to": "live",
+      "label": "POST /api/v1/duplicates/merges/:id/undo",
+      "note": "Replayed from the stored pre-images, inside a 30-day undo window. It refuses when either record has been edited since the merge, because undoing would silently discard those edits, and it refuses outright for merges that predate version-guarded undo.",
+      "source": "apps/api/src/services/duplicates.ts:722"
+    },
+    {
+      "from": "trashed",
+      "to": "purge_due",
+      "label": "Thirty days elapse",
+      "note": "The window is a single constant, and the Trash screen counts down from the same value it enforces.",
+      "source": "apps/api/src/services/retention.ts:18"
+    },
+    {
+      "from": "merged_away",
+      "to": "purge_due",
+      "label": "Thirty days elapse — the same clock",
+      "note": "The sweep selects on `deleted_at` alone and does not read `merged_into`, so a merged-away record ages out exactly like a trashed one, and its undo window closes at the same moment its purge becomes due.",
+      "source": "apps/api/src/services/retention.ts:72"
+    },
+    {
+      "from": "purge_due",
+      "to": "purged",
+      "label": "The purge runs",
+      "note": "Dependents are deleted before the records themselves, so a crash mid-purge can never leave a live record whose history is already gone. Every edge touching a purged node goes with it — including live ones — because such an edge can never be valid again.",
+      "source": "apps/api/src/services/retention.ts:163"
+    },
+    {
+      "from": "purge_due",
+      "to": "blob_gc_pending",
+      "label": "The object-store delete fails",
+      "note": "External bytes are deleted first, before any database row. A failure keeps the attachment row so the next run retries it, and is counted separately in the purge summary as a blob failure rather than folded into the success count.",
+      "source": "apps/api/src/services/retention.ts:148"
+    },
+    {
+      "from": "blob_gc_pending",
+      "to": "purged",
+      "label": "A later purge retries the blob and succeeds",
+      "note": "Every run picks up attachments flagged `gc_pending` alongside the ones newly past retention, which is what makes the outbox drain without a dedicated job.",
+      "source": "apps/api/src/services/retention.ts:76"
+    }
+  ]
+}

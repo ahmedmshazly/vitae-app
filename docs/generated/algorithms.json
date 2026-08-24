@@ -411,6 +411,16 @@
           "test": false
         },
         {
+          "file": "apps/web/src/routes/docs/DocsExplainer.test.tsx",
+          "symbol": "TIE_STRENGTH",
+          "test": true
+        },
+        {
+          "file": "apps/web/src/routes/docs/DocsExplainer.tsx",
+          "symbol": "TIE_STRENGTH",
+          "test": false
+        },
+        {
           "file": "packages/core/src/algorithms/atom-scoring.ts",
           "symbol": "SELECTION",
           "test": false
@@ -467,8 +477,8 @@
         }
       ],
       "consumer_count": {
-        "product": 13,
-        "test": 0
+        "product": 14,
+        "test": 1
       }
     },
     {
@@ -1254,6 +1264,16 @@
           "test": false
         },
         {
+          "file": "apps/web/src/routes/docs/DocsExplainer.test.tsx",
+          "symbol": "escapeLatex",
+          "test": true
+        },
+        {
+          "file": "apps/web/src/routes/docs/DocsExplainer.tsx",
+          "symbol": "escapeLatex",
+          "test": false
+        },
+        {
           "file": "packages/core/src/algorithms/latex-escape.test.ts",
           "symbol": "assertNoUnresolvedTokens",
           "test": true
@@ -1290,8 +1310,8 @@
         }
       ],
       "consumer_count": {
-        "product": 6,
-        "test": 7
+        "product": 7,
+        "test": 8
       }
     },
     {
@@ -1794,6 +1814,31 @@
           "test": false
         },
         {
+          "file": "apps/web/src/routes/docs/DocsExplainer.tsx",
+          "symbol": "normalizeForMatch",
+          "test": false
+        },
+        {
+          "file": "apps/web/src/routes/docs/DocsExplainer.tsx",
+          "symbol": "stem",
+          "test": false
+        },
+        {
+          "file": "apps/web/src/routes/docs/DocsExplainer.tsx",
+          "symbol": "STOPWORDS",
+          "test": false
+        },
+        {
+          "file": "apps/web/src/routes/docs/DocsExplainer.tsx",
+          "symbol": "tokenize",
+          "test": false
+        },
+        {
+          "file": "apps/web/src/routes/docs/docsReference.ts",
+          "symbol": "normalizeForMatch",
+          "test": false
+        },
+        {
           "file": "apps/web/src/routes/docs/docsSearch.ts",
           "symbol": "stem",
           "test": false
@@ -1925,7 +1970,7 @@
         }
       ],
       "consumer_count": {
-        "product": 20,
+        "product": 25,
         "test": 11
       }
     },
@@ -1992,14 +2037,29 @@
           "test": false
         },
         {
+          "file": "apps/web/src/routes/docs/DocsExplainer.test.tsx",
+          "symbol": "computeTieStrength",
+          "test": true
+        },
+        {
+          "file": "apps/web/src/routes/docs/DocsExplainer.tsx",
+          "symbol": "computeTieStrength",
+          "test": false
+        },
+        {
+          "file": "apps/web/src/routes/docs/DocsExplainer.tsx",
+          "symbol": "InteractionEvent",
+          "test": false
+        },
+        {
           "file": "packages/core/src/algorithms/tie-strength.test.ts",
           "symbol": "computeTieStrength",
           "test": true
         }
       ],
       "consumer_count": {
-        "product": 2,
-        "test": 1
+        "product": 4,
+        "test": 2
       }
     },
     {

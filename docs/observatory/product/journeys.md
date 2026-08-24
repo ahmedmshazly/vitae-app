@@ -151,3 +151,9 @@ is the whole reason the five empty rows are written down.
 [The capability map](capabilities.md) defines the capabilities these journeys
 cross, and explains the requirement-to-code-to-test spine that sits underneath
 them.
+
+The arc the whole product exists for, lane by lane:
+
+```diagram
+DGM-CAREER-MOVE
+```

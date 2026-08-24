@@ -169,6 +169,12 @@ that would resolve it, so the interface can say something specific.
 Five access states exist: trialing, active, past due, read-only, and pending
 deletion. Two things move between them.
 
+The states a hosted workspace can be in, and what moves it between them:
+
+```diagram
+DGM-SUBSCRIPTION-LIFECYCLE
+```
+
 **Expiry**, evaluated when a request resolves its workspace. A trial past its
 end date, or a payment grace period past its end, becomes read-only and gets a
 deletion date scheduled from the export grace window. The transition is
@@ -203,6 +209,12 @@ plan defines. Custom data on the transaction carries the workspace, the user,
 the plan code and the interval, which is what lets a later webhook be attributed.
 No entitlement is inferred from a return URL, and the customer portal link never
 changes access locally.
+
+The webhook has no session to check, so this is what it does instead:
+
+```diagram
+DGM-BILLING-WEBHOOK
+```
 
 **The webhook** is the only thing that grants access, and it is the one route in
 the system that answers without a session on the strength of a shared secret.

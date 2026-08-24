@@ -238,3 +238,9 @@ With fictional data, tracking one application from interest to interview.
 - Produce the document this pipeline is about: [Producing a résumé](write-a-resume.md).
 - Improve the ranking by improving what it reads: [Capturing people, work and evidence](build-your-graph.md).
 - Look up any screen mentioned here: [Every screen, and what it is for](screens.md).
+
+Every status an application can be in, and what moves it:
+
+```diagram
+DGM-APPLICATION-LIFECYCLE
+```

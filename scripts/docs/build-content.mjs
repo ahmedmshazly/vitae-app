@@ -21,6 +21,19 @@
  *   search-text.json       every page's prose as plain text, fetched once when
  *                          a reader searches
  *
+ * The generated catalogs are copied out alongside them, unchanged. They are
+ * the other half of the documentation: prose explains why something is the way
+ * it is, and these answer what exists. Copying rather than transforming is
+ * deliberate — the reading surface shows whatever the artifact holds, including
+ * fields nobody thought to give a column, so this surface cannot under-report
+ * the file it reads.
+ *
+ * A diagram is a third thing. `docs/registry/diagrams/*.json` declares them,
+ * and a page names one in a ```diagram fence. The specification is folded into
+ * the page here rather than fetched separately: a diagram is part of the
+ * sentence around it, and a reader should never watch one arrive after the
+ * prose that refers to it.
+ *
  * The one transformation that matters is links. A page links to its neighbour
  * by relative Markdown path so that it reads correctly on the repository host
  * as well as in the application; the renderer receives only a block tree and
@@ -29,10 +42,18 @@
  *
  * Usage: node scripts/docs/build-content.mjs [--out <dir>] [--quiet]
  */
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import { dirname, join, normalize, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readFileSync } from 'node:fs';
 import { classifyLink, readCorpus } from './lib/corpus.mjs';
 import { blockText } from './lib/markdown.mjs';
 
@@ -96,6 +117,37 @@ function compare(a, b) {
   return a.data.title.localeCompare(b.data.title, 'en');
 }
 
+/**
+ * Every declared diagram, by identifier.
+ *
+ * Read once. A page that names one that does not exist is a build failure
+ * rather than an empty box at the bottom of a paragraph explaining it.
+ */
+const DIAGRAMS = 'docs/registry/diagrams';
+const diagrams = new Map();
+try {
+  for (const file of readdirSync(join(root, DIAGRAMS)).sort()) {
+    if (!file.endsWith('.json')) continue;
+    const spec = JSON.parse(readFileSync(join(root, DIAGRAMS, file), 'utf8'));
+    delete spec.$schema;
+    diagrams.set(spec.id, spec);
+  }
+} catch (error) {
+  if (error.code !== 'ENOENT') throw error;
+}
+
+/** The words a diagram contributes to the search index. */
+function diagramText(spec) {
+  const out = [spec.title, spec.summary, spec.note ?? ''];
+  for (const key of ['actors', 'states', 'zones', 'nodes', 'lanes', 'phases']) {
+    for (const item of spec[key] ?? []) out.push(item.label, item.note ?? '');
+  }
+  for (const key of ['steps', 'transitions', 'links']) {
+    for (const item of spec[key] ?? []) out.push(item.label, item.note ?? '');
+  }
+  return out.filter(Boolean).join(' ');
+}
+
 /** Where a page's compiled JSON lives, mirroring its path in the corpus. */
 const contentPath = (page) => `pages/${page.rel.slice(CORPUS.length + 1).replace(/\.md$/, '.json')}`;
 
@@ -112,14 +164,26 @@ function resolveHref(href, page) {
   return anchor ? `${destination.route}#${anchor}` : destination.route;
 }
 
-/** Walk a block tree, rewriting every link in it. Blocks are small; recursion is fine. */
-function resolveLinks(node, page) {
-  if (Array.isArray(node)) return node.map((n) => resolveLinks(n, page));
+/**
+ * Walk a block tree, rewriting every link and folding in every diagram.
+ *
+ * Blocks are small; recursion is fine.
+ */
+function resolveBlocks(node, page) {
+  if (Array.isArray(node)) return node.map((n) => resolveBlocks(n, page));
   if (!node || typeof node !== 'object') return node;
+  if (node.type === 'diagram') {
+    const spec = diagrams.get(node.id);
+    if (!spec) {
+      console.error(`${page.rel}: names diagram ${node.id}, which ${DIAGRAMS}/ does not declare.`);
+      process.exit(1);
+    }
+    return { type: 'diagram', id: node.id, spec };
+  }
   const out = {};
   for (const [key, value] of Object.entries(node)) {
     if (key === 'href' && typeof value === 'string') out[key] = resolveHref(value, page);
-    else out[key] = resolveLinks(value, page);
+    else out[key] = resolveBlocks(value, page);
   }
   return out;
 }
@@ -176,18 +240,34 @@ const manifest = {
   pages: manifestPages,
 };
 
-rmSync(outDir, { recursive: true, force: true });
+/**
+ * Everything this run wrote, so that stale files can be swept afterwards.
+ *
+ * The output directory used to be deleted first, which is the obvious way to
+ * drop a page that has been renamed. It is also a window in which the directory
+ * does not exist, and there are two builders: this script, and the dev server's
+ * watcher running this script. Editing a page while the server was up made both
+ * run at once, and whichever deleted the tree second removed files the first
+ * was still writing into. Writing first and sweeping afterwards removes the
+ * window: two concurrent runs now overwrite identical bytes.
+ */
+const written = new Set();
+const emit = (rel, body) => {
+  const file = join(outDir, rel);
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, body);
+  written.add(file);
+};
+
 mkdirSync(outDir, { recursive: true });
-writeFileSync(join(outDir, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
+emit('manifest.json', `${JSON.stringify(manifest, null, 2)}\n`);
 
 for (const page of ordered) {
   // The title is rendered from metadata, so leaving its heading in the blocks
   // would print it twice and give the page two level-one headings.
   const blocks = page.blocks.filter((b, i) => !(i === 0 && b.type === 'heading' && b.level === 1));
-  const file = join(outDir, contentPath(page));
-  mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(
-    file,
+  emit(
+    contentPath(page),
     `${JSON.stringify(
       {
         id: page.data.id,
@@ -206,7 +286,7 @@ for (const page of ordered) {
         supersedes: links(page.data.supersedes),
         superseded_by: links(page.data.superseded_by),
         headings: page.headings.filter((h) => h.level > 1 && h.level < 4),
-        blocks: resolveLinks(blocks, page),
+        blocks: resolveBlocks(blocks, page),
       },
       null,
       2,
@@ -225,20 +305,89 @@ for (const page of ordered) {
  * moment, instead of two that agree until one is changed. The corpus is small
  * enough that the difference costs a few milliseconds once per session.
  */
-writeFileSync(
-  join(outDir, 'search-text.json'),
+emit(
+  'search-text.json',
   `${JSON.stringify({
     version: 1,
     pages: ordered.map((page) => ({
       id: page.data.id,
       headings: page.headings.filter((h) => h.level > 1 && h.level < 4),
-      text: blockText(page.blocks.filter((b, i) => !(i === 0 && b.type === 'heading' && b.level === 1))),
+      text: [
+        blockText(page.blocks.filter((b, i) => !(i === 0 && b.type === 'heading' && b.level === 1))),
+        // A diagram carries real words — actor names, transitions, trust
+        // zones — and a reader searching for one of them should find the page
+        // that shows it, not only the pages that spell it out in prose.
+        ...page.blocks
+          .filter((b) => b.type === 'diagram')
+          .map((b) => (diagrams.has(b.id) ? diagramText(diagrams.get(b.id)) : '')),
+      ]
+        .filter(Boolean)
+        .join(' '),
     })),
   })}\n`,
 );
 
+/**
+ * The generated catalogs, copied out for the reference surface.
+ *
+ * Static JSON for the same reason the pages are: it is fetched only when a
+ * reader opens that catalog, and it never enters the JavaScript budget. The
+ * requirement register comes from the registry rather than from
+ * `docs/generated/`, because it is curated — the identifiers were adopted from
+ * the code that already cited them, and a generator would have nothing to
+ * derive the wording from.
+ */
+const CATALOG_FILES = [
+  'docs/generated/routes.json',
+  'docs/generated/api.json',
+  'docs/generated/config.json',
+  'docs/generated/algorithms.json',
+  'docs/generated/database.json',
+  'docs/generated/tokens.json',
+  'docs/generated/components.json',
+  'docs/generated/packages.json',
+  'docs/generated/tests.json',
+  'docs/generated/traceability.json',
+  // Generated at build time and never committed: a rename would rewrite
+  // thousands of lines of diff. Absent in a checkout that has not run
+  // `pnpm docs:gen`, which the reading surface reports rather than hides.
+  'docs/generated/atlas.json',
+  'docs/registry/requirements.json',
+];
+
+mkdirSync(join(outDir, 'reference'), { recursive: true });
+const copied = [];
+for (const rel of CATALOG_FILES) {
+  const from = join(root, rel);
+  if (!existsSync(from)) {
+    // A build without `pnpm docs:gen` is a legitimate build; the catalog it is
+    // missing reports itself unavailable rather than taking the page down.
+    console.warn(`docs-content: ${rel} is absent, so its catalog will be unavailable.`);
+    continue;
+  }
+  const to = join(outDir, 'reference', rel.split('/').pop());
+  copyFileSync(from, to);
+  written.add(to);
+  copied.push(rel);
+}
+
+/** Anything left from a previous run that this one did not write. */
+function sweep(dir) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      sweep(path);
+      if (readdirSync(path).length === 0) rmSync(path, { recursive: true, force: true });
+      continue;
+    }
+    if (!written.has(path)) rmSync(path, { force: true });
+  }
+}
+if (statSync(outDir).isDirectory()) sweep(outDir);
+
 if (!quiet) {
   console.log(
-    `docs-content: ${ordered.length} page(s) in ${manifest.domains.length} section(s) -> ${relative(root, outDir)}`,
+    `docs-content: ${ordered.length} page(s) in ${manifest.domains.length} section(s), `
+      + `${diagrams.size} diagram(s), ${copied.length} catalog(s) -> ${relative(root, outDir)}`,
   );
 }

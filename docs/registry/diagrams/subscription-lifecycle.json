@@ -1,0 +1,123 @@
+{
+  "$schema": "../schema/diagram.schema.json",
+  "id": "DGM-SUBSCRIPTION-LIFECYCLE",
+  "title": "A hosted workspace's access state",
+  "summary": "The five access states a Cloud workspace can hold, the two things that move between them — an expiring clock and a verified provider webhook — and the one state nothing reaches.",
+  "kind": "state",
+  "note": "This machine does not run in a default build. Every transition below is gated on `VITAE_CLOUD_ENABLED` (apps/api/src/cloud/config.ts:17), which the example environment leaves off: with it off, workspace resolution and the entitlement gate are no-ops, the billing routes return a not-found, and the payment webhook returns a not-found before parsing. Nothing in this repository asserts that a hosted service is operating, that these terms are on offer, or that any workspace has ever transacted — the provider price identifiers are deployment configuration and are absent from the repository entirely. Read the durations as intent: 14 trial days, 7 payment grace days and 30 export grace days are constants in packages/core/src/cloud/individual-plan.ts:52-54. Two structural facts are worth carrying away. First, expiry is evaluated when a request resolves its workspace, not by a scheduled worker — there is no lifecycle worker in the repository — so a workspace nobody visits keeps its stale state in the database until someone calls. Second, money never grants access directly: a verified webhook is the only thing that changes an access state upward (apps/api/src/cloud/paddle.ts:321), and returning from a checkout page proves nothing.",
+  "sources": [
+    "packages/core/src/cloud/individual-plan.ts",
+    "apps/api/src/cloud/config.ts",
+    "apps/api/src/cloud/paddle.ts",
+    "apps/api/src/services/control-plane.ts",
+    "apps/api/src/middleware/workspace.ts",
+    "apps/api/src/routes/v1/billing.ts",
+    "apps/api/src/routes/v1/auth.ts",
+    "apps/api/src/routes/webhooks/paddle.ts",
+    "apps/api/src/db/migrations/007-cloud-control-plane.ts",
+    "apps/api/src/openapi/spec.ts",
+    "apps/web/src/routes/Billing.tsx",
+    "apps/web/src/lib/auth.tsx",
+    "apps/api/src/routes/v1/cloud.integration.test.ts"
+  ],
+  "states": [
+    {
+      "id": "unenrolled",
+      "label": "No workspace",
+      "initial": true,
+      "note": "A verified identity with no membership. There is no lifecycle row yet. Every API path except the three auth-control routes fails with a 409 `WORKSPACE_BOOTSTRAP_REQUIRED` (apps/api/src/middleware/workspace.ts:36)."
+    },
+    {
+      "id": "trialing",
+      "label": "Trialing",
+      "note": "Full write access. `trial_ends_at` is stamped 14 days out at enrolment. Billing control rows are created here, before any checkout, so the workspace's own record of its state survives a closed checkout overlay."
+    },
+    {
+      "id": "active",
+      "label": "Active",
+      "note": "Full write access on a paid subscription — or on the one-time legacy claim, which starts active with no trial end at all."
+    },
+    {
+      "id": "past_due",
+      "label": "Past due",
+      "note": "A payment failed. Write access is unchanged; only the clock is running. `grace_ends_at` is stamped 7 days out at the moment the state is applied (apps/api/src/services/control-plane.ts:332)."
+    },
+    {
+      "id": "read_only",
+      "label": "Read-only",
+      "note": "Reads answer; every non-read method returns 402 `PAYMENT_REQUIRED` carrying the access state and the action that would resolve it, except export, billing management and sign-out (apps/api/src/middleware/workspace.ts:57-79). A deletion date is scheduled 30 days out. This is also where a corrupt or unrecognised control row lands: `asAccessState` fails closed rather than permissively (apps/api/src/services/control-plane.ts:46)."
+    },
+    {
+      "id": "deletion_pending",
+      "label": "Pending deletion",
+      "terminal": true,
+      "note": "Declared and honoured everywhere, and written by nothing. Established by enumerating every writer of `access_state` in the repository; there are three, and none can produce this value. The enrolment insert sets `claimedLegacy ? 'active' : 'trialing'` (apps/api/src/services/control-plane.ts:230). The expiry update sets a local that is only ever assigned `'read_only'`, on both of its two branches (apps/api/src/services/control-plane.ts:104). The billing update takes its state from its single call site (apps/api/src/cloud/paddle.ts:321), which passes the return of `accessFrom` — a function whose five branches yield only trialing, active, past due, read-only or null (apps/api/src/cloud/paddle.ts:193-200). The seeding migration inserts only active and read-only (apps/api/src/db/migrations/007-cloud-control-plane.ts:161). Nothing else touches the column. Meanwhile the value is carried by the type (apps/api/src/services/control-plane.ts:23), permitted by the database CHECK constraint (apps/api/src/db/migrations/007-cloud-control-plane.ts:87), declared twice in the OpenAPI schema (apps/api/src/openapi/spec.ts:602), enforced by the entitlement gate exactly as read-only is (apps/api/src/middleware/workspace.ts:63), reported to the browser (apps/api/src/middleware/workspace.ts:78), and given a complete presentation card in the billing screen — a label, a danger tone and a sentence telling the person to export before the deletion date — that no one can ever see (apps/web/src/routes/Billing.tsx:70). Only a direct database write reaches it. There is no executor either: nothing reads `deletion_scheduled_at` to delete anything, so even a hand-written row would sit in this state forever.",
+      "unreachable": true
+    }
+  ],
+  "transitions": [
+    {
+      "from": "unenrolled",
+      "to": "trialing",
+      "label": "Enrol: POST /api/v1/auth/bootstrap",
+      "note": "Idempotent, and deliberately not a public route even though the identity endpoint beside it is, because it creates a private workspace and starts a trial. Refuses when the verified email already belongs to a different account identifier rather than merging two people. Writes a `trial_started` lifecycle event.",
+      "source": "apps/api/src/services/control-plane.ts:230"
+    },
+    {
+      "from": "unenrolled",
+      "to": "active",
+      "label": "The configured legacy owner claims the pre-Cloud graph",
+      "note": "One time only, and only while the legacy workspace is still unowned. No trial, no trial end date, and a `legacy_workspace_claimed` event instead of `trial_started`. It is a claim on the existing graph, not a copy of it.",
+      "source": "apps/api/src/services/control-plane.ts:230"
+    },
+    {
+      "from": "trialing",
+      "to": "active",
+      "label": "Verified webhook: subscription active, or a completed transaction",
+      "note": "The provider status maps to the access state; `transaction.completed` and `transaction.paid` also map to active. Applied inside the same transaction that records the event exactly once.",
+      "source": "apps/api/src/cloud/paddle.ts:195"
+    },
+    {
+      "from": "trialing",
+      "to": "read_only",
+      "label": "The trial end passes",
+      "note": "Evaluated on the request path when the workspace is resolved, not on a schedule. Idempotent, so a missed job cannot leave a lapsed workspace writable — but equally, a workspace nobody opens keeps `trialing` in the database past its end date until the next request.",
+      "source": "apps/api/src/services/control-plane.ts:103"
+    },
+    {
+      "from": "active",
+      "to": "past_due",
+      "label": "Verified webhook: subscription past due",
+      "note": "The 7-day grace end is derived at apply time, not taken from the provider payload.",
+      "source": "apps/api/src/cloud/paddle.ts:197"
+    },
+    {
+      "from": "past_due",
+      "to": "active",
+      "label": "Verified webhook: payment recovered",
+      "note": "The grace end is cleared as a side effect of applying any state that is not past due.",
+      "source": "apps/api/src/cloud/paddle.ts:195"
+    },
+    {
+      "from": "past_due",
+      "to": "read_only",
+      "label": "The payment grace end passes",
+      "note": "Same request-path evaluation as the trial expiry, and the same consequence for an idle workspace.",
+      "source": "apps/api/src/services/control-plane.ts:106"
+    },
+    {
+      "from": "active",
+      "to": "read_only",
+      "label": "Verified webhook: cancelled or paused",
+      "note": "`canceled`, `cancelled` and `paused` all map to read-only, and a deletion date is scheduled 30 days out. The same mapping applies to a trial cancelled before its end date.",
+      "source": "apps/api/src/cloud/paddle.ts:198"
+    },
+    {
+      "from": "read_only",
+      "to": "active",
+      "label": "Verified webhook: resubscribed",
+      "note": "Applying any state that is neither read-only nor pending deletion clears the scheduled deletion date. An out-of-order or un-timestamped retry cannot do this: once a provider timestamp has been recorded, an older one is filed as audit evidence and changes nothing.",
+      "source": "apps/api/src/services/control-plane.ts:333"
+    }
+  ]
+}

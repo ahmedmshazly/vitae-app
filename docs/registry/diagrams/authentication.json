@@ -1,0 +1,196 @@
+{
+  "$schema": "../schema/diagram.schema.json",
+  "id": "DGM-AUTHENTICATION",
+  "title": "How a session is obtained and how the API decides who is calling",
+  "summary": "Google sign-in and the loopback-only developer shortcut, then the three token paths the gate tries and the authorisation rule that differs by mode.",
+  "kind": "sequence",
+  "note": "Two things here are gated closed in a default build. The developer shortcut is off unless AUTH_ENABLE_DEV_LOGIN is set — .env.example:56 sets it true for local work — and packages/config/src/env.ts:117 refuses to start a NODE_ENV=production process with it set at all; even when on it answers only loopback callers. Cloud enrolment is off unless VITAE_CLOUD_ENABLED is set, which .env.example:40 leaves false, so in a default build /auth/bootstrap returns 409 SELF_HOSTED_MODE and the OWNER_EMAIL comparison is the whole authorisation rule. GET /auth/me is the one route in this flow reachable without a session; it is special-cased above the public-path check rather than by it.",
+  "requirements": [
+    "FR-015",
+    "FR-SET-001",
+    "INT-1"
+  ],
+  "sources": [
+    "apps/api/src/app.ts",
+    "apps/api/src/middleware/auth.ts",
+    "apps/api/src/middleware/workspace.ts",
+    "apps/api/src/routes/v1/auth.ts",
+    "apps/api/src/services/control-plane.ts",
+    "apps/api/src/cloud/config.ts",
+    "apps/api/src/firebase.ts",
+    "apps/web/src/lib/auth.tsx",
+    "apps/web/src/lib/api.ts",
+    "apps/web/src/lib/firebase.ts",
+    "apps/web/src/lib/runtime.ts",
+    "packages/config/src/env.ts",
+    ".env.example"
+  ],
+  "actors": [
+    {
+      "id": "browser",
+      "label": "Browser (AuthProvider)",
+      "note": "Renders only what /auth/me returns; it never chooses a workspace or decides that Cloud is on."
+    },
+    {
+      "id": "google",
+      "label": "Firebase / Google",
+      "note": "Issues the ID token. In dev builds this is the Auth emulator, whose first onAuthStateChanged can lag by seconds."
+    },
+    {
+      "id": "auth-route",
+      "label": "/api/v1/auth/*",
+      "note": "dev-login, logout and me are public paths; bootstrap deliberately is not."
+    },
+    {
+      "id": "auth-gate",
+      "label": "authGate",
+      "note": "Mounted at /api (app.ts:62). Resolves a token, then applies a mode-dependent authorisation rule."
+    },
+    {
+      "id": "control-plane",
+      "label": "Control plane",
+      "note": "Owns identities, memberships and lifecycle. Reached only after the gate has proved an identity."
+    },
+    {
+      "id": "postgres",
+      "label": "Postgres",
+      "note": "users, workspaces, workspace_members, workspace_lifecycles."
+    }
+  ],
+  "steps": [
+    {
+      "from": "browser",
+      "to": "auth-route",
+      "label": "GET /auth/me on load, before anything is signed in",
+      "kind": "call",
+      "note": "Public because the browser has to ask who it is before it can render a sign-in screen. It returns nulls plus two deployment booleans: cloudEnabled and devLoginEnabled.",
+      "source": "apps/web/src/lib/auth.tsx:87"
+    },
+    {
+      "from": "auth-gate",
+      "to": "auth-route",
+      "label": "/auth/me is matched before the public-path check and resolves a token if one is present",
+      "kind": "aside",
+      "note": "A special case at auth.ts:128, not the PUBLIC_PATHS list. It sets req.user opportunistically and always calls next(), so the route answers signed-out without a 401.",
+      "source": "apps/api/src/middleware/auth.ts:128"
+    },
+    {
+      "from": "browser",
+      "to": "google",
+      "label": "signInWithGoogle popup",
+      "kind": "call",
+      "note": "Only offered when the build carries Firebase config (googleSignInAvailable). The ID token is then read per request by setAuthTokenProvider(currentIdToken).",
+      "source": "apps/web/src/lib/auth.tsx:145"
+    },
+    {
+      "from": "google",
+      "to": "browser",
+      "label": "Firebase ID token",
+      "kind": "return",
+      "source": "apps/web/src/lib/firebase.ts:77"
+    },
+    {
+      "from": "browser",
+      "to": "auth-route",
+      "label": "POST /auth/dev-login (local development only)",
+      "kind": "call",
+      "note": "The browser offers this button only under Vite DEV on a loopback hostname (apps/web/src/lib/runtime.ts:13). That is a UI courtesy; the server checks independently.",
+      "source": "apps/web/src/lib/auth.tsx:139"
+    },
+    {
+      "from": "auth-route",
+      "to": "browser",
+      "label": "403 DEV_LOGIN_DISABLED or 403 DEV_LOGIN_REMOTE",
+      "kind": "refusal",
+      "note": "Defence in depth, three independent conditions: the flag must be set, the socket's remote address must be loopback, and the env schema refuses to boot production with the flag on at all.",
+      "source": "apps/api/src/routes/v1/auth.ts:32"
+    },
+    {
+      "from": "auth-route",
+      "to": "browser",
+      "label": "Set-Cookie vitae_session (httpOnly, sameSite lax, 24h)",
+      "kind": "return",
+      "note": "The token is the session and is not echoed in the body — that would put an owner credential in JS reach and in every proxy log. The one exception is an emulator run, where the test client has no cookie jar.",
+      "source": "apps/api/src/routes/v1/auth.ts:39"
+    },
+    {
+      "from": "browser",
+      "to": "auth-gate",
+      "label": "any /api call: Authorization: Bearer <token>, else the session cookie",
+      "kind": "call",
+      "note": "The client prefers a bearer token when a provider supplies one and otherwise relies on credentials: 'include'. The gate reads them in the same order.",
+      "source": "apps/api/src/middleware/auth.ts:140"
+    },
+    {
+      "from": "auth-gate",
+      "to": "browser",
+      "label": "401 UNAUTHENTICATED — no token at all",
+      "kind": "refusal",
+      "source": "apps/api/src/middleware/auth.ts:142"
+    },
+    {
+      "from": "auth-gate",
+      "to": "auth-gate",
+      "label": "path 1: verify as a local dev JWT (SESSION_SECRET, no network)",
+      "kind": "aside",
+      "note": "Tried first because it is free. Accepted only when the payload carries via === 'dev'.",
+      "source": "apps/api/src/middleware/auth.ts:56"
+    },
+    {
+      "from": "auth-gate",
+      "to": "google",
+      "label": "path 2: verifyIdToken against the primary Firebase project",
+      "kind": "call",
+      "note": "Accepted only when email_verified is true AND the sign-in provider is google.com. Anything else falls through as if invalid.",
+      "source": "apps/api/src/middleware/auth.ts:70"
+    },
+    {
+      "from": "auth-gate",
+      "to": "google",
+      "label": "path 3: verifyIdToken against the configured companion project",
+      "kind": "call",
+      "note": "Only when trustedAuth is configured. Held to the same strict bar, and its uid is prefixed 'trusted:' so a coincidental collision can never alias a primary Cloud account.",
+      "source": "apps/api/src/middleware/auth.ts:99"
+    },
+    {
+      "from": "auth-gate",
+      "to": "browser",
+      "label": "401 UNAUTHORIZED — neutral, identical for every rejection reason",
+      "kind": "refusal",
+      "note": "Self-host: the verified email must equal OWNER_EMAIL. Cloud: any verified google or dev identity with a uid passes here, and membership decides the rest. The message never reveals the allow-list.",
+      "source": "apps/api/src/middleware/auth.ts:151"
+    },
+    {
+      "from": "auth-gate",
+      "to": "control-plane",
+      "label": "identity proved; Cloud resolves a workspace for this uid",
+      "kind": "call",
+      "note": "Skipped when cloudEnabled() is false, and skipped for /auth/bootstrap, /auth/me and /auth/logout, which must work before a workspace exists.",
+      "source": "apps/api/src/middleware/workspace.ts:34"
+    },
+    {
+      "from": "browser",
+      "to": "auth-route",
+      "label": "POST /auth/bootstrap when Cloud is on and /auth/me returned no workspace",
+      "kind": "call",
+      "note": "Idempotent, so a restored Google session and a fresh sign-in behave identically. Not public: it creates a private workspace and starts a trial.",
+      "source": "apps/web/src/lib/auth.tsx:93"
+    },
+    {
+      "from": "control-plane",
+      "to": "postgres",
+      "label": "upsert the user, create one personal workspace, start the trial",
+      "kind": "call",
+      "note": "A verified email already bound to a different uid raises IdentityConflictError → 409, rather than silently attaching one person's identity to another's records.",
+      "source": "apps/api/src/services/control-plane.ts:170"
+    },
+    {
+      "from": "auth-route",
+      "to": "browser",
+      "label": "{ user, workspace, self, cloudEnabled, devLoginEnabled }",
+      "kind": "return",
+      "note": "/auth/me swallows a graph or database failure and returns self as null: the owner check already passed, and auth must not fail while the graph is degraded.",
+      "source": "apps/api/src/routes/v1/auth.ts:124"
+    }
+  ]
+}

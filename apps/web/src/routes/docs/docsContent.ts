@@ -18,6 +18,7 @@
 import type { QueryClient } from '@tanstack/react-query';
 import type { DocsManifest, DocsPageContent, DocsPageSummary } from './docsModel.js';
 import { buildDocsIndex, type DocsIndexInput, type DocsSearchIndex } from './docsSearch.js';
+import type { CatalogSpec, Row } from './docsReference.js';
 
 /**
  * Where the compiled corpus is served from. Deliberately not `/docs`: the
@@ -119,6 +120,38 @@ export function searchIndexQueryOptions(manifest: DocsManifest) {
         inputs.push({ summary, headings: text?.headings ?? [], text: text?.text ?? '' });
       }
       return buildDocsIndex(inputs);
+    },
+    ...FOREVER,
+  };
+}
+
+/**
+ * One generated catalog, fetched when a reader opens it.
+ *
+ * The artifacts are copied out of `docs/generated/` unchanged, so what is shown
+ * is what the generator wrote. A catalog missing from the build is an absent
+ * file rather than an empty array: the surface reports it unavailable instead
+ * of claiming the codebase has no routes.
+ */
+export function catalogQueryOptions(spec: CatalogSpec) {
+  return {
+    queryKey: ['docs', 'catalog', spec.artifact, spec.collection],
+    queryFn: async (): Promise<readonly Row[]> => {
+      const data = await readContent<Record<string, unknown>>(
+        `reference/${spec.artifact}`,
+        `the ${spec.title.toLowerCase()} catalog`,
+      );
+      const rows = data[spec.collection];
+      if (!Array.isArray(rows)) {
+        // The artifact loaded but does not hold what the spec expects, which
+        // means a generator renamed a field. Saying so names the real problem;
+        // rendering an empty table would report it as "nothing exists".
+        throw new Error(
+          `The ${spec.title.toLowerCase()} catalog has no "${spec.collection}" list. `
+            + 'A generator changed shape, so this table cannot be trusted until it is regenerated.',
+        );
+      }
+      return rows as readonly Row[];
     },
     ...FOREVER,
   };

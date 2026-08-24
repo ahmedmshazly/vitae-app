@@ -17,6 +17,7 @@ sources:
   - scripts/check-brand-bans.mjs
   - scripts/check-web-budgets.mjs
   - scripts/check-docs-pages.mjs
+  - scripts/check-docs-diagrams.mjs
   - scripts/check-docs-coverage.mjs
   - scripts/check-docs-generated.mjs
   - scripts/check-docs-traceability.mjs
@@ -189,7 +190,7 @@ the skeleton, and two print stylesheets where a literal colour is the point.
 
 ### `pnpm docs:check` — the documentation gates
 
-Four checkers, each preceded by its own self-test — nine self-tests in total
+Five checkers, each preceded by its own self-test — ten self-tests in total
 before the first real check runs.
 
 - **Pages.** Every curated page's metadata is complete and drawn from a closed
@@ -211,6 +212,17 @@ before the first real check runs.
   tokens are covered by their generated catalogs instead and must not be
   claimed. The uncovered list in `docs/registry/coverage.json` is a ratchet: it
   may shrink and never grow, and it is rewritten with `--update`.
+- **Diagrams.** Every file in `docs/registry/diagrams/` matches the diagram
+  schema and the fields its own kind requires, its filename matches its
+  identifier, every arrow names something the same file declares, a state
+  machine has exactly one starting state and no state that is unreachable or
+  has no way out, and a journey phase names a route the application actually
+  mounts. The check that earns its place is the citations: every `path:line` a
+  diagram cites must point at a line that still exists, so a diagram stops
+  passing the moment the code it describes is refactored. A state the code
+  declares that nothing reaches is a finding rather than an error — it is
+  marked `unreachable` with an explanation, and the gate then verifies that
+  nothing has started reaching it.
 - **Traceability.** The requirement, capability and journey registers are
   validated against their schemas and joined against the generated traceability
   artifact. An identifier cited by the code but absent from the register, or

@@ -88,6 +88,12 @@ on a day the container is down.
 8. **Fit.** If the document is longer than one page, a trim step is planned and
    applied, and stages 4 through 7 repeat.
 
+The same stages as a sequence, with the isolated build service at the end:
+
+```diagram
+DGM-RESUME-BUILD
+```
+
 The formulas behind stages 1, 2, 3 and 8 are on
 [The deterministic algorithms](algorithms.md); this page is the path they sit in.
 

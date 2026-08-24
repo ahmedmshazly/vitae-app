@@ -260,3 +260,9 @@ at which the habit sticks.
 - To go straight at a job description: [Producing a résumé](write-a-resume.md).
 - To bring in an existing export instead of typing: [Getting data in and out](import-and-export.md).
 - To look up a screen you landed on: [Every screen, and what it is for](screens.md).
+
+The same first session, phase by phase, with what has an automated test behind it:
+
+```diagram
+DGM-FIRST-RUN
+```

@@ -2,7 +2,7 @@
   "generated_by": "scripts/docs/gen-traceability.mjs",
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
-    "files_scanned": 842,
+    "files_scanned": 851,
     "files_citing": 160,
     "excluded": {
       "self_referential": [
@@ -346,7 +346,7 @@
       ],
       "documents": [
         "docs/observatory/architecture/algorithms.md:35",
-        "docs/observatory/architecture/algorithms.md:365",
+        "docs/observatory/architecture/algorithms.md:377",
         "docs/observatory/architecture/resume-pipeline.md:26",
         "docs/observatory/use/write-a-resume.md:30"
       ]
@@ -506,7 +506,7 @@
       "tests": [],
       "documents": [
         "docs/observatory/architecture/request-lifecycle.md:26",
-        "docs/observatory/architecture/request-lifecycle.md:185",
+        "docs/observatory/architecture/request-lifecycle.md:191",
         "docs/observatory/meta/coverage-and-contradictions.md:373"
       ]
     },
@@ -1320,7 +1320,7 @@
       "documents": [
         "docs/adr/0003-deterministic-intelligence.md:30",
         "docs/observatory/architecture/algorithms.md:35",
-        "docs/observatory/architecture/algorithms.md:602",
+        "docs/observatory/architecture/algorithms.md:614",
         "docs/observatory/decisions/catalog.md:143"
       ]
     },

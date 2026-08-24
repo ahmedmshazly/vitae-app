@@ -1,0 +1,350 @@
+{
+  "$schema": "../schema/diagram.schema.json",
+  "id": "DGM-DATA-LINEAGE",
+  "title": "Where a person's data enters, rests, and leaves",
+  "summary": "Four ways in, five places it rests, four things derived from it, three ways it comes back out to the person, and five services that see a piece of it.",
+  "kind": "topology",
+  "requirements": ["FR-004", "FR-012", "FR-021", "FR-EXP-010", "FR-SET-007", "INT-5"],
+  "note": "The claim this diagram is really making is that the list of exits is short and each one is nameable. Only two kinds of thing leave: a bundle the person asked for, and the minimum a third party needs to do its job. Three details worth pulling out. Records marked sensitive are excluded from an export unless the person opts in, and the exclusion is transitive — edges touching a sensitive record, and the revisions and atoms that describe it, go too, because a partial exclusion would leave the shape of what was hidden. The one outbound payload that is text a person wrote is the place query sent to an unauthenticated public geocoder. And the control-plane tables are deliberately outside the graph repository — identities, memberships, lifecycle and provider events are operational records, not exportable career data, which is exactly what keeps them out of the export bundle. Nothing here models an analytics pipeline, a telemetry sink, a message queue or a model provider, because the repository contains none: there is no LLM call anywhere in the API, and the \"Ask\" surface is a deterministic ranking over the local graph.",
+  "sources": [
+    "apps/api/src/routes/v1/capture.ts",
+    "apps/api/src/routes/v1/nodes.ts",
+    "apps/api/src/routes/v1/imports.ts",
+    "apps/api/src/routes/v1/places.ts",
+    "apps/api/src/routes/v1/export.ts",
+    "apps/api/src/routes/v1/resumes.ts",
+    "apps/api/src/routes/v1/dashboard.ts",
+    "apps/api/src/routes/v1/ask.ts",
+    "apps/api/src/services/imports.ts",
+    "apps/api/src/services/export.ts",
+    "apps/api/src/services/restore.ts",
+    "apps/api/src/services/resume.ts",
+    "apps/api/src/services/crm.ts",
+    "apps/api/src/services/duplicates.ts",
+    "apps/api/src/services/places.ts",
+    "apps/api/src/services/secrets.ts",
+    "apps/api/src/services/storage/cloudinary.ts",
+    "apps/api/src/db/schema.ts",
+    "apps/api/src/db/search-index.ts",
+    "apps/api/src/db/migrations/007-cloud-control-plane.ts",
+    "apps/api/src/cloud/paddle.ts",
+    "apps/api/src/middleware/auth.ts"
+  ],
+  "zones": [
+    {
+      "id": "entry",
+      "label": "How it gets in",
+      "trust": "untrusted",
+      "note": "Every one of these is input from outside the process, whether it was typed, uploaded, or fetched from a third party on the person's behalf."
+    },
+    {
+      "id": "store",
+      "label": "Where it rests",
+      "trust": "trusted",
+      "note": "One Postgres database and one secret store. Which table a record lands in decides whether it is exportable career data or operational record."
+    },
+    {
+      "id": "derived",
+      "label": "What is computed from it",
+      "trust": "trusted",
+      "note": "All four are recomputable from the stored records. None is a source of truth, and losing any of them costs a rebuild, not data."
+    },
+    {
+      "id": "handback",
+      "label": "What comes back to the person",
+      "trust": "edge",
+      "note": "Bytes crossing back out of the system to the machine of the person who owns them."
+    },
+    {
+      "id": "outside",
+      "label": "What a third party sees",
+      "trust": "external",
+      "note": "Five services. Note what none of them receives: no third party is ever sent the graph."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "manual_entry",
+      "label": "Capture line and record forms",
+      "zone": "entry",
+      "note": "The ⌘K capture line parses one typed line into a plan of linked records, previewable before commit and committed as one transaction; the structured forms cover every node type. Both land as ordinary graph writes with provenance and a revision.",
+      "source": "apps/api/src/routes/v1/capture.ts:18"
+    },
+    {
+      "id": "file_imports",
+      "label": "Uploaded files",
+      "zone": "entry",
+      "note": "LinkedIn exports, vCard contacts, ICS calendars, browser bookmarks, a résumé to disassemble, and a Vitae graph bundle. Read client-side and posted as text, never multipart. Nothing reaches the graph until a person reviews the staged rows.",
+      "source": "apps/api/src/routes/v1/imports.ts:41"
+    },
+    {
+      "id": "github_sync",
+      "label": "GitHub repository sync",
+      "zone": "entry",
+      "note": "The one import that bypasses staging: repositories become repository nodes and their languages become skill nodes with USES_SKILL edges, written directly and tagged `source_ref: 'github_sync'`. It creates no batch, so it cannot be rolled back the way a staged import can.",
+      "source": "apps/api/src/routes/v1/imports.ts:61"
+    },
+    {
+      "id": "place_lookup",
+      "label": "Place lookup",
+      "zone": "entry",
+      "note": "A person types a place; the result becomes coordinates and a display name on a place node. The query goes out before anything comes in, which is what makes this both an entrance and an exit.",
+      "source": "apps/api/src/routes/v1/places.ts:13"
+    },
+    {
+      "id": "graph_tables",
+      "label": "Nodes, edges and revisions",
+      "zone": "store",
+      "note": "The career graph, and the audit history of every durable mutation beside it. Deletion is a timestamp here, not a removal.",
+      "source": "apps/api/src/db/schema.ts:236"
+    },
+    {
+      "id": "document_tables",
+      "label": "The other twenty-one document tables",
+      "zone": "store",
+      "note": "Atoms and their variants and skills, targets, résumés, letters, templates, reminders, tags and taggings, attachments, merges, imports, saved views, habit checks and deduplication state. All twenty-four document tables carry the workspace as part of their primary key, not merely as a filter beside it.",
+      "source": "apps/api/src/db/schema.ts:236"
+    },
+    {
+      "id": "raw_uploads",
+      "label": "Raw upload chunks",
+      "zone": "store",
+      "note": "The original bytes of an import, kept only while the batch is open for review, and deleted at every exit — commit, discard, or rollback. The most sensitive artifact in the system is also the shortest-lived.",
+      "source": "apps/api/src/services/imports.ts:541"
+    },
+    {
+      "id": "control_tables",
+      "label": "Control-plane tables",
+      "zone": "store",
+      "note": "Users, workspaces, memberships, lifecycle states and events, billing customers, subscriptions and provider events. Kept outside the graph repository on purpose, which is what stops them appearing in an export.",
+      "source": "apps/api/src/db/migrations/007-cloud-control-plane.ts:51"
+    },
+    {
+      "id": "secret_store",
+      "label": "Secret store",
+      "zone": "store",
+      "note": "Never the database. An injected environment variable, or a git-ignored file store with restrictive permissions. A credential found in the old database location is migrated out and deleted on read, so a backup taken afterwards no longer carries a usable token.",
+      "source": "apps/api/src/services/secrets.ts:78"
+    },
+    {
+      "id": "search_index",
+      "label": "Search index",
+      "zone": "derived",
+      "note": "In-memory, per workspace, rebuilt from live nodes when a mutation marks it dirty. Indexes titles, subtitles, notes and a whitelist of text-bearing properties.",
+      "source": "apps/api/src/db/search-index.ts:33"
+    },
+    {
+      "id": "crm_signals",
+      "label": "Relationship signals",
+      "zone": "derived",
+      "note": "Contact strength, reconnect lanes, warm introduction paths and the who-to-call ranking, all deterministic functions over one graph read per request.",
+      "source": "apps/api/src/services/crm.ts:35"
+    },
+    {
+      "id": "duplicate_scan",
+      "label": "Duplicate candidates",
+      "zone": "derived",
+      "note": "A cached scored pairing of records that might be the same person or organisation. Invalidated explicitly by any write that could change the answer, rather than left to expire.",
+      "source": "apps/api/src/services/duplicates.ts:286"
+    },
+    {
+      "id": "resume_model",
+      "label": "Résumé model and LaTeX",
+      "zone": "derived",
+      "note": "Selected evidence assembled into a résumé model, then rendered through a template into a LaTeX document. Every user-controlled string passes the escape layer here, before it can reach a compiler.",
+      "source": "apps/api/src/services/resume.ts:450"
+    },
+    {
+      "id": "export_bundle",
+      "label": "Export bundle",
+      "zone": "handback",
+      "note": "A streamed zip: JSONL for every durable collection with document identity preserved, an Obsidian-readable Markdown vault with one note per live node, the stored blobs, and a manifest with schema version, counts and SHA-256 checksums. It is the anti-lock-in guarantee, and apps/api/src/services/restore.ts:47 is the half that reads it back.",
+      "source": "apps/api/src/routes/v1/export.ts:20"
+    },
+    {
+      "id": "csv_view",
+      "label": "Saved view as CSV",
+      "zone": "handback",
+      "note": "A targeted extract beside the full bundle. Every cell that a spreadsheet would execute as a formula is prefixed first, and sensitive records are dropped unless explicitly requested.",
+      "source": "apps/api/src/routes/v1/export.ts:80"
+    },
+    {
+      "id": "compiled_document",
+      "label": "Compiled PDF, or the LaTeX source",
+      "zone": "handback",
+      "note": "A compiled résumé, returned to the browser as a PDF. When the build service is unreachable the response says so and hands back the .tex instead, so the flow degrades rather than fails. Cover letters are not in this path: their LaTeX and PDF compilation is explicitly deferred until letter templates exist, so a letter leaves as text only.",
+      "source": "apps/api/src/routes/v1/resumes.ts:236"
+    },
+    {
+      "id": "firebase_auth",
+      "label": "Firebase Auth",
+      "zone": "outside",
+      "note": "Sees the sign-in itself and the token it issued. What comes back into the system is three fields: a stable identifier, a verified email, and the provider that proved it.",
+      "source": "apps/api/src/middleware/auth.ts:53"
+    },
+    {
+      "id": "paddle",
+      "label": "Paddle",
+      "zone": "outside",
+      "note": "Receives an email address and two opaque identifiers as custom data; returns subscription events that never touch the graph, only the control plane. No career data is sent, and no entitlement is inferred from anything the browser reports.",
+      "source": "apps/api/src/cloud/paddle.ts:68"
+    },
+    {
+      "id": "cloudinary",
+      "label": "Cloudinary",
+      "zone": "outside",
+      "note": "Holds compiled artifact bytes under a content hash namespaced by workspace, with a private delivery type reachable only through short-lived signed URLs. It is the only durable store of a person's data outside the database.",
+      "source": "apps/api/src/services/storage/cloudinary.ts:25"
+    },
+    {
+      "id": "github",
+      "label": "GitHub",
+      "zone": "outside",
+      "note": "Receives the personal access token and an ETag; returns the person's own repository list.",
+      "source": "apps/api/src/services/imports.ts:1192"
+    },
+    {
+      "id": "nominatim",
+      "label": "Nominatim",
+      "zone": "outside",
+      "note": "Receives the place text as typed, or a coordinate pair, with no credential and no account. The only third party that sees free text a person wrote.",
+      "source": "apps/api/src/services/places.ts:37"
+    }
+  ],
+  "links": [
+    {
+      "from": "manual_entry",
+      "to": "graph_tables",
+      "label": "Commit, in one transaction",
+      "carries": "Nodes, edges and a revision per write"
+    },
+    {
+      "from": "manual_entry",
+      "to": "document_tables",
+      "label": "Records that are documents rather than graph nodes",
+      "carries": "Atoms, reminders, targets, résumés, letters, saved views"
+    },
+    {
+      "from": "file_imports",
+      "to": "raw_uploads",
+      "label": "Stage the original bytes",
+      "carries": "The uploaded file, chunked",
+      "note": "Held only for the life of the review."
+    },
+    {
+      "from": "file_imports",
+      "to": "document_tables",
+      "label": "Stage the parsed rows",
+      "carries": "One reviewable row per record, each with a duplicate verdict"
+    },
+    {
+      "from": "file_imports",
+      "to": "graph_tables",
+      "label": "Commit the accepted rows",
+      "carries": "Nodes, edges and atoms tagged with the batch identifier",
+      "note": "That tag is what makes a per-batch rollback possible later."
+    },
+    {
+      "from": "github_sync",
+      "to": "github",
+      "label": "Ask for the repository list",
+      "carries": "The token from the secret store"
+    },
+    {
+      "from": "github",
+      "to": "graph_tables",
+      "label": "Repositories and languages become records",
+      "carries": "Repository nodes, skill nodes, USES_SKILL edges"
+    },
+    {
+      "from": "place_lookup",
+      "to": "nominatim",
+      "label": "Search or reverse-geocode",
+      "carries": "The place text the person typed"
+    },
+    {
+      "from": "nominatim",
+      "to": "graph_tables",
+      "label": "The chosen hit becomes a place",
+      "carries": "Coordinates, a display name and a country code"
+    },
+    {
+      "from": "firebase_auth",
+      "to": "control_tables",
+      "label": "Enrolment persists the verified principal",
+      "carries": "The identifier, the email and the provider"
+    },
+    {
+      "from": "paddle",
+      "to": "control_tables",
+      "label": "Verified webhooks are recorded and applied",
+      "carries": "The event payload, the subscription status and the derived access state",
+      "note": "The raw event is kept as evidence even when it names no known workspace."
+    },
+    {
+      "from": "graph_tables",
+      "to": "search_index",
+      "label": "Rebuild from live nodes"
+    },
+    {
+      "from": "graph_tables",
+      "to": "crm_signals",
+      "label": "One graph read, many derived answers"
+    },
+    {
+      "from": "graph_tables",
+      "to": "duplicate_scan",
+      "label": "Score every plausible pair"
+    },
+    {
+      "from": "document_tables",
+      "to": "resume_model",
+      "label": "Select evidence against the page budget",
+      "carries": "Atoms, their variants, the target's keywords and the template"
+    },
+    {
+      "from": "resume_model",
+      "to": "compiled_document",
+      "label": "Render, compile, return",
+      "carries": "LaTeX out to the compiler, PDF bytes back"
+    },
+    {
+      "from": "resume_model",
+      "to": "cloudinary",
+      "label": "Finalising stores the artifact",
+      "carries": "PDF bytes and their content hash"
+    },
+    {
+      "from": "graph_tables",
+      "to": "export_bundle",
+      "label": "Stream every collection and a vault note per node",
+      "carries": "JSONL with document identity preserved, plus Markdown",
+      "note": "Sensitive records and everything transitively depending on them are excluded unless the person opts in."
+    },
+    {
+      "from": "document_tables",
+      "to": "export_bundle",
+      "label": "Every other durable collection",
+      "carries": "JSONL, checksummed in the manifest"
+    },
+    {
+      "from": "cloudinary",
+      "to": "export_bundle",
+      "label": "Stored blobs are pulled back into the zip",
+      "carries": "The bytes, keyed by content hash",
+      "note": "So the bundle is complete on its own, not a set of references to a service."
+    },
+    {
+      "from": "search_index",
+      "to": "csv_view",
+      "label": "A saved query, flattened to rows",
+      "carries": "Identifier, type, title, subtitle, updated time, provenance"
+    },
+    {
+      "from": "control_tables",
+      "to": "export_bundle",
+      "label": "Never crosses",
+      "note": "Stated as an absence, because it is a deliberate design choice rather than an omission: the control plane sits outside the graph repository so an export cannot reach it."
+    }
+  ]
+}

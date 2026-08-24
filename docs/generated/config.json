@@ -1472,11 +1472,12 @@
       "reads": [
         "scripts/check-docs-coverage.mjs:32",
         "scripts/check-docs-coverage.mjs:33",
+        "scripts/check-docs-diagrams.mjs:36",
         "scripts/check-docs-generated.mjs:25",
         "scripts/check-docs-generated.mjs:26",
         "scripts/check-docs-pages.mjs:43",
         "scripts/check-docs-traceability.mjs:28",
-        "scripts/docs/build-content.mjs:40",
+        "scripts/docs/build-content.mjs:61",
         "scripts/docs/gen-api.mjs:30",
         "scripts/docs/gen-routes.mjs:27",
         "scripts/docs/gen-srs.mjs:21",

@@ -1,0 +1,190 @@
+{
+  "$schema": "../schema/diagram.schema.json",
+  "id": "DGM-EXPORT-BUNDLE",
+  "title": "Producing an export bundle and restoring from one",
+  "summary": "A streamed ZIP of every durable collection with per-file checksums, and the privileged restore that verifies all of them before it writes a single row.",
+  "kind": "sequence",
+  "note": "The two halves have different front doors and that asymmetry is real, not a drawing simplification. Export is an authenticated HTTP route the browser calls. Restore has NO route: restoreBundle is reached only from the CLI script apps/api/src/scripts/restore.ts, run by an operator against an extracted directory with the API env pointed at the target database. The share-safe export (includeSensitive false) is deliberately not restorable — restore.ts:61 refuses it outright, because entire collections come back as empty files.",
+  "requirements": [
+    "FR-006",
+    "FR-009",
+    "FR-105",
+    "FR-EXP-010",
+    "FR-SET-007"
+  ],
+  "sources": [
+    "apps/api/src/routes/v1/export.ts",
+    "apps/api/src/services/export.ts",
+    "apps/api/src/services/restore.ts",
+    "apps/api/src/scripts/restore.ts",
+    "apps/api/src/lib/create-zip-archive.ts",
+    "apps/api/src/services/storage/cloudinary.ts",
+    "apps/api/src/db/repository.ts",
+    "apps/web/src/lib/api.ts",
+    "apps/web/src/routes/ExportPage.tsx"
+  ],
+  "actors": [
+    {
+      "id": "browser",
+      "label": "Browser (Export page)",
+      "note": "Uses api.download, which carries the bearer token, the session cookie and the data-space header, with a ten-minute timeout because the stream is legitimately slow."
+    },
+    {
+      "id": "export-route",
+      "label": "export router",
+      "note": "Streams the ZIP entry by entry. A per-workspace in-process lock refuses a concurrent export."
+    },
+    {
+      "id": "export-service",
+      "label": "export service",
+      "note": "An async generator: one collection or vault note at a time, paged from Postgres, hashed incrementally. The full database is never in memory at once."
+    },
+    {
+      "id": "postgres",
+      "label": "Postgres",
+      "note": "Walked id-ordered with keyset paging (id > last), 500 rows at a time — not OFFSET, which would re-scan the prefix on every page."
+    },
+    {
+      "id": "storage",
+      "label": "Object storage",
+      "note": "Attachment bytes. Streamed into the bundle one object at a time and re-hashed on the way through."
+    },
+    {
+      "id": "operator",
+      "label": "Operator (CLI)",
+      "note": "Runs `pnpm --filter @vitae/api restore <dir> [--force]` against an extracted bundle. There is no HTTP restore."
+    },
+    {
+      "id": "restore-service",
+      "label": "restore service",
+      "note": "Verifies manifest, checksums, counts, referential integrity and blob hashes before the first write."
+    }
+  ],
+  "steps": [
+    {
+      "from": "browser",
+      "to": "export-route",
+      "label": "POST /api/v1/export { includeSensitive }",
+      "kind": "call",
+      "note": "Passing the flow's own gate first: this is one of the routes the entitlement gate still allows while a workspace is read-only, so a lapsed account can always get its data out.",
+      "source": "apps/web/src/routes/ExportPage.tsx:74"
+    },
+    {
+      "from": "export-route",
+      "to": "browser",
+      "label": "409 EXPORT_IN_PROGRESS",
+      "kind": "refusal",
+      "note": "A per-workspace Set held in process memory (FR-105). It does not serialize across instances; cross-instance exclusion would need a shared lease.",
+      "source": "apps/api/src/routes/v1/export.ts:24"
+    },
+    {
+      "from": "export-route",
+      "to": "export-service",
+      "label": "open the ZIP stream, then pull entries from the generator",
+      "kind": "call",
+      "note": "The archive is piped to the response immediately; an aborted request aborts the archive rather than leaving it writing into a dead socket.",
+      "source": "apps/api/src/routes/v1/export.ts:31"
+    },
+    {
+      "from": "export-service",
+      "to": "postgres",
+      "label": "page each collection, drop sensitive records transitively",
+      "kind": "call",
+      "note": "Exclusion follows references: an edge touching a sensitive node, an atom owned by one, its variants and skills, its revisions, reminders, taggings and merges all go with it. Policy checks re-read the referenced record instead of holding collection-sized maps.",
+      "source": "apps/api/src/services/export.ts:241"
+    },
+    {
+      "from": "export-service",
+      "to": "export-service",
+      "label": "hash every JSONL file incrementally as it is produced",
+      "kind": "aside",
+      "note": "Each line is `{_doc_id, ...data}` so a restore can put every document back under its original id. Secrets are scrubbed regardless of source: the GitHub PAT is stripped from the meta row.",
+      "source": "apps/api/src/services/export.ts:160"
+    },
+    {
+      "from": "export-service",
+      "to": "storage",
+      "label": "stream attachment bytes into blobs/<sha> (complete backups only)",
+      "kind": "call",
+      "note": "Re-hashed while streaming; a checksum or byte-count mismatch throws mid-export rather than producing a bundle that only looks complete. Without includeSensitive, blobs is 0 and targets/resumes/letters/imports/meta are empty files.",
+      "source": "apps/api/src/services/export.ts:325"
+    },
+    {
+      "from": "export-service",
+      "to": "export-route",
+      "label": "manifest.json last: schema_version, counts, checksums, blobs",
+      "kind": "return",
+      "note": "The manifest is both the final entry and the generator's return value, so the route can record last_export_at and the counts without re-reading the archive.",
+      "source": "apps/api/src/services/export.ts:377"
+    },
+    {
+      "from": "export-route",
+      "to": "browser",
+      "label": "application/zip stream, then persist the export status doc",
+      "kind": "return",
+      "source": "apps/api/src/routes/v1/export.ts:48"
+    },
+    {
+      "from": "operator",
+      "to": "restore-service",
+      "label": "restore <extracted-bundle-dir> [--force]",
+      "kind": "call",
+      "note": "Files are read off disk by the script; blobs/* stay Buffers and everything else becomes UTF-8 text.",
+      "source": "apps/api/src/scripts/restore.ts:42"
+    },
+    {
+      "from": "restore-service",
+      "to": "operator",
+      "label": "RestoreError: unsupported schema_version, or a share-safe bundle",
+      "kind": "refusal",
+      "note": "Only 3.x is understood; older bundles do not guarantee complete subcollection and blob recovery. A bundle without includes_sensitive is refused because it is intentionally incomplete.",
+      "source": "apps/api/src/services/restore.ts:55"
+    },
+    {
+      "from": "restore-service",
+      "to": "restore-service",
+      "label": "verify: every required file present, SHA-256 matches the manifest, counts match",
+      "kind": "aside",
+      "note": "This is the integrity boundary. All of it runs before the first write, so a corrupt bundle cannot half-land. Optional collections (letters, dedup_aliases) may be absent but are still parsed when present.",
+      "source": "apps/api/src/services/restore.ts:73"
+    },
+    {
+      "from": "restore-service",
+      "to": "operator",
+      "label": "RestoreError: checksum mismatch, count mismatch, or a dangling reference",
+      "kind": "refusal",
+      "note": "Counts are checked at restore.ts:82 and in-bundle referential integrity from restore.ts:109: an edge whose src or dst is not among the bundle's nodes, a variant without its atom, an import row without its import.",
+      "source": "apps/api/src/services/restore.ts:77"
+    },
+    {
+      "from": "restore-service",
+      "to": "postgres",
+      "label": "count every collection; refuse a non-empty database unless --force",
+      "kind": "call",
+      "source": "apps/api/src/services/restore.ts:151"
+    },
+    {
+      "from": "restore-service",
+      "to": "storage",
+      "label": "verify every blob's size and SHA-256, then upload them all",
+      "kind": "call",
+      "note": "Verification of the whole blob set completes before any upload, and the new storage keys are remapped onto the attachment rows as they are written.",
+      "source": "apps/api/src/services/restore.ts:157"
+    },
+    {
+      "from": "restore-service",
+      "to": "postgres",
+      "label": "bulk upsert every document under its original id, then prune stale rows if --force",
+      "kind": "call",
+      "note": "--force is a non-destructive upsert-then-prune, never a truncate: a failed restore can be rerun safely and never begins by emptying the only copy. A collection the bundle does not carry is skipped rather than pruned to empty.",
+      "source": "apps/api/src/services/restore.ts:224"
+    },
+    {
+      "from": "restore-service",
+      "to": "operator",
+      "label": "{ collections, total } after publishing a search invalidation",
+      "kind": "return",
+      "source": "apps/api/src/services/restore.ts:276"
+    }
+  ]
+}

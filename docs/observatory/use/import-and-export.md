@@ -71,6 +71,12 @@ Every committed file batch can still be rolled back as one unit.
 A file import moves through four visible stages, and the screen shows which one
 you are in:
 
+What happens to a file between choosing it and committing anything:
+
+```diagram
+DGM-IMPORT-PIPELINE
+```
+
 1. **Choose source** — file, text, or a connected service.
 2. **Read safely** — parse the content and check each row against your existing
    records for identity collisions. Nothing is written.
@@ -102,6 +108,12 @@ Then it stages with that mapping.
 **Commit** writes the accepted rows into the graph in one transaction.
 **Discard** throws the batch away without writing. **Roll back** reverses a
 batch that was already committed, as one unit.
+
+The states an import batch moves through:
+
+```diagram
+DGM-IMPORT-LIFECYCLE
+```
 
 Every one of those operations reports itself at the top of the import screen
 rather than inside the review panel, so an operation you started from batch

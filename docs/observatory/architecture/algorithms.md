@@ -104,6 +104,12 @@ by the product.
 
 Two modules, `text.ts` and `aho-corasick.ts`, everything else builds on.
 
+These are the functions this documentation’s own search uses. Type into them:
+
+```explainer
+text
+```
+
 `text.ts` takes strings and returns strings, token arrays or similarity numbers.
 Normalisation is NFC, lowercase, and collapsing anything that is not a letter,
 digit, `+`, `#`, `.`, hyphen or space — those four punctuation marks are
@@ -139,6 +145,12 @@ matching happens elsewhere, on purpose.
 
 Inputs: a self-reported closeness of 1 to 5, a list of interactions with kinds
 and dates, an optional cadence target, and a reference time.
+
+The shipped function, run here against inputs you can change:
+
+```explainer
+tie-strength
+```
 
 The intensity term is the conditional intensity of a self-exciting point process
 with an exponential kernel — the standard shape for bursty human contact:

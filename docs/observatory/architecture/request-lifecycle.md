@@ -98,6 +98,12 @@ JSON parser, cookie parsing, the data-space context, the timezone context, the
 two health probes, the authentication gate, the workspace resolver, the
 entitlement gate, and finally the versioned router. The error handler is last.
 
+The whole path, with every place it can be refused:
+
+```diagram
+DGM-REQUEST-LIFECYCLE
+```
+
 Three of those positions are load-bearing.
 
 **The payment webhook is registered before any JSON parser** (`app.ts:50`). Its

@@ -145,6 +145,12 @@ restore clears it and writes another. Reads hide soft-deleted records unless a
 caller asks for them, and edges touching a deleted node are hidden by query
 filters rather than removed, which is what makes restore lossless.
 
+The two steps, and what can bring a record back from each:
+
+```diagram
+DGM-DELETION-LIFECYCLE
+```
+
 The thirty-day promise is kept by a separate purge, which hard-deletes records
 past the cutoff along with everything that exists only to describe them — their
 revisions, reminders, taggings, attachments, and for nodes the edges that
@@ -175,6 +181,12 @@ by entry into a ZIP, so a large graph does not have to be held in memory.
 Records marked sensitive are excluded unless explicitly opted in, and the
 exclusion is transitive: edges touching a sensitive node, and the revisions and
 atoms that describe it, go too.
+
+Where integrity is checked, which is before anything is written:
+
+```diagram
+DGM-EXPORT-BUNDLE
+```
 
 One export runs at a time per workspace. The lock is a process-local set
 (`apps/api/src/routes/v1/export.ts:17`), which is correct for a single instance

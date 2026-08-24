@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vitae.invalid/registry/diagram.schema.json",
+  "title": "Vitae documentation diagram",
+  "description": "One diagram, declared rather than drawn. Identifiers allow an underscore because a state, actor or node id is often the literal value the code uses — a subscription really is `past_due` — and an id that differs from the source it cites is an id a reader cannot match against the code. The reading surface renders four shapes from these files and produces a table equivalent from the same fields, so a diagram cannot say something its accessible form does not.",
+  "type": "object",
+  "required": ["id", "title", "summary", "kind", "sources"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": { "type": "string", "pattern": "^DGM-[A-Z0-9]+(-[A-Z0-9]+)*$" },
+    "title": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string", "minLength": 1 },
+    "kind": { "enum": ["sequence", "state", "topology", "lanes"] },
+    "sources": {
+      "description": "Repository-relative paths the diagram was read from. Every one must exist.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "pattern": "^[^/].*" }
+    },
+    "requirements": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z]" } },
+    "note": { "type": "string", "minLength": 1 },
+
+    "actors": {
+      "description": "Participants in a sequence, left to right.",
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" },
+          "label": { "type": "string", "minLength": 1 },
+          "note": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "steps": {
+      "description": "Messages in order. `kind` distinguishes a call from what comes back and from a refusal.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "label"],
+        "additionalProperties": false,
+        "properties": {
+          "from": { "type": "string", "minLength": 1 },
+          "to": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "kind": { "enum": ["call", "return", "refusal", "aside"] },
+          "note": { "type": "string", "minLength": 1 },
+          "source": { "type": "string", "pattern": "^[^/].*" }
+        }
+      }
+    },
+
+    "states": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" },
+          "label": { "type": "string", "minLength": 1 },
+          "note": { "type": "string", "minLength": 1 },
+          "initial": { "type": "boolean" },
+          "terminal": { "type": "boolean" },
+          "unreachable": {
+            "description": "This state is declared by the code but no code path reaches it. Set it only for a state that is genuinely dead, and say so in `note`: an unreachable state that is a finding belongs on the diagram, where omitting it would hide it.",
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "transitions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "label"],
+        "additionalProperties": false,
+        "properties": {
+          "from": { "type": "string", "minLength": 1 },
+          "to": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "note": { "type": "string", "minLength": 1 },
+          "source": { "type": "string", "pattern": "^[^/].*" }
+        }
+      }
+    },
+
+    "zones": {
+      "description": "Trust boundaries. A node sits in exactly one.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "trust"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" },
+          "label": { "type": "string", "minLength": 1 },
+          "trust": { "enum": ["untrusted", "edge", "trusted", "external"] },
+          "note": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "zone"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" },
+          "label": { "type": "string", "minLength": 1 },
+          "zone": { "type": "string", "minLength": 1 },
+          "note": { "type": "string", "minLength": 1 },
+          "source": { "type": "string", "pattern": "^[^/].*" }
+        }
+      }
+    },
+    "links": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "label"],
+        "additionalProperties": false,
+        "properties": {
+          "from": { "type": "string", "minLength": 1 },
+          "to": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "carries": { "type": "string", "minLength": 1 },
+          "note": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+
+    "lanes": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" },
+          "label": { "type": "string", "minLength": 1 },
+          "note": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "phases": {
+      "description": "Steps of a journey, in order, each belonging to one lane.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "lane", "label"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" },
+          "lane": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "note": { "type": "string", "minLength": 1 },
+          "route": { "type": "string", "pattern": "^/" },
+          "covered_by": {
+            "description": "Test files that exercise this phase. An empty list is a real answer.",
+            "type": "array",
+            "items": { "type": "string", "pattern": "^[^/].*" }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "sequence" } }, "required": ["kind"] },
+      "then": { "required": ["actors", "steps"] }
+    },
+    {
+      "if": { "properties": { "kind": { "const": "state" } }, "required": ["kind"] },
+      "then": { "required": ["states", "transitions"] }
+    },
+    {
+      "if": { "properties": { "kind": { "const": "topology" } }, "required": ["kind"] },
+      "then": { "required": ["zones", "nodes", "links"] }
+    },
+    {
+      "if": { "properties": { "kind": { "const": "lanes" } }, "required": ["kind"] },
+      "then": { "required": ["lanes", "phases"] }
+    }
+  ]
+}

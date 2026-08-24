@@ -1414,3 +1414,613 @@ h6.docs-heading {
 .docs-resume__forget:hover {
   color: var(--ae-fg-strong);
 }
+
+/* ---------------------------------------------------------------- diagrams */
+
+/*
+ * A diagram is drawn from the same fields its table prints, so nothing here
+ * carries meaning the table cannot. Colour never states anything: a refusal is
+ * a cross, a returned message is a dashed line, a trust zone says its own trust
+ * level in words, and a phase with no test says "no test" rather than turning
+ * a different shade.
+ */
+
+.docs-diagram {
+  margin: var(--ae-space-6) 0;
+  padding: 0;
+  border-top: 1px solid var(--ae-border);
+  border-bottom: 1px solid var(--ae-border);
+}
+
+.docs-diagram__caption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--ae-space-3) 0;
+  border-bottom: 1px solid var(--ae-border);
+}
+
+.docs-diagram__title {
+  color: var(--ae-fg-strong);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-sm);
+  font-weight: 500;
+}
+
+.docs-diagram__summary {
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-sm);
+  line-height: 1.5;
+}
+
+/* Wide diagrams scroll inside their own frame. The page never scrolls sideways. */
+.docs-diagram__frame {
+  overflow-x: auto;
+  padding: var(--ae-space-4) 0;
+}
+
+.docs-diagram__svg {
+  display: block;
+  max-width: none;
+  color: var(--ae-fg-soft);
+}
+
+.docs-diagram__actor {
+  fill: var(--ae-surface-raised);
+  stroke: var(--ae-border-control);
+  stroke-width: 1;
+}
+
+.docs-diagram__actor-text {
+  fill: var(--ae-fg-strong);
+  font-family: var(--ae-font-sans);
+  font-size: 12px;
+}
+
+.docs-diagram__lifeline {
+  stroke: var(--ae-border);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+
+.docs-diagram__arrow {
+  stroke: var(--ae-fg-soft);
+  stroke-width: 1.25;
+}
+
+.docs-diagram__arrow--dashed {
+  stroke-dasharray: 4 3;
+}
+
+.docs-diagram__refusal line {
+  stroke: var(--ae-fg-strong);
+  stroke-width: 1.5;
+}
+
+.docs-diagram__label {
+  fill: var(--ae-fg);
+  font-family: var(--ae-font-sans);
+  font-size: 11px;
+}
+
+/* -- state machine matrix -- */
+
+.docs-diagram__matrix table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--ae-text-xs);
+}
+
+.docs-diagram__matrix th,
+.docs-diagram__matrix td {
+  padding: var(--ae-space-2);
+  border: 1px solid var(--ae-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.docs-diagram__matrix thead th {
+  color: var(--ae-fg-soft);
+  font-weight: 500;
+}
+
+.docs-diagram__matrix tbody th {
+  color: var(--ae-fg-strong);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.docs-diagram__matrix td[data-filled='no'] {
+  background: var(--ae-surface-sunken);
+}
+
+.docs-diagram__state-mark {
+  display: block;
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  font-weight: 400;
+}
+
+.docs-diagram__move {
+  display: block;
+  color: var(--ae-fg);
+}
+
+.docs-diagram__legend {
+  margin: var(--ae-space-3) 0 0;
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-xs);
+  line-height: 1.5;
+}
+
+/* -- topology -- */
+
+.docs-diagram__topology {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-3);
+}
+
+.docs-diagram__zone {
+  padding: var(--ae-space-3);
+  border: 1px solid var(--ae-border-control);
+  border-radius: var(--ae-radius);
+}
+
+.docs-diagram__zone[data-trust='untrusted'] {
+  border-style: dashed;
+}
+
+.docs-diagram__zone[data-trust='external'] {
+  border-style: dotted;
+}
+
+.docs-diagram__zone-title {
+  margin: 0 0 var(--ae-space-2);
+  color: var(--ae-fg-strong);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-sm);
+}
+
+.docs-diagram__zone-trust {
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+}
+
+.docs-diagram__nodes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ae-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-diagram__nodes li {
+  padding: 2px var(--ae-space-2);
+  border: 1px solid var(--ae-border);
+  border-radius: var(--ae-radius-sm);
+  color: var(--ae-fg);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-xs);
+}
+
+.docs-diagram__links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-diagram__links li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ae-space-2);
+  padding: var(--ae-space-2) 0;
+  border-bottom: 1px solid var(--ae-border);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-xs);
+}
+
+.docs-diagram__link-ends {
+  color: var(--ae-fg-strong);
+}
+
+.docs-diagram__link-label {
+  color: var(--ae-fg-soft);
+}
+
+.docs-diagram__link-crossing {
+  color: var(--ae-fg);
+  font-family: var(--ae-font-mono);
+}
+
+/* -- lanes -- */
+
+.docs-diagram__grid {
+  display: grid;
+  gap: 1px;
+  min-width: 100%;
+  background: var(--ae-border);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-xs);
+}
+
+.docs-diagram__corner,
+.docs-diagram__phase-head,
+.docs-diagram__lane-name,
+.docs-diagram__cell {
+  padding: var(--ae-space-2);
+  background: var(--ae-bg);
+}
+
+.docs-diagram__phase-head {
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-mono);
+  text-align: center;
+}
+
+.docs-diagram__lane-name {
+  color: var(--ae-fg-strong);
+}
+
+.docs-diagram__cell[data-here='no'] {
+  background: var(--ae-surface-sunken);
+}
+
+.docs-diagram__phase {
+  display: block;
+  color: var(--ae-fg-strong);
+  line-height: 1.4;
+}
+
+.docs-diagram__covered {
+  display: block;
+  margin-top: 2px;
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-mono);
+}
+
+/* -- controls and tables -- */
+
+.docs-diagram__note {
+  margin: 0 0 var(--ae-space-3);
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-sm);
+  line-height: 1.55;
+}
+
+.docs-diagram__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ae-space-3);
+  padding-bottom: var(--ae-space-3);
+}
+
+.docs-diagram__toggle {
+  min-height: 32px;
+  padding: 0 var(--ae-space-3);
+  border: 1px solid var(--ae-border-control);
+  border-radius: var(--ae-radius);
+  background: none;
+  color: var(--ae-fg-strong);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-sm);
+  cursor: pointer;
+  transition: border-color var(--ae-dur) var(--ae-ease);
+}
+
+.docs-diagram__toggle:hover {
+  border-color: var(--ae-fg);
+}
+
+.docs-diagram__read-from {
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-xs);
+}
+
+.docs-diagram__tables {
+  padding-bottom: var(--ae-space-4);
+}
+
+.docs-diagram__table {
+  margin-bottom: var(--ae-space-4);
+}
+
+.docs-diagram__table caption {
+  padding-bottom: var(--ae-space-2);
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-xs);
+  text-align: left;
+}
+
+/* --------------------------------------------------------------- catalogs */
+
+/*
+ * A generated catalog is a ledger with a filter beside it. It uses the prose
+ * table styles rather than a second table language, because it is the same
+ * kind of object: rows of facts a reader scans. What is different is density —
+ * these are read by looking things up, so the type is one step down and the
+ * literal columns are mono.
+ */
+
+.docs-head__kicker {
+  margin: 0 0 var(--ae-space-2);
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-sm);
+}
+
+.docs-catalog__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-3);
+}
+
+.docs-catalog__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ae-space-6);
+  align-items: start;
+}
+
+@media (min-width: 64rem) {
+  .docs-catalog__layout {
+    grid-template-columns: minmax(0, 1fr) var(--docs-rail);
+  }
+}
+
+/* The table scrolls inside its own box. The page never scrolls sideways. */
+.docs-catalog__scroll {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.docs-catalog__table {
+  width: 100%;
+  font-size: var(--ae-text-xs);
+}
+
+.docs-catalog__table th[data-numeric],
+.docs-catalog__table td[data-numeric] {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.docs-catalog__table tbody tr[data-expanded] {
+  background: var(--ae-surface-sunken);
+}
+
+.docs-catalog__more {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.docs-catalog__toggle {
+  min-height: 32px;
+  padding: 0 var(--ae-space-2);
+  border: 0;
+  background: none;
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-xs);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color var(--ae-dur) var(--ae-ease);
+}
+
+.docs-catalog__toggle:hover {
+  color: var(--ae-fg-strong);
+}
+
+.docs-catalog__detail {
+  display: grid;
+  grid-template-columns: minmax(8rem, auto) minmax(0, 1fr);
+  gap: var(--ae-space-1) var(--ae-space-3);
+  margin: var(--ae-space-3) 0 var(--ae-space-2);
+  white-space: normal;
+}
+
+.docs-catalog__detail > div {
+  display: contents;
+}
+
+.docs-catalog__detail dt {
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-xs);
+}
+
+.docs-catalog__detail dd {
+  margin: 0;
+  min-width: 0;
+  color: var(--ae-fg);
+  font-size: var(--ae-text-xs);
+  overflow-wrap: anywhere;
+}
+
+.docs-catalog__detail dd ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* -------------------------------------------------------------- explainers */
+
+/*
+ * An explainer is a worked example with the inputs left open. It sits in the
+ * prose as a ruled block rather than a card, and its readout is a description
+ * list because that is what it is: named quantities and their values.
+ */
+
+.docs-explainer {
+  margin: var(--ae-space-6) 0;
+  padding: var(--ae-space-4) 0;
+  border-top: 1px solid var(--ae-border);
+  border-bottom: 1px solid var(--ae-border);
+}
+
+.docs-explainer__head {
+  margin-bottom: var(--ae-space-4);
+}
+
+.docs-explainer__title {
+  margin: 0;
+  color: var(--ae-fg-strong);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-base);
+  font-weight: 500;
+}
+
+.docs-explainer__what {
+  margin: var(--ae-space-2) 0 0;
+  color: var(--ae-fg);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-sm);
+  line-height: 1.55;
+}
+
+.docs-explainer__source {
+  margin: var(--ae-space-2) 0 0;
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-xs);
+}
+
+.docs-explainer__inputs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-3);
+  align-items: flex-start;
+  margin-bottom: var(--ae-space-4);
+}
+
+.docs-explainer__field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ae-space-3);
+  margin: 0;
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-sm);
+}
+
+.docs-explainer__field--wide {
+  display: block;
+  width: 100%;
+  margin-bottom: var(--ae-space-4);
+}
+
+.docs-explainer__field--wide label {
+  display: block;
+  margin-bottom: var(--ae-space-2);
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-sm);
+}
+
+.docs-explainer__field label {
+  color: var(--ae-fg-soft);
+}
+
+.docs-explainer__field output {
+  color: var(--ae-fg-strong);
+  font-size: var(--ae-text-sm);
+}
+
+.docs-explainer__table {
+  width: 100%;
+  font-size: var(--ae-text-xs);
+}
+
+.docs-explainer__table caption {
+  padding-bottom: var(--ae-space-2);
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-xs);
+  text-align: left;
+}
+
+.docs-explainer__table select,
+.docs-explainer__table input {
+  min-height: 32px;
+  padding: 0 var(--ae-space-2);
+  border: 1px solid var(--ae-border-control);
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-bg);
+  color: var(--ae-fg-strong);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-xs);
+}
+
+.docs-explainer__table input[type='number'] {
+  width: 5rem;
+}
+
+.docs-explainer__remove {
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-xs);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color var(--ae-dur) var(--ae-ease);
+}
+
+.docs-explainer__remove:hover {
+  color: var(--ae-fg-strong);
+}
+
+.docs-explainer__readout {
+  display: grid;
+  grid-template-columns: minmax(10rem, auto) minmax(0, 1fr);
+  gap: 0;
+  margin: 0 0 var(--ae-space-4);
+}
+
+.docs-explainer__readout > div {
+  display: contents;
+}
+
+.docs-explainer__readout dt,
+.docs-explainer__readout dd {
+  padding: var(--ae-space-2) 0;
+  border-bottom: 1px solid var(--ae-border);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-sm);
+}
+
+.docs-explainer__readout dt {
+  color: var(--ae-fg-soft);
+}
+
+.docs-explainer__readout dd {
+  margin: 0;
+  min-width: 0;
+  color: var(--ae-fg-strong);
+  overflow-wrap: anywhere;
+}
+
+.docs-explainer__note {
+  margin: 0;
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-sm);
+  line-height: 1.55;
+}
+
+.docs-explainer__missing {
+  margin: var(--ae-space-4) 0;
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-sm);
+}

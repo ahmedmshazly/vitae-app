@@ -22,6 +22,8 @@
  *   ATX headings              # .. ######
  *   paragraphs                blank-line separated, lazily continued
  *   fenced code               ``` or ~~~ with an optional info string
+ *   diagrams                  a ```diagram fence holding one DGM- identifier
+ *   explainers                an ```explainer fence holding one algorithm id
  *   GFM pipe tables           with :--- / :---: / ---: alignment
  *   lists                     - * + and 1. , nested by two spaces
  *   GitHub alerts             > [!NOTE] .. > [!CAUTION]
@@ -233,6 +235,12 @@ export function blockText(blocks) {
         case 'figure':
           out.push(block.caption);
           break;
+        case 'explainer':
+        case 'diagram':
+          // The identifier is not prose. The build replaces this block with the
+          // diagram's specification and adds its words to the search text
+          // there, where the specification is actually loaded.
+          break;
         default:
           break;
       }
@@ -366,11 +374,36 @@ export function markdown(body, { file = '<input>', startLine = 1 } = {}) {
         while (end < to && !closer.test(src[end])) end += 1;
         if (end >= to) throw new Error(`${at(i)}: code fence opened and never closed`);
         const strip = fence[1].length;
-        out.push({
-          type: 'code',
-          lang: info.trim() || null,
-          code: src.slice(i + 1, end).map((l) => l.slice(0, strip).trim() === '' ? l.slice(strip) : l).join('\n'),
-        });
+        const body = src.slice(i + 1, end).map((l) => l.slice(0, strip).trim() === '' ? l.slice(strip) : l).join('\n');
+        const language = info.trim() || null;
+        // A fence marked `diagram` is not code: its body is the identifier of a
+        // diagram declared in docs/registry/diagrams, and the build replaces it
+        // with that diagram's specification. Authoring it as a fence rather than
+        // as a new block syntax means the page still reads on the repository
+        // host, where it shows the identifier instead of nothing at all.
+        // An explainer is the same idea as a diagram and for the same reason:
+        // a named block the reading surface knows how to build, written where
+        // the prose needs it. Its body is the identifier of an algorithm the
+        // reader can drive with real inputs.
+        if (language === 'explainer') {
+          const id = body.trim();
+          if (!/^[a-z][a-z0-9-]*$/.test(id)) {
+            throw new Error(`${at(i)}: an explainer block holds one algorithm identifier such as tie-strength, not ${JSON.stringify(body.trim())}`);
+          }
+          out.push({ type: 'explainer', id });
+          i = end + 1;
+          continue;
+        }
+        if (language === 'diagram') {
+          const id = body.trim();
+          if (!/^DGM-[A-Z0-9]+(-[A-Z0-9]+)*$/.test(id)) {
+            throw new Error(`${at(i)}: a diagram block holds one identifier such as DGM-REQUEST-LIFECYCLE, not ${JSON.stringify(body.trim())}`);
+          }
+          out.push({ type: 'diagram', id });
+          i = end + 1;
+          continue;
+        }
+        out.push({ type: 'code', lang: language, code: body });
         i = end + 1;
         continue;
       }

@@ -1,0 +1,227 @@
+{
+  "$schema": "../schema/diagram.schema.json",
+  "id": "DGM-REQUEST-LIFECYCLE",
+  "title": "An authenticated API request, end to end",
+  "summary": "One POST from the browser through every middleware in registration order to Postgres and back, with the refusal each gate can issue instead.",
+  "kind": "sequence",
+  "note": "The stack is drawn in Express registration order (apps/api/src/app.ts:31-71), because position is what decides reachability: anything registered above the gate at app.ts:62 answers without a session. The two Cloud middlewares — workspace resolution and the entitlement gate — are no-ops unless VITAE_CLOUD_ENABLED is set, which .env.example:40 leaves false, so in a default build the request goes straight from the auth gate to the router and the legacy real/demo space from spaceMiddleware is the partition. POST /api/v1/nodes is drawn as the concrete route; every other authenticated route passes the same stack.",
+  "requirements": [
+    "FR-010",
+    "FR-014",
+    "FR-025",
+    "FR-026",
+    "FR-102"
+  ],
+  "sources": [
+    "apps/api/src/app.ts",
+    "apps/api/src/middleware/request-context.ts",
+    "apps/api/src/middleware/security.ts",
+    "apps/api/src/middleware/auth.ts",
+    "apps/api/src/middleware/workspace.ts",
+    "apps/api/src/middleware/error.ts",
+    "apps/api/src/middleware/health.ts",
+    "apps/api/src/db/space.ts",
+    "apps/api/src/db/timezone.ts",
+    "apps/api/src/db/repository.ts",
+    "apps/api/src/db/pg.ts",
+    "apps/api/src/routes/v1/index.ts",
+    "apps/api/src/routes/v1/nodes.ts",
+    "apps/api/src/services/control-plane.ts",
+    "apps/api/src/cloud/config.ts",
+    "apps/web/src/lib/api.ts",
+    ".env.example"
+  ],
+  "actors": [
+    {
+      "id": "browser",
+      "label": "Browser",
+      "note": "One typed client sets every outbound header: bearer token or session cookie, x-vitae-space, x-vitae-tz (apps/web/src/lib/api.ts:57-60)."
+    },
+    {
+      "id": "request-context",
+      "label": "requestContext",
+      "note": "Assigns or echoes x-request-id and logs one structured line per response. Registered first so it observes everything, including refusals."
+    },
+    {
+      "id": "security",
+      "label": "cspNonce + helmet + cors",
+      "note": "Per-request CSP nonce, Helmet headers, and an explicit CORS allow-list built from WEB_ORIGIN — never an origin reflector."
+    },
+    {
+      "id": "body-parser",
+      "label": "express.json",
+      "note": "Two parsers: 15 MB scoped to /api/v1/imports, then the 2 MB default. Registration order is the whole mechanism."
+    },
+    {
+      "id": "context",
+      "label": "space + timezone context",
+      "note": "cookieParser, then two AsyncLocalStorage contexts: the data partition and the IANA timezone from x-vitae-tz."
+    },
+    {
+      "id": "auth-gate",
+      "label": "authGate",
+      "note": "Default-deny, mounted at /api. Everything registered above it answers without a session."
+    },
+    {
+      "id": "workspace",
+      "label": "workspaceMiddleware + entitlementGate",
+      "note": "Cloud only. Both return immediately when cloudEnabled() is false, which is the default build."
+    },
+    {
+      "id": "router",
+      "label": "v1Router → nodes route",
+      "note": "Thirty-three mounted prefixes; the route validates and orchestrates."
+    },
+    {
+      "id": "repository",
+      "label": "Repository",
+      "note": "The only layer that turns a record into a row, and the only place the workspace filter is applied."
+    },
+    {
+      "id": "postgres",
+      "label": "Postgres",
+      "note": "One pool per process, statement_timeout 30s, TLS verified against an explicit CA on any remote host."
+    },
+    {
+      "id": "error-handler",
+      "label": "errorHandler",
+      "note": "Registered last. Every thrown error leaves as one envelope shape."
+    }
+  ],
+  "steps": [
+    {
+      "from": "browser",
+      "to": "request-context",
+      "label": "POST /api/v1/nodes with session, x-vitae-space, x-vitae-tz",
+      "kind": "call",
+      "note": "Even downloads go through this client, because a bare fetch inherits only the cookie and once exported the real graph while the person was viewing demo data.",
+      "source": "apps/web/src/lib/api.ts:62"
+    },
+    {
+      "from": "request-context",
+      "to": "security",
+      "label": "attach request id, start the timer",
+      "kind": "call",
+      "note": "The id is echoed as x-request-id and reappears in every error envelope, so a 500 in a log can be tied to the call that caused it.",
+      "source": "apps/api/src/middleware/request-context.ts:23"
+    },
+    {
+      "from": "security",
+      "to": "body-parser",
+      "label": "CSP nonce, Helmet headers, CORS allow-list",
+      "kind": "call",
+      "note": "script-src is nonce-based with strict-dynamic; frame-ancestors none. Inline styles and any HTTPS image/connect source are permitted — the soft edge of the policy.",
+      "source": "apps/api/src/app.ts:32"
+    },
+    {
+      "from": "body-parser",
+      "to": "context",
+      "label": "parse JSON body against the applicable limit",
+      "kind": "call",
+      "note": "The import parser is mounted at app.ts:51, ahead of the default at :52. A router-local parser would run too late — the 2 MB default rejects first (FR-010).",
+      "source": "apps/api/src/app.ts:51"
+    },
+    {
+      "from": "body-parser",
+      "to": "error-handler",
+      "label": "413 PAYLOAD_TOO_LARGE / 400 MALFORMED_JSON",
+      "kind": "refusal",
+      "note": "body-parser tags its errors; errorHandler maps entity.too.large, entity.parse.failed, encoding.unsupported and request.aborted explicitly rather than letting them reach the generic 500.",
+      "source": "apps/api/src/middleware/error.ts:41"
+    },
+    {
+      "from": "context",
+      "to": "auth-gate",
+      "label": "enter the space and timezone AsyncLocalStorage scopes",
+      "kind": "call",
+      "note": "In Cloud mode spaceMiddleware deliberately ignores the browser-controlled x-vitae-space header and pins the legacy id until workspaceMiddleware replaces it.",
+      "source": "apps/api/src/db/space.ts:57"
+    },
+    {
+      "from": "auth-gate",
+      "to": "error-handler",
+      "label": "401 UNAUTHENTICATED (no token) or UNAUTHORIZED (rejected)",
+      "kind": "refusal",
+      "note": "Three token paths are tried in cost order — local dev JWT, primary Firebase project, configured companion project — and DGM-AUTHENTICATION draws them. The refusal is written directly to the response, not thrown, and its message is neutral in every failure case so a probe holding a token learns nothing about why.",
+      "source": "apps/api/src/middleware/auth.ts:142"
+    },
+    {
+      "from": "auth-gate",
+      "to": "workspace",
+      "label": "req.user is set; continue",
+      "kind": "call",
+      "source": "apps/api/src/middleware/auth.ts:163"
+    },
+    {
+      "from": "workspace",
+      "to": "postgres",
+      "label": "resolve a member workspace for req.user.uid (Cloud only)",
+      "kind": "call",
+      "note": "Joins workspace_members to workspaces and workspace_lifecycles, and moves an expired trial or grace period to read_only in the same request. Skipped entirely when cloudEnabled() is false.",
+      "source": "apps/api/src/services/control-plane.ts:130"
+    },
+    {
+      "from": "workspace",
+      "to": "error-handler",
+      "label": "409 WORKSPACE_BOOTSTRAP_REQUIRED, 404 WORKSPACE_NOT_FOUND, or 402 PAYMENT_REQUIRED",
+      "kind": "refusal",
+      "note": "The 404/409 pair comes from workspace resolution (workspace.ts:36-43); the 402 comes from the entitlement gate at workspace.ts:76. That gate is method-based, not route-annotated, so a route added without an annotation fails closed. Export, billing and logout stay reachable while read-only.",
+      "source": "apps/api/src/middleware/workspace.ts:36"
+    },
+    {
+      "from": "workspace",
+      "to": "router",
+      "label": "run the rest of the request inside the workspace partition",
+      "kind": "call",
+      "source": "apps/api/src/middleware/workspace.ts:47"
+    },
+    {
+      "from": "router",
+      "to": "repository",
+      "label": "validate the body, then open one transaction",
+      "kind": "call",
+      "note": "The route does its reads first — endpoint checks for every implied edge — before the first stage, so a write never half-lands on a missing reference.",
+      "source": "apps/api/src/routes/v1/nodes.ts:174"
+    },
+    {
+      "from": "router",
+      "to": "error-handler",
+      "label": "422 VALIDATION with field-level detail",
+      "kind": "refusal",
+      "note": "ValidationError carries the parser's issue list; NotFoundError becomes 404; a thrown HttpError carries its own status and code.",
+      "source": "apps/api/src/middleware/error.ts:63"
+    },
+    {
+      "from": "repository",
+      "to": "postgres",
+      "label": "INSERT node + revision, scoped to space and workspace_id",
+      "kind": "call",
+      "note": "The partition is read from AsyncLocalStorage on every call rather than cached, which is what lets a maintenance script run inside an explicit partition with no request at all.",
+      "source": "apps/api/src/db/repository.ts:131"
+    },
+    {
+      "from": "postgres",
+      "to": "repository",
+      "label": "committed; the in-process write generation and the search generation are bumped",
+      "kind": "return",
+      "source": "apps/api/src/db/repository.ts:636",
+      "note": "Memoised read models and the search index compare generations rather than guessing with a timer, so a value written a moment ago is visible on the next read. A failure to publish the invalidation is logged, never rethrown — the write is already committed and must not be reported as failed (repository.ts:650)."
+    },
+    {
+      "from": "router",
+      "to": "browser",
+      "label": "201 { node }",
+      "kind": "return",
+      "note": "On the way out, requestContext's finish handler logs the route pattern (not the raw path, which ids would shard), status and duration.",
+      "source": "apps/api/src/routes/v1/nodes.ts:185"
+    },
+    {
+      "from": "error-handler",
+      "to": "browser",
+      "label": "{ error: { code, message, details?, request_id } }",
+      "kind": "return",
+      "note": "One envelope for every failure. Anything unrecognised is logged with the request id and answered with a neutral 500.",
+      "source": "apps/api/src/middleware/error.ts:81"
+    }
+  ]
+}

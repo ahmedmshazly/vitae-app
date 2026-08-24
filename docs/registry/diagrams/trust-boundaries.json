@@ -1,0 +1,375 @@
+{
+  "$schema": "../schema/diagram.schema.json",
+  "id": "DGM-TRUST-BOUNDARIES",
+  "title": "Every process and store, by trust zone",
+  "summary": "Six zones, from the open internet to a compiler on a sealed network, and what crosses each boundary. Position in the middleware stack — not a declaration — decides which routes answer without a session.",
+  "kind": "topology",
+  "requirements": ["FR-004", "FR-015", "FR-027", "FR-SET-001", "INT-1", "INT-5"],
+  "note": "Three things a reader should carry away. First, the routes that answer without a session do so because of where they are registered, not because anything declares them public: the two health probes and the payment webhook sit above the gate in `createApp`, and nothing would notice if a future route were added above it by accident. Second, the sealed zone is sealed by deployment, not by code — in production compose the buildsvc container is on a network marked `internal: true` with no route out, with a read-only root filesystem and a tmpfs, and its Tectonic package cache is warmed at image build time so it needs no network at request time. Third, the boundary between the browser and the API is an explicit CORS allow-list built from configured origins, never an origin reflector. Two deployment facts, stated because they are easy to miss: the browser application is not served by this API at all — it is a static bundle on Vercel, while the API, the proxy and the compiler are three containers on one virtual machine — and locally the Postgres container is a development convenience, never a deployment target, because production points at RDS. Nothing here models a queue, a cache tier or a CDN, because the repository contains none.",
+  "sources": [
+    "apps/api/src/app.ts",
+    "apps/api/src/middleware/auth.ts",
+    "apps/api/src/middleware/workspace.ts",
+    "apps/api/src/middleware/security.ts",
+    "apps/api/src/middleware/health.ts",
+    "apps/api/src/routes/v1/index.ts",
+    "apps/api/src/routes/webhooks/paddle.ts",
+    "apps/api/src/index.ts",
+    "apps/api/src/firebase.ts",
+    "apps/api/src/db/pg.ts",
+    "apps/api/src/db/search-index.ts",
+    "apps/api/src/db/space.ts",
+    "apps/api/src/services/secrets.ts",
+    "apps/api/src/services/storage/cloudinary.ts",
+    "apps/api/src/services/buildsvc-client.ts",
+    "apps/api/src/services/imports.ts",
+    "apps/api/src/services/places.ts",
+    "apps/api/src/cloud/paddle.ts",
+    "apps/web/src/lib/api.ts",
+    "apps/web/src/lib/firebase.ts",
+    "apps/web/src/lib/paddle.ts",
+    "services/buildsvc/src/server.ts",
+    "packages/config/src/env.ts",
+    "compose.yaml",
+    "deploy/compose.prod.yml",
+    "deploy/Caddyfile",
+    "vercel.json"
+  ],
+  "zones": [
+    {
+      "id": "open",
+      "label": "The open internet",
+      "trust": "untrusted",
+      "note": "Everything that arrives from here is input, including a request that carries a perfectly valid session. Refusals are neutral by design: a probe holding a token learns nothing about why it was refused."
+    },
+    {
+      "id": "edge",
+      "label": "Public edge",
+      "trust": "edge",
+      "note": "The only two things with a public address. Both terminate TLS and neither holds application state."
+    },
+    {
+      "id": "app",
+      "label": "API process",
+      "trust": "trusted",
+      "note": "One Express process. The middleware order in `createApp` is load-bearing: everything registered above the gate answers without a session."
+    },
+    {
+      "id": "sealed",
+      "label": "Compile sandbox",
+      "trust": "trusted",
+      "note": "Reachable only from the API, only over HTTP, and only with a signed request. On its own Docker network marked internal, so it has no route to the internet even if something inside it tried."
+    },
+    {
+      "id": "data",
+      "label": "Data plane",
+      "trust": "trusted",
+      "note": "Where records rest. The workspace partition is read from async-local storage on every call rather than cached, and is part of each record's primary key rather than a filter applied to it."
+    },
+    {
+      "id": "third_party",
+      "label": "Third parties",
+      "trust": "external",
+      "note": "Five services, none of them optional-by-accident: identity, payments, object storage, repository sync and geocoding. Each is reached with its own credential and its own failure mode."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "browser",
+      "label": "The person's browser",
+      "zone": "open",
+      "note": "Runs the single-page application. Carries a session cookie or a bearer identity token, plus the chosen data space and the browser's IANA timezone on every request — the last because \"today\", \"overdue\" and streaks are calendar questions the server cannot answer without it.",
+      "source": "apps/web/src/lib/api.ts:58"
+    },
+    {
+      "id": "spa_host",
+      "label": "Static SPA host (Vercel)",
+      "zone": "edge",
+      "note": "Serves the built browser bundle and rewrites every path to index.html. Sets its own frame-deny, nosniff and referrer headers. It never sees an API request; the bundle talks to the API domain directly.",
+      "source": "vercel.json:19"
+    },
+    {
+      "id": "caddy",
+      "label": "Caddy reverse proxy",
+      "zone": "edge",
+      "note": "Public :80 and :443 for the API domain, automatic Let's Encrypt certificates, and a single reverse-proxy rule to api:4000. It is the only container in the production compose file with published ports.",
+      "source": "deploy/Caddyfile:3"
+    },
+    {
+      "id": "http_policy",
+      "label": "Headers and origin policy",
+      "zone": "app",
+      "note": "A per-request script nonce, Helmet's content security policy with strict-dynamic, frame and plugin denial, and a CORS allow-list built from the configured origins. State the soft edges honestly: inline styles are permitted and both image and connection sources allow any HTTPS origin. Scripts are the part held tightly.",
+      "source": "apps/api/src/app.ts:32"
+    },
+    {
+      "id": "health_probes",
+      "label": "Liveness and readiness probes",
+      "zone": "app",
+      "note": "Registered above the gate, so both answer without a session. `/health` returns a fixed object and touches nothing. `/ready` runs a database probe and, when it fails, returns a stringified driver error that can name a host or a port — an intentional trade for operability, not nothing.",
+      "source": "apps/api/src/app.ts:58"
+    },
+    {
+      "id": "paddle_webhook",
+      "label": "Payment webhook receiver",
+      "zone": "app",
+      "note": "Registered above every JSON parser and above the gate, because the provider's signature covers the exact bytes it sent. Possession of the shared secret is the authentication. Returns a not-found before doing anything at all when the hosted mode is off.",
+      "source": "apps/api/src/app.ts:50"
+    },
+    {
+      "id": "auth_gate",
+      "label": "Default-deny authentication gate",
+      "zone": "app",
+      "note": "Mounted at the API prefix. Tries a local development session token first, then a Google identity token from the primary Firebase project, then one from an optionally configured companion project held to a stricter bar and prefixed so its identifiers can never alias a primary account. Note that the public-path list contains a `/health` pattern that can never match, because the gate is mounted at `/api` and tests the full path.",
+      "source": "apps/api/src/middleware/auth.ts:124"
+    },
+    {
+      "id": "workspace_gate",
+      "label": "Workspace membership resolution",
+      "zone": "app",
+      "note": "Hosted mode only. Resolves the verified identity's memberships and puts the workspace into async-local storage. A request may name which of its own memberships it wants; it cannot name one it is not a member of, and the browser-controlled legacy space header is ignored entirely in this mode.",
+      "source": "apps/api/src/middleware/workspace.ts:27"
+    },
+    {
+      "id": "entitlement_gate",
+      "label": "Entitlement gate",
+      "zone": "app",
+      "note": "Refuses every non-read method for a read-only or pending-deletion workspace, allowing export, billing management and sign-out through. Written against the HTTP method rather than per-route annotations deliberately, so a route added without an annotation fails closed instead of staying writable.",
+      "source": "apps/api/src/middleware/workspace.ts:57"
+    },
+    {
+      "id": "api_routes",
+      "label": "The v1 routers",
+      "zone": "app",
+      "note": "Thirty-three routers behind the gate. The layering rule inside is route to service to repository, and only the repository knows how a record reaches Postgres.",
+      "source": "apps/api/src/routes/v1/index.ts:36"
+    },
+    {
+      "id": "purge_timer",
+      "label": "In-process retention sweep",
+      "zone": "app",
+      "note": "A daily interval inside the API process, not a separate worker and not a scheduler. It is the only thing in the repository that runs outside a request and touches tenant data, and it is the pattern to copy: it asks the control plane for active workspaces and wraps each one, because outside a request the workspace context falls back to the legacy workspace.",
+      "source": "apps/api/src/index.ts:56"
+    },
+    {
+      "id": "buildsvc",
+      "label": "Tectonic build service",
+      "zone": "sealed",
+      "note": "Compiles a self-contained LaTeX document and extracts its text with poppler. Every request is signed over the timestamp and the raw body within a five-minute skew. It refuses to start without a secret and refuses to start in production with a published development default. Tectonic runs untrusted with no shell escape, in a per-request temporary directory, against a cache warmed at image build time.",
+      "source": "services/buildsvc/src/server.ts:175"
+    },
+    {
+      "id": "postgres",
+      "label": "Postgres",
+      "zone": "data",
+      "note": "The graph, the twenty-four document tables and the control-plane tables, in one database reached through one pool. Local compose runs it as a development convenience; production points at RDS, and the environment schema refuses to boot a production process still carrying the localhost default.",
+      "source": "apps/api/src/db/pg.ts:69"
+    },
+    {
+      "id": "search_index",
+      "label": "In-memory search index",
+      "zone": "data",
+      "note": "FlexSearch over live nodes, rebuilt lazily when a mutation marks it dirty. Invalidation is a generation counter rather than a boolean, so a write during an in-flight rebuild is not lost. It is process-local and instantiated per workspace, so it does not survive a restart and is not shared between instances.",
+      "source": "apps/api/src/db/search-index.ts:33"
+    },
+    {
+      "id": "secret_store",
+      "label": "Third-party secret store",
+      "zone": "data",
+      "note": "Deliberately not the database. Two backends in order: an injected environment variable from the deployment's secret manager, then a git-ignored directory with restrictive permissions for self-hosted installs. The database holds only non-secret sync metadata and a reference saying where the secret lives, so a dump or a backup is no longer a way to obtain someone else's account.",
+      "source": "apps/api/src/services/secrets.ts:78"
+    },
+    {
+      "id": "firebase_auth",
+      "label": "Firebase Auth (Google)",
+      "zone": "third_party",
+      "note": "Authentication only. The data plane moved to Postgres and sign-in stayed here because token verification is free and unmetered. A token is accepted only when the email is verified and the sign-in provider is Google.",
+      "source": "apps/api/src/firebase.ts:28"
+    },
+    {
+      "id": "paddle",
+      "label": "Paddle",
+      "zone": "third_party",
+      "note": "Payments. The server owns the price catalog; the browser supplies only a billing interval and receives only an opaque transaction identifier. Provider response bodies are never forwarded to the caller because they can carry personal and payment detail.",
+      "source": "apps/api/src/cloud/paddle.ts:68"
+    },
+    {
+      "id": "cloudinary",
+      "label": "Cloudinary",
+      "zone": "third_party",
+      "note": "Object storage for compiled résumé artifacts, reached through a single adapter interface. Objects are content-addressed, stored with a private delivery type, and namespaced by workspace so two tenants uploading identical bytes do not share an object.",
+      "source": "apps/api/src/services/storage/cloudinary.ts:25"
+    },
+    {
+      "id": "github",
+      "label": "GitHub API",
+      "zone": "third_party",
+      "note": "Repository synchronisation, ETag-incremental. The token comes from the secret store, never from the request body and never from the database.",
+      "source": "apps/api/src/services/imports.ts:1192"
+    },
+    {
+      "id": "nominatim",
+      "label": "Nominatim (OpenStreetMap)",
+      "zone": "third_party",
+      "note": "Place search and reverse geocoding, with a short-lived in-memory result cache. Unauthenticated: what identifies the caller is a user-agent string.",
+      "source": "apps/api/src/services/places.ts:37"
+    }
+  ],
+  "links": [
+    {
+      "from": "browser",
+      "to": "spa_host",
+      "label": "Loads the application",
+      "carries": "The built static bundle"
+    },
+    {
+      "from": "browser",
+      "to": "firebase_auth",
+      "label": "Google sign-in, in the browser",
+      "carries": "The person's Google credentials, and back an identity token",
+      "note": "The emulator path is gated on the build mode, not only on a flag, so no environment variable can point a shipped bundle at a visitor's own loopback address."
+    },
+    {
+      "from": "browser",
+      "to": "paddle",
+      "label": "Opens the checkout overlay",
+      "carries": "An opaque transaction identifier and a public checkout-scoped token",
+      "note": "A test token is sandbox-only, so a live token is the only way a production build reaches a production checkout."
+    },
+    {
+      "from": "browser",
+      "to": "caddy",
+      "label": "Every API call, over HTTPS",
+      "carries": "A session cookie or a bearer identity token, the data space, the timezone"
+    },
+    {
+      "from": "paddle",
+      "to": "caddy",
+      "label": "Signed subscription webhook",
+      "carries": "The raw event bytes and a timestamped HMAC"
+    },
+    {
+      "from": "caddy",
+      "to": "http_policy",
+      "label": "Reverse proxy to api:4000",
+      "note": "The API container is the only thing on both the edge and the internal network."
+    },
+    {
+      "from": "http_policy",
+      "to": "health_probes",
+      "label": "Answers without a session",
+      "note": "Position in the stack, not a declaration."
+    },
+    {
+      "from": "http_policy",
+      "to": "paddle_webhook",
+      "label": "Answers without a session, on the shared secret",
+      "carries": "The untouched request buffer",
+      "note": "Above both JSON parsers, because re-serialising the body would invalidate the signature."
+    },
+    {
+      "from": "paddle_webhook",
+      "to": "postgres",
+      "label": "Record the event once, then transition access",
+      "carries": "The provider event and the derived access state",
+      "note": "The provider's own event identifier is the exactly-once key; the workspace's lifecycle row is locked first so ordering holds under concurrent delivery."
+    },
+    {
+      "from": "http_policy",
+      "to": "auth_gate",
+      "label": "Everything under the API prefix",
+      "carries": "The credential, if any"
+    },
+    {
+      "from": "auth_gate",
+      "to": "firebase_auth",
+      "label": "Verify the identity token",
+      "carries": "The token; nothing about the graph"
+    },
+    {
+      "from": "auth_gate",
+      "to": "workspace_gate",
+      "label": "A verified identity",
+      "note": "Self-hosted mode compares the verified email against the configured owner here and treats the next two nodes as no-ops."
+    },
+    {
+      "from": "workspace_gate",
+      "to": "postgres",
+      "label": "Resolve membership",
+      "carries": "The user identifier and, optionally, a requested workspace",
+      "note": "This is also where an expired trial or grace period is moved forward, because expiry is evaluated on the request path rather than by a worker."
+    },
+    {
+      "from": "workspace_gate",
+      "to": "entitlement_gate",
+      "label": "The resolved workspace, in async-local storage"
+    },
+    {
+      "from": "entitlement_gate",
+      "to": "api_routes",
+      "label": "Reads always; writes only when the workspace is not read-only"
+    },
+    {
+      "from": "api_routes",
+      "to": "postgres",
+      "label": "Every read and write, through the repository",
+      "carries": "Nodes, edges, documents and revisions",
+      "note": "Filtered and keyed on the workspace read from async-local storage on every call."
+    },
+    {
+      "from": "api_routes",
+      "to": "search_index",
+      "label": "Mark dirty on write, rebuild on read"
+    },
+    {
+      "from": "api_routes",
+      "to": "secret_store",
+      "label": "Read a third-party credential when one is needed",
+      "carries": "The GitHub token, in memory only"
+    },
+    {
+      "from": "api_routes",
+      "to": "buildsvc",
+      "label": "Signed compile request",
+      "carries": "Rendered LaTeX and its assets, base64-encoded",
+      "note": "Every user-controlled string has already passed the escape layer before it gets here, so the compiler can stay too ignorant to be trusted. If the service is unreachable the call returns an offline result and the caller falls back to a .tex download rather than failing the flow."
+    },
+    {
+      "from": "api_routes",
+      "to": "cloudinary",
+      "label": "Store a compiled artifact",
+      "carries": "PDF bytes, under a workspace-namespaced content hash"
+    },
+    {
+      "from": "api_routes",
+      "to": "github",
+      "label": "Synchronise repositories",
+      "carries": "The token out; repository names, descriptions and languages back"
+    },
+    {
+      "from": "api_routes",
+      "to": "nominatim",
+      "label": "Search or reverse-geocode a place",
+      "carries": "The place text the person typed, or a coordinate pair",
+      "note": "The one outbound call whose payload is content a person wrote, sent to an unauthenticated public service."
+    },
+    {
+      "from": "api_routes",
+      "to": "paddle",
+      "label": "Create a checkout or a portal session",
+      "carries": "The person's email, the workspace identifier and the user identifier"
+    },
+    {
+      "from": "purge_timer",
+      "to": "postgres",
+      "label": "Hard-delete everything past retention",
+      "note": "Wraps each active workspace explicitly, because outside a request there is no async context to inherit."
+    },
+    {
+      "from": "purge_timer",
+      "to": "cloudinary",
+      "label": "Delete the bytes before the metadata",
+      "note": "A failed delete keeps its metadata row as the retry outbox."
+    }
+  ]
+}

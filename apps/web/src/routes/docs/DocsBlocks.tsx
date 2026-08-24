@@ -22,6 +22,8 @@ import {
   CALLOUT_LABEL,
   isExternalDocsLink,
 } from './docsModel.js';
+import { DocsDiagram } from './DocsDiagram.js';
+import { DocsExplainer } from './DocsExplainer.js';
 
 /** Copy that reads as an instruction rather than a state, per CONTRIBUTING. */
 const COPY_IDLE = 'Copy';
@@ -330,6 +332,12 @@ function Block({ block }: { block: DocsBlock }) {
       );
     case 'table':
       return <DataTable block={block} />;
+    case 'diagram':
+      return <DocsDiagram spec={block.spec} />;
+
+    case 'explainer':
+      return <DocsExplainer id={block.id} />;
+
     case 'figure':
       return (
         <figure className="docs-figure">

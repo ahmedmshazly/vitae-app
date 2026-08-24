@@ -19,6 +19,7 @@
  */
 import '../../styles/docs.css';
 import '../../styles/docs-print.css';
+import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { EmptyState, LogoHorizontal, Skeleton } from '@vitae/ui';
@@ -26,7 +27,9 @@ import { QueryBoundary } from '../../components/QueryBoundary.js';
 import { DocsNav } from './DocsChrome.js';
 import { DocsPage } from './DocsPage.js';
 import { DocsCommandPalette, useDocsPalette } from './DocsCommandPalette.js';
+import { DocsCatalog, DocsReferenceIndex, catalogDocumentTitle } from './DocsReference.js';
 import { DocsSearch } from './DocsSearch.js';
+import { catalogByKey } from './docsReference.js';
 import { manifestQueryOptions } from './docsContent.js';
 import { type DocsManifest, normalizeDocsRoute, pageAtRoute } from './docsModel.js';
 
@@ -88,12 +91,43 @@ function ShellSkeleton() {
  * claims wins.
  */
 const SEARCH_ROUTE = '/docs/search';
+const REFERENCE_ROUTE = '/docs/reference';
+
+/**
+ * What the application serves at a path the corpus does not produce.
+ *
+ * The manifest is consulted first and always wins, so a curated page can never
+ * be shadowed by a built-in surface; only paths no page claims reach this.
+ */
+function builtInAt(route: string) {
+  if (route === SEARCH_ROUTE) return { kind: 'search' as const };
+  if (route === REFERENCE_ROUTE) return { kind: 'reference' as const };
+  if (route.startsWith(`${REFERENCE_ROUTE}/`)) {
+    const spec = catalogByKey(route.slice(REFERENCE_ROUTE.length + 1));
+    if (spec) return { kind: 'catalog' as const, spec };
+  }
+  return null;
+}
+
+/** A catalog names its own tab, the way a curated page does. */
+function useCatalogHead(title: string | null) {
+  useEffect(() => {
+    if (title === null || typeof document === 'undefined') return;
+    const previous = document.title;
+    document.title = title;
+    return () => {
+      document.title = previous;
+    };
+  }, [title]);
+}
 
 function DocsRoute({ manifest }: { manifest: DocsManifest }) {
   const { pathname } = useLocation();
   const route = normalizeDocsRoute(pathname);
   const summary = pageAtRoute(manifest, pathname);
-  const built = !summary && route === SEARCH_ROUTE;
+  const built = summary ? null : builtInAt(route);
+
+  useCatalogHead(built?.kind === 'catalog' ? catalogDocumentTitle(built.spec) : null);
 
   if (!summary && !built) return <DocsNotFound pathname={route} />;
 
@@ -105,7 +139,10 @@ function DocsRoute({ manifest }: { manifest: DocsManifest }) {
           the two-column breakpoint it moves to the end of the page, which is
           what the skip link above it exists to make cheap. */}
       <main className="docs-main" id="main-content" tabIndex={-1}>
-        {summary ? <DocsPage manifest={manifest} summary={summary} /> : <DocsSearch manifest={manifest} />}
+        {summary && <DocsPage manifest={manifest} summary={summary} />}
+        {built?.kind === 'search' && <DocsSearch manifest={manifest} />}
+        {built?.kind === 'reference' && <DocsReferenceIndex />}
+        {built?.kind === 'catalog' && <DocsCatalog spec={built.spec} />}
       </main>
     </div>
   );
@@ -142,6 +179,7 @@ export default function DocsApp() {
             Jump to a page <span aria-hidden="true">/</span>
           </button>
           <Link to="/docs/search">Search</Link>
+          <Link to="/docs/reference">Reference</Link>
           <Link to="/reference/entities">Entity reference</Link>
           <Link to="/">Vitae</Link>
         </nav>

@@ -1,0 +1,184 @@
+{
+  "$schema": "../schema/diagram.schema.json",
+  "id": "DGM-BILLING-WEBHOOK",
+  "title": "The payment provider's webhook",
+  "summary": "How a request with no session authenticates itself by HMAC over raw bytes, how a duplicate or out-of-order delivery is neutralised, and the one thing it is allowed to change.",
+  "kind": "sequence",
+  "note": "This whole flow is gated closed in a default build: cloudEnabled() reads VITAE_CLOUD_ENABLED, which .env.example:40 leaves false, and the handler returns 404 CLOUD_DISABLED before touching the body. Note also that the Cloud and Paddle variables are read straight from process.env in cloud/config.ts, not through the validated schema in packages/config/src/env.ts, so none of the boot-time production refusals cover them. The webhook is the only thing that changes what a workspace may do — a checkout creates a provider transaction and grants nothing, and returning from a checkout page proves nothing.",
+  "requirements": [
+    "FR-105"
+  ],
+  "sources": [
+    "apps/api/src/app.ts",
+    "apps/api/src/routes/webhooks/paddle.ts",
+    "apps/api/src/cloud/paddle.ts",
+    "apps/api/src/cloud/config.ts",
+    "apps/api/src/services/control-plane.ts",
+    "apps/api/src/middleware/error.ts",
+    "apps/api/src/middleware/workspace.ts",
+    "apps/api/src/routes/v1/billing.ts",
+    "apps/api/src/db/migrations/008-billing-event-ordering.ts",
+    "packages/core/src/cloud/individual-plan.ts",
+    ".env.example"
+  ],
+  "actors": [
+    {
+      "id": "paddle",
+      "label": "Paddle",
+      "note": "The payment provider. Retries deliveries, and can deliver them out of order."
+    },
+    {
+      "id": "webhook-route",
+      "label": "POST /webhooks/paddle",
+      "note": "Registered at app.ts:50, above every JSON parser and above the auth gate. Reachable by position, not by any public-path declaration."
+    },
+    {
+      "id": "paddle-module",
+      "label": "cloud/paddle",
+      "note": "Signature verification, parsing, and the one transaction that applies an event."
+    },
+    {
+      "id": "control-plane",
+      "label": "Control plane",
+      "note": "applyBillingAccess is the only writer of workspace access state from a provider event."
+    },
+    {
+      "id": "postgres",
+      "label": "Postgres",
+      "note": "billing_events, billing_customers, billing_subscriptions, workspace_lifecycles, workspace_lifecycle_events."
+    },
+    {
+      "id": "error-handler",
+      "label": "errorHandler",
+      "note": "The handler catches and calls next(error), so every refusal leaves as the same envelope the rest of the API uses."
+    }
+  ],
+  "steps": [
+    {
+      "from": "paddle",
+      "to": "webhook-route",
+      "label": "POST /webhooks/paddle with header paddle-signature: ts=…;h1=…",
+      "kind": "call",
+      "note": "No session, no cookie, no bearer token. Possession of the shared secret is the authentication.",
+      "source": "apps/api/src/app.ts:50"
+    },
+    {
+      "from": "webhook-route",
+      "to": "error-handler",
+      "label": "404 CLOUD_DISABLED before anything else is read",
+      "kind": "refusal",
+      "note": "A self-hosted install does not admit that the endpoint exists. This is the first check in the handler.",
+      "source": "apps/api/src/routes/webhooks/paddle.ts:12"
+    },
+    {
+      "from": "webhook-route",
+      "to": "webhook-route",
+      "label": "take the untouched Buffer from express.raw (limit 1mb)",
+      "kind": "aside",
+      "note": "Registered before every JSON parser deliberately: the signature covers the exact bytes sent, and parsing then re-serialising the object would change them and invalidate it.",
+      "source": "apps/api/src/app.ts:50"
+    },
+    {
+      "from": "webhook-route",
+      "to": "paddle-module",
+      "label": "verifyPaddleWebhookSignature(rawBody, signature)",
+      "kind": "call",
+      "source": "apps/api/src/cloud/paddle.ts:141"
+    },
+    {
+      "from": "paddle-module",
+      "to": "error-handler",
+      "label": "401 INVALID_WEBHOOK_SIGNATURE — no secret, stale timestamp, or digest mismatch",
+      "kind": "refusal",
+      "note": "Three ways to fail: the timestamp must be within five seconds of now; each candidate digest must be 64 hex characters of the right byte length before it is decoded, so malformed attacker input is a clean false rather than a timingSafeEqual length exception; and the comparison itself is constant time.",
+      "source": "apps/api/src/cloud/paddle.ts:157"
+    },
+    {
+      "from": "paddle-module",
+      "to": "error-handler",
+      "label": "400 INVALID_WEBHOOK — not a Buffer, or no event_id/event_type after parsing",
+      "kind": "refusal",
+      "note": "Two separate checks: the body must be a raw Buffer (routes/webhooks/paddle.ts:13), and parsePaddleWebhook (cloud/paddle.ts:170) must find both an event_id and an event_type. Parsing happens only after the signature verified, so there is never a parsed object to be confused about.",
+      "source": "apps/api/src/routes/webhooks/paddle.ts:19"
+    },
+    {
+      "from": "paddle-module",
+      "to": "postgres",
+      "label": "open one transaction; resolve custom_data.workspace_id against a real workspace",
+      "kind": "call",
+      "note": "The workspace id arrives inside the event's custom_data, which the server itself put on the transaction at checkout. It is confirmed to exist before it is used; an unknown id resolves to null rather than being trusted.",
+      "source": "apps/api/src/cloud/paddle.ts:216"
+    },
+    {
+      "from": "paddle-module",
+      "to": "postgres",
+      "label": "INSERT the event on provider_event_id … ON CONFLICT DO NOTHING",
+      "kind": "call",
+      "note": "The unique provider event id is the idempotency key. This is the exactly-once boundary: a redelivery loses the insert race and never reaches the lifecycle transition.",
+      "source": "apps/api/src/cloud/paddle.ts:221"
+    },
+    {
+      "from": "paddle-module",
+      "to": "webhook-route",
+      "label": "duplicate delivery: return early, change nothing",
+      "kind": "return",
+      "note": "Answered 200 with { duplicate: true } so the provider stops retrying. An event carrying no resolvable workspace is likewise stored as unlinked evidence, marked processed, and grants nothing.",
+      "source": "apps/api/src/cloud/paddle.ts:234"
+    },
+    {
+      "from": "paddle-module",
+      "to": "postgres",
+      "label": "SELECT … FOR UPDATE on workspace_lifecycles to serialize this workspace's events",
+      "kind": "call",
+      "note": "The lifecycle row is locked first, not the subscription row: a durable lifecycle row exists for every workspace, whereas FOR UPDATE alone cannot lock the absent subscription row on a first subscription. That is what makes ordering hold under concurrent delivery as well as ordinary retries.",
+      "source": "apps/api/src/cloud/paddle.ts:250"
+    },
+    {
+      "from": "paddle-module",
+      "to": "paddle-module",
+      "label": "compare the provider timestamp against the stored one; mark stale if older or absent",
+      "kind": "aside",
+      "note": "The provider's own timestamp is the ordering key. Once one has been recorded, an older — or an entirely un-timestamped — retry can only be audit evidence; it must never roll a customer's entitlement backwards.",
+      "source": "apps/api/src/cloud/paddle.ts:277"
+    },
+    {
+      "from": "paddle-module",
+      "to": "postgres",
+      "label": "not stale: upsert billing_customers and billing_subscriptions",
+      "kind": "call",
+      "note": "Status, billing period, current period end, cancel-at-period-end and the raw payload. Nothing about the plan's price comes from the event — the price catalogue is server-owned.",
+      "source": "apps/api/src/cloud/paddle.ts:281"
+    },
+    {
+      "from": "paddle-module",
+      "to": "control-plane",
+      "label": "applyBillingAccess(workspaceId, mapped access state)",
+      "kind": "call",
+      "note": "The whole permitted vocabulary: active, trialing, past_due, or read_only for canceled/cancelled/paused. A transaction.completed or transaction.paid event maps to active. Any other status maps to null and changes no access at all.",
+      "source": "apps/api/src/cloud/paddle.ts:319"
+    },
+    {
+      "from": "control-plane",
+      "to": "postgres",
+      "label": "update workspace_lifecycles; write a lifecycle event when the state actually changed",
+      "kind": "call",
+      "note": "This is the only thing the webhook is allowed to change. past_due gets a payment grace deadline; read_only gets an export grace deadline before deletion. A workspace with no lifecycle row is a silent no-op rather than a create.",
+      "source": "apps/api/src/services/control-plane.ts:324"
+    },
+    {
+      "from": "paddle-module",
+      "to": "postgres",
+      "label": "stamp processed_at, commit",
+      "kind": "call",
+      "note": "Storing the event, ordering it and transitioning access all commit together, so a crash mid-flight cannot leave an event recorded as processed without its effect.",
+      "source": "apps/api/src/cloud/paddle.ts:334"
+    },
+    {
+      "from": "webhook-route",
+      "to": "paddle",
+      "label": "200 { ok: true, duplicate }",
+      "kind": "return",
+      "source": "apps/api/src/routes/webhooks/paddle.ts:21"
+    }
+  ]
+}

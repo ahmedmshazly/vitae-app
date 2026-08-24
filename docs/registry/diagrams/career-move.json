@@ -1,0 +1,198 @@
+{
+  "$schema": "../schema/diagram.schema.json",
+  "id": "DGM-CAREER-MOVE",
+  "title": "The full career move: capture, target, tailor, apply, follow up",
+  "summary": "Fourteen phases across six surfaces, from a fact captured months earlier to an outcome recorded — and the stretch near the end, where the application itself lives, that no browser test walks.",
+  "kind": "lanes",
+  "requirements": ["FR-CAP-001", "FR-RES-011", "FR-IMP-001"],
+  "note": "This is the arc the product exists for, and it is also where the coverage register is most uneven. Everything up to and including the compiled document is exercised end to end, several phases by more than one spec. Everything from the moment a job becomes an application you are tracking is not: no browser test opens `/career/applications` or an application dossier and asserts anything about an application record. Two specs reach `/career` — the shell's deep-link test checks the rail's current-page marker, and the résumé hub's narrow-viewport test clicks straight through to Résumé — but neither looks at what the screen is for, and the applications nav link is only ever checked for its href. The gap is a journey-register gap, not a total absence of testing: the list and dossier screens have seven unit cases between them and the read projection has two API integration cases. It is simply the case that nobody has written down the end-to-end path through applying that must never break, which is exactly what the five unnamed journeys J2, J3, J5, J6 and J7 leave room for. One product boundary worth stating inside the arc: a cover letter is text, not a document — its LaTeX and PDF compilation is explicitly deferred until letter templates exist, so only the résumé leaves as a PDF.",
+  "sources": [
+    "apps/web/src/App.tsx",
+    "apps/web/src/routes/career/CareerOverview.tsx",
+    "apps/web/src/routes/career/ApplicationDossier.tsx",
+    "apps/web/src/routes/career/ApplicationActions.tsx",
+    "apps/web/src/routes/career/application-view.ts",
+    "apps/web/src/routes/tailor/Tailor.tsx",
+    "apps/web/src/routes/Atoms.tsx",
+    "apps/web/src/routes/Outputs.tsx",
+    "apps/web/src/routes/Letters.tsx",
+    "apps/web/src/routes/Templates.tsx",
+    "apps/api/src/routes/v1/applications.ts",
+    "apps/api/src/routes/v1/targets.ts",
+    "apps/api/src/routes/v1/resumes.ts",
+    "apps/api/src/routes/v1/letters.ts",
+    "apps/api/src/routes/v1/intros.ts",
+    "apps/api/src/services/resume.ts",
+    "packages/core/src/schema/resume.ts",
+    "packages/core/src/schema/application.ts",
+    "packages/core/src/forms/node-forms.ts",
+    "docs/registry/journeys.json",
+    "docs/generated/routes.json",
+    "docs/generated/tests.json",
+    "e2e/tests/journeys.spec.ts",
+    "e2e/tests/atoms.spec.ts",
+    "e2e/tests/tailor.spec.ts",
+    "e2e/tests/target-lifecycle.spec.ts",
+    "e2e/tests/resume-full.spec.ts",
+    "e2e/tests/outputs.spec.ts",
+    "e2e/tests/letters.spec.ts",
+    "e2e/tests/templates.spec.ts",
+    "e2e/tests/import.spec.ts",
+    "e2e/tests/intros.spec.ts",
+    "e2e/tests/today.spec.ts",
+    "e2e/tests/shell.spec.ts",
+    "e2e/tests/resume-hub.spec.ts",
+    "e2e/tests/overlays.spec.ts",
+    "e2e/tests/entity-form.spec.ts",
+    "e2e/tests/forms.spec.ts",
+    "e2e/tests/repositories.spec.ts",
+    "e2e/tests/duplicates.spec.ts",
+    "e2e/tests/tailor-wording.spec.ts",
+    "e2e/tests/document-editor.spec.ts"
+  ],
+  "lanes": [
+    {
+      "id": "capture",
+      "label": "Capture and import",
+      "note": "The part that happens long before the job exists. Everything downstream is a selection over what was captured here, which is why an empty graph produces an empty résumé rather than a bad one."
+    },
+    {
+      "id": "evidence",
+      "label": "Evidence library",
+      "note": "Achievement bullets that belong to a record rather than to a document, so the same claim can be reused, reworded and re-cited across every application."
+    },
+    {
+      "id": "tailor",
+      "label": "Target and tailoring",
+      "note": "One surface: the job description on one side, the scored evidence on the other, and a page budget deciding what fits."
+    },
+    {
+      "id": "documents",
+      "label": "Documents",
+      "note": "What comes out, and where it is findable afterwards: the template that shapes it, the compiled outputs archive, the letters."
+    },
+    {
+      "id": "applications",
+      "label": "Applications",
+      "note": "The Career workspace. The list and the dossier are the same component behind two addresses — `/career` and `/career/applications` both render it."
+    },
+    {
+      "id": "followup",
+      "label": "Follow-up",
+      "note": "The part that decides outcomes and is easiest to drop: the next step, the warm path in, and the record of what happened."
+    }
+  ],
+  "phases": [
+    {
+      "id": "capture_facts",
+      "lane": "capture",
+      "label": "Capture facts as they happen",
+      "covered_by": ["e2e/tests/journeys.spec.ts", "e2e/tests/overlays.spec.ts", "e2e/tests/entity-form.spec.ts", "e2e/tests/forms.spec.ts"],
+      "note": "One typed line through the ⌘K grammar, or a structured form covering every record type. No route, because both are overlays reachable from anywhere. The form specs exercise the dialog with people and ideas, not with applications, so the mechanism is covered while the application form itself is not."
+    },
+    {
+      "id": "import_history",
+      "lane": "capture",
+      "label": "Bring in an existing history",
+      "route": "/data/imports",
+      "covered_by": ["e2e/tests/import.spec.ts", "e2e/tests/repositories.spec.ts", "e2e/tests/duplicates.spec.ts"],
+      "note": "A LinkedIn export, a contacts file, a calendar, or a GitHub sync. Every staged row carries a duplicate verdict, and probable duplicates default to skip rather than accept. The specs enter at the legacy `/import` address."
+    },
+    {
+      "id": "write_atoms",
+      "lane": "evidence",
+      "label": "Turn work into reusable evidence",
+      "route": "/career/resume/evidence",
+      "covered_by": ["e2e/tests/atoms.spec.ts"],
+      "note": "A bullet is linked to the record it is evidence for, so a claim can be traced to the role or project that earned it. Covered for creation with linked evidence, archive-and-undo, the empty versus over-filtered distinction, and accessibility. The spec enters at the legacy `/resume/atoms`."
+    },
+    {
+      "id": "pick_template",
+      "lane": "documents",
+      "label": "Choose the layout",
+      "route": "/career/resume/templates",
+      "covered_by": ["e2e/tests/templates.spec.ts"],
+      "note": "Not cosmetic: the template carries the line model the one-page budget measures against, so changing it changes what fits. The spec covers a partial compiler warmup being named as partial, a failed catalogue, an empty catalogue, and a rejected default change leaving the current default intact."
+    },
+    {
+      "id": "open_target",
+      "lane": "tailor",
+      "label": "Paste the job description, start a target",
+      "route": "/career/resume/tailor",
+      "covered_by": ["e2e/tests/journeys.spec.ts", "e2e/tests/tailor.spec.ts", "e2e/tests/target-lifecycle.spec.ts"],
+      "note": "J4's opening move. The description is parsed into weighted keywords that everything downstream scores against."
+    },
+    {
+      "id": "score_select",
+      "lane": "tailor",
+      "label": "Score and select against the page budget",
+      "route": "/career/resume/tailor",
+      "covered_by": ["e2e/tests/tailor.spec.ts", "e2e/tests/resume-full.spec.ts", "e2e/tests/tailor-wording.spec.ts", "e2e/tests/document-editor.spec.ts"],
+      "note": "The score breakdown is asserted to prove its own arithmetic rather than to display a number. The failure states get as much attention as the happy path: a failed autosave, a failed target list, a failed atom list and a failed re-score each have to say what broke without claiming the work is lost."
+    },
+    {
+      "id": "track_target",
+      "lane": "tailor",
+      "label": "Move the target through its own status",
+      "route": "/career/resume/tailor",
+      "covered_by": ["e2e/tests/target-lifecycle.spec.ts"],
+      "note": "A target has a four-value status of its own — saved, active, applied, closed — which is a separate vocabulary from the eight-value application status and from a job posting's five. Nothing in the code keeps the three in step."
+    },
+    {
+      "id": "compile",
+      "lane": "tailor",
+      "label": "Compile the résumé",
+      "route": "/career/resume/tailor",
+      "covered_by": ["e2e/tests/journeys.spec.ts", "e2e/tests/resume-full.spec.ts"],
+      "note": "J4 asserts that a rendered PDF preview appears rather than a LaTeX dump, which is what distinguishes a working compile service from a successful template render. If the build service is unreachable the flow degrades to a .tex download instead of failing."
+    },
+    {
+      "id": "outputs",
+      "lane": "documents",
+      "label": "Find the finished document again",
+      "route": "/career/resume/outputs",
+      "covered_by": ["e2e/tests/outputs.spec.ts", "e2e/tests/resume-full.spec.ts"],
+      "note": "Detail, duplicate and archive, plus the honest-empty-state rule: an empty archive and an over-filtered one are asserted to be different screens."
+    },
+    {
+      "id": "letter",
+      "lane": "documents",
+      "label": "Write the cover letter",
+      "route": "/career/resume/letters",
+      "covered_by": ["e2e/tests/letters.spec.ts"],
+      "note": "Draft, final or sent — a three-value status of its own. Blocks may cite an evidence bullet or carry free text. No compile: letters produce no PDF, by an explicit deferral in the code rather than an oversight."
+    },
+    {
+      "id": "record_application",
+      "lane": "applications",
+      "label": "Record the application you sent",
+      "route": "/career/applications",
+      "covered_by": [],
+      "note": "No browser coverage. The screen groups the pipeline into five stages and the outcomes into three, counts what needs attention, and offers an Add-application dialog that navigates straight into the new dossier. Below the browser it has five unit cases and two API integration cases; end to end, nothing walks it."
+    },
+    {
+      "id": "track_dossier",
+      "lane": "applications",
+      "label": "Work the dossier: interviews, referral, deadline, outcome",
+      "route": "/career/applications/:id",
+      "covered_by": [],
+      "note": "No browser coverage. The dossier is where the arc actually converges — the posting, the interview rounds in stage order with the next un-finished one surfaced, the person who referred you, the target and the résumé that was sent — and it is also where the terminal outcome is finally recorded. Two unit cases."
+    },
+    {
+      "id": "next_step",
+      "lane": "followup",
+      "label": "Keep the next step from slipping",
+      "route": "/today",
+      "covered_by": ["e2e/tests/today.spec.ts"],
+      "note": "An application's `next_step_date` or `deadline`, whichever is sooner, becomes an overdue, today or upcoming flag — and stops counting once the application closes. Today's queue is covered for completing a reminder and undoing it from the toast; the applications side of that same signal is not."
+    },
+    {
+      "id": "warm_intro",
+      "lane": "followup",
+      "label": "Find the warm path in",
+      "route": "/intros",
+      "covered_by": ["e2e/tests/intros.spec.ts"],
+      "note": "The best-covered follow-up phase, at eleven cases: every path ranked, each hop weighted by its own tie rather than the path's label, the destination held in the URL, and an unreachable organisation saying so without claiming a failure. `referral` is one of the four channels an application can record, which is where this phase rejoins the dossier."
+    }
+  ]
+}

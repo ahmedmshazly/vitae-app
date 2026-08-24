@@ -35,12 +35,16 @@
  */
 import {
   type DocsBlock,
+  type DocsDiagramSpec,
   type DocsInline,
   type DocsManifest,
   type DocsPageContent,
   type DocsPageSummary,
   type DocsReference,
   CALLOUT_LABEL,
+  DOCS_STEP_KIND,
+  DOCS_TRUST,
+  docsStatePosition,
   audienceMeta,
   breadcrumbs,
   docsDocumentTitle,
@@ -118,6 +122,148 @@ function cellsHtml(cells: readonly (readonly DocsInline[])[], tag: 'th' | 'td'):
     .join('');
 }
 
+/**
+ * A diagram as a table, which is the whole of it here.
+ *
+ * The React reader draws these; a document with no script cannot. That is not
+ * a degraded form: the table is the accessible equivalent the design rules
+ * require of every diagram, and the reason a diagram is declared as data
+ * rather than drawn is so the two cannot say different things. A reader with a
+ * screen reader and a reader with no JavaScript get the same document, and it
+ * is complete.
+ */
+function table(caption: string, head: readonly string[], rows: readonly (readonly string[])[]): string {
+  if (rows.length === 0) return '';
+  const header = head.map((cell) => `<th scope="col">${cell}</th>`).join('');
+  const body = rows
+    .map((row) => {
+      const cells = row.map((cell, index) =>
+        index === 0 ? `<th scope="row">${cell}</th>` : `<td>${cell}</td>`,
+      );
+      return `<tr>${cells.join('')}</tr>`;
+    })
+    .join('');
+  return `<table><caption>${caption}</caption><thead><tr>${header}</tr></thead><tbody>${body}</tbody></table>`;
+}
+
+function named(list: readonly { id: string; label: string }[] | undefined, id: string): string {
+  return escapeHtml(list?.find((item) => item.id === id)?.label ?? id);
+}
+
+function code(value: string | undefined): string {
+  return value ? `<code>${escapeHtml(value)}</code>` : '—';
+}
+
+function diagramTables(spec: DocsDiagramSpec): string {
+  const out: string[] = [];
+  if (spec.kind === 'sequence') {
+    out.push(
+      table(
+        'Steps in order',
+        ['Step', 'From', 'To', 'What happens', 'Where'],
+        (spec.steps ?? []).map((step, index) => [
+          String(index + 1),
+          named(spec.actors, step.from),
+          named(spec.actors, step.to),
+          `${DOCS_STEP_KIND[step.kind ?? 'call']}: ${escapeHtml(step.label)}`
+            + (step.note ? ` ${escapeHtml(step.note)}` : ''),
+          code(step.source),
+        ]),
+      ),
+    );
+  }
+  if (spec.kind === 'state') {
+    out.push(
+      table(
+        'States',
+        ['State', 'Meaning', 'Position'],
+        (spec.states ?? []).map((state) => [
+          escapeHtml(state.label),
+          escapeHtml(state.note ?? '—'),
+          docsStatePosition(state),
+        ]),
+      ),
+      table(
+        'Transitions',
+        ['From', 'To', 'What causes it', 'Where'],
+        (spec.transitions ?? []).map((move) => [
+          named(spec.states, move.from),
+          named(spec.states, move.to),
+          escapeHtml(move.label) + (move.note ? ` ${escapeHtml(move.note)}` : ''),
+          code(move.source),
+        ]),
+      ),
+    );
+  }
+  if (spec.kind === 'topology') {
+    out.push(
+      table(
+        'Trust zones',
+        ['Zone', 'Trust', 'Note'],
+        (spec.zones ?? []).map((zone) => [
+          escapeHtml(zone.label),
+          DOCS_TRUST[zone.trust],
+          escapeHtml(zone.note ?? '—'),
+        ]),
+      ),
+      table(
+        'Components',
+        ['Component', 'Zone', 'Note', 'Where'],
+        (spec.nodes ?? []).map((node) => [
+          escapeHtml(node.label),
+          named(spec.zones, node.zone),
+          escapeHtml(node.note ?? '—'),
+          code(node.source),
+        ]),
+      ),
+      table(
+        'What crosses between them',
+        ['From', 'To', 'What moves', 'Carrying'],
+        (spec.links ?? []).map((link) => [
+          named(spec.nodes, link.from),
+          named(spec.nodes, link.to),
+          escapeHtml(link.label),
+          escapeHtml(link.carries ?? '—'),
+        ]),
+      ),
+    );
+  }
+  if (spec.kind === 'lanes') {
+    out.push(
+      table(
+        'Phases in order',
+        ['Phase', 'Where it happens', 'What the person does', 'Route', 'Covered by'],
+        (spec.phases ?? []).map((phase) => [
+          escapeHtml(phase.label),
+          named(spec.lanes, phase.lane),
+          escapeHtml(phase.note ?? '—'),
+          code(phase.route),
+          phase.covered_by && phase.covered_by.length > 0
+            ? phase.covered_by.map((file) => `<code>${escapeHtml(file)}</code>`).join(', ')
+            : 'Nothing runs this phase',
+        ]),
+      ),
+    );
+  }
+  return out.filter(Boolean).join('');
+}
+
+function diagramHtml(spec: DocsDiagramSpec): string {
+  const sources = spec.sources
+    .map((path) => `<li><code>${escapeHtml(path)}</code></li>`)
+    .join('');
+  return [
+    `<figure data-vitae-diagram="${escapeHtml(spec.id)}">`,
+    `<figcaption><strong>${escapeHtml(spec.title)}</strong> ${escapeHtml(spec.summary)}</figcaption>`,
+    spec.note ? `<p>${escapeHtml(spec.note)}</p>` : '',
+    diagramTables(spec),
+    `<p>Read from:</p><ul>${sources}</ul>`,
+    '</figure>',
+  ]
+    .filter(Boolean)
+    .join('');
+}
+
 function blockHtml(block: DocsBlock): string {
   switch (block.type) {
     case 'heading': {
@@ -150,6 +296,18 @@ function blockHtml(block: DocsBlock): string {
     }
     case 'figure':
       return `<figure><img src="${escapeHtml(block.src)}" alt="${escapeHtml(block.caption)}" /><figcaption>${escapeHtml(block.caption)}</figcaption></figure>`;
+    case 'diagram':
+      return diagramHtml(block.spec);
+    case 'explainer':
+      // An explainer runs a real function from `@vitae/core` against inputs the
+      // reader changes, so there is nothing to render without a script. What
+      // there is, is the truth about that: the surrounding prose states the
+      // algorithm's inputs, formula, constants and limits in full, and this
+      // says so rather than leaving an empty box in the middle of a sentence.
+      return `<aside data-vitae-explainer="${escapeHtml(block.id)}"><p><strong>Interactive example</strong> `
+        + `The <code>${escapeHtml(block.id)}</code> algorithm can be run here against inputs you choose, `
+        + 'which needs JavaScript. The sections around this one state its inputs, its formula, its tuned '
+        + 'constants and its limits in full.</p></aside>';
     default: {
       // Exhaustiveness, enforced. A new member of DocsBlock stops compiling
       // here rather than disappearing from every prerendered page.

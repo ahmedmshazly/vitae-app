@@ -1,0 +1,204 @@
+{
+  "$schema": "../schema/diagram.schema.json",
+  "id": "DGM-RESUME-BUILD",
+  "title": "Producing a compiled résumé",
+  "summary": "One POST /resumes/finalize: selection against the parsed job description, model assembly, a signed compile in the sealed build container, and the fit loop that recompiles until the document is one page.",
+  "kind": "sequence",
+  "note": "Drawn for POST /api/v1/resumes/finalize, the only path that runs the whole chain; /resumes/model stops after assembly and /resumes/compile stops after the first compile. Nothing in this path calls a language model — the same graph, job description and template produce the same PDF byte for byte, because SOURCE_DATE_EPOCH is fixed from the target's created_at. Artifacts are skipped entirely when NODE_ENV is 'test' (resumes.ts:402), so a test run finalizes without touching object storage.",
+  "requirements": [
+    "FR-RES-008",
+    "FR-RES-009",
+    "FR-RES-011",
+    "FR-RES-012",
+    "FR-RES-013",
+    "FR-RES-014",
+    "FR-RES-015"
+  ],
+  "sources": [
+    "apps/api/src/routes/v1/resumes.ts",
+    "apps/api/src/services/resume.ts",
+    "apps/api/src/services/resume-model.ts",
+    "apps/api/src/services/template-renderers.ts",
+    "apps/api/src/services/buildsvc-client.ts",
+    "apps/api/src/services/storage/cloudinary.ts",
+    "apps/api/src/db/repository.ts",
+    "packages/core/src/algorithms/atom-scoring.ts",
+    "packages/core/src/algorithms/selection.ts",
+    "packages/core/src/algorithms/fit-loop.ts",
+    "packages/core/src/algorithms/latex-escape.ts",
+    "services/buildsvc/src/server.ts",
+    "services/buildsvc/src/calibrate.ts"
+  ],
+  "actors": [
+    {
+      "id": "browser",
+      "label": "Browser (Tailor)",
+      "note": "Sends the target id, template key, and any manual curation: pins, blocks, explicit atom order, per-section and per-item configuration."
+    },
+    {
+      "id": "resumes-route",
+      "label": "resumes router",
+      "note": "Orchestrates prepare → compile → fit → persist. All three of model, compile and finalize share the same prepare()."
+    },
+    {
+      "id": "resume-service",
+      "label": "resume service",
+      "note": "tailor(), renderTemplate(), compileResume(). The only layer that escapes text on its way into LaTeX."
+    },
+    {
+      "id": "core",
+      "label": "@vitae/core algorithms",
+      "note": "Pure functions: scoreAtoms, selectAtoms/selectManual, estimateLines, planFitStep, applyFitStep. Testable without a database."
+    },
+    {
+      "id": "postgres",
+      "label": "Postgres",
+      "note": "Atoms, variants, the graph, the target record, and where the finalized résumé and its artifacts land."
+    },
+    {
+      "id": "build-service",
+      "label": "buildsvc (Tectonic)",
+      "note": "A separate container. HMAC-gated, no runtime network, --untrusted, per-request temp directory."
+    },
+    {
+      "id": "storage",
+      "label": "Object storage",
+      "note": "Cloudinary adapter. Holds the PDF and .tex bytes; the résumé record keeps only keys and hashes."
+    }
+  ],
+  "steps": [
+    {
+      "from": "browser",
+      "to": "resumes-route",
+      "label": "POST /resumes/finalize { targetId, templateKey, pins, blocks, atomOrder, … }",
+      "kind": "call",
+      "source": "apps/api/src/routes/v1/resumes.ts:266"
+    },
+    {
+      "from": "resumes-route",
+      "to": "browser",
+      "label": "404 NOT_FOUND when the target does not exist",
+      "kind": "refusal",
+      "note": "prepare() also rejects a body that mixes curation modes before any work is done (assertCuratedBody, resumes.ts:60).",
+      "source": "apps/api/src/routes/v1/resumes.ts:167"
+    },
+    {
+      "from": "resumes-route",
+      "to": "postgres",
+      "label": "load the target's parsed keywords, the template line model, and the graph once",
+      "kind": "call",
+      "note": "FR-102: one graph load serves both the static-section model and the final model. The job description was parsed into weighted keywords earlier, when the target was created.",
+      "source": "apps/api/src/routes/v1/resumes.ts:175"
+    },
+    {
+      "from": "resumes-route",
+      "to": "resume-service",
+      "label": "shrink the budget by the static sections, then tailor()",
+      "kind": "call",
+      "note": "Skills, education, awards, research and summary consume lines the knapsack does not know about, so a static model is built first and its measured lines subtracted from lines_per_page.",
+      "source": "apps/api/src/routes/v1/resumes.ts:179"
+    },
+    {
+      "from": "resume-service",
+      "to": "core",
+      "label": "scoreAtoms against the keywords, then selectAtoms within the line budget",
+      "kind": "call",
+      "note": "Auto mode is a budgeted greedy optimiser over saturating keyword coverage plus quality; manual mode takes `include` as the exact ordered list. Pinned atoms are forced in, blocked ones excluded.",
+      "source": "apps/api/src/services/resume.ts:380"
+    },
+    {
+      "from": "core",
+      "to": "resume-service",
+      "label": "selection entries with per-atom emphasis and line counts",
+      "kind": "return",
+      "source": "packages/core/src/algorithms/selection.ts:108"
+    },
+    {
+      "from": "resumes-route",
+      "to": "resume-service",
+      "label": "buildFullModel: group by owner, fold in skills, education, awards, contacts",
+      "kind": "call",
+      "note": "The model is scoped to the person node marked is_self. With no such anchor it produces an EMPTY model (resume-model.ts:477) rather than rendering the whole graph under a placeholder name — the graph holds other people's roles and degrees.",
+      "source": "apps/api/src/services/resume-model.ts:463"
+    },
+    {
+      "from": "resume-service",
+      "to": "resume-service",
+      "label": "renderTemplate: splice the model into main.tex, escaping every dynamic value",
+      "kind": "aside",
+      "note": "Guillemet tokens are replaced one by one; assertNoUnresolvedTokens then throws rather than compiling a document with «SECTIONS» printed in it. Only the renderers may emit unescaped macros.",
+      "source": "apps/api/src/services/resume.ts:408"
+    },
+    {
+      "from": "resume-service",
+      "to": "build-service",
+      "label": "POST /compile signed with HMAC over timestamp + '.' + raw body",
+      "kind": "call",
+      "note": "The signing key IS the authentication (FR-027). The service refuses to start with no secret, and refuses in production with any of the published development defaults.",
+      "source": "apps/api/src/services/buildsvc-client.ts:50"
+    },
+    {
+      "from": "build-service",
+      "to": "resume-service",
+      "label": "401 BAD_SIGNATURE — missing header, >5min skew, or digest mismatch",
+      "kind": "refusal",
+      "source": "services/buildsvc/src/server.ts:176"
+    },
+    {
+      "from": "build-service",
+      "to": "build-service",
+      "label": "tectonic --untrusted --only-cached in a fresh temp dir, then pdfinfo and pdftotext",
+      "kind": "aside",
+      "note": "The package cache is warmed at image build time and the runtime network is sealed, so --only-cached makes a cache miss fail fast instead of hanging in DNS timeouts. The temp dir is removed in a finally block.",
+      "source": "services/buildsvc/src/server.ts:203"
+    },
+    {
+      "from": "build-service",
+      "to": "resume-service",
+      "label": "{ pdf (base64), pages, text } — or 400 COMPILE_ERROR with a guessed section and log tail",
+      "kind": "return",
+      "note": "A compile failure is a structured error, not a 500. If the service is unreachable at all, the client returns { offline: true } and the caller falls back to a .tex download (FR-RES-013).",
+      "source": "services/buildsvc/src/server.ts:222"
+    },
+    {
+      "from": "resume-service",
+      "to": "resume-service",
+      "label": "coverage: measure the parsed keywords against the extracted PDF text",
+      "kind": "aside",
+      "note": "Measured from the output, not the model that produced it — that is what catches a keyword the selection intended to include but the template hyphenated or pushed off the page. The gate passes at 0.95 weighted.",
+      "source": "apps/api/src/services/resume.ts:431"
+    },
+    {
+      "from": "resumes-route",
+      "to": "core",
+      "label": "while pages > 1 and fewer than 3 iterations: planFitStep, applyFitStep, rebuild, recompile",
+      "kind": "call",
+      "note": "planFitStep at resumes.ts:330 chooses a concise-swap or a drop, never touching a pinned atom. If no step is available, or three iterations were not enough, needsManualTrim is set and the loop stops rather than dropping something the person pinned.",
+      "source": "apps/api/src/routes/v1/resumes.ts:323"
+    },
+    {
+      "from": "resumes-route",
+      "to": "storage",
+      "label": "upload the PDF and .tex bytes, keyed by SHA-256",
+      "kind": "aside",
+      "note": "Wrapped in try/catch: a storage outage must not block finalize. The record is written with null keys and Outputs offers a re-export instead.",
+      "source": "apps/api/src/routes/v1/resumes.ts:402"
+    },
+    {
+      "from": "resumes-route",
+      "to": "postgres",
+      "label": "one transaction: résumé record + attachments + revision (+ base pointer if first final)",
+      "kind": "call",
+      "note": "status is 'final' only when the compile succeeded, the document is exactly one page, and coverage passed the gate; otherwise 'draft'.",
+      "source": "apps/api/src/routes/v1/resumes.ts:487"
+    },
+    {
+      "from": "resumes-route",
+      "to": "browser",
+      "label": "{ id, status, onePage, gatePassed, needsManualTrim, fitDecisions, coverage, pages }",
+      "kind": "return",
+      "note": "fitDecisions is the audit trail of what the loop trimmed and why, so a person can see what the one-page constraint cost them.",
+      "source": "apps/api/src/routes/v1/resumes.ts:504"
+    }
+  ]
+}

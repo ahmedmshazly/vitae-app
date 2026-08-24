@@ -98,6 +98,12 @@ public within the gate, and 3 as outside it.
 | `POST /api/v1/auth/logout` | Listed in the public paths | Yes. Clears a cookie and returns an acknowledgement. |
 | `GET /api/v1/auth/me` | Listed, and special-cased above the check (`auth.ts:128`) | Deliberate, with a small disclosure. See below. |
 
+How a session is obtained, and how a request is attributed to a person:
+
+```diagram
+DGM-AUTHENTICATION
+```
+
 **`/ready` returns a diagnostic string.** When the database probe fails, the
 response carries a `detail` field built by stringifying the underlying error
 (`middleware/health.ts`). A driver error can name a host or a port, so an
@@ -155,6 +161,12 @@ companion project, held to a deliberately stricter bar because that project's
 sign-in methods are not this system's to govern, and its identifiers are
 prefixed so a coincidental collision can never alias an account in the control
 plane.
+
+Every process and store, grouped by how far it is trusted:
+
+```diagram
+DGM-TRUST-BOUNDARIES
+```
 
 Authorisation then differs by mode. Self-hosted compares the verified email
 against the configured owner. Hosted accepts any verified identity at this layer
@@ -247,6 +259,12 @@ key is not a guessable address. The stored identifier is namespaced by the
 workspace, with the reason recorded in place: a shared content hash across two
 tenants is itself an information leak, even though the object would be
 identical.
+
+Where a person’s data enters, where it rests, and every way it leaves:
+
+```diagram
+DGM-DATA-LINEAGE
+```
 
 On the way out, records marked sensitive are excluded from an export unless the
 person explicitly opts in, and the exclusion is transitive — the edges that

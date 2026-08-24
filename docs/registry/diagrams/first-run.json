@@ -1,0 +1,152 @@
+{
+  "$schema": "../schema/diagram.schema.json",
+  "id": "DGM-FIRST-RUN",
+  "title": "A new person's first session",
+  "summary": "Eleven phases from the public home page to a first record, across five surfaces — and the three phases in the middle that no browser test touches.",
+  "kind": "lanes",
+  "requirements": ["FR-CAP-001", "FR-SET-001", "INT-1"],
+  "note": "Onboarding is deliberately not a wizard. The welcome dialog is three moves, shown once per browser behind a localStorage flag, and everything else is a resumable ledger on Today so a person can leave and come back rather than be trapped in a sequence. Read the coverage column carefully: the welcome dialog itself is tested in exactly one place, because the shared sign-in helper sets `vitae.v1.welcomed` before every other spec runs — the suite's normal path is the path with onboarding switched off. Both onboarding gates are per-browser localStorage flags, not server state, so the same account on a second device sees the first run again. Two phases here have no route because they are not screens: enrolment happens inside the auth provider on mount, and the welcome dialog is an overlay mounted in the shell above every private route.",
+  "sources": [
+    "apps/web/src/App.tsx",
+    "apps/web/src/app/Shell.tsx",
+    "apps/web/src/features/FirstRun.tsx",
+    "apps/web/src/features/GettingStarted.tsx",
+    "apps/web/src/features/QuickAdd.tsx",
+    "apps/web/src/lib/auth.tsx",
+    "apps/web/src/lib/firebase.ts",
+    "apps/web/src/routes/Dashboard.tsx",
+    "apps/web/src/routes/SignIn.tsx",
+    "apps/web/src/public/site.ts",
+    "apps/api/src/routes/v1/auth.ts",
+    "apps/api/src/routes/v1/dashboard.ts",
+    "apps/api/src/services/control-plane.ts",
+    "docs/generated/routes.json",
+    "docs/generated/tests.json",
+    "e2e/tests/helpers/auth.ts",
+    "e2e/tests/landing.spec.ts",
+    "e2e/tests/tour.spec.ts",
+    "e2e/tests/signin.spec.ts",
+    "e2e/tests/foundation.spec.ts",
+    "e2e/tests/overlays.spec.ts",
+    "e2e/tests/today.spec.ts",
+    "e2e/tests/settings.spec.ts",
+    "e2e/tests/journeys.spec.ts",
+    "e2e/tests/sweep.spec.ts",
+    "e2e/tests/visual-baselines.spec.ts",
+    "e2e/tests/resume-hub.spec.ts"
+  ],
+  "lanes": [
+    {
+      "id": "public",
+      "label": "Public site",
+      "note": "Fully public and, by explicit design, never allowed to wait on Firebase or the API. These routes are declared above the authentication gate in the route tree so a reader with no account is never bounced to sign-in."
+    },
+    {
+      "id": "door",
+      "label": "Sign-in door",
+      "note": "One screen with two ways in: Google, and — only when the deployment enables it and the caller is on loopback — a developer sign-in."
+    },
+    {
+      "id": "identity",
+      "label": "Identity and workspace",
+      "note": "No screen of its own. The auth provider asks who it is, and in hosted mode enrols a first-time account into exactly one personal workspace before anything else is allowed to run."
+    },
+    {
+      "id": "shell",
+      "label": "Application shell",
+      "note": "The chrome that wraps every private route: the rail, the keyboard overlays, and the once-per-browser welcome dialog."
+    },
+    {
+      "id": "today",
+      "label": "Today",
+      "note": "Where a signed-in session lands, and where onboarding continues as a ledger rather than a wizard."
+    }
+  ],
+  "phases": [
+    {
+      "id": "arrive",
+      "lane": "public",
+      "label": "Land on the public home page",
+      "route": "/",
+      "covered_by": ["e2e/tests/landing.spec.ts", "e2e/tests/sweep.spec.ts", "e2e/tests/visual-baselines.spec.ts"],
+      "note": "Only the screenshot baseline enters at the canonical address; the other two enter at `/welcome`, the permanent redirect kept for old links."
+    },
+    {
+      "id": "read",
+      "lane": "public",
+      "label": "Read what it does, and what it costs",
+      "route": "/how-it-works",
+      "covered_by": [],
+      "note": "No browser test opens this page, or `/pricing`, or either of the two product deep-dives. The pricing page is also where the hosted offering would present itself, and it stays in its pre-launch state until five separate public values are configured and well-formed — so a partially configured deployment cannot appear live."
+    },
+    {
+      "id": "tour",
+      "lane": "public",
+      "label": "Walk the guided tour",
+      "route": "/tour",
+      "covered_by": ["e2e/tests/tour.spec.ts"],
+      "note": "Reachable from the welcome dialog as well as from the public site: the dialog's second control is a link to the tour, not a button, so it is one tab stop and one thing to do."
+    },
+    {
+      "id": "door",
+      "lane": "door",
+      "label": "Open the front door",
+      "route": "/signin",
+      "covered_by": ["e2e/tests/signin.spec.ts", "e2e/tests/foundation.spec.ts", "e2e/tests/visual-baselines.spec.ts"],
+      "note": "`/signup` renders the same door. Tested for keyboard order, a visible focus ring, the two-column split above 1024px, the skeletonised loading splash, and no automated accessibility violations."
+    },
+    {
+      "id": "prove",
+      "lane": "identity",
+      "label": "Prove an identity",
+      "route": "/signin",
+      "covered_by": ["e2e/tests/signin.spec.ts"],
+      "note": "The Google path is asserted only as far as the button — its label and its position first in the tab order. What every other spec actually exercises is the developer sign-in, through the shared helper, so the token path the suite runs on is not the token path a real person uses."
+    },
+    {
+      "id": "enrol",
+      "lane": "identity",
+      "label": "Resolve or create the workspace",
+      "covered_by": [],
+      "note": "No screen and no browser coverage. The auth provider calls `/auth/me`, and on a first-time hosted account follows with `/auth/bootstrap`, which creates one personal workspace on a 14-day trial, seeds the billing control rows before any checkout, and writes a lifecycle event. In a default self-hosted build this is a no-op, so the phase is invisible as well as untested. Its only automated coverage is an API integration file of four cases."
+    },
+    {
+      "id": "welcome",
+      "lane": "shell",
+      "label": "The welcome dialog: three moves",
+      "covered_by": ["e2e/tests/overlays.spec.ts"],
+      "note": "Capture with ⌘K, create any record with n, find or act with ⌘P. One test, and it has to delete the localStorage flag first to see the dialog at all. It asserts the dialog role, that it dismisses, and that it stays dismissed across a reload."
+    },
+    {
+      "id": "land",
+      "lane": "today",
+      "label": "Land on Today",
+      "route": "/today",
+      "covered_by": ["e2e/tests/foundation.spec.ts", "e2e/tests/today.spec.ts", "e2e/tests/resume-hub.spec.ts"],
+      "note": "The private root redirects here. The signal the shared helper waits on is the week rule, because it is the one element that renders only after the dashboard aggregate resolves, so a test cannot pass against a half-loaded page."
+    },
+    {
+      "id": "ledger",
+      "lane": "today",
+      "label": "The getting-started ledger, six steps",
+      "route": "/today",
+      "covered_by": [],
+      "note": "Profile, a first person, a first interaction, GitHub, résumé evidence, a first résumé — each deep-linked, each ticked from real dashboard state rather than from a stored step counter, and the whole panel auto-hiding once complete. No browser test asserts any of it. The only mention in the suite is a comment in today.spec.ts explaining that the checklist is also a list of list items, written so the queue's own locator would not match it."
+    },
+    {
+      "id": "first_step",
+      "lane": "today",
+      "label": "Follow the first step to the profile",
+      "route": "/settings/profile",
+      "covered_by": ["e2e/tests/settings.spec.ts"],
+      "note": "The destination has its own coverage; the ledger link that leads here does not."
+    },
+    {
+      "id": "first_capture",
+      "lane": "shell",
+      "label": "Capture the first record",
+      "covered_by": ["e2e/tests/journeys.spec.ts", "e2e/tests/overlays.spec.ts"],
+      "note": "The move the welcome dialog leads with, and the only first-run phase covered end to end: J1 opens the capture line from anywhere, types one line naming a person with an organisation, a tag, a date and a note, checks the parse appears as preview chips, commits, and then finds the record through the quick-switcher — that last step being what proves the write reached the search index and not merely the database."
+    }
+  ]
+}
