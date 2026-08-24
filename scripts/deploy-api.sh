@@ -83,14 +83,11 @@ step "Compiling the documentation corpus"
 pnpm docs:build
 [ -f docs/.compiled/manifest.json ] || die "docs:build produced no manifest"
 
-step "Publishing the corpus to ${HOST}:${APP_DIR}/deploy/docs-content"
-# --delete so a page removed from the corpus stops being served. The API reads
-# this read-only and refuses anything outside it, so a stale file left behind
-# would simply be served forever.
-rsync -a --delete \
-  -e "$(printf '%q ' "${SSH[@]:0:${#SSH[@]}-1}")" \
-  docs/.compiled/ "${HOST}:${APP_DIR}/deploy/docs-content/"
-
+# Moving the code first, publishing second, is not arbitrary. The corpus lands
+# inside the deployed checkout, so copying it up before the cleanliness check
+# makes the tree dirty and the deploy refuses itself — which is exactly what
+# happened the first time this ran. Merging first also means the .gitignore
+# that excludes the published corpus is in place before it arrives.
 step "Deploying ${BRANCH} to ${HOST}:${APP_DIR}"
 "${SSH[@]}" bash -seuo pipefail <<REMOTE
   cd "${APP_DIR}"
@@ -102,6 +99,19 @@ step "Deploying ${BRANCH} to ${HOST}:${APP_DIR}"
   git checkout --quiet "${BRANCH}"
   git merge --ff-only "origin/${BRANCH}"
   git log --oneline -1
+REMOTE
+
+step "Publishing the corpus to ${HOST}:${APP_DIR}/deploy/docs-content"
+# --delete so a page removed from the corpus stops being served. The API reads
+# this read-only and refuses anything outside it, so a stale file left behind
+# would simply be served forever.
+rsync -a --delete \
+  -e "$(printf '%q ' "${SSH[@]:0:${#SSH[@]}-1}")" \
+  docs/.compiled/ "${HOST}:${APP_DIR}/deploy/docs-content/"
+
+step "Building and restarting"
+"${SSH[@]}" bash -seuo pipefail <<REMOTE
+  cd "${APP_DIR}"
   # The API image bakes the source. Build it before migrating so the migration
   # runner and the image that will serve traffic use the same release.
   docker compose -f deploy/compose.prod.yml build api buildsvc

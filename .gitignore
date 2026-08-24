@@ -85,3 +85,7 @@ docs/.compiled/
 # Kept as a safety net. The corpus must never be written under apps/web/public/
 # again — anything there is copied into the bundle and served to anyone.
 apps/web/public/docs-content/
+
+# The corpus as published to a deployment host, copied there by
+# scripts/deploy-api.sh. A build artifact on the VM, never a tracked file.
+deploy/docs-content/
