@@ -13,13 +13,18 @@
  */
 import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import jwt from 'jsonwebtoken';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import type { Express } from 'express';
 import { env } from '../../env.js';
 import { authHeader, getAuthedApp } from '../../__tests__/helpers/app.js';
+
+// apps/api/src/routes/v1 -> repo root is five levels up, the same walk the
+// router makes.
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../..');
 
 let app: Express;
 let token: string;
@@ -145,14 +150,24 @@ describe('where a relative directory points', () => {
     // repository paths. Resolved against the cwd, `docs/.compiled` silently
     // becomes `apps/api/docs/.compiled` and the only symptom is documentation
     // that reports itself unavailable for no visible reason. This is that bug.
-    process.env.DOCS_CONTENT_DIR = 'docs/.compiled';
-    const res = await request(app).get('/api/v1/docs/manifest.json').set(authHeader(token));
-    process.env.DOCS_CONTENT_DIR = root;
-
-    // The repository's own compiled corpus may or may not be built right now,
-    // so the assertion is about which failure this is: anything but "no corpus
-    // configured" proves the path was resolved somewhere real.
-    expect(res.body.code).not.toBe('DOCS_UNAVAILABLE');
+    //
+    // A corpus is planted at a known relative path rather than pointing at the
+    // repository's own `docs/.compiled`, which is a gitignored build artifact:
+    // depending on it would pass here and fail in a fresh checkout, which is
+    // exactly what it did the first time this was written.
+    const relative = `docs/.compiled-test-${process.pid}`;
+    const planted = join(REPO_ROOT, relative);
+    mkdirSync(planted, { recursive: true });
+    writeFileSync(join(planted, 'manifest.json'), JSON.stringify({ pages: [] }));
+    try {
+      process.env.DOCS_CONTENT_DIR = relative;
+      const res = await request(app).get('/api/v1/docs/manifest.json').set(authHeader(token));
+      expect(res.status).toBe(200);
+      expect(res.body).toStrictEqual({ pages: [] });
+    } finally {
+      process.env.DOCS_CONTENT_DIR = root;
+      rmSync(planted, { recursive: true, force: true });
+    }
   });
 });
 
