@@ -470,7 +470,18 @@ export function DocsDiagram({ spec }: { spec: DocsDiagramSpec }) {
         <span className="docs-diagram__summary">{spec.summary}</span>
       </figcaption>
 
-      <div className="docs-diagram__frame">
+      {/* A wide diagram scrolls inside this box, and a box that scrolls has to
+          be reachable by keyboard or its right-hand side is unreachable
+          without a mouse — WCAG 2.1.1, and the reason Safari needs it. It is
+          named rather than left as a bare focus stop, and the name says where
+          the same content is in text, because the drawing itself is hidden
+          from assistive technology as a duplicate of the table. */}
+      <div
+        className="docs-diagram__frame"
+        role="group"
+        aria-label={`${spec.title}, drawn. The same information is in the table below.`}
+        tabIndex={0}
+      >
         <Drawing spec={spec} />
       </div>
 

@@ -4645,7 +4645,7 @@
     {
       "file": "e2e/tests/docs.spec.ts",
       "package": "@vitae/e2e",
-      "cases": 7,
+      "cases": 16,
       "skipped": 0,
       "todo": 0,
       "suites": [],
@@ -4658,7 +4658,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 119
+      "lines": 275
     },
     {
       "file": "e2e/tests/document-editor.spec.ts",
@@ -6785,13 +6785,13 @@
   ],
   "summary": {
     "files": 318,
-    "cases": 2076,
+    "cases": 2085,
     "skipped": 0,
     "todo": 0,
     "by_package": {
       "@vitae/api": 195,
       "@vitae/web": 1118,
-      "@vitae/e2e": 257,
+      "@vitae/e2e": 266,
       "@vitae/core": 273,
       "@vitae/testkit": 7,
       "@vitae/ui": 226

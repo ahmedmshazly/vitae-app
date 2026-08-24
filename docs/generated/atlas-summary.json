@@ -8,7 +8,7 @@
     },
     "@vitae/web": {
       "files": 173,
-      "lines": 46919,
+      "lines": 46930,
       "exports": 742,
       "undocumented": 505
     },
@@ -106,7 +106,7 @@
     },
     "screen": {
       "files": 67,
-      "lines": 25053,
+      "lines": 25064,
       "exports": 171,
       "undocumented": 108
     },
@@ -678,7 +678,7 @@
   "summary": {
     "files": 348,
     "test_files": 318,
-    "lines": 79328,
+    "lines": 79339,
     "exports": 1712,
     "undocumented_exports": 1213,
     "edges": 1548,

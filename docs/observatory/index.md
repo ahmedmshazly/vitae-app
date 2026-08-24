@@ -80,6 +80,11 @@ Each section opens with a page that says what is in it and what it assumes you
 already know. Nothing here expects to be read in order, but every page names
 the page before and after it, so it can be.
 
+The [Glossary](glossary.md) is the other way in. A word earns a place in it
+only where the ordinary meaning would mislead — "verified" means checked
+against code on a stated date, "gated" means built but closed, and a "journey"
+is a registered identifier rather than a figure of speech.
+
 ## What this corpus does not do
 
 It does not list what a script can index. Every route, endpoint, configuration
