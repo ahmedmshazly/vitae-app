@@ -22,6 +22,7 @@ sources:
   - scripts/check-public-release.mjs
   - packages/ui/src/styles/base.css
   - scripts/docs/lib/citations.mjs
+  - docs/testing/source-test-map.json
 verified_at: 2026-08-24
 ---
 
@@ -461,6 +462,72 @@ grep -c A11Y docs/generated/traceability.json               # 0
 
 ---
 
+### DOC-D-043 — sixteen map entries declared a module untested while its tests sat beside it
+
+> **Resolved.** What follows is the state before the fix, kept because the record
+> of what was wrong is the point of this document. The fix is in the resolved
+> table at the end.
+
+`docs/testing/source-test-map.json` is the repository's answer to the question
+"what proves this module". Sixteen entries answered "nothing", from a directory
+that already held the suite:
+
+```json
+"apps/web/src/routes/reference/EntityCatalogOverview.tsx": {
+  "risk": "medium",
+  "layers": ["component", "e2e"],
+  "status": "deferred",
+  "tests": [],
+  "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+}
+```
+
+`EntityCatalogOverview.states.test.tsx` sits beside that module, imports it and
+asserts its states. The same sentence stood over `Person.tsx` (three suites),
+`Org.tsx` (two), `Browse.tsx`, `Atoms.tsx`, `Outputs.tsx`, `app/routes.ts`, the
+two bulk-delete features, four Atlas panels and three further reference modules.
+
+The cause is one function away from `DOC-D-001`. `colocatedTest()` built its
+candidates by swapping extensions, so the only shapes it could recognise were
+`<name>.test.ts`, `<name>.test.tsx` and `<name>.spec.ts`. This repository's
+other convention is a facet suffix — `Person.states.test.tsx`,
+`AtlasCanvas.error.test.tsx`, `Person.log.test.ts` — and eighty-four such files
+sit beside a module of the same stem inside the three directories the gate
+walks. It could see none of them, so it demanded a map entry for each; whoever
+wrote the entry was recording the gate's view of the world, and the map
+inherited it.
+
+Thirteen of the sixteen arrived that way. The other three — `app/routes.ts`,
+`Org.tsx` and `Person.tsx` — do have a plainly named suite, so the gate found
+it, skipped the module and never opened the entry beside it. That is the second
+half of the defect and the more durable one: the `tests` field was written by
+hand and read by nobody, in a file whose whole purpose is to be checked.
+
+Note which way this points, because it is the opposite of `DOC-D-001`. There a
+gate could not fail. Here a gate fails correctly, for a reason that is wrong,
+and files that wrong reason in a reference surface a reader is entitled to
+trust. Nothing broke and no test was lost; the cost falls on whoever plans the
+next wave of test work and begins with sixteen modules that are already covered.
+The claim did not spread beyond the file: no generator reads it, and the
+`untested` counts in `docs/generated/` are computed from the import graph.
+
+Reproduce:
+
+```bash
+ls apps/web/src/routes/reference/EntityCatalogOverview*   # module and suite, one directory
+git show 48c534c:docs/testing/source-test-map.json |
+  node -e 'const m = JSON.parse(require("node:fs").readFileSync(0, "utf8"));
+    console.log(JSON.stringify(m.modules["apps/web/src/routes/reference/EntityCatalogOverview.tsx"]))'
+# {"risk":"medium","layers":["component","e2e"],"status":"deferred","tests":[],
+#  "exclude_reason":"Deferred web coverage: component and/or e2e ownership in a later wave."}
+```
+
+Run the repaired `scripts/check-test-coverage-map.mjs` against that revision's
+map and it names all sixteen, each as `declared untested while <suite> sits
+beside it`.
+
+---
+
 ## Severity 3: contradictions between documentation and shipped code
 
 ### DOC-D-010 — the Cloud subsystem is a documentation blackout
@@ -645,3 +712,4 @@ cannot contain that commit's hash. Resolve a subject with
 | `DOC-D-040` | `fix(a11y): make the skip links skip` | `Chrome.tsx`'s main carries `tabIndex={-1}`, so its skip link now moves focus rather than only the viewport. `/reference/entities` gained the skip link it never had, with the same off-screen-until-focused treatment the shell and the marketing chrome use, and `.ec-main:focus` suppresses the ring the way `.content:focus` does at `apps/web/src/styles/app.css:3554` — a page-height element turns a `box-shadow` ring into two vertical lines. `seo.ts` was left alone: the row naming it was wrong, and the entry above now says why. Both surfaces are asserted by tests that were run against the unfixed code and seen to fail: a new `apps/web/src/routes/marketing/Chrome.test.tsx`, and a case added to `apps/web/src/routes/reference/EntityCatalog.states.test.tsx`. |
 | `DOC-D-041` | `fix(build): make a local pnpm build a production build` | `NODE_ENV` removed from `.env.example`, which is the only file in the repository that put it on a developer's machine; the comment left in its place explains why it must not come back. Because an existing `.env` is user-owned and was not edited, `scripts/check-web-budgets.mjs` now refuses a bundle carrying the development JSX runtime or the build machine's absolute paths, before it forms any opinion about size — so the residue announces itself instead of being measured. Seen to fail: `49 of 55 chunks carry the development JSX runtime`, exit 1. `scripts/check-web-budgets.selftest.mjs` runs seven cases ahead of every invocation. |
 | `DOC-D-032` | `docs(traceability): define every requirement the code cites` | Found while editing, not during the audit, so it has no open row above: the stack table in `docs/specs/srs.md` named the web application as *"React 18 and Vite"*, while `apps/web/package.json:29` pins `react: ^19.2.8`. Corrected in the same edit. This is the same fact as `DOC-D-020`, which remains open in its second location, `apps/web/package.json:6`. |
+| `DOC-D-043` | `fix(testing): let the coverage map see the tests beside it` | `colocatedTest()` is replaced by `siblingTests()`, which lists the directory instead of guessing filenames. Plain `<name>.test.ts`, `.test.tsx` and `.spec.ts` count on their name, because a few of them prove a component through the content module it renders; facet-named files count only when they import the module, so `Foo.helpers.test.ts` can never be read as proof of `Foo.ts`. That costs recall deliberately: fifty-two of the eighty-four facet suites import their module and count, and the other thirty-two still require a map entry. A second rule closes the half nothing was reading — an entry with an empty `tests` array now fails when a sibling suite exists, which is what caught these sixteen. All sixteen entries now name their real suites and `$schema_note` states both rules. Seen to fail: the two new cases in `scripts/check-test-coverage-map.selftest.mjs` were run against `HEAD`'s checker and reported `expected exit 0, got 1` and `expected exit 1, got 0`. An entry that names some of its siblings but not all of them is incomplete rather than false, and is left alone. |

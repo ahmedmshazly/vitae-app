@@ -32,7 +32,12 @@ function fixture(map, files) {
     writeFileSync(abs, body);
   };
   write('docs/testing/source-test-map.json', JSON.stringify(map, null, 2));
-  for (const rel of files) write(rel, 'export const fixture = 1;\n');
+  // A plain string is a file whose contents do not matter. A pair carries a
+  // body, which the import-aware half of the gate reads.
+  for (const item of files) {
+    const [rel, body] = Array.isArray(item) ? item : [item, 'export const fixture = 1;\n'];
+    write(rel, body);
+  }
   return dir;
 }
 
@@ -145,6 +150,53 @@ check('an explicit exclude_reason is accepted', {
   },
   files: ['packages/core/src/mapped.ts'],
   expect: 0,
+});
+
+// Thirty suites in this repository are named `<module>.<facet>.test.tsx`, and
+// the gate could not see any of them: it built candidate paths by swapping the
+// extension, which only ever produces `<module>.test.tsx`. Sixteen map entries
+// declared a module untested while its own suite sat in the same directory.
+check('a facet-named suite beside a module satisfies the gate', {
+  files: [
+    'apps/web/src/Widget.tsx',
+    ['apps/web/src/Widget.states.test.tsx', "import { Widget } from './Widget.js';\n"],
+  ],
+  expect: 0,
+});
+
+// The facet convention is a prefix match, so `Foo.helpers.test.ts` would credit
+// `Foo.ts` on its name alone. Requiring the import keeps the proof attached to
+// the module it actually loads.
+check('a facet-named suite proving a neighbour does not count', {
+  files: [
+    'apps/web/src/Widget.tsx',
+    'apps/web/src/Widget.helpers.ts',
+    ['apps/web/src/Widget.helpers.test.ts', "import { help } from './Widget.helpers.js';\n"],
+  ],
+  expect: 1,
+  mentions: 'apps/web/src/Widget.tsx',
+});
+
+// The rule that would have caught the drift. An entry with no tests is read as
+// "nothing proves this yet", and a declared gap has to be a real one.
+check('a declared gap fails when a suite sits beside the module', {
+  map: {
+    modules: {
+      'apps/web/src/Widget.tsx': {
+        risk: 'medium',
+        layers: ['component'],
+        status: 'deferred',
+        tests: [],
+        exclude_reason: 'Fixture module with a declared coverage gap.',
+      },
+    },
+  },
+  files: [
+    'apps/web/src/Widget.tsx',
+    ['apps/web/src/Widget.states.test.tsx', "import { Widget } from './Widget.js';\n"],
+  ],
+  expect: 1,
+  mentions: 'declared untested',
 });
 
 check('exclude_globs skip a module entirely', {

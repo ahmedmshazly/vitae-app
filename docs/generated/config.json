@@ -1668,10 +1668,10 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/check-test-coverage-map.mjs:12",
+      "source": "scripts/check-test-coverage-map.mjs:14",
       "reads": [
-        "scripts/check-test-coverage-map.mjs:12",
-        "scripts/check-test-coverage-map.mjs:13"
+        "scripts/check-test-coverage-map.mjs:14",
+        "scripts/check-test-coverage-map.mjs:15"
       ],
       "read_by": [
         "scripts"

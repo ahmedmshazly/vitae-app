@@ -1,5 +1,5 @@
 {
-  "$schema_note": "Machine-checked source-to-test ownership. Every production module under packages/core, apps/api/src (non-scripts), and apps/web/src must appear here with layers and tests, or an explicit exclude reason.",
+  "$schema_note": "Machine-checked source-to-test ownership. Every production module under packages/core, apps/api/src (non-scripts), and apps/web/src must appear here with layers and tests, or an explicit exclude reason. An entry may never leave tests empty while a test file that imports the module sits in the same directory; check-test-coverage-map.mjs fails on that. Status deferred alongside real tests means some layer this entry names is not attached yet, not that nothing proves the module.",
   "exclude_globs": [
     "**/index.ts",
     "**/index.tsx",
@@ -1005,8 +1005,9 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/app/routes.test.ts"
+      ]
     },
     "apps/web/src/components/EntityPicker.tsx": {
       "risk": "medium",
@@ -1045,8 +1046,9 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/features/BulkEdgeDelete.states.test.tsx"
+      ]
     },
     "apps/web/src/features/BulkNodeDelete.tsx": {
       "risk": "medium",
@@ -1055,8 +1057,9 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/features/BulkNodeDelete.states.test.tsx"
+      ]
     },
     "apps/web/src/features/Composer.tsx": {
       "risk": "medium",
@@ -1413,8 +1416,9 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/features/map/AtlasCompareDock.states.test.tsx"
+      ]
     },
     "apps/web/src/features/map/AtlasCorridorDock.tsx": {
       "risk": "medium",
@@ -1433,8 +1437,9 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/features/map/AtlasDossier.states.test.tsx"
+      ]
     },
     "apps/web/src/features/map/AtlasList.tsx": {
       "risk": "medium",
@@ -1453,8 +1458,9 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/features/map/AtlasToolbar.states.test.tsx"
+      ]
     },
     "apps/web/src/features/map/AtlasView.tsx": {
       "risk": "medium",
@@ -1473,8 +1479,9 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/features/map/PlaceResolvePanel.states.test.tsx"
+      ]
     },
     "apps/web/src/features/map/UnmappedDock.tsx": {
       "risk": "medium",
@@ -1709,8 +1716,9 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/routes/Atoms.states.test.tsx"
+      ]
     },
     "apps/web/src/routes/Browse.tsx": {
       "risk": "medium",
@@ -1719,8 +1727,9 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/routes/Browse.states.test.tsx"
+      ]
     },
     "apps/web/src/routes/Collections.tsx": {
       "risk": "medium",
@@ -1815,8 +1824,10 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/routes/Org.states.test.tsx",
+        "apps/web/src/routes/Org.test.tsx"
+      ]
     },
     "apps/web/src/routes/Orgs.tsx": {
       "risk": "medium",
@@ -1837,8 +1848,9 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/routes/Outputs.states.test.tsx"
+      ]
     },
     "apps/web/src/routes/People.tsx": {
       "risk": "medium",
@@ -1859,8 +1871,11 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/routes/Person.log.test.ts",
+        "apps/web/src/routes/Person.states.test.tsx",
+        "apps/web/src/routes/Person.test.tsx"
+      ]
     },
     "apps/web/src/routes/Record.tsx": {
       "risk": "medium",
@@ -2110,8 +2125,9 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/routes/reference/EntityCatalogAtlas.states.test.tsx"
+      ]
     },
     "apps/web/src/routes/reference/EntityCatalogDetails.tsx": {
       "risk": "medium",
@@ -2120,8 +2136,9 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/routes/reference/EntityCatalogDetails.states.test.tsx"
+      ]
     },
     "apps/web/src/routes/reference/EntityCatalogOverview.tsx": {
       "risk": "medium",
@@ -2130,8 +2147,9 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/routes/reference/EntityCatalogOverview.states.test.tsx"
+      ]
     },
     "apps/web/src/routes/reference/EntityObservatoryCommandPalette.tsx": {
       "risk": "medium",
@@ -2172,8 +2190,9 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/routes/reference/EntityObservatoryMatrix.states.test.tsx"
+      ]
     },
     "apps/web/src/routes/reference/EntityObservatorySnapshot.tsx": {
       "risk": "medium",
