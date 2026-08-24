@@ -352,8 +352,8 @@ journey rather than as a failing type check.
 
 `pnpm docs:check` reads the corpus as Markdown. It never runs
 `scripts/docs/build-content.mjs`, the step that turns those pages into the JSON
-the reading surface actually fetches, so every claim in the section above is
-about the source and none of it is about the artifact.
+the reading surface actually fetches, so everything the entry on `docs:check`
+above claims is about the source and none of it is about the artifact.
 
 Until August 2026 that did not matter, because the compiler ran inside the web
 build: the corpus was written into `apps/web/public/` and shipped inside the

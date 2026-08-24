@@ -216,6 +216,13 @@ Measured in Chrome against the built bundle on
 targetTabIndex: null   focusAfterSkip: "BODY"   focusIsTargetOrInside: false
 ```
 
+That measurement was taken while the documentation was still served as static
+files by the web host. It is not any more — the corpus is private and comes
+from the API behind the owner allow-list — so reproducing this one means
+signing in as the owner first, and the deployment must have been given a
+compiled corpus at all. The finding and the fix are unaffected; only the way
+you get to the page has changed.
+
 Two accessibility gates run over these surfaces and neither can see it.
 
 `runAxe` (`apps/web/src/test/a11y.ts`) applies no tag filter, so axe-core's

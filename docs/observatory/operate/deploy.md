@@ -164,11 +164,12 @@ compiles no documentation. This is a gap in the tooling rather than a rule, and
 it is stated plainly because the symptom is silent.
 
 The consequence is worth being unsurprised by: an instance deployed exactly as
-described above serves no documentation. `GET /api/v1/docs` answers 503 with a
-code saying no corpus was built into this deployment, and the reading surface
-repeats it. That is the intended answer for that situation — the alternative,
-an empty documentation set, would send someone looking for pages that were
-never compiled.
+described above serves no documentation. A request for any file under
+`/api/v1/docs` answers 503 with a code saying no corpus was built into this
+deployment, `GET /api/v1/docs` itself reports it neither configured nor
+available, and the reading surface repeats the message. That is the intended
+answer for that situation — the alternative, an empty documentation set, would
+send someone looking for pages that were never compiled.
 
 To give an instance its documentation:
 

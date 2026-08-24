@@ -247,8 +247,8 @@ anyone who wants one.
 The `/docs/*` route in the browser is still mounted above the authentication
 gate, and that is deliberate rather than an oversight. The gate bounces a
 signed-out visitor to the public home page without explaining why, so a reader
-who bookmarked a page and later signed out would simply find themselves
-somewhere else. Instead the surface loads its own frame and says what happened:
+who bookmarked a page and later signed out would find themselves somewhere
+else with no idea why. Instead the surface loads its own frame and says so:
 *"The documentation is private. Sign in at /signin with the account that owns
 this instance, then open this page again."* The frame gives nothing away. It
 carries no corpus text, and the section navigation is not drawn at all until an

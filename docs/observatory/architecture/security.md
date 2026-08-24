@@ -163,8 +163,10 @@ the system and names the gaps that are known rather than closed, and its
 generated half enumerates every route, endpoint, configuration key, table,
 migration and exported symbol in the repository. Until August 2026 it was
 served as static files by the public web host, which made all of that readable
-by anyone who knew the URL. Nothing about it was secret and nothing about it
-was meant to be published either.
+by anyone who knew the URL. Nothing in it is a credential; the objection is
+aggregation. One document that names every boundary and lists every surface is
+worth considerably more to somebody probing this system than the same facts
+scattered through the source they would otherwise have to read.
 
 It is now served by this API, from a router mounted inside the v1 tree and
 therefore *below* `app.use('/api', authGate)`. It declares no public paths and
@@ -175,11 +177,27 @@ not need a different answer from the one the graph already gets.
 
 What the router does have to get right is file access, because it maps a URL
 onto a path under one directory and that is the classic way to serve a file
-nobody meant to publish. Containment is checked twice: once after resolving the
-request against the root, and again after `realpathSync`, because resolution is
-string arithmetic and a symlink placed inside the corpus would otherwise pass
-the first check and be read. The comparison includes the path separator, so a
-sibling directory whose name merely starts with the root's is not inside it.
+nobody meant to publish. Containment is checked twice, and the second check is
+there because the first was not enough.
+
+The first check resolves the requested path against the root and asserts the
+result is inside it, separator included — `startsWith` alone would accept a
+sibling directory whose name merely begins with the root's. That is what
+catches a traversal spelled in the URL. It has to catch the percent-encoded
+form specifically, because Express normalises a literal `..` out of the path
+before routing, so the literal form is answered by the router never matching
+rather than by this check at all.
+
+It does not defeat a symlink. Path resolution is string arithmetic and does not
+follow links, so a link placed *inside* the corpus and pointing anywhere on the
+filesystem passed that check and was then read. The first version of this
+router had exactly that hole. Its own test suite found it, and the fix is the
+second check: `realpathSync` both the candidate and the root, then assert
+containment again on the paths that will actually be opened. This is the
+difference between a defence that was reasoned about and one that was tried —
+and it is why the suite spells the traversal cases out rather than assuming
+them.
+
 Every refusal — a traversal, an absolute path, a link pointing out, a
 directory, a file that is not there — returns the same 404 with the same body,
 so a caller cannot learn where the root is or what sits beside it.
@@ -190,9 +208,10 @@ holding a copy would hand it to the next person through it. And the content
 type is stated as JSON rather than inferred from the extension, so a file that
 somehow is not JSON cannot be served as something a browser will execute.
 
-A deployment that was never given a corpus answers 503 with a code naming that
-specific condition, rather than an empty documentation set — the difference
-between an operator's missing build step and a reader's broken link.
+A file request against a deployment that was never given a corpus answers 503
+with a code naming that specific condition, rather than an empty documentation
+set — the difference between an operator's missing build step and a reader's
+broken link.
 
 The integration suite proves the part that matters: an anonymous request is
 refused, and so is a request carrying a perfectly valid session for somebody

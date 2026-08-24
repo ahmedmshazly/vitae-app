@@ -54,12 +54,13 @@ directory outside the bundle and served by the API, which refuses it to anyone
 who is not the owner of the instance.
 
 The move cost real properties, and they were traded away rather than lost.
-Every documentation page used to be prerendered to HTML: readable with
-JavaScript disabled, readable with the API stopped, and listed in the sitemap
-for a search engine to index. None of that is true now, and none of it can be
-while the corpus is private, because each of those properties is a way of
-handing a page to someone who has not been asked to identify themselves. What
-was bought is stated on the entrance page under
+Every documentation page used to be prerendered to HTML from the same compiled
+JSON the browser reads, which made it readable with JavaScript disabled and
+readable with the API stopped, and its route was handed to the sitemap builder
+to be indexed in any build where the hosted mode was open. None of that is true
+now, and none of it can be while the corpus is private, because each of those
+properties is a way of handing a page to someone who has not been asked to
+identify themselves. What was bought is stated on the entrance page under
 [Who can read this](../index.md#who-can-read-this): this corpus describes every
 trust boundary in the system and enumerates every route, endpoint, table and
 exported symbol in the repository, and a map of that kind is worth more to

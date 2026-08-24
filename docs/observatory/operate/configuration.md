@@ -215,11 +215,14 @@ and something has to tell the API where it is.
 Four behaviours are worth carrying.
 
 **Unset is not an error, and it is not an empty corpus either.** A deployment
-with no value serves no documentation, and says so: the endpoint answers 503
-with a code naming that condition, and the reading surface repeats it as an
-operator's problem rather than a reader's. The two are worth distinguishing
-because a documentation set that reports itself empty sends somebody to look
-for missing pages that were never built.
+with no value serves no documentation, and says so: a request for any file
+under the documentation mount answers 503 with a code naming that condition,
+and the reading surface repeats it as an operator's problem rather than a
+reader's. The two are worth distinguishing because a documentation set that
+reports itself empty sends somebody to look for missing pages that were never
+built. The mount's own index answers separately, with two booleans — whether a
+directory is configured at all, and whether it exists — which is how you tell
+*not built* from *built somewhere else* without opening the container.
 
 **A relative value is resolved against the repository root, not the working
 directory of the process.** `.env` sits at the repository root and is written
