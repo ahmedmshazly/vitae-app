@@ -46,11 +46,18 @@ check('a value outside an enum is reported',
   { expect: 'invalid', mentions: 'is not one of' });
 
 check('a string failing its pattern is reported',
-  { type: 'string', pattern: '^(FR|NFR)(-[A-Z]{2,4})?-[0-9]{3}$' }, 'FR-12',
+  { type: 'string', pattern: '^(FR|NFR)(-[A-Z][A-Z0-9]{1,4})?-[0-9]{3}$' }, 'FR-12',
   { expect: 'invalid', mentions: 'does not match' });
 
 check('a canonical identifier passes the same pattern',
-  { type: 'string', pattern: '^(FR|NFR)(-[A-Z]{2,4})?-[0-9]{3}$' }, 'FR-RES-009',
+  { type: 'string', pattern: '^(FR|NFR)(-[A-Z][A-Z0-9]{1,4})?-[0-9]{3}$' }, 'FR-RES-009',
+  { expect: 'valid' });
+
+// The pattern above is the one docs/registry/schema/requirements.schema.json
+// applies to every registered identifier. A family whose name carries a digit
+// is the case it used to reject; see the FAMILY constant in citations.mjs.
+check('a family whose name carries a digit passes the same pattern',
+  { type: 'string', pattern: '^(FR|NFR)(-[A-Z][A-Z0-9]{1,4})?-[0-9]{3}$' }, 'NFR-A11Y-001',
   { expect: 'valid' });
 
 check('an empty string is reported against minLength',

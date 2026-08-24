@@ -13,14 +13,14 @@
     "id_aliases": {
       "description": "Unprefixed spellings that appear in existing documents, mapped to the canonical identifier.",
       "type": "object",
-      "propertyNames": { "pattern": "^[A-Z]{2,4}-[0-9]{3}$" },
-      "additionalProperties": { "pattern": "^(FR|NFR)(-[A-Z]{2,4})?-[0-9]{3}$" }
+      "propertyNames": { "pattern": "^[A-Z][A-Z0-9]{1,4}-[0-9]{3}$" },
+      "additionalProperties": { "pattern": "^(FR|NFR)(-[A-Z][A-Z0-9]{1,4})?-[0-9]{3}$" }
     },
     "alias_note": { "type": "string" },
     "families": {
       "description": "Identifier families beyond FR and NFR that the citation reader must opt into by name.",
       "type": "object",
-      "propertyNames": { "pattern": "^[A-Z]{2,4}$" },
+      "propertyNames": { "pattern": "^[A-Z][A-Z0-9]{1,4}$" },
       "additionalProperties": {
         "type": "object",
         "required": ["title", "numbering", "note"],
@@ -70,7 +70,7 @@
       "required": ["id", "capability", "kind", "title", "statement", "implementation_status", "definition_provenance", "review"],
       "additionalProperties": false,
       "properties": {
-        "id": { "type": "string", "pattern": "^(FR|NFR)(-[A-Z]{2,4})?-[0-9]{3}$|^[A-Z]{2,4}-[0-9]{1,3}$" },
+        "id": { "type": "string", "pattern": "^(FR|NFR)(-[A-Z][A-Z0-9]{1,4})?-[0-9]{3}$|^[A-Z][A-Z0-9]{1,4}-[0-9]{1,3}$" },
         "capability": { "type": "string", "pattern": "^CAP-[A-Z-]+$" },
         "kind": { "enum": ["functional", "non-functional", "interface"] },
         "title": { "type": ["string", "null"], "minLength": 1 },

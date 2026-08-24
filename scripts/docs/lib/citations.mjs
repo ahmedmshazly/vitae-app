@@ -15,10 +15,30 @@
  * which `families` opts in by name.
  */
 
+/**
+ * What a family name may look like: a letter, then one to four letters or
+ * digits.
+ *
+ * A letters-only rule reads every family in this repository but one. `A11Y` is
+ * the numeronym for accessibility, and `packages/ui/src/styles/base.css:123`
+ * cites `NFR-A11Y-001` beside the rule that draws every focus ring in the
+ * product. A pattern that cannot spell the family cannot see the citation, and
+ * an unseen citation is indistinguishable from an unwritten one — so the
+ * requirement was absent from the register, absent from the generated
+ * traceability, and reported by nothing.
+ *
+ * The first character stays a letter so that a version number or an offset can
+ * never open a family name. Every reader of an identifier in this repository
+ * builds its pattern from this constant; `docs/registry/schema/*.schema.json`
+ * cannot import it, so `citations.selftest.mjs` asserts the schemas spell it
+ * the same way.
+ */
+export const FAMILY = '[A-Z][A-Z0-9]{1,4}';
+
 /** A full identifier, plus any `/NNN` or `..NNN` continuations that follow it. */
-const CITATION = /\b((?:FR|NFR)(?:-[A-Z]{2,4})?)-(\d{3})((?:\s*(?:\/|\.\.)\s*\d{3})*)/g;
+const CITATION = new RegExp(`\\b((?:FR|NFR)(?:-${FAMILY})?)-(\\d{3})((?:\\s*(?:/|\\.\\.)\\s*\\d{3})*)`, 'g');
 /** An identifier written without its `FR-` prefix, as `docs/ROADMAP.md` does. */
-const ALIAS = /(^|[^A-Z-])([A-Z]{2,4})-(\d{3})((?:\s*(?:\/|\.\.)\s*\d{3})*)/g;
+const ALIAS = new RegExp(`(^|[^A-Z-])(${FAMILY})-(\\d{3})((?:\\s*(?:/|\\.\\.)\\s*\\d{3})*)`, 'g');
 
 function expand(family, first, tail) {
   const ids = [`${family}-${first}`];
@@ -69,7 +89,7 @@ export function citationsIn(text, { aliases = {}, families = [] } = {}) {
 /** Sort identifiers by family, then numerically, so output order is stable. */
 export function compareIds(a, b) {
   const split = (id) => {
-    const m = /^([A-Z]{2,4}(?:-[A-Z]{2,4})?)-(\d{1,3})$/.exec(id);
+    const m = new RegExp(`^(${FAMILY}(?:-${FAMILY})?)-(\\d{1,3})$`).exec(id);
     return m ? [m[1], Number(m[2])] : [id, 0];
   };
   const [fa, na] = split(a);

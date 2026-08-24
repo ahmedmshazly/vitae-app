@@ -3,7 +3,7 @@
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
     "files_scanned": 779,
-    "files_citing": 133,
+    "files_citing": 134,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -19,10 +19,10 @@
     }
   },
   "totals": {
-    "registered": 98,
-    "citations": 348,
+    "registered": 99,
+    "citations": 352,
     "implemented_and_tested": 19,
-    "implemented_untested": 56,
+    "implemented_untested": 57,
     "tested_only": 2,
     "documents_only": 21,
     "uncited": 0,
@@ -874,7 +874,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:617"
+        "docs/observatory/meta/coverage-and-contradictions.md:621"
       ]
     },
     "FR-RES-003": {
@@ -886,7 +886,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:617"
+        "docs/observatory/meta/coverage-and-contradictions.md:621"
       ]
     },
     "FR-RES-004": {
@@ -998,7 +998,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:617"
+        "docs/observatory/meta/coverage-and-contradictions.md:621"
       ]
     },
     "FR-RES-011": {
@@ -1088,7 +1088,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:617"
+        "docs/observatory/meta/coverage-and-contradictions.md:621"
       ]
     },
     "FR-RES-017": {
@@ -1100,7 +1100,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:617"
+        "docs/observatory/meta/coverage-and-contradictions.md:621"
       ]
     },
     "FR-RES-018": {
@@ -1334,6 +1334,21 @@
       "tests": [],
       "documents": []
     },
+    "NFR-A11Y-001": {
+      "capability": "CAP-PLATFORM",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "evidence": "implemented-untested",
+      "sources": [
+        "packages/ui/src/styles/base.css:123"
+      ],
+      "tests": [],
+      "documents": [
+        "docs/observatory/meta/coverage-and-contradictions.md:398",
+        "docs/observatory/meta/coverage-and-contradictions.md:401",
+        "docs/observatory/meta/coverage-and-contradictions.md:625"
+      ]
+    },
     "NFR-MNT-002": {
       "capability": "CAP-PLATFORM",
       "implementation_status": "implemented",
@@ -1344,7 +1359,7 @@
       ],
       "tests": [],
       "documents": [
-        "docs/observatory/meta/coverage-and-contradictions.md:617"
+        "docs/observatory/meta/coverage-and-contradictions.md:621"
       ]
     },
     "NFR-REL-003": {
@@ -1547,6 +1562,7 @@
       "FR-104",
       "FR-SET-004",
       "FR-VIS-004",
+      "NFR-A11Y-001",
       "NFR-MNT-002",
       "INT-2",
       "INT-3",
@@ -2002,6 +2018,7 @@
       "FR-VIS-001",
       "FR-VIS-002",
       "FR-VIS-003",
+      "NFR-A11Y-001",
       "NFR-MNT-002",
       "NFR-REL-003",
       "INT-1"
@@ -2117,6 +2134,9 @@
     ],
     "packages/ui/src/overlay.tsx": [
       "FR-022"
+    ],
+    "packages/ui/src/styles/base.css": [
+      "NFR-A11Y-001"
     ],
     "packages/ui/src/styles/components.css": [
       "FR-CAP-002"

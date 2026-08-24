@@ -22,7 +22,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertKnownKeywords, validate } from './docs/lib/json-schema.mjs';
-import { compareIds } from './docs/lib/citations.mjs';
+import { FAMILY, compareIds } from './docs/lib/citations.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = process.env.VITAE_DOCS_ROOT ? process.env.VITAE_DOCS_ROOT : join(here, '..');
@@ -83,7 +83,7 @@ if (capDoc && reqDoc && jrnDoc) {
 
   for (const req of reqDoc.requirements) {
     if (!capIds.has(req.capability)) fail(req.id, `names unknown capability ${req.capability}`);
-    const family = /^([A-Z]{2,4})-\d{1,3}$/.exec(req.id)?.[1];
+    const family = new RegExp(`^(${FAMILY})-\\d{1,3}$`).exec(req.id)?.[1];
     if (family && family !== 'FR' && family !== 'NFR' && !(reqDoc.families ?? {})[family]) {
       fail(req.id, `belongs to family ${family}, which docs/registry/requirements.json does not declare`);
     }

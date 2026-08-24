@@ -6,7 +6,10 @@
  * this repository actually cites, and the loss is invisible: a missing
  * identifier looks exactly like an identifier nobody wrote down.
  */
-import { citationsIn, compareIds, isTestPath, stripGenerated } from './citations.mjs';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { FAMILY, citationsIn, compareIds, isTestPath, stripGenerated } from './citations.mjs';
 
 let failures = 0;
 const ALIASES = { 'VIS-001': 'FR-VIS-001', 'IMP-001': 'FR-IMP-001', 'IMP-006': 'FR-IMP-006' };
@@ -69,8 +72,16 @@ check('an undeclared family is ignored', 'SRS INT-2/INT-6.', []);
 check('a declared family does not match inside a longer word',
   'SPRINT-2 and FOOTPRINT-3', [], {}, ['INT']);
 
-const sorted = ['FR-RES-009', 'NFR-REL-003', 'FR-002', 'FR-CAP-001', 'FR-102'].sort(compareIds);
-const wanted = ['FR-002', 'FR-102', 'FR-CAP-001', 'FR-RES-009', 'NFR-REL-003'];
+// A11Y is a numeronym, and a letters-only family pattern cannot spell it. The
+// citation in packages/ui/src/styles/base.css was invisible for exactly this
+// reason: not missing, unreadable.
+check('a family whose name carries a digit is read',
+  '/* Visible focus everywhere (WCAG 2.1 AA: NFR-A11Y-001). */', ['NFR-A11Y-001']);
+
+check('a digit still may not open a family name', '3D-001 and 2FA-003', []);
+
+const sorted = ['FR-RES-009', 'NFR-REL-003', 'FR-002', 'FR-CAP-001', 'FR-102', 'NFR-A11Y-001'].sort(compareIds);
+const wanted = ['FR-002', 'FR-102', 'FR-CAP-001', 'FR-RES-009', 'NFR-A11Y-001', 'NFR-REL-003'];
 if (JSON.stringify(sorted) === JSON.stringify(wanted)) {
   console.log('  ok  identifiers sort by family then number');
 } else {
@@ -111,6 +122,24 @@ if (stripped.split('\n').length === GENERATED.split('\n').length) {
 } else {
   failures += 1;
   console.error('  FAIL  stripping a generated block changed the line count');
+}
+
+// The register's JSON Schema cannot import FAMILY, so it repeats the pattern.
+// Two spellings of the same rule is how the digit-bearing family went missing in
+// the first place; this asserts they stay one rule.
+const here = dirname(fileURLToPath(import.meta.url));
+const schema = readFileSync(join(here, '../../../docs/registry/schema/requirements.schema.json'), 'utf8');
+const stale = [...schema.matchAll(/\[A-Z\][^"]*?\{1,\d\}|\[A-Z\]\{\d,\d\}/g)]
+  .map((m) => m[0])
+  .filter((fragment) => fragment !== FAMILY);
+if (stale.length === 0 && schema.includes(FAMILY)) {
+  console.log('  ok  the register schema spells a family the same way this module does');
+} else {
+  failures += 1;
+  console.error(
+    `  FAIL  docs/registry/schema/requirements.schema.json does not use ${FAMILY}` +
+      (stale.length ? `: found ${[...new Set(stale)].join(', ')}` : ''),
+  );
 }
 
 if (failures) {
