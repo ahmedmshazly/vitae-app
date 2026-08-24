@@ -115,11 +115,32 @@ step "Building and restarting"
   # The API image bakes the source. Build it before migrating so the migration
   # runner and the image that will serve traffic use the same release.
   docker compose -f deploy/compose.prod.yml build api buildsvc
-  docker compose -f deploy/compose.prod.yml run --rm --no-deps api ./node_modules/.bin/tsx src/scripts/migrate.ts
+
+  # \`< /dev/null\` is load-bearing, not tidiness. This script reaches the remote
+  # shell on stdin, and \`compose run\` attaches stdin to the container it
+  # starts — so without the redirect it consumes the rest of THIS SCRIPT. The
+  # recreate below was swallowed on every deploy that ever ran: the migration
+  # succeeded, nothing was recreated, and the readiness check then passed
+  # against the container that had never gone away.
+  docker compose -f deploy/compose.prod.yml run --rm --no-deps -T api \
+    ./node_modules/.bin/tsx src/scripts/migrate.ts < /dev/null
+
   # A changed tag alone is not enough for every Compose version to replace an
   # existing container. Force the two source-bearing services to recreate;
   # Caddy stays at the edge and resumes proxying once API health is restored.
   docker compose -f deploy/compose.prod.yml up -d --force-recreate api buildsvc
+
+  # Prove the container that is now running is the image just built. Readiness
+  # alone cannot: an old container answers /ready perfectly well, which is
+  # exactly how the swallowed recreate went unnoticed.
+  running=\$(docker inspect -f '{{.Image}}' vitae-api-1)
+  built=\$(docker inspect -f '{{.Id}}' vitae/api:prod)
+  if [ "\$running" != "\$built" ]; then
+    echo "api container is running \$running but the build produced \$built" >&2
+    echo "the recreate did not take effect; refusing to report a successful deploy" >&2
+    exit 1
+  fi
+  echo "api is running the image just built (\${built:0:19})"
 REMOTE
 
 step "Waiting for readiness"
