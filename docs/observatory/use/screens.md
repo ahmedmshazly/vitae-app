@@ -48,6 +48,8 @@ sources:
   - apps/web/src/public/site.ts
   - apps/web/src/routes/marketing/Chrome.tsx
   - apps/web/src/routes/reference/EntityCatalog.tsx
+  - apps/web/src/routes/docs/docsContent.ts
+  - apps/api/src/routes/v1/docs.ts
   - docs/generated/routes.json
 covers:
   - route:/
@@ -156,8 +158,9 @@ bookmarks and shared links survive. All navigation inside the product points at
 the canonical form. Both forms resolve to the same workspace in the rail.
 
 Anything under `/docs` and `/reference/entities` is neither: those are reading
-surfaces that describe the system rather than your records, and they need no
-account.
+surfaces that describe the system rather than your records. They differ in who
+may read them — the entity catalogue is open, the documentation is not — and
+the section below says why.
 
 ## The public site
 
@@ -222,15 +225,34 @@ is a build problem and pretending otherwise wastes the reader's time.
 period chosen on the pricing page through to the billing screen — as a
 preference, not as an entitlement.
 
-## Reading surfaces that need no account
+## The two reading surfaces
 
-| Screen | What it is for |
-| --- | --- |
-| `/reference/entities` | Every record type, connection type and relation kind the system knows — 34 record types and 28 connection types — generated from the same constants the API validates against. It describes the schema, not your data. Two views: a schema observatory of how the types relate, and an A4 atlas made to be printed. |
+Both describe the system rather than your records, and neither has any
+workspace chrome to inherit. Only one of them is open.
 
-The documentation you are reading is the other one. Both are mounted above the
-authentication gate on purpose: a reader with no account must be able to reach
-them, and neither has any workspace chrome to inherit.
+| Screen | What it is for | Who may read it |
+| --- | --- | --- |
+| `/reference/entities` | Every record type, connection type and relation kind the system knows — 34 record types and 28 connection types — generated from the same constants the API validates against. It describes the schema, not your data. Two views: a schema observatory of how the types relate, and an A4 atlas made to be printed. | Anyone. Its content is compiled into the build, so it needs no account and never waits on the API. |
+| `/docs` | The documentation you are reading. | The owner of the instance, signed in. |
+
+The documentation was open until August 2026 and is not any more. Every page of
+it is fetched from the API, which refuses the request unless it carries a
+verified identity — and on a self-hosted install, unless that identity is the
+configured `OWNER_EMAIL`. The reason is what the corpus is: its curated half
+describes every trust boundary and every known gap in the system, and its
+generated half enumerates every route, endpoint, table, migration and exported
+symbol in the repository. Published openly it is a map of the software for
+anyone who wants one.
+
+The `/docs/*` route in the browser is still mounted above the authentication
+gate, and that is deliberate rather than an oversight. The gate bounces a
+signed-out visitor to the public home page without explaining why, so a reader
+who bookmarked a page and later signed out would simply find themselves
+somewhere else. Instead the surface loads its own frame and says what happened:
+*"The documentation is private. Sign in at /signin with the account that owns
+this instance, then open this page again."* The frame gives nothing away. It
+carries no corpus text, and the section navigation is not drawn at all until an
+authenticated request has returned something.
 
 ## The workspace frame
 

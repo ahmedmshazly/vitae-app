@@ -1,14 +1,20 @@
 /**
- * Reading the compiled corpus over the network.
+ * Reading the corpus over the authenticated API.
  *
  * This is the transport half of the documentation surface, split from
  * `docsModel.ts` so that the model half stays free of `fetch`, of
- * `import.meta.env` and of TanStack Query. That is not tidiness for its own
- * sake: the build plugin that prerenders `/docs/*` into static HTML has to
- * import the same breadcrumb, reading-order and vocabulary rules the React
- * reader uses, and it runs inside Vite's config loader in Node, where
- * `import.meta.env` does not exist and a query client would be meaningless.
- * One module the two can share, one module only the browser needs.
+ * `import.meta.env` and of TanStack Query.
+ *
+ * The corpus used to be static files beside the application, readable by
+ * anyone who knew the URL. It is not public: the curated half describes every
+ * trust boundary and known gap in the system, and the generated half
+ * enumerates every route, endpoint, table and exported symbol in the
+ * repository. It now comes from `GET /docs/*` on the API, behind the same
+ * default-deny gate and OWNER_EMAIL allow-list that protect the graph itself,
+ * which is why every request here goes through `api.get` rather than a bare
+ * `fetch`: that is where the bearer token, the session cookie and the rest of
+ * the transport policy live, and a second copy of them would be a second thing
+ * to get wrong.
  *
  * The corpus is a build artifact, so within one page load it cannot change.
  * Every query here is therefore `staleTime: Infinity`: navigating back to a
@@ -16,43 +22,47 @@
  * shows a refresh trace for content that could not have moved.
  */
 import type { QueryClient } from '@tanstack/react-query';
+import { ApiError, api } from '../../lib/api.js';
 import type { DocsManifest, DocsPageContent, DocsPageSummary } from './docsModel.js';
 import { buildDocsIndex, type DocsIndexInput, type DocsSearchIndex } from './docsSearch.js';
 import type { CatalogSpec, Row } from './docsReference.js';
 
-/**
- * Where the compiled corpus is served from. Deliberately not `/docs`: the
- * static tree would then collide with the client routes at `/docs/*` and with
- * the prerendered HTML the SEO plugin writes for them.
- */
-export const DOCS_CONTENT_BASE = 'docs-content';
-
-/** An absolute URL for a content file, honouring a non-root deployment base. */
-export function docsAsset(path: string): string {
-  const base = import.meta.env.BASE_URL || '/';
-  return `${base.endsWith('/') ? base : `${base}/`}${DOCS_CONTENT_BASE}/${path}`;
-}
+/** The API mount the corpus is served from, relative to the API base URL. */
+export const DOCS_CONTENT_BASE = '/docs';
 
 /**
  * Read one compiled file.
  *
  * `what` is a noun phrase that reads inside "Couldn't load ___", because a
  * failure here reaches the screen through `QueryBoundary`, which shows the
- * error's own message. "Failed to fetch" tells a reader nothing; "the
- * documentation index is not available (404)" tells them the build is
- * incomplete rather than their network is down.
+ * error's own message.
+ *
+ * The three cases worth separating are the three a reader can act on. Not
+ * signed in as the owner is the common one now that the corpus is private, and
+ * saying "not available" for it would send someone to debug a build that is
+ * fine. A deployment with no corpus in it is an operator's problem, not a
+ * reader's. Everything else is a network or a genuinely missing file.
  */
 async function readContent<T>(path: string, what: string): Promise<T> {
-  let response: Response;
   try {
-    response = await fetch(docsAsset(path), { credentials: 'omit' });
-  } catch {
+    return await api.get<T>(`${DOCS_CONTENT_BASE}/${path}`);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.status === 401 || error.status === 403) {
+        throw new Error(
+          'The documentation is private. Sign in at /signin with the account that owns this '
+            + 'instance, then open this page again.',
+        );
+      }
+      if (error.code === 'DOCS_UNAVAILABLE') {
+        throw new Error(
+          'No documentation was built into this deployment, so there is nothing to read here yet.',
+        );
+      }
+      throw new Error(`${what} is not available (${error.status}).`);
+    }
     throw new Error(`Couldn’t reach ${what}. Check your connection and try again.`);
   }
-  if (!response.ok) {
-    throw new Error(`${what} is not available (${response.status}).`);
-  }
-  return (await response.json()) as T;
 }
 
 const FOREVER = { staleTime: Number.POSITIVE_INFINITY, gcTime: Number.POSITIVE_INFINITY } as const;

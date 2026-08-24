@@ -3,7 +3,7 @@
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
     "files_scanned": 852,
-    "files_citing": 160,
+    "files_citing": 159,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,7 +20,7 @@
   },
   "totals": {
     "registered": 99,
-    "citations": 492,
+    "citations": 490,
     "implemented_and_tested": 19,
     "implemented_untested": 57,
     "tested_only": 2,
@@ -45,13 +45,11 @@
         "apps/api/src/__tests__/api.integration.test.ts:1456",
         "apps/api/src/__tests__/api.integration.test.ts:1645",
         "apps/api/src/routes/v1/export.integration.test.ts:37",
-        "apps/api/src/services/restore.integration.test.ts:2",
-        "apps/web/src/public/docs-static.test.ts:151",
-        "apps/web/src/public/docs-static.test.ts:153"
+        "apps/api/src/services/restore.integration.test.ts:2"
       ],
       "documents": [
         "docs/observatory/architecture/persistence.md:25",
-        "docs/observatory/meta/coverage-and-contradictions.md:373",
+        "docs/observatory/meta/coverage-and-contradictions.md:380",
         "docs/observatory/use/import-and-export.md:24"
       ]
     },
@@ -114,12 +112,12 @@
         "apps/api/src/services/secrets.ts:2",
         "apps/api/src/services/settings.ts:5",
         "apps/api/src/services/settings.ts:60",
-        "packages/config/src/env.ts:84"
+        "packages/config/src/env.ts:98"
       ],
       "tests": [],
       "documents": [
-        "docs/observatory/architecture/security.md:28",
-        "docs/observatory/operate/configuration.md:23",
+        "docs/observatory/architecture/security.md:30",
+        "docs/observatory/operate/configuration.md:26",
         "docs/observatory/operate/secrets-and-rotation.md:24"
       ]
     },
@@ -173,7 +171,7 @@
       ],
       "tests": [],
       "documents": [
-        "docs/observatory/operate/deploy.md:22"
+        "docs/observatory/operate/deploy.md:25"
       ]
     },
     "FR-008": {
@@ -217,7 +215,7 @@
       ],
       "documents": [
         "docs/observatory/architecture/request-lifecycle.md:26",
-        "docs/observatory/use/troubleshooting.md:34"
+        "docs/observatory/use/troubleshooting.md:35"
       ]
     },
     "FR-011": {
@@ -234,7 +232,7 @@
         "apps/api/src/routes/v1/resumes.integration.test.ts:35"
       ],
       "documents": [
-        "docs/observatory/use/troubleshooting.md:34",
+        "docs/observatory/use/troubleshooting.md:35",
         "docs/observatory/use/write-a-resume.md:30"
       ]
     },
@@ -252,7 +250,7 @@
       ],
       "documents": [
         "docs/observatory/architecture/persistence.md:25",
-        "docs/observatory/architecture/security.md:28",
+        "docs/observatory/architecture/security.md:30",
         "docs/observatory/use/import-and-export.md:24"
       ]
     },
@@ -270,7 +268,7 @@
         "docs/observatory/architecture/career-graph.md:23",
         "docs/observatory/architecture/career-graph.md:145",
         "docs/observatory/use/build-your-graph.md:29",
-        "docs/observatory/use/troubleshooting.md:34"
+        "docs/observatory/use/troubleshooting.md:35"
       ]
     },
     "FR-014": {
@@ -296,14 +294,14 @@
       "evidence": "implemented-untested",
       "sources": [
         "apps/api/src/routes/v1/auth.ts:18",
-        "packages/config/src/env.ts:111"
+        "packages/config/src/env.ts:125"
       ],
       "tests": [],
       "documents": [
-        "docs/observatory/architecture/security.md:28",
-        "docs/observatory/operate/configuration.md:23",
+        "docs/observatory/architecture/security.md:30",
+        "docs/observatory/operate/configuration.md:26",
         "docs/observatory/operate/secrets-and-rotation.md:24",
-        "docs/observatory/use/troubleshooting.md:34"
+        "docs/observatory/use/troubleshooting.md:35"
       ]
     },
     "FR-016": {
@@ -316,7 +314,7 @@
       ],
       "tests": [],
       "documents": [
-        "docs/observatory/operate/deploy.md:22"
+        "docs/observatory/operate/deploy.md:25"
       ]
     },
     "FR-017": {
@@ -409,7 +407,7 @@
       ],
       "tests": [],
       "documents": [
-        "docs/observatory/use/troubleshooting.md:34"
+        "docs/observatory/use/troubleshooting.md:35"
       ]
     },
     "FR-023": {
@@ -427,7 +425,7 @@
       ],
       "tests": [],
       "documents": [
-        "docs/observatory/use/troubleshooting.md:34"
+        "docs/observatory/use/troubleshooting.md:35"
       ]
     },
     "FR-025": {
@@ -469,7 +467,7 @@
       "tests": [],
       "documents": [
         "docs/observatory/architecture/request-lifecycle.md:26",
-        "docs/observatory/operate/deploy.md:22",
+        "docs/observatory/operate/deploy.md:25",
         "docs/observatory/operate/incident-response.md:20"
       ]
     },
@@ -480,15 +478,15 @@
       "evidence": "implemented-untested",
       "sources": [
         "compose.yaml:58",
-        "packages/config/src/env.ts:93",
-        "packages/config/src/env.ts:111",
+        "packages/config/src/env.ts:107",
+        "packages/config/src/env.ts:125",
         "services/buildsvc/src/server.ts:29"
       ],
       "tests": [],
       "documents": [
-        "docs/observatory/architecture/security.md:28",
-        "docs/observatory/meta/coverage-and-contradictions.md:373",
-        "docs/observatory/operate/configuration.md:23",
+        "docs/observatory/architecture/security.md:30",
+        "docs/observatory/meta/coverage-and-contradictions.md:380",
+        "docs/observatory/operate/configuration.md:26",
         "docs/observatory/operate/secrets-and-rotation.md:24"
       ]
     },
@@ -507,7 +505,7 @@
       "documents": [
         "docs/observatory/architecture/request-lifecycle.md:26",
         "docs/observatory/architecture/request-lifecycle.md:191",
-        "docs/observatory/meta/coverage-and-contradictions.md:373"
+        "docs/observatory/meta/coverage-and-contradictions.md:380"
       ]
     },
     "FR-104": {
@@ -521,7 +519,7 @@
       ],
       "tests": [],
       "documents": [
-        "docs/observatory/meta/coverage-and-contradictions.md:373"
+        "docs/observatory/meta/coverage-and-contradictions.md:380"
       ]
     },
     "FR-105": {
@@ -540,7 +538,7 @@
         "docs/observatory/decisions/0006-cloud-multi-tenancy.md:9",
         "docs/observatory/decisions/0006-cloud-multi-tenancy.md:178",
         "docs/observatory/decisions/0006-cloud-multi-tenancy.md:273",
-        "docs/observatory/meta/coverage-and-contradictions.md:373",
+        "docs/observatory/meta/coverage-and-contradictions.md:380",
         "docs/observatory/operate/backup-and-restore.md:26",
         "docs/observatory/use/import-and-export.md:24"
       ]
@@ -813,7 +811,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:40",
-        "docs/observatory/meta/coverage-and-contradictions.md:390"
+        "docs/observatory/meta/coverage-and-contradictions.md:397"
       ]
     },
     "FR-EXP-013": {
@@ -825,7 +823,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:40",
-        "docs/observatory/meta/coverage-and-contradictions.md:390"
+        "docs/observatory/meta/coverage-and-contradictions.md:397"
       ]
     },
     "FR-IMP-001": {
@@ -837,7 +835,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:21",
-        "docs/observatory/meta/coverage-and-contradictions.md:390",
+        "docs/observatory/meta/coverage-and-contradictions.md:397",
         "docs/observatory/use/import-and-export.md:24"
       ]
     },
@@ -850,7 +848,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:21",
-        "docs/observatory/meta/coverage-and-contradictions.md:390",
+        "docs/observatory/meta/coverage-and-contradictions.md:397",
         "docs/observatory/use/import-and-export.md:24"
       ]
     },
@@ -863,7 +861,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:21",
-        "docs/observatory/meta/coverage-and-contradictions.md:390"
+        "docs/observatory/meta/coverage-and-contradictions.md:397"
       ]
     },
     "FR-IMP-004": {
@@ -875,7 +873,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:21",
-        "docs/observatory/meta/coverage-and-contradictions.md:390"
+        "docs/observatory/meta/coverage-and-contradictions.md:397"
       ]
     },
     "FR-IMP-005": {
@@ -887,7 +885,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:21",
-        "docs/observatory/meta/coverage-and-contradictions.md:390"
+        "docs/observatory/meta/coverage-and-contradictions.md:397"
       ]
     },
     "FR-IMP-006": {
@@ -899,7 +897,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:21",
-        "docs/observatory/meta/coverage-and-contradictions.md:390"
+        "docs/observatory/meta/coverage-and-contradictions.md:397"
       ]
     },
     "FR-ORG-001": {
@@ -984,7 +982,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:707"
+        "docs/observatory/meta/coverage-and-contradictions.md:714"
       ]
     },
     "FR-RES-003": {
@@ -996,7 +994,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:707"
+        "docs/observatory/meta/coverage-and-contradictions.md:714"
       ]
     },
     "FR-RES-004": {
@@ -1109,7 +1107,7 @@
         "docs/ROADMAP.md:23",
         "docs/observatory/architecture/algorithms.md:35",
         "docs/observatory/architecture/resume-pipeline.md:26",
-        "docs/observatory/operate/deploy.md:22",
+        "docs/observatory/operate/deploy.md:25",
         "docs/observatory/use/write-a-resume.md:30",
         "docs/runbooks/bump-tectonic.md:15"
       ]
@@ -1123,7 +1121,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:707"
+        "docs/observatory/meta/coverage-and-contradictions.md:714"
       ]
     },
     "FR-RES-011": {
@@ -1158,7 +1156,7 @@
         "docs/ROADMAP.md:23",
         "docs/observatory/architecture/algorithms.md:35",
         "docs/observatory/architecture/resume-pipeline.md:26",
-        "docs/observatory/architecture/security.md:28"
+        "docs/observatory/architecture/security.md:30"
       ]
     },
     "FR-RES-013": {
@@ -1176,7 +1174,7 @@
       "documents": [
         "docs/ROADMAP.md:23",
         "docs/observatory/architecture/resume-pipeline.md:26",
-        "docs/observatory/use/troubleshooting.md:34",
+        "docs/observatory/use/troubleshooting.md:35",
         "docs/observatory/use/write-a-resume.md:30"
       ]
     },
@@ -1226,7 +1224,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:707"
+        "docs/observatory/meta/coverage-and-contradictions.md:714"
       ]
     },
     "FR-RES-017": {
@@ -1238,7 +1236,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:707"
+        "docs/observatory/meta/coverage-and-contradictions.md:714"
       ]
     },
     "FR-RES-018": {
@@ -1304,7 +1302,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:13",
-        "docs/observatory/architecture/security.md:28",
+        "docs/observatory/architecture/security.md:30",
         "docs/observatory/decisions/catalog.md:144"
       ]
     },
@@ -1336,7 +1334,7 @@
       "documents": [
         "docs/ROADMAP.md:26",
         "docs/observatory/operate/incident-response.md:20",
-        "docs/observatory/use/troubleshooting.md:34"
+        "docs/observatory/use/troubleshooting.md:35"
       ]
     },
     "FR-SET-007": {
@@ -1349,7 +1347,7 @@
       ],
       "tests": [],
       "documents": [
-        "docs/observatory/architecture/security.md:28",
+        "docs/observatory/architecture/security.md:30",
         "docs/observatory/use/import-and-export.md:24"
       ]
     },
@@ -1435,7 +1433,7 @@
       "documents": [
         "docs/ROADMAP.md:20",
         "docs/design/addenda/P25-graph-explorer-v2.md:1",
-        "docs/observatory/meta/coverage-and-contradictions.md:390"
+        "docs/observatory/meta/coverage-and-contradictions.md:397"
       ]
     },
     "FR-VIS-002": {
@@ -1449,7 +1447,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:20",
-        "docs/observatory/meta/coverage-and-contradictions.md:390"
+        "docs/observatory/meta/coverage-and-contradictions.md:397"
       ]
     },
     "FR-VIS-003": {
@@ -1464,7 +1462,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:20",
-        "docs/observatory/meta/coverage-and-contradictions.md:390"
+        "docs/observatory/meta/coverage-and-contradictions.md:397"
       ]
     },
     "FR-VIS-004": {
@@ -1503,9 +1501,9 @@
       "tests": [],
       "documents": [
         "docs/observatory/design/accessibility.md:20",
-        "docs/observatory/meta/coverage-and-contradictions.md:418",
-        "docs/observatory/meta/coverage-and-contradictions.md:421",
-        "docs/observatory/meta/coverage-and-contradictions.md:711"
+        "docs/observatory/meta/coverage-and-contradictions.md:425",
+        "docs/observatory/meta/coverage-and-contradictions.md:428",
+        "docs/observatory/meta/coverage-and-contradictions.md:718"
       ]
     },
     "NFR-MNT-002": {
@@ -1520,7 +1518,7 @@
       "documents": [
         "docs/observatory/architecture/system-overview.md:21",
         "docs/observatory/develop/where-to-change.md:168",
-        "docs/observatory/meta/coverage-and-contradictions.md:707"
+        "docs/observatory/meta/coverage-and-contradictions.md:714"
       ]
     },
     "NFR-REL-003": {
@@ -1534,7 +1532,7 @@
       "tests": [],
       "documents": [
         "docs/observatory/architecture/persistence.md:25",
-        "docs/observatory/meta/coverage-and-contradictions.md:375"
+        "docs/observatory/meta/coverage-and-contradictions.md:382"
       ]
     },
     "INT-1": {
@@ -1550,8 +1548,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:13",
-        "docs/observatory/architecture/security.md:28",
-        "docs/observatory/meta/coverage-and-contradictions.md:389"
+        "docs/observatory/architecture/security.md:30",
+        "docs/observatory/meta/coverage-and-contradictions.md:396"
       ]
     },
     "INT-2": {
@@ -2046,9 +2044,6 @@
     ],
     "apps/web/src/lib/firebase.ts": [
       "INT-1"
-    ],
-    "apps/web/src/public/docs-static.test.ts": [
-      "FR-001"
     ],
     "apps/web/src/routes/Ask.tsx": [
       "FR-CON-006",

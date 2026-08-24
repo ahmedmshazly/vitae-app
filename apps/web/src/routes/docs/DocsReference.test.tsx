@@ -14,7 +14,9 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { ApiError } from '../../lib/api.js';
+import { mockApi, resetMockApi } from '../../test/api-mock.js';
 import DocsApp from './DocsApp.js';
 import type { DocsManifest } from './docsModel.js';
 
@@ -51,28 +53,21 @@ const routes = {
   ],
 };
 
-const fetchMock = vi.fn();
 let routesBody: unknown = routes;
 let routesOk = true;
 
 beforeEach(() => {
   routesBody = routes;
   routesOk = true;
-  fetchMock.mockReset();
-  fetchMock.mockImplementation(async (url: string) => {
-    const path = url.slice(url.indexOf('docs-content/') + 'docs-content/'.length);
-    if (path === 'manifest.json') return { ok: true, status: 200, json: async () => manifest };
-    if (path === 'reference/routes.json') {
+  resetMockApi();
+  mockApi.get.mockImplementation(async (path: string) => {
+    if (path === '/docs/manifest.json') return manifest;
+    if (path === '/docs/reference/routes.json') {
       if (!routesOk) throw new TypeError('Failed to fetch');
-      return { ok: true, status: 200, json: async () => routesBody };
+      return routesBody;
     }
-    return { ok: false, status: 404, json: async () => ({}) };
+    throw new ApiError(404, 'NOT_FOUND', 'no');
   });
-  vi.stubGlobal('fetch', fetchMock);
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
 });
 
 let address = '';
@@ -113,8 +108,8 @@ describe('the reference entrance', () => {
   it('does not fetch a catalog nobody opened', async () => {
     renderDocs('/docs/reference');
     await screen.findByRole('heading', { level: 1 });
-    const asked = fetchMock.mock.calls.map((call) => String(call[0]));
-    expect(asked.some((url) => url.includes('reference/'))).toBe(false);
+    const asked = mockApi.get.mock.calls.map((call) => String(call[0]));
+    expect(asked.some((path) => path.includes('reference/'))).toBe(false);
   });
 
   it('says there is no such catalog rather than showing an empty one', async () => {

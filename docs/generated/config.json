@@ -26,7 +26,7 @@
       "example": {
         "value": "https://aperture.example.com",
         "commented": true,
-        "source": ".env.example:68"
+        "source": ".env.example:81"
       }
     },
     {
@@ -129,7 +129,7 @@
       "example": {
         "value": "true",
         "commented": false,
-        "source": ".env.example:56"
+        "source": ".env.example:69"
       }
     },
     {
@@ -167,7 +167,7 @@
       "example": {
         "value": "2026-07-16",
         "commented": true,
-        "source": ".env.example:123"
+        "source": ".env.example:136"
       }
     },
     {
@@ -260,7 +260,7 @@
       "example": {
         "value": "s3://vitae-backups/prod",
         "commented": true,
-        "source": ".env.example:122"
+        "source": ".env.example:135"
       }
     },
     {
@@ -292,7 +292,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:128"
+        "source": ".env.example:141"
       }
     },
     {
@@ -311,9 +311,9 @@
       "section": "LaTeX build service (SRS §8.4)",
       "description": "Shared secret for HMAC-SHA256 request signing (SRS T4). Must match buildsvc. This secret IS the compiler's authentication. buildsvc refuses to start without it and rejects the published development defaults in production. node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\"",
       "requirements": [],
-      "source": "packages/config/src/env.ts:81",
+      "source": "packages/config/src/env.ts:95",
       "reads": [
-        "deploy/compose.prod.yml:69",
+        "deploy/compose.prod.yml:88",
         "services/buildsvc/src/server.ts:40"
       ],
       "read_by": [
@@ -327,7 +327,7 @@
       "example": {
         "value": "change-me-to-a-shared-secret",
         "commented": false,
-        "source": ".env.example:108"
+        "source": ".env.example:121"
       }
     },
     {
@@ -373,7 +373,7 @@
       "section": "LaTeX build service (SRS §8.4)",
       "description": "LaTeX build service (SRS §8.4)",
       "requirements": [],
-      "source": "packages/config/src/env.ts:80",
+      "source": "packages/config/src/env.ts:94",
       "reads": [],
       "read_by": [],
       "read_via": "declaration-only",
@@ -383,7 +383,7 @@
       "example": {
         "value": "http://localhost:8787",
         "commented": false,
-        "source": ".env.example:103"
+        "source": ".env.example:116"
       }
     },
     {
@@ -425,7 +425,7 @@
       "section": "Storage: Cloudinary (SRS T5; owner-provided)",
       "description": "Folder prefix for all Vitae uploads.",
       "requirements": [],
-      "source": "packages/config/src/env.ts:77",
+      "source": "packages/config/src/env.ts:91",
       "reads": [],
       "read_by": [],
       "read_via": "declaration-only",
@@ -435,7 +435,7 @@
       "example": {
         "value": "vitae",
         "commented": false,
-        "source": ".env.example:100"
+        "source": ".env.example:113"
       }
     },
     {
@@ -454,7 +454,7 @@
       "section": "Storage: Cloudinary (SRS T5; owner-provided)",
       "description": "Storage: Cloudinary (SRS T5)",
       "requirements": [],
-      "source": "packages/config/src/env.ts:76",
+      "source": "packages/config/src/env.ts:90",
       "reads": [],
       "read_by": [],
       "read_via": "declaration-only",
@@ -464,7 +464,7 @@
       "example": {
         "value": "cloudinary://your_key:your_secret@your_cloud",
         "commented": false,
-        "source": ".env.example:98"
+        "source": ".env.example:111"
       }
     },
     {
@@ -496,7 +496,7 @@
       "example": {
         "value": "YES",
         "commented": true,
-        "source": ".env.example:125"
+        "source": ".env.example:138"
       }
     },
     {
@@ -515,7 +515,7 @@
       "section": "Postgres: the data plane (ADR 0005)",
       "description": "PEM bundle for verifying the database's TLS certificate. Required whenever DATABASE_URL is not localhost: RDS certificates are signed by an Amazon CA that Node does not trust by default, and the alternative to supplying it is `rejectUnauthorized: false`, which accepts any certificate at all.",
       "requirements": [],
-      "source": "packages/config/src/env.ts:73",
+      "source": "packages/config/src/env.ts:87",
       "reads": [],
       "read_by": [],
       "read_via": "declaration-only",
@@ -525,7 +525,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:77"
+        "source": ".env.example:90"
       }
     },
     {
@@ -545,7 +545,7 @@
       "section": null,
       "description": "Single-user workload; a large pool would only hold RDS connections idle.",
       "requirements": [],
-      "source": "packages/config/src/env.ts:66",
+      "source": "packages/config/src/env.ts:80",
       "reads": [],
       "read_by": [],
       "read_via": "declaration-only",
@@ -570,7 +570,7 @@
       "section": "Postgres: the data plane (ADR 0005)",
       "description": "Postgres, the data plane (ADR 0005). The default points at the local compose service; production supplies the RDS endpoint and is refused at boot if it is still carrying this default (see assertSafeCombination).",
       "requirements": [],
-      "source": "packages/config/src/env.ts:64",
+      "source": "packages/config/src/env.ts:78",
       "reads": [],
       "read_by": [],
       "read_via": "declaration-only",
@@ -580,7 +580,40 @@
       "example": {
         "value": "postgresql://vitae:vitae@127.0.0.1:5433/vitae",
         "commented": false,
-        "source": ".env.example:73"
+        "source": ".env.example:86"
+      }
+    },
+    {
+      "name": "DOCS_CONTENT_DIR",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [
+        "min(1)"
+      ],
+      "section": "Auth (SRS INT-1 / FR-SET-001)",
+      "description": "Where the compiled documentation corpus lives on disk. The corpus is served by this API rather than by the public web host, because it is private: it describes the whole system, and its generated half enumerates every route, endpoint, table and exported symbol in the repository. Behind this API it inherits the OWNER_EMAIL allow-list that gates every other request, which is the only reason it is readable at all. Unset means no corpus was built into this deployment, and the endpoints report that rather than pretending the documentation is empty.",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:67",
+      "reads": [
+        "apps/api/src/routes/v1/docs.ts:45"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "docs/.compiled",
+        "commented": false,
+        "source": ".env.example:67"
       }
     },
     {
@@ -618,7 +651,7 @@
       "example": {
         "value": "1",
         "commented": true,
-        "source": ".env.example:124"
+        "source": ".env.example:137"
       }
     },
     {
@@ -714,7 +747,7 @@
       "section": "Firebase: AUTH ONLY (ADR 0005)",
       "description": "When set, the Admin SDK talks to the local Auth emulator instead of prod.",
       "requirements": [],
-      "source": "packages/config/src/env.ts:59",
+      "source": "packages/config/src/env.ts:73",
       "reads": [],
       "read_by": [],
       "read_via": "declaration-only",
@@ -724,7 +757,7 @@
       "example": {
         "value": "127.0.0.1:9099",
         "commented": false,
-        "source": ".env.example:85"
+        "source": ".env.example:98"
       }
     },
     {
@@ -743,7 +776,7 @@
       "section": "Firebase: AUTH ONLY (ADR 0005)",
       "description": "Firebase: AUTH ONLY (ADR 0005). Sign-in stayed on Firebase when the data plane moved to Postgres, because `verifyIdToken` is free, unmetered, and was never the constraint. There is no Firestore here any more.",
       "requirements": [],
-      "source": "packages/config/src/env.ts:58",
+      "source": "packages/config/src/env.ts:72",
       "reads": [],
       "read_by": [],
       "read_via": "declaration-only",
@@ -753,7 +786,7 @@
       "example": {
         "value": "vitae-local",
         "commented": false,
-        "source": ".env.example:83"
+        "source": ".env.example:96"
       }
     },
     {
@@ -800,7 +833,7 @@
       "requirements": [
         "FR-004"
       ],
-      "source": "packages/config/src/env.ts:86",
+      "source": "packages/config/src/env.ts:100",
       "reads": [
         "apps/api/src/services/secrets.ts:38"
       ],
@@ -814,7 +847,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:115"
+        "source": ".env.example:128"
       }
     },
     {
@@ -1229,7 +1262,7 @@
       "example": {
         "value": "change-me-to-a-long-random-string",
         "commented": false,
-        "source": ".env.example:58"
+        "source": ".env.example:71"
       }
     },
     {
@@ -1312,7 +1345,7 @@
       "example": {
         "value": "companion-production",
         "commented": true,
-        "source": ".env.example:66"
+        "source": ".env.example:79"
       }
     },
     {
@@ -1477,7 +1510,7 @@
         "scripts/check-docs-generated.mjs:26",
         "scripts/check-docs-pages.mjs:43",
         "scripts/check-docs-traceability.mjs:28",
-        "scripts/docs/build-content.mjs:61",
+        "scripts/docs/build-content.mjs:62",
         "scripts/docs/gen-api.mjs:30",
         "scripts/docs/gen-routes.mjs:27",
         "scripts/docs/gen-srs.mjs:21",
@@ -1751,7 +1784,7 @@
       "section": "LaTeX build service (SRS §8.4)",
       "description": "Where the file-backed secret store lives (default: <repo root>/.secrets).",
       "requirements": [],
-      "source": "packages/config/src/env.ts:87",
+      "source": "packages/config/src/env.ts:101",
       "reads": [
         "apps/api/src/services/secrets.ts:53"
       ],
@@ -1765,7 +1798,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:117"
+        "source": ".env.example:130"
       }
     },
     {
@@ -1909,7 +1942,7 @@
       "example": {
         "value": "demo-api-key",
         "commented": false,
-        "source": ".env.example:87"
+        "source": ".env.example:100"
       }
     },
     {
@@ -1940,7 +1973,7 @@
       "example": {
         "value": "vitae-local.firebaseapp.com",
         "commented": false,
-        "source": ".env.example:88"
+        "source": ".env.example:101"
       }
     },
     {
@@ -1971,7 +2004,7 @@
       "example": {
         "value": "http://127.0.0.1:9099",
         "commented": false,
-        "source": ".env.example:94"
+        "source": ".env.example:107"
       }
     },
     {
@@ -2002,7 +2035,7 @@
       "example": {
         "value": "vitae-local",
         "commented": false,
-        "source": ".env.example:89"
+        "source": ".env.example:102"
       }
     },
     {
@@ -2033,7 +2066,7 @@
       "example": {
         "value": "true",
         "commented": false,
-        "source": ".env.example:90"
+        "source": ".env.example:103"
       }
     },
     {
@@ -2303,14 +2336,14 @@
     "Storage: Cloudinary (SRS T5; owner-provided)"
   ],
   "summary": {
-    "total": 78,
+    "total": 79,
     "by_scope": {
-      "server": 46,
+      "server": 47,
       "deploy": 19,
       "web-build": 13
     },
-    "declared": 31,
-    "validated": 19,
+    "declared": 32,
+    "validated": 20,
     "server_unvalidated": [
       "BUILDSVC_HOST",
       "EXPORT_OUT",

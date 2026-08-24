@@ -15,8 +15,11 @@ sources:
   - apps/web/vite.config.ts
   - services/buildsvc/src/server.ts
   - apps/api/src/routes/v1/auth.ts
+  - apps/api/src/routes/v1/docs.ts
+  - scripts/docs/build-content.mjs
   - docs/generated/config.json
   - .env.example
+  - .gitignore
   - deploy/.env.example
   - firebase.json
   - docs/runbooks/run-emulators.md
@@ -61,7 +64,7 @@ a file the deployment reads where one does not.
 
 Only the server environment is validated as a schema. `packages/config/src/env.ts`
 declares a Zod schema and `loadServerEnv` parses `process.env` against it once,
-caching the result. Nineteen of the seventy-eight keys the generated catalog
+caching the result. Twenty of the seventy-nine keys the generated catalog
 knows about are declared there. Everything else — the Paddle credentials, the
 templates directory, the backup destination and the rest — is read straight
 from the environment at the point of use, by the module or shell script that
@@ -198,6 +201,45 @@ Billing credentials are read only when the endpoint that needs them is invoked,
 so a local or test run makes no accidental provider traffic. Turning either on
 is a launch decision governed by `docs/CLOUD-LAUNCH.md`, not a configuration
 change.
+
+### The documentation corpus has to be pointed at
+
+`DOCS_CONTENT_DIR` is new, it is declared in the schema, and it is optional. It
+names the directory holding the compiled documentation corpus, which the API
+serves from behind the same gate as everything else. That is why it is an
+operational concern at all: the corpus describes every trust boundary in this
+system and enumerates every route, endpoint, table and exported symbol in the
+repository, so it is served by the API rather than published by the web host,
+and something has to tell the API where it is.
+
+Four behaviours are worth carrying.
+
+**Unset is not an error, and it is not an empty corpus either.** A deployment
+with no value serves no documentation, and says so: the endpoint answers 503
+with a code naming that condition, and the reading surface repeats it as an
+operator's problem rather than a reader's. The two are worth distinguishing
+because a documentation set that reports itself empty sends somebody to look
+for missing pages that were never built.
+
+**A relative value is resolved against the repository root, not the working
+directory of the process.** `.env` sits at the repository root and is written
+by someone thinking in repository paths, so `docs/.compiled` has to mean what
+it looks like it means. Resolved against the process's own directory it would
+quietly become `apps/api/docs/.compiled`, and the only symptom would be
+documentation reporting itself unavailable for no visible reason.
+
+**It is read from the environment on each request rather than from the parsed
+object.** The schema still declares and validates it; this only decides when it
+is read. The consequence is that a corpus mounted after the process started is
+picked up without a restart — which is the opposite of every other key on this
+page, and is the same choice the hosted-mode flag makes.
+
+**Do not build the corpus under `apps/web/public/`.** Everything in that
+directory is copied into the web bundle and served to anyone who asks, which is
+how the corpus was public in the first place. `pnpm docs:build` writes
+`docs/.compiled`, which is git-ignored; the old path is kept in `.gitignore` as
+a safety net. Note that the net is only against committing it. No gate fails a
+build that puts a corpus back under `apps/web/public/`.
 
 ## What is not checked
 

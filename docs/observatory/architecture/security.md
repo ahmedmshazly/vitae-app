@@ -14,6 +14,8 @@ sources:
   - apps/api/src/middleware/health.ts
   - apps/api/src/middleware/error.ts
   - apps/api/src/routes/v1/auth.ts
+  - apps/api/src/routes/v1/docs.ts
+  - apps/api/src/routes/v1/docs.integration.test.ts
   - apps/api/src/routes/webhooks/paddle.ts
   - apps/api/src/cloud/paddle.ts
   - apps/api/src/services/secrets.ts
@@ -84,7 +86,7 @@ omits three routes that are reachable without a session, and it credits the
 public-path list with governing a route that list cannot match.
 
 The real surface, derived from the routers by `docs/generated/api.json`, is six
-routes out of 135. The catalog labels 129 endpoints as authenticated, 3 as
+routes out of 137. The catalog labels 131 endpoints as authenticated, 3 as
 public within the gate, and 3 as outside it.
 
 ### The six routes that answer without a session
@@ -150,6 +152,58 @@ inventory of unauthenticated routes is describing a mechanism that does not
 govern the route it names — and would also miss the two routes registered above
 the gate that the list does not mention at all. The generated API catalog labels
 these correctly, distinguishing `public` from `outside-auth-gate`.
+
+### The documentation corpus sits below the gate
+
+The table above is the surface that answers *without* a session, and the
+documentation is not on it. That is worth saying rather than leaving to
+inference, because it is a recent change and because the corpus is part of this
+page's own subject matter: its curated half describes every trust boundary in
+the system and names the gaps that are known rather than closed, and its
+generated half enumerates every route, endpoint, configuration key, table,
+migration and exported symbol in the repository. Until August 2026 it was
+served as static files by the public web host, which made all of that readable
+by anyone who knew the URL. Nothing about it was secret and nothing about it
+was meant to be published either.
+
+It is now served by this API, from a router mounted inside the v1 tree and
+therefore *below* `app.use('/api', authGate)`. It declares no public paths and
+carries no authorisation code of its own: it inherits the default-deny gate,
+and in self-hosted mode the same `OWNER_EMAIL` comparison that protects the
+graph. A second gate would be a second thing to get wrong, and the corpus does
+not need a different answer from the one the graph already gets.
+
+What the router does have to get right is file access, because it maps a URL
+onto a path under one directory and that is the classic way to serve a file
+nobody meant to publish. Containment is checked twice: once after resolving the
+request against the root, and again after `realpathSync`, because resolution is
+string arithmetic and a symlink placed inside the corpus would otherwise pass
+the first check and be read. The comparison includes the path separator, so a
+sibling directory whose name merely starts with the root's is not inside it.
+Every refusal — a traversal, an absolute path, a link pointing out, a
+directory, a file that is not there — returns the same 404 with the same body,
+so a caller cannot learn where the root is or what sits beside it.
+
+Two response details follow from the corpus being private rather than merely
+authenticated. Every file is sent `private, no-store`, because a shared proxy
+holding a copy would hand it to the next person through it. And the content
+type is stated as JSON rather than inferred from the extension, so a file that
+somehow is not JSON cannot be served as something a browser will execute.
+
+A deployment that was never given a corpus answers 503 with a code naming that
+specific condition, rather than an empty documentation set — the difference
+between an operator's missing build step and a reader's broken link.
+
+The integration suite proves the part that matters: an anonymous request is
+refused, and so is a request carrying a perfectly valid session for somebody
+who is not the owner. A real token is not the same thing as permission.
+
+The `/docs` address in the browser is a separate question and answers without a
+session on purpose. It renders an empty frame and a sentence naming the account
+to sign in with, because the alternative — the workspace gate's silent redirect
+— sends a reader to debug a build that is working. The frame holds no corpus
+text. Every page, the navigation and the search index arrive from an
+authenticated request or not at all.
 
 ### Identity and authorisation
 

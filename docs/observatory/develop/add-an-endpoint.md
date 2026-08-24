@@ -28,7 +28,7 @@ related: [DEV, DEV-WHERE, DEV-TESTING, DEV-GATES]
 
 ## What you are adding to
 
-The v1 API is 135 registered operations across 33 mount prefixes. One router
+The v1 API is 137 registered operations across 34 mount prefixes. One router
 file owns each prefix, `apps/api/src/routes/v1/index.ts` mounts them all onto
 `v1Router`, and `apps/api/src/app.ts` mounts `v1Router` at `/api/v1` behind
 three middlewares that apply to everything under `/api`: the authentication
@@ -205,7 +205,7 @@ reported by `pnpm docs:check` as a stale artifact.
 path for every declared prefix. Be aware of how that requirement is currently
 satisfied: `stubPathsForMounts()` emits a placeholder `GET` for any prefix with
 no hand-written path, so the requirement passes whether or not you write
-anything. Today 46 of the 135 operations are described in detail and the rest
+anything. Today 47 of the 137 operations are described in detail and the rest
 are covered by stubs. Writing a real operation in `detailedPaths()` is what
 makes the document useful to a client; the gate will not make you.
 

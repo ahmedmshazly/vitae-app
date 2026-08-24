@@ -15,6 +15,7 @@ import { lettersRouter } from './letters.js';
 import { remindersRouter } from './reminders.js';
 import { dashboardRouter } from './dashboard.js';
 import { statusRouter } from './status.js';
+import { docsRouter } from './docs.js';
 import { exportRouter } from './export.js';
 import { settingsRouter } from './settings.js';
 import { habitsRouter } from './habits.js';
@@ -50,6 +51,9 @@ v1Router.use('/letters', lettersRouter);
 v1Router.use('/reminders', remindersRouter);
 v1Router.use('/dashboard', dashboardRouter);
 v1Router.use('/status', statusRouter);
+// The documentation corpus. Private: it inherits the default-deny gate and
+// the OWNER_EMAIL allow-list that protect everything else under /api.
+v1Router.use('/docs', docsRouter);
 v1Router.use('/export', exportRouter);
 v1Router.use('/settings', settingsRouter);
 v1Router.use('/habits', habitsRouter);

@@ -12,7 +12,9 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { ApiError } from '../../lib/api.js';
+import { mockApi, resetMockApi } from '../../test/api-mock.js';
 import DocsApp from './DocsApp.js';
 import type { DocsManifest } from './docsModel.js';
 
@@ -75,29 +77,20 @@ const page = {
   blocks: [{ type: 'paragraph', children: [{ type: 'text', value: 'How storage works.' }] }],
 };
 
-const fetchMock = vi.fn();
 let failIndex = false;
 
 beforeEach(() => {
   failIndex = false;
-  fetchMock.mockReset();
-  fetchMock.mockImplementation(async (url: string) => {
-    const path = url.slice(url.indexOf('docs-content/') + 'docs-content/'.length);
-    if (path === 'manifest.json') return { ok: true, status: 200, json: async () => manifest };
-    if (path === 'search-text.json') {
+  resetMockApi();
+  mockApi.get.mockImplementation(async (path: string) => {
+    if (path === '/docs/manifest.json') return manifest;
+    if (path === '/docs/search-text.json') {
       if (failIndex) throw new TypeError('Failed to fetch');
-      return { ok: true, status: 200, json: async () => searchText };
+      return searchText;
     }
-    if (path === 'pages/architecture/persistence.json') {
-      return { ok: true, status: 200, json: async () => page };
-    }
-    return { ok: false, status: 404, json: async () => ({}) };
+    if (path === '/docs/pages/architecture/persistence.json') return page;
+    throw new ApiError(404, 'NOT_FOUND', 'no');
   });
-  vi.stubGlobal('fetch', fetchMock);
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
 });
 
 function renderDocs(route = '/docs/operate/migrations') {
@@ -120,8 +113,8 @@ describe('jumping to a page', () => {
   it('is not fetched until someone asks for it', async () => {
     renderDocs();
     await screen.findByRole('heading', { level: 1 });
-    const asked = fetchMock.mock.calls.map((call) => String(call[0]));
-    expect(asked.some((url) => url.includes('search-text.json'))).toBe(false);
+    const asked = mockApi.get.mock.calls.map((call) => String(call[0]));
+    expect(asked.some((path) => path.includes('search-text.json'))).toBe(false);
   });
 
   it('opens on a bare slash and lists the corpus before anything is typed', async () => {

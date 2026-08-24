@@ -42,7 +42,26 @@ services:
       - NODE_ENV=production
       - API_PORT=4000
       - BUILDSVC_URL=http://buildsvc:8787
+      - DOCS_CONTENT_DIR=/app/docs-content
     volumes:
+      # The compiled documentation corpus. Served by the API rather than by the
+      # web host because it is private: it describes every trust boundary in
+      # the system and enumerates every route, endpoint, table and exported
+      # symbol in the repository, so published openly it is a map of the
+      # software for anyone who wants one. Behind the API it inherits the
+      # OWNER_EMAIL allow-list that gates every other request.
+      #
+      # Mounted rather than baked in, for the same reason as the CA bundle
+      # below: republishing the documentation is then a file copy instead of an
+      # image rebuild. Build it on a machine with the repository checked out —
+      # the compiler reads the tracked file set with git, which no build
+      # context has — and copy the result here:
+      #   pnpm docs:build && rsync -a docs/.compiled/ <host>:deploy/docs-content/
+      #
+      # Read-only: nothing should ever write to it. If the directory is absent
+      # the API answers /api/v1/docs with 503 and says so, rather than
+      # reporting an empty corpus.
+      - ./docs-content:/app/docs-content:ro
       # RDS presents a certificate signed by an Amazon CA that Node does not
       # trust by default. Mounted rather than baked into the image so rotating
       # it is a file copy, not a rebuild, and read-only because nothing should

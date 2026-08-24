@@ -79,5 +79,9 @@ docs/seeds/
 # churn on every rename and make diffs unreadable.
 docs/generated/atlas.json
 
-# compiled documentation corpus (rebuilt by vite.docs-content.ts)
+# The compiled documentation corpus. Private: served by the API out of
+# DOCS_CONTENT_DIR, never from the web bundle.
+docs/.compiled/
+# Kept as a safety net. The corpus must never be written under apps/web/public/
+# again — anything there is copied into the bundle and served to anyone.
 apps/web/public/docs-content/

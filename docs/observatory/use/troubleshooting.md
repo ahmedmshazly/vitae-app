@@ -29,6 +29,7 @@ sources:
   - apps/api/src/routes/v1/export.ts
   - apps/api/src/services/imports.ts
   - apps/api/src/services/restore.ts
+  - apps/web/src/routes/docs/docsContent.ts
   - packages/ui/src/feedback.tsx
   - packages/ui/src/layout.tsx
 requirements: [FR-010, FR-013, FR-011, FR-RES-013, FR-022, FR-023, FR-015, FR-SET-006]
@@ -390,6 +391,19 @@ apart: a page that was renamed, or a link older than the page it pointed at.
 
 If you are signed out and followed a link into the workspace, you were sent to
 the public home page rather than shown a login wall.
+
+**"The documentation is private. Sign in at /signin with the account that owns
+this instance, then open this page again."** means the address is fine and you
+are not. The documentation is served by the API, which refuses it to anyone who
+is not the owner, so a signed-out reader — or a reader signed in as somebody
+else — gets the empty frame and this sentence rather than a redirect. It is
+worded to stop you debugging a build that is working.
+
+**"No documentation was built into this deployment, so there is nothing to read
+here yet."** is the other one, and it is an operator's problem rather than
+yours. The corpus is compiled separately from the application and the API has
+to be pointed at the result; this message means it was not. See
+[Operate](../operate/index.md).
 
 ## Where to look when nothing obvious is wrong
 

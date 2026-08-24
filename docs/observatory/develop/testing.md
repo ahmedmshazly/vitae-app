@@ -210,7 +210,7 @@ is slow, it is opt-in locally, and it runs in no gate.
 ### What the numbers do not tell you
 
 Test counts are not coverage. Two measurements in the generated catalogs say so
-directly: 128 of the 135 registered API endpoints have a test associated with
+directly: 130 of the 137 registered API endpoints have a test associated with
 them, and of the 99 identifiers in the requirement register, only 22 are cited
 from inside a test file. The second figure measures citation, not proof — a
 requirement can be thoroughly tested by a suite that never names it — but it

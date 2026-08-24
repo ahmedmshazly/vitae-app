@@ -150,14 +150,14 @@ Three middlewares sit at the API prefix, in this order:
    staying writable.
 
 The generated API catalog labels every endpoint with the gate that applies to
-it. Of 135 registered endpoints it records 129 as authenticated, 3 as public
+it. Of 137 registered endpoints it records 131 as authenticated, 3 as public
 within the gate, and 3 as sitting outside it entirely.
 [Trust boundaries and data handling](security.md) explains each of those six and
 why it is where it is.
 
 ### Mounts, routers and the API description
 
-The versioned router mounts thirty-three prefixes. The same list is declared
+The versioned router mounts thirty-four prefixes. The same list is declared
 separately in `apps/api/src/openapi/mounts.ts`, and a contract test imports both
 the declared list and the generated document and asserts that every prefix has
 at least one documented path.
@@ -166,8 +166,8 @@ That assertion is worth understanding before trusting the OpenAPI document.
 `apps/api/src/openapi/spec.ts:60` defines `stubGet`, and `:471` emits one
 placeholder operation for each mount prefix that the hand-written paths do not
 already cover. The contract test therefore passes on full mount coverage while
-the document describes a minority of the operations: 48 paths and 52 operations
-against 135 registered endpoints, of which 46 are documented and 6 documented
+the document describes a minority of the operations: 49 paths and 53 operations
+against 137 registered endpoints, of which 47 are documented and 6 documented
 operations are not registered as routes at all.
 
 **Use `docs/generated/api.json` as the API's description, not

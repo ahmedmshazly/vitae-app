@@ -2,14 +2,15 @@
 /**
  * Compile the curated corpus into what the reading surface fetches.
  *
- * The output is static JSON under `apps/web/public/`, not a JavaScript module,
- * and that is a deliberate constraint rather than a convenience. The web
- * bundle is held to a size budget that counts `dist/assets/*.js`; a corpus
- * this size compiled into a chunk would breach it on the day it landed. Static
- * JSON also forces the reading surface to have real loading, empty and
- * unavailable states instead of pretending content is always present, and it
- * means the documentation is served by the same static host as the shell, with
- * no dependency on the API being up.
+ * The output is static JSON, not a JavaScript module, and that is a deliberate
+ * constraint rather than a convenience. The web bundle is held to a size budget
+ * that counts `dist/assets/*.js`; a corpus this size compiled into a chunk
+ * would breach it on the day it landed. Static JSON also forces the reading
+ * surface to have real loading, empty and unavailable states instead of
+ * pretending content is always present.
+ *
+ * The API serves these files rather than the public web host, because the
+ * corpus is private. See `apps/api/src/routes/v1/docs.ts`.
  *
  * Two shapes come out of it:
  *
@@ -63,8 +64,17 @@ const root = process.env.VITAE_DOCS_ROOT ? process.env.VITAE_DOCS_ROOT : join(he
 const args = process.argv.slice(2);
 const quiet = args.includes('--quiet');
 const outIndex = args.indexOf('--out');
+/**
+ * Where the compiled corpus lands.
+ *
+ * Not under `apps/web/public/` any more. Anything there is copied into the web
+ * bundle and served by the public host to anyone who asks, and this corpus is
+ * private: its generated half enumerates every route, endpoint, table and
+ * exported symbol in the repository. It is served instead by the API, behind
+ * the owner allow-list, from whatever directory `DOCS_CONTENT_DIR` names.
+ */
 const outDir =
-  outIndex === -1 ? join(root, 'apps/web/public/docs-content') : join(root, args[outIndex + 1]);
+  outIndex === -1 ? join(root, 'docs/.compiled') : join(root, args[outIndex + 1]);
 
 const model = JSON.parse(readFileSync(join(root, 'docs/registry/content-model.json'), 'utf8'));
 const CORPUS = model.corpus;

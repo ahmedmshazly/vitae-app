@@ -9,14 +9,7 @@ import {
 
 const SOCIAL_IMAGE_PATH = '/social-card.svg';
 
-/**
- * Text made safe to place in markup.
- *
- * Exported because the documentation prerenderer escapes the same kinds of
- * text against the same rules. A second copy would be a second thing to get
- * wrong, and getting it wrong is an injected script.
- */
-export function escapeHtml(value: string): string {
+function escapeHtml(value: string): string {
   return value.replace(/[&<>'"]/g, (character) => {
     switch (character) {
       case '&':
@@ -193,22 +186,9 @@ export function robotsTxt(launch: PublicLaunchConfig): string {
   return `User-agent: *\nAllow: /\n\nSitemap: ${launch.siteUrl}/sitemap.xml\n`;
 }
 
-/**
- * Every indexable public URL.
- *
- * `extraPaths` carries the documentation routes, which are not in
- * `PUBLIC_METADATA`: the corpus is a build artifact, so its route list is
- * discovered at build time rather than maintained by hand. They pass through
- * the same gate as everything else — a sitemap that lists pages while
- * `robots.txt` disallows the whole site is a contradiction a crawler is
- * entitled to act on, and this build serves both files.
- */
-export function sitemapXml(
-  launch: PublicLaunchConfig,
-  extraPaths: readonly string[] = [],
-): string {
-  const open = launch.cloudEnabled && Boolean(launch.siteUrl);
-  const urls = open ? [...publicRoutePathsForSitemap(launch), ...extraPaths] : [];
+/** Every indexable public URL. */
+export function sitemapXml(launch: PublicLaunchConfig): string {
+  const urls = publicRoutePathsForSitemap(launch);
   const entries = urls
     .map((path) => absolutePublicUrl(launch.siteUrl, path))
     .filter((url): url is string => url !== null)

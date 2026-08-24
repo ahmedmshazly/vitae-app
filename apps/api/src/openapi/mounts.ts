@@ -23,6 +23,7 @@ export const V1_MOUNT_PREFIXES = [
   '/dashboard',
   '/applications',
   '/status',
+  '/docs',
   '/export',
   '/settings',
   '/habits',

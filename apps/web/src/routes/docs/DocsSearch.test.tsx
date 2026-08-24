@@ -12,7 +12,9 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { ApiError } from '../../lib/api.js';
+import { mockApi, resetMockApi } from '../../test/api-mock.js';
 import DocsApp from './DocsApp.js';
 import type { DocsManifest } from './docsModel.js';
 
@@ -76,26 +78,20 @@ const searchText = {
   ],
 };
 
-const fetchMock = vi.fn();
 let failIndex = false;
 
 beforeEach(() => {
   failIndex = false;
-  fetchMock.mockReset();
-  fetchMock.mockImplementation(async (url: string) => {
-    const path = url.slice(url.indexOf('docs-content/') + 'docs-content/'.length);
-    if (path === 'manifest.json') return { ok: true, status: 200, json: async () => manifest };
-    if (path === 'search-text.json') {
+  resetMockApi();
+  // Through `api.get`, because the corpus is behind the owner allow-list now.
+  mockApi.get.mockImplementation(async (path: string) => {
+    if (path === '/docs/manifest.json') return manifest;
+    if (path === '/docs/search-text.json') {
       if (failIndex) throw new TypeError('Failed to fetch');
-      return { ok: true, status: 200, json: async () => searchText };
+      return searchText;
     }
-    return { ok: false, status: 404, json: async () => ({}) };
+    throw new ApiError(404, 'NOT_FOUND', 'no');
   });
-  vi.stubGlobal('fetch', fetchMock);
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
 });
 
 let address = '';
@@ -192,11 +188,10 @@ describe('searching the corpus', () => {
     expect(await screen.findByText('Couldn’t load the search index')).toBeInTheDocument();
   });
 
-  it('reads the index without a session', async () => {
+  it('reads the index through the authenticated API', async () => {
     renderSearch('/docs/search?q=migration');
     await screen.findByRole('link', { name: /Running database migrations/ });
-    for (const call of fetchMock.mock.calls) {
-      expect(call[1]).toEqual({ credentials: 'omit' });
-    }
+    const asked = mockApi.get.mock.calls.map((call) => String(call[0]));
+    expect(asked).toContain('/docs/search-text.json');
   });
 });

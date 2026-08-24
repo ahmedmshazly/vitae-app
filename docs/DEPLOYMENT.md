@@ -92,6 +92,40 @@ Set at least the following values in `deploy/.env`:
 Do not set `AUTH_ENABLE_DEV_LOGIN=true` in production. Do not expose Postgres
 or port `8787` to the internet.
 
+## 2b. Publish the documentation corpus
+
+The documentation at `/docs` is **private**. It is not part of the web bundle
+and never has been served by the public host: the curated half describes every
+trust boundary and known gap in the system, and the generated half enumerates
+every route, endpoint, configuration key, table, migration and exported symbol
+in the repository. Published openly it is a map of the software for anyone who
+wants one.
+
+The API serves it instead, from `GET /api/v1/docs/*`, behind the same
+default-deny gate and `OWNER_EMAIL` allow-list that protect the graph. A reader
+who is not signed in as the owner is refused, and the browser tells them so.
+
+Compile it on a machine with the repository checked out — the compiler reads
+the tracked file set with `git`, which a Docker build context does not have —
+and copy the result to the API host:
+
+```bash
+pnpm docs:build                       # writes docs/.compiled
+rsync -a docs/.compiled/ <host>:/srv/vitae/deploy/docs-content/
+```
+
+`deploy/compose.prod.yml` mounts `./docs-content` read-only at
+`/app/docs-content` and sets `DOCS_CONTENT_DIR` to match, so republishing the
+documentation is a file copy rather than an image rebuild.
+
+Leaving the directory absent is a supported state: `/api/v1/docs` then answers
+`503 DOCS_UNAVAILABLE` and says what to do, rather than reporting a corpus with
+nothing in it.
+
+> [!WARNING]
+> Never place the compiled corpus under `apps/web/public/`. Anything there is
+> copied into the web bundle and served to anyone who asks for the URL.
+
 ## 3. Apply migrations and verify
 
 Run migrations once for each deployment before directing traffic to a new API

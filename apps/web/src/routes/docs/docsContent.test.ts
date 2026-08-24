@@ -1,13 +1,14 @@
 /**
- * What a failed read says out loud, and what it never sends.
+ * How the reader asks for a corpus that is no longer public.
  *
- * The corpus is public static JSON, so the interesting behaviour here is not
- * the happy path. It is the two failure messages, which are the only thing a
- * reader sees when a build shipped without its content, and the absence of
- * credentials on a request that has no business carrying any.
+ * The corpus moved behind the API's default-deny gate, so the interesting
+ * behaviour here is what a refusal says and what every request carries. A
+ * reader who is signed out must be told the documentation is private rather
+ * than that the build is broken — those send them to entirely different places
+ * — and a deployment with no corpus in it is an operator's problem, not theirs.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { docsAsset, manifestQueryOptions, pageQueryOptions } from './docsContent.js';
+import { DOCS_CONTENT_BASE, manifestQueryOptions, pageQueryOptions } from './docsContent.js';
 import type { DocsPageSummary } from './docsModel.js';
 
 const page: DocsPageSummary = {
@@ -24,7 +25,15 @@ const page: DocsPageSummary = {
   status: 'verified',
 };
 
-describe('fetching compiled content', () => {
+const json = (status: number, body: unknown) => ({
+  ok: status >= 200 && status < 300,
+  status,
+  statusText: String(status),
+  headers: { get: () => 'application/json' },
+  json: async () => body,
+});
+
+describe('asking the API for the corpus', () => {
   const fetchMock = vi.fn();
 
   beforeEach(() => {
@@ -36,22 +45,44 @@ describe('fetching compiled content', () => {
     vi.unstubAllGlobals();
   });
 
-  it('reads from the content root, which is not the client route prefix', () => {
-    expect(docsAsset('manifest.json')).toMatch(/\/docs-content\/manifest\.json$/);
-    expect(docsAsset('manifest.json')).not.toMatch(/\/docs\/manifest\.json$/);
+  it('reads from the API mount, not from a file beside the application', () => {
+    // The static tree is gone. Anything still pointing at `docs-content` would
+    // be requesting a path the public host no longer serves — and must not.
+    expect(DOCS_CONTENT_BASE).toBe('/docs');
   });
 
-  it('sends no credentials with a public read', async () => {
-    fetchMock.mockResolvedValue({ ok: true, status: 200, json: async () => ({}) });
+  it('carries the session, because the corpus is behind the owner allow-list', async () => {
+    fetchMock.mockResolvedValue(json(200, {}));
     await manifestQueryOptions().queryFn();
-    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('manifest.json'), {
-      credentials: 'omit',
-    });
+
+    const [url, init] = fetchMock.mock.calls[0]!;
+    expect(String(url)).toContain('/docs/manifest.json');
+    expect(init.credentials).toBe('include');
   });
 
-  // "Failed to fetch" reaches the screen through QueryBoundary and tells a
-  // reader nothing they can act on. These two messages separate "your network"
-  // from "this build is incomplete".
+  it('says the documentation is private when the caller is not the owner', async () => {
+    // 401 here is not a broken build, and telling a reader it was one sends
+    // them to look at the wrong thing entirely.
+    fetchMock.mockResolvedValue(json(401, { error: { code: 'UNAUTHENTICATED', message: 'no' } }));
+    await expect(manifestQueryOptions().queryFn()).rejects.toThrow(
+      /documentation is private.*Sign in at \/signin with the account that owns this instance/s,
+    );
+  });
+
+  it('says the same for a forbidden read', async () => {
+    fetchMock.mockResolvedValue(json(403, { error: { code: 'FORBIDDEN', message: 'no' } }));
+    await expect(manifestQueryOptions().queryFn()).rejects.toThrow(/documentation is private/);
+  });
+
+  it('distinguishes a deployment that was built without any corpus', async () => {
+    fetchMock.mockResolvedValue(
+      json(503, { error: { code: 'DOCS_UNAVAILABLE', message: 'nothing here' } }),
+    );
+    await expect(manifestQueryOptions().queryFn()).rejects.toThrow(
+      /No documentation was built into this deployment/,
+    );
+  });
+
   it('says the connection failed when the request never completes', async () => {
     fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
     await expect(manifestQueryOptions().queryFn()).rejects.toThrow(
@@ -59,15 +90,15 @@ describe('fetching compiled content', () => {
     );
   });
 
-  it('names the status code when the file is not there', async () => {
-    fetchMock.mockResolvedValue({ ok: false, status: 404, json: async () => ({}) });
+  it('names the status code when the file is genuinely not there', async () => {
+    fetchMock.mockResolvedValue(json(404, { error: { code: 'NOT_FOUND', message: 'no' } }));
     await expect(manifestQueryOptions().queryFn()).rejects.toThrow(
       /the documentation index is not available \(404\)/,
     );
   });
 
   it('quotes the page title when a page fails, so the reader knows which one', async () => {
-    fetchMock.mockResolvedValue({ ok: false, status: 500, json: async () => ({}) });
+    fetchMock.mockResolvedValue(json(500, { error: { code: 'ERROR', message: 'no' } }));
     const options = pageQueryOptions(page);
     expect(options.queryKey).toEqual(['docs', 'page', 'ONE']);
     await expect(options.queryFn()).rejects.toThrow(/“First” is not available \(500\)/);

@@ -104,11 +104,7 @@ export type PublicPageKind =
   | 'guide'
   | 'legal'
   | 'status'
-  | 'resource'
-  // A page of the documentation corpus. Not in PUBLIC_METADATA: its
-  // metadata is synthesised from the compiled manifest at build time, so
-  // the head of a documentation page comes from the page itself.
-  | 'documentation';
+  | 'resource';
 
 export type PublicMetadata = Readonly<{
   path: string;

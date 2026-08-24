@@ -21,6 +21,8 @@ sources:
   - scripts/check-docs-coverage.mjs
   - scripts/check-docs-generated.mjs
   - scripts/check-docs-traceability.mjs
+  - scripts/docs/build-content.mjs
+  - apps/web/vite.docs-content.ts
   - scripts/ci-local.sh
   - docs/design/brand-ban-allowlist.json
   - docs/testing/prose-allowlist.json
@@ -191,7 +193,9 @@ the skeleton, and two print stylesheets where a literal colour is the point.
 ### `pnpm docs:check` — the documentation gates
 
 Five checkers, each preceded by its own self-test — ten self-tests in total
-before the first real check runs.
+before the first real check runs. All five judge the corpus as it is written.
+None of them compiles it into what the reading surface fetches, and no other
+job does either; that hole is described under *Where the gates do not reach*.
 
 - **Pages.** Every curated page's metadata is complete and drawn from a closed
   vocabulary, its declared domain matches its directory, every path in
@@ -343,6 +347,34 @@ declares neither `typecheck` nor `build`, and no workspace imports it, so its
 **250 cases** — the entire browser acceptance suite — are compiled only at the
 moment Playwright runs a file. A type error in a helper surfaces as a failing
 journey rather than as a failing type check.
+
+### Nothing compiles the documentation corpus any more
+
+`pnpm docs:check` reads the corpus as Markdown. It never runs
+`scripts/docs/build-content.mjs`, the step that turns those pages into the JSON
+the reading surface actually fetches, so every claim in the section above is
+about the source and none of it is about the artifact.
+
+Until August 2026 that did not matter, because the compiler ran inside the web
+build: the corpus was written into `apps/web/public/` and shipped inside the
+bundle, so `pnpm build` in the build job compiled it on every commit. The
+corpus is private now. It is served by the API out of a directory outside the
+bundle, the Vite plugin that used to compile it runs only while the development
+server is up, and no job invokes `pnpm docs:build`. The one gate that covered
+this step covered it as a side effect, and the side effect is gone.
+
+Run it by hand when you change the corpus, the content model or the builder:
+
+```bash
+pnpm docs:build
+```
+
+Two smaller holes sit beside it. The compiled corpus is git-ignored, so
+`test:public` — which scans tracked and untracked-but-not-ignored files — never
+sees it. And nothing fails a build that writes the corpus back under
+`apps/web/public/`, where it would be copied into the bundle and served to
+anyone; `.gitignore` still lists the old path, which stops it being committed
+and stops nothing else.
 
 ### Gates that exist but run in no job
 

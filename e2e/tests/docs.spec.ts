@@ -1,17 +1,23 @@
 import { test, expect, type Page } from '@playwright/test';
 import { expectNoA11yViolations } from './helpers/a11y';
+import { signIn } from './helpers/auth';
 
 /**
  * The documentation surface at `/docs`.
  *
  * These tests assert the properties the corpus promises rather than any
  * particular page, so adding, renaming or reordering pages cannot break them.
- * The properties are: it opens with no session, it never calls the API, every
- * section it advertises is reachable, and a reader can walk the whole thing
- * with the keyboard.
+ *
+ * The first property used to be that the surface needed no session and never
+ * called the API. It is the opposite now, deliberately: the corpus describes
+ * every trust boundary in the system and enumerates every route, endpoint,
+ * table and symbol in the repository, so it is served by the API behind the
+ * owner allow-list rather than published as static files. The suite therefore
+ * signs in first, and the one test that still checks an unauthenticated view
+ * checks that it is refused.
  */
 
-/** Requests the reading surface must never make. */
+/** Requests the reading surface makes, for the tests that care which. */
 function watchForApiCalls(page: Page): string[] {
   const calls: string[] = [];
   page.on('request', (request) => {
@@ -21,21 +27,42 @@ function watchForApiCalls(page: Page): string[] {
   return calls;
 }
 
-test('the corpus opens without a session and without touching the API', async ({ page }) => {
+/**
+ * Every test below reads the corpus, and the corpus is private. Signing in as
+ * the owner is therefore setup rather than something under test — except in the
+ * one test that clears the session on purpose to prove the refusal.
+ */
+test.beforeEach(async ({ page }) => {
+  await signIn(page);
+});
+
+test('the owner can read the corpus, and it comes from the API', async ({ page }) => {
   const apiCalls = watchForApiCalls(page);
   const consoleErrors: string[] = [];
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(message.text());
   });
 
-  await page.context().clearCookies();
   await page.goto('/docs');
 
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Documentation sections' })).toBeVisible();
 
-  expect(apiCalls, 'the reading surface is readable with the API stopped').toEqual([]);
+  // The corpus is no longer a static file beside the application. If this ever
+  // passes without an /api/v1/docs request, something is serving it publicly.
+  expect(apiCalls.some((path) => path.startsWith('/api/v1/docs/'))).toBe(true);
   expect(consoleErrors).toEqual([]);
+});
+
+test('a reader with no session is refused, and told why', async ({ page, context }) => {
+  // The whole point of the move. A signed-out reader must not get the corpus,
+  // and must not be sent to debug a build that is fine.
+  await context.clearCookies();
+  await page.goto('/docs');
+
+  await expect(page.getByText(/documentation is private/i)).toBeVisible();
+  await expect(page.getByText(/account that owns this instance/i)).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Documentation sections' })).toBeHidden();
 });
 
 test('every section the navigation advertises is reachable', async ({ page }) => {
@@ -107,7 +134,9 @@ test('an unknown documentation path says so instead of asking for a login', asyn
 
   await expect(page.getByRole('main')).toContainText(/no documentation page at this address/i);
   await expect(page.getByRole('link', { name: /documentation/i }).first()).toBeVisible();
-  expect(apiCalls).toEqual([]);
+  // The manifest is fetched; no page request follows, because the manifest
+  // already said this route does not exist.
+  expect(apiCalls.some((path) => path.includes('/docs/pages/'))).toBe(false);
 });
 
 test('the skip link puts the keyboard on the document', async ({ page }) => {
@@ -144,7 +173,9 @@ test('search answers from a static index, with the query in the address', async 
   const results = page.getByRole('status');
   await expect(results).toContainText(/page/);
   await expect(page.getByRole('link').filter({ hasText: /migration/i }).first()).toBeVisible();
-  expect(apiCalls, 'search must not need the API').toEqual([]);
+  // The index is one file from the API, fetched once, not a query per keystroke.
+  const indexReads = apiCalls.filter((path) => path.includes('search-text.json'));
+  expect(indexReads.length).toBe(1);
 });
 
 test('a search can be opened from a link and narrowed by facet', async ({ page }) => {
@@ -193,7 +224,8 @@ test('a generated catalog loads, filters, and keeps the filter in the address', 
   await expect(page).toHaveURL(/\?q=pricing$/);
   await expect(page.getByRole('status')).not.toHaveText(all ?? '');
 
-  expect(apiCalls, 'a catalog is a static artifact').toEqual([]);
+  // One artifact, fetched once. Filtering happens in the page, not on a server.
+  expect(apiCalls.filter((path) => path.endsWith('/routes.json')).length).toBe(1);
 });
 
 test('a diagram carries its table whether or not anyone asks for it', async ({ page }) => {
@@ -222,7 +254,11 @@ test('an explainer runs the real algorithm in the page', async ({ page }) => {
   await expect(tokens.getByRole('rowheader', { name: 'running' })).toBeVisible();
   await expect(tokens.getByRole('rowheader', { name: 'migrations' })).toBeVisible();
 
-  expect(apiCalls, 'the algorithm runs here, not on a server').toEqual([]);
+  // The algorithm itself runs in the browser: typing must not produce traffic.
+  const before = apiCalls.length;
+  await field.fill('another phrase entirely');
+  await expect(tokens.getByRole('rowheader', { name: 'phrase' })).toBeVisible();
+  expect(apiCalls.length, 'the algorithm runs here, not on a server').toBe(before);
 });
 
 /**

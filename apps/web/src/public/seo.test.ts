@@ -55,24 +55,6 @@ describe('public SEO artifacts', () => {
     expect(robotsTxt(liveLaunch)).toContain('Sitemap: https://vitae.example.com/sitemap.xml');
   });
 
-  it('lists the documentation routes the build discovered', () => {
-    // The corpus is a build artifact, so its routes are not in PUBLIC_METADATA
-    // and reach the sitemap only by being handed in.
-    const sitemap = sitemapXml(liveLaunch, ['/docs', '/docs/architecture/security']);
-
-    expect(sitemap).toContain('<loc>https://vitae.example.com/docs</loc>');
-    expect(sitemap).toContain('<loc>https://vitae.example.com/docs/architecture/security</loc>');
-  });
-
-  it('holds the documentation routes back behind the same gate as everything else', () => {
-    // robots.txt disallows the whole site until the gate opens. A sitemap that
-    // named pages anyway would contradict it, and a crawler may act on either.
-    const closed = getPublicLaunchConfig({});
-
-    expect(sitemapXml(closed, ['/docs'])).not.toContain('/docs');
-    expect(robotsTxt(closed)).toContain('Disallow: /');
-  });
-
   it('replaces the SEO marker and includes semantic static public text', () => {
     const home = publicMetadataForPath('/')!;
     const html = withPublicHead(

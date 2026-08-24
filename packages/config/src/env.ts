@@ -52,6 +52,20 @@ const serverEnvSchema = z.object({
   /** Browser origin allowed to call this API in addition to WEB_ORIGIN. */
   APERTURE_ORIGIN: z.string().url().optional(),
 
+  /**
+   * Where the compiled documentation corpus lives on disk.
+   *
+   * The corpus is served by this API rather than by the public web host,
+   * because it is private: it describes the whole system, and its generated
+   * half enumerates every route, endpoint, table and exported symbol in the
+   * repository. Behind this API it inherits the OWNER_EMAIL allow-list that
+   * gates every other request, which is the only reason it is readable at all.
+   *
+   * Unset means no corpus was built into this deployment, and the endpoints
+   * report that rather than pretending the documentation is empty.
+   */
+  DOCS_CONTENT_DIR: z.string().min(1).optional(),
+
   // Firebase: AUTH ONLY (ADR 0005). Sign-in stayed on Firebase when the data
   // plane moved to Postgres, because `verifyIdToken` is free, unmetered, and was
   // never the constraint. There is no Firestore here any more.

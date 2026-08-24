@@ -7,6 +7,11 @@ domain: meta
 type: index
 status: verified
 verified_at: 2026-08-24
+sources:
+  - scripts/docs/build-content.mjs
+  - apps/web/vite.docs-content.ts
+  - apps/web/vite.public-seo.ts
+  - apps/api/src/routes/v1/docs.ts
 ---
 
 # About these documents
@@ -28,6 +33,37 @@ It records four kinds of defect: a quality gate that could not fail, reference
 surfaces that under-reported what shipped, documents that contradicted the
 running code, and facts that had simply gone stale. Each entry says whether it
 has been repaired, and where.
+
+## How these pages reach a reader
+
+The corpus is Markdown in `docs/observatory/`. A build step compiles it into
+JSON — one file per page, plus a manifest and a search text — and copies the
+generated catalogs in beside it. The reading surface fetches those files; it
+never parses Markdown in the browser.
+
+The compiled output is not committed. An artifact that lives in the repository
+is one somebody can forget to regenerate, and the failure mode is the worst
+kind: a documentation surface confidently serving a page that no longer says
+what the corpus says. During development a plugin recompiles on every save. A
+production build of the web application does not compile it at all.
+
+That last sentence is the part that changed. The corpus used to be compiled
+into `apps/web/public/`, which meant it shipped inside the web bundle and was
+served, as static files, by the public host. It is now compiled into a
+directory outside the bundle and served by the API, which refuses it to anyone
+who is not the owner of the instance.
+
+The move cost real properties, and they were traded away rather than lost.
+Every documentation page used to be prerendered to HTML: readable with
+JavaScript disabled, readable with the API stopped, and listed in the sitemap
+for a search engine to index. None of that is true now, and none of it can be
+while the corpus is private, because each of those properties is a way of
+handing a page to someone who has not been asked to identify themselves. What
+was bought is stated on the entrance page under
+[Who can read this](../index.md#who-can-read-this): this corpus describes every
+trust boundary in the system and enumerates every route, endpoint, table and
+exported symbol in the repository, and a map of that kind is worth more to
+someone attacking the system than to anyone it was written for.
 
 ## The rules these pages are held to
 

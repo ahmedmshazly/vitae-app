@@ -12,14 +12,18 @@ function compile(): void {
 }
 
 /**
- * Compile the documentation corpus into `public/docs-content` before Vite
- * serves or builds.
+ * Keep the compiled corpus fresh while the dev server is running.
+ *
+ * The corpus is not a web asset any more: it is served by the API behind the
+ * owner allow-list, out of the directory `DOCS_CONTENT_DIR` names. Nothing in
+ * this bundle reads it, so this plugin no longer runs at build time — it exists
+ * purely so that editing a page during development recompiles it and the API
+ * serves the new text on the next request.
  *
  * The compiled JSON is not committed. An artifact that lives in the repository
  * is one someone can forget to regenerate, and the failure mode is the worst
  * kind: a documentation surface confidently serving a page that no longer says
- * what the corpus says. Compiling on every serve and every build removes the
- * chance to be out of date rather than adding a check for it.
+ * what the corpus says.
  *
  * The builder runs as a separate process rather than an import because a watch
  * rebuild needs it to run again, and a module that has already been evaluated
@@ -28,15 +32,9 @@ function compile(): void {
 export function docsContent(): Plugin {
   return {
     name: 'vitae-docs-content',
-    buildStart() {
-      // Vitest loads this config too, and no unit test reads the compiled
-      // corpus — it is fetched over the network by a browser. Compiling there
-      // only creates a way for one unfinished Markdown page to fail every test
-      // in the package, which reports an authoring mistake as a broken build
-      // system. `pnpm docs:check` is where a bad page is meant to be caught.
-      if (process.env.VITEST) return;
-      compile();
-    },
+    // No `buildStart`. A production build of this bundle must not compile the
+    // corpus: nothing here serves it, and writing it anywhere near `dist` is
+    // how it became public in the first place.
     configureServer(server) {
       server.watcher.add([CORPUS, MODEL]);
       const rebuild = (path: string) => {

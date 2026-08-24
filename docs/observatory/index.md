@@ -7,6 +7,10 @@ domain: meta
 type: index
 status: verified
 verified_at: 2026-08-24
+sources:
+  - apps/api/src/routes/v1/docs.ts
+  - apps/web/src/routes/docs/docsContent.ts
+  - apps/web/vite.public-seo.ts
 ---
 
 # Vitae documentation
@@ -39,6 +43,38 @@ and fails if the committed copy has drifted, so it cannot quietly go stale.
 Prose never lists what a generator can index. That separation is what makes it
 possible to document every small part of a system this size without the
 readable half turning into a code dump nobody maintains.
+
+## Who can read this
+
+This documentation is private. It is served by the API, from behind the same
+default-deny gate that protects the graph itself, and on a self-hosted install
+the only identity that gate admits is the configured `OWNER_EMAIL`.
+
+The reason is the two halves above, taken together. The curated half describes
+every trust boundary in the system and names the gaps that are known rather
+than closed. The generated half enumerates every route, endpoint, configuration
+key, table, migration and exported symbol in the repository. Published openly,
+that is a map of the software for anyone who wants one — and the map is more
+useful to someone attacking the system than to anyone else, because the people
+it was written for can sign in.
+
+It was open until August 2026, and the properties it had then are gone. There
+is no prerendered copy of any page, nothing readable with JavaScript disabled,
+nothing readable with the API stopped, and no documentation address in the
+sitemap. Nothing under `apps/web/public/` holds the corpus, because everything
+there is copied into the web bundle and served to anyone who asks.
+
+What did not change is the address. `/docs` still resolves in the browser
+without a session, deliberately: it draws its own frame and a sentence saying
+the corpus is private and which account to sign in with, rather than
+redirecting a signed-out reader somewhere else with no explanation. The frame
+carries no text from the corpus. Every page, the navigation and the search
+index arrive from an authenticated request or not at all.
+
+Because the corpus is now a deployment artifact rather than part of the web
+build, an instance has to be given one. [Operate](operate/index.md) covers
+building it and pointing the API at it, and what a deployment that has not done
+so reports instead.
 
 ## What the status badges claim
 

@@ -17,7 +17,9 @@ import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { ApiError } from '../../lib/api.js';
+import { mockApi, resetMockApi } from '../../test/api-mock.js';
 import { runAxe } from '../../test/a11y.js';
 import DocsApp from './DocsApp.js';
 import type { DocsManifest, DocsPageContent } from './docsModel.js';
@@ -192,30 +194,28 @@ const pages: Record<string, DocsPageContent> = {
 
 type Outcome = { ok: true; body: unknown } | { ok: false; status: number } | { throws: true };
 
-const fetchMock = vi.fn();
 let overrides: Record<string, Outcome>;
 
-function file(url: string): string {
-  return url.slice(url.indexOf('docs-content/') + 'docs-content/'.length);
+/** `/docs/pages/meta/one.json` -> `pages/meta/one.json`. */
+function file(path: string): string {
+  return path.replace(/^\/docs\//, '');
 }
 
 beforeEach(() => {
   overrides = {};
-  fetchMock.mockReset();
-  fetchMock.mockImplementation(async (url: string) => {
-    const path = file(url);
+  resetMockApi();
+  // The corpus arrives through `api.get`, which is where the session cookie and
+  // bearer token live. Mocking that rather than `fetch` is what keeps this
+  // suite testing the reader instead of re-testing the transport.
+  mockApi.get.mockImplementation(async (requested: string) => {
+    const path = file(requested);
     const override = overrides[path];
     if (override && 'throws' in override) throw new TypeError('Failed to fetch');
-    if (override && !override.ok) return { ok: false, status: override.status, json: async () => ({}) };
+    if (override && !override.ok) throw new ApiError(override.status, 'ERROR', 'no');
     const body = override?.ok ? override.body : path === 'manifest.json' ? manifest : pages[path];
-    if (body === undefined) return { ok: false, status: 404, json: async () => ({}) };
-    return { ok: true, status: 200, json: async () => body };
+    if (body === undefined) throw new ApiError(404, 'NOT_FOUND', 'no');
+    return body;
   });
-  vi.stubGlobal('fetch', fetchMock);
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
 });
 
 /**
@@ -262,14 +262,15 @@ describe('reaching the corpus', () => {
     expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
   });
 
-  // A reader with no session and no API must still get the corpus: everything
-  // it reads is a static file, so nothing here can be gated behind a login.
-  it('never sends credentials, so no session is needed to read', async () => {
+  // The corpus is private. Every read goes through the authenticated client, so
+  // a reader without the owner's session gets nothing — see docsContent.test.ts
+  // for what each refusal says.
+  it('reads the corpus through the authenticated API, not from a public file', async () => {
     renderDocs('/docs/meta/coverage');
     await screen.findByText('Nine checks run in CI.');
-    for (const call of fetchMock.mock.calls) {
-      expect(call[1]).toEqual({ credentials: 'omit' });
-    }
+    const asked = mockApi.get.mock.calls.map((call) => String(call[0]));
+    expect(asked).toContain('/docs/manifest.json');
+    expect(asked.every((path) => path.startsWith('/docs/'))).toBe(true);
   });
 });
 
@@ -496,16 +497,13 @@ describe('finding the way', () => {
     const user = userEvent.setup();
     renderDocs('/docs/meta');
     await screen.findByText('What the corpus is.');
-    fetchMock.mockClear();
+    mockApi.get.mockClear();
 
     const nav = screen.getByRole('navigation', { name: 'Documentation sections' });
     await user.hover(within(nav).getByRole('link', { name: 'Coverage and contradictions' }));
 
     await waitFor(() =>
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining('pages/meta/coverage.json'),
-        expect.anything(),
-      ),
+      expect(mockApi.get).toHaveBeenCalledWith('/docs/pages/meta/coverage.json'),
     );
   });
 

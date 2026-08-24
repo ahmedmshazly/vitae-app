@@ -1,20 +1,20 @@
 {
   "by_package": {
     "@vitae/api": {
-      "files": 106,
-      "lines": 19539,
-      "exports": 366,
-      "undocumented": 276
+      "files": 107,
+      "lines": 19689,
+      "exports": 367,
+      "undocumented": 277
     },
     "@vitae/web": {
-      "files": 173,
-      "lines": 46930,
-      "exports": 742,
+      "files": 172,
+      "lines": 46350,
+      "exports": 738,
       "undocumented": 505
     },
     "@vitae/config": {
       "files": 1,
-      "lines": 166,
+      "lines": 180,
       "exports": 3,
       "undocumented": 1
     },
@@ -45,9 +45,9 @@
   },
   "by_kind": {
     "module": {
-      "files": 65,
-      "lines": 9980,
-      "exports": 362,
+      "files": 64,
+      "lines": 9380,
+      "exports": 359,
       "undocumented": 204
     },
     "migration": {
@@ -76,15 +76,15 @@
     },
     "contract": {
       "files": 3,
-      "lines": 903,
+      "lines": 904,
       "exports": 3,
       "undocumented": 2
     },
     "route": {
-      "files": 44,
-      "lines": 8100,
+      "files": 45,
+      "lines": 8259,
       "exports": 224,
-      "undocumented": 175
+      "undocumented": 176
     },
     "script": {
       "files": 12,
@@ -100,7 +100,7 @@
     },
     "component": {
       "files": 65,
-      "lines": 16599,
+      "lines": 16609,
       "exports": 291,
       "undocumented": 228
     },
@@ -118,7 +118,7 @@
     },
     "schema": {
       "files": 9,
-      "lines": 1722,
+      "lines": 1736,
       "exports": 179,
       "undocumented": 146
     },
@@ -678,11 +678,11 @@
   "summary": {
     "files": 348,
     "test_files": 318,
-    "lines": 79339,
-    "exports": 1712,
-    "undocumented_exports": 1213,
-    "edges": 1548,
-    "untested": 137,
+    "lines": 78923,
+    "exports": 1709,
+    "undocumented_exports": 1214,
+    "edges": 1545,
+    "untested": 138,
     "no_consumer": [],
     "consumed_only_by_tests": [
       "apps/web/src/components/ListToolbar.tsx",
@@ -710,7 +710,7 @@
       },
       {
         "file": "apps/web/src/lib/api.ts",
-        "dependents": 52
+        "dependents": 53
       },
       {
         "file": "packages/ui/src/overlay.tsx",

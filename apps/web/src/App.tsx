@@ -255,10 +255,20 @@ export function App() {
         }
       />
       {/*
-        The documentation corpus is public, so it has to be declared above the
-        wildcard below: `AuthGate` claims every path it reaches, and a reader
-        with no account would be redirected to sign in instead of reading. It
-        also mounts outside `Shell` and `ToastProvider`, alongside the entity
+        The documentation *corpus* is private — it is served by the API behind
+        the owner allow-list — but this route is still declared above the
+        wildcard below, and deliberately.
+
+        `AuthGate` claims every path it reaches and bounces a signed-out visitor
+        to the public home page with no explanation. A reader who bookmarked a
+        documentation page and later signed out would simply find themselves
+        somewhere else. Rendering the shell instead lets the surface say what
+        actually happened — the corpus is private, sign in as the owner — which
+        is the more useful answer and gives nothing away: every byte of the
+        corpus arrives from an authenticated request, so an anonymous visitor
+        reaches an empty frame and a sentence.
+
+        It also mounts outside `Shell` and `ToastProvider`, alongside the entity
         catalog, because a reading surface has no workspace chrome to inherit.
       */}
       <Route

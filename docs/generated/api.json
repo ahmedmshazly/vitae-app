@@ -2,17 +2,17 @@
   "generated_by": "scripts/docs/gen-api.mjs",
   "note": "Derived from the Express routers, not from docs/api/openapi.json. Do not edit by hand.",
   "totals": {
-    "endpoints": 135,
-    "mounts": 33,
-    "declared_mount_prefixes": 33,
+    "endpoints": 137,
+    "mounts": 34,
+    "declared_mount_prefixes": 34,
     "public_endpoints": 3,
     "outside_auth_gate": 3,
     "blocked_when_read_only": 70,
-    "documented_in_openapi": 46,
-    "undocumented_in_openapi": 89,
-    "openapi_operations": 52,
+    "documented_in_openapi": 47,
+    "undocumented_in_openapi": 90,
+    "openapi_operations": 53,
     "documented_but_not_registered": 6,
-    "endpoints_with_tests": 128,
+    "endpoints_with_tests": 130,
     "endpoints_citing_requirements": 27
   },
   "gates": {
@@ -68,6 +68,12 @@
       "router": "dashboardRouter",
       "source": "apps/api/src/routes/v1/dashboard.ts",
       "endpoints": 1
+    },
+    {
+      "prefix": "/docs",
+      "router": "docsRouter",
+      "source": "apps/api/src/routes/v1/docs.ts",
+      "endpoints": 2
     },
     {
       "prefix": "/duplicates",
@@ -914,6 +920,52 @@
         "apps/api/src/routes/v1/dashboard.integration.test.ts"
       ],
       "openapi": true
+    },
+    {
+      "id": "GET /api/v1/docs",
+      "slug": "get-api-v1-docs",
+      "method": "GET",
+      "path": "/api/v1/docs",
+      "express_path": "/api/v1/docs",
+      "mount": "/docs",
+      "source": "apps/api/src/routes/v1/docs.ts:106",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/docs.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/docs/*",
+      "slug": "get-api-v1-docs",
+      "method": "GET",
+      "path": "/api/v1/docs/*",
+      "express_path": "/api/v1/docs/*",
+      "mount": "/docs",
+      "source": "apps/api/src/routes/v1/docs.ts:119",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/docs.integration.test.ts"
+      ],
+      "openapi": false
     },
     {
       "id": "GET /api/v1/duplicates",
@@ -4032,6 +4084,7 @@
     "POST /api/v1/atoms/{id}/restore",
     "POST /api/v1/composer/draft",
     "POST /api/v1/composer/send",
+    "GET /api/v1/docs/*",
     "GET /api/v1/duplicates/aliases",
     "DELETE /api/v1/duplicates/aliases/{id}",
     "POST /api/v1/duplicates/check",

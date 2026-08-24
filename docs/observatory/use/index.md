@@ -54,10 +54,16 @@ the six workspaces named in the left rail. A signed-out visitor who follows a
 deep link into the workspace is returned to the public home page rather than
 shown a login wall over a screen they cannot have.
 
-Two further surfaces sit outside both: the entity catalogue at
-`/reference/entities` and this documentation. Both describe the system rather
-than your data, so both are mounted above the authentication gate and need no
-account. [Every screen, and what it is for](screens.md) separates the three.
+Two further surfaces sit outside both, and they describe the system rather than
+your data. The entity catalogue at `/reference/entities` needs no account: what
+it shows is compiled into the build, so it never waits on the API. **This
+documentation does need one.** Its route is mounted above the authentication
+gate so that a signed-out reader is told what happened rather than silently
+redirected, but the corpus itself is fetched from the API and refused to
+anyone who is not the owner of the instance — because it describes every trust
+boundary in the system and enumerates every route, endpoint, table and exported
+symbol in the repository. [Every screen, and what it is for](screens.md)
+separates the three.
 
 ## What this section deliberately does not do
 

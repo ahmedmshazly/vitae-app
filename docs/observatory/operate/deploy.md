@@ -18,6 +18,9 @@ sources:
   - .github/workflows/ci.yml
   - apps/api/src/middleware/health.ts
   - apps/api/src/index.ts
+  - apps/api/src/routes/v1/docs.ts
+  - scripts/docs/build-content.mjs
+  - packages/config/src/env.ts
   - docs/runbooks/bump-tectonic.md
 requirements: [FR-026, FR-016, FR-007, FR-RES-009]
 covers: [runbook:docs/runbooks/bump-tectonic.md]
@@ -38,6 +41,12 @@ Nothing deploys itself. Continuous integration builds and tests, and stops
 there; moving code onto the API host is one command a person runs, and it is
 guarded so that it cannot run against a host or a directory it was not told
 about.
+
+One thing that used to travel with the web application no longer does: the
+documentation corpus is private, so the API serves it rather than the static
+host, and it has to be built and put on the API host by hand. Nothing below
+does that for you, and an instance that skips the step runs correctly with no
+documentation in it.
 
 ## How it works
 
@@ -139,6 +148,47 @@ as an unprivileged user. Both images have `npm` removed from the final layer,
 because nothing in either one runs it and leaving it in means carrying its
 vendored dependencies through every vulnerability scan.
 
+### Getting the documentation corpus onto the API host
+
+The documentation is served by the API, out of whatever directory
+`DOCS_CONTENT_DIR` names, because the corpus describes every trust boundary in
+the system and enumerates every route, endpoint, table and exported symbol in
+the repository. Behind the API it inherits the owner allow-list. On the static
+host it inherited nothing.
+
+Nothing in the deploy path produces it. The API image copies the workspace
+packages, the API source and the templates; it does not copy `docs/`. The
+compiled corpus is git-ignored, so it is not in the host's checkout either. The
+deploy script builds images, runs migrations and recreates containers; it
+compiles no documentation. This is a gap in the tooling rather than a rule, and
+it is stated plainly because the symptom is silent.
+
+The consequence is worth being unsurprised by: an instance deployed exactly as
+described above serves no documentation. `GET /api/v1/docs` answers 503 with a
+code saying no corpus was built into this deployment, and the reading surface
+repeats it. That is the intended answer for that situation — the alternative,
+an empty documentation set, would send someone looking for pages that were
+never compiled.
+
+To give an instance its documentation:
+
+1. Compile the corpus from a checkout: `pnpm docs:build`, which writes
+   `docs/.compiled`. It is a build artifact; rebuild it whenever the corpus
+   changes rather than expecting a checkout to carry it.
+2. Copy that directory to the API host and make it visible inside the API
+   container. The compose file already demonstrates the pattern with the
+   database CA bundle: a read-only bind mount, so refreshing it is a file copy
+   rather than an image rebuild.
+3. Set `DOCS_CONTENT_DIR` to the path **inside the container**. A relative
+   value is resolved against the repository root rather than the process's
+   working directory, which is what makes `docs/.compiled` mean what it looks
+   like it means.
+
+Do not publish the corpus with the web application to save the trouble.
+Anything under `apps/web/public/` is copied into the bundle and served by the
+static host to anyone who asks, which is exactly the arrangement this move
+undid.
+
 ### The deploy command
 
 Run migrations before directing traffic at a new API version. On the documented
@@ -218,6 +268,10 @@ forces the exit. A deploy should never drop a compile or an import mid-write.
   without being told who the owner is.
 - A résumé compiles; stopping the build service briefly produces the documented
   `.tex` fallback rather than a failure.
+- If this instance is meant to carry documentation, `GET /api/v1/docs` as the
+  signed-in owner reports it available, and the same request with no session is
+  refused. Both halves matter: the second is what proves the corpus did not
+  come back out from behind the gate.
 - An export restores into a separate, empty database. This is the only check
   that proves the data is recoverable, and it belongs to
   [Backup and restore](backup-and-restore.md).
