@@ -3273,6 +3273,26 @@
       "lines": 101
     },
     {
+      "file": "apps/web/src/routes/marketing/Chrome.test.tsx",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "MarketingShell, the way past the masthead"
+      ],
+      "subjects": [
+        "./Chrome.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 74
+    },
+    {
       "file": "apps/web/src/routes/marketing/Landing.test.ts",
       "package": "@vitae/web",
       "cases": 4,
@@ -3645,7 +3665,7 @@
     {
       "file": "apps/web/src/routes/reference/EntityCatalog.states.test.tsx",
       "package": "@vitae/web",
-      "cases": 9,
+      "cases": 10,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -3660,7 +3680,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 151
+      "lines": 172
     },
     {
       "file": "apps/web/src/routes/reference/EntityCatalog.test.tsx",
@@ -6521,21 +6541,21 @@
     }
   ],
   "summary": {
-    "files": 306,
-    "cases": 1938,
+    "files": 307,
+    "cases": 1942,
     "skipped": 0,
     "todo": 0,
     "by_package": {
       "@vitae/api": 195,
-      "@vitae/web": 987,
+      "@vitae/web": 991,
       "@vitae/e2e": 250,
       "@vitae/core": 273,
       "@vitae/testkit": 7,
       "@vitae/ui": 226
     },
     "by_script": {
-      "test": 306,
-      "test:web": 149,
+      "test": 307,
+      "test:web": 150,
       "test:api": 52,
       "test:e2e": 52,
       "test:unit": 44,

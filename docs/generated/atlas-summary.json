@@ -8,7 +8,7 @@
     },
     "@vitae/web": {
       "files": 163,
-      "lines": 43226,
+      "lines": 43241,
       "exports": 681,
       "undocumented": 473
     },
@@ -106,7 +106,7 @@
     },
     "screen": {
       "files": 62,
-      "lines": 23100,
+      "lines": 23115,
       "exports": 162,
       "undocumented": 102
     },
@@ -677,12 +677,12 @@
   },
   "summary": {
     "files": 338,
-    "test_files": 306,
-    "lines": 75635,
+    "test_files": 307,
+    "lines": 75650,
     "exports": 1651,
     "undocumented_exports": 1181,
     "edges": 1497,
-    "untested": 136,
+    "untested": 135,
     "no_consumer": [],
     "consumed_only_by_tests": [
       "apps/web/src/components/ListToolbar.tsx",

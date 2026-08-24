@@ -211,8 +211,8 @@
         }
       ],
       "source_files": 163,
-      "test_files": 149,
-      "source_lines": 43226,
+      "test_files": 150,
+      "source_lines": 43241,
       "exports": 681,
       "dependents": [],
       "imported_by": [],
@@ -651,8 +651,8 @@
   "summary": {
     "packages": 8,
     "source_files": 338,
-    "test_files": 306,
-    "source_lines": 75635,
+    "test_files": 307,
+    "source_lines": 75650,
     "layers": 2,
     "cyclic": [],
     "workspace_typecheck": {

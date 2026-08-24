@@ -35,6 +35,38 @@
   overflow-wrap: anywhere;
 }
 
+/* Off-screen until focused, like the shell's and the marketing chrome's. */
+.ec-skip {
+  position: fixed;
+  top: var(--ae-space-2);
+  left: var(--ae-space-2);
+  z-index: calc(var(--ae-z-popover) + 1);
+  padding: var(--ae-space-2) var(--ae-space-3);
+  border: 1px solid var(--ae-accent);
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-bg);
+  color: var(--ae-fg-strong);
+  font-size: var(--ae-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-160%);
+  transition: transform var(--ae-dur-fast) var(--ae-ease);
+}
+
+.ec-skip:focus-visible {
+  transform: translateY(0);
+}
+
+/* The same suppression `.content:focus` carries in app.css:3554, for the same
+   reason: the focus ring is a box-shadow, and a main element the height of the
+   page turns it into two vertical lines running off both edges of the screen.
+   `:focus` rather than `:focus-visible`, because a programmatic focus on a
+   non-interactive element does not reliably match the latter. */
+.ec-main:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 .ec-header {
   display: flex;
   align-items: flex-end;

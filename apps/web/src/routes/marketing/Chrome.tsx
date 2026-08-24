@@ -218,7 +218,12 @@ export function MarketingShell({
         Skip to content
       </a>
       <MkNav />
-      <main id="main-content" className={mainClassName || undefined}>
+      {/* tabIndex is what makes the skip link above skip. A browser moves focus
+          to a fragment target only if the target can hold focus; without it the
+          viewport scrolls, focus stays on the link, and the next Tab lands back
+          in the nav the reader was trying to get past. -1 makes this a focus
+          destination without adding a tab stop. */}
+      <main id="main-content" tabIndex={-1} className={mainClassName || undefined}>
         {children}
       </main>
       <MkFoot />

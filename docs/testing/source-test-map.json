@@ -2030,8 +2030,10 @@
         "e2e"
       ],
       "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+      "tests": [
+        "apps/web/src/routes/marketing/Chrome.test.tsx"
+      ],
+      "note": "Chrome.test.tsx proves one thing: the skip link that every public route inherits, and the three landmarks it moves between. The nav's links, the mobile sheet and the footer's four groups are still unproven."
     },
     "apps/web/src/routes/marketing/CloudAction.tsx": {
       "risk": "medium",

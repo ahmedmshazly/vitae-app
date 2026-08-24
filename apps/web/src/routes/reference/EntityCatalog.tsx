@@ -665,6 +665,14 @@ export function EntityCatalog() {
 
   return (
     <div className="ec ec--observatory" data-print-mode={printMode ?? 'atlas'}>
+      {/* This screen mounts outside Shell, so it inherits none of the shell's
+          chrome — including its skip link. Ahead of the content sit a back
+          link, seven output buttons and a three-way tab strip, and a keyboard
+          reader crossed all of them on arrival and again after every lens
+          change. */}
+      <a className="ec-skip" href="#main-content">
+        Skip to content
+      </a>
       <header className="ec-header ec-observatory-header">
         <div className="ec-header__brand">
           {/* This route mounts outside Shell, so it carries no rail and no
@@ -752,7 +760,9 @@ export function EntityCatalog() {
         onChange={(next) => patchView(next as ReferenceView)}
       />
 
-      <main id="main-content" className="ec-main">
+      {/* tabIndex is what makes the skip link skip rather than merely scroll:
+          a fragment target takes focus only if it can hold focus. */}
+      <main id="main-content" tabIndex={-1} className="ec-main">
       {view === 'explore' ? (
         <div className="ec-explorer ec-observatory">
           <EntityObservatoryControls

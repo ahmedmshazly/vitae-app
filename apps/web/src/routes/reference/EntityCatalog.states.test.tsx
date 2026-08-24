@@ -58,6 +58,27 @@ describe('EntityCatalog, reported states', () => {
     expect(screen.getByRole('link', { name: /Back to Vitae/ })).toHaveAttribute('href', '/today');
   });
 
+  // Mounting outside Shell means inheriting none of its chrome, including its
+  // skip link. Ahead of the content sit a back link, seven output buttons and
+  // a three-way lens strip, and a keyboard reader crossed all of them on
+  // arrival and again after every lens change. The target needs `tabIndex`
+  // because a browser moves focus to a fragment only when the fragment can
+  // hold it; jsdom implements no fragment focus at all, so what is asserted is
+  // that precondition plus the landmark accepting focus when it is placed.
+  it('offers a way past its own toolbar, and a target that can take the focus', async () => {
+    await renderCatalog();
+    await userEvent.tab();
+    const skip = screen.getByRole('link', { name: 'Skip to content' });
+    expect(skip).toHaveFocus();
+    expect(skip).toHaveAttribute('href', '#main-content');
+
+    const main = screen.getByRole('main');
+    expect(main).toHaveAttribute('id', 'main-content');
+    expect(main).toHaveAttribute('tabindex', '-1');
+    main.focus();
+    expect(main).toHaveFocus();
+  });
+
   it('says why a workspace file was rejected instead of ignoring it', async () => {
     const { container } = await renderCatalog();
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;

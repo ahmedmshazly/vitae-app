@@ -160,11 +160,12 @@ node -e "console.log(require('./docs/generated/tests.json').summary.workspaces_a
 pnpm --filter @vitae/ui test   # 226 pass, run by no gate
 ```
 
-### DOC-D-040 — three skip links scroll without skipping
+### DOC-D-040 — a skip link that scrolls without skipping, and two surfaces with none
 
-> **Open.** The documentation surface was fixed in
-> `feat(docs): build the documentation reading surface`. The three product
-> surfaces named below were not, so this stays here.
+> **Resolved.** What follows is the state before the fix, kept because the record
+> of what was wrong is the point of this document. The fix is in the resolved
+> table at the end. The row for `seo.ts` was wrong when it was written and is
+> corrected below rather than removed.
 
 A browser places focus on a fragment target only when that target can hold
 focus. A skip link whose target has no `tabindex` moves the viewport and leaves
@@ -178,17 +179,34 @@ skip target is the route wrapper at `:408`, which carries `tabIndex={-1}`, and
 *"tabIndex -1 is what makes the region focusable by script without adding a tab
 stop."* Three later surfaces declared the same `id` without the attribute.
 
-| Surface | Target | `tabindex` |
-| --- | --- | --- |
-| Application shell | `apps/web/src/app/Shell.tsx:408` | `-1` — correct |
-| Marketing chrome | `apps/web/src/routes/marketing/Chrome.tsx:221` | absent |
-| Entity reference | `apps/web/src/routes/reference/EntityCatalog.tsx:755` | absent |
-| Prerendered public pages | `apps/web/src/public/seo.ts:254` | absent |
-| Documentation | `apps/web/src/routes/docs/DocsApp.tsx:44,98` | `-1` — fixed in this work |
+| Surface | Skip link | Target | `tabindex` |
+| --- | --- | --- | --- |
+| Application shell | `Shell.tsx:191` | `Shell.tsx:408` | `-1` — correct |
+| Marketing chrome | `Chrome.tsx:217` | `Chrome.tsx:221` | absent |
+| Entity reference | none | `EntityCatalog.tsx:755` | absent |
+| Prerendered public pages | none | `public/seo.ts:254` | absent |
+| Documentation | `DocsApp.tsx:118` | `DocsApp.tsx:44,98` | `-1` — fixed in this work |
 
-`seo.ts:254` is the static body served to a reader with no JavaScript, so on the
-public marketing routes the defect is present in both the hydrated and the
-unhydrated version of the same page.
+Only one row is the defect in the title. `Chrome.tsx` has a working skip link
+pointing at a target that cannot take focus, so it scrolls and does not skip.
+
+The next two rows are a different, larger problem that the first framing of this
+entry hid by counting targets instead of links. `/reference/entities` has no
+skip link at all, and it puts a back link, seven output buttons and a three-way
+tab strip ahead of its content — crossed on arrival and again after every lens
+change.
+
+The `seo.ts` row was a mistake. That is the static body served before any
+JavaScript runs, and in it `<main>` is the only child of `#root`:
+
+```
+<body><div id="root"><main id="main-content" data-vitae-static-public-page="/manifesto">
+```
+
+There is nothing ahead of it to skip, no link points at it, and the element is
+replaced by `Chrome.tsx`'s the moment React mounts. Adding `tabindex` there
+would change nothing for anyone. The row is kept and corrected rather than
+deleted, because a wrong row in an evidence document is itself a finding.
 
 Measured in Chrome against the built bundle on
 `/docs/meta/coverage-and-contradictions`, before the fix:
@@ -229,6 +247,7 @@ Reproduce:
 
 ```bash
 grep -rn 'id="main-content"' apps/web/src            # tabIndex on two of five
+grep -rn 'skip-link\|docs-skip\|ec-skip' apps/web/src | grep -v test   # links, not targets
 node -e "const a=require('./node_modules/.pnpm/axe-core@4.12.1/node_modules/axe-core');console.log(a.getRules().find(r=>r.ruleId==='skip-link').tags)"
 ```
 
@@ -623,5 +642,6 @@ cannot contain that commit's hash. Resolve a subject with
 | `DOC-D-027` | `fix(testing): let the source-to-test gate fail again` | `pnpm test:brand` added to the `quality` job in `.github/workflows/ci.yml`. |
 | `DOC-D-030` | `fix(testing): let the source-to-test gate fail again` | `let` to `const` in `apps/api/src/services/control-plane.ts:100`. No behaviour change. `pnpm lint` now exits 0 with 40 pre-existing warnings and no errors. |
 | `DOC-D-042` | `fix(traceability): let a family name carry a digit` | `FAMILY` in `scripts/docs/lib/citations.mjs` is now one exported pattern, `[A-Z][A-Z0-9]{1,4}`, that the citation reader, the sort order and `check-docs-traceability.mjs` all build their expressions from; a digit still may not open a family name, so `SHA-256` and `3D-001` are refused as before. `NFR-A11Y-001` is registered from the evidence in `base.css` and marked `needs-review`. The register's JSON Schema cannot import the constant, so `citations.selftest.mjs` asserts the two spellings match and was seen to fail when they were made to differ. Measured effect: traceability went from 348 citations across 133 files to 351 across 134 — `packages/ui/src/styles/base.css` had been absent from the graph entirely, because its only identifier was unreadable rather than unwritten. |
+| `DOC-D-040` | `fix(a11y): make the skip links skip` | `Chrome.tsx`'s main carries `tabIndex={-1}`, so its skip link now moves focus rather than only the viewport. `/reference/entities` gained the skip link it never had, with the same off-screen-until-focused treatment the shell and the marketing chrome use, and `.ec-main:focus` suppresses the ring the way `.content:focus` does at `apps/web/src/styles/app.css:3554` — a page-height element turns a `box-shadow` ring into two vertical lines. `seo.ts` was left alone: the row naming it was wrong, and the entry above now says why. Both surfaces are asserted by tests that were run against the unfixed code and seen to fail: a new `apps/web/src/routes/marketing/Chrome.test.tsx`, and a case added to `apps/web/src/routes/reference/EntityCatalog.states.test.tsx`. |
 | `DOC-D-041` | `fix(build): make a local pnpm build a production build` | `NODE_ENV` removed from `.env.example`, which is the only file in the repository that put it on a developer's machine; the comment left in its place explains why it must not come back. Because an existing `.env` is user-owned and was not edited, `scripts/check-web-budgets.mjs` now refuses a bundle carrying the development JSX runtime or the build machine's absolute paths, before it forms any opinion about size — so the residue announces itself instead of being measured. Seen to fail: `49 of 55 chunks carry the development JSX runtime`, exit 1. `scripts/check-web-budgets.selftest.mjs` runs seven cases ahead of every invocation. |
 | `DOC-D-032` | `docs(traceability): define every requirement the code cites` | Found while editing, not during the audit, so it has no open row above: the stack table in `docs/specs/srs.md` named the web application as *"React 18 and Vite"*, while `apps/web/package.json:29` pins `react: ^19.2.8`. Corrected in the same edit. This is the same fact as `DOC-D-020`, which remains open in its second location, `apps/web/package.json:6`. |
