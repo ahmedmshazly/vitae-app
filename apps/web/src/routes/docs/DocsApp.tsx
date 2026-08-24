@@ -2,10 +2,12 @@
  * The documentation surface.
  *
  * Mounted above the authentication wildcard in App.tsx and outside `Shell`,
- * for the same reason `/reference/entities` is: this is a public reading
- * surface, and a reader must never need an account, a session or a running API
- * to reach it. Everything it renders comes from static files under
- * `public/docs-content/`.
+ * for the same reason `/reference/entities` is: it has no workspace chrome to
+ * inherit. It is *not* public, which is the difference between the two. Every
+ * page it renders is fetched from `GET /api/v1/docs/*`, which refuses the
+ * request unless it carries the owner's identity, so this shell holds nothing
+ * until an authenticated request returns something. See `App.tsx` for why the
+ * route stays above the gate even though the content does not.
  *
  * Routing is not declared here. The manifest lists every page with the route
  * it is served at, so this component resolves the current path against that

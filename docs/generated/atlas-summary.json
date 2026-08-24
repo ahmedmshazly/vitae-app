@@ -8,7 +8,7 @@
     },
     "@vitae/web": {
       "files": 172,
-      "lines": 46350,
+      "lines": 46354,
       "exports": 738,
       "undocumented": 505
     },
@@ -82,7 +82,7 @@
     },
     "route": {
       "files": 45,
-      "lines": 8259,
+      "lines": 8261,
       "exports": 224,
       "undocumented": 176
     },
@@ -106,7 +106,7 @@
     },
     "screen": {
       "files": 67,
-      "lines": 25064,
+      "lines": 25066,
       "exports": 171,
       "undocumented": 108
     },
@@ -678,7 +678,7 @@
   "summary": {
     "files": 348,
     "test_files": 318,
-    "lines": 78923,
+    "lines": 78927,
     "exports": 1709,
     "undocumented_exports": 1214,
     "edges": 1545,

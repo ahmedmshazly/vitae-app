@@ -2,8 +2,10 @@
  * What the compiled corpus is, and every question it can answer on its own.
  *
  * `scripts/docs/build-content.mjs` compiles `docs/observatory/**` into
- * `public/docs-content/`: one manifest naming every page in reading order, and
- * one JSON file per page holding its typed blocks. Nothing here parses
+ * `docs/.compiled/`: one manifest naming every page in reading order, and one
+ * JSON file per page holding its typed blocks. The API serves that directory,
+ * privately; it is deliberately not under `apps/web/public/`, because anything
+ * there is copied into the bundle and served to anyone who asks. Nothing here parses
  * Markdown, resolves a link or decides an order — all of that happened at build
  * time, where a mistake fails a gate instead of a reader's screen.
  *
