@@ -30,7 +30,7 @@
     "test:e2e": "pnpm --filter @vitae/e2e test",
     "test:visual": "pnpm --filter @vitae/e2e exec playwright test visual-baselines",
     "test:security": "pnpm --filter @vitae/api exec vitest run src/__tests__/security src/middleware/security.test.ts src/middleware/auth.test.ts",
-    "test:performance": "node scripts/check-web-budgets.mjs",
+    "test:performance": "node scripts/check-web-budgets.selftest.mjs && node scripts/check-web-budgets.mjs",
     "test:resilience": "pnpm --filter @vitae/api exec vitest run src/__tests__/resilience src/services/buildsvc-client.test.ts",
     "test:mutation": "pnpm --filter @vitae/core test:mutation",
     "test:coverage": "pnpm --filter @vitae/core exec vitest run --coverage && pnpm --filter @vitae/testkit test",

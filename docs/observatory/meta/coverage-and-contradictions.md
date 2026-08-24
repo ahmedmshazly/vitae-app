@@ -234,6 +234,10 @@ node -e "const a=require('./node_modules/.pnpm/axe-core@4.12.1/node_modules/axe-
 
 ### DOC-D-041 — following the setup instructions turns `pnpm build` into a development build
 
+> **Resolved.** What follows is the state before the fix, kept because the record
+> of what was wrong is the point of this document. The fix is in the resolved
+> table at the end. Reproducing it today means adding the line back by hand.
+
 `README.md:51` and `docs/ONBOARDING.md:23` both open with the same step:
 
 ```bash
@@ -614,4 +618,5 @@ cannot contain that commit's hash. Resolve a subject with
 | `DOC-D-012` | `docs(traceability): define every requirement the code cites` | `docs/specs/srs.md` no longer denies multi-tenant hosting. The replacement states what migration `009-workspace-primary-keys` established, names the workspace boundary as a shipped property of the schema, and says in the document itself that the earlier sentence was corrected rather than repeated, so a reader who remembers the old claim can see it was withdrawn on evidence. |
 | `DOC-D-027` | `fix(testing): let the source-to-test gate fail again` | `pnpm test:brand` added to the `quality` job in `.github/workflows/ci.yml`. |
 | `DOC-D-030` | `fix(testing): let the source-to-test gate fail again` | `let` to `const` in `apps/api/src/services/control-plane.ts:100`. No behaviour change. `pnpm lint` now exits 0 with 40 pre-existing warnings and no errors. |
+| `DOC-D-041` | `fix(build): make a local pnpm build a production build` | `NODE_ENV` removed from `.env.example`, which is the only file in the repository that put it on a developer's machine; the comment left in its place explains why it must not come back. Because an existing `.env` is user-owned and was not edited, `scripts/check-web-budgets.mjs` now refuses a bundle carrying the development JSX runtime or the build machine's absolute paths, before it forms any opinion about size — so the residue announces itself instead of being measured. Seen to fail: `49 of 55 chunks carry the development JSX runtime`, exit 1. `scripts/check-web-budgets.selftest.mjs` runs seven cases ahead of every invocation. |
 | `DOC-D-032` | `docs(traceability): define every requirement the code cites` | Found while editing, not during the audit, so it has no open row above: the stack table in `docs/specs/srs.md` named the web application as *"React 18 and Vite"*, while `apps/web/package.json:29` pins `react: ^19.2.8`. Corrected in the same edit. This is the same fact as `DOC-D-020`, which remains open in its second location, `apps/web/package.json:6`. |
