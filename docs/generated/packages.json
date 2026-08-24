@@ -210,10 +210,10 @@
           "range": "^3.24.1"
         }
       ],
-      "source_files": 157,
+      "source_files": 158,
       "test_files": 146,
-      "source_lines": 41720,
-      "exports": 635,
+      "source_lines": 41776,
+      "exports": 636,
       "dependents": [],
       "imported_by": [],
       "unused_manifest_deps": [],
@@ -643,9 +643,9 @@
   ],
   "summary": {
     "packages": 8,
-    "source_files": 332,
+    "source_files": 333,
     "test_files": 303,
-    "source_lines": 74129,
+    "source_lines": 74185,
     "layers": 2,
     "cyclic": [],
     "workspace_typecheck": {

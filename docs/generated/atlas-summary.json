@@ -7,9 +7,9 @@
       "undocumented": 276
     },
     "@vitae/web": {
-      "files": 157,
-      "lines": 41720,
-      "exports": 635,
+      "files": 158,
+      "lines": 41776,
+      "exports": 636,
       "undocumented": 452
     },
     "@vitae/config": {
@@ -45,9 +45,9 @@
   },
   "by_kind": {
     "module": {
-      "files": 63,
-      "lines": 9311,
-      "exports": 358,
+      "files": 64,
+      "lines": 9367,
+      "exports": 359,
       "undocumented": 205
     },
     "migration": {
@@ -676,13 +676,13 @@
     ]
   },
   "summary": {
-    "files": 332,
+    "files": 333,
     "test_files": 303,
-    "lines": 74129,
-    "exports": 1605,
+    "lines": 74185,
+    "exports": 1606,
     "undocumented_exports": 1160,
-    "edges": 1479,
-    "untested": 133,
+    "edges": 1480,
+    "untested": 134,
     "no_consumer": [],
     "consumed_only_by_tests": [
       "apps/web/src/components/ListToolbar.tsx",

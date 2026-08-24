@@ -1480,6 +1480,7 @@
         "scripts/check-docs-generated.mjs:26",
         "scripts/check-docs-pages.mjs:43",
         "scripts/check-docs-traceability.mjs:28",
+        "scripts/docs/build-content.mjs:37",
         "scripts/docs/gen-api.mjs:30",
         "scripts/docs/gen-routes.mjs:27",
         "scripts/docs/gen-srs.mjs:21",

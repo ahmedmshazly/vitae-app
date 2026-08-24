@@ -78,3 +78,6 @@ docs/seeds/
 # committed baseline; the full index is ~3 MB of per-symbol detail that would
 # churn on every rename and make diffs unreadable.
 docs/generated/atlas.json
+
+# compiled documentation corpus (rebuilt by vite.docs-content.ts)
+apps/web/public/docs-content/

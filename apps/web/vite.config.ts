@@ -7,6 +7,7 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { getPublicLaunchConfig } from './src/public/site.js';
 import { publicSeoArtifacts } from './vite.public-seo.js';
+import { docsContent } from './vite.docs-content.js';
 
 const ENV_DIRECTORY = '../../';
 
@@ -63,6 +64,7 @@ export default defineConfig(({ mode }) => {
       // silently skipped.
       react({ babel: { plugins: [['babel-plugin-react-compiler', {}]] } }),
       tailwindcss(),
+      docsContent(),
       publicSeoArtifacts(env),
     ],
     // The monorepo keeps a single .env at the repo root (see .env.example); without
