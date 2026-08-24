@@ -60,12 +60,42 @@ from the same file.
 A page with no badge does not exist here. If something is unknown, it is
 labelled unknown rather than left to read as fact.
 
-## Reading this while it is being built
+## Where to start
 
-This corpus is being assembled in reviewable slices, and it is honest about how
-far it has got: the navigation shows the sections that exist, not the sections
-that are planned. The inventory of what the older documentation gets wrong, and
-what is still missing, is itself a page here rather than a private note.
+Six people read this documentation, and the section that answers a question
+depends on which of them is asking.
 
-Start with [About these documents](meta/index.md) to see what has been checked
-so far.
+| If you are | Start at |
+| --- | --- |
+| Using Vitae to run your own career work | [Use](use/index.md) |
+| Deciding whether Vitae is the right instrument | [Product](product/index.md) |
+| Changing how a surface looks, reads or behaves | [Design](design/index.md) |
+| Changing the code | [Develop](develop/index.md) |
+| Working out how the system is put together | [Architecture](architecture/index.md) |
+| Running an instance | [Operate](operate/index.md) |
+| Reviewing trust boundaries or data handling | [Architecture](architecture/index.md) |
+| Asking why something is the way it is | [Decisions](decisions/index.md) |
+
+Each section opens with a page that says what is in it and what it assumes you
+already know. Nothing here expects to be read in order, but every page names
+the page before and after it, so it can be.
+
+## What this corpus does not do
+
+It does not list what a script can index. Every route, endpoint, configuration
+key, database table, migration, design token, component and exported symbol is
+generated from the source into `docs/generated/`, checked in, and regenerated
+by a gate in continuous integration that fails when the committed copy has
+drifted. The pages here explain the shape, the rules and the exceptions, and
+point at the catalog for the enumeration.
+
+It does not describe a hosted service as though it were operating. The Cloud
+workspace and billing plane is built and closed; pages that touch it say so and
+carry the gated badge. Prices, trial terms, legal entities and support
+arrangements are recorded as intent where the repository records them, and as
+needing confirmation everywhere else.
+
+It does not invent. Where the older documentation contradicted the running
+code, the contradiction was resolved against the code and the resolution
+written down. [About these documents](meta/index.md) holds the inventory of
+what was wrong, with the file and line that proved it.

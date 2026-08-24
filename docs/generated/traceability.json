@@ -2,8 +2,8 @@
   "generated_by": "scripts/docs/gen-traceability.mjs",
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
-    "files_scanned": 793,
-    "files_citing": 135,
+    "files_scanned": 842,
+    "files_citing": 160,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,7 +20,7 @@
   },
   "totals": {
     "registered": 99,
-    "citations": 354,
+    "citations": 492,
     "implemented_and_tested": 19,
     "implemented_untested": 57,
     "tested_only": 2,
@@ -50,7 +50,9 @@
         "apps/web/src/public/docs-static.test.ts:153"
       ],
       "documents": [
-        "docs/observatory/meta/coverage-and-contradictions.md:373"
+        "docs/observatory/architecture/persistence.md:25",
+        "docs/observatory/meta/coverage-and-contradictions.md:373",
+        "docs/observatory/use/import-and-export.md:24"
       ]
     },
     "FR-002": {
@@ -73,7 +75,9 @@
         "apps/api/src/routes/v1/duplicates.integration.test.ts:43",
         "apps/api/src/routes/v1/interactions.integration.test.ts:2"
       ],
-      "documents": []
+      "documents": [
+        "docs/observatory/architecture/persistence.md:25"
+      ]
     },
     "FR-003": {
       "capability": "CAP-IDENTITY",
@@ -94,7 +98,9 @@
         "apps/api/src/routes/v1/duplicates.integration.test.ts:13",
         "apps/api/src/routes/v1/duplicates.integration.test.ts:43"
       ],
-      "documents": []
+      "documents": [
+        "docs/observatory/use/import-and-export.md:24"
+      ]
     },
     "FR-004": {
       "capability": "CAP-OPERATE",
@@ -111,7 +117,11 @@
         "packages/config/src/env.ts:84"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/architecture/security.md:28",
+        "docs/observatory/operate/configuration.md:23",
+        "docs/observatory/operate/secrets-and-rotation.md:24"
+      ]
     },
     "FR-005": {
       "capability": "CAP-OPERATE",
@@ -145,7 +155,11 @@
       "tests": [
         "apps/api/src/routes/v1/retention.integration.test.ts:2"
       ],
-      "documents": []
+      "documents": [
+        "docs/observatory/architecture/persistence.md:25",
+        "docs/observatory/operate/incident-response.md:20",
+        "docs/observatory/use/import-and-export.md:24"
+      ]
     },
     "FR-007": {
       "capability": "CAP-PLATFORM",
@@ -158,7 +172,9 @@
         "e2e/playwright.config.ts:38"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/operate/deploy.md:22"
+      ]
     },
     "FR-008": {
       "capability": "CAP-IDENTITY",
@@ -170,7 +186,9 @@
         "apps/web/src/routes/Settings.tsx:137"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/use/import-and-export.md:24"
+      ]
     },
     "FR-009": {
       "capability": "CAP-EXPORT",
@@ -197,7 +215,10 @@
         "apps/api/src/__tests__/api.integration.test.ts:1233",
         "apps/api/src/middleware/error.test.ts:3"
       ],
-      "documents": []
+      "documents": [
+        "docs/observatory/architecture/request-lifecycle.md:26",
+        "docs/observatory/use/troubleshooting.md:34"
+      ]
     },
     "FR-011": {
       "capability": "CAP-RESUME",
@@ -212,7 +233,10 @@
         "apps/api/src/routes/v1/resumes.integration.test.ts:2",
         "apps/api/src/routes/v1/resumes.integration.test.ts:35"
       ],
-      "documents": []
+      "documents": [
+        "docs/observatory/use/troubleshooting.md:34",
+        "docs/observatory/use/write-a-resume.md:30"
+      ]
     },
     "FR-012": {
       "capability": "CAP-EXPORT",
@@ -226,7 +250,11 @@
         "apps/api/src/__tests__/api.integration.test.ts:1263",
         "apps/api/src/routes/v1/export.integration.test.ts:37"
       ],
-      "documents": []
+      "documents": [
+        "docs/observatory/architecture/persistence.md:25",
+        "docs/observatory/architecture/security.md:28",
+        "docs/observatory/use/import-and-export.md:24"
+      ]
     },
     "FR-013": {
       "capability": "CAP-DATA-CORE",
@@ -238,7 +266,12 @@
         "apps/api/src/__tests__/api.integration.test.ts:1102",
         "packages/core/src/forms/descriptors.test.ts:78"
       ],
-      "documents": []
+      "documents": [
+        "docs/observatory/architecture/career-graph.md:23",
+        "docs/observatory/architecture/career-graph.md:145",
+        "docs/observatory/use/build-your-graph.md:29",
+        "docs/observatory/use/troubleshooting.md:34"
+      ]
     },
     "FR-014": {
       "capability": "CAP-PLATFORM",
@@ -251,7 +284,10 @@
         "apps/web/src/routes/ExportPage.tsx:92"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/architecture/request-lifecycle.md:26",
+        "docs/observatory/use/import-and-export.md:24"
+      ]
     },
     "FR-015": {
       "capability": "CAP-AUTH",
@@ -263,7 +299,12 @@
         "packages/config/src/env.ts:111"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/architecture/security.md:28",
+        "docs/observatory/operate/configuration.md:23",
+        "docs/observatory/operate/secrets-and-rotation.md:24",
+        "docs/observatory/use/troubleshooting.md:34"
+      ]
     },
     "FR-016": {
       "capability": "CAP-PLATFORM",
@@ -274,7 +315,9 @@
         ".github/workflows/ci.yml:7"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/operate/deploy.md:22"
+      ]
     },
     "FR-017": {
       "capability": "CAP-SEARCH",
@@ -285,7 +328,9 @@
         "apps/api/src/db/search-index.ts:37"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/architecture/persistence.md:25"
+      ]
     },
     "FR-018": {
       "capability": "CAP-RESUME",
@@ -299,7 +344,12 @@
       "tests": [
         "packages/core/src/algorithms/selection.test.ts:167"
       ],
-      "documents": []
+      "documents": [
+        "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/architecture/algorithms.md:365",
+        "docs/observatory/architecture/resume-pipeline.md:26",
+        "docs/observatory/use/write-a-resume.md:30"
+      ]
     },
     "FR-019": {
       "capability": "CAP-PLATFORM",
@@ -310,7 +360,11 @@
         "apps/api/src/routes/v1/favors.ts:13"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/architecture/career-graph.md:23",
+        "docs/observatory/architecture/system-overview.md:21",
+        "docs/observatory/architecture/system-overview.md:91"
+      ]
     },
     "FR-020": {
       "capability": "CAP-IMPORT",
@@ -323,7 +377,9 @@
         "apps/api/src/services/imports.ts:1082"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/use/import-and-export.md:24"
+      ]
     },
     "FR-021": {
       "capability": "CAP-EXPORT",
@@ -335,7 +391,9 @@
         "apps/api/src/__tests__/api.integration.test.ts:1209",
         "apps/api/src/routes/v1/export.integration.test.ts:13"
       ],
-      "documents": []
+      "documents": [
+        "docs/observatory/use/import-and-export.md:24"
+      ]
     },
     "FR-022": {
       "capability": "CAP-PLATFORM",
@@ -350,7 +408,9 @@
         "packages/ui/src/overlay.tsx:82"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/use/troubleshooting.md:34"
+      ]
     },
     "FR-023": {
       "capability": "CAP-PLATFORM",
@@ -366,7 +426,9 @@
         "apps/web/src/styles/app.css:2208"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/use/troubleshooting.md:34"
+      ]
     },
     "FR-025": {
       "capability": "CAP-PLATFORM",
@@ -386,7 +448,10 @@
         "apps/web/src/lib/dates.ts:2"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/architecture/request-lifecycle.md:26",
+        "docs/observatory/use/track-applications.md:23"
+      ]
     },
     "FR-026": {
       "capability": "CAP-OPERATE",
@@ -402,7 +467,11 @@
         "apps/api/src/services/imports.ts:1191"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/architecture/request-lifecycle.md:26",
+        "docs/observatory/operate/deploy.md:22",
+        "docs/observatory/operate/incident-response.md:20"
+      ]
     },
     "FR-027": {
       "capability": "CAP-OPERATE",
@@ -417,7 +486,10 @@
       ],
       "tests": [],
       "documents": [
-        "docs/observatory/meta/coverage-and-contradictions.md:373"
+        "docs/observatory/architecture/security.md:28",
+        "docs/observatory/meta/coverage-and-contradictions.md:373",
+        "docs/observatory/operate/configuration.md:23",
+        "docs/observatory/operate/secrets-and-rotation.md:24"
       ]
     },
     "FR-102": {
@@ -433,6 +505,8 @@
       ],
       "tests": [],
       "documents": [
+        "docs/observatory/architecture/request-lifecycle.md:26",
+        "docs/observatory/architecture/request-lifecycle.md:185",
         "docs/observatory/meta/coverage-and-contradictions.md:373"
       ]
     },
@@ -460,7 +534,15 @@
       ],
       "tests": [],
       "documents": [
-        "docs/observatory/meta/coverage-and-contradictions.md:373"
+        "docs/observatory/architecture/cloud-plane.md:31",
+        "docs/observatory/architecture/cloud-plane.md:154",
+        "docs/observatory/architecture/persistence.md:25",
+        "docs/observatory/decisions/0006-cloud-multi-tenancy.md:9",
+        "docs/observatory/decisions/0006-cloud-multi-tenancy.md:178",
+        "docs/observatory/decisions/0006-cloud-multi-tenancy.md:273",
+        "docs/observatory/meta/coverage-and-contradictions.md:373",
+        "docs/observatory/operate/backup-and-restore.md:26",
+        "docs/observatory/use/import-and-export.md:24"
       ]
     },
     "FR-CAP-001": {
@@ -476,7 +558,10 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:15"
+        "docs/ROADMAP.md:15",
+        "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/use/build-your-graph.md:29",
+        "docs/observatory/use/getting-started.md:20"
       ]
     },
     "FR-CAP-002": {
@@ -500,7 +585,9 @@
         "packages/core/src/schema/validate.test.ts:20"
       ],
       "documents": [
-        "docs/design/addenda/P23-entity-forms.md:1"
+        "docs/design/addenda/P23-entity-forms.md:1",
+        "docs/observatory/architecture/career-graph.md:23",
+        "docs/observatory/use/build-your-graph.md:29"
       ]
     },
     "FR-CAP-003": {
@@ -520,7 +607,8 @@
         "apps/api/src/routes/v1/suggest.integration.test.ts:2"
       ],
       "documents": [
-        "docs/ROADMAP.md:15"
+        "docs/ROADMAP.md:15",
+        "docs/observatory/use/build-your-graph.md:29"
       ]
     },
     "FR-CAP-004": {
@@ -554,7 +642,9 @@
         "apps/api/src/services/capture.ts:28"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/use/build-your-graph.md:29"
+      ]
     },
     "FR-CON-001": {
       "capability": "CAP-RELATIONSHIPS",
@@ -569,7 +659,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:18",
-        "docs/design/addenda/P24-connection-editor.md:1"
+        "docs/design/addenda/P24-connection-editor.md:1",
+        "docs/observatory/use/build-your-graph.md:29"
       ]
     },
     "FR-CON-002": {
@@ -583,7 +674,8 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:18"
+        "docs/ROADMAP.md:18",
+        "docs/observatory/use/build-your-graph.md:29"
       ]
     },
     "FR-CON-003": {
@@ -598,7 +690,9 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:18"
+        "docs/ROADMAP.md:18",
+        "docs/observatory/use/build-your-graph.md:29",
+        "docs/observatory/use/track-applications.md:23"
       ]
     },
     "FR-CON-004": {
@@ -612,7 +706,8 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:18"
+        "docs/ROADMAP.md:18",
+        "docs/observatory/architecture/algorithms.md:35"
       ]
     },
     "FR-CON-005": {
@@ -643,7 +738,9 @@
       ],
       "documents": [
         "docs/ROADMAP.md:18",
-        "docs/ROADMAP.md:19"
+        "docs/ROADMAP.md:19",
+        "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/use/track-applications.md:23"
       ]
     },
     "FR-CON-007": {
@@ -658,7 +755,9 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:18",
-        "docs/ROADMAP.md:19"
+        "docs/ROADMAP.md:19",
+        "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/use/track-applications.md:23"
       ]
     },
     "FR-CON-008": {
@@ -670,7 +769,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:18",
-        "docs/ROADMAP.md:19"
+        "docs/ROADMAP.md:19",
+        "docs/observatory/use/track-applications.md:23"
       ]
     },
     "FR-CON-009": {
@@ -684,7 +784,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:18",
-        "docs/ROADMAP.md:19"
+        "docs/ROADMAP.md:19",
+        "docs/observatory/use/build-your-graph.md:29"
       ]
     },
     "FR-EXP-010": {
@@ -698,7 +799,9 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:25"
+        "docs/ROADMAP.md:25",
+        "docs/observatory/operate/backup-and-restore.md:26",
+        "docs/observatory/use/import-and-export.md:24"
       ]
     },
     "FR-EXP-012": {
@@ -734,7 +837,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:21",
-        "docs/observatory/meta/coverage-and-contradictions.md:390"
+        "docs/observatory/meta/coverage-and-contradictions.md:390",
+        "docs/observatory/use/import-and-export.md:24"
       ]
     },
     "FR-IMP-002": {
@@ -746,7 +850,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:21",
-        "docs/observatory/meta/coverage-and-contradictions.md:390"
+        "docs/observatory/meta/coverage-and-contradictions.md:390",
+        "docs/observatory/use/import-and-export.md:24"
       ]
     },
     "FR-IMP-003": {
@@ -818,7 +923,8 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:16"
+        "docs/ROADMAP.md:16",
+        "docs/observatory/use/import-and-export.md:24"
       ]
     },
     "FR-ORG-005": {
@@ -832,7 +938,9 @@
         "packages/core/src/algorithms/filter-grammar.ts:9"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/architecture/algorithms.md:35"
+      ]
     },
     "FR-ORG-007": {
       "capability": "CAP-ORGANIZE",
@@ -901,7 +1009,9 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:23"
+        "docs/ROADMAP.md:23",
+        "docs/observatory/use/build-your-graph.md:29",
+        "docs/observatory/use/write-a-resume.md:30"
       ]
     },
     "FR-RES-005": {
@@ -914,7 +1024,9 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:23"
+        "docs/ROADMAP.md:23",
+        "docs/observatory/architecture/resume-pipeline.md:26",
+        "docs/observatory/use/write-a-resume.md:30"
       ]
     },
     "FR-RES-006": {
@@ -928,7 +1040,9 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:23"
+        "docs/ROADMAP.md:23",
+        "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/use/write-a-resume.md:30"
       ]
     },
     "FR-RES-007": {
@@ -948,7 +1062,9 @@
         "packages/core/src/algorithms/atom-scoring.test.ts:46"
       ],
       "documents": [
-        "docs/ROADMAP.md:23"
+        "docs/ROADMAP.md:23",
+        "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/use/write-a-resume.md:30"
       ]
     },
     "FR-RES-008": {
@@ -967,7 +1083,10 @@
         "packages/core/src/algorithms/selection.test.ts:84"
       ],
       "documents": [
-        "docs/ROADMAP.md:23"
+        "docs/ROADMAP.md:23",
+        "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/architecture/resume-pipeline.md:26",
+        "docs/observatory/use/write-a-resume.md:30"
       ]
     },
     "FR-RES-009": {
@@ -988,6 +1107,10 @@
       ],
       "documents": [
         "docs/ROADMAP.md:23",
+        "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/architecture/resume-pipeline.md:26",
+        "docs/observatory/operate/deploy.md:22",
+        "docs/observatory/use/write-a-resume.md:30",
         "docs/runbooks/bump-tectonic.md:15"
       ]
     },
@@ -1013,7 +1136,9 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:23"
+        "docs/ROADMAP.md:23",
+        "docs/observatory/architecture/resume-pipeline.md:26",
+        "docs/observatory/use/write-a-resume.md:30"
       ]
     },
     "FR-RES-012": {
@@ -1030,7 +1155,10 @@
         "packages/core/src/algorithms/latex-escape.test.ts:105"
       ],
       "documents": [
-        "docs/ROADMAP.md:23"
+        "docs/ROADMAP.md:23",
+        "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/architecture/resume-pipeline.md:26",
+        "docs/observatory/architecture/security.md:28"
       ]
     },
     "FR-RES-013": {
@@ -1046,7 +1174,10 @@
         "apps/api/src/services/buildsvc-client.test.ts:2"
       ],
       "documents": [
-        "docs/ROADMAP.md:23"
+        "docs/ROADMAP.md:23",
+        "docs/observatory/architecture/resume-pipeline.md:26",
+        "docs/observatory/use/troubleshooting.md:34",
+        "docs/observatory/use/write-a-resume.md:30"
       ]
     },
     "FR-RES-014": {
@@ -1064,7 +1195,10 @@
         "packages/core/src/algorithms/fit-loop.test.ts:15"
       ],
       "documents": [
-        "docs/ROADMAP.md:23"
+        "docs/ROADMAP.md:23",
+        "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/architecture/resume-pipeline.md:26",
+        "docs/observatory/use/write-a-resume.md:30"
       ]
     },
     "FR-RES-015": {
@@ -1078,7 +1212,9 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:23"
+        "docs/ROADMAP.md:23",
+        "docs/observatory/architecture/resume-pipeline.md:26",
+        "docs/observatory/use/write-a-resume.md:30"
       ]
     },
     "FR-RES-016": {
@@ -1115,7 +1251,9 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:23"
+        "docs/ROADMAP.md:23",
+        "docs/observatory/use/track-applications.md:23",
+        "docs/observatory/use/write-a-resume.md:30"
       ]
     },
     "FR-RES-019": {
@@ -1127,7 +1265,9 @@
         "apps/api/src/routes/v1/resumes.ts:675"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/use/write-a-resume.md:30"
+      ]
     },
     "FR-RES-020": {
       "capability": "CAP-RESUME",
@@ -1147,7 +1287,8 @@
         "apps/api/src/routes/v1/letters.integration.test.ts:2"
       ],
       "documents": [
-        "docs/ROADMAP.md:41"
+        "docs/ROADMAP.md:41",
+        "docs/observatory/use/write-a-resume.md:30"
       ]
     },
     "FR-SET-001": {
@@ -1162,7 +1303,9 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:13"
+        "docs/ROADMAP.md:13",
+        "docs/observatory/architecture/security.md:28",
+        "docs/observatory/decisions/catalog.md:144"
       ]
     },
     "FR-SET-004": {
@@ -1175,7 +1318,10 @@
       ],
       "tests": [],
       "documents": [
-        "docs/adr/0003-deterministic-intelligence.md:30"
+        "docs/adr/0003-deterministic-intelligence.md:30",
+        "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/architecture/algorithms.md:602",
+        "docs/observatory/decisions/catalog.md:143"
       ]
     },
     "FR-SET-006": {
@@ -1188,7 +1334,9 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:26"
+        "docs/ROADMAP.md:26",
+        "docs/observatory/operate/incident-response.md:20",
+        "docs/observatory/use/troubleshooting.md:34"
       ]
     },
     "FR-SET-007": {
@@ -1200,7 +1348,10 @@
         "apps/api/src/services/export.ts:10"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/architecture/security.md:28",
+        "docs/observatory/use/import-and-export.md:24"
+      ]
     },
     "FR-SRCH-001": {
       "capability": "CAP-SEARCH",
@@ -1235,7 +1386,8 @@
       ],
       "documents": [
         "docs/ARCHITECTURE.md:146",
-        "docs/ROADMAP.md:17"
+        "docs/ROADMAP.md:17",
+        "docs/observatory/architecture/algorithms.md:35"
       ]
     },
     "FR-SRCH-003": {
@@ -1267,7 +1419,8 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:17"
+        "docs/ROADMAP.md:17",
+        "docs/observatory/use/getting-started.md:20"
       ]
     },
     "FR-VIS-001": {
@@ -1323,7 +1476,10 @@
         "apps/api/src/routes/v1/dashboard.ts:19"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/use/getting-started.md:20",
+        "docs/observatory/use/track-applications.md:23"
+      ]
     },
     "FR-VIS-005": {
       "capability": "CAP-EXPLORE",
@@ -1346,6 +1502,7 @@
       ],
       "tests": [],
       "documents": [
+        "docs/observatory/design/accessibility.md:20",
         "docs/observatory/meta/coverage-and-contradictions.md:418",
         "docs/observatory/meta/coverage-and-contradictions.md:421",
         "docs/observatory/meta/coverage-and-contradictions.md:711"
@@ -1361,6 +1518,8 @@
       ],
       "tests": [],
       "documents": [
+        "docs/observatory/architecture/system-overview.md:21",
+        "docs/observatory/develop/where-to-change.md:168",
         "docs/observatory/meta/coverage-and-contradictions.md:707"
       ]
     },
@@ -1374,6 +1533,7 @@
       ],
       "tests": [],
       "documents": [
+        "docs/observatory/architecture/persistence.md:25",
         "docs/observatory/meta/coverage-and-contradictions.md:375"
       ]
     },
@@ -1390,6 +1550,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:13",
+        "docs/observatory/architecture/security.md:28",
         "docs/observatory/meta/coverage-and-contradictions.md:389"
       ]
     },
@@ -1403,6 +1564,8 @@
       ],
       "tests": [],
       "documents": [
+        "docs/observatory/architecture/system-overview.md:21",
+        "docs/observatory/develop/where-to-change.md:168",
         "docs/specs/merge-plan.md:3"
       ]
     },
@@ -1415,7 +1578,10 @@
         "packages/ui/src/styles/tokens.css:2"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/design/identity.md:19",
+        "docs/observatory/design/tokens.md:16"
+      ]
     },
     "INT-5": {
       "capability": "CAP-OPERATE",
@@ -2001,6 +2167,92 @@
     "docs/design/addenda/P25-graph-explorer-v2.md": [
       "FR-VIS-001"
     ],
+    "docs/observatory/architecture/algorithms.md": [
+      "FR-018",
+      "FR-CAP-001",
+      "FR-CON-004",
+      "FR-CON-006",
+      "FR-CON-007",
+      "FR-ORG-005",
+      "FR-RES-006",
+      "FR-RES-007",
+      "FR-RES-008",
+      "FR-RES-009",
+      "FR-RES-012",
+      "FR-RES-014",
+      "FR-SET-004",
+      "FR-SRCH-002"
+    ],
+    "docs/observatory/architecture/career-graph.md": [
+      "FR-013",
+      "FR-019",
+      "FR-CAP-002"
+    ],
+    "docs/observatory/architecture/cloud-plane.md": [
+      "FR-105"
+    ],
+    "docs/observatory/architecture/persistence.md": [
+      "FR-001",
+      "FR-002",
+      "FR-006",
+      "FR-012",
+      "FR-017",
+      "FR-105",
+      "NFR-REL-003"
+    ],
+    "docs/observatory/architecture/request-lifecycle.md": [
+      "FR-010",
+      "FR-014",
+      "FR-025",
+      "FR-026",
+      "FR-102"
+    ],
+    "docs/observatory/architecture/resume-pipeline.md": [
+      "FR-018",
+      "FR-RES-005",
+      "FR-RES-008",
+      "FR-RES-009",
+      "FR-RES-011",
+      "FR-RES-012",
+      "FR-RES-013",
+      "FR-RES-014",
+      "FR-RES-015"
+    ],
+    "docs/observatory/architecture/security.md": [
+      "FR-004",
+      "FR-012",
+      "FR-015",
+      "FR-027",
+      "FR-RES-012",
+      "FR-SET-001",
+      "FR-SET-007",
+      "INT-1"
+    ],
+    "docs/observatory/architecture/system-overview.md": [
+      "FR-019",
+      "NFR-MNT-002",
+      "INT-2"
+    ],
+    "docs/observatory/decisions/0006-cloud-multi-tenancy.md": [
+      "FR-105"
+    ],
+    "docs/observatory/decisions/catalog.md": [
+      "FR-SET-001",
+      "FR-SET-004"
+    ],
+    "docs/observatory/design/accessibility.md": [
+      "NFR-A11Y-001"
+    ],
+    "docs/observatory/design/identity.md": [
+      "INT-3"
+    ],
+    "docs/observatory/design/tokens.md": [
+      "INT-3"
+    ],
+    "docs/observatory/develop/where-to-change.md": [
+      "NFR-MNT-002",
+      "INT-2"
+    ],
     "docs/observatory/meta/coverage-and-contradictions.md": [
       "FR-001",
       "FR-027",
@@ -2027,6 +2279,100 @@
       "NFR-MNT-002",
       "NFR-REL-003",
       "INT-1"
+    ],
+    "docs/observatory/operate/backup-and-restore.md": [
+      "FR-105",
+      "FR-EXP-010"
+    ],
+    "docs/observatory/operate/configuration.md": [
+      "FR-004",
+      "FR-015",
+      "FR-027"
+    ],
+    "docs/observatory/operate/deploy.md": [
+      "FR-007",
+      "FR-016",
+      "FR-026",
+      "FR-RES-009"
+    ],
+    "docs/observatory/operate/incident-response.md": [
+      "FR-006",
+      "FR-026",
+      "FR-SET-006"
+    ],
+    "docs/observatory/operate/secrets-and-rotation.md": [
+      "FR-004",
+      "FR-015",
+      "FR-027"
+    ],
+    "docs/observatory/use/build-your-graph.md": [
+      "FR-013",
+      "FR-CAP-001",
+      "FR-CAP-002",
+      "FR-CAP-003",
+      "FR-CAP-008",
+      "FR-CON-001",
+      "FR-CON-002",
+      "FR-CON-003",
+      "FR-CON-009",
+      "FR-RES-004"
+    ],
+    "docs/observatory/use/getting-started.md": [
+      "FR-CAP-001",
+      "FR-SRCH-004",
+      "FR-VIS-004"
+    ],
+    "docs/observatory/use/import-and-export.md": [
+      "FR-001",
+      "FR-003",
+      "FR-006",
+      "FR-008",
+      "FR-012",
+      "FR-014",
+      "FR-020",
+      "FR-021",
+      "FR-105",
+      "FR-EXP-010",
+      "FR-IMP-001",
+      "FR-IMP-002",
+      "FR-ORG-002",
+      "FR-SET-007"
+    ],
+    "docs/observatory/use/track-applications.md": [
+      "FR-025",
+      "FR-CON-003",
+      "FR-CON-006",
+      "FR-CON-007",
+      "FR-CON-008",
+      "FR-RES-018",
+      "FR-VIS-004"
+    ],
+    "docs/observatory/use/troubleshooting.md": [
+      "FR-010",
+      "FR-011",
+      "FR-013",
+      "FR-015",
+      "FR-022",
+      "FR-023",
+      "FR-RES-013",
+      "FR-SET-006"
+    ],
+    "docs/observatory/use/write-a-resume.md": [
+      "FR-011",
+      "FR-018",
+      "FR-RES-004",
+      "FR-RES-005",
+      "FR-RES-006",
+      "FR-RES-007",
+      "FR-RES-008",
+      "FR-RES-009",
+      "FR-RES-011",
+      "FR-RES-013",
+      "FR-RES-014",
+      "FR-RES-015",
+      "FR-RES-018",
+      "FR-RES-019",
+      "FR-RES-020"
     ],
     "docs/runbooks/bump-tectonic.md": [
       "FR-RES-009"

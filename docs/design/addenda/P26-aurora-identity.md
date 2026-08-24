@@ -1,4 +1,16 @@
-# P26: "Aurora Signal" product identity (2026-07 rebrand)
+# SUPERSEDED — P26: "Aurora Signal" product identity (2026-07 rebrand)
+
+> **Superseded by the 2026-08 "Quiet" identity. Do not implement anything on
+> this page.** Quiet is specified in [`../brand-book.html`](../brand-book.html),
+> extracted in [`../IDENTITY.md`](../IDENTITY.md), and defined in
+> `packages/ui/src/styles/tokens.css`. Aurora's central prescriptions are now
+> refused by `scripts/check-brand-bans.mjs`, which fails the build on gradients,
+> on blurred glow shadows outside the two approved tokens, on a second easing
+> curve, on durations off the token scale, and on raw hex outside the token file
+> — so the gradients, glows, ambient washes, spring easing, 120/180/320ms
+> durations and cyan palette below cannot ship. This page is kept as the record
+> of an identity that was tried and removed on purpose; the rest of it is
+> unedited.
 
 **Story:** *your life as a living, bioluminescent network; the graph is the hero.*
 Vitae's identity moved from "warm-onyx paper & ink personal instrument" to a
