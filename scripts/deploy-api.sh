@@ -2,7 +2,7 @@
 #
 # Deploy the API (and buildsvc) to the production VM.
 #
-#   ./scripts/deploy-api.sh          # pull + build + migrate + restart, then verify
+#   ./scripts/deploy-api.sh          # publish docs + pull + build + migrate + restart, verify
 #   ./scripts/deploy-api.sh --check  # report what is deployed, change nothing
 #
 # Production is one VM running caddy + api + buildsvc from
@@ -11,6 +11,12 @@
 # moves code.
 #
 # The SPA is not here: Vercel builds it from main on push.
+#
+# The documentation corpus IS here. It is private — served by the API behind the
+# OWNER_EMAIL allow-list rather than published by the web host — so it has to
+# reach the VM, and it cannot be built there: the compiler reads the tracked
+# file set with git and the VM's checkout is not where the corpus is authored.
+# This script compiles it locally and copies it up before restarting anything.
 #
 # See docs/DEPLOYMENT.md.
 set -euo pipefail
@@ -37,6 +43,7 @@ esac
 [ -n "$HEALTH_URL" ] || die "set VITAE_HEALTH_URL (e.g. https://api.vitae.example.com/health)"
 command -v ssh        >/dev/null || die "ssh not found"
 command -v ssh-keygen >/dev/null || die "ssh-keygen not found"
+command -v rsync      >/dev/null || die "rsync not found (needed to publish the documentation)"
 [ -f "$KNOWN_HOSTS" ] || die "known-hosts file not found at $KNOWN_HOSTS (set VITAE_KNOWN_HOSTS)"
 ssh-keygen -F "$HOST_KEY_NAME" -f "$KNOWN_HOSTS" >/dev/null 2>&1 \
   || die "no pinned SSH host key for $HOST_KEY_NAME in $KNOWN_HOSTS"
@@ -59,9 +66,30 @@ esac
 if [ "${1:-}" = "--check" ]; then
   step "Deployed on ${HOST}"
   "${SSH[@]}" "cd ${APP_DIR} && git log --oneline -1 && docker compose -f deploy/compose.prod.yml ps"
+  step "Documentation corpus on ${HOST}"
+  # A directory with no manifest is not a corpus. A bind mount whose host path
+  # is missing is created empty, so "the directory is there" proves nothing.
+  "${SSH[@]}" "cd ${APP_DIR} && if [ -f deploy/docs-content/manifest.json ]; then \
+      echo \"published: \$(grep -c '\"route\"' deploy/docs-content/manifest.json) page entries\"; \
+    else echo 'NOT published — /api/v1/docs will answer 503'; fi"
   curl -fsS --max-time 10 "$HEALTH_URL" && echo
   exit 0
 fi
+
+# The corpus is compiled from the working tree, so a deploy publishes the
+# documentation that matches the branch being deployed rather than whatever was
+# last left in docs/.compiled.
+step "Compiling the documentation corpus"
+pnpm docs:build
+[ -f docs/.compiled/manifest.json ] || die "docs:build produced no manifest"
+
+step "Publishing the corpus to ${HOST}:${APP_DIR}/deploy/docs-content"
+# --delete so a page removed from the corpus stops being served. The API reads
+# this read-only and refuses anything outside it, so a stale file left behind
+# would simply be served forever.
+rsync -a --delete \
+  -e "$(printf '%q ' "${SSH[@]:0:${#SSH[@]}-1}")" \
+  docs/.compiled/ "${HOST}:${APP_DIR}/deploy/docs-content/"
 
 step "Deploying ${BRANCH} to ${HOST}:${APP_DIR}"
 "${SSH[@]}" bash -seuo pipefail <<REMOTE

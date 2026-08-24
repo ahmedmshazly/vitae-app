@@ -103,10 +103,25 @@ function privately(res: Parameters<Parameters<Router['get']>[1]>[1]): void {
   res.set('X-Content-Type-Options', 'nosniff');
 }
 
+/**
+ * Is there a corpus here, rather than just a directory where one should be?
+ *
+ * The manifest is the test, not the directory. A bind mount whose host path
+ * does not exist is created empty by the container runtime, so "the directory
+ * exists" is true on a deployment that was never given a corpus at all — and
+ * every file request would then 404 individually instead of saying, once, that
+ * nothing was published. A reader would go looking for a broken link; the
+ * problem is a missing deploy step.
+ */
+function corpusAt(root: string | null): string | null {
+  if (root === null) return null;
+  return existsSync(resolve(root, 'manifest.json')) ? root : null;
+}
+
 docsRouter.get('/', (_req, res) => {
   const root = contentRoot();
   res.json({
-    available: root !== null && existsSync(root),
+    available: corpusAt(root) !== null,
     // Named so an operator can tell "not built" from "built somewhere else"
     // without reading the container's filesystem.
     configured: root !== null,
@@ -117,13 +132,13 @@ docsRouter.get('/', (_req, res) => {
 // `/{*name}` form belongs to Express 5 and would be read here as a literal
 // path segment, so the route would simply never match.
 docsRouter.get('/*', (req: Request<Record<string, string>>, res) => {
-  const root = contentRoot();
-  if (root === null || !existsSync(root)) {
+  const root = corpusAt(contentRoot());
+  if (root === null) {
     res.status(503).json({
       code: 'DOCS_UNAVAILABLE',
       message:
-        'No documentation corpus was built into this deployment. Run `pnpm docs:build --out <dir>` '
-        + 'and set DOCS_CONTENT_DIR to that directory.',
+        'No documentation corpus was published to this deployment. Run `pnpm docs:build` and copy '
+        + 'the result to the directory DOCS_CONTENT_DIR names.',
     });
     return;
   }

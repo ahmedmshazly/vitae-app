@@ -1389,9 +1389,9 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/deploy-api.sh:22",
+      "source": "scripts/deploy-api.sh:28",
       "reads": [
-        "scripts/deploy-api.sh:22"
+        "scripts/deploy-api.sh:28"
       ],
       "read_by": [
         "deploy"
@@ -1416,9 +1416,9 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/deploy-api.sh:24",
+      "source": "scripts/deploy-api.sh:30",
       "reads": [
-        "scripts/deploy-api.sh:24"
+        "scripts/deploy-api.sh:30"
       ],
       "read_by": [
         "deploy"
@@ -1594,9 +1594,9 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/deploy-api.sh:23",
+      "source": "scripts/deploy-api.sh:29",
       "reads": [
-        "scripts/deploy-api.sh:23"
+        "scripts/deploy-api.sh:29"
       ],
       "read_by": [
         "deploy"
@@ -1621,9 +1621,9 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/deploy-api.sh:18",
+      "source": "scripts/deploy-api.sh:24",
       "reads": [
-        "scripts/deploy-api.sh:18"
+        "scripts/deploy-api.sh:24"
       ],
       "read_by": [
         "deploy"
@@ -1648,9 +1648,9 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/deploy-api.sh:21",
+      "source": "scripts/deploy-api.sh:27",
       "reads": [
-        "scripts/deploy-api.sh:21"
+        "scripts/deploy-api.sh:27"
       ],
       "read_by": [
         "deploy"
@@ -1675,9 +1675,9 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/deploy-api.sh:20",
+      "source": "scripts/deploy-api.sh:26",
       "reads": [
-        "scripts/deploy-api.sh:20"
+        "scripts/deploy-api.sh:26"
       ],
       "read_by": [
         "deploy"
@@ -1842,9 +1842,9 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/deploy-api.sh:19",
+      "source": "scripts/deploy-api.sh:25",
       "reads": [
-        "scripts/deploy-api.sh:19"
+        "scripts/deploy-api.sh:25"
       ],
       "read_by": [
         "deploy"

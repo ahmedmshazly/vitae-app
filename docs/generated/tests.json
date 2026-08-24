@@ -503,7 +503,7 @@
     {
       "file": "apps/api/src/routes/v1/docs.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 12,
+      "cases": 14,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -511,7 +511,7 @@
         "keeping the corpus out of shared caches",
         "what the file server refuses",
         "where a relative directory points",
-        "a deployment with no corpus built into it"
+        "a deployment with no corpus published to it"
       ],
       "subjects": [
         "../../__tests__/helpers/app.js",
@@ -523,7 +523,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 169
+      "lines": 191
     },
     {
       "file": "apps/api/src/routes/v1/duplicates.integration.test.ts",
@@ -6791,11 +6791,11 @@
   ],
   "summary": {
     "files": 318,
-    "cases": 2082,
+    "cases": 2084,
     "skipped": 0,
     "todo": 0,
     "by_package": {
-      "@vitae/api": 207,
+      "@vitae/api": 209,
       "@vitae/web": 1101,
       "@vitae/e2e": 268,
       "@vitae/core": 273,

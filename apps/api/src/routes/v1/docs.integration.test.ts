@@ -156,7 +156,7 @@ describe('where a relative directory points', () => {
   });
 });
 
-describe('a deployment with no corpus built into it', () => {
+describe('a deployment with no corpus published to it', () => {
   it('says so rather than reporting an empty documentation set', async () => {
     delete process.env.DOCS_CONTENT_DIR;
     const res = await request(app).get('/api/v1/docs/manifest.json').set(authHeader(token));
@@ -164,5 +164,27 @@ describe('a deployment with no corpus built into it', () => {
 
     expect(res.status).toBe(503);
     expect(res.body.code).toBe('DOCS_UNAVAILABLE');
+  });
+
+  it('treats an empty directory as no corpus, not as a corpus with nothing in it', async () => {
+    // This is the shape a real deployment fails in. A bind mount whose host
+    // path does not exist is created empty by the container runtime, so the
+    // directory is there and the manifest is not. Answering 404 per file would
+    // send a reader hunting a broken link; the problem is a missing deploy step.
+    const empty = mkdtempSync(join(tmpdir(), 'vitae-docs-empty-'));
+    process.env.DOCS_CONTENT_DIR = empty;
+    const file = await request(app).get('/api/v1/docs/manifest.json').set(authHeader(token));
+    const status = await request(app).get('/api/v1/docs').set(authHeader(token));
+    process.env.DOCS_CONTENT_DIR = root;
+    rmSync(empty, { recursive: true, force: true });
+
+    expect(file.status).toBe(503);
+    expect(file.body.code).toBe('DOCS_UNAVAILABLE');
+    expect(status.body).toStrictEqual({ available: false, configured: true });
+  });
+
+  it('reports availability once a corpus is there', async () => {
+    const res = await request(app).get('/api/v1/docs').set(authHeader(token)).expect(200);
+    expect(res.body).toStrictEqual({ available: true, configured: true });
   });
 });

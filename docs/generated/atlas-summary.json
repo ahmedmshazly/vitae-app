@@ -2,7 +2,7 @@
   "by_package": {
     "@vitae/api": {
       "files": 107,
-      "lines": 19689,
+      "lines": 19704,
       "exports": 367,
       "undocumented": 277
     },
@@ -82,7 +82,7 @@
     },
     "route": {
       "files": 45,
-      "lines": 8261,
+      "lines": 8276,
       "exports": 224,
       "undocumented": 176
     },
@@ -678,7 +678,7 @@
   "summary": {
     "files": 348,
     "test_files": 318,
-    "lines": 78927,
+    "lines": 78942,
     "exports": 1709,
     "undocumented_exports": 1214,
     "edges": 1545,
