@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { expectNoA11yViolations } from './helpers/a11y';
-import { signIn } from './helpers/auth';
+
 
 /**
  * The documentation surface at `/docs`.
@@ -28,12 +28,33 @@ function watchForApiCalls(page: Page): string[] {
 }
 
 /**
+ * Sign in far enough to read, and no further.
+ *
+ * The shared `signIn` helper waits for the Today dashboard, because most specs
+ * are about the product. These are about the documentation, which needs a
+ * session and nothing else — no seeded graph, no dashboard query, no workspace.
+ * Waiting for Today would make every test in this file fail whenever something
+ * unrelated to documentation broke, and would make the file unrunnable against
+ * a stack whose database is merely out of date.
+ */
+async function signInToRead(page: Page) {
+  await page.goto('/signin');
+  await page.evaluate(() => localStorage.setItem('vitae.v1.welcomed', '1'));
+  const button = page.getByRole('button', { name: /developer sign-in/i });
+  await button.waitFor({ state: 'visible', timeout: 10_000 });
+  await button.click();
+  // The session cookie is what the corpus needs. Leaving /signin is the signal
+  // that it exists; where the application lands afterwards is its business.
+  await page.waitForURL((url) => !url.pathname.startsWith('/signin'), { timeout: 10_000 });
+}
+
+/**
  * Every test below reads the corpus, and the corpus is private. Signing in as
  * the owner is therefore setup rather than something under test — except in the
  * one test that clears the session on purpose to prove the refusal.
  */
 test.beforeEach(async ({ page }) => {
-  await signIn(page);
+  await signInToRead(page);
 });
 
 test('the owner can read the corpus, and it comes from the API', async ({ page }) => {

@@ -263,6 +263,11 @@ jobs:
       VITE_FIREBASE_PROJECT_ID: vitae-local
       VITE_FIREBASE_USE_EMULATOR: 'true'
       VITE_FIREBASE_AUTH_EMULATOR_HOST: http://127.0.0.1:9099
+      # The documentation corpus is served by the API from here, not by the web
+      # host, so `docs.spec.ts` needs it built and pointed at. Without this the
+      # API answers 503 and every documentation navigation in that spec fails
+      # on a missing heading rather than on anything it is testing.
+      DOCS_CONTENT_DIR: docs/.compiled
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
@@ -304,6 +309,11 @@ jobs:
           done
           docker logs vitae-buildsvc-e2e
           echo "::error::Build service did not become ready within 30s"; exit 1
+
+      # Before the API starts, because the API reads this directory on the first
+      # request and a missing manifest is reported as "no corpus published".
+      - name: Compile the documentation corpus
+        run: pnpm docs:build
 
       - name: Start API and web
         run: |

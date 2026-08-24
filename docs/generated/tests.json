@@ -4656,8 +4656,7 @@
       "todo": 0,
       "suites": [],
       "subjects": [
-        "./helpers/a11y",
-        "./helpers/auth"
+        "./helpers/a11y"
       ],
       "requirements": [],
       "run_by": [
@@ -4665,7 +4664,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 311
+      "lines": 332
     },
     {
       "file": "e2e/tests/document-editor.spec.ts",
