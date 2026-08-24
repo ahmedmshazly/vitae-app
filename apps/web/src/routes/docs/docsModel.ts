@@ -1,5 +1,5 @@
 /**
- * What the documentation surface reads, and where it reads it from.
+ * What the compiled corpus is, and every question it can answer on its own.
  *
  * `scripts/docs/build-content.mjs` compiles `docs/observatory/**` into
  * `public/docs-content/`: one manifest naming every page in reading order, and
@@ -12,12 +12,15 @@
  * so could never disagree with it, which is the entire value: when the two
  * drift, `pnpm --filter @vitae/web typecheck` is the thing that notices.
  *
- * The corpus is a build artifact, so within one page load it cannot change.
- * Every query here is therefore `staleTime: Infinity`: navigating back to a
- * page already read is instant and silent, and no documentation page ever
- * shows a refresh trace for content that could not have moved.
+ * This module holds no I/O. Fetching lives next door in `docsContent.ts`, and
+ * the split is what lets two very different renderers share one set of rules:
+ * the React reader in the browser, and the build plugin that prerenders every
+ * page into static HTML from Node, where `fetch`, `import.meta.env` and a
+ * query client are all either absent or beside the point. A breadcrumb, a
+ * reading order and a status label are decided in exactly one place, so the
+ * document a reader gets with JavaScript disabled cannot disagree with the
+ * one they get with it enabled.
  */
-import type { QueryClient } from '@tanstack/react-query';
 
 /** Who a page is written for. Keys of `manifest.audiences`. */
 export type DocsAudience = 'user' | 'designer' | 'developer' | 'maintainer' | 'operator' | 'security';
@@ -168,79 +171,46 @@ export interface DocsPageContent {
 }
 
 // ---------------------------------------------------------------------------
-// Reading it
-// ---------------------------------------------------------------------------
-
-/**
- * Where the compiled corpus is served from. Deliberately not `/docs`: the
- * static tree would then collide with the client routes at `/docs/*` and with
- * the prerendered HTML the SEO plugin writes for them.
- */
-export const DOCS_CONTENT_BASE = 'docs-content';
-
-/** An absolute URL for a content file, honouring a non-root deployment base. */
-export function docsAsset(path: string): string {
-  const base = import.meta.env.BASE_URL || '/';
-  return `${base.endsWith('/') ? base : `${base}/`}${DOCS_CONTENT_BASE}/${path}`;
-}
-
-/**
- * Read one compiled file.
- *
- * `what` is a noun phrase that reads inside "Couldn't load ___", because a
- * failure here reaches the screen through `QueryBoundary`, which shows the
- * error's own message. "Failed to fetch" tells a reader nothing; "the
- * documentation index is not available (404)" tells them the build is
- * incomplete rather than their network is down.
- */
-async function readContent<T>(path: string, what: string): Promise<T> {
-  let response: Response;
-  try {
-    response = await fetch(docsAsset(path), { credentials: 'omit' });
-  } catch {
-    throw new Error(`Couldn’t reach ${what}. Check your connection and try again.`);
-  }
-  if (!response.ok) {
-    throw new Error(`${what} is not available (${response.status}).`);
-  }
-  return (await response.json()) as T;
-}
-
-/**
- * The corpus is compiled at build time, so it cannot change while a reader is
- * on the page. Marking it fresh forever means back-and-forth navigation never
- * refetches and never flickers a skeleton over prose the reader already had.
- */
-const FOREVER = { staleTime: Number.POSITIVE_INFINITY, gcTime: Number.POSITIVE_INFINITY } as const;
-
-export function manifestQueryOptions() {
-  return {
-    queryKey: ['docs', 'manifest'] as const,
-    queryFn: () => readContent<DocsManifest>('manifest.json', 'the documentation index'),
-    ...FOREVER,
-  };
-}
-
-export function pageQueryOptions(page: DocsPageSummary) {
-  return {
-    queryKey: ['docs', 'page', page.id] as const,
-    queryFn: () => readContent<DocsPageContent>(page.content, `“${page.title}”`),
-    ...FOREVER,
-  };
-}
-
-/**
- * Warm a page before the reader asks for it. Called on pointer-enter and on
- * focus of a link, so following one is usually instant; a hover that goes
- * nowhere costs one cached fetch of a file measured in kilobytes.
- */
-export function prefetchDocsPage(client: QueryClient, page: DocsPageSummary): void {
-  void client.prefetchQuery(pageQueryOptions(page));
-}
-
-// ---------------------------------------------------------------------------
 // Questions the manifest can answer without fetching anything
 // ---------------------------------------------------------------------------
+
+/** Tone words a reader sees. The parser accepts GitHub's alert vocabulary. */
+export const CALLOUT_LABEL: Record<DocsCalloutTone, string> = {
+  note: 'Note',
+  tip: 'Tip',
+  important: 'Important',
+  warning: 'Warning',
+  caution: 'Caution',
+};
+
+/**
+ * Does this link leave the application?
+ *
+ * The builder has already turned every intra-corpus reference into an
+ * application route, so anything still carrying a scheme is somewhere else.
+ * Both renderers ask, and both have to get the same answer: the React reader
+ * to decide whether to open a new tab, the prerenderer to decide whether to
+ * mark the link `noreferrer`.
+ */
+export function isExternalDocsLink(href: string): boolean {
+  return /^[a-z][a-z0-9+.-]*:/i.test(href);
+}
+
+/**
+ * How a page title reads as a document title.
+ *
+ * The React reader applies this on navigation; the build plugin bakes it into
+ * every prerendered page. Two callers, one rule, so the tab is titled the same
+ * whether or not the script ran.
+ */
+export const DOCS_TITLE_SUFFIX = 'Vitae documentation';
+
+export function docsDocumentTitle(title: string): string {
+  // The corpus entrance is itself called "Vitae documentation", so appending
+  // unconditionally titled that tab "Vitae documentation · Vitae
+  // documentation". A page whose title already ends in the suffix keeps it.
+  return title.endsWith(DOCS_TITLE_SUFFIX) ? title : `${title} · ${DOCS_TITLE_SUFFIX}`;
+}
 
 /** Trailing slashes are a URL detail; the manifest holds one spelling. */
 export function normalizeDocsRoute(pathname: string): string {

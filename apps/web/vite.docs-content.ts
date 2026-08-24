@@ -29,6 +29,12 @@ export function docsContent(): Plugin {
   return {
     name: 'vitae-docs-content',
     buildStart() {
+      // Vitest loads this config too, and no unit test reads the compiled
+      // corpus — it is fetched over the network by a browser. Compiling there
+      // only creates a way for one unfinished Markdown page to fail every test
+      // in the package, which reports an authoring mistake as a broken build
+      // system. `pnpm docs:check` is where a bad page is meant to be caught.
+      if (process.env.VITEST) return;
       compile();
     },
     configureServer(server) {

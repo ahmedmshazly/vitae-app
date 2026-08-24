@@ -1,24 +1,21 @@
 /**
- * The questions the manifest answers, and what a failed read says out loud.
+ * The questions the manifest answers without reading anything else.
  *
  * These helpers are the only place the documentation surface makes a decision
  * about structure — which page a URL is, what comes next, what a breadcrumb
  * contains — so they are tested against a manifest rather than against the
  * real corpus. The corpus grows every commit; the rules do not.
  */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   type DocsManifest,
   audienceMeta,
   breadcrumbs,
-  docsAsset,
   domainOf,
-  manifestQueryOptions,
   neighbours,
   normalizeDocsRoute,
   pageAtRoute,
   pageById,
-  pageQueryOptions,
   sectionEntrance,
   sectionPages,
   statusMeta,
@@ -190,60 +187,5 @@ describe('status and audience vocabulary', () => {
 
   it('reads a declared type', () => {
     expect(typeMeta(manifest, 'index').label).toBe('Section index');
-  });
-});
-
-describe('fetching compiled content', () => {
-  const fetchMock = vi.fn();
-
-  beforeEach(() => {
-    fetchMock.mockReset();
-    vi.stubGlobal('fetch', fetchMock);
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
-  it('reads from the content root, which is not the client route prefix', () => {
-    expect(docsAsset('manifest.json')).toMatch(/\/docs-content\/manifest\.json$/);
-    expect(docsAsset('manifest.json')).not.toMatch(/\/docs\/manifest\.json$/);
-  });
-
-  it('sends no credentials with a public read', async () => {
-    fetchMock.mockResolvedValue({ ok: true, status: 200, json: async () => manifest });
-    await manifestQueryOptions().queryFn();
-    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('manifest.json'), {
-      credentials: 'omit',
-    });
-  });
-
-  // "Failed to fetch" reaches the screen through QueryBoundary and tells a
-  // reader nothing they can act on. These two messages separate "your network"
-  // from "this build is incomplete".
-  it('says the connection failed when the request never completes', async () => {
-    fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
-    await expect(manifestQueryOptions().queryFn()).rejects.toThrow(
-      /Couldn’t reach the documentation index/,
-    );
-  });
-
-  it('names the status code when the file is not there', async () => {
-    fetchMock.mockResolvedValue({ ok: false, status: 404, json: async () => ({}) });
-    await expect(manifestQueryOptions().queryFn()).rejects.toThrow(
-      /the documentation index is not available \(404\)/,
-    );
-  });
-
-  it('quotes the page title when a page fails, so the reader knows which one', async () => {
-    fetchMock.mockResolvedValue({ ok: false, status: 500, json: async () => ({}) });
-    const options = pageQueryOptions(manifest.pages[2]!);
-    expect(options.queryKey).toEqual(['docs', 'page', 'ONE']);
-    await expect(options.queryFn()).rejects.toThrow(/“First” is not available \(500\)/);
-  });
-
-  it('caches the corpus forever, because a build artifact cannot change mid-visit', () => {
-    expect(manifestQueryOptions().staleTime).toBe(Number.POSITIVE_INFINITY);
-    expect(pageQueryOptions(manifest.pages[2]!).staleTime).toBe(Number.POSITIVE_INFINITY);
   });
 });

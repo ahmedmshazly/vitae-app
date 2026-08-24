@@ -2778,6 +2778,30 @@
       "lines": 46
     },
     {
+      "file": "apps/web/src/public/docs-static.test.ts",
+      "package": "@vitae/web",
+      "cases": 18,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "the page a reader gets without JavaScript",
+        "how a documentation page describes itself to a crawler"
+      ],
+      "subjects": [
+        "../routes/docs/docsModel.js",
+        "./docs-static.js"
+      ],
+      "requirements": [
+        "FR-001"
+      ],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 232
+    },
+    {
       "file": "apps/web/src/public/PublicDocumentPage.test.tsx",
       "package": "@vitae/web",
       "cases": 3,
@@ -2800,7 +2824,7 @@
     {
       "file": "apps/web/src/public/seo.test.ts",
       "package": "@vitae/web",
-      "cases": 8,
+      "cases": 10,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -2816,7 +2840,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 95
+      "lines": 113
     },
     {
       "file": "apps/web/src/public/site.test.ts",
@@ -3125,9 +3149,51 @@
       "lines": 297
     },
     {
+      "file": "apps/web/src/routes/docs/DocsCommandPalette.test.tsx",
+      "package": "@vitae/web",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "jumping to a page"
+      ],
+      "subjects": [
+        "./DocsApp.js",
+        "./docsModel.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 209
+    },
+    {
+      "file": "apps/web/src/routes/docs/docsContent.test.ts",
+      "package": "@vitae/web",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "fetching compiled content"
+      ],
+      "subjects": [
+        "./docsContent.js",
+        "./docsModel.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 81
+    },
+    {
       "file": "apps/web/src/routes/docs/docsModel.test.ts",
       "package": "@vitae/web",
-      "cases": 23,
+      "cases": 17,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -3135,8 +3201,7 @@
         "sections",
         "reading order",
         "breadcrumbs",
-        "status and audience vocabulary",
-        "fetching compiled content"
+        "status and audience vocabulary"
       ],
       "subjects": [
         "./docsModel.js"
@@ -3147,7 +3212,75 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 250
+      "lines": 192
+    },
+    {
+      "file": "apps/web/src/routes/docs/docsProgress.test.ts",
+      "package": "@vitae/web",
+      "cases": 16,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "what the browser remembers",
+        "how far through the corpus a reader is",
+        "what to read next",
+        "what was opened recently"
+      ],
+      "subjects": [
+        "./docsModel.js",
+        "./docsProgress.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 159
+    },
+    {
+      "file": "apps/web/src/routes/docs/docsSearch.test.ts",
+      "package": "@vitae/web",
+      "cases": 19,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "building the index",
+        "asking the corpus a question",
+        "narrowing by facet"
+      ],
+      "subjects": [
+        "./docsModel.js",
+        "./docsSearch.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 177
+    },
+    {
+      "file": "apps/web/src/routes/docs/DocsSearch.test.tsx",
+      "package": "@vitae/web",
+      "cases": 9,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "searching the corpus"
+      ],
+      "subjects": [
+        "./DocsApp.js",
+        "./docsModel.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 203
     },
     {
       "file": "apps/web/src/routes/Duplicates.audit.test.tsx",
@@ -4416,6 +4549,24 @@
       ],
       "run_in_ci": true,
       "lines": 160
+    },
+    {
+      "file": "e2e/tests/docs.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 119
     },
     {
       "file": "e2e/tests/document-editor.spec.ts",
@@ -6541,23 +6692,23 @@
     }
   ],
   "summary": {
-    "files": 307,
-    "cases": 1942,
+    "files": 314,
+    "cases": 2020,
     "skipped": 0,
     "todo": 0,
     "by_package": {
       "@vitae/api": 195,
-      "@vitae/web": 991,
-      "@vitae/e2e": 250,
+      "@vitae/web": 1062,
+      "@vitae/e2e": 257,
       "@vitae/core": 273,
       "@vitae/testkit": 7,
       "@vitae/ui": 226
     },
     "by_script": {
-      "test": 307,
-      "test:web": 150,
+      "test": 314,
+      "test:web": 156,
+      "test:e2e": 53,
       "test:api": 52,
-      "test:e2e": 52,
       "test:unit": 44,
       "test:coverage": 44,
       "test:core": 42,

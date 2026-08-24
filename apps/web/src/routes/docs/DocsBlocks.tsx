@@ -16,23 +16,15 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { DocsBlock, DocsCalloutTone, DocsInline } from './docsModel.js';
-
-/** Tone words a reader sees. The parser accepts GitHub's alert vocabulary. */
-const CALLOUT_LABEL: Record<DocsCalloutTone, string> = {
-  note: 'Note',
-  tip: 'Tip',
-  important: 'Important',
-  warning: 'Warning',
-  caution: 'Caution',
-};
+import {
+  type DocsBlock,
+  type DocsInline,
+  CALLOUT_LABEL,
+  isExternalDocsLink,
+} from './docsModel.js';
 
 /** Copy that reads as an instruction rather than a state, per CONTRIBUTING. */
 const COPY_IDLE = 'Copy';
-
-function isExternal(href: string): boolean {
-  return /^[a-z][a-z0-9+.-]*:/i.test(href);
-}
 
 /**
  * One link, routed three ways.
@@ -51,7 +43,7 @@ export function DocsLink({ href, children }: { href: string; children: React.Rea
       </a>
     );
   }
-  if (isExternal(href)) {
+  if (isExternalDocsLink(href)) {
     const mail = href.startsWith('mailto:');
     return (
       <a

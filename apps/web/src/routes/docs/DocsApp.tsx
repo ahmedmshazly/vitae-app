@@ -25,12 +25,10 @@ import { EmptyState, LogoHorizontal, Skeleton } from '@vitae/ui';
 import { QueryBoundary } from '../../components/QueryBoundary.js';
 import { DocsNav } from './DocsChrome.js';
 import { DocsPage } from './DocsPage.js';
-import {
-  type DocsManifest,
-  manifestQueryOptions,
-  normalizeDocsRoute,
-  pageAtRoute,
-} from './docsModel.js';
+import { DocsCommandPalette, useDocsPalette } from './DocsCommandPalette.js';
+import { DocsSearch } from './DocsSearch.js';
+import { manifestQueryOptions } from './docsContent.js';
+import { type DocsManifest, normalizeDocsRoute, pageAtRoute } from './docsModel.js';
 
 /**
  * A path under `/docs` that the corpus does not produce.
@@ -81,12 +79,23 @@ function ShellSkeleton() {
   );
 }
 
+/**
+ * The routes the application serves that no page in the corpus produces.
+ *
+ * Kept as a list rather than as conditions scattered through the resolver, so
+ * that adding one is a single edit and so that a corpus page can never quietly
+ * shadow a built-in surface: the manifest is consulted first, and anything it
+ * claims wins.
+ */
+const SEARCH_ROUTE = '/docs/search';
+
 function DocsRoute({ manifest }: { manifest: DocsManifest }) {
   const { pathname } = useLocation();
   const route = normalizeDocsRoute(pathname);
   const summary = pageAtRoute(manifest, pathname);
+  const built = !summary && route === SEARCH_ROUTE;
 
-  if (!summary) return <DocsNotFound pathname={route} />;
+  if (!summary && !built) return <DocsNotFound pathname={route} />;
 
   return (
     <div className="docs-layout">
@@ -96,7 +105,7 @@ function DocsRoute({ manifest }: { manifest: DocsManifest }) {
           the two-column breakpoint it moves to the end of the page, which is
           what the skip link above it exists to make cheap. */}
       <main className="docs-main" id="main-content" tabIndex={-1}>
-        <DocsPage manifest={manifest} summary={summary} />
+        {summary ? <DocsPage manifest={manifest} summary={summary} /> : <DocsSearch manifest={manifest} />}
       </main>
     </div>
   );
@@ -104,6 +113,7 @@ function DocsRoute({ manifest }: { manifest: DocsManifest }) {
 
 export default function DocsApp() {
   const manifest = useQuery(manifestQueryOptions());
+  const palette = useDocsPalette();
 
   return (
     <div className="docs-root">
@@ -124,6 +134,14 @@ export default function DocsApp() {
           <span className="docs-masthead__label">Documentation</span>
         </Link>
         <nav className="docs-masthead__links" aria-label="Vitae">
+          <button
+            className="docs-masthead__jump"
+            type="button"
+            onClick={() => palette.setOpen(true)}
+          >
+            Jump to a page <span aria-hidden="true">/</span>
+          </button>
+          <Link to="/docs/search">Search</Link>
           <Link to="/reference/entities">Entity reference</Link>
           <Link to="/">Vitae</Link>
         </nav>
@@ -136,7 +154,17 @@ export default function DocsApp() {
         errorTitle="Couldn’t load the documentation"
         retryLabel="Try again"
       >
-        {(data) => <DocsRoute manifest={data} />}
+        {(data) => (
+          <>
+            <DocsRoute manifest={data} />
+            {/* Mounted only while open, so the index it needs is not fetched
+                by a reader who never opens it. The overlay remembers where
+                focus came from and puts it back on close. */}
+            {palette.open && (
+              <DocsCommandPalette manifest={data} onClose={() => palette.setOpen(false)} />
+            )}
+          </>
+        )}
       </QueryBoundary>
 
       <footer className="docs-foot">

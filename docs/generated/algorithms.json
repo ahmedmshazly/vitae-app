@@ -1794,6 +1794,21 @@
           "test": false
         },
         {
+          "file": "apps/web/src/routes/docs/docsSearch.ts",
+          "symbol": "stem",
+          "test": false
+        },
+        {
+          "file": "apps/web/src/routes/docs/docsSearch.ts",
+          "symbol": "STOPWORDS",
+          "test": false
+        },
+        {
+          "file": "apps/web/src/routes/docs/docsSearch.ts",
+          "symbol": "tokenize",
+          "test": false
+        },
+        {
           "file": "packages/core/src/algorithms/atom-scoring.ts",
           "symbol": "stem",
           "test": false
@@ -1910,7 +1925,7 @@
         }
       ],
       "consumer_count": {
-        "product": 17,
+        "product": 20,
         "test": 11
       }
     },

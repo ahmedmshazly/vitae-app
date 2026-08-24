@@ -18,6 +18,8 @@
  *                          fetched once
  *   pages/<path>.json      one page's blocks, headings and relations, fetched
  *                          when a reader opens it
+ *   search-text.json       every page's prose as plain text, fetched once when
+ *                          a reader searches
  *
  * The one transformation that matters is links. A page links to its neighbour
  * by relative Markdown path so that it reads correctly on the repository host
@@ -32,6 +34,7 @@ import { dirname, join, normalize, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFileSync } from 'node:fs';
 import { classifyLink, readCorpus } from './lib/corpus.mjs';
+import { blockText } from './lib/markdown.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = process.env.VITAE_DOCS_ROOT ? process.env.VITAE_DOCS_ROOT : join(here, '../..');
@@ -210,6 +213,29 @@ for (const page of ordered) {
     )}\n`,
   );
 }
+
+/**
+ * The prose of every page, for the search surface to index.
+ *
+ * Text rather than a finished index, which is the opposite of what a build
+ * step usually emits. The reason is that the index and the query have to agree
+ * on what a word is, and that agreement lives in `@vitae/core`'s tokenizer,
+ * which is TypeScript this script cannot load. Emitting text and building the
+ * index in the browser means one tokenizer, used by both halves at the same
+ * moment, instead of two that agree until one is changed. The corpus is small
+ * enough that the difference costs a few milliseconds once per session.
+ */
+writeFileSync(
+  join(outDir, 'search-text.json'),
+  `${JSON.stringify({
+    version: 1,
+    pages: ordered.map((page) => ({
+      id: page.data.id,
+      headings: page.headings.filter((h) => h.level > 1 && h.level < 4),
+      text: blockText(page.blocks.filter((b, i) => !(i === 0 && b.type === 'heading' && b.level === 1))),
+    })),
+  })}\n`,
+);
 
 if (!quiet) {
   console.log(

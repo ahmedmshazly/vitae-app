@@ -7,10 +7,10 @@
       "undocumented": 276
     },
     "@vitae/web": {
-      "files": 163,
-      "lines": 43241,
-      "exports": 681,
-      "undocumented": 473
+      "files": 169,
+      "lines": 44894,
+      "exports": 708,
+      "undocumented": 485
     },
     "@vitae/config": {
       "files": 1,
@@ -45,10 +45,10 @@
   },
   "by_kind": {
     "module": {
-      "files": 64,
-      "lines": 9367,
-      "exports": 359,
-      "undocumented": 205
+      "files": 65,
+      "lines": 9822,
+      "exports": 362,
+      "undocumented": 204
     },
     "migration": {
       "files": 10,
@@ -81,10 +81,10 @@
       "undocumented": 2
     },
     "route": {
-      "files": 40,
-      "lines": 6973,
-      "exports": 175,
-      "undocumented": 148
+      "files": 43,
+      "lines": 7542,
+      "exports": 196,
+      "undocumented": 158
     },
     "script": {
       "files": 12,
@@ -105,10 +105,10 @@
       "undocumented": 228
     },
     "screen": {
-      "files": 62,
-      "lines": 23115,
-      "exports": 162,
-      "undocumented": 102
+      "files": 64,
+      "lines": 23744,
+      "exports": 165,
+      "undocumented": 105
     },
     "test-support": {
       "files": 7,
@@ -676,13 +676,13 @@
     ]
   },
   "summary": {
-    "files": 338,
-    "test_files": 307,
-    "lines": 75650,
-    "exports": 1651,
-    "undocumented_exports": 1181,
-    "edges": 1497,
-    "untested": 135,
+    "files": 344,
+    "test_files": 314,
+    "lines": 77303,
+    "exports": 1678,
+    "undocumented_exports": 1193,
+    "edges": 1529,
+    "untested": 137,
     "no_consumer": [],
     "consumed_only_by_tests": [
       "apps/web/src/components/ListToolbar.tsx",
@@ -694,19 +694,19 @@
     "most_depended_on": [
       {
         "file": "packages/ui/src/index.ts",
-        "dependents": 104
+        "dependents": 106
       },
       {
         "file": "packages/ui/src/components.tsx",
-        "dependents": 79
+        "dependents": 80
       },
       {
         "file": "packages/core/src/index.ts",
-        "dependents": 77
+        "dependents": 78
       },
       {
         "file": "packages/ui/src/feedback.tsx",
-        "dependents": 67
+        "dependents": 69
       },
       {
         "file": "apps/web/src/lib/api.ts",
@@ -714,7 +714,7 @@
       },
       {
         "file": "packages/ui/src/overlay.tsx",
-        "dependents": 51
+        "dependents": 52
       },
       {
         "file": "apps/api/src/db/repository.ts",
@@ -738,7 +738,7 @@
       },
       {
         "file": "packages/ui/src/layout.tsx",
-        "dependents": 32
+        "dependents": 33
       },
       {
         "file": "apps/web/src/features/Toast.tsx",

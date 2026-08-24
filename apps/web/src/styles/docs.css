@@ -1072,3 +1072,345 @@ h6.docs-heading {
     min-height: var(--ae-hit-target);
   }
 }
+
+/* ------------------------------------------------------------------ search */
+
+/*
+ * The search surface is the same ledger, not a second visual language. Results
+ * are ruled rows; the facet panel is a column of plain checkboxes with counts
+ * set in the mono face, because a count is a literal. Nothing here is coloured
+ * to mean anything: a status badge on a result names its status, exactly as it
+ * does on the page it points at.
+ */
+
+.docs-search__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-2);
+  margin-bottom: var(--ae-space-5);
+}
+
+.docs-search__label {
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-sm);
+}
+
+.docs-search__field {
+  width: 100%;
+  min-height: var(--ae-control-h);
+  padding: 0 var(--ae-space-3);
+  border: 1px solid var(--ae-border-control);
+  border-radius: var(--ae-radius);
+  background: var(--ae-bg);
+  color: var(--ae-fg-strong);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-base);
+  transition: border-color var(--ae-dur) var(--ae-ease);
+}
+
+.docs-search__field:hover {
+  border-color: var(--ae-fg);
+}
+
+.docs-search__field:focus-visible {
+  outline: var(--ae-focus-ring);
+  outline-offset: 2px;
+}
+
+.docs-search__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-3);
+}
+
+.docs-search__count {
+  margin: 0 0 var(--ae-space-4);
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-sm);
+}
+
+.docs-search__missing {
+  margin: 0 0 var(--ae-space-4);
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-sm);
+}
+
+/*
+ * Results first in the document, filters after. Someone searching wants the
+ * answer; the panel is a refinement they reach for only when the answer is too
+ * broad. On a wide screen the grid lifts the panel into a right-hand column
+ * without changing that order.
+ */
+.docs-search__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ae-space-6);
+}
+
+@media (min-width: 60rem) {
+  .docs-search__body {
+    grid-template-columns: minmax(0, 1fr) var(--docs-rail);
+  }
+}
+
+.docs-search__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-search__list > li {
+  padding: var(--ae-space-4) 0;
+  border-bottom: 1px solid var(--ae-border);
+}
+
+.docs-search__list > li:first-child {
+  padding-top: 0;
+}
+
+.docs-search__hit {
+  display: block;
+  color: var(--ae-fg-strong);
+  text-decoration: none;
+}
+
+.docs-search__hit-title {
+  display: block;
+  font-size: var(--ae-text-lg);
+  line-height: 1.3;
+  text-decoration: underline;
+  text-decoration-color: var(--ae-border-control);
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--ae-dur) var(--ae-ease);
+}
+
+.docs-search__hit:hover .docs-search__hit-title {
+  text-decoration-color: var(--ae-fg);
+}
+
+.docs-search__hit:focus-visible {
+  outline: var(--ae-focus-ring);
+  outline-offset: 3px;
+}
+
+.docs-search__hit-summary {
+  display: block;
+  margin-top: var(--ae-space-1);
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-sm);
+  line-height: 1.5;
+}
+
+.docs-search__hit-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  margin: var(--ae-space-2) 0 0;
+}
+
+.docs-search__hit-where,
+.docs-search__hit-sections {
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-xs);
+}
+
+.docs-search__hit-sections {
+  margin: var(--ae-space-1) 0 0;
+  line-height: 1.5;
+}
+
+.docs-search__facets {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-4);
+  align-self: start;
+}
+
+.docs-search__facet {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid var(--ae-border);
+}
+
+.docs-search__facet legend {
+  padding: 0;
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.docs-search__facet ul {
+  margin: var(--ae-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-search__facet label {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  /* 32px is the precise-pointer target minimum in DESIGN.md; a checkbox row
+     that is only as tall as its text is a target nobody can hit twice. */
+  min-height: 32px;
+  color: var(--ae-fg);
+  font-size: var(--ae-text-sm);
+}
+
+.docs-search__facet-name {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.docs-search__facet-count {
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.docs-search__clear {
+  align-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ae-fg-soft);
+  font-family: inherit;
+  font-size: var(--ae-text-sm);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color var(--ae-dur) var(--ae-ease);
+}
+
+.docs-search__clear:hover {
+  color: var(--ae-fg-strong);
+}
+
+/* --------------------------------------------------------- command palette */
+
+.docs-masthead__jump {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  min-height: 32px;
+  padding: 0 var(--ae-space-3);
+  border: 1px solid var(--ae-border-control);
+  border-radius: var(--ae-radius);
+  background: none;
+  color: var(--ae-fg-soft);
+  font-family: inherit;
+  font-size: var(--ae-text-sm);
+  cursor: pointer;
+  transition: color var(--ae-dur) var(--ae-ease);
+}
+
+.docs-masthead__jump:hover {
+  color: var(--ae-fg-strong);
+}
+
+.docs-masthead__jump span {
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+}
+
+.docs-palette__loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-2);
+  padding: var(--ae-space-3) var(--ae-space-4);
+}
+
+.docs-palette__message {
+  margin: 0;
+  padding: var(--ae-space-4);
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-sm);
+}
+
+.docs-palette__title {
+  display: block;
+  color: var(--ae-fg-strong);
+  font-size: var(--ae-text-sm);
+}
+
+.docs-palette__where {
+  display: block;
+  margin-top: 2px;
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-xs);
+}
+
+.docs-palette__hint {
+  margin: 0;
+  padding: var(--ae-space-2) var(--ae-space-4);
+  border-top: 1px solid var(--ae-border);
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-xs);
+}
+
+/* --------------------------------------------------------- reading history */
+
+.docs-resume {
+  margin-top: var(--ae-space-6);
+  padding-top: var(--ae-space-5);
+  border-top: 1px solid var(--ae-border);
+}
+
+.docs-resume__title {
+  margin: 0;
+  color: var(--ae-fg-strong);
+  font-size: var(--ae-text-base);
+  font-weight: 500;
+}
+
+.docs-resume__count {
+  margin: var(--ae-space-2) 0 0;
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-sm);
+}
+
+.docs-resume__next {
+  margin: var(--ae-space-4) 0 0;
+}
+
+.docs-resume__subtitle {
+  margin: var(--ae-space-5) 0 0;
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-xs);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.docs-resume__list {
+  margin: var(--ae-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-resume__list li {
+  padding: var(--ae-space-2) 0;
+  border-bottom: 1px solid var(--ae-border);
+  font-size: var(--ae-text-sm);
+}
+
+.docs-resume__forget {
+  margin-top: var(--ae-space-4);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ae-fg-soft);
+  font-family: inherit;
+  font-size: var(--ae-text-sm);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color var(--ae-dur) var(--ae-ease);
+}
+
+.docs-resume__forget:hover {
+  color: var(--ae-fg-strong);
+}

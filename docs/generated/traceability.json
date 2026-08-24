@@ -2,8 +2,8 @@
   "generated_by": "scripts/docs/gen-traceability.mjs",
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
-    "files_scanned": 780,
-    "files_citing": 134,
+    "files_scanned": 793,
+    "files_citing": 135,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,7 +20,7 @@
   },
   "totals": {
     "registered": 99,
-    "citations": 352,
+    "citations": 354,
     "implemented_and_tested": 19,
     "implemented_untested": 57,
     "tested_only": 2,
@@ -45,7 +45,9 @@
         "apps/api/src/__tests__/api.integration.test.ts:1456",
         "apps/api/src/__tests__/api.integration.test.ts:1645",
         "apps/api/src/routes/v1/export.integration.test.ts:37",
-        "apps/api/src/services/restore.integration.test.ts:2"
+        "apps/api/src/services/restore.integration.test.ts:2",
+        "apps/web/src/public/docs-static.test.ts:151",
+        "apps/web/src/public/docs-static.test.ts:153"
       ],
       "documents": [
         "docs/observatory/meta/coverage-and-contradictions.md:373"
@@ -1878,6 +1880,9 @@
     ],
     "apps/web/src/lib/firebase.ts": [
       "INT-1"
+    ],
+    "apps/web/src/public/docs-static.test.ts": [
+      "FR-001"
     ],
     "apps/web/src/routes/Ask.tsx": [
       "FR-CON-006",

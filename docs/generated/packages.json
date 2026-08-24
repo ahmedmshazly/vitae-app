@@ -210,10 +210,10 @@
           "range": "^3.24.1"
         }
       ],
-      "source_files": 163,
-      "test_files": 150,
-      "source_lines": 43241,
-      "exports": 681,
+      "source_files": 169,
+      "test_files": 156,
+      "source_lines": 44894,
+      "exports": 708,
       "dependents": [],
       "imported_by": [],
       "unused_manifest_deps": [],
@@ -487,7 +487,7 @@
       "dev_depends_on": [],
       "external_dependencies": [],
       "source_files": 0,
-      "test_files": 52,
+      "test_files": 53,
       "source_lines": 0,
       "exports": 0,
       "dependents": [],
@@ -650,9 +650,9 @@
   ],
   "summary": {
     "packages": 8,
-    "source_files": 338,
-    "test_files": 307,
-    "source_lines": 75650,
+    "source_files": 344,
+    "test_files": 314,
+    "source_lines": 77303,
     "layers": 2,
     "cyclic": [],
     "workspace_typecheck": {

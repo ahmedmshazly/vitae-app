@@ -23,13 +23,22 @@
  * collapses into the stack, and when the rail came first a reader scrolled
  * past 1,700px of table of contents to reach the first sentence.
  */
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Banner, Skeleton } from '@vitae/ui';
 import { QueryBoundary } from '../../components/QueryBoundary.js';
 import { DocsBlocks } from './DocsBlocks.js';
 import { DocsBreadcrumb, DocsPrevNext, DocsStatusBadge, DocsToc } from './DocsChrome.js';
+import { pageQueryOptions } from './docsContent.js';
+import {
+  continueDocsReading,
+  docsProgressCount,
+  forgetDocsProgress,
+  readDocsProgress,
+  recentDocsPages,
+  recordDocsVisit,
+} from './docsProgress.js';
 import {
   type DocsManifest,
   type DocsPageContent,
@@ -37,8 +46,8 @@ import {
   type DocsReference,
   audienceMeta,
   breadcrumbs,
+  docsDocumentTitle,
   neighbours,
-  pageQueryOptions,
   sectionEntrance,
   sectionPages,
   typeMeta,
@@ -47,22 +56,17 @@ import {
 /**
  * Title and description for the tab and for anything that reads the head.
  *
- * The public marketing routes get theirs from a typed registry and a build
- * plugin; a documentation page's comes from the page itself, so it is applied
- * here on navigation. The description element is tagged and reused rather than
- * appended, or a reader moving through ten pages would leave ten of them
- * behind.
+ * The public marketing routes get theirs from a typed registry; a
+ * documentation page's comes from the page itself, so it is applied here on
+ * navigation and baked into the prerendered HTML by the same rule. The
+ * description element is tagged and reused rather than appended, or a reader
+ * moving through ten pages would leave ten of them behind.
  */
-const TITLE_SUFFIX = 'Vitae documentation';
-
 function useDocsHead(title: string, description: string) {
   useEffect(() => {
     if (typeof document === 'undefined') return;
     const previous = document.title;
-    // The corpus entrance is itself called "Vitae documentation", so appending
-    // unconditionally titled that tab "Vitae documentation · Vitae
-    // documentation". A page whose title already ends in the suffix keeps it.
-    document.title = title.endsWith(TITLE_SUFFIX) ? title : `${title} · ${TITLE_SUFFIX}`;
+    document.title = docsDocumentTitle(title);
     let tag = document.head.querySelector<HTMLMetaElement>('meta[data-vitae-docs-seo]');
     if (!tag) {
       tag = document.createElement('meta');
@@ -183,6 +187,66 @@ function SectionContents({ manifest, page }: { manifest: DocsManifest; page: Doc
   );
 }
 
+/**
+ * Where this reader stopped, offered back to them.
+ *
+ * Rendered only on the corpus entrance, and only when there is something to
+ * say. A corpus this size is read across sessions, and the one fact a static
+ * site cannot normally supply is which page came next for *you*. It is held in
+ * `localStorage` and nowhere else: no session, no request, nothing that leaves
+ * the machine.
+ *
+ * Mounted conditionally, so returning to the entrance reads the store again
+ * rather than showing the position the reader had when they first arrived.
+ */
+function DocsResume({ manifest }: { manifest: DocsManifest }) {
+  // Read once on mount. A store this small does not need subscribing to: the
+  // only writer is this reader, and every write happens on a navigation that
+  // unmounts this component.
+  const [progress, setProgress] = useState(readDocsProgress);
+  const counted = docsProgressCount(manifest, progress);
+  const next = continueDocsReading(manifest, progress);
+  const recent = recentDocsPages(manifest, progress, 4);
+
+  if (counted.read === 0) return null;
+
+  return (
+    <section className="docs-resume">
+      <h2 className="docs-resume__title">Where you were</h2>
+      <p className="docs-resume__count">
+        You have opened {counted.read} of {counted.total} pages. This is remembered in this browser
+        only.
+      </p>
+      {next && (
+        <p className="docs-resume__next">
+          <Link className="docs-button" to={next.route}>
+            Continue with {next.title}
+          </Link>
+        </p>
+      )}
+      {recent.length > 0 && (
+        <>
+          <h3 className="docs-resume__subtitle">Recently opened</h3>
+          <ul className="docs-resume__list">
+            {recent.map((page) => (
+              <li key={page.id}>
+                <Link to={page.route}>{page.title}</Link>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      <button
+        className="docs-resume__forget"
+        type="button"
+        onClick={() => setProgress(forgetDocsProgress())}
+      >
+        Forget what I have read
+      </button>
+    </section>
+  );
+}
+
 /** The corpus entrance also lists every section. */
 function CorpusContents({ manifest }: { manifest: DocsManifest }) {
   return (
@@ -238,6 +302,13 @@ export function DocsPage({
 
   useDocsHead(summary.title, summary.summary);
   useDocsScroll(hash, query.data !== undefined);
+
+  // Remembering the page is a write to an external store, which is what an
+  // effect is for. Nothing in this component reads it back, so the write never
+  // causes a render.
+  useEffect(() => {
+    recordDocsVisit(summary.id);
+  }, [summary.id]);
 
   // A client-side navigation replaces the document without telling anyone who
   // is not watching the viewport. Moving focus to the new title is what makes
@@ -320,7 +391,12 @@ export function DocsPage({
               <DocsBlocks blocks={page.blocks} />
             </article>
             <SectionContents manifest={manifest} page={summary} />
-            {summary.route === '/docs' && <CorpusContents manifest={manifest} />}
+            {summary.route === '/docs' && (
+              <>
+                <DocsResume manifest={manifest} />
+                <CorpusContents manifest={manifest} />
+              </>
+            )}
           </>
         )}
       </QueryBoundary>

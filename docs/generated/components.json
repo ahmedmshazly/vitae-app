@@ -40,10 +40,11 @@
         "apps/web/src/routes/Person.tsx",
         "apps/web/src/routes/Templates.tsx",
         "apps/web/src/routes/docs/DocsPage.tsx",
+        "apps/web/src/routes/docs/DocsSearch.tsx",
         "apps/web/src/routes/reference/EntityCatalog.tsx",
         "apps/web/src/routes/tailor/PreviewPane.tsx"
       ],
-      "uses": 16,
+      "uses": 17,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/layout.css"
@@ -745,9 +746,10 @@
       "renders_jsx": true,
       "used_by": [
         "apps/web/src/features/QuickAdd.tsx",
-        "apps/web/src/features/QuickSwitcher.tsx"
+        "apps/web/src/features/QuickSwitcher.tsx",
+        "apps/web/src/routes/docs/DocsCommandPalette.tsx"
       ],
-      "uses": 2,
+      "uses": 3,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/combobox.css",
@@ -1035,13 +1037,14 @@
         "apps/web/src/routes/career/ApplicationDossier.tsx",
         "apps/web/src/routes/career/CareerOverview.tsx",
         "apps/web/src/routes/docs/DocsApp.tsx",
+        "apps/web/src/routes/docs/DocsSearch.tsx",
         "apps/web/src/routes/reference/EntityCatalog.tsx",
         "apps/web/src/routes/tailor/SelectionPane.tsx",
         "apps/web/src/routes/tailor/Tailor.tsx",
         "apps/web/src/routes/tailor/TargetRail.tsx",
         "apps/web/src/routes/workspaces/Planner.tsx"
       ],
-      "uses": 38,
+      "uses": 39,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/components.css"
@@ -1812,9 +1815,10 @@
         "apps/web/src/features/FirstRun.tsx",
         "apps/web/src/features/QuickAdd.tsx",
         "apps/web/src/features/QuickSwitcher.tsx",
+        "apps/web/src/routes/docs/DocsCommandPalette.tsx",
         "apps/web/src/routes/reference/EntityObservatoryControls.tsx"
       ],
-      "uses": 5,
+      "uses": 6,
       "tested": false,
       "styled_in": [
         "packages/ui/src/styles/components.css"
@@ -3049,12 +3053,14 @@
         "apps/web/src/routes/SignIn.tsx",
         "apps/web/src/routes/Templates.tsx",
         "apps/web/src/routes/docs/DocsApp.tsx",
+        "apps/web/src/routes/docs/DocsCommandPalette.tsx",
         "apps/web/src/routes/docs/DocsPage.tsx",
+        "apps/web/src/routes/docs/DocsSearch.tsx",
         "apps/web/src/routes/reference/EntityCatalog.tsx",
         "apps/web/src/routes/tailor/DocumentPane.tsx",
         "apps/web/src/routes/tailor/PreviewPane.tsx"
       ],
-      "uses": 14,
+      "uses": 16,
       "tested": true,
       "styled_in": [
         "apps/web/src/styles/resume-paper.css",

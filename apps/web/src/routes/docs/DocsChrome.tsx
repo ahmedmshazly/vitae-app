@@ -10,12 +10,12 @@
  */
 import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import { prefetchDocsPage } from './docsContent.js';
 import {
   type DocsCrumb,
   type DocsHeading,
   type DocsManifest,
   type DocsPageSummary,
-  prefetchDocsPage,
   sectionEntrance,
   sectionPages,
   statusMeta,

@@ -197,6 +197,51 @@ export function plain(nodes) {
     .join('');
 }
 
+/**
+ * The prose of a page, with the markup taken off.
+ *
+ * The search surface builds its index from this rather than from the block
+ * tree, so the words a reader can find are decided once, here, where the tree
+ * is produced. Code is included: someone searching for a command or a
+ * configuration key is searching for something that only ever appears inside a
+ * fenced block. Alternative text is included for the reason a figure has it —
+ * it is the content of the image, not decoration around it.
+ */
+export function blockText(blocks) {
+  const out = [];
+  const walk = (list) => {
+    for (const block of list) {
+      switch (block.type) {
+        case 'heading':
+        case 'paragraph':
+          out.push(plain(block.children));
+          break;
+        case 'code':
+          out.push(block.code);
+          break;
+        case 'callout':
+        case 'quote':
+          walk(block.children);
+          break;
+        case 'list':
+          for (const item of block.items) walk(item);
+          break;
+        case 'table':
+          for (const cell of block.head) out.push(plain(cell));
+          for (const row of block.rows) for (const cell of row) out.push(plain(cell));
+          break;
+        case 'figure':
+          out.push(block.caption);
+          break;
+        default:
+          break;
+      }
+    }
+  };
+  walk(blocks);
+  return out.join(' ');
+}
+
 const ALERTS = new Set(['note', 'tip', 'important', 'warning', 'caution']);
 const FENCE = /^(\s*)(`{3,}|~{3,})\s*([^`]*)$/;
 const BULLET = /^(\s*)([-*+])\s+(.*)$/;
