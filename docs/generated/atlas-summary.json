@@ -2,7 +2,7 @@
   "by_package": {
     "@vitae/api": {
       "files": 107,
-      "lines": 19704,
+      "lines": 19752,
       "exports": 367,
       "undocumented": 277
     },
@@ -70,7 +70,7 @@
     },
     "middleware": {
       "files": 6,
-      "lines": 539,
+      "lines": 552,
       "exports": 19,
       "undocumented": 13
     },
@@ -82,7 +82,7 @@
     },
     "route": {
       "files": 45,
-      "lines": 8276,
+      "lines": 8311,
       "exports": 224,
       "undocumented": 176
     },
@@ -678,10 +678,10 @@
   "summary": {
     "files": 348,
     "test_files": 318,
-    "lines": 78942,
+    "lines": 78990,
     "exports": 1709,
     "undocumented_exports": 1214,
-    "edges": 1545,
+    "edges": 1546,
     "untested": 138,
     "no_consumer": [],
     "consumed_only_by_tests": [
@@ -745,12 +745,12 @@
         "dependents": 31
       },
       {
-        "file": "apps/web/src/lib/entity-href.ts",
+        "file": "apps/api/src/env.ts",
         "dependents": 25
       },
       {
-        "file": "apps/api/src/env.ts",
-        "dependents": 24
+        "file": "apps/web/src/lib/entity-href.ts",
+        "dependents": 25
       }
     ],
     "cross_package_edges": [

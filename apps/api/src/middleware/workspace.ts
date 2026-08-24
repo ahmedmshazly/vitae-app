@@ -20,12 +20,25 @@ function isAuthControlPath(req: Request): boolean {
 }
 
 /**
+ * The documentation corpus is a property of the installation, not of a tenant.
+ *
+ * Resolving a workspace for it would make reading the documentation depend on
+ * having finished account setup, which has nothing to do with it: a signed-in
+ * owner who had not bootstrapped would be told to finish setup before they
+ * could read the page explaining how. The router has its own owner check, so
+ * skipping workspace resolution here removes a coupling rather than a gate.
+ */
+function isInstanceDocsPath(req: Request): boolean {
+  return (req.baseUrl + req.path).startsWith('/api/v1/docs');
+}
+
+/**
  * Resolve workspace after auth. The optional header chooses among memberships;
  * it cannot create a workspace context by itself and Cloud mode ignores the
  * legacy x-vitae-space header entirely.
  */
 export function workspaceMiddleware(req: Request, _res: Response, next: NextFunction): void {
-  if (!cloudEnabled() || !req.user || isAuthControlPath(req)) {
+  if (!cloudEnabled() || !req.user || isAuthControlPath(req) || isInstanceDocsPath(req)) {
     next();
     return;
   }

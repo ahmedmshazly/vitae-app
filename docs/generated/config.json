@@ -313,7 +313,7 @@
       "requirements": [],
       "source": "packages/config/src/env.ts:95",
       "reads": [
-        "deploy/compose.prod.yml:88",
+        "deploy/compose.prod.yml:100",
         "services/buildsvc/src/server.ts:40"
       ],
       "read_by": [
@@ -601,7 +601,7 @@
       "requirements": [],
       "source": "packages/config/src/env.ts:67",
       "reads": [
-        "apps/api/src/routes/v1/docs.ts:45"
+        "apps/api/src/routes/v1/docs.ts:80"
       ],
       "read_by": [
         "api"

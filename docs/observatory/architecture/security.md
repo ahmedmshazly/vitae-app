@@ -169,11 +169,31 @@ worth considerably more to somebody probing this system than the same facts
 scattered through the source they would otherwise have to read.
 
 It is now served by this API, from a router mounted inside the v1 tree and
-therefore *below* `app.use('/api', authGate)`. It declares no public paths and
-carries no authorisation code of its own: it inherits the default-deny gate,
-and in self-hosted mode the same `OWNER_EMAIL` comparison that protects the
-graph. A second gate would be a second thing to get wrong, and the corpus does
-not need a different answer from the one the graph already gets.
+therefore *below* `app.use('/api', authGate)`. It declares no public paths, so
+it inherits the default-deny gate — but unlike every other router it does *not*
+rely on that gate alone to decide who may read it, and the reason is worth
+following.
+
+Self-hosted, `authGate` admits nobody but `OWNER_EMAIL`, so an inherited gate
+would be enough. In Cloud mode the same gate admits **any verified Google
+account**, because that is what Cloud mode is for. A corpus that inherited only
+the gate would therefore have been handed to every subscriber the moment
+`VITAE_CLOUD_ENABLED` was turned on: silently, on a flag flip, with no diff to
+review and nothing failing. That flag was turned on for the production
+deployment on 2026-08-24.
+
+So `apps/api/src/routes/v1/docs.ts` carries its own ownership test, applied to
+every request before any file is resolved, and it does not consult the mode.
+The corpus is a property of the installation rather than of a tenant: it
+describes this system's trust boundaries and enumerates its whole surface, and
+no subscriber has any business reading that. A non-owner receives `403` — not
+`404`, because the caller is already authenticated and hiding the route's
+existence would buy nothing while costing them an explanation.
+
+Workspace resolution is skipped for this route for the same reason. Reading the
+documentation has nothing to do with having finished account setup, and without
+the exemption a signed-in owner who had not yet bootstrapped would be told to
+finish setup before they could read the page explaining how to.
 
 What the router does have to get right is file access, because it maps a URL
 onto a path under one directory and that is the classic way to serve a file

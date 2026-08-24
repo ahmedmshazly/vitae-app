@@ -503,11 +503,12 @@
     {
       "file": "apps/api/src/routes/v1/docs.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 14,
+      "cases": 17,
       "skipped": 0,
       "todo": 0,
       "suites": [
         "who may read the documentation",
+        "who may read it once anyone can sign up",
         "keeping the corpus out of shared caches",
         "what the file server refuses",
         "where a relative directory points",
@@ -523,7 +524,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 191
+      "lines": 256
     },
     {
       "file": "apps/api/src/routes/v1/duplicates.integration.test.ts",
@@ -6791,11 +6792,11 @@
   ],
   "summary": {
     "files": 318,
-    "cases": 2084,
+    "cases": 2087,
     "skipped": 0,
     "todo": 0,
     "by_package": {
-      "@vitae/api": 209,
+      "@vitae/api": 212,
       "@vitae/web": 1101,
       "@vitae/e2e": 268,
       "@vitae/core": 273,

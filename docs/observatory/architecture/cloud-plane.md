@@ -5,7 +5,7 @@ summary: The tenant partition, where isolation is enforced and where it is calle
 audience: [maintainer, security, operator]
 domain: architecture
 type: explanation
-status: gated
+status: partial
 verified_at: 2026-08-24
 sources:
   - apps/api/src/db/migrations/007-cloud-control-plane.ts
@@ -252,7 +252,7 @@ the exact diagnostics stay in the provider's own logs.
 
 | Surface | Gate | Behaviour when closed |
 | --- | --- | --- |
-| Server behaviour | `VITAE_CLOUD_ENABLED`, off in the example environment | Workspace resolution and the entitlement gate become no-ops; the legacy two-space behaviour is retained |
+| Server behaviour | `VITAE_CLOUD_ENABLED`, off in `.env.example`, **on in `deploy/compose.prod.yml`** | Workspace resolution and the entitlement gate become no-ops; the legacy two-space behaviour is retained |
 | Payment webhook | same | Returns a not-found before parsing |
 | Billing routes | same | Return a not-found |
 | Enrolment | same | Returns a conflict naming self-hosted mode |
@@ -276,7 +276,32 @@ integration file of four cases
 (`apps/api/src/routes/v1/cloud.integration.test.ts`), plus a configuration unit
 suite and a browser billing screen suite.
 
-**Does not run in a default build:** all of it. The flag is off.
+**Does not run in a default build:** all of it. `.env.example` sets the flag
+false and a self-hosted installation is expected to leave it there.
+
+**Does run in the production deployment**, as of 2026-08-24.
+`deploy/compose.prod.yml` sets `VITAE_CLOUD_ENABLED=true`, so that deployment
+admits any verified Google sign-in and gives each one its own workspace. Three
+consequences are worth stating plainly, because none of them is obvious from
+the flag:
+
+- The owner is unaffected by the trial. `OWNER_EMAIL` claims the pre-Cloud
+  workspace on first bootstrap and that claim sets `active` with no trial end,
+  so the graph that existed before the flag was turned on never becomes
+  read-only.
+- **Everyone else trials and then stops being able to write.** A new workspace
+  starts `trialing`; when the trial end passes it moves to `read_only`, and the
+  entitlement gate answers `402` to every mutation. Only a verified provider
+  webhook moves it back, so without the Paddle server credentials configured
+  there is no path out of read-only. Signing up works; paying does not.
+- The public marketing surface is a separate gate and is still closed. It needs
+  a site URL, a support address, a legal entity name, a terms version and a
+  checkout-scoped token, all present and well-formed, and none of those is a
+  fact this repository can supply.
+
+The documentation corpus is deliberately outside all of this: it is served only
+to `OWNER_EMAIL` whatever mode the deployment is in. See
+[Trust boundaries and data handling](security.md).
 
 **Is not built at all:** a lifecycle worker — expiry is evaluated on the request
 path and nothing runs on a schedule; a cross-instance export lease; a workspace

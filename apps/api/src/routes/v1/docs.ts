@@ -21,11 +21,46 @@
  * paranoid: resolve first, then prove the result is inside the root, and refuse
  * anything else without explaining which part was wrong.
  */
-import { Router, type Request } from 'express';
+import { Router, type NextFunction, type Request, type Response } from 'express';
 import { createReadStream, existsSync, realpathSync, statSync } from 'node:fs';
 import { dirname, isAbsolute, normalize, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { env } from '../../env.js';
 export const docsRouter: Router = Router();
+
+/**
+ * The corpus is for the owner of the instance, in every mode.
+ *
+ * The gate in front of `/api` is not enough here, and the difference is the
+ * whole reason this exists. Self-hosted, `authGate` already admits nobody but
+ * `OWNER_EMAIL`, so this check is redundant. In Cloud mode it admits *any*
+ * verified Google account — that is the point of Cloud mode — and without this
+ * check, turning Cloud on would hand the corpus to every person who signed up.
+ * It would do it silently, on a flag flip, with no diff to review.
+ *
+ * So the ownership test lives here rather than being inherited. The corpus is a
+ * property of the installation, not of a tenant: it describes this system's
+ * trust boundaries and enumerates its whole surface, and no subscriber has any
+ * business reading that.
+ *
+ * 403 rather than 404: the caller is already authenticated, so hiding the
+ * route's existence buys nothing, and the reading surface turns this into a
+ * sentence explaining why rather than a broken link.
+ */
+function ownerOnly(req: Request, res: Response, next: NextFunction): void {
+  if (req.user?.email === env.OWNER_EMAIL.toLowerCase()) {
+    next();
+    return;
+  }
+  res.status(403).json({
+    error: {
+      code: 'FORBIDDEN',
+      message: 'The documentation is available to the owner of this instance.',
+    },
+  });
+}
+
+docsRouter.use(ownerOnly);
 
 /**
  * The directory the corpus was built into, or null if this deployment has none.

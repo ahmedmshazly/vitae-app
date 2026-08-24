@@ -86,6 +86,56 @@ describe('who may read the documentation', () => {
   });
 });
 
+describe('who may read it once anyone can sign up', () => {
+  // The reason this suite exists. Self-hosted, `authGate` admits nobody but the
+  // owner and the router's own check is redundant. In Cloud mode the gate
+  // admits every verified Google account, so without that check turning Cloud
+  // on would hand the corpus to every subscriber — silently, on a flag flip.
+  const originalCloud = process.env.VITAE_CLOUD_ENABLED;
+
+  beforeAll(() => {
+    process.env.VITAE_CLOUD_ENABLED = 'true';
+  });
+
+  afterAll(() => {
+    if (originalCloud === undefined) delete process.env.VITAE_CLOUD_ENABLED;
+    else process.env.VITAE_CLOUD_ENABLED = originalCloud;
+  });
+
+  it('still serves the owner', async () => {
+    const res = await request(app)
+      .get('/api/v1/docs/manifest.json')
+      .set(authHeader(token))
+      .expect(200);
+    expect(res.body.pages).toStrictEqual([{ id: 'ARC' }]);
+  });
+
+  it('refuses a subscriber who is otherwise perfectly entitled', async () => {
+    // A real, verified, signed-in Cloud user. Everything the gate asks for, and
+    // still not the owner of this installation.
+    const subscriber = jwt.sign(
+      { uid: 'dev:subscriber@example.com', email: 'subscriber@example.com', via: 'dev' },
+      env.SESSION_SECRET,
+      { expiresIn: '1h' },
+    );
+    const res = await request(app)
+      .get('/api/v1/docs/manifest.json')
+      .set(authHeader(subscriber));
+
+    expect(res.status).toBe(403);
+    expect(res.body.error.code).toBe('FORBIDDEN');
+    expect(JSON.stringify(res.body)).not.toContain('ARC');
+  });
+
+  it('does not make reading the documentation wait on account setup', async () => {
+    // Workspace resolution is skipped for this route. Without that, an owner
+    // who had not bootstrapped would be told to finish setup before they could
+    // read the page explaining how to.
+    const res = await request(app).get('/api/v1/docs/manifest.json').set(authHeader(token));
+    expect(res.status).not.toBe(409);
+  });
+});
+
 describe('keeping the corpus out of shared caches', () => {
   it('marks every file private and unstorable', async () => {
     // A proxy holding a copy would hand it to the next person through it.
