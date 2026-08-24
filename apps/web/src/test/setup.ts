@@ -1,6 +1,6 @@
 /**
  * Vitest setup for the web app. Adds jest-dom matchers, axe matchers, and the
- * two browser APIs jsdom does not implement but the component tree touches on mount.
+ * browser APIs jsdom does not implement but the component tree touches on mount.
  */
 import '@testing-library/jest-dom/vitest';
 import { expect } from 'vitest';
@@ -20,6 +20,16 @@ if (!window.matchMedia) {
     removeEventListener: () => {},
     dispatchEvent: () => false,
   })) as unknown as typeof window.matchMedia;
+}
+
+// Scrolling. jsdom defines `window.scrollTo` only so that calling it throws
+// "Not implemented" onto stderr, and omits `scrollIntoView` entirely, so both
+// are replaced rather than guarded. Any component that puts the reader
+// somewhere on navigation touches one of them on mount; the alternative is
+// optional-calling a method that exists in every real browser.
+window.scrollTo = (() => {}) as typeof window.scrollTo;
+if (!Element.prototype.scrollIntoView) {
+  Element.prototype.scrollIntoView = () => {};
 }
 
 if (!globalThis.ResizeObserver) {

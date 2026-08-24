@@ -7,10 +7,10 @@
       "undocumented": 276
     },
     "@vitae/web": {
-      "files": 158,
-      "lines": 41776,
-      "exports": 636,
-      "undocumented": 452
+      "files": 163,
+      "lines": 43226,
+      "exports": 681,
+      "undocumented": 473
     },
     "@vitae/config": {
       "files": 1,
@@ -81,10 +81,10 @@
       "undocumented": 2
     },
     "route": {
-      "files": 39,
-      "lines": 6629,
-      "exports": 141,
-      "undocumented": 133
+      "files": 40,
+      "lines": 6973,
+      "exports": 175,
+      "undocumented": 148
     },
     "script": {
       "files": 12,
@@ -100,19 +100,19 @@
     },
     "component": {
       "files": 65,
-      "lines": 16577,
+      "lines": 16599,
       "exports": 291,
       "undocumented": 228
     },
     "screen": {
-      "files": 58,
-      "lines": 22026,
-      "exports": 151,
-      "undocumented": 96
+      "files": 62,
+      "lines": 23100,
+      "exports": 162,
+      "undocumented": 102
     },
     "test-support": {
       "files": 7,
-      "lines": 275,
+      "lines": 285,
       "exports": 8,
       "undocumented": 8
     },
@@ -676,13 +676,13 @@
     ]
   },
   "summary": {
-    "files": 333,
-    "test_files": 303,
-    "lines": 74185,
-    "exports": 1606,
-    "undocumented_exports": 1160,
-    "edges": 1480,
-    "untested": 134,
+    "files": 338,
+    "test_files": 306,
+    "lines": 75635,
+    "exports": 1651,
+    "undocumented_exports": 1181,
+    "edges": 1497,
+    "untested": 136,
     "no_consumer": [],
     "consumed_only_by_tests": [
       "apps/web/src/components/ListToolbar.tsx",
@@ -694,7 +694,7 @@
     "most_depended_on": [
       {
         "file": "packages/ui/src/index.ts",
-        "dependents": 102
+        "dependents": 104
       },
       {
         "file": "packages/ui/src/components.tsx",
@@ -706,7 +706,7 @@
       },
       {
         "file": "packages/ui/src/feedback.tsx",
-        "dependents": 65
+        "dependents": 67
       },
       {
         "file": "apps/web/src/lib/api.ts",
@@ -737,11 +737,11 @@
         "dependents": 35
       },
       {
-        "file": "apps/web/src/features/Toast.tsx",
-        "dependents": 31
+        "file": "packages/ui/src/layout.tsx",
+        "dependents": 32
       },
       {
-        "file": "packages/ui/src/layout.tsx",
+        "file": "apps/web/src/features/Toast.tsx",
         "dependents": 31
       },
       {
@@ -760,6 +760,6 @@
       "@vitae/web → @vitae/core",
       "@vitae/web → @vitae/ui"
     ],
-    "dynamic_edges": 58
+    "dynamic_edges": 59
   }
 }

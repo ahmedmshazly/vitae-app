@@ -1,0 +1,1074 @@
+/*
+ * The documentation reading surface.
+ *
+ * Composed as a ledger rather than a card grid: one-pixel rules separate the
+ * section rail, the prose and the evidence rail, and nothing floats. The three
+ * columns are named grid areas over a single set of elements, so a table of
+ * contents exists once in the document at every width instead of twice with
+ * one copy hidden.
+ *
+ * Type carries the hierarchy. Prose is Source Serif 4, the editorial face the
+ * manifesto route already uses, because a documentation corpus is long-form
+ * reading. Everything that is chrome — headings, navigation, badges, table
+ * cells — is Instrument Sans, and everything that is a literal — a path, an
+ * identifier, a command — is IBM Plex Mono. A reader can tell what a run of
+ * text *is* before reading a word of it.
+ *
+ * No colour states anything on its own. A status badge names its status, a
+ * callout names its tone, an external link says where it goes, and every link
+ * in prose is underlined.
+ */
+
+.docs-root {
+  --docs-measure: 74ch;
+  --docs-rail: 244px;
+  --docs-nav-width: 216px;
+  --docs-gutter: var(--ae-space-6);
+  min-height: 100vh;
+  background: var(--ae-bg);
+  color: var(--ae-fg);
+  font-family: var(--ae-font-sans);
+  font-size: var(--ae-text-base);
+}
+
+/* ---------------------------------------------------------------- masthead */
+
+/*
+ * Off-screen until focused, which is the only way a keyboard user reaches the
+ * prose without walking the section rail first. It matters more here than on
+ * a product screen: below the two-column breakpoint the rail moves to the end
+ * of the page visually while staying before it in the document.
+ */
+.docs-skip {
+  position: absolute;
+  left: var(--ae-space-3);
+  top: var(--ae-space-3);
+  z-index: 10;
+  padding: var(--ae-space-2) var(--ae-space-4);
+  border: 1px solid var(--ae-border-strong);
+  border-radius: var(--ae-radius);
+  background: var(--ae-surface-raised);
+  color: var(--ae-fg-strong);
+  font-size: var(--ae-text-sm);
+  transform: translateY(-200%);
+}
+
+.docs-skip:focus-visible {
+  transform: translateY(0);
+}
+
+.docs-masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ae-space-4);
+  padding: var(--ae-space-4) var(--docs-gutter);
+  border-bottom: 1px solid var(--ae-border);
+  background: var(--ae-rail);
+}
+
+.docs-masthead__brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--ae-space-3);
+  color: var(--ae-fg-strong);
+  text-decoration: none;
+}
+
+.docs-masthead__label {
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ae-muted);
+}
+
+.docs-masthead__links {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-5);
+}
+
+.docs-masthead__links a {
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-sm);
+  text-decoration: none;
+  transition: color var(--ae-dur) var(--ae-ease);
+}
+
+.docs-masthead__links a:hover {
+  color: var(--ae-fg-strong);
+}
+
+/* ------------------------------------------------------------------ layout */
+
+.docs-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  width: 100%;
+  max-width: 1560px;
+  margin: 0 auto;
+}
+
+/* Below the two-column breakpoint the rail follows the page it describes. */
+.docs-layout > .docs-nav {
+  order: 2;
+}
+
+.docs-layout > .docs-main {
+  order: 1;
+}
+
+.docs-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  /*
+   * One column, so this is the order a phone actually reads in. The rail is
+   * about the article, so it follows the article; the pager is the way out, so
+   * it goes last. The wide layout below re-places the same four elements into
+   * two columns, which is why this order costs nothing there.
+   */
+  grid-template-areas:
+    'head'
+    'article'
+    'rail'
+    'pager';
+  min-width: 0;
+  padding: var(--ae-space-6) var(--docs-gutter) var(--ae-space-8);
+}
+
+.docs-main--message {
+  padding-top: var(--ae-space-8);
+}
+
+/*
+ * The skip link's target takes focus, and draws nothing for it.
+ *
+ * `main` carries `tabIndex={-1}` so that activating the skip link actually
+ * moves focus rather than only scrolling. The global rule then wants to ring
+ * it, and the global ring is a `box-shadow` — on an element thirteen thousand
+ * pixels tall that is two vertical lines running off both edges of the screen
+ * with no top or bottom in view. It reports nothing a reader can use.
+ *
+ * Suppressing it is not removing a focus indicator. `main` is not in the tab
+ * order and is not operable; what tells the reader they arrived is the page
+ * moving to the top and the title being announced. Every control that can be
+ * tabbed to still rings, including the skip link itself.
+ */
+.docs-main:focus-visible {
+  box-shadow: none;
+  outline: none;
+}
+
+.docs-head {
+  grid-area: head;
+}
+.docs-rail {
+  grid-area: rail;
+}
+.docs-article {
+  grid-area: article;
+  min-width: 0;
+}
+.docs-pager {
+  grid-area: pager;
+}
+
+/* --------------------------------------------------------------- nav rail */
+
+.docs-nav {
+  padding: var(--ae-space-6) var(--docs-gutter);
+  border-top: 1px solid var(--ae-border);
+}
+
+.docs-nav__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-nav__section,
+.docs-nav__page {
+  display: block;
+  padding: var(--ae-space-2) var(--ae-space-3);
+  border-radius: var(--ae-radius-sm);
+  color: var(--ae-fg-soft);
+  font-size: var(--ae-text-sm);
+  line-height: 1.4;
+  text-decoration: none;
+  transition: color var(--ae-dur) var(--ae-ease);
+}
+
+.docs-nav__section {
+  color: var(--ae-fg);
+  font-weight: 500;
+}
+
+.docs-nav__section--plain {
+  color: var(--ae-muted);
+}
+
+.docs-nav__section:hover,
+.docs-nav__page:hover {
+  color: var(--ae-fg-strong);
+}
+
+/*
+ * The current page is marked twice: a heavier ink and a rule in the gutter.
+ * The rule is what a reader who cannot separate the two greys still sees.
+ */
+.docs-nav__section[aria-current='page'],
+.docs-nav__page[aria-current='page'] {
+  border-left: 2px solid var(--ae-accent);
+  background: var(--ae-accent-bg);
+  color: var(--ae-fg-strong);
+  padding-left: calc(var(--ae-space-3) - 2px);
+}
+
+.docs-nav__pages {
+  display: flex;
+  flex-direction: column;
+  margin: var(--ae-space-1) 0 var(--ae-space-3);
+  padding: 0 0 0 var(--ae-space-3);
+  border-left: 1px solid var(--ae-border);
+  list-style: none;
+}
+
+/* --------------------------------------------------------------- page head */
+
+.docs-crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ae-space-2);
+  margin: 0 0 var(--ae-space-4);
+  padding: 0;
+  list-style: none;
+  font-size: var(--ae-text-xs);
+}
+
+.docs-crumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+}
+
+.docs-crumbs a {
+  color: var(--ae-muted);
+  text-decoration: none;
+}
+
+.docs-crumbs a:hover {
+  color: var(--ae-fg);
+}
+
+.docs-crumbs [aria-current='page'] {
+  color: var(--ae-fg-soft);
+}
+
+.docs-crumbs__sep {
+  color: var(--ae-faint);
+}
+
+.docs-head__title {
+  max-width: 22ch;
+  margin: 0;
+  color: var(--ae-fg-strong);
+  font-size: var(--ae-text-2xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.docs-head__title:focus-visible {
+  border-radius: var(--ae-radius);
+}
+
+.docs-head__summary {
+  max-width: 62ch;
+  margin: var(--ae-space-3) 0 0;
+  color: var(--ae-fg-soft);
+  font-family: 'Source Serif 4', ui-serif, serif;
+  font-size: var(--ae-text-lg);
+  line-height: 1.6;
+}
+
+.docs-head__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ae-space-3);
+  margin-top: var(--ae-space-5);
+  padding-bottom: var(--ae-space-5);
+  border-bottom: 1px solid var(--ae-border);
+}
+
+.docs-head__type {
+  color: var(--ae-muted);
+  font-size: var(--ae-text-xs);
+}
+
+/*
+ * The legend for the audience chips. Set as the same uppercase micro-label the
+ * rail uses for "ON THIS PAGE", because it is doing the same job: naming what
+ * the row beside it contains.
+ */
+.docs-head__for {
+  color: var(--ae-faint);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.docs-head__audience {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ae-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-head__audience li {
+  padding: 2px var(--ae-space-2);
+  border: 1px solid var(--ae-border);
+  border-radius: var(--ae-radius-sm);
+  color: var(--ae-faint);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+}
+
+/* ------------------------------------------------------------------ badges */
+
+.docs-badge {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--ae-space-2);
+  padding: 2px var(--ae-space-2);
+  border: 1px solid var(--ae-border-strong);
+  border-radius: var(--ae-radius-sm);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  white-space: nowrap;
+}
+
+.docs-badge__label {
+  color: var(--ae-fg-strong);
+  font-weight: 500;
+}
+
+.docs-badge__date {
+  color: var(--ae-faint);
+}
+
+.docs-badge[data-tone='positive'] {
+  border-color: var(--ae-success);
+}
+
+.docs-badge[data-tone='caution'] {
+  border-color: var(--ae-warning);
+}
+
+.docs-badge[data-tone='neutral'] {
+  border-color: var(--ae-border-control);
+}
+
+/* -------------------------------------------------------------------- rail */
+
+.docs-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-5);
+  margin: var(--ae-space-5) 0 0;
+  padding: var(--ae-space-4) 0;
+  border-bottom: 1px solid var(--ae-border);
+  min-width: 0;
+}
+
+.docs-rail__title,
+.docs-toc__title {
+  margin: 0 0 var(--ae-space-2);
+  color: var(--ae-muted);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.docs-rail__list,
+.docs-rail__ids,
+.docs-toc ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--ae-text-sm);
+}
+
+.docs-rail__list a {
+  color: var(--ae-fg);
+  text-decoration: none;
+}
+
+.docs-rail__list a:hover {
+  color: var(--ae-fg-strong);
+  text-decoration: underline;
+}
+
+.docs-rail__note {
+  display: block;
+  margin-top: 2px;
+  color: var(--ae-faint);
+  font-size: var(--ae-text-xs);
+  line-height: 1.45;
+}
+
+.docs-rail__list--mono li,
+.docs-rail__source {
+  margin: 0;
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.docs-rail__ids {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.docs-rail__ids li {
+  padding: 2px var(--ae-space-2);
+  border: 1px solid var(--ae-border);
+  border-radius: var(--ae-radius-sm);
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+}
+
+.docs-toc li[data-level='3'] {
+  padding-left: var(--ae-space-3);
+}
+
+.docs-toc a {
+  color: var(--ae-fg-soft);
+  text-decoration: none;
+  line-height: 1.45;
+}
+
+.docs-toc a:hover {
+  color: var(--ae-fg-strong);
+  text-decoration: underline;
+}
+
+/* ------------------------------------------------------------------- prose */
+
+.docs-prose {
+  padding-top: var(--ae-space-5);
+  color: var(--ae-fg);
+}
+
+.docs-p,
+.docs-list,
+.docs-quote {
+  max-width: var(--docs-measure);
+}
+
+.docs-p {
+  margin: 0 0 var(--ae-space-5);
+  font-family: 'Source Serif 4', ui-serif, serif;
+  font-size: var(--ae-text-lg);
+  line-height: 1.75;
+  color: var(--ae-fg-soft);
+}
+
+.docs-prose strong {
+  color: var(--ae-fg-strong);
+  font-weight: 600;
+}
+
+.docs-heading {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ae-space-2);
+  max-width: var(--docs-measure);
+  color: var(--ae-fg-strong);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  scroll-margin-top: var(--ae-space-6);
+}
+
+h2.docs-heading {
+  margin: var(--ae-space-8) 0 var(--ae-space-3);
+  padding-top: var(--ae-space-4);
+  border-top: 1px solid var(--ae-border);
+  font-size: var(--ae-text-xl);
+}
+
+h3.docs-heading {
+  margin: var(--ae-space-6) 0 var(--ae-space-3);
+  font-size: var(--ae-text-md);
+}
+
+h4.docs-heading,
+h5.docs-heading,
+h6.docs-heading {
+  margin: var(--ae-space-5) 0 var(--ae-space-2);
+  font-size: var(--ae-text-base);
+  color: var(--ae-fg);
+}
+
+/*
+ * The permalink is always in the tab order and always announced; only its ink
+ * is held back until the heading is hovered or the link itself is focused. A
+ * control that appears on hover is a control a keyboard cannot find.
+ */
+.docs-heading__anchor {
+  color: transparent;
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-sm);
+  font-weight: 400;
+  text-decoration: none;
+  transition: color var(--ae-dur) var(--ae-ease);
+}
+
+.docs-heading:hover .docs-heading__anchor,
+.docs-heading__anchor:focus-visible {
+  color: var(--ae-faint);
+}
+
+.docs-heading__anchor:hover {
+  color: var(--ae-fg);
+}
+
+.docs-list {
+  margin: 0 0 var(--ae-space-5);
+  padding-left: var(--ae-space-5);
+  font-family: 'Source Serif 4', ui-serif, serif;
+  font-size: var(--ae-text-lg);
+  line-height: 1.7;
+  color: var(--ae-fg-soft);
+}
+
+.docs-list li {
+  margin-bottom: var(--ae-space-2);
+}
+
+.docs-list li::marker {
+  color: var(--ae-faint);
+}
+
+.docs-list .docs-p:last-child {
+  margin-bottom: 0;
+}
+
+.docs-quote {
+  margin: 0 0 var(--ae-space-5);
+  padding-left: var(--ae-space-4);
+  border-left: 2px solid var(--ae-border-strong);
+  color: var(--ae-muted);
+}
+
+.docs-quote .docs-p {
+  font-style: italic;
+}
+
+.docs-rule {
+  max-width: var(--docs-measure);
+  margin: var(--ae-space-6) 0;
+  border: 0;
+  border-top: 1px solid var(--ae-border);
+}
+
+.docs-figure {
+  max-width: var(--docs-measure);
+  margin: 0 0 var(--ae-space-5);
+}
+
+.docs-figure img,
+.docs-inline-image {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--ae-border);
+  border-radius: var(--ae-radius);
+}
+
+.docs-figure figcaption {
+  margin-top: var(--ae-space-2);
+  color: var(--ae-faint);
+  font-size: var(--ae-text-sm);
+  line-height: 1.5;
+}
+
+/* ------------------------------------------------------------------- links */
+
+.docs-link {
+  color: var(--ae-fg-strong);
+  text-decoration: underline;
+  text-decoration-color: var(--ae-border-control);
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--ae-dur) var(--ae-ease);
+}
+
+.docs-link:hover {
+  text-decoration-color: var(--ae-fg);
+}
+
+.docs-link__mark {
+  margin-left: 2px;
+  font-size: 0.85em;
+  color: var(--ae-muted);
+}
+
+/* -------------------------------------------------------------------- code */
+
+.docs-code-inline {
+  padding: 1px 5px;
+  border: 1px solid var(--ae-border);
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-surface-sunken);
+  color: var(--ae-fg-strong);
+  font-family: var(--ae-font-mono);
+  font-size: 0.86em;
+}
+
+.docs-code {
+  margin: 0 0 var(--ae-space-5);
+  border: 1px solid var(--ae-border);
+  border-radius: var(--ae-radius);
+  background: var(--ae-surface-sunken);
+  overflow: hidden;
+}
+
+.docs-code__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ae-space-3);
+  padding: var(--ae-space-1) var(--ae-space-3);
+  border-bottom: 1px solid var(--ae-border);
+  background: var(--ae-surface);
+}
+
+.docs-code__lang {
+  color: var(--ae-faint);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.docs-code__body {
+  margin: 0;
+  padding: var(--ae-space-4);
+  overflow-x: auto;
+  color: var(--ae-fg-soft);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-sm);
+  line-height: 1.65;
+  tab-size: 2;
+}
+
+.docs-copy {
+  min-height: var(--ae-hit-target);
+  padding: 0 var(--ae-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--ae-radius-sm);
+  background: none;
+  color: var(--ae-muted);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color var(--ae-dur) var(--ae-ease),
+    border-color var(--ae-dur) var(--ae-ease);
+}
+
+.docs-copy:hover {
+  color: var(--ae-fg-strong);
+  border-color: var(--ae-border);
+}
+
+.docs-copy[data-state='copied'] {
+  color: var(--ae-success);
+}
+
+.docs-copy[data-state='failed'] {
+  color: var(--ae-danger);
+}
+
+/* ------------------------------------------------------------------ tables */
+
+/*
+ * A wide reference table is the one thing in a corpus that cannot be made
+ * narrow, so it scrolls inside its own box. The box takes focus because a
+ * scroll container that cannot be focused is one a keyboard user cannot
+ * scroll, which quietly hides its rightmost columns from them.
+ */
+.docs-table {
+  margin: 0 0 var(--ae-space-5);
+  border: 1px solid var(--ae-border);
+  border-radius: var(--ae-radius);
+  overflow-x: auto;
+}
+
+.docs-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--ae-text-sm);
+  line-height: 1.55;
+}
+
+.docs-table th,
+.docs-table td {
+  padding: var(--ae-space-2) var(--ae-space-3);
+  border-bottom: 1px solid var(--ae-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.docs-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--ae-surface);
+  color: var(--ae-fg-strong);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.docs-table tbody th {
+  color: var(--ae-fg);
+  font-weight: 500;
+}
+
+.docs-table tbody td {
+  color: var(--ae-fg-soft);
+}
+
+.docs-table tbody tr:last-child th,
+.docs-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.docs-table [data-align='center'] {
+  text-align: center;
+}
+
+.docs-table [data-align='right'] {
+  text-align: right;
+}
+
+/* ---------------------------------------------------------------- callouts */
+
+.docs-callout {
+  max-width: var(--docs-measure);
+  margin: 0 0 var(--ae-space-5);
+  padding: var(--ae-space-4);
+  border: 1px solid var(--ae-border);
+  border-left-width: 2px;
+  border-radius: var(--ae-radius);
+  background: var(--ae-surface);
+}
+
+.docs-callout__label {
+  margin: 0 0 var(--ae-space-2);
+  color: var(--ae-fg-strong);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.docs-callout__body .docs-p:last-child,
+.docs-callout__body .docs-list:last-child {
+  margin-bottom: 0;
+}
+
+.docs-callout__body .docs-p {
+  font-size: var(--ae-text-md);
+}
+
+.docs-callout[data-tone='note'] {
+  border-left-color: var(--ae-border-control);
+}
+
+.docs-callout[data-tone='tip'] {
+  border-left-color: var(--ae-success);
+}
+
+.docs-callout[data-tone='important'] {
+  border-left-color: var(--ae-info);
+}
+
+.docs-callout[data-tone='warning'] {
+  border-left-color: var(--ae-warning);
+}
+
+.docs-callout[data-tone='caution'] {
+  border-left-color: var(--ae-danger);
+}
+
+/* -------------------------------------------------------------- section index */
+
+.docs-contents {
+  margin-top: var(--ae-space-8);
+  padding-top: var(--ae-space-4);
+  border-top: 1px solid var(--ae-border);
+}
+
+.docs-contents__title {
+  margin: 0 0 var(--ae-space-3);
+  color: var(--ae-muted);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.docs-contents__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-contents__list li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ae-space-4);
+  padding: var(--ae-space-3) 0;
+  border-bottom: 1px solid var(--ae-border);
+}
+
+.docs-contents__link {
+  display: block;
+  min-width: 0;
+  color: var(--ae-fg-strong);
+  text-decoration: none;
+}
+
+.docs-contents__name {
+  display: block;
+  font-size: var(--ae-text-md);
+  font-weight: 500;
+}
+
+.docs-contents__link:hover .docs-contents__name {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.docs-contents__summary {
+  display: block;
+  max-width: 68ch;
+  margin-top: 2px;
+  color: var(--ae-muted);
+  font-size: var(--ae-text-sm);
+  line-height: 1.5;
+}
+
+.docs-contents__count {
+  color: var(--ae-faint);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------- pager */
+
+.docs-pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ae-space-4);
+  margin-top: var(--ae-space-8);
+  padding-top: var(--ae-space-5);
+  border-top: 1px solid var(--ae-border);
+}
+
+.docs-pager__link {
+  display: block;
+  padding: var(--ae-space-3) var(--ae-space-4);
+  border: 1px solid var(--ae-border);
+  border-radius: var(--ae-radius);
+  color: var(--ae-fg);
+  text-decoration: none;
+  transition: border-color var(--ae-dur) var(--ae-ease);
+}
+
+.docs-pager__link:hover {
+  border-color: var(--ae-border-control);
+}
+
+.docs-pager__link--next {
+  text-align: right;
+}
+
+.docs-pager__label {
+  display: block;
+  color: var(--ae-faint);
+  font-family: var(--ae-font-mono);
+  font-size: var(--ae-text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.docs-pager__title {
+  display: block;
+  margin-top: 2px;
+  color: var(--ae-fg-strong);
+  font-size: var(--ae-text-md);
+  line-height: 1.4;
+}
+
+/* -------------------------------------------------------- states and footer */
+
+.docs-article__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-3);
+  padding-top: var(--ae-space-5);
+}
+
+.docs-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--ae-control-h);
+  padding: 0 var(--ae-space-4);
+  border: 1px solid var(--ae-border-control);
+  border-radius: var(--ae-radius);
+  color: var(--ae-fg-strong);
+  font-size: var(--ae-text-sm);
+  text-decoration: none;
+  transition: border-color var(--ae-dur) var(--ae-ease);
+}
+
+.docs-button:hover {
+  border-color: var(--ae-fg);
+}
+
+.docs-mono {
+  font-family: var(--ae-font-mono);
+  font-size: 0.92em;
+  color: var(--ae-fg-soft);
+  overflow-wrap: anywhere;
+}
+
+.docs-foot {
+  padding: var(--ae-space-5) var(--docs-gutter);
+  border-top: 1px solid var(--ae-border);
+  color: var(--ae-faint);
+  font-size: var(--ae-text-xs);
+}
+
+.docs-foot p {
+  max-width: 80ch;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ------------------------------------------------------------- breakpoints */
+
+@media (min-width: 960px) {
+  .docs-root {
+    --docs-gutter: var(--ae-space-6);
+  }
+
+  .docs-layout {
+    grid-template-columns: var(--docs-nav-width) minmax(0, 1fr);
+  }
+
+  .docs-layout > .docs-nav {
+    order: 0;
+    position: sticky;
+    top: var(--ae-space-5);
+    align-self: start;
+    max-height: calc(100vh - var(--ae-space-8));
+    padding-right: var(--ae-space-5);
+    border-top: 0;
+    border-right: 1px solid var(--ae-border);
+    overflow-y: auto;
+  }
+
+  .docs-layout > .docs-main {
+    order: 0;
+  }
+}
+
+@media (min-width: 1180px) {
+  .docs-main {
+    grid-template-columns: minmax(0, 1fr) var(--docs-rail);
+    grid-template-areas:
+      'head    rail'
+      'article rail'
+      'pager   rail';
+    column-gap: var(--ae-space-8);
+  }
+
+  .docs-rail {
+    position: sticky;
+    top: var(--ae-space-5);
+    align-self: start;
+    margin: 0;
+    padding: var(--ae-space-2) 0 var(--ae-space-5) var(--ae-space-5);
+    border-bottom: 0;
+    border-left: 1px solid var(--ae-border);
+    max-height: calc(100vh - var(--ae-space-8));
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 599px) {
+  .docs-pager {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .docs-pager__link--next {
+    text-align: left;
+  }
+
+  .docs-head__title {
+    font-size: var(--ae-text-xl);
+  }
+}
+
+/*
+ * A pointer that cannot be precise needs a larger target than a mouse does.
+ * The rail and the table of contents are lists of links set at reading
+ * density, which is exactly where that bites.
+ */
+@media (pointer: coarse) {
+  .docs-nav__section,
+  .docs-nav__page,
+  .docs-toc a,
+  .docs-rail__list a,
+  .docs-masthead__brand,
+  .docs-masthead__links a {
+    min-height: var(--ae-hit-target);
+    display: flex;
+    align-items: center;
+  }
+
+  /*
+   * A contents entry is a name above a summary, so it is already tall enough
+   * and must stay two lines. It gets the floor without the flex row that would
+   * put the summary beside the name.
+   */
+  .docs-contents__link {
+    min-height: var(--ae-hit-target);
+  }
+}

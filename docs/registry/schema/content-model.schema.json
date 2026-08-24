@@ -14,10 +14,18 @@
       "pattern": "^[^/].*[^/]$"
     },
     "audiences": {
-      "description": "Who a page is written for. A page names at least one.",
+      "description": "Who a page is written for. A page names at least one. The label is what a surface prints; the note is what the term means.",
       "type": "object",
       "minProperties": 1,
-      "additionalProperties": { "type": "string", "minLength": 1 }
+      "additionalProperties": {
+        "type": "object",
+        "required": ["label", "note"],
+        "additionalProperties": false,
+        "properties": {
+          "label": { "type": "string", "minLength": 1 },
+          "note": { "type": "string", "minLength": 1 }
+        }
+      }
     },
     "domains": {
       "description": "Sections of the corpus. The key is the directory name under `corpus`.",
@@ -35,10 +43,18 @@
       }
     },
     "types": {
-      "description": "What kind of reading a page is. Drives the structural rules in `sections`.",
+      "description": "What kind of reading a page is. Drives the structural rules in `sections`. Shaped like `audiences` and `statuses` so no surface has to guess whether it is holding a name or a definition.",
       "type": "object",
       "minProperties": 1,
-      "additionalProperties": { "type": "string", "minLength": 1 }
+      "additionalProperties": {
+        "type": "object",
+        "required": ["label", "note"],
+        "additionalProperties": false,
+        "properties": {
+          "label": { "type": "string", "minLength": 1 },
+          "note": { "type": "string", "minLength": 1 }
+        }
+      }
     },
     "statuses": {
       "description": "What a page claims about the code it describes. Rendered as a badge, filtered on in search.",

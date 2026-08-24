@@ -1,14 +1,32 @@
 {
   "$schema": "./schema/content-model.schema.json",
-  "note": "The shape of a documentation page: the vocabularies its metadata may use, the sections its body must carry, and the sections of the corpus it may live in. `scripts/check-docs-pages.mjs` enforces this and the reading surface renders from it, so a status badge and the gate that judges it cannot disagree. A page names the domain of the directory it sits in; the few pages at the corpus root — its entrance and its glossary — are documentation about the documentation, and name `meta`.",
+  "note": "The shape of a documentation page: the vocabularies its metadata may use, the sections its body must carry, and the sections of the corpus it may live in. `scripts/check-docs-pages.mjs` enforces this and the reading surface renders from it, so a status badge and the gate that judges it cannot disagree. Every vocabulary here carries a `label` a surface may print and a `note` saying what the term means; keeping the three the same shape is what stops a definition being rendered where a name belongs. A page names the domain of the directory it sits in; the few pages at the corpus root — its entrance and its glossary — are documentation about the documentation, and name `meta`.",
   "corpus": "docs/observatory",
   "audiences": {
-    "user": "Someone using Vitae to run their own career work.",
-    "designer": "Someone changing how a surface looks, reads or behaves.",
-    "developer": "Someone changing the code.",
-    "maintainer": "Someone responsible for the shape of the system over time.",
-    "operator": "Someone deploying, migrating, backing up or recovering an instance.",
-    "security": "Someone reviewing trust boundaries, data handling or failure modes."
+    "user": {
+      "label": "User",
+      "note": "Someone using Vitae to run their own career work."
+    },
+    "designer": {
+      "label": "Designer",
+      "note": "Someone changing how a surface looks, reads or behaves."
+    },
+    "developer": {
+      "label": "Developer",
+      "note": "Someone changing the code."
+    },
+    "maintainer": {
+      "label": "Maintainer",
+      "note": "Someone responsible for the shape of the system over time."
+    },
+    "operator": {
+      "label": "Operator",
+      "note": "Someone deploying, migrating, backing up or recovering an instance."
+    },
+    "security": {
+      "label": "Security reviewer",
+      "note": "Someone reviewing trust boundaries, data handling or failure modes."
+    }
   },
   "domains": {
     "product": {
@@ -53,12 +71,30 @@
     }
   },
   "types": {
-    "index": "Leads a reader into a section. Carries no facts of its own that a page below it does not carry.",
-    "explanation": "Builds understanding of something that already exists.",
-    "tutorial": "Takes a newcomer through a first success, start to finish.",
-    "task": "Answers a specific goal someone already has.",
-    "reference": "States facts to be looked up, not read through.",
-    "decision": "Records a choice, its context and its consequences."
+    "index": {
+      "label": "Section index",
+      "note": "Leads a reader into a section. Carries no facts of its own that a page below it does not carry."
+    },
+    "explanation": {
+      "label": "Explanation",
+      "note": "Builds understanding of something that already exists."
+    },
+    "tutorial": {
+      "label": "Tutorial",
+      "note": "Takes a newcomer through a first success, start to finish."
+    },
+    "task": {
+      "label": "Task",
+      "note": "Answers a specific goal someone already has."
+    },
+    "reference": {
+      "label": "Reference",
+      "note": "States facts to be looked up, not read through."
+    },
+    "decision": {
+      "label": "Decision",
+      "note": "Records a choice, its context and its consequences."
+    }
   },
   "statuses": {
     "verified": {

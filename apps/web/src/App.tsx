@@ -52,6 +52,7 @@ const Org = lazyNamed(() => import('./routes/Org.js'), 'Org');
 const Collections = lazyNamed(() => import('./routes/Collections.js'), 'Collections');
 const GraphView = lazy(() => import('./routes/GraphView.js'));
 const EntityCatalog = lazy(() => import('./routes/reference/EntityCatalog.js'));
+const DocsApp = lazy(() => import('./routes/docs/DocsApp.js'));
 const Timeline = lazyNamed(() => import('./routes/Timeline.js'), 'Timeline');
 const MapView = lazyNamed(() => import('./routes/MapView.js'), 'MapView');
 const ImportHub = lazyNamed(() => import('./routes/ImportHub.js'), 'ImportHub');
@@ -250,6 +251,27 @@ export function App() {
             }
           >
             <EntityCatalog />
+          </Suspense>
+        }
+      />
+      {/*
+        The documentation corpus is public, so it has to be declared above the
+        wildcard below: `AuthGate` claims every path it reaches, and a reader
+        with no account would be redirected to sign in instead of reading. It
+        also mounts outside `Shell` and `ToastProvider`, alongside the entity
+        catalog, because a reading surface has no workspace chrome to inherit.
+      */}
+      <Route
+        path="/docs/*"
+        element={
+          <Suspense
+            fallback={
+              <div className="app-splash">
+                <Spinner />
+              </div>
+            }
+          >
+            <DocsApp />
           </Suspense>
         }
       />

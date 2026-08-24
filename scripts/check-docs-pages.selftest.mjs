@@ -445,6 +445,17 @@ check('a content model that breaks its own schema fails', {
   expect: ['docs/registry/content-model.json:', 'loud'],
 });
 
+// The page header prints `label` and the search facets print `note`. When two
+// of the three vocabularies were bare strings, the header had no way to tell a
+// name from a definition and printed the definition on every page.
+check('a vocabulary entry that is a bare string, not a label and a note, fails', {
+  mutate: (s) => {
+    s.model.types.explanation = 'Builds understanding of something that already exists.';
+  },
+  exit: 1,
+  expect: ['docs/registry/content-model.json:', 'types'],
+});
+
 check('a missing content model is reported, not crashed on', {
   mutate: (s, dir) => {
     rmSync(join(dir, 'docs/registry/content-model.json'));

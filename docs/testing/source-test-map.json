@@ -1987,6 +1987,42 @@
       ],
       "note": "The register, runway, attention, and filtered-empty derivations it owns are asserted through both host screens."
     },
+    "apps/web/src/routes/docs/DocsApp.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "a11y"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/docs/DocsApp.states.test.tsx"
+      ],
+      "note": "The suite mounts this component directly, without Shell or a session, which is the property the route exists to hold: manifest loading, failure, retry, and the no-such-page state are all asserted against the real component tree."
+    },
+    "apps/web/src/routes/docs/DocsChrome.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "a11y"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/docs/DocsApp.states.test.tsx"
+      ],
+      "note": "Nav expansion, aria-current, breadcrumb depth, the table of contents threshold, reading-order links and hover prefetch are asserted through the mounted surface rather than in isolation, because each of them is derived from the route."
+    },
+    "apps/web/src/routes/docs/DocsPage.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "a11y"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/docs/DocsApp.states.test.tsx"
+      ],
+      "note": "Covers the split between manifest and page content: the header survives a failed prose fetch, hash arrival waits for the prose, focus moves to the new title, and the supersession banner renders from the page body."
+    },
     "apps/web/src/routes/marketing/Chrome.tsx": {
       "risk": "medium",
       "layers": [

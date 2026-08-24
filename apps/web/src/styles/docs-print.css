@@ -1,0 +1,350 @@
+/*
+ * Printing a documentation page.
+ *
+ * A printed page has no hover, no scrolling and no back button, so the print
+ * rules are not a restyle — they change what the document *contains*. Chrome
+ * that only exists to navigate is removed. Evidence that only exists on screen
+ * as a rail is kept, because on paper it is the only way to check a claim. And
+ * every link prints its destination, since a reader holding a sheet of paper
+ * cannot follow one.
+ *
+ * The failure this file mostly exists to prevent is silent clipping: a code
+ * block or a wide table that scrolls on screen prints only the part that fits
+ * and gives no sign that the rest was cut. Both become wrapping, fully visible
+ * blocks here.
+ *
+ * Raw hex is deliberate. The `--ae-*` ramp is built for a matte near-black
+ * screen; on white paper `--ae-fg` is invisible and `--ae-border` is not there
+ * at all. `check-brand-bans.mjs` permits literal colour inside `@media print`
+ * for exactly this reason.
+ */
+
+@media print {
+  @page {
+    margin: 18mm 16mm;
+  }
+
+  html,
+  body,
+  #root,
+  .docs-root {
+    margin: 0 !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .docs-root {
+    font-size: 10.5pt;
+  }
+
+  /* Navigation has no meaning on paper. */
+  .docs-skip,
+  .docs-masthead,
+  .docs-nav,
+  .docs-toc,
+  .docs-pager,
+  .docs-copy,
+  .docs-heading__anchor,
+  .docs-article__skeleton,
+  .docs-contents__count {
+    display: none !important;
+  }
+
+  .docs-layout,
+  .docs-main {
+    display: block !important;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Sticky boxes resolve against the paged viewport and land in odd places. */
+  .docs-rail,
+  .docs-table thead th {
+    position: static !important;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .docs-crumbs ol {
+    margin-bottom: 6pt;
+    color: #555;
+    font-size: 8pt;
+  }
+
+  .docs-crumbs a,
+  .docs-crumbs [aria-current='page'],
+  .docs-crumbs__sep {
+    color: #555 !important;
+  }
+
+  .docs-head__title {
+    max-width: none;
+    color: #000 !important;
+    font-size: 20pt;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .docs-head__summary {
+    max-width: none;
+    color: #222 !important;
+    font-size: 11.5pt;
+  }
+
+  .docs-head__meta {
+    gap: 8pt;
+    margin-top: 8pt;
+    padding-bottom: 6pt;
+    border-bottom: 0.5pt solid #999;
+  }
+
+  .docs-badge,
+  .docs-head__audience li,
+  .docs-rail__ids li {
+    border-color: #999 !important;
+  }
+
+  .docs-badge__label,
+  .docs-head__type,
+  .docs-head__for,
+  .docs-head__audience li,
+  .docs-badge__date {
+    color: #333 !important;
+  }
+
+  /*
+   * The evidence rail prints between the heading and the prose. On screen it
+   * sits beside the article and can be glanced at; on paper the only place it
+   * can be read before the claims it supports is above them.
+   */
+  .docs-rail {
+    margin: 0 0 10pt;
+    padding: 6pt 0;
+    border: 0;
+    border-bottom: 0.5pt solid #bbb;
+    gap: 8pt;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .docs-rail__title {
+    color: #555 !important;
+    font-size: 7.5pt;
+  }
+
+  .docs-rail__list,
+  .docs-rail__list--mono li,
+  .docs-rail__source,
+  .docs-rail__note,
+  .docs-rail__ids li {
+    color: #333 !important;
+    font-size: 8.5pt;
+  }
+
+  .docs-prose,
+  .docs-p,
+  .docs-list,
+  .docs-quote,
+  .docs-rule,
+  .docs-figure,
+  .docs-heading,
+  .docs-callout {
+    max-width: none;
+  }
+
+  .docs-p,
+  .docs-list {
+    color: #1a1a1a !important;
+    font-size: 10.5pt;
+    line-height: 1.55;
+    orphans: 3;
+    widows: 3;
+  }
+
+  .docs-heading,
+  .docs-contents__title,
+  .docs-prose strong {
+    color: #000 !important;
+  }
+
+  .docs-heading {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  h2.docs-heading {
+    margin: 14pt 0 6pt;
+    padding-top: 6pt;
+    border-top: 0.5pt solid #bbb;
+    font-size: 14pt;
+  }
+
+  h3.docs-heading {
+    margin: 11pt 0 5pt;
+    font-size: 11.5pt;
+  }
+
+  .docs-quote {
+    border-left: 1.5pt solid #999;
+    color: #333 !important;
+  }
+
+  .docs-rule {
+    border-top: 0.5pt solid #bbb;
+  }
+
+  /* Links carry their own destination, since a page cannot be clicked. */
+  .docs-link {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+
+  .docs-prose a[href]::after {
+    content: ' (' attr(href) ')';
+    color: #555;
+    font-family: var(--ae-font-mono);
+    font-size: 8pt;
+    overflow-wrap: anywhere;
+  }
+
+  .docs-link__mark {
+    display: none;
+  }
+
+  /*
+   * Scroll containers clip on paper. Both of these wrap instead, so a printed
+   * page never quietly loses the right-hand side of a command or a table.
+   */
+  .docs-code,
+  .docs-table {
+    border: 0.5pt solid #999;
+    overflow: visible !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .docs-code__bar {
+    border-bottom: 0.5pt solid #999;
+    background: #f2f2f2 !important;
+    padding: 2pt 6pt;
+  }
+
+  .docs-code__lang {
+    color: #444 !important;
+    font-size: 7.5pt;
+  }
+
+  .docs-code__body {
+    padding: 6pt;
+    background: #fafafa !important;
+    color: #1a1a1a !important;
+    font-size: 8.5pt;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    overflow: visible !important;
+  }
+
+  .docs-code-inline {
+    border: 0.5pt solid #ccc;
+    background: #f6f6f6 !important;
+    color: #000 !important;
+  }
+
+  .docs-table table {
+    font-size: 8.5pt;
+  }
+
+  .docs-table th,
+  .docs-table td {
+    border-bottom: 0.5pt solid #ccc;
+    color: #1a1a1a !important;
+  }
+
+  .docs-table thead th {
+    background: #f2f2f2 !important;
+    color: #000 !important;
+    white-space: normal;
+  }
+
+  .docs-callout {
+    border: 0.5pt solid #999;
+    border-left-width: 2pt;
+    background: transparent !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .docs-callout__label {
+    color: #000 !important;
+  }
+
+  /*
+   * Tone is a left rule on screen and nothing but ink weight on a monochrome
+   * printer, so the label above it — NOTE, WARNING, CAUTION — is what actually
+   * carries the meaning. These greys only keep the rules from all looking alike
+   * on a colour printer.
+   */
+  .docs-callout[data-tone='note'] {
+    border-left-color: #999;
+  }
+
+  .docs-callout[data-tone='tip'],
+  .docs-callout[data-tone='important'] {
+    border-left-color: #555;
+  }
+
+  .docs-callout[data-tone='warning'],
+  .docs-callout[data-tone='caution'] {
+    border-left-color: #000;
+  }
+
+  .docs-figure img,
+  .docs-inline-image {
+    border: 0.5pt solid #ccc;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .docs-figure figcaption {
+    color: #555 !important;
+    font-size: 8.5pt;
+  }
+
+  .docs-contents {
+    margin-top: 14pt;
+    padding-top: 6pt;
+    border-top: 0.5pt solid #bbb;
+  }
+
+  .docs-contents__list li {
+    padding: 4pt 0;
+    border-bottom: 0.5pt solid #ddd;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .docs-contents__name {
+    color: #000 !important;
+    font-size: 10pt;
+  }
+
+  .docs-contents__summary {
+    max-width: none;
+    color: #333 !important;
+    font-size: 8.5pt;
+  }
+
+  .docs-contents__link::after {
+    display: none;
+  }
+
+  .docs-foot {
+    margin-top: 12pt;
+    padding: 6pt 0 0;
+    border-top: 0.5pt solid #bbb;
+    color: #555 !important;
+    font-size: 8pt;
+  }
+}

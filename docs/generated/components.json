@@ -39,10 +39,11 @@
         "apps/web/src/routes/Outputs.tsx",
         "apps/web/src/routes/Person.tsx",
         "apps/web/src/routes/Templates.tsx",
+        "apps/web/src/routes/docs/DocsPage.tsx",
         "apps/web/src/routes/reference/EntityCatalog.tsx",
         "apps/web/src/routes/tailor/PreviewPane.tsx"
       ],
-      "uses": 15,
+      "uses": 16,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/layout.css"
@@ -1033,13 +1034,14 @@
         "apps/web/src/routes/Trash.tsx",
         "apps/web/src/routes/career/ApplicationDossier.tsx",
         "apps/web/src/routes/career/CareerOverview.tsx",
+        "apps/web/src/routes/docs/DocsApp.tsx",
         "apps/web/src/routes/reference/EntityCatalog.tsx",
         "apps/web/src/routes/tailor/SelectionPane.tsx",
         "apps/web/src/routes/tailor/Tailor.tsx",
         "apps/web/src/routes/tailor/TargetRail.tsx",
         "apps/web/src/routes/workspaces/Planner.tsx"
       ],
-      "uses": 37,
+      "uses": 38,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/components.css"
@@ -1854,9 +1856,10 @@
       "renders_jsx": true,
       "used_by": [
         "apps/web/src/app/Shell.tsx",
+        "apps/web/src/routes/docs/DocsApp.tsx",
         "apps/web/src/routes/marketing/Chrome.tsx"
       ],
-      "uses": 2,
+      "uses": 3,
       "tested": false,
       "styled_in": [],
       "unstyled_classes": []
@@ -3045,11 +3048,13 @@
         "apps/web/src/routes/ResumeHub.tsx",
         "apps/web/src/routes/SignIn.tsx",
         "apps/web/src/routes/Templates.tsx",
+        "apps/web/src/routes/docs/DocsApp.tsx",
+        "apps/web/src/routes/docs/DocsPage.tsx",
         "apps/web/src/routes/reference/EntityCatalog.tsx",
         "apps/web/src/routes/tailor/DocumentPane.tsx",
         "apps/web/src/routes/tailor/PreviewPane.tsx"
       ],
-      "uses": 12,
+      "uses": 14,
       "tested": true,
       "styled_in": [
         "apps/web/src/styles/resume-paper.css",

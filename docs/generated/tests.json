@@ -3072,6 +3072,84 @@
       "lines": 158
     },
     {
+      "file": "apps/web/src/routes/docs/DocsApp.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 25,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "reaching the corpus",
+        "a path the corpus does not publish",
+        "a page whose prose fails",
+        "a page that loaded",
+        "finding the way",
+        "accessibility"
+      ],
+      "subjects": [
+        "./DocsApp.js",
+        "./docsModel.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 572
+    },
+    {
+      "file": "apps/web/src/routes/docs/DocsBlocks.test.tsx",
+      "package": "@vitae/web",
+      "cases": 21,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "untrusted-looking content",
+        "headings",
+        "links",
+        "code",
+        "tables",
+        "the rest of the dialect",
+        "plainText"
+      ],
+      "subjects": [
+        "./DocsBlocks.js",
+        "./docsModel.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 297
+    },
+    {
+      "file": "apps/web/src/routes/docs/docsModel.test.ts",
+      "package": "@vitae/web",
+      "cases": 23,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "reading a route",
+        "sections",
+        "reading order",
+        "breadcrumbs",
+        "status and audience vocabulary",
+        "fetching compiled content"
+      ],
+      "subjects": [
+        "./docsModel.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 250
+    },
+    {
       "file": "apps/web/src/routes/Duplicates.audit.test.tsx",
       "package": "@vitae/web",
       "cases": 2,
@@ -6443,21 +6521,21 @@
     }
   ],
   "summary": {
-    "files": 303,
-    "cases": 1869,
+    "files": 306,
+    "cases": 1938,
     "skipped": 0,
     "todo": 0,
     "by_package": {
       "@vitae/api": 195,
-      "@vitae/web": 918,
+      "@vitae/web": 987,
       "@vitae/e2e": 250,
       "@vitae/core": 273,
       "@vitae/testkit": 7,
       "@vitae/ui": 226
     },
     "by_script": {
-      "test": 303,
-      "test:web": 146,
+      "test": 306,
+      "test:web": 149,
       "test:api": 52,
       "test:e2e": 52,
       "test:unit": 44,

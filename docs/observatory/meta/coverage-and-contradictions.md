@@ -13,6 +13,15 @@ sources:
   - docs/specs/srs.md
   - docs/ARCHITECTURE.md
   - GOVERNANCE.md
+  - apps/web/src/app/Shell.tsx
+  - apps/web/src/test/a11y.ts
+  - e2e/tests/helpers/a11y.ts
+  - .env.example
+  - apps/web/vite.config.ts
+  - scripts/check-web-budgets.mjs
+  - scripts/check-public-release.mjs
+  - packages/ui/src/styles/base.css
+  - scripts/docs/lib/citations.mjs
 verified_at: 2026-08-24
 ---
 
@@ -151,6 +160,143 @@ node -e "console.log(require('./docs/generated/tests.json').summary.workspaces_a
 pnpm --filter @vitae/ui test   # 226 pass, run by no gate
 ```
 
+### DOC-D-040 — three skip links scroll without skipping
+
+> **Open.** The documentation surface was fixed in
+> `feat(docs): build the documentation reading surface`. The three product
+> surfaces named below were not, so this stays here.
+
+A browser places focus on a fragment target only when that target can hold
+focus. A skip link whose target has no `tabindex` moves the viewport and leaves
+focus where it was: the reader presses Tab, and lands back on the first link in
+the navigation they were trying to get past. Nothing announces that anything
+happened.
+
+`apps/web/src/app/Shell.tsx` gets this right and has since it was written. Its
+skip target is the route wrapper at `:408`, which carries `tabIndex={-1}`, and
+`apps/web/src/app/Shell.test.tsx:97` asserts it with the reason attached:
+*"tabIndex -1 is what makes the region focusable by script without adding a tab
+stop."* Three later surfaces declared the same `id` without the attribute.
+
+| Surface | Target | `tabindex` |
+| --- | --- | --- |
+| Application shell | `apps/web/src/app/Shell.tsx:408` | `-1` — correct |
+| Marketing chrome | `apps/web/src/routes/marketing/Chrome.tsx:221` | absent |
+| Entity reference | `apps/web/src/routes/reference/EntityCatalog.tsx:755` | absent |
+| Prerendered public pages | `apps/web/src/public/seo.ts:254` | absent |
+| Documentation | `apps/web/src/routes/docs/DocsApp.tsx:44,98` | `-1` — fixed in this work |
+
+`seo.ts:254` is the static body served to a reader with no JavaScript, so on the
+public marketing routes the defect is present in both the hydrated and the
+unhydrated version of the same page.
+
+Measured in Chrome against the built bundle on
+`/docs/meta/coverage-and-contradictions`, before the fix:
+
+```
+targetTabIndex: null   focusAfterSkip: "BODY"   focusIsTargetOrInside: false
+```
+
+Two accessibility gates run over these surfaces and neither can see it.
+
+`runAxe` (`apps/web/src/test/a11y.ts`) applies no tag filter, so axe-core's
+`skip-link` rule does run — the rule whose own help text reads *"The skip-link
+target should exist and be focusable"*. Its implementation tests something
+weaker:
+
+```js
+function skipLinkEvaluate(node) {
+  var target = get_element_by_reference_default(node, 'href');
+  if (target) {
+    return _isVisibleToScreenReaders(target) || void 0;
+  }
+```
+
+Existence and visibility. Nothing about focus. It passes on a target that cannot
+take any.
+
+The Playwright scan never reaches the rule. `skip-link` is tagged
+`cat.keyboard, best-practice, RGAAv4, RGAA-12.7.1` and carries no WCAG tag, while
+`e2e/tests/helpers/a11y.ts:37` filters to
+`['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']`.
+
+Both gates report green truthfully and neither statement means what a reader of
+the result would assume: one rule implements less than its description promises,
+the other is excluded by tag. The shape is `DOC-D-001` again — a check that
+cannot go red.
+
+Reproduce:
+
+```bash
+grep -rn 'id="main-content"' apps/web/src            # tabIndex on two of five
+node -e "const a=require('./node_modules/.pnpm/axe-core@4.12.1/node_modules/axe-core');console.log(a.getRules().find(r=>r.ruleId==='skip-link').tags)"
+```
+
+### DOC-D-041 — following the setup instructions turns `pnpm build` into a development build
+
+`README.md:51` and `docs/ONBOARDING.md:23` both open with the same step:
+
+```bash
+cp .env.example .env
+```
+
+`.env.example:7` sets `NODE_ENV=development`. From that point on, `pnpm build`
+on that machine no longer builds for production, and says nothing about it.
+
+| | with the documented `.env` | with no `.env` |
+| --- | --- | --- |
+| files containing `jsxDEV(` | 49 | 0 |
+| files containing an absolute `/home/…` path | 49 | 0 |
+| total JavaScript | 5,875 kB | 4,850 kB |
+| largest chunk | `index` 1,455 kB | `EntityObservatoryGraph` 1,385 kB |
+| `check-web-budgets.mjs` | ok | ok |
+
+`apps/web/vite.config.ts:52` reads the file with `loadEnv(mode, ENV_DIRECTORY,
+'')`, where `ENV_DIRECTORY` is the repository root (`:12`), and Vite copies the
+parsed value into `process.env.VITE_USER_NODE_ENV`. In `resolveConfig` it
+captures `isNodeEnvSet = !!process.env.NODE_ENV` **before**
+loading the config file, sets `NODE_ENV` to `production` for a build, then
+overwrites it back to `development` when `!isNodeEnvSet && userNodeEnv ===
+'development'`. `isProduction` is read from `process.env.NODE_ENV` immediately
+after. Nothing inside `vite.config.ts` can prevent this: `isNodeEnvSet` is
+already captured by the time any config hook runs.
+
+**What is not affected.** The CI `build` job (`.github/workflows/ci.yml:98`)
+runs `pnpm build` on a bare checkout, and `.env` is git-ignored, so it is absent
+and the build is a production build. The documented host build
+(`docs/DEPLOYMENT.md:45`) runs the same command on the static host from the same
+bare checkout. Both produce the correct artifact. What ships is fine.
+
+**What is affected is every local build**, and two things follow from that.
+
+The local budget gate measures an artifact nobody deploys. Run
+`VITAE_REQUIRE_BUDGETS=true pnpm test:performance` on a set-up machine and it
+reports `total 5875kb, largest index-UL8_rbwL.js 1455kb` against limits of 6,000
+and 1,500 — 98% of one, 97% of the other — and exits 0. CI, measuring the real
+bundle, sees 4,850 kB and 1,385 kB. A developer sizing a new lazy route against
+their own run believes there is 125 kB of headroom. There is **1,150 kB**. The
+chunk the local run names as largest is not even the largest chunk in a real
+build.
+
+Every locally built chunk carries the developer's absolute home path, and the
+guard written to catch exactly that cannot see it. `check-public-release.mjs:29`
+bans `/home/<handle>` across tracked *and* untracked files, but its file list
+comes from `git ls-files --others --exclude-standard`, and `.gitignore:9` ignores
+`apps/web/dist/`. No documented workflow uploads a locally built `dist/`, so this
+is latent rather than shipped — but the command in `DEPLOYMENT.md` is the same
+command a developer runs locally, and nothing between the two would notice.
+
+Reproduce:
+
+```bash
+cp .env.example .env
+pnpm --filter @vitae/web build
+grep -l 'jsxDEV(' apps/web/dist/assets/*.js | wc -l   # 49
+grep -l '/home/' apps/web/dist/assets/*.js | wc -l    # 49
+mv .env .env.off && pnpm --filter @vitae/web build && mv .env.off .env
+grep -l 'jsxDEV(' apps/web/dist/assets/*.js | wc -l   # 0
+```
+
 ---
 
 ## Severity 2: reference surfaces that under-report reality
@@ -235,6 +381,56 @@ first-time user has the marketing site and the running application, nothing else
 All seven first-party packages are undocumented at their root: `packages/core`,
 `packages/ui`, `packages/config`, `packages/testkit`, `apps/web`, `apps/api`,
 `services/buildsvc`.
+
+### DOC-D-042 — a requirement family with a digit in its name is invisible to the tooling
+
+`packages/ui/src/styles/base.css:123` carries a requirement citation:
+
+```css
+/* Visible focus everywhere (WCAG 2.1 AA: NFR-A11Y-001). */
+```
+
+`NFR-A11Y-001` is not in `docs/registry/requirements.json`, is not in that file's
+`id_aliases`, and does not appear anywhere in `docs/generated/traceability.json`.
+It is not merely undefined — it cannot be read. Both patterns in
+`scripts/docs/lib/citations.mjs:19` spell a family name as uppercase letters
+only:
+
+```js
+const CITATION = /\b((?:FR|NFR)(?:-[A-Z]{2,4})?)-(\d{3})…/g;
+const ALIAS = /(^|[^A-Z-])([A-Z]{2,4})-(\d{3})…/g;
+```
+
+`A11Y` contains digits, so `[A-Z]{2,4}` cannot express it. Tracing `CITATION`
+against the string: `(?:FR|NFR)` consumes `NFR`, the optional family group tries
+`-A11Y` and fails on the `1`, so it matches empty, and the pattern then requires
+`-` followed by three digits where the text has `-A11`. No later start position
+matches either. `ALIAS` needs two to four consecutive uppercase letters before
+`-001` and finds one. The identifier produces no match of any kind. The JSON
+Schema at `scripts/docs/lib/json-schema.selftest.mjs:49` carries the same
+`[A-Z]{2,4}`, so even adding the requirement to the registry by hand would be
+rejected as malformed.
+
+`gen-traceability.mjs:54` does read `.css`, and `:50` excludes only
+`scripts/docs/`, so the file is scanned and the line is reached. The grammar is
+the whole of the failure.
+
+This is the mild form of the `DOC-D-001` shape. Nothing is broken, no check
+lies, and `check-docs-traceability.mjs` correctly reports that every citation it
+can see resolves. The set it can see is smaller than the set that exists, and
+nothing says so. A sweep of every tracked readable file for the loose form
+`[A-Z][A-Z0-9]{1,5}-\d{3}` found exactly one identifier the strict grammar
+misses, so the blind spot is currently one requirement wide — but it is the
+accessibility requirement, cited on the rule that draws every focus ring in the
+product.
+
+Reproduce:
+
+```bash
+git ls-files -z | xargs -0 grep -n 'NFR-A11Y-[0-9]\{3\}'   # one hit
+grep -c A11Y docs/registry/requirements.json                # 0
+grep -c A11Y docs/generated/traceability.json               # 0
+```
 
 ---
 
