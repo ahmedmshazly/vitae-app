@@ -7,7 +7,16 @@
 #
 #   ./scripts/ci-local.sh            # everything that runs without Docker
 #   ./scripts/ci-local.sh --full     # adds both image builds and e2e
-#   ./scripts/ci-local.sh --quick    # typecheck + lint + core tests only
+#   ./scripts/ci-local.sh --quick    # the gates that need no Postgres or build
+#
+# GitHub Actions on this account can be billing-blocked, so this script is the
+# gate rather than a convenience. It therefore runs the repository gates, the
+# property suite, the accessibility suite, the dependency audit and the web
+# budgets that the workflow runs, plus @vitae/ui and @vitae/testkit, which no
+# job on either side used to run at all.
+#
+# Not covered here, and deliberately: the Trivy image scans, the SBOM, and the
+# LaTeX calibration job. They need registry access and a warmed Tectonic cache.
 #
 # The Auth emulator is reused when already running. The script starts only the
 # services it owns and leaves an existing local Postgres container in place.
@@ -21,7 +30,7 @@ for arg in "$@"; do
   case "$arg" in
     --full) FULL=1 ;;
     --quick) QUICK=1 ;;
-    -h|--help) sed -n '3,20p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '3,23p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown flag: $arg (try --help)" >&2; exit 2 ;;
   esac
 done
@@ -60,25 +69,52 @@ run_step() {
 
 port_open() { (exec 3<>"/dev/tcp/127.0.0.1/$1") 2>/dev/null; }
 
+# Stop whatever is listening on a port this script owns.
+#
+# `e2e_local()` refuses to run when any of these ports is already in use, so
+# anything holding one at cleanup time was started here. That is what makes
+# reaping by port safe rather than a blunt instrument.
+#
+# It is also necessary. `$!` after `ci_env setsid env ... &` is the pid of the
+# subshell bash forks to run the `ci_env` *function*, not of the session
+# `setsid` creates for the service inside it. `kill -- -$pid` therefore
+# signalled a process group with no members, the API survived, and the `wait`
+# that followed blocked on that subshell for ever: the gate printed its summary
+# and never exited, holding 4010, 5183 and 8797 so the next run refused to
+# start. Seen on 2026-08-25, hung for 54 minutes.
+reap_port() {
+  local port="$1" pid pgid
+  pid="$(ss -ltnp 2>/dev/null | grep ":$port " | grep -oE 'pid=[0-9]+' | head -1 | cut -d= -f2)"
+  [ -n "$pid" ] || return 0
+  pgid="$(ps -o pgid= -p "$pid" 2>/dev/null | tr -d ' ')"
+  [ -n "$pgid" ] && kill -- "-$pgid" 2>/dev/null || true
+  kill "$pid" 2>/dev/null || true
+}
+
 cleanup() {
   for pid in "${SERVICE_PIDS[@]:-}"; do
-    # Both services start in their own session. Stopping the whole process
-    # group matters: `pnpm start` otherwise leaves its `tsx` child listening
-    # after an E2E failure and contaminates the next isolated run.
     [ -n "$pid" ] && kill -- "-$pid" 2>/dev/null || true
+    [ -n "$pid" ] && kill "$pid" 2>/dev/null || true
   done
-  for pid in "${SERVICE_PIDS[@]:-}"; do
-    [ -n "$pid" ] && wait "$pid" 2>/dev/null || true
+  reap_port "$API_PORT"
+  reap_port "$WEB_PORT"
+  # Bounded. A service that ignores the signal must not hold the gate open.
+  local waited=0
+  while { port_open "$API_PORT" || port_open "$WEB_PORT"; } && [ "$waited" -lt 10 ]; do
+    sleep 1
+    waited=$((waited + 1))
   done
   if [ -n "$BUILDSVC_CONTAINER" ]; then
     docker rm -f "$BUILDSVC_CONTAINER" >/dev/null 2>&1 || true
   fi
   if [ "$STARTED_EMULATORS" = "1" ] && [ -n "$EMULATOR_PID" ]; then
     step "Stopping the Auth emulator this script started (pid $EMULATOR_PID)"
-    # The Firebase CLI launches Java children. It gets its own process group so
-    # cleanup cannot leave an orphaned Auth emulator occupying the next run.
+    # The Firebase CLI launches Java children, in their own session, so the
+    # recorded pid is not the group that holds the port. Same reason as
+    # reap_port above: signal what is actually listening.
     kill -- "-$EMULATOR_PID" 2>/dev/null || true
-    wait "$EMULATOR_PID" 2>/dev/null || true
+    kill "$EMULATOR_PID" 2>/dev/null || true
+    reap_port "$AUTH_PORT"
   fi
 }
 trap cleanup EXIT
@@ -159,6 +195,29 @@ api_integration() {
     pnpm --filter @vitae/api test
 }
 
+# The four repository gates the `quality` job runs as one step. Grouped the same
+# way so a failure points at the same place the workflow would.
+repository_gates() {
+  pnpm test:map && pnpm test:prose && pnpm test:public && pnpm test:brand
+}
+
+# The web bundle is measured, not guessed. The repository .env carries
+# NODE_ENV=development, and Vite captures `isNodeEnvSet` before it loads the
+# config, so a value in .env outranks `vite build` and the result is a
+# development bundle about a megabyte larger than what ships. Exporting
+# NODE_ENV here is what makes this the same artifact CI builds from a bare
+# checkout. scripts/check-web-budgets.mjs carries the full account.
+#
+# It must not leak any further: packages/config refuses to boot an API with
+# NODE_ENV=production and AUTH_ENABLE_DEV_LOGIN=true, which is every run below.
+production_build() {
+  NODE_ENV=production pnpm build && test -f apps/web/dist/index.html
+}
+
+web_budgets() {
+  VITAE_REQUIRE_BUDGETS=true pnpm test:performance
+}
+
 # Production images are digest-pinned and CI enforces it. Keep the guard here
 # because it catches an irreversible mistake early.
 digest_pin_guard() {
@@ -178,12 +237,19 @@ bold "Vitae · local CI  (mirror of .github/workflows/ci.yml)"
 run_step "Install (frozen lockfile)" pnpm install --frozen-lockfile
 run_step "Typecheck"                 pnpm typecheck
 run_step "Lint"                      pnpm lint
-run_step "Unit + property tests (packages/core)" pnpm test:core
+run_step "Repository gates (map, prose, public, brand)" repository_gates
+run_step "Generated documentation"   pnpm docs:check
+run_step "Unit tests (core + testkit)" pnpm test:unit
+run_step "Design system (@vitae/ui)" pnpm --filter @vitae/ui test
 run_step "Web unit tests"            pnpm --filter @vitae/web test
+run_step "Web accessibility (axe)"   pnpm test:a11y
 
 if [ "$QUICK" = "0" ]; then
+  run_step "Property, metamorphic and golden" pnpm test:property
+  run_step "Dependency audit"        pnpm audit --audit-level=high
   run_step "Digest-pin guard"        digest_pin_guard
-  run_step "Production build"        pnpm build
+  run_step "Production build"        production_build
+  run_step "Web performance budgets" web_budgets
   run_step "API integration (Postgres + Auth emulator)" api_integration
 fi
 
@@ -216,6 +282,22 @@ ci_env() {
     SESSION_SECRET=ci-session-secret-not-a-real-one \
     AUTH_ENABLE_DEV_LOGIN=true \
     BUILDSVC_HMAC_SECRET=ci-buildsvc-secret \
+    DOCS_CONTENT_DIR=docs/.compiled \
+    "$@"
+}
+
+# What the workflow's e2e job sets for the browser bundle. Without these the
+# sign-in screen renders no developer button and every signed-in spec fails at
+# the door. A relative DOCS_CONTENT_DIR resolves against the repository root,
+# not the process cwd, which is why the bare value works from anywhere.
+web_build_env() {
+  env \
+    NODE_ENV=production \
+    VITE_FIREBASE_API_KEY=demo-api-key \
+    VITE_FIREBASE_AUTH_DOMAIN=vitae-local.firebaseapp.com \
+    VITE_FIREBASE_PROJECT_ID=vitae-local \
+    VITE_FIREBASE_USE_EMULATOR=true \
+    VITE_FIREBASE_AUTH_EMULATOR_HOST="http://127.0.0.1:$AUTH_PORT" \
     "$@"
 }
 
@@ -271,7 +353,12 @@ e2e_local() {
     return 1
   fi
 
-  VITE_API_BASE_URL="http://127.0.0.1:$API_PORT/api/v1" \
+  # The API caches "no corpus published" on its first request, so the corpus is
+  # compiled before anything starts. Without it the API answers 503 and the
+  # nineteen cases in docs.spec.ts fail looking exactly like a product defect.
+  pnpm docs:build || return 1
+
+  web_build_env VITE_API_BASE_URL="http://127.0.0.1:$API_PORT/api/v1" \
     pnpm --filter @vitae/web build || return 1
 
   VITAE_CI_DATABASE_URL="$E2E_DATABASE_URL" ci_env setsid env \
@@ -295,15 +382,32 @@ e2e_local() {
     return 1
   fi
 
+  # CI=1 buys the same single retry the workflow gets, for the same reason: the
+  # stack is real and one cold-start hiccup is not a regression. It is also what
+  # e2e/playwright.config.ts reads to decide there is a gate watching.
+  local status=0
   if [ -n "${VITAE_E2E_TESTS:-}" ]; then
+    CI=1 \
     E2E_BASE_URL="http://127.0.0.1:$WEB_PORT" \
     E2E_API_BASE_URL="http://127.0.0.1:$API_PORT/api/v1" \
-      pnpm --filter @vitae/e2e exec playwright test $VITAE_E2E_TESTS
+      pnpm --filter @vitae/e2e exec playwright test $VITAE_E2E_TESTS || status=$?
   else
+    CI=1 \
     E2E_BASE_URL="http://127.0.0.1:$WEB_PORT" \
     E2E_API_BASE_URL="http://127.0.0.1:$API_PORT/api/v1" \
-      pnpm e2e
+      pnpm e2e || status=$?
   fi
+
+  if [ "$status" != "0" ]; then
+    echo
+    echo "E2E failed. The evidence is on disk, not only in this scrollback:"
+    echo "  report  e2e/playwright-report/index.html"
+    echo "  traces  e2e/test-results/            (open one with: pnpm --filter @vitae/e2e exec playwright show-trace <path>)"
+    echo "  junit   e2e/test-results/junit.xml"
+    echo "  api log $API_LOG"
+    echo "  web log $WEB_LOG"
+  fi
+  return "$status"
 }
 
 if [ "$FULL" = "1" ]; then
@@ -323,7 +427,7 @@ if [ "${#FAILED[@]}" -gt 0 ]; then
 fi
 
 if [ "$QUICK" = "1" ]; then
-  printf '\n\033[33mQuick mode: build, API integration and the digest guard did NOT run.\033[0m\n'
+  printf '\n\033[33mQuick mode: property tests, the dependency audit, the digest guard, the build, the web budgets and API integration did NOT run.\033[0m\n'
 elif [ "$FULL" = "0" ]; then
   printf '\n\033[33mDocker image builds and e2e did NOT run (use --full before a deploy).\033[0m\n'
 fi

@@ -73,6 +73,11 @@ jobs:
         run: pnpm audit --audit-level=high
       - name: Unit + property-fuzz tests (packages/core + testkit)
         run: pnpm test:unit
+      # The design system is the most depended-on package in the repository and
+      # no job ran its 226 cases. docs/generated/tests.json counted them under
+      # "workspaces CI never runs" for as long as that artifact has existed.
+      - name: Design system tests (@vitae/ui)
+        run: pnpm --filter @vitae/ui test
       - name: Property / metamorphic / golden corpus
         run: pnpm test:property
       - name: Web unit / component tests
