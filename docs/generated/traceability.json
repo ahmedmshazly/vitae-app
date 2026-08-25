@@ -2,8 +2,8 @@
   "generated_by": "scripts/docs/gen-traceability.mjs",
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
-    "files_scanned": 866,
-    "files_citing": 162,
+    "files_scanned": 877,
+    "files_citing": 173,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,7 +20,7 @@
   },
   "totals": {
     "registered": 131,
-    "citations": 635,
+    "citations": 747,
     "implemented_and_tested": 19,
     "implemented_untested": 59,
     "tested_only": 2,
@@ -78,6 +78,7 @@
       "documents": [
         "docs/ROADMAP.md:17",
         "docs/observatory/architecture/persistence.md:25",
+        "docs/observatory/product/blueprint/capture-and-search.md:29",
         "docs/observatory/product/stories.md:41"
       ]
     },
@@ -101,6 +102,7 @@
         "apps/api/src/routes/v1/duplicates.integration.test.ts:43"
       ],
       "documents": [
+        "docs/observatory/product/blueprint/data-import-export.md:44",
         "docs/observatory/product/stories.md:94",
         "docs/observatory/use/import-and-export.md:24"
       ]
@@ -123,7 +125,8 @@
       "documents": [
         "docs/observatory/architecture/security.md:30",
         "docs/observatory/operate/configuration.md:26",
-        "docs/observatory/operate/secrets-and-rotation.md:24"
+        "docs/observatory/operate/secrets-and-rotation.md:24",
+        "docs/observatory/product/blueprint/data-import-export.md:51"
       ]
     },
     "FR-005": {
@@ -161,6 +164,7 @@
       "documents": [
         "docs/observatory/architecture/persistence.md:25",
         "docs/observatory/operate/incident-response.md:20",
+        "docs/observatory/product/blueprint/data-import-export.md:65",
         "docs/observatory/product/stories.md:89",
         "docs/observatory/product/stories.md:203",
         "docs/observatory/use/import-and-export.md:24"
@@ -192,6 +196,8 @@
       "tests": [],
       "documents": [
         "docs/ARCHITECTURE.md:142",
+        "docs/observatory/product/blueprint/capture-and-search.md:45",
+        "docs/observatory/product/blueprint/data-import-export.md:44",
         "docs/observatory/product/stories.md:93",
         "docs/observatory/use/import-and-export.md:24"
       ]
@@ -240,6 +246,7 @@
         "apps/api/src/routes/v1/resumes.integration.test.ts:35"
       ],
       "documents": [
+        "docs/observatory/product/blueprint/career-and-resume.md:81",
         "docs/observatory/product/stories.md:131",
         "docs/observatory/use/troubleshooting.md:35",
         "docs/observatory/use/write-a-resume.md:30"
@@ -260,6 +267,7 @@
       "documents": [
         "docs/observatory/architecture/persistence.md:25",
         "docs/observatory/architecture/security.md:30",
+        "docs/observatory/product/blueprint/data-import-export.md:58",
         "docs/observatory/product/stories.md:166",
         "docs/observatory/use/import-and-export.md:24"
       ]
@@ -389,6 +397,7 @@
       ],
       "tests": [],
       "documents": [
+        "docs/observatory/product/blueprint/data-import-export.md:25",
         "docs/observatory/product/stories.md:87",
         "docs/observatory/product/stories.md:89",
         "docs/observatory/use/import-and-export.md:24"
@@ -405,6 +414,7 @@
         "apps/api/src/routes/v1/export.integration.test.ts:13"
       ],
       "documents": [
+        "docs/observatory/product/blueprint/data-import-export.md:59",
         "docs/observatory/product/stories.md:168",
         "docs/observatory/use/import-and-export.md:24"
       ]
@@ -575,6 +585,7 @@
         "docs/ARCHITECTURE.md:145",
         "docs/ROADMAP.md:18",
         "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/product/blueprint/capture-and-search.md:29",
         "docs/observatory/product/stories.md:39",
         "docs/observatory/use/build-your-graph.md:29",
         "docs/observatory/use/getting-started.md:20"
@@ -603,6 +614,7 @@
       "documents": [
         "docs/design/addenda/P23-entity-forms.md:1",
         "docs/observatory/architecture/career-graph.md:23",
+        "docs/observatory/product/blueprint/capture-and-search.md:45",
         "docs/observatory/use/build-your-graph.md:29"
       ]
     },
@@ -673,7 +685,8 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:27"
+        "docs/ROADMAP.md:27",
+        "docs/observatory/product/blueprint/career-and-resume.md:29"
       ]
     },
     "FR-CAR-002": {
@@ -684,7 +697,8 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:27"
+        "docs/ROADMAP.md:27",
+        "docs/observatory/product/blueprint/career-and-resume.md:45"
       ]
     },
     "FR-CAR-003": {
@@ -695,7 +709,8 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:49"
+        "docs/ROADMAP.md:49",
+        "docs/observatory/product/blueprint/career-and-resume.md:33"
       ]
     },
     "FR-CAR-004": {
@@ -706,7 +721,8 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:27"
+        "docs/ROADMAP.md:27",
+        "docs/observatory/product/blueprint/career-and-resume.md:29"
       ]
     },
     "FR-COMM-001": {
@@ -718,6 +734,9 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:45",
+        "docs/observatory/product/blueprint/index.md:49",
+        "docs/observatory/product/blueprint/network.md:56",
+        "docs/observatory/product/blueprint/network.md:110",
         "docs/observatory/product/stories.md:180"
       ]
     },
@@ -730,6 +749,10 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:45",
+        "docs/observatory/product/blueprint/index.md:50",
+        "docs/observatory/product/blueprint/network.md:101",
+        "docs/observatory/product/blueprint/network.md:110",
+        "docs/observatory/product/blueprint/today-and-planner.md:42",
         "docs/observatory/product/stories.md:183"
       ]
     },
@@ -742,6 +765,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:45",
+        "docs/observatory/product/blueprint/network.md:64",
+        "docs/observatory/product/blueprint/network.md:91",
         "docs/observatory/product/stories.md:186"
       ]
     },
@@ -813,6 +838,7 @@
         "docs/ARCHITECTURE.md:138",
         "docs/ROADMAP.md:21",
         "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/product/blueprint/network.md:39",
         "docs/observatory/product/stories.md:60",
         "docs/observatory/product/stories.md:75"
       ]
@@ -849,6 +875,7 @@
         "docs/ROADMAP.md:21",
         "docs/ROADMAP.md:22",
         "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/product/blueprint/network.md:83",
         "docs/observatory/use/track-applications.md:23"
       ]
     },
@@ -866,6 +893,7 @@
         "docs/ROADMAP.md:21",
         "docs/ROADMAP.md:22",
         "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/product/blueprint/network.md:83",
         "docs/observatory/use/track-applications.md:23"
       ]
     },
@@ -879,6 +907,7 @@
       "documents": [
         "docs/ROADMAP.md:21",
         "docs/ROADMAP.md:22",
+        "docs/observatory/product/blueprint/network.md:90",
         "docs/observatory/use/track-applications.md:23",
         "docs/specs/srs.md:1238"
       ]
@@ -908,6 +937,7 @@
       "sources": [],
       "tests": [],
       "documents": [
+        "docs/observatory/product/blueprint/network.md:53",
         "docs/observatory/product/stories.md:68"
       ]
     },
@@ -920,6 +950,9 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:46",
+        "docs/observatory/product/blueprint/career-and-resume.md:111",
+        "docs/observatory/product/blueprint/explore.md:32",
+        "docs/observatory/product/blueprint/index.md:50",
         "docs/observatory/product/stories.md:148"
       ]
     },
@@ -932,6 +965,9 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:46",
+        "docs/observatory/product/blueprint/career-and-resume.md:101",
+        "docs/observatory/product/blueprint/career-and-resume.md:111",
+        "docs/observatory/product/blueprint/index.md:50",
         "docs/observatory/product/stories.md:145"
       ]
     },
@@ -948,6 +984,7 @@
       "documents": [
         "docs/ROADMAP.md:28",
         "docs/observatory/operate/backup-and-restore.md:26",
+        "docs/observatory/product/blueprint/data-import-export.md:58",
         "docs/observatory/product/stories.md:163",
         "docs/observatory/use/import-and-export.md:24"
       ]
@@ -1083,6 +1120,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:19",
+        "docs/observatory/product/blueprint/data-import-export.md:65",
         "docs/observatory/product/stories.md:201",
         "docs/observatory/use/import-and-export.md:24"
       ]
@@ -1099,7 +1137,8 @@
       ],
       "tests": [],
       "documents": [
-        "docs/observatory/architecture/algorithms.md:35"
+        "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/product/blueprint/explore.md:28"
       ]
     },
     "FR-ORG-007": {
@@ -1123,6 +1162,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:25",
+        "docs/observatory/product/blueprint/data-import-export.md:45",
         "docs/observatory/product/stories.md:96",
         "docs/specs/srs.md:1240"
       ]
@@ -1136,6 +1176,17 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:47",
+        "docs/observatory/product/blueprint/capture-and-search.md:34",
+        "docs/observatory/product/blueprint/capture-and-search.md:67",
+        "docs/observatory/product/blueprint/career-and-resume.md:46",
+        "docs/observatory/product/blueprint/career-and-resume.md:112",
+        "docs/observatory/product/blueprint/explore.md:38",
+        "docs/observatory/product/blueprint/index.md:53",
+        "docs/observatory/product/blueprint/network.md:61",
+        "docs/observatory/product/blueprint/network.md:76",
+        "docs/observatory/product/blueprint/record-and-collections.md:31",
+        "docs/observatory/product/blueprint/record-and-collections.md:49",
+        "docs/observatory/product/blueprint/today-and-planner.md:56",
         "docs/observatory/product/stories.md:148"
       ]
     },
@@ -1147,7 +1198,13 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:47"
+        "docs/ROADMAP.md:47",
+        "docs/observatory/product/blueprint/data-import-export.md:39",
+        "docs/observatory/product/blueprint/explore.md:52",
+        "docs/observatory/product/blueprint/index.md:49",
+        "docs/observatory/product/blueprint/today-and-planner.md:35",
+        "docs/observatory/product/blueprint/today-and-planner.md:46",
+        "docs/observatory/product/blueprint/today-and-planner.md:68"
       ]
     },
     "FR-PROV-003": {
@@ -1158,7 +1215,10 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:47"
+        "docs/ROADMAP.md:47",
+        "docs/observatory/product/blueprint/record-and-collections.md:35",
+        "docs/observatory/product/blueprint/today-and-planner.md:46",
+        "docs/observatory/product/blueprint/today-and-planner.md:68"
       ]
     },
     "FR-RES-001": {
@@ -1210,6 +1270,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:26",
+        "docs/observatory/product/blueprint/career-and-resume.md:59",
         "docs/observatory/product/stories.md:121",
         "docs/observatory/use/build-your-graph.md:29",
         "docs/observatory/use/write-a-resume.md:30"
@@ -1228,6 +1289,7 @@
         "docs/ARCHITECTURE.md:140",
         "docs/ROADMAP.md:26",
         "docs/observatory/architecture/resume-pipeline.md:26",
+        "docs/observatory/product/blueprint/career-and-resume.md:71",
         "docs/observatory/product/stories.md:115",
         "docs/observatory/use/write-a-resume.md:30"
       ]
@@ -1245,6 +1307,7 @@
       "documents": [
         "docs/ROADMAP.md:26",
         "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/product/blueprint/career-and-resume.md:71",
         "docs/observatory/product/stories.md:116",
         "docs/observatory/use/write-a-resume.md:30"
       ]
@@ -1269,6 +1332,7 @@
         "docs/ARCHITECTURE.md:141",
         "docs/ROADMAP.md:26",
         "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/product/blueprint/career-and-resume.md:71",
         "docs/observatory/product/stories.md:118",
         "docs/observatory/use/write-a-resume.md:30"
       ]
@@ -1293,6 +1357,7 @@
         "docs/ROADMAP.md:26",
         "docs/observatory/architecture/algorithms.md:35",
         "docs/observatory/architecture/resume-pipeline.md:26",
+        "docs/observatory/product/blueprint/career-and-resume.md:72",
         "docs/observatory/product/stories.md:120",
         "docs/observatory/use/write-a-resume.md:30"
       ]
@@ -1319,6 +1384,7 @@
         "docs/observatory/architecture/algorithms.md:35",
         "docs/observatory/architecture/resume-pipeline.md:26",
         "docs/observatory/operate/deploy.md:25",
+        "docs/observatory/product/blueprint/career-and-resume.md:73",
         "docs/observatory/product/stories.md:120",
         "docs/observatory/use/write-a-resume.md:30",
         "docs/runbooks/bump-tectonic.md:15"
@@ -1388,6 +1454,7 @@
       "documents": [
         "docs/ROADMAP.md:26",
         "docs/observatory/architecture/resume-pipeline.md:26",
+        "docs/observatory/product/blueprint/career-and-resume.md:74",
         "docs/observatory/product/stories.md:125",
         "docs/observatory/use/troubleshooting.md:35",
         "docs/observatory/use/write-a-resume.md:30"
@@ -1411,6 +1478,7 @@
         "docs/ROADMAP.md:26",
         "docs/observatory/architecture/algorithms.md:35",
         "docs/observatory/architecture/resume-pipeline.md:26",
+        "docs/observatory/product/blueprint/career-and-resume.md:74",
         "docs/observatory/product/stories.md:128",
         "docs/observatory/use/write-a-resume.md:30"
       ]
@@ -1428,6 +1496,7 @@
       "documents": [
         "docs/ROADMAP.md:26",
         "docs/observatory/architecture/resume-pipeline.md:26",
+        "docs/observatory/product/blueprint/career-and-resume.md:75",
         "docs/observatory/product/stories.md:127",
         "docs/observatory/use/write-a-resume.md:30"
       ]
@@ -1469,6 +1538,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:26",
+        "docs/observatory/product/blueprint/career-and-resume.md:39",
         "docs/observatory/product/stories.md:130",
         "docs/observatory/use/track-applications.md:23",
         "docs/observatory/use/write-a-resume.md:30"
@@ -1484,6 +1554,7 @@
       ],
       "tests": [],
       "documents": [
+        "docs/observatory/product/blueprint/career-and-resume.md:81",
         "docs/observatory/product/stories.md:133",
         "docs/observatory/use/write-a-resume.md:30"
       ]
@@ -1507,6 +1578,7 @@
       ],
       "documents": [
         "docs/ROADMAP.md:50",
+        "docs/observatory/product/blueprint/career-and-resume.md:94",
         "docs/observatory/product/stories.md:135",
         "docs/observatory/use/write-a-resume.md:30"
       ]
@@ -1520,6 +1592,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:50",
+        "docs/observatory/product/blueprint/career-and-resume.md:94",
         "docs/observatory/product/stories.md:135"
       ]
     },
@@ -1553,7 +1626,9 @@
         "docs/adr/0003-deterministic-intelligence.md:30",
         "docs/observatory/architecture/algorithms.md:35",
         "docs/observatory/architecture/algorithms.md:614",
-        "docs/observatory/decisions/catalog.md:148"
+        "docs/observatory/decisions/catalog.md:148",
+        "docs/observatory/product/blueprint/settings-and-system.md:20",
+        "docs/observatory/product/blueprint/settings-and-system.md:28"
       ]
     },
     "FR-SET-006": {
@@ -1568,6 +1643,7 @@
       "documents": [
         "docs/ROADMAP.md:29",
         "docs/observatory/operate/incident-response.md:20",
+        "docs/observatory/product/blueprint/settings-and-system.md:33",
         "docs/observatory/use/troubleshooting.md:35"
       ]
     },
@@ -1582,6 +1658,7 @@
       "tests": [],
       "documents": [
         "docs/observatory/architecture/security.md:30",
+        "docs/observatory/product/blueprint/data-import-export.md:58",
         "docs/observatory/product/stories.md:166",
         "docs/observatory/use/import-and-export.md:24"
       ]
@@ -1599,7 +1676,8 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:20"
+        "docs/ROADMAP.md:20",
+        "docs/observatory/product/blueprint/capture-and-search.md:64"
       ]
     },
     "FR-SRCH-002": {
@@ -1620,7 +1698,8 @@
       "documents": [
         "docs/ARCHITECTURE.md:146",
         "docs/ROADMAP.md:20",
-        "docs/observatory/architecture/algorithms.md:35"
+        "docs/observatory/architecture/algorithms.md:35",
+        "docs/observatory/product/blueprint/capture-and-search.md:64"
       ]
     },
     "FR-SRCH-003": {
@@ -1636,7 +1715,8 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:20"
+        "docs/ROADMAP.md:20",
+        "docs/observatory/product/blueprint/capture-and-search.md:64"
       ]
     },
     "FR-SRCH-004": {
@@ -1653,6 +1733,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:20",
+        "docs/observatory/product/blueprint/capture-and-search.md:54",
         "docs/observatory/product/stories.md:43",
         "docs/observatory/use/getting-started.md:20"
       ]
@@ -1667,6 +1748,7 @@
       "documents": [
         "docs/ROADMAP.md:48",
         "docs/ROADMAP.md:68",
+        "docs/observatory/product/blueprint/data-import-export.md:29",
         "docs/observatory/product/stories.md:105"
       ]
     },
@@ -1680,6 +1762,8 @@
       "documents": [
         "docs/ROADMAP.md:48",
         "docs/ROADMAP.md:68",
+        "docs/observatory/product/blueprint/data-import-export.md:32",
+        "docs/observatory/product/blueprint/data-import-export.md:52",
         "docs/observatory/product/stories.md:107"
       ]
     },
@@ -1695,7 +1779,8 @@
       "documents": [
         "docs/ROADMAP.md:23",
         "docs/design/addenda/P25-graph-explorer-v2.md:1",
-        "docs/observatory/meta/coverage-and-contradictions.md:397"
+        "docs/observatory/meta/coverage-and-contradictions.md:397",
+        "docs/observatory/product/blueprint/explore.md:44"
       ]
     },
     "FR-VIS-002": {
@@ -1709,7 +1794,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:397"
+        "docs/observatory/meta/coverage-and-contradictions.md:397",
+        "docs/observatory/product/blueprint/explore.md:50"
       ]
     },
     "FR-VIS-003": {
@@ -1724,7 +1810,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:397"
+        "docs/observatory/meta/coverage-and-contradictions.md:397",
+        "docs/observatory/product/blueprint/explore.md:58"
       ]
     },
     "FR-VIS-004": {
@@ -1750,7 +1837,9 @@
         "apps/web/src/features/timeline/TimelineView.tsx:2"
       ],
       "tests": [],
-      "documents": []
+      "documents": [
+        "docs/observatory/product/blueprint/explore.md:50"
+      ]
     },
     "NFR-A11Y-001": {
       "capability": "CAP-PLATFORM",
@@ -1777,6 +1866,8 @@
       "sources": [],
       "tests": [],
       "documents": [
+        "docs/observatory/product/blueprint/network.md:112",
+        "docs/observatory/product/blueprint/today-and-planner.md:47",
         "docs/specs/srs.md:1187"
       ]
     },
@@ -1789,6 +1880,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:28",
+        "docs/observatory/product/blueprint/public-and-marketing.md:63",
         "docs/observatory/product/stories.md:171",
         "docs/specs/srs.md:1190"
       ]
@@ -1801,6 +1893,8 @@
       "sources": [],
       "tests": [],
       "documents": [
+        "docs/observatory/product/blueprint/career-and-resume.md:82",
+        "docs/observatory/product/blueprint/career-and-resume.md:113",
         "docs/observatory/product/stories.md:133",
         "docs/observatory/product/stories.md:151",
         "docs/specs/srs.md:1192"
@@ -1857,6 +1951,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:51",
+        "docs/observatory/product/blueprint/index.md:47",
+        "docs/observatory/product/blueprint/settings-and-system.md:58",
         "docs/observatory/product/stories.md:171",
         "docs/specs/srs.md:1199"
       ]
@@ -1880,6 +1976,7 @@
       "sources": [],
       "tests": [],
       "documents": [
+        "docs/observatory/product/blueprint/explore.md:44",
         "docs/specs/srs.md:1203"
       ]
     },
@@ -1892,6 +1989,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:67",
+        "docs/observatory/product/blueprint/public-and-marketing.md:63",
         "docs/specs/srs.md:96"
       ]
     },
@@ -1903,6 +2001,8 @@
       "sources": [],
       "tests": [],
       "documents": [
+        "docs/observatory/product/blueprint/public-and-marketing.md:63",
+        "docs/observatory/product/personas.md:145",
         "docs/specs/srs.md:98"
       ]
     },
@@ -1914,6 +2014,11 @@
       "sources": [],
       "tests": [],
       "documents": [
+        "docs/observatory/product/blueprint/explore.md:36",
+        "docs/observatory/product/blueprint/network.md:58",
+        "docs/observatory/product/blueprint/network.md:83",
+        "docs/observatory/product/blueprint/public-and-marketing.md:63",
+        "docs/observatory/product/blueprint/today-and-planner.md:29",
         "docs/observatory/product/stories.md:61",
         "docs/observatory/product/stories.md:75",
         "docs/observatory/product/stories.md:181",
@@ -1933,6 +2038,7 @@
         "docs/ROADMAP.md:17",
         "docs/observatory/architecture/persistence.md:25",
         "docs/observatory/meta/coverage-and-contradictions.md:382",
+        "docs/observatory/product/blueprint/data-import-export.md:38",
         "docs/observatory/product/stories.md:91",
         "docs/observatory/product/stories.md:205",
         "docs/specs/srs.md:1204"
@@ -1946,6 +2052,10 @@
       "sources": [],
       "tests": [],
       "documents": [
+        "docs/observatory/product/blueprint/capture-and-search.md:80",
+        "docs/observatory/product/blueprint/network.md:112",
+        "docs/observatory/product/blueprint/record-and-collections.md:42",
+        "docs/observatory/product/blueprint/today-and-planner.md:78",
         "docs/specs/srs.md:1206"
       ]
     },
@@ -1960,6 +2070,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:16",
+        "docs/observatory/product/blueprint/public-and-marketing.md:79",
         "docs/specs/srs.md:77"
       ]
     },
@@ -1998,6 +2109,8 @@
       "sources": [],
       "tests": [],
       "documents": [
+        "docs/observatory/product/blueprint/data-import-export.md:51",
+        "docs/observatory/product/blueprint/settings-and-system.md:21",
         "docs/specs/srs.md:91"
       ]
     },
@@ -2845,6 +2958,125 @@
       "FR-004",
       "FR-015",
       "FR-027"
+    ],
+    "docs/observatory/product/blueprint/capture-and-search.md": [
+      "FR-002",
+      "FR-008",
+      "FR-CAP-001",
+      "FR-CAP-002",
+      "FR-PROV-001",
+      "FR-SRCH-001",
+      "FR-SRCH-002",
+      "FR-SRCH-003",
+      "FR-SRCH-004",
+      "NFR-REL-004"
+    ],
+    "docs/observatory/product/blueprint/career-and-resume.md": [
+      "FR-011",
+      "FR-CAR-001",
+      "FR-CAR-002",
+      "FR-CAR-003",
+      "FR-CAR-004",
+      "FR-DOS-001",
+      "FR-DOS-002",
+      "FR-PROV-001",
+      "FR-RES-004",
+      "FR-RES-005",
+      "FR-RES-006",
+      "FR-RES-007",
+      "FR-RES-008",
+      "FR-RES-009",
+      "FR-RES-013",
+      "FR-RES-014",
+      "FR-RES-015",
+      "FR-RES-018",
+      "FR-RES-019",
+      "FR-RES-020",
+      "FR-RES-021",
+      "NFR-COMP-002"
+    ],
+    "docs/observatory/product/blueprint/data-import-export.md": [
+      "FR-003",
+      "FR-004",
+      "FR-006",
+      "FR-008",
+      "FR-012",
+      "FR-020",
+      "FR-021",
+      "FR-EXP-010",
+      "FR-ORG-002",
+      "FR-ORG-008",
+      "FR-PROV-002",
+      "FR-SET-007",
+      "FR-SYNC-001",
+      "FR-SYNC-002",
+      "NFR-REL-003",
+      "NFR-SEC-004"
+    ],
+    "docs/observatory/product/blueprint/explore.md": [
+      "FR-DOS-001",
+      "FR-ORG-005",
+      "FR-PROV-001",
+      "FR-PROV-002",
+      "FR-VIS-001",
+      "FR-VIS-002",
+      "FR-VIS-003",
+      "FR-VIS-005",
+      "NFR-PERF-002",
+      "NFR-PRIV-003"
+    ],
+    "docs/observatory/product/blueprint/index.md": [
+      "FR-COMM-001",
+      "FR-COMM-002",
+      "FR-DOS-001",
+      "FR-DOS-002",
+      "FR-PROV-001",
+      "FR-PROV-002",
+      "NFR-OPS-002"
+    ],
+    "docs/observatory/product/blueprint/network.md": [
+      "FR-COMM-001",
+      "FR-COMM-002",
+      "FR-COMM-003",
+      "FR-CON-004",
+      "FR-CON-006",
+      "FR-CON-007",
+      "FR-CON-008",
+      "FR-CON-010",
+      "FR-PROV-001",
+      "NFR-A11Y-002",
+      "NFR-PRIV-003",
+      "NFR-REL-004"
+    ],
+    "docs/observatory/product/blueprint/public-and-marketing.md": [
+      "NFR-COMP-001",
+      "NFR-PRIV-001",
+      "NFR-PRIV-002",
+      "NFR-PRIV-003",
+      "NFR-SEC-001"
+    ],
+    "docs/observatory/product/blueprint/record-and-collections.md": [
+      "FR-PROV-001",
+      "FR-PROV-003",
+      "NFR-REL-004"
+    ],
+    "docs/observatory/product/blueprint/settings-and-system.md": [
+      "FR-SET-004",
+      "FR-SET-006",
+      "NFR-OPS-002",
+      "NFR-SEC-004"
+    ],
+    "docs/observatory/product/blueprint/today-and-planner.md": [
+      "FR-COMM-002",
+      "FR-PROV-001",
+      "FR-PROV-002",
+      "FR-PROV-003",
+      "NFR-A11Y-002",
+      "NFR-PRIV-003",
+      "NFR-REL-004"
+    ],
+    "docs/observatory/product/personas.md": [
+      "NFR-PRIV-002"
     ],
     "docs/observatory/product/stories.md": [
       "FR-001",

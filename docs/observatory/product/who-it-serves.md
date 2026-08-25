@@ -1,19 +1,20 @@
 ---
 id: PRD-PEOPLE
 title: Who Vitae is for
-summary: One person signs in to an installation. Everybody else in the graph is a record, not a user — and that asymmetry shapes the whole product.
+summary: One person signs in to an installation; everybody else in the graph is a record, not a user. Four personas now name who that one person is — and what each of them would pay for.
 audience: [user, designer, maintainer]
 domain: product
 type: explanation
 status: verified
-verified_at: 2026-08-24
+verified_at: 2026-08-26
 sources:
   - PRODUCT.md
   - apps/api/src/middleware/auth.ts
   - apps/api/src/db/space.ts
   - apps/api/src/middleware/workspace.ts
   - docs/CLOUD-LAUNCH.md
-related: [PRD-PURPOSE, PRD-BOUNDARIES, PRD-CAPABILITIES]
+  - docs/adr/0007-product-definition-regeneration.md
+related: [PRD-PURPOSE, PRD-BOUNDARIES, PRD-CAPABILITIES, PRD-PERSONAS]
 ---
 
 # Who Vitae is for
@@ -43,6 +44,14 @@ role below them to delegate to and no administrator above them to appeal to. A
 product that assumed otherwise would need permissions, invitations and an audit
 trail of who changed what; this one needs none of that, and is smaller for it.
 
+Since 2026-08 the operator has four researched faces, named P1 through P4 and
+profiled in [the four people](personas.md): the deliberate mover preparing a
+career move in private, the consultant whose practice runs on relationships and
+per-engagement evidence, the periodic prover who must periodically compile a
+verifiable account of their own history, and the privacy-first self-hoster who
+runs the free system because ownership is the point. They are one operator role
+seen at four buying moments, not four kinds of account.
+
 ### The people in the graph
 
 Everyone else is a subject, not a user. A `person` node exists because the
@@ -71,11 +80,13 @@ self-hosted install.
 ### The customer the hosted plane was designed for
 
 A hosted offering is designed and partly built, and it is not open. Its intended
-customer is recorded in the launch guide: an experienced professional preparing a
+customer is P1, the deliberate mover: an experienced professional preparing a
 deliberate career move, who already has meaningful work and relationships but
 needs those facts connected before an opportunity arrives — explicitly not
 someone managing a sales pipeline, recruiting a team, or generating generic
-résumés at volume.
+résumés at volume. P2 and P3 shape retention and expansion rather than the
+launch pitch, and P4 never pays by design — the flywheel that keeps the paid
+product honest.
 
 Read that as a design brief rather than as a description of anyone being served.
 No hosted service is asserted to be operating, and the intended shape is one
@@ -124,7 +135,8 @@ not introduce a second user to any one graph. It introduces more graphs.
 
 ## Related
 
-[What Vitae is for](what-vitae-is.md) describes what the operator is actually
-working with. [What Vitae does not do](boundaries.md) states the hosting and
-commercial boundaries this page only summarises, including exactly what the
-hosted plane is and is not.
+[The four people](personas.md) profiles the personas this page names, with the
+market evidence behind each. [What Vitae is for](what-vitae-is.md) describes
+what the operator is actually working with. [What Vitae does not do](boundaries.md)
+states the hosting and commercial boundaries this page only summarises,
+including exactly what the hosted plane is and is not.

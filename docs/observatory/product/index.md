@@ -27,10 +27,12 @@ Nothing here explains how a thing is built. That is the next section along.
 | --- | --- | --- |
 | [What Vitae is for](what-vitae-is.md) | Why a graph, and why deterministic? | Anyone |
 | [Who Vitae is for](who-it-serves.md) | Who signs in, and who is only ever a record? | Anyone |
+| [The four people](personas.md) | Who exactly is the operator, and what would each face of them pay for? | Maintainers |
 | [The capability map](capabilities.md) | What are the units of product scope, and what proves each one? | Maintainers |
 | [The journeys that must work](journeys.md) | Which paths through the product are held by a test? | Maintainers |
 | [The stories behind the journeys](stories.md) | Who wants each journey, and how would we know it worked? | Maintainers |
 | [What Vitae does not do](boundaries.md) | Where does the product stop, and why there? | Anyone |
+| [The re-conception blueprint](blueprint/index.md) | What should every screen become, and which persona is it for? | Maintainers |
 
 Read them in that order the first time. After that they are independent: the
 capability map and the journey register are looked up rather than read through,
