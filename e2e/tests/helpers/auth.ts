@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test';
+import { devToken } from './api';
 
 export interface SignInOptions {
   /** Data space to enter before signing in; 'demo' targets the seeded demo graph. */
@@ -6,21 +7,38 @@ export interface SignInOptions {
 }
 
 /**
- * Developer sign-in shared by every spec. Skips the first-run welcome modal,
- * waits out the auth-loading spinner before clicking, and confirms Today's
- * register rule, the one element that only renders once the dashboard query
- * has resolved, so it can't pass against a half-loaded page. The old signal
- * was the subtitle string "Your day at a glance", which Screen 2 deleted.
+ * Developer sign-in shared by every spec.
+ *
+ * This does not drive the sign-in screen. Driving it is `signin.spec.ts`'s
+ * subject, and re-proving it before each of the other 240 signed-in tests bought
+ * nothing: it loaded `/signin`, waited up to ten seconds for the developer
+ * button to render, clicked it, waited for the redirect, and only then arrived
+ * where the test wanted to be. The session is minted straight from
+ * `/auth/dev-login` instead, which sets the same httpOnly cookie in the same
+ * browser context, and the page goes directly to Today.
+ *
+ * The two localStorage keys are seeded through `addInitScript` so they are
+ * present before the shell mounts, rather than written to one page and hoped
+ * for on the next.
+ *
+ * The readiness signal is unchanged: Today's register rule, the one element
+ * that only renders once the dashboard query has resolved, so this cannot pass
+ * against a half-loaded page.
  */
 export async function signIn(page: Page, opts: SignInOptions = {}) {
-  await page.goto('/signin');
-  await page.evaluate((space) => {
+  const space = opts.space ?? 'real';
+  await page.addInitScript((chosen) => {
     localStorage.setItem('vitae.v1.welcomed', '1');
-    if (space === 'demo') localStorage.setItem('vitae.space', 'demo');
-  }, opts.space ?? 'real');
-  const devButton = page.getByRole('button', { name: /developer sign-in/i });
-  await devButton.waitFor({ state: 'visible', timeout: 10_000 });
-  await devButton.click();
+    // Seed the space, do not enforce it. An init script runs before *every*
+    // navigation, so writing unconditionally re-imposed the starting space on
+    // each `goto` and silently undid an in-session toggle: demo-mode switched
+    // to demo, navigated, and arrived back in the real graph.
+    if (localStorage.getItem('vitae.space') === null) {
+      localStorage.setItem('vitae.space', chosen);
+    }
+  }, space);
+  await devToken(page);
+  await page.goto('/today');
   await expect(page.getByRole('img', { name: /^Days of this week/ })).toBeVisible({
     timeout: 10_000,
   });

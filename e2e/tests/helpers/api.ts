@@ -16,16 +16,46 @@ export async function spaceFromPage(page: Page): Promise<E2ESpace> {
   return space === 'demo' ? 'demo' : 'real';
 }
 
+/**
+ * One developer session per page, not one per call.
+ *
+ * Every apiGet/apiPost/apiPatch/apiDelete goes through `apiHeaders`, which used
+ * to post `/auth/dev-login` each time. A fixture creating a person, an
+ * organisation and an edge therefore paid three sign-ins, and the token it
+ * minted was identical every time. The token is a 24 hour JWT and the page it
+ * belongs to lives for one test, so it is cached against the page and goes away
+ * with it. A failed mint is evicted so the next call retries rather than
+ * replaying the rejection.
+ */
+const sessions = new WeakMap<Page, Promise<string>>();
+
+export function devToken(page: Page): Promise<string> {
+  const existing = sessions.get(page);
+  if (existing) return existing;
+  const minting = (async () => {
+    const login = await page.request.post(`${API_BASE}/auth/dev-login`);
+    if (!login.ok()) {
+      throw new Error(`E2E developer sign-in failed: ${login.status()} ${await login.text()}`);
+    }
+    const { token } = (await login.json()) as { token?: string };
+    if (!token) throw new Error('E2E developer sign-in did not return a token.');
+    return token;
+  })().catch((error: unknown) => {
+    sessions.delete(page);
+    throw error;
+  });
+  sessions.set(page, minting);
+  return minting;
+}
+
 export async function apiHeaders(page: Page, extra: Record<string, string> = {}): Promise<Record<string, string>> {
+  // Read live rather than cached: demo-mode and negative both toggle the space
+  // mid-test, and a stale header would write to the graph they just left.
   const space = await spaceFromPage(page);
-  const login = await page.request.post(`${API_BASE}/auth/dev-login`);
-  if (!login.ok()) throw new Error(`E2E developer sign-in failed: ${login.status()} ${await login.text()}`);
-  const { token } = (await login.json()) as { token?: string };
-  if (!token) throw new Error('E2E developer sign-in did not return a token.');
   return {
     'x-vitae-space': space,
     'x-vitae-tz': 'UTC',
-    authorization: `Bearer ${token}`,
+    authorization: `Bearer ${await devToken(page)}`,
     ...extra,
   };
 }
