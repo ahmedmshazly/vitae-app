@@ -15,6 +15,27 @@ import { expect, type Page } from '@playwright/test';
  * its own scan in its own spec; here the dialog is what is under test.
  */
 export async function expectNoA11yViolations(page: Page, within?: string): Promise<void> {
+  // A stylesheet that has not applied yet reports the same false contrast a
+  // half-finished animation does, and for the same reason: axe reads the colour
+  // that is on screen now. A route whose CSS arrives in its own chunk was seen
+  // failing at 1.51:1, ink #333333 on ground #0f0f0f, with `.docs-root` among
+  // the targets. Those are the unstyled defaults, not the page. Wait for the
+  // sheets, then the fonts, before anything is measured.
+  await page.evaluate(async () => {
+    const pending = [...document.querySelectorAll('link[rel="stylesheet"]')]
+      .filter((link) => !(link as HTMLLinkElement).sheet)
+      .map(
+        (link) =>
+          new Promise((settle) => {
+            link.addEventListener('load', settle, { once: true });
+            // An error settles it too. A sheet that will never arrive is a
+            // different defect, and blocking here would report it as a timeout.
+            link.addEventListener('error', settle, { once: true });
+          }),
+      );
+    await Promise.all(pending);
+    await document.fonts.ready;
+  });
   // Entrance motion is part of the design system, and a fading element is a
   // different colour on every frame. Scanning mid-flight sampled half-opacity
   // ink and reported contrast the settled screen never shows: a 27px heading
