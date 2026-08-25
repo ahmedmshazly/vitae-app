@@ -88,7 +88,11 @@ test('the register rule plots interactions by date, not evenly', async ({ page }
   expect(positions.length).toBeGreaterThan(2);
   // Evenly spaced ticks would carry no information beyond the count; real
   // dates cluster, so at least two gaps differ.
-  const gaps = positions.slice(1).map((p, i) => Number((p - positions[i]).toFixed(3)));
+  const gaps = positions.slice(1).map((position, i) => {
+    const previous = positions[i];
+    if (previous === undefined) throw new Error('the tick list shrank between reads');
+    return Number((position - previous).toFixed(3));
+  });
   expect(new Set(gaps).size).toBeGreaterThan(1);
   await expect(page.locator('.vt-register__tick--on')).toHaveCount(1);
 });

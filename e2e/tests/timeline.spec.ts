@@ -34,7 +34,10 @@ test('the track is flat ground, no wash, no texture, no frosted glass', async ({
 
   const years = await page.locator('.tl__years').evaluate((el) => {
     const cs = getComputedStyle(el);
-    return { filter: cs.backdropFilter || cs.webkitBackdropFilter, image: cs.backgroundImage };
+    return {
+      filter: cs.backdropFilter || cs.getPropertyValue('-webkit-backdrop-filter'),
+      image: cs.backgroundImage,
+    };
   });
   // Glassmorphism is a standing ban, and this was the app's only blur.
   expect(years.filter === 'none' || years.filter === '').toBe(true);

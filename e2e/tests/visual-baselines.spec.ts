@@ -12,7 +12,12 @@ test.describe('visual baselines', () => {
     // Deterministic chrome for screenshot contracts.
     viewport: { width: 1280, height: 720 },
     colorScheme: 'light',
-    reducedMotion: 'reduce',
+    // reducedMotion belongs to the browser context, not to the test options.
+    // Spelled at the top level it type-checks as an unknown key and is dropped,
+    // so until now nothing here asked for reduced motion at all. Under it the
+    // token durations in packages/ui/src/styles/tokens.css collapse to 0ms,
+    // which is what makes the entrance animations settle before the shot.
+    contextOptions: { reducedMotion: 'reduce' },
   });
 
   test('landing hero (desktop)', async ({ page }) => {
