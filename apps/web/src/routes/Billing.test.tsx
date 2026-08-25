@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('../lib/api.js', () => ({ api: { get: mocks.get, post: mocks.post } }));
-vi.mock('../lib/auth.js', () => ({ useAuth: () => ({ cloudEnabled: mocks.cloudEnabled }) }));
+vi.mock('../lib/auth.js', () => ({ useAuth: () => ({ cloudEnabled: mocks.cloudEnabled }), useCanWrite: () => true, WRITE_LOCK_HINT: 'Read-only workspace' }));
 vi.mock('../lib/paddle.js', () => ({
   openPaddleCheckout: mocks.openPaddleCheckout,
   paddleCheckoutReady: mocks.paddleCheckoutReady,

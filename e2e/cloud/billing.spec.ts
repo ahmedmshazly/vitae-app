@@ -63,6 +63,20 @@ test('a build with no provider token never offers checkout', async ({ page }) =>
   await expect(page.getByRole('button', { name: /^Continue to/i })).toHaveCount(0);
 });
 
+test('billing sits in the settings navigation on a Cloud build', async ({ page }) => {
+  await signInToCloud(page);
+  await page.goto('/settings');
+  // The screen existed in the route table, the breadcrumb, and the Settings
+  // tiles, but not in the workspace strip - reachable only by tile or by the
+  // access banner. On a Cloud build the strip now lists it like any other
+  // settings destination; a self-hosted build still omits it, because there
+  // the address redirects away.
+  await expect(page.getByRole('link', { name: 'Billing & access' }).first()).toHaveAttribute(
+    'href',
+    '/settings/billing',
+  );
+});
+
 test('the billing screen has no automated a11y violations', async ({ page }) => {
   await signInToCloud(page);
   await page.goto('/settings/billing');

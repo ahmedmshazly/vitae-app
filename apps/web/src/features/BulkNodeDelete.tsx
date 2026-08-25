@@ -24,6 +24,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button, Checkbox, ConfirmDialog } from '@vitae/ui';
+import { useCanWrite, WRITE_LOCK_HINT } from '../lib/auth.js';
 import { api } from '../lib/api.js';
 import { BulkBar } from '../components/BulkBar.js';
 import { useToast } from './Toast.js';
@@ -139,6 +140,7 @@ export function BulkDeleteBar({
   allSelected?: boolean;
   onToggleAll?: () => void;
 }) {
+  const canWrite = useCanWrite();
   if (typeof document === 'undefined') return null;
   return createPortal(
     <BulkBar
@@ -149,7 +151,14 @@ export function BulkDeleteBar({
       onToggleAll={onToggleAll}
       onClear={onClear}
     >
-      <Button variant="danger" size="sm" glyph="trash" onClick={onDelete}>
+      <Button
+        variant="danger"
+        size="sm"
+        glyph="trash"
+        onClick={onDelete}
+        disabled={!canWrite}
+        title={canWrite ? undefined : WRITE_LOCK_HINT}
+      >
         Delete
       </Button>
     </BulkBar>,

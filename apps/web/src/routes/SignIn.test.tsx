@@ -18,7 +18,7 @@ const auth = {
   cloudEnabled: false,
   accountError: null as string | null,
 };
-vi.mock('../lib/auth.js', () => ({ useAuth: () => auth }));
+vi.mock('../lib/auth.js', () => ({ useAuth: () => auth, useCanWrite: () => true, WRITE_LOCK_HINT: 'Read-only workspace' }));
 
 function renderSignIn(over: Partial<typeof auth> = {}) {
   Object.assign(auth, over);

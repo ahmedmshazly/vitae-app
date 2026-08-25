@@ -228,3 +228,27 @@ export function useAuth(): AuthState {
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
 }
+
+/**
+ * Whether the active workspace accepts writes. A self-hosted install always
+ * does. A Cloud workspace in a locked lifecycle state does not — the server
+ * refuses every mutation with 402 regardless of what the interface offers —
+ * so write entry points use this to disable themselves at the control, with
+ * the lock explained beside them instead of discovered on submit
+ * (NFR-OPS-002).
+ */
+export function useCanWrite(): boolean {
+  // Deliberately tolerant of a missing provider: this hook gates an
+  // *enhancement* (disabling controls before the server would refuse them),
+  // so a component rendered outside AuthProvider — unit tests render leaf
+  // components bare — offers writes rather than crashing. useAuth keeps its
+  // throw for consumers that need real identity.
+  const ctx = useContext(AuthContext);
+  if (!ctx) return true;
+  const state = ctx.workspace?.accessState;
+  return !(ctx.cloudEnabled && (state === 'read_only' || state === 'deletion_pending'));
+}
+
+/** One sentence for a disabled write control on a locked workspace. */
+export const WRITE_LOCK_HINT =
+  'Read-only workspace — saving is paused. Your records are intact; manage billing or export.';

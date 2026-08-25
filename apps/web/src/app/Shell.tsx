@@ -13,7 +13,7 @@ import {
   TooltipProvider,
 } from '@vitae/ui';
 import { api, getSpace, setSpace } from '../lib/api.js';
-import { useAuth } from '../lib/auth.js';
+import { useAuth, WRITE_LOCK_HINT } from '../lib/auth.js';
 import { FirstRun, useFirstRun } from '../features/FirstRun.js';
 import { QuickAdd } from '../features/QuickAdd.js';
 import { QuickSwitcher } from '../features/QuickSwitcher.js';
@@ -122,7 +122,11 @@ export function Shell({ children }: { children: ReactNode }) {
     : resolvedHubId == null
       ? { path: '/', label: 'Not found', description: 'No matching workspace' }
       : activeHub;
-  const localRoutes = hasActiveHub ? WORKSPACE_NAV[activeHubId] : [];
+  // Billing is a real workspace destination only when the hosted plane is on;
+  // a self-hosted install redirects it to Settings, so the strip omits it.
+  const localRoutes = (hasActiveHub ? WORKSPACE_NAV[activeHubId] : []).filter(
+    (route) => cloudEnabled || route.path !== '/settings/billing',
+  );
 
   const crumb = crumbFor(pathname);
   const routeAnnouncement = crumb.parent ? `${crumb.parent}, ${crumb.leaf}` : crumb.leaf;
@@ -264,7 +268,8 @@ export function Shell({ children }: { children: ReactNode }) {
             type="button"
             className={`rail__capture${compactRail ? ' rail__capture--compact' : ''}`}
             aria-label="Capture to graph"
-            title="Quick capture (⌘K)"
+            title={accessLock ? WRITE_LOCK_HINT : 'Quick capture (⌘K)'}
+            disabled={accessLock !== null}
             onClick={() => setQuickAdd(true)}
           >
             <Glyph name="capture" size={18} />
@@ -344,7 +349,8 @@ export function Shell({ children }: { children: ReactNode }) {
                 glyph="capture"
                 className="topbar__capture"
                 aria-label="Quick capture"
-                title="Quick capture (⌘K)"
+                title={accessLock ? WRITE_LOCK_HINT : 'Quick capture (⌘K)'}
+                disabled={accessLock !== null}
                 onClick={() => setQuickAdd(true)}
               >
                 <span className="topbar__action-label">Capture</span>

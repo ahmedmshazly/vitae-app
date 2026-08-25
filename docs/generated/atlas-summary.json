@@ -8,8 +8,8 @@
     },
     "@vitae/web": {
       "files": 172,
-      "lines": 46462,
-      "exports": 739,
+      "lines": 46543,
+      "exports": 741,
       "undocumented": 506
     },
     "@vitae/config": {
@@ -46,7 +46,7 @@
   "by_kind": {
     "module": {
       "files": 64,
-      "lines": 9380,
+      "lines": 9383,
       "exports": 359,
       "undocumented": 204
     },
@@ -100,8 +100,8 @@
     },
     "component": {
       "files": 65,
-      "lines": 16702,
-      "exports": 292,
+      "lines": 16780,
+      "exports": 294,
       "undocumented": 229
     },
     "screen": {
@@ -678,10 +678,10 @@
   "summary": {
     "files": 348,
     "test_files": 322,
-    "lines": 79098,
-    "exports": 1710,
+    "lines": 79179,
+    "exports": 1712,
     "undocumented_exports": 1215,
-    "edges": 1547,
+    "edges": 1552,
     "untested": 138,
     "no_consumer": [],
     "consumed_only_by_tests": [

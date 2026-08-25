@@ -15,6 +15,7 @@ import { createPortal } from 'react-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button, ConfirmDialog } from '@vitae/ui';
 import { api } from '../lib/api.js';
+import { useCanWrite, WRITE_LOCK_HINT } from '../lib/auth.js';
 import { BulkBar } from '../components/BulkBar.js';
 import { useToast } from './Toast.js';
 
@@ -120,6 +121,7 @@ export function BulkUnlinkBar({
   allSelected?: boolean;
   onToggleAll?: () => void;
 }) {
+  const canWrite = useCanWrite();
   if (typeof document === 'undefined') return null;
   return createPortal(
     <BulkBar
@@ -130,7 +132,14 @@ export function BulkUnlinkBar({
       onToggleAll={onToggleAll}
       onClear={onClear}
     >
-      <Button variant="danger" size="sm" glyph="trash" onClick={onUnlink}>
+      <Button
+        variant="danger"
+        size="sm"
+        glyph="trash"
+        onClick={onUnlink}
+        disabled={!canWrite}
+        title={canWrite ? undefined : WRITE_LOCK_HINT}
+      >
         Unlink
       </Button>
     </BulkBar>,

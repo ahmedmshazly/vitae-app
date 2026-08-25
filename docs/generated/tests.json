@@ -1142,7 +1142,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 51
+      "lines": 53
     },
     {
       "file": "apps/web/src/App.test.tsx",
@@ -1244,7 +1244,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 177
+      "lines": 179
     },
     {
       "file": "apps/web/src/components/BulkBar.test.tsx",
@@ -2909,7 +2909,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 201
+      "lines": 203
     },
     {
       "file": "apps/web/src/routes/Billing.test.tsx",
@@ -3502,7 +3502,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 101
+      "lines": 103
     },
     {
       "file": "apps/web/src/routes/marketing/Chrome.test.tsx",
@@ -3768,7 +3768,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 309
+      "lines": 311
     },
     {
       "file": "apps/web/src/routes/People.a11y.test.tsx",
@@ -4182,7 +4182,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 55
+      "lines": 57
     },
     {
       "file": "apps/web/src/routes/Settings.states.test.tsx",
@@ -4209,7 +4209,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 238
+      "lines": 240
     },
     {
       "file": "apps/web/src/routes/Settings.test.ts",
@@ -4356,7 +4356,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 181
+      "lines": 183
     },
     {
       "file": "apps/web/src/routes/Templates.test.ts",
@@ -4500,7 +4500,7 @@
     {
       "file": "e2e/cloud/access.spec.ts",
       "package": "@vitae/e2e",
-      "cases": 7,
+      "cases": 8,
       "skipped": 0,
       "todo": 0,
       "suites": [],
@@ -4515,12 +4515,12 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 111
+      "lines": 134
     },
     {
       "file": "e2e/cloud/billing.spec.ts",
       "package": "@vitae/e2e",
-      "cases": 5,
+      "cases": 6,
       "skipped": 0,
       "todo": 0,
       "suites": [],
@@ -4534,7 +4534,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 74
+      "lines": 88
     },
     {
       "file": "e2e/cloud/helpers/cloud.ts",
@@ -6866,13 +6866,13 @@
   ],
   "summary": {
     "files": 322,
-    "cases": 2103,
+    "cases": 2105,
     "skipped": 0,
     "todo": 0,
     "by_package": {
       "@vitae/api": 212,
       "@vitae/web": 1104,
-      "@vitae/e2e": 281,
+      "@vitae/e2e": 283,
       "@vitae/core": 273,
       "@vitae/testkit": 7,
       "@vitae/ui": 226

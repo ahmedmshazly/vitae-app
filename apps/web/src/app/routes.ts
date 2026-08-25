@@ -178,6 +178,9 @@ export const WORKSPACE_NAV: Record<HubId, RouteEntry[]> = {
     ROUTES.settingsProfile,
     ROUTES.settingsPreferences,
     ROUTES.settingsSystem,
+    // Shown only on Cloud builds; the shell filters it out when the hosted
+    // plane is off, because a self-hosted install redirects billing away.
+    ROUTES.settingsBilling,
   ],
 };
 

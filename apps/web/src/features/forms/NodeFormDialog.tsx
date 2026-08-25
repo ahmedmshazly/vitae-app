@@ -10,6 +10,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Glyph, Modal, Skeleton, Spinner } from '@vitae/ui';
 import { NODE_FORM_DESCRIPTORS, subjectSubEditor, type NodeType } from '@vitae/core';
 import { api } from '../../lib/api.js';
+import { useCanWrite, WRITE_LOCK_HINT } from '../../lib/auth.js';
 import { useToast } from '../Toast.js';
 import { EntityForm, type EntityFormSubmit, type EntityFormValues } from './EntityForm.js';
 import { newDraftKey, type ConnectionDraft } from './EdgeSubEditorRow.js';
@@ -76,6 +77,7 @@ export function NodeFormDialog({
 }) {
   const qc = useQueryClient();
   const toast = useToast();
+  const canWrite = useCanWrite();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [draft, setDraft] = useState<EntityFormValues | null>(null);
@@ -295,10 +297,19 @@ export function NodeFormDialog({
       footer={
         loadingEdit || failedEdit ? undefined : (
           <>
+            {!canWrite && (
+              <span className="mr-auto text-sm text-muted">{WRITE_LOCK_HINT}</span>
+            )}
             <Button type="button" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" form={formId} variant="primary" disabled={busy}>
+            <Button
+              type="submit"
+              form={formId}
+              variant="primary"
+              disabled={busy || !canWrite}
+              title={canWrite ? undefined : WRITE_LOCK_HINT}
+            >
               {busy ? 'Saving…' : nodeId ? 'Save changes' : `Create ${typeLabel(type)}`}
             </Button>
           </>

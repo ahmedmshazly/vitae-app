@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { Button, Menu, NODE_GLYPH, type MenuGroup } from '@vitae/ui';
 import { type NodeType } from '@vitae/core';
+import { useCanWrite, WRITE_LOCK_HINT } from '../../lib/auth.js';
 import { NodeFormDialog } from './NodeFormDialog.js';
 
 /**
@@ -65,6 +66,7 @@ export function NewEntityMenu({
   onOpenChange?: (open: boolean) => void;
 }) {
   const [formType, setFormType] = useState<NodeType | null>(null);
+  const canWrite = useCanWrite();
 
   return (
     <>
@@ -72,7 +74,13 @@ export function NewEntityMenu({
         open={open}
         onOpenChange={onOpenChange}
         trigger={
-          <Button size="sm" glyph="plus" aria-label="New record (n)" title="New record (n)">
+          <Button
+            size="sm"
+            glyph="plus"
+            aria-label="New record (n)"
+            title={canWrite ? 'New record (n)' : WRITE_LOCK_HINT}
+            disabled={!canWrite}
+          >
             <span className="topbar__action-label">New</span>
           </Button>
         }

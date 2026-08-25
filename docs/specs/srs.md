@@ -940,9 +940,9 @@ Status: implemented · Evidence: cited by source · Provenance: reconstructed, n
 
 When payment lapses, a hosted workspace becomes read-only rather than deleted: reads, export, billing, and sign-out keep working while every other mutation is refused by the server with the access state and the way out named in the refusal. The interface must present the lock at the controls it disables, not only announce it globally.
 
-Status: partial · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+Status: partial · Evidence: cited by source · Provenance: reconstructed, confirmed
 
-> Authored 2026-08-26 as a product decision under ADR 0007. The server half is enforced by the method-based entitlement gate in apps/api/src/middleware/workspace.ts and the shell banner names the lock; the stated remainder is the second sentence — the write controls themselves are still enabled across the routes, which the commit that added the banner records in as many words.
+> Authored 2026-08-26 as a product decision under ADR 0007. The server half is enforced by the method-based entitlement gate in apps/api/src/middleware/workspace.ts; the shell banner names the lock, and the shared write entry points — the new-record menu, both capture triggers, the entity form dialog, and the bulk bars — disable themselves with the lock explained at the control. The stated remainder is the long tail of per-screen inline mutations (the interaction logger, tailoring autosave, reminder completion), which still rely on the server refusal being surfaced rather than pre-empted.
 
 ### Cross-cutting platform behavior
 

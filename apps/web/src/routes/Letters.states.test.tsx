@@ -13,6 +13,8 @@ import { Letters } from './Letters.js';
 
 vi.mock('../lib/auth.js', () => ({
   useAuth: () => createTestAuth(),
+  useCanWrite: () => true,
+  WRITE_LOCK_HINT: 'Read-only workspace',
 }));
 
 const TARGET = { id: 't1', role_title: 'Staff Engineer', company: 'Northwind' };

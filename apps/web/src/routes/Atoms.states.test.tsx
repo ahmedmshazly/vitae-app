@@ -14,6 +14,8 @@ import { Atoms } from './Atoms.js';
 
 vi.mock('../lib/auth.js', () => ({
   useAuth: () => createTestAuth(),
+  useCanWrite: () => true,
+  WRITE_LOCK_HINT: 'Read-only workspace',
 }));
 
 const ROUTE = '/career/resume/evidence';

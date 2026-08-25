@@ -11,6 +11,8 @@ import { Shell } from './Shell.js';
 let auth = createTestAuth();
 vi.mock('../lib/auth.js', () => ({
   useAuth: () => auth,
+  useCanWrite: () => true,
+  WRITE_LOCK_HINT: 'Read-only workspace',
 }));
 
 beforeEach(() => {

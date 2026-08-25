@@ -80,6 +80,29 @@ test('a locked workspace refuses the write the banner warns about', async ({ pag
   expect(body.error?.details?.billing_action).toBe('manage_billing');
 });
 
+test('a locked workspace disables the write entry points and says why', async ({ page }) => {
+  await signInToCloud(page);
+  await deliverSubscriptionStatus(page, 'canceled');
+  await page.reload();
+  await expect(page.getByRole('status', { name: 'Workspace access' })).toBeVisible({
+    timeout: 15_000,
+  });
+
+  // The visible offers to write are disabled with the lock explained at the
+  // control, instead of every control staying enabled and turning the first
+  // save into a refused request.
+  await expect(page.getByRole('button', { name: 'New record (n)' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Quick capture' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Capture to graph' })).toBeDisabled();
+
+  // The keyboard chord still opens the capture dialog; the lock is explained
+  // inside it too, and Enter is guarded rather than converted into a 402.
+  await page.keyboard.press('Meta+k');
+  const dialog = page.getByRole('dialog', { name: 'Quick add' });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByText(/read-only workspace/i)).toBeVisible();
+});
+
 test('reading is untouched while writing is paused', async ({ page }) => {
   await signInToCloud(page);
   await deliverSubscriptionStatus(page, 'canceled');

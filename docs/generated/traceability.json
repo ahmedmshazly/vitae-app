@@ -3,7 +3,7 @@
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
     "files_scanned": 877,
-    "files_citing": 173,
+    "files_citing": 174,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,11 +20,11 @@
   },
   "totals": {
     "registered": 131,
-    "citations": 747,
+    "citations": 749,
     "implemented_and_tested": 19,
-    "implemented_untested": 59,
+    "implemented_untested": 60,
     "tested_only": 2,
-    "documents_only": 51,
+    "documents_only": 50,
     "uncited": 0,
     "unregistered_identifiers": 0,
     "capabilities": 19,
@@ -427,7 +427,7 @@
       "sources": [
         "apps/web/src/features/Composer.tsx:45",
         "apps/web/src/features/InteractionLogger.tsx:34",
-        "apps/web/src/features/QuickAdd.tsx:14",
+        "apps/web/src/features/QuickAdd.tsx:15",
         "apps/web/src/features/QuickSwitcher.tsx:23",
         "packages/ui/src/overlay.tsx:82"
       ],
@@ -577,7 +577,7 @@
       "sources": [
         "apps/api/src/routes/v1/capture.ts:17",
         "apps/api/src/services/capture.ts:2",
-        "apps/web/src/features/QuickAdd.tsx:11",
+        "apps/web/src/features/QuickAdd.tsx:12",
         "packages/core/src/algorithms/capture-grammar.ts:2"
       ],
       "tests": [],
@@ -1946,8 +1946,11 @@
       "capability": "CAP-CLOUD",
       "implementation_status": "partial",
       "definition_provenance": "reconstructed",
-      "evidence": "documents-only",
-      "sources": [],
+      "evidence": "implemented-untested",
+      "sources": [
+        "apps/web/src/features/QuickAdd.tsx:156",
+        "apps/web/src/lib/auth.tsx:238"
+      ],
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:51",
@@ -2618,7 +2621,8 @@
     ],
     "apps/web/src/features/QuickAdd.tsx": [
       "FR-022",
-      "FR-CAP-001"
+      "FR-CAP-001",
+      "NFR-OPS-002"
     ],
     "apps/web/src/features/QuickSwitcher.tsx": [
       "FR-022",
@@ -2659,6 +2663,9 @@
     "apps/web/src/lib/api.ts": [
       "FR-014",
       "FR-025"
+    ],
+    "apps/web/src/lib/auth.tsx": [
+      "NFR-OPS-002"
     ],
     "apps/web/src/lib/dates.ts": [
       "FR-025"

@@ -13,6 +13,8 @@ vi.mock('./lib/auth.js', () => ({
   // The public home renders for a visitor with no remembered session; the
   // returning-session redirect is asserted end to end in shell.spec.ts.
   hasSessionHint: () => false,
+  useCanWrite: () => true,
+  WRITE_LOCK_HINT: 'Read-only workspace',
 }));
 
 vi.mock('./routes/marketing/Landing.js', () => ({

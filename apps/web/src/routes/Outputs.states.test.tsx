@@ -14,6 +14,8 @@ import { Outputs } from './Outputs.js';
 
 vi.mock('../lib/auth.js', () => ({
   useAuth: () => createTestAuth(),
+  useCanWrite: () => true,
+  WRITE_LOCK_HINT: 'Read-only workspace',
 }));
 
 const WITH_PDF = {

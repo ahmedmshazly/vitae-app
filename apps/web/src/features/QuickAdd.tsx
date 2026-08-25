@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Chip, CommandOverlay, Glyph, Kbd, StatusTrace } from '@vitae/ui';
 import { isNodeType, type CapturePlan, type NodeType } from '@vitae/core';
 import { api } from '../lib/api.js';
+import { useCanWrite, WRITE_LOCK_HINT } from '../lib/auth.js';
 import { useToast } from './Toast.js';
 import { NodeFormDialog } from './forms/NodeFormDialog.js';
 import type { EntityFormValues } from './forms/EntityForm.js';
@@ -23,6 +24,7 @@ export function QuickAdd({ onClose }: { onClose: () => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const qc = useQueryClient();
   const { flash } = useToast();
+  const canWrite = useCanWrite();
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -51,6 +53,9 @@ export function QuickAdd({ onClose }: { onClose: () => void }) {
   }, [value]);
 
   async function commit() {
+    // A locked workspace would only convert this Enter into a 402; the
+    // notice below the input already says so, so the guard keeps the line.
+    if (!canWrite) return;
     if (!value.trim() || busy) return;
     setBusy(true);
     setError(null);
@@ -144,6 +149,12 @@ export function QuickAdd({ onClose }: { onClose: () => void }) {
               <strong className="font-semibold">Capture failed.</strong> {error}
             </span>
           </p>
+        )}
+        {!canWrite && (
+          // The chord opens this dialog even while the visible triggers are
+          // disabled, so the lock is explained here too rather than letting
+          // Enter turn into a refused request (NFR-OPS-002).
+          <p className="border-t border-hairline px-4 py-3 text-sm text-muted">{WRITE_LOCK_HINT}</p>
         )}
         <div className="vt-palette__foot">
           {plan && plan.primaryType !== 'unknown' ? (
