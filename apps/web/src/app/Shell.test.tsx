@@ -2,17 +2,19 @@
  * Shell chrome smoke: primary nav Today link and Capture control.
  */
 import './../test/api-mock.js';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockApi, resetMockApi } from '../test/api-mock.js';
 import { createTestAuth, renderWithApp } from '../test/render.js';
 import { Shell } from './Shell.js';
 
+let auth = createTestAuth();
 vi.mock('../lib/auth.js', () => ({
-  useAuth: () => createTestAuth(),
+  useAuth: () => auth,
 }));
 
 beforeEach(() => {
+  auth = createTestAuth();
   resetMockApi();
   localStorage.clear();
   // Suppress first-run modal so chrome controls stay unobscured.
@@ -99,5 +101,76 @@ describe('Shell', () => {
     const main = document.getElementById('main-content');
     expect(main).not.toBeNull();
     expect(main).toHaveAttribute('tabindex', '-1');
+  });
+});
+
+/**
+ * A read-only workspace refuses every write with 402 PAYMENT_REQUIRED
+ * (apps/api/src/middleware/workspace.ts entitlementGate), and until now nothing
+ * in the browser said so: `useAuth().workspace.accessState` was carried on the
+ * context and rendered nowhere, so every write control stayed enabled and the
+ * only feedback was whatever toast the failing mutation happened to raise.
+ */
+describe('Shell, when the workspace is read-only', () => {
+  const readOnly = {
+    id: 'workspace-legacy-real',
+    role: 'owner' as const,
+    accessState: 'read_only' as const,
+    trialEndsAt: null,
+    graceEndsAt: null,
+    deletionScheduledAt: null,
+  };
+
+  it('names the state, and says what can still be done', async () => {
+    auth = createTestAuth({ cloudEnabled: true, workspace: readOnly });
+    renderWithApp(
+      <Shell>
+        <div>main</div>
+      </Shell>,
+      { route: '/today' },
+    );
+
+    const banner = await screen.findByRole('status', { name: /workspace access/i });
+    expect(banner).toHaveTextContent(/read-only/i);
+    expect(within(banner).getByRole('link', { name: /billing/i })).toHaveAttribute(
+      'href',
+      '/settings/billing',
+    );
+    expect(within(banner).getByRole('link', { name: /export/i })).toHaveAttribute(
+      'href',
+      '/data/exports',
+    );
+  });
+
+  it('names a scheduled deletion differently from a plain lock', async () => {
+    auth = createTestAuth({
+      cloudEnabled: true,
+      workspace: { ...readOnly, accessState: 'deletion_pending' },
+    });
+    renderWithApp(
+      <Shell>
+        <div>main</div>
+      </Shell>,
+      { route: '/today' },
+    );
+
+    const banner = await screen.findByRole('status', { name: /workspace access/i });
+    expect(banner).toHaveTextContent(/scheduled for deletion/i);
+  });
+
+  it('says nothing at all when the workspace is active', async () => {
+    auth = createTestAuth({
+      cloudEnabled: true,
+      workspace: { ...readOnly, accessState: 'active' },
+    });
+    renderWithApp(
+      <Shell>
+        <div>main</div>
+      </Shell>,
+      { route: '/today' },
+    );
+
+    await waitFor(() => expect(mockApi.get).toHaveBeenCalled());
+    expect(screen.queryByRole('status', { name: /workspace access/i })).toBeNull();
   });
 });

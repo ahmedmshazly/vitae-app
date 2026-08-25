@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, type MemoryRouterProps } from 'react-router-dom';
 import type { ReactElement, ReactNode } from 'react';
 import { ToastProvider } from '../features/Toast.js';
+import type { WorkspaceAccess } from '../lib/auth.js';
 
 export type TestAuth = {
   user: { email: string; via: 'google' | 'dev' } | null;
@@ -17,6 +18,10 @@ export type TestAuth = {
   signOut: () => Promise<void>;
   devLoginEnabled: boolean;
   googleEnabled: boolean;
+  // Cloud mode carries a workspace and its access state on the same context.
+  // Both default to the self-hosted shape, where there is no workspace at all.
+  cloudEnabled: boolean;
+  workspace: WorkspaceAccess | null;
 };
 
 export type RenderWithAppResult = RenderResult & { queryClient: QueryClient };
@@ -39,6 +44,8 @@ export function createTestAuth(over: Partial<TestAuth> = {}): TestAuth {
     signOut: async () => {},
     devLoginEnabled: true,
     googleEnabled: true,
+    cloudEnabled: false,
+    workspace: null,
     ...over,
   };
 }

@@ -67,6 +67,34 @@ function RailLink({ hub, compact, active }: { hub: HubEntry; compact: boolean; a
   );
 }
 
+/**
+ * The two access states that refuse every write with 402 PAYMENT_REQUIRED,
+ * and what the shell says about each. Wording follows Billing.tsx's chips so a
+ * person reading the banner and then the billing screen sees one story.
+ */
+const ACCESS_LOCK = {
+  read_only: {
+    label: 'Read-only access',
+    detail: 'Saving is paused. Your records are intact and can still be exported.',
+  },
+  deletion_pending: {
+    label: 'Scheduled for deletion',
+    detail: 'Saving is paused and this workspace is scheduled for deletion. Export while you can.',
+  },
+} as const;
+
+/**
+ * Which lock to announce, if any. Self-hosted installs have no workspace and
+ * never reach this; a trialing, active or past_due workspace can still write.
+ */
+function lockedAccess(
+  cloud: boolean,
+  access: string | undefined,
+): keyof typeof ACCESS_LOCK | null {
+  if (!cloud) return null;
+  return access === 'read_only' || access === 'deletion_pending' ? access : null;
+}
+
 export function Shell({ children }: { children: ReactNode }) {
   const [quickAdd, setQuickAdd] = useState(false);
   const [switcher, setSwitcher] = useState(false);
@@ -80,7 +108,8 @@ export function Shell({ children }: { children: ReactNode }) {
   const [space, setSpaceState] = useState(() => getSpace());
   const navigate = useNavigate();
   const { pathname, search } = useLocation();
-  const { signOut } = useAuth();
+  const { signOut, cloudEnabled, workspace } = useAuth();
+  const accessLock = lockedAccess(cloudEnabled, workspace?.accessState);
   const routeMotion = useRoute();
   const queryClient = useQueryClient();
   const isHelp = pathname === '/help';
@@ -384,6 +413,18 @@ export function Shell({ children }: { children: ReactNode }) {
               {systemLabel}
             </Link>
           </nav>
+
+          {accessLock && (
+            <div role="status" aria-label="Workspace access" className="demo-banner">
+              <span className="demo-banner__dot" />
+              <span className="demo-banner__label">{ACCESS_LOCK[accessLock].label}</span>
+              <span className="demo-banner__detail">{ACCESS_LOCK[accessLock].detail}</span>
+              <span className="demo-banner__actions">
+                <Link to="/data/exports">Export your record</Link>
+                <Link to="/settings/billing">Manage billing</Link>
+              </span>
+            </div>
+          )}
 
           {space === 'demo' && (
             <div role="status" className="demo-banner">

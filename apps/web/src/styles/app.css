@@ -292,6 +292,17 @@
 .demo-banner__detail {
   color: var(--ae-fg-soft);
 }
+/* Two destinations rather than one action, so they share the right-hand slot. */
+.demo-banner__actions {
+  margin-left: auto;
+  display: flex;
+  gap: var(--ae-space-3);
+  flex: none;
+}
+.demo-banner__actions a {
+  color: inherit;
+  text-decoration: underline;
+}
 .demo-banner__back {
   margin-left: auto;
   background: none;
