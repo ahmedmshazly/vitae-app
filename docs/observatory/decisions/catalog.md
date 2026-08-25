@@ -1,12 +1,12 @@
 ---
 id: ADR-CATALOG
 title: The decisions on record
-summary: All six architecture decisions, what each settled, which supersede which, and the governing document two of them cite that this repository does not contain.
+summary: All seven architecture decisions, what each settled, which supersede which, and the governing document two of them cite that this repository does not contain.
 audience: [maintainer, developer, security]
 domain: decisions
 type: reference
 status: verified
-verified_at: 2026-08-24
+verified_at: 2026-08-26
 sources:
   - GOVERNANCE.md
   - docs/adr/0001-firestore-over-postgres.md
@@ -14,6 +14,7 @@ sources:
   - docs/adr/0003-deterministic-intelligence.md
   - docs/adr/0004-subject-scoped-ownership.md
   - docs/adr/0005-postgres-over-firestore.md
+  - docs/adr/0007-product-definition-regeneration.md
   - docs/ARCHITECTURE.md
   - docs/specs/srs.md
   - docs/registry/requirements.json
@@ -22,8 +23,8 @@ related: [ADR, ADR-0006]
 
 # The decisions on record
 
-Six decisions have shaped this system. Five are written down in `docs/adr/`.
-The sixth is only in the code, and is reconstructed at
+Seven decisions have shaped this system. Six are written down in `docs/adr/`.
+One was made only in the code, and is reconstructed at
 [ADR 0006](0006-cloud-multi-tenancy.md).
 
 ## When a decision has to be recorded
@@ -39,7 +40,7 @@ practical" and weights maintainability, data safety, backward compatibility and
 documented behaviour above novelty, so the record is meant to be the artefact
 that survives the pull request rather than a formality alongside it.
 
-## The six
+## The seven
 
 | # | Decision | Dated | Status as written | What it settled |
 | :--- | :--- | :--- | :--- | :--- |
@@ -49,6 +50,7 @@ that survives the pull request rather than a formality alongside it.
 | 0004 | Subject-scoped ownership: many people in one graph | 2026-07-31 | accepted | Subject edges become authoritative on the read path, an unowned record belongs to a reserved placeholder person rather than to the graph owner, and the résumé alone is scoped strictly to the `is_self` anchor. |
 | 0005 | Postgres instead of Firestore | 2026-07-31 | accepted | Move the data plane to Postgres with each record whole in a `jsonb` column and its queryable fields as generated columns. Firebase Auth and Cloudinary stay. |
 | 0006 | Workspace-partitioned multi-tenancy | 2026-08-23 | **no record was written** | Make `(workspace_id, id)` the identity of every graph table, resolve a workspace from server-side membership after authentication, and gate the whole plane behind two deployment flags. Reconstructed from evidence at [ADR 0006](0006-cloud-multi-tenancy.md). |
+| 0007 | The product definition is authored forward | 2026-08-26 | accepted | Author personas, journeys, stories, and a full non-functional set into the register under the existing gates; mark every authored statement as a decision rather than a recovery; keep every legacy identifier cited through a durable anchor in the requirements document. |
 
 The dates are the ones each record gives itself. ADR 0006 has no self-declared
 date; 2026-08-23 is the author date of `1e2c502 feat(cloud): add tenant-safe
@@ -69,6 +71,7 @@ been replaced without being told so.
 | 0004 | amends `SRS §4.3.1`, `§6.6` (see below) | nothing |
 | 0005 | ADR 0001 | nothing |
 | 0006 | nothing | nothing |
+| 0007 | nothing (amends the epistemic status of `docs/specs/srs.md`) | nothing |
 
 ADR 0005 bounds its own reach: its scope line reads "the data plane only.
 Firebase **Auth** stays; Cloudinary stays." So what it withdrew from ADR 0001
@@ -89,9 +92,11 @@ catalogue is not the place to revise them.
 
 ## What still binds
 
-Binding today: **0002**, **0003**, **0004** and **0005**. Each is marked
-accepted in its own file, none is superseded, and each is still visible in the
-code it describes.
+Binding today: **0002**, **0003**, **0004**, **0005** and **0007**. Each is
+marked accepted in its own file and none is superseded. The first four are
+visible in the code they describe; 0007 governs the definition corpus itself,
+and what makes it visible is the register's mixture of recovered and authored
+statements, each marked which.
 
 Replaced: **0001**, in full, by ADR 0005. It is worth reading anyway, because
 ADR 0005 argues against it directly and quotes it while doing so. ADR 0001 was

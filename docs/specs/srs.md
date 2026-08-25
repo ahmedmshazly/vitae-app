@@ -901,6 +901,34 @@ job-description parsing, résumé selection, record deduplication, line
 estimation, LaTeX escaping, and the capture and filter grammars. Every ranking
 shown to an operator must be traceable to factors the UI can present.
 
+## Historical and superseded identifiers
+
+The register above adopted every identifier the repository cites, including
+seventeen whose individual statements could not be recovered and four more that
+are evidenced only by prose documents. Until now, most of them stayed alive
+through grouped and ranged citations in roadmap rows — a fragile arrangement,
+because rewriting one table row could silently orphan a dozen registered
+identifiers and fail the citation gate. This section is the durable anchor: each
+identifier below is named individually, so no later rewrite of a roadmap row or
+product page can leave it uncited.
+
+Statement-less identifiers held by this anchor: FR-CAP-005, FR-CON-005,
+FR-IMP-001, FR-IMP-002, FR-IMP-003, FR-IMP-004, FR-IMP-005, FR-IMP-006,
+FR-ORG-001, FR-ORG-007, FR-RES-001, FR-RES-002, FR-RES-003, FR-RES-010,
+FR-RES-016, FR-RES-017, and INT-6.
+
+Document-evidenced identifiers held by this anchor: FR-CON-008
+(warm-introduction paths with per-hop evidence), FR-EXP-012 (scheduled off-box
+backups), FR-EXP-013 (periodic restore drill), and FR-ORG-008 (the identity
+integrity workflow).
+
+The 2026-08 product-definition regeneration (ADR 0007) treats these identifiers
+under one policy. Where a fresh statement is authored for one of them, the
+register records it as a new product decision rather than a recovered original,
+in its reconstruction note. Where no fresh statement is authored, the identifier
+stays statement-less, and any successor requirement is named in its
+reconstruction note instead. Identifiers are never renumbered and never deleted.
+
 ## Source of truth
 
 This document describes current product requirements. For implementation detail,

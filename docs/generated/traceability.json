@@ -2,8 +2,8 @@
   "generated_by": "scripts/docs/gen-traceability.mjs",
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
-    "files_scanned": 860,
-    "files_citing": 160,
+    "files_scanned": 865,
+    "files_citing": 161,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,7 +20,7 @@
   },
   "totals": {
     "registered": 99,
-    "citations": 491,
+    "citations": 512,
     "implemented_and_tested": 19,
     "implemented_untested": 57,
     "tested_only": 2,
@@ -315,7 +315,7 @@
       "tests": [],
       "documents": [
         "docs/observatory/operate/deploy.md:25",
-        "docs/testing/e2e-review-2026-08-25.md:408"
+        "docs/testing/e2e-review-2026-08-25.md:430"
       ]
     },
     "FR-017": {
@@ -629,7 +629,8 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:15"
+        "docs/ROADMAP.md:15",
+        "docs/specs/srs.md:915"
       ]
     },
     "FR-CAP-008": {
@@ -717,7 +718,8 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:18"
+        "docs/ROADMAP.md:18",
+        "docs/specs/srs.md:915"
       ]
     },
     "FR-CON-006": {
@@ -769,7 +771,8 @@
       "documents": [
         "docs/ROADMAP.md:18",
         "docs/ROADMAP.md:19",
-        "docs/observatory/use/track-applications.md:23"
+        "docs/observatory/use/track-applications.md:23",
+        "docs/specs/srs.md:920"
       ]
     },
     "FR-CON-009": {
@@ -812,7 +815,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:40",
-        "docs/observatory/meta/coverage-and-contradictions.md:397"
+        "docs/observatory/meta/coverage-and-contradictions.md:397",
+        "docs/specs/srs.md:921"
       ]
     },
     "FR-EXP-013": {
@@ -824,7 +828,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:40",
-        "docs/observatory/meta/coverage-and-contradictions.md:397"
+        "docs/observatory/meta/coverage-and-contradictions.md:397",
+        "docs/specs/srs.md:922"
       ]
     },
     "FR-IMP-001": {
@@ -837,7 +842,8 @@
       "documents": [
         "docs/ROADMAP.md:21",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
-        "docs/observatory/use/import-and-export.md:24"
+        "docs/observatory/use/import-and-export.md:24",
+        "docs/specs/srs.md:916"
       ]
     },
     "FR-IMP-002": {
@@ -850,7 +856,8 @@
       "documents": [
         "docs/ROADMAP.md:21",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
-        "docs/observatory/use/import-and-export.md:24"
+        "docs/observatory/use/import-and-export.md:24",
+        "docs/specs/srs.md:916"
       ]
     },
     "FR-IMP-003": {
@@ -862,7 +869,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:21",
-        "docs/observatory/meta/coverage-and-contradictions.md:397"
+        "docs/observatory/meta/coverage-and-contradictions.md:397",
+        "docs/specs/srs.md:916"
       ]
     },
     "FR-IMP-004": {
@@ -874,7 +882,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:21",
-        "docs/observatory/meta/coverage-and-contradictions.md:397"
+        "docs/observatory/meta/coverage-and-contradictions.md:397",
+        "docs/specs/srs.md:916"
       ]
     },
     "FR-IMP-005": {
@@ -886,7 +895,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:21",
-        "docs/observatory/meta/coverage-and-contradictions.md:397"
+        "docs/observatory/meta/coverage-and-contradictions.md:397",
+        "docs/specs/srs.md:916"
       ]
     },
     "FR-IMP-006": {
@@ -898,7 +908,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:21",
-        "docs/observatory/meta/coverage-and-contradictions.md:397"
+        "docs/observatory/meta/coverage-and-contradictions.md:397",
+        "docs/specs/srs.md:916"
       ]
     },
     "FR-ORG-001": {
@@ -909,7 +920,8 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:16"
+        "docs/ROADMAP.md:16",
+        "docs/specs/srs.md:917"
       ]
     },
     "FR-ORG-002": {
@@ -949,7 +961,8 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:16"
+        "docs/ROADMAP.md:16",
+        "docs/specs/srs.md:917"
       ]
     },
     "FR-ORG-008": {
@@ -960,7 +973,8 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:22"
+        "docs/ROADMAP.md:22",
+        "docs/specs/srs.md:922"
       ]
     },
     "FR-RES-001": {
@@ -971,7 +985,8 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:23"
+        "docs/ROADMAP.md:23",
+        "docs/specs/srs.md:917"
       ]
     },
     "FR-RES-002": {
@@ -983,7 +998,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:714"
+        "docs/observatory/meta/coverage-and-contradictions.md:714",
+        "docs/specs/srs.md:917"
       ]
     },
     "FR-RES-003": {
@@ -995,7 +1011,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:714"
+        "docs/observatory/meta/coverage-and-contradictions.md:714",
+        "docs/specs/srs.md:917"
       ]
     },
     "FR-RES-004": {
@@ -1122,7 +1139,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:714"
+        "docs/observatory/meta/coverage-and-contradictions.md:714",
+        "docs/specs/srs.md:917"
       ]
     },
     "FR-RES-011": {
@@ -1225,7 +1243,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:714"
+        "docs/observatory/meta/coverage-and-contradictions.md:714",
+        "docs/specs/srs.md:918"
       ]
     },
     "FR-RES-017": {
@@ -1237,7 +1256,8 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/observatory/meta/coverage-and-contradictions.md:714"
+        "docs/observatory/meta/coverage-and-contradictions.md:714",
+        "docs/specs/srs.md:918"
       ]
     },
     "FR-RES-018": {
@@ -1304,7 +1324,7 @@
       "documents": [
         "docs/ROADMAP.md:13",
         "docs/observatory/architecture/security.md:30",
-        "docs/observatory/decisions/catalog.md:144"
+        "docs/observatory/decisions/catalog.md:149"
       ]
     },
     "FR-SET-004": {
@@ -1320,7 +1340,7 @@
         "docs/adr/0003-deterministic-intelligence.md:30",
         "docs/observatory/architecture/algorithms.md:35",
         "docs/observatory/architecture/algorithms.md:614",
-        "docs/observatory/decisions/catalog.md:143"
+        "docs/observatory/decisions/catalog.md:148"
       ]
     },
     "FR-SET-006": {
@@ -1601,7 +1621,8 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/specs/merge-plan.md:3"
+        "docs/specs/merge-plan.md:3",
+        "docs/specs/srs.md:918"
       ]
     }
   },
@@ -2375,6 +2396,29 @@
     ],
     "docs/specs/merge-plan.md": [
       "INT-2",
+      "INT-6"
+    ],
+    "docs/specs/srs.md": [
+      "FR-CAP-005",
+      "FR-CON-005",
+      "FR-CON-008",
+      "FR-EXP-012",
+      "FR-EXP-013",
+      "FR-IMP-001",
+      "FR-IMP-002",
+      "FR-IMP-003",
+      "FR-IMP-004",
+      "FR-IMP-005",
+      "FR-IMP-006",
+      "FR-ORG-001",
+      "FR-ORG-007",
+      "FR-ORG-008",
+      "FR-RES-001",
+      "FR-RES-002",
+      "FR-RES-003",
+      "FR-RES-010",
+      "FR-RES-016",
+      "FR-RES-017",
       "INT-6"
     ],
     "docs/testing/e2e-review-2026-08-25.md": [
