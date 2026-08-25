@@ -1,0 +1,24 @@
+{
+  "$note": "Numbers scripts/check-e2e-ratchets.mjs holds the end-to-end suite to. Measured 2026-08-25.",
+  "notes": [
+    "Floors may only be raised, and only when the suite has genuinely grown. Lowering one gives coverage back.",
+    "Ceilings may only be lowered. Each is a compromise the suite has agreed to carry, not a target.",
+    "test_blocks counts `test(` calls only, excluding `test.describe(` and friends, which is why it reads lower than a bare grep for 'test('.",
+    "sleeps counts both `waitForTimeout(` and hand-rolled `setTimeout(`. The coverage plan published 1 for years; there were 3, because the grep it named never matched the second form.",
+    "Accessibility is checked by screen, not by file. A spec without expectNoA11yViolations is fine when every route it visits is scanned by the spec that owns that screen. Counting files reported 12 uncovered specs while 0 screens were actually uncovered."
+  ],
+  "floors": {
+    "spec_files": 46,
+    "test_blocks": 262,
+    "expect_lines": 917
+  },
+  "ceilings": {
+    "sleeps": 3,
+    "weak_truthy": 4
+  },
+  "route_normalisation": {
+    "/welcome": "/",
+    "/browse/*": "/browse/:type"
+  },
+  "a11y_exempt_routes": {}
+}
