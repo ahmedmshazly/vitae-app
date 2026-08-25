@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { signIn } from './helpers/auth';
+import { expectNoA11yViolations } from './helpers/a11y';
 
 /** Demo/real space toggle: banner, isolated data, and a clean way back. */
 
@@ -12,6 +13,12 @@ test('toggle into the demo space and back', async ({ page }) => {
   // Toggle on via the topbar chip.
   await page.getByRole('button', { name: /view demo/i }).click();
   await expect(page.getByText(/demo space/i)).toBeVisible({ timeout: 10_000 });
+
+  // The banner is chrome that exists in no other state, so nothing else scans
+  // it. Every other screen these specs reach is scanned by the spec that owns
+  // it; docs/testing/e2e-ratchets.json records that mapping and the gate checks
+  // it, which is a stronger claim than counting how many files call the helper.
+  await expectNoA11yViolations(page);
 
   // Demo data is present (seeded Jordan graph → targets in the Tailor rail).
   await page.goto('/resume/tailor');

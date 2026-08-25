@@ -36,15 +36,14 @@ test('add a typed KNOWS relationship carrying a topic', async ({ page }) => {
 
   // Relation is a scalar select; topics is the list-valued prop under test.
   const relation = page.getByRole('combobox').nth(1);
-  if (await relation.count()) {
-    await relation.click();
-    await page.getByRole('option', { name: /Friend/ }).first().click();
-  }
+  await expect(relation).toBeVisible();
+  await relation.click();
+  await page.getByRole('option', { name: /Friend/ }).first().click();
+
   const topics = page.getByPlaceholder(/Topics|Add…/).first();
-  if (await topics.count()) {
-    await topics.fill('Business');
-    await topics.press('Enter');
-  }
+  await expect(topics).toBeVisible();
+  await topics.fill('Business');
+  await topics.press('Enter');
 
   await page.getByRole('button', { name: 'Create link' }).click();
 

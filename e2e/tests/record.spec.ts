@@ -34,6 +34,17 @@ async function openRecord(page: Page, title: string, type: string) {
   return page.url();
 }
 
+/**
+ * What the rule's accessible name has to say about the window it drew. Below
+ * the cap it names the active revision and that is the whole history; above it,
+ * the rule must admit it is showing a window rather than silently truncating.
+ */
+function windowClause(total: number, max: number, latest: number): RegExp {
+  return total > max
+    ? new RegExp(`the most recent ${max} of ${total}`)
+    : new RegExp(`revision ${latest}: `);
+}
+
 test('the register rule carries one tick per revision, with the latest active', async ({ page }) => {
   await signIn(page);
   await openRecord(page, 'Senior ML Engineer', 'role');
@@ -59,11 +70,7 @@ test('the register rule carries one tick per revision, with the latest active', 
 
   // This assertion is the one that matters: the rule must never draw fewer
   // ticks than there are revisions without saying so.
-  if (revisions.length > MAX_TICKS) {
-    await expect(rule).toHaveAccessibleName(
-      new RegExp(`the most recent ${MAX_TICKS} of ${revisions.length}`),
-    );
-  }
+  await expect(rule).toHaveAccessibleName(windowClause(revisions.length, MAX_TICKS, highest));
 });
 
 test('property labels read as labels, and the count matches the rows', async ({ page }) => {

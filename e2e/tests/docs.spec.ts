@@ -196,7 +196,7 @@ test('search answers from a static index, with the query in the address', async 
   await expect(page.getByRole('link').filter({ hasText: /migration/i }).first()).toBeVisible();
   // The index is one file from the API, fetched once, not a query per keystroke.
   const indexReads = apiCalls.filter((path) => path.includes('search-text.json'));
-  expect(indexReads.length).toBe(1);
+  expect(indexReads).toHaveLength(1);
 });
 
 test('a search can be opened from a link and narrowed by facet', async ({ page }) => {
@@ -246,7 +246,7 @@ test('a generated catalog loads, filters, and keeps the filter in the address', 
   await expect(page.getByRole('status')).not.toHaveText(all ?? '');
 
   // One artifact, fetched once. Filtering happens in the page, not on a server.
-  expect(apiCalls.filter((path) => path.endsWith('/routes.json')).length).toBe(1);
+  expect(apiCalls.filter((path) => path.endsWith('/routes.json'))).toHaveLength(1);
 });
 
 test('a diagram carries its table whether or not anyone asks for it', async ({ page }) => {
@@ -279,7 +279,7 @@ test('an explainer runs the real algorithm in the page', async ({ page }) => {
   const before = apiCalls.length;
   await field.fill('another phrase entirely');
   await expect(tokens.getByRole('rowheader', { name: 'phrase' })).toBeVisible();
-  expect(apiCalls.length, 'the algorithm runs here, not on a server').toBe(before);
+  expect(apiCalls, 'the algorithm runs here, not on a server').toHaveLength(before);
 });
 
 /**

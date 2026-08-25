@@ -82,16 +82,25 @@ test('an ongoing span says so in words, not only in colour', async ({ page }) =>
   }
 });
 
+/**
+ * Press every lane toggle the toolbar will let go of. Which lanes are mounted
+ * depends on what the graph holds, and the last one standing refuses, so this
+ * asks each control rather than assuming a fixed set is there to press.
+ */
+async function switchOffEveryLaneThatWill(page: Page): Promise<void> {
+  for (const name of ['Roles', 'Projects', 'Education', 'Events', 'Trips']) {
+    const lane = page.getByRole('button', { name, exact: true }).first();
+    if ((await lane.count()) && (await lane.isEnabled())) await lane.click();
+  }
+}
+
 test('the last lane cannot be switched off, and says so rather than refusing silently', async ({ page }) => {
   await signIn(page);
   await goTimeline(page);
 
   // At least one lane must stay on. That was enforced by putting the lane
   // straight back, so the button looked live and did nothing when pressed.
-  for (const name of ['Roles', 'Projects', 'Education', 'Events', 'Trips']) {
-    const b = page.getByRole('button', { name, exact: true }).first();
-    if ((await b.count()) && (await b.isEnabled())) await b.click();
-  }
+  await switchOffEveryLaneThatWill(page);
 
   const on = page.locator('[aria-label="Lanes"] .graph__filter--on');
   await expect(on).toHaveCount(1);

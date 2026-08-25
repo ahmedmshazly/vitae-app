@@ -52,11 +52,11 @@ test('the overlay is drawn in tokens, not in a palette of its own', async ({ pag
     });
   });
 
-  for (const ink of inks) {
-    for (const value of [ink.bg, ink.fg]) {
-      if (value === 'rgba(0, 0, 0, 0)' || !value) continue;
-      expect(allowed, `${value} is not a token colour`).toContain(value);
-    }
+  const painted = inks
+    .flatMap((ink) => [ink.bg, ink.fg])
+    .filter((value) => Boolean(value) && value !== 'rgba(0, 0, 0, 0)');
+  for (const value of painted) {
+    expect(allowed, `${value} is not a token colour`).toContain(value);
   }
 });
 

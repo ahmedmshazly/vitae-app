@@ -139,16 +139,21 @@ test('changing the default reports success and survives reload without leaving t
   const cards = page.locator('article[data-template-key]');
   await expect(cards.first()).toBeVisible();
   const current = cards.filter({ has: page.getByText('Default', { exact: true }) });
-  const originalKey = await current.getAttribute('data-template-key');
-  const originalName = (await current.getByRole('heading').textContent())?.trim();
-  expect(originalKey).toBeTruthy();
-  expect(originalName).toBeTruthy();
+  // Both values are read because the default has to be put back afterwards.
+  // The assertion that proves they are there retries; a snapshot taken once
+  // would read an empty card mid-render and restore nothing.
+  await expect(current).toHaveAttribute('data-template-key', /\S/);
+  await expect(current.getByRole('heading')).toHaveText(/\S/);
+  const originalKey = (await current.getAttribute('data-template-key')) ?? '';
+  const originalName = ((await current.getByRole('heading').textContent()) ?? '').trim();
 
   const candidate = cards.filter({ hasNot: page.getByText('Default', { exact: true }) }).first();
-  const candidateKey = await candidate.getAttribute('data-template-key');
-  const candidateName = (await candidate.getByRole('heading').textContent())?.trim();
-  expect(candidateKey).toBeTruthy();
-  expect(candidateName).toBeTruthy();
+  await expect(candidate).toHaveAttribute('data-template-key', /\S/);
+  await expect(candidate.getByRole('heading')).toHaveText(/\S/);
+  const candidateKey = (await candidate.getAttribute('data-template-key')) ?? '';
+  const candidateName = ((await candidate.getByRole('heading').textContent()) ?? '').trim();
+  // The candidate has to be a different layout, or the change is not a change.
+  expect(candidateKey).not.toBe(originalKey);
 
   try {
     await candidate.getByRole('button', { name: `Make default: ${candidateName!}` }).click();
@@ -177,12 +182,15 @@ test('changing the default refreshes the already-cached Settings value', async (
   await expect(page.getByRole('heading', { name: /^Layouts/ })).toBeVisible();
   const cards = page.locator('article[data-template-key]');
   const current = cards.filter({ has: page.getByText('Default', { exact: true }) });
-  const originalKey = await current.getAttribute('data-template-key');
+  await expect(current).toHaveAttribute('data-template-key', /\S/);
+  const originalKey = (await current.getAttribute('data-template-key')) ?? '';
   const candidate = cards.filter({ hasNot: page.getByText('Default', { exact: true }) }).first();
-  const candidateKey = await candidate.getAttribute('data-template-key');
-  const candidateName = (await candidate.getByRole('heading').textContent())?.trim();
-  expect(originalKey).toBeTruthy();
-  expect(candidateKey).toBeTruthy();
+  await expect(candidate).toHaveAttribute('data-template-key', /\S/);
+  await expect(candidate.getByRole('heading')).toHaveText(/\S/);
+  const candidateKey = (await candidate.getAttribute('data-template-key')) ?? '';
+  const candidateName = ((await candidate.getByRole('heading').textContent()) ?? '').trim();
+  // The candidate has to be a different layout, or the change is not a change.
+  expect(candidateKey).not.toBe(originalKey);
 
   try {
     await candidate.getByRole('button', { name: `Make default: ${candidateName!}` }).click();

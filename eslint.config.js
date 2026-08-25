@@ -134,12 +134,20 @@ export default tseslint.config(
       // existing assertions, which was out of scope for that review, so this
       // is a warning until someone takes that decision.
       'playwright/prefer-web-first-assertions': 'warn',
-      // Both of the following have honest uses in this suite and stay warnings.
-      // ask.spec.ts waits 500ms to prove a request was never sent, which no
-      // assertion can express, and a few specs branch on what the shared graph
-      // happens to hold. A new one still deserves a second look.
-      'playwright/no-wait-for-timeout': 'warn',
-      'playwright/no-conditional-in-test': 'warn',
+      // A branch in a test body means the test asserts different things on
+      // different data, so what it proved on any given run is unknown.
+      // Arrangement is allowed to branch; it lives in a named helper above the
+      // tests, where the name says why.
+      'playwright/no-conditional-in-test': 'error',
+      'playwright/no-conditional-expect': 'error',
+      // Reading with count(), innerText() or getAttribute() takes one sample
+      // against a client-rendered app. The toHave* forms retry.
+      'playwright/prefer-web-first-assertions': 'error',
+      'playwright/prefer-to-have-count': 'error',
+      'playwright/prefer-to-have-length': 'error',
+      // One sleep survives, in ask.spec.ts, with the reason written beside it:
+      // proving a request was never sent needs a window to not-happen in.
+      'playwright/no-wait-for-timeout': 'error',
     },
   },
   {

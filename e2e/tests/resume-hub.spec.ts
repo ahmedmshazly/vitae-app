@@ -3,6 +3,11 @@ import { signInDemo } from './helpers/auth';
 import { chooseOption, chosenOption } from './helpers/controls';
 import { expectNoA11yViolations } from './helpers/a11y';
 
+/** The wording that is not the one showing, so saving is a real change. */
+function theOtherWording(current: string | null): 'Leadership' | 'Technical' {
+  return current === 'Leadership' ? 'Technical' : 'Leadership';
+}
+
 const OVERVIEW = '**/api/v1/resumes/overview';
 
 /**
@@ -31,9 +36,7 @@ test('settings exposes résumé defaults for template, accent, and wording', asy
   await expect(page.getByRole('heading', { name: 'Résumé defaults' })).toBeVisible({
     timeout: 10_000,
   });
-  const next = (await chosenOption(page, 'Default wording')) === 'Leadership'
-    ? 'Technical'
-    : 'Leadership';
+  const next = theOtherWording(await chosenOption(page, 'Default wording'));
   await chooseOption(page, 'Default wording', next);
   await page.locator('button[aria-label^="Use "][aria-pressed="false"]').first().click();
   await page.getByRole('button', { name: /Save résumé defaults/i }).click();

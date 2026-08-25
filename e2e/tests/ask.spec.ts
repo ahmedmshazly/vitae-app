@@ -34,6 +34,10 @@ test('nothing asked yet is a different screen from nobody found', async ({ page 
     calls += 1;
     return route.continue();
   });
+  // The only sleep in the suite, and it is the honest form. Proving a request
+  // was never sent needs a window to not-happen in, and no retrying assertion
+  // can express that: they all pass the instant the condition holds.
+  // eslint-disable-next-line playwright/no-wait-for-timeout
   await page.waitForTimeout(500);
   expect(calls).toBe(0);
 
@@ -90,8 +94,7 @@ test('every rank is explained by name and number, not by colour', async ({ page 
 
   // Every contributing factor gets a chip; the old card sliced to five.
   const segs = await rows.first().locator('.vt-factorbar__seg').count();
-  const chips = await rows.first().locator('.vt-chip').count();
-  expect(chips).toBe(segs);
+  await expect(rows.first().locator('.vt-chip')).toHaveCount(segs);
 });
 
 test('the ask lives in the URL, linkable, reloadable, and back-able', async ({ page }) => {

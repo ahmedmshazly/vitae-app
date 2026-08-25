@@ -68,7 +68,7 @@ test('the applied filter is announced, not just coloured', async ({ page }) => {
   await expect(group.getByRole('button', { name: 'All', exact: true })).toHaveAttribute('aria-pressed', 'false');
 
   // Exactly one at a time, these are mutually exclusive.
-  expect(await group.locator('[aria-pressed="true"]').count()).toBe(1);
+  await expect(group.locator('[aria-pressed="true"]')).toHaveCount(1);
 });
 
 test('strength is one hue at varying weight, with the number always present', async ({ page }) => {
@@ -101,10 +101,9 @@ test('strength is one hue at varying weight, with the number always present', as
   expect(new Set(rows.map((r) => r.bg)).size).toBe(1);
 
   // And weight tracks the value, for every pair that differs.
-  for (const a of rows) {
-    for (const b of rows) {
-      if (a.value > b.value) expect(a.opacity).toBeGreaterThan(b.opacity);
-    }
+  const stronger = rows.flatMap((a) => rows.filter((b) => a.value > b.value).map((b) => [a, b] as const));
+  for (const [a, b] of stronger) {
+    expect(a.opacity).toBeGreaterThan(b.opacity);
   }
 
   await expect(page.locator('.vt-strength__value').first()).toHaveText(/^\d\.\d{2}$/);

@@ -14,12 +14,11 @@ test('live résumé paper exposes contact, section, entry, and skill controls', 
 
   // Contacts are first-class ordered items with independent visibility.
   const hideEmail = paper.getByRole('button', { name: /hide email/i });
-  if (await hideEmail.count()) {
-    await hideEmail.click();
-    await expect(paper.getByRole('button', { name: /show email/i })).toBeVisible({ timeout: 10_000 });
-    await paper.getByRole('button', { name: /show email/i }).click();
-    await expect(paper.getByRole('button', { name: /hide email/i })).toBeVisible({ timeout: 10_000 });
-  }
+  await expect(hideEmail).toBeVisible({ timeout: 10_000 });
+  await hideEmail.click();
+  await expect(paper.getByRole('button', { name: /show email/i })).toBeVisible({ timeout: 10_000 });
+  await paper.getByRole('button', { name: /show email/i }).click();
+  await expect(paper.getByRole('button', { name: /hide email/i })).toBeVisible({ timeout: 10_000 });
 
   // Sections remain visible as muted editor blocks when excluded, making them
   // easy to restore without leaving the document.

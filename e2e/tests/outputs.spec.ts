@@ -16,10 +16,7 @@ test('outputs studio supports detail, duplicate, and archive', async ({ page }) 
   await expect(page.getByRole('heading', { name: 'Outputs' })).toBeVisible({ timeout: 10_000 });
   await expect(page.getByLabel('Search outputs')).toBeVisible();
 
-  if (await page.getByText('No outputs yet').isVisible().catch(() => false)) {
-    await expect(page.getByRole('button', { name: /tailor a résumé/i })).toBeVisible();
-    return;
-  }
+  await expect(page.getByText('No outputs yet')).toHaveCount(0);
 
   const rows = page.locator('.output-row');
   await expect(rows.first()).toBeVisible({ timeout: 10_000 });

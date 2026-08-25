@@ -97,7 +97,7 @@ test('the count says how many are shown of how many there are', async ({ page })
   // over a library of forty is unreadable.
   await page.getByPlaceholder(/Search bullet text/i).fill('Python');
   await expect(shown).toHaveText(/\d+ of \d+ shown/);
-  expect(await shown.innerText()).not.toBe(all);
+  await expect(shown).not.toHaveText(all);
 });
 
 test('archiving an atom confirms, reports, and can be undone', async ({ page }) => {

@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 import { signIn } from './helpers/auth';
 import { expectNoA11yViolations } from './helpers/a11y';
 import { ensureQueue } from './helpers/fixtures';
@@ -52,16 +52,23 @@ test('a reminder can be completed from the queue and undone from the toast', asy
   await expect(rows).toHaveCount(before);
 });
 
+/**
+ * Put the habit back to unchecked before the test acts on it. The seed leaves
+ * today unchecked, but the suite shares one data space and a previous run may
+ * have left it the other way.
+ */
+async function resetHabitToUnchecked(check: Locator, uncheck: Locator): Promise<void> {
+  if (!(await uncheck.isVisible())) return;
+  await uncheck.click();
+  await expect(check).toBeVisible();
+}
+
 test('checking a habit flips at once, confirms, and survives a reload', async ({ page }) => {
   await signIn(page);
 
   const check = page.getByRole('button', { name: /^Check Deep work 2h/ });
   const uncheck = page.getByRole('button', { name: /^Uncheck Deep work 2h/ });
-  // The seed leaves today unchecked; if a previous run left it checked, reset.
-  if (await uncheck.isVisible()) {
-    await uncheck.click();
-    await expect(check).toBeVisible();
-  }
+  await resetHabitToUnchecked(check, uncheck);
 
   await check.click();
   await expect(uncheck).toHaveAttribute('aria-pressed', 'true');
