@@ -104,6 +104,18 @@
       ]
     },
     {
+      "id": "CAP-COMMS",
+      "title": "Correspondence intelligence",
+      "summary": "Deterministic analytics over logged interactions: reciprocity, reply latency, unanswered inbound, introduction events, brokers, and dormant-but-once-strong ties, computed with the constants the relationship algorithms already ship.",
+      "status": "planned",
+      "surfaces": [],
+      "evidence": [
+        "docs/ROADMAP.md",
+        "PRODUCT.md"
+      ],
+      "note": "Planned under ADR 0007. The mathematics ships in packages/core (tie strength, decay, cadence constants); the import runbook specifies the analytics in full; no in-app surface computes or presents them yet."
+    },
+    {
       "id": "CAP-EXPLORE",
       "title": "Explore",
       "summary": "The Life map, the Chronograph timeline, and the Atlas of places, each with a keyboard and list equivalent and URL-backed state.",
@@ -146,6 +158,18 @@
       ]
     },
     {
+      "id": "CAP-PROV",
+      "title": "Provenance and change history",
+      "summary": "Surfacing what every record already carries: where a fact came from, how confident it is, and what changed since the operator last looked, over the in-transaction revision history.",
+      "status": "planned",
+      "surfaces": [],
+      "evidence": [
+        "docs/ROADMAP.md",
+        "PRODUCT.md"
+      ],
+      "note": "Planned under ADR 0007. Source, source reference, and confidence ship on every envelope, and every mutation writes a revision with a stored diff; the surfaces that would show them do not exist yet."
+    },
+    {
       "id": "CAP-RESUME",
       "title": "Resume evidence and tailoring",
       "summary": "Atoms and variants scored against a parsed job description, selected to a one-page budget, escaped, rendered to LaTeX, compiled, and checked for coverage.",
@@ -160,6 +184,18 @@
         "apps/api/src/services/resume.ts",
         "services/buildsvc"
       ]
+    },
+    {
+      "id": "CAP-DOSSIER",
+      "title": "Evidence dossiers",
+      "summary": "Derived evidence packets that generalize the résumé pipeline for audiences beyond hiring: a promotion review, a petition exhibit list, a clearance history — single-subject, deterministic, with a provenance appendix.",
+      "status": "planned",
+      "surfaces": [],
+      "evidence": [
+        "docs/ROADMAP.md",
+        "PRODUCT.md"
+      ],
+      "note": "Planned under ADR 0007 for the periodic-prover persona. Selection, compilation, and reproducibility reuse the résumé machinery; what is new is the audience grammars and the provenance appendix."
     },
     {
       "id": "CAP-CAREER",

@@ -24,7 +24,7 @@
     "IMP-005": "FR-IMP-005",
     "IMP-006": "FR-IMP-006"
   },
-  "alias_note": "docs/ROADMAP.md writes three families without the FR- prefix. VIS and EXP are normalized to FR-VIS and FR-EXP because both families use the prefixed form in source. IMP has no prefixed form anywhere, so FR-IMP is this register inferring the family prefix from its two siblings; the inference is recorded here rather than silently applied.",
+  "alias_note": "docs/ROADMAP.md historically wrote three families without the FR- prefix. VIS and EXP are normalized to FR-VIS and FR-EXP because both families use the prefixed form in source. IMP has no prefixed form anywhere, so FR-IMP is this register inferring the family prefix from its two siblings; the inference is recorded here rather than silently applied. The roadmap was rewritten in canonical spellings on 2026-08-26; the aliases stay registered because earlier revisions and commit messages still use the bare forms.",
   "families": {
     "INT": {
       "title": "Interface and integration requirements",
@@ -433,6 +433,83 @@
       "review": "needs-review"
     },
     {
+      "id": "FR-CAR-001",
+      "capability": "CAP-CAREER",
+      "kind": "functional",
+      "title": "An application is a typed record with a status machine",
+      "statement": "An application is a graph record carrying a typed status machine, and the career runway groups applications by live stage — draft, applied, screening, interview, offer — with terminal outcomes presented apart from the live stages rather than mixed into them.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007 — the career capability shipped with no requirement naming what it does. Enforced by the application property schema in packages/core/src/schema/node-props.ts and the runway grouping in apps/web/src/routes/career/CareerOverview.tsx; neither cites this identifier, so the attribution is recorded here."
+    },
+    {
+      "id": "FR-CAR-002",
+      "capability": "CAP-CAREER",
+      "kind": "functional",
+      "title": "The application dossier joins its whole context",
+      "statement": "An application's dossier must join the posting, the tailoring target, the sent résumé, the company, the referrer, and the interview loop into one surface, and must state in one line which context is missing rather than hiding the gap.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. Enforced by the dossier read projection in packages/core/src/schema/application.ts and apps/web/src/routes/career/ApplicationDossier.tsx; neither cites this identifier, so the attribution is recorded here."
+    },
+    {
+      "id": "FR-CAR-003",
+      "capability": "CAP-CAREER",
+      "kind": "functional",
+      "title": "Applications get first-class write endpoints",
+      "statement": "Applications must be creatable and editable through first-class endpoints that validate the status machine and its transitions, not only through the generic record API.",
+      "implementation_status": "planned",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. Today the application list is read-only at the API surface and writes travel through the generic node endpoints, so a status transition is validated as a property shape rather than as a transition."
+    },
+    {
+      "id": "FR-CAR-004",
+      "capability": "CAP-CAREER",
+      "kind": "functional",
+      "title": "The runway leads with next moves",
+      "statement": "The career runway must lead with next moves: the due and overdue next steps across live applications, ranked by date, each linking to the application it belongs to.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. Enforced by the next-moves panel in apps/web/src/routes/career/CareerOverview.tsx, which does not cite this identifier, so the attribution is recorded here."
+    },
+    {
+      "id": "FR-COMM-001",
+      "capability": "CAP-COMMS",
+      "kind": "functional",
+      "title": "A correspondence profile per person",
+      "statement": "For any person with logged interactions, a correspondence profile must be computable deterministically: reciprocity ratio, median reply latency in each direction, unanswered inbound count, and the distribution of contact days — each figure decomposing into the interactions that produced it.",
+      "implementation_status": "planned",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. The constants and the interaction substrate ship in packages/core; no surface computes or presents the profile yet."
+    },
+    {
+      "id": "FR-COMM-002",
+      "capability": "CAP-COMMS",
+      "kind": "functional",
+      "title": "A network rollup of correspondence health",
+      "statement": "A network-level correspondence rollup must rank dormant-but-once-strong ties for reactivation and name the brokers through whom introductions have historically flowed, computed with the same constants the relationship algorithms ship with, so the rollup and the per-tie views cannot disagree.",
+      "implementation_status": "planned",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007."
+    },
+    {
+      "id": "FR-COMM-003",
+      "capability": "CAP-COMMS",
+      "kind": "functional",
+      "title": "Introductions are first-class facts",
+      "statement": "An introduction must be recordable as a first-class fact — who introduced whom, when, in what context — feeding broker detection, warm-path evidence, and the favor ledger.",
+      "implementation_status": "planned",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. The relationship edge already stores met_via and an intro_path; this requirement is the recording surface and the computation over it, not new storage."
+    },
+    {
       "id": "FR-CON-001",
       "capability": "CAP-RELATIONSHIPS",
       "kind": "functional",
@@ -523,6 +600,28 @@
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "needs-review"
+    },
+    {
+      "id": "FR-DOS-001",
+      "capability": "CAP-DOSSIER",
+      "kind": "functional",
+      "title": "A dossier is compiled evidence with a provenance appendix",
+      "statement": "A dossier is a named, single-subject selection of evidence records compiled deterministically into a document whose every claim cites the records behind it, closed by a provenance appendix carrying each claim's source, confidence, and revision trail.",
+      "implementation_status": "planned",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007, for the periodic-prover persona. Selection, compilation, reproducibility, and the single-subject rule reuse the résumé machinery and its requirements."
+    },
+    {
+      "id": "FR-DOS-002",
+      "capability": "CAP-DOSSIER",
+      "kind": "functional",
+      "title": "Dossier templates address named audiences",
+      "statement": "Dossier templates must address named audiences — a promotion review, a petition exhibit list, a clearance or background history — each with its own section grammar and inclusion rules, sharing one selection and compile pipeline underneath.",
+      "implementation_status": "planned",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007."
     },
     {
       "id": "FR-EXP-010",
@@ -674,6 +773,39 @@
       "definition_provenance": "reconstructed",
       "review": "needs-review",
       "reconstruction_note": "The only citation is the identity-integrity row of docs/ROADMAP.md:22, so the statement is that row restated as a requirement rather than recovered from code. The behavior is implemented: the candidate queue and merge live in apps/api/src/routes/v1/duplicates.ts, and the scoring in packages/core/src/algorithms/dedup.ts. Neither cites the identifier, which is why the attribution is recorded here instead of being inferred silently."
+    },
+    {
+      "id": "FR-PROV-001",
+      "capability": "CAP-PROV",
+      "kind": "functional",
+      "title": "Provenance is visible on the record",
+      "statement": "Every record surface must be able to show where a fact came from — source, source reference, and confidence — as inspectable provenance rather than hidden columns, and provenance must be filterable wherever records are searched.",
+      "implementation_status": "planned",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. The fields ship on every envelope and the search grammar already filters on source; the record surfaces do not yet present them."
+    },
+    {
+      "id": "FR-PROV-002",
+      "capability": "CAP-PROV",
+      "kind": "functional",
+      "title": "The ledger answers what changed",
+      "statement": "A ledger must answer what changed since the operator last looked: a reverse-chronological feed over the revision history, each entry naming the operation and linking to its record and its diff.",
+      "implementation_status": "planned",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. Every mutation already writes a revision carrying snapshot, diff, operation, and source in the same transaction; the feed is a read surface over what exists."
+    },
+    {
+      "id": "FR-PROV-003",
+      "capability": "CAP-PROV",
+      "kind": "functional",
+      "title": "History opens into field-level diffs",
+      "statement": "A record's history must open into field-level diffs between revisions — what changed, from what, to what — not only a count of revision ticks.",
+      "implementation_status": "planned",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. The stored revision rows already carry the field diff."
     },
     {
       "id": "FR-RES-001",
@@ -884,6 +1016,17 @@
       "reconstruction_note": "The model and the generation interface are shipped. docs/ROADMAP.md records LaTeX and PDF compilation of a cover letter as deferred, so the requirement is partially implemented."
     },
     {
+      "id": "FR-RES-021",
+      "capability": "CAP-RESUME",
+      "kind": "functional",
+      "title": "Letters compile like résumés",
+      "statement": "A finalized cover letter must compile to the same artifact pair as a résumé — PDF plus source — through the same sandboxed compiler, with the same escape guarantees and the same graceful degradation when the compiler is unreachable.",
+      "implementation_status": "planned",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007, closing the parity gap FR-RES-020 records: the letters surface ships authoring without compilation, and shipping half a document pipeline silently was the alternative being declined."
+    },
+    {
       "id": "FR-SET-001",
       "capability": "CAP-AUTH",
       "kind": "functional",
@@ -963,6 +1106,28 @@
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "needs-review"
+    },
+    {
+      "id": "FR-SYNC-001",
+      "capability": "CAP-IMPORT",
+      "kind": "functional",
+      "title": "Imports can propose field-level updates",
+      "statement": "A staged import that matches an existing record by identity key must be able to propose field-level updates, presented as a per-field diff for review; nothing updates without acceptance, and a rejected proposal leaves the record untouched.",
+      "implementation_status": "planned",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. Today a repeat identity key returns the existing record unchanged, so longitudinal updates are impossible through any importer — the gap that forces manual reconciliation of every re-import."
+    },
+    {
+      "id": "FR-SYNC-002",
+      "capability": "CAP-IMPORT",
+      "kind": "functional",
+      "title": "Re-import is longitudinal",
+      "statement": "Re-importing from the same source must be longitudinal: unchanged rows converge silently on their identity keys, changed rows become update proposals, and the batch report counts created, updated, unchanged, and skipped separately.",
+      "implementation_status": "planned",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. Deterministic identifiers derived from identity keys already make convergence possible; the update path is what is missing."
     },
     {
       "id": "FR-VIS-001",
