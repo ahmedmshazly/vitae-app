@@ -994,7 +994,7 @@ Status: implemented · Evidence: cited by source · Provenance: reconstructed, n
 
 Any question about today, overdue, due, a streak, or a snooze target must be answered in the user timezone, which the client sends and the server carries for the life of the request.
 
-Status: implemented · Evidence: cited by source · Provenance: reconstructed, needs-review
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, needs-review
 
 #### FR-102 — Read the graph once per request
 

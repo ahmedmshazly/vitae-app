@@ -13,7 +13,7 @@
     "openapi_operations": 53,
     "documented_but_not_registered": 6,
     "endpoints_with_tests": 130,
-    "endpoints_citing_requirements": 27
+    "endpoints_citing_requirements": 28
   },
   "gates": {
     "auth": "/api",
@@ -766,7 +766,7 @@
       "path": "/api/v1/capture",
       "express_path": "/api/v1/capture",
       "mount": "/capture",
-      "source": "apps/api/src/routes/v1/capture.ts:18",
+      "source": "apps/api/src/routes/v1/capture.ts:20",
       "summary": "Commit a capture line into linked records (SRS FR-CAP-001).",
       "requirements": [
         "FR-CAP-001"
@@ -798,9 +798,11 @@
       "path": "/api/v1/capture/preview",
       "express_path": "/api/v1/capture/preview",
       "mount": "/capture",
-      "source": "apps/api/src/routes/v1/capture.ts:9",
+      "source": "apps/api/src/routes/v1/capture.ts:10",
       "summary": "Live preview, parse only, no writes (drives the ⌘K chip preview).",
-      "requirements": [],
+      "requirements": [
+        "FR-025"
+      ],
       "request_schemas": [],
       "services": [],
       "success_status": 200,

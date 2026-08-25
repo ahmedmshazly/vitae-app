@@ -2,8 +2,8 @@
   "by_package": {
     "@vitae/api": {
       "files": 107,
-      "lines": 19752,
-      "exports": 367,
+      "lines": 19768,
+      "exports": 368,
       "undocumented": 277
     },
     "@vitae/web": {
@@ -58,8 +58,8 @@
     },
     "database": {
       "files": 8,
-      "lines": 1700,
-      "exports": 51,
+      "lines": 1712,
+      "exports": 52,
       "undocumented": 33
     },
     "entry": {
@@ -82,7 +82,7 @@
     },
     "route": {
       "files": 45,
-      "lines": 8311,
+      "lines": 8313,
       "exports": 224,
       "undocumented": 176
     },
@@ -94,7 +94,7 @@
     },
     "service": {
       "files": 24,
-      "lines": 7504,
+      "lines": 7506,
       "exports": 203,
       "undocumented": 149
     },
@@ -678,10 +678,10 @@
   "summary": {
     "files": 348,
     "test_files": 322,
-    "lines": 79179,
-    "exports": 1712,
+    "lines": 79195,
+    "exports": 1713,
     "undocumented_exports": 1215,
-    "edges": 1552,
+    "edges": 1553,
     "untested": 138,
     "no_consumer": [],
     "consumed_only_by_tests": [

@@ -129,6 +129,31 @@ d('Vitae API (integration)', () => {
     expect(revs.body.revisions[0].op).toBe('create');
   });
 
+  it('resolves ^today in the timezone the request carries (FR-025)', async () => {
+    // At any real instant, at least one of these two zones sits on a
+    // different calendar date from the server host. Before the fix, capture
+    // resolved ^today with the host clock while every read surface answered
+    // "today" in the request timezone — so for a few hours every night a
+    // captured task and its follow-up reminder landed one day in the future
+    // and Today's queue rightly refused to show them. That is exactly how a
+    // gate run that started at 02:40 host-local lost its Done rows.
+    for (const tz of ['Etc/GMT-14', 'Etc/GMT+12']) {
+      const expected = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date());
+      const res = await request(app)
+        .post('/api/v1/capture')
+        .set('Authorization', `Bearer ${token}`)
+        .set('x-vitae-tz', tz)
+        .send({ raw: `t Timezone boundary ${tz} ^today` })
+        .expect(201);
+
+      const node = await request(app)
+        .get(`/api/v1/nodes/${res.body.primaryId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
+      expect(node.body.node.start_date, `^today from ${tz}`).toBe(expected);
+    }
+  });
+
   it('lists imported people without claiming the owner knows them', async () => {
     const title = `Imported Directory Person ${Date.now()}`;
     const created = await request(app)

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { parseCapture } from '@vitae/core';
+import { userCalendarNow } from '../../db/timezone.js';
 import { asyncHandler, HttpError } from '../../middleware/error.js';
 import { commitCapture } from '../../services/capture.js';
 
@@ -10,7 +11,8 @@ captureRouter.post(
   '/preview',
   asyncHandler(async (req, res) => {
     const raw = String(req.body?.raw ?? '');
-    res.json({ plan: parseCapture(raw) });
+    // The preview must promise the same dates the commit will write (FR-025).
+    res.json({ plan: parseCapture(raw, userCalendarNow()) });
   }),
 );
 

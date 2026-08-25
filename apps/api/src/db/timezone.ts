@@ -47,6 +47,18 @@ export function todayIso(now: Date = new Date()): string {
   return `${value('year')}-${value('month')}-${value('day')}`;
 }
 
+/**
+ * The request's calendar "now" as a local-midnight Date, for callers that
+ * take a `Date` and read only its calendar fields — the capture grammar's
+ * `^today` / `^fri` tokens above all (FR-025). Handing such a caller a bare
+ * `new Date()` resolves relative dates on the host's calendar, which is one
+ * day off from the user's for a few hours every night.
+ */
+export function userCalendarNow(now: Date = new Date()): Date {
+  const [year, month, day] = todayIso(now).split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
 /** The calendar date `days` from today, in the request's timezone. */
 export function isoDateIn(days: number, now: Date = new Date()): string {
   const [year, month, day] = todayIso(now).split('-').map(Number);

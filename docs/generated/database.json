@@ -1094,14 +1094,14 @@
           "file": "apps/api/src/__tests__/api.integration.test.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 1511,
+          "line": 1536,
           "test": true
         },
         {
           "file": "apps/api/src/__tests__/api.integration.test.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1488,
+          "line": 1513,
           "test": true
         },
         {
@@ -2822,7 +2822,7 @@
           "file": "apps/api/src/__tests__/api.integration.test.ts",
           "method": "docCount",
           "access": "repository",
-          "line": 1655,
+          "line": 1680,
           "test": true
         },
         {
@@ -3017,7 +3017,7 @@
           "file": "apps/api/src/services/capture.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 174,
+          "line": 176,
           "test": false
         },
         {
@@ -3431,14 +3431,14 @@
           "file": "apps/api/src/__tests__/api.integration.test.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 1507,
+          "line": 1532,
           "test": true
         },
         {
           "file": "apps/api/src/__tests__/api.integration.test.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1497,
+          "line": 1522,
           "test": true
         },
         {
@@ -3567,7 +3567,7 @@
           "file": "apps/api/src/services/capture.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 162,
+          "line": 164,
           "test": false
         },
         {
@@ -3665,14 +3665,14 @@
           "file": "apps/api/src/services/capture.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 158,
+          "line": 160,
           "test": false
         },
         {
           "file": "apps/api/src/services/capture.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 138,
+          "line": 140,
           "test": false
         },
         {

@@ -21,7 +21,7 @@
     {
       "file": "apps/api/src/__tests__/api.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 37,
+      "cases": 38,
       "skipped": 0,
       "todo": 0,
       "suites": [],
@@ -37,6 +37,7 @@
         "FR-012",
         "FR-013",
         "FR-021",
+        "FR-025",
         "FR-CAP-002",
         "FR-CAP-003",
         "FR-RES-020"
@@ -46,7 +47,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 1658
+      "lines": 1683
     },
     {
       "file": "apps/api/src/__tests__/contracts/error-envelope.contract.test.ts",
@@ -6866,11 +6867,11 @@
   ],
   "summary": {
     "files": 322,
-    "cases": 2105,
+    "cases": 2106,
     "skipped": 0,
     "todo": 0,
     "by_package": {
-      "@vitae/api": 212,
+      "@vitae/api": 213,
       "@vitae/web": 1104,
       "@vitae/e2e": 283,
       "@vitae/core": 273,
@@ -6932,7 +6933,7 @@
       "e2e/tests/helpers/toast.ts"
     ],
     "with_skips": [],
-    "requirements_proven": 21,
+    "requirements_proven": 22,
     "requirements_unproven": [
       "FR-004",
       "FR-005",
@@ -6947,7 +6948,6 @@
       "FR-020",
       "FR-022",
       "FR-023",
-      "FR-025",
       "FR-026",
       "FR-027",
       "FR-102",

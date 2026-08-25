@@ -9,7 +9,7 @@
 import { parseCapture, type CapturePlan, type EdgeCreateInput, type NodeType } from '@vitae/core';
 import { repository } from '../db/repository.js';
 import { newId, nowIso } from '../db/util.js';
-import { todayIso } from '../db/timezone.js';
+import { todayIso, userCalendarNow } from '../db/timezone.js';
 import { getSelf } from './self.js';
 import { searchIndex } from '../db/search-index.js';
 
@@ -22,7 +22,9 @@ export interface CaptureResult {
 const NOTE_APPEND = 'note_append';
 
 export async function commitCapture(raw: string, opts: { lastViewedId?: string } = {}): Promise<CaptureResult> {
-  const plan = parseCapture(raw);
+  // ^today and ^fri are calendar questions, answered in the request timezone
+  // (FR-025) — the host clock is a day ahead of some users every night.
+  const plan = parseCapture(raw, userCalendarNow());
   const created: CaptureResult['created'] = { nodes: [], edges: [], reminders: [], tags: [] };
 
   // Note-append mode targets the last-viewed record (SRS FR-CAP-008).

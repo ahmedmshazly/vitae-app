@@ -20,9 +20,9 @@
   },
   "totals": {
     "registered": 131,
-    "citations": 749,
-    "implemented_and_tested": 19,
-    "implemented_untested": 60,
+    "citations": 753,
+    "implemented_and_tested": 20,
+    "implemented_untested": 59,
     "tested_only": 2,
     "documents_only": 50,
     "uncited": 0,
@@ -40,10 +40,10 @@
         "apps/web/src/routes/ExportPage.tsx:53"
       ],
       "tests": [
-        "apps/api/src/__tests__/api.integration.test.ts:1263",
-        "apps/api/src/__tests__/api.integration.test.ts:1425",
-        "apps/api/src/__tests__/api.integration.test.ts:1456",
-        "apps/api/src/__tests__/api.integration.test.ts:1645",
+        "apps/api/src/__tests__/api.integration.test.ts:1288",
+        "apps/api/src/__tests__/api.integration.test.ts:1450",
+        "apps/api/src/__tests__/api.integration.test.ts:1481",
+        "apps/api/src/__tests__/api.integration.test.ts:1670",
         "apps/api/src/routes/v1/export.integration.test.ts:37",
         "apps/api/src/services/restore.integration.test.ts:2"
       ],
@@ -69,8 +69,8 @@
         "apps/api/src/services/imports.ts:842"
       ],
       "tests": [
-        "apps/api/src/__tests__/api.integration.test.ts:1146",
-        "apps/api/src/__tests__/api.integration.test.ts:1384",
+        "apps/api/src/__tests__/api.integration.test.ts:1171",
+        "apps/api/src/__tests__/api.integration.test.ts:1409",
         "apps/api/src/routes/v1/duplicates.integration.test.ts:2",
         "apps/api/src/routes/v1/duplicates.integration.test.ts:43",
         "apps/api/src/routes/v1/interactions.integration.test.ts:2"
@@ -95,8 +95,8 @@
         "apps/api/src/services/duplicates.ts:743"
       ],
       "tests": [
-        "apps/api/src/__tests__/api.integration.test.ts:1349",
-        "apps/api/src/__tests__/api.integration.test.ts:1384",
+        "apps/api/src/__tests__/api.integration.test.ts:1374",
+        "apps/api/src/__tests__/api.integration.test.ts:1409",
         "apps/api/src/routes/v1/duplicates.integration.test.ts:2",
         "apps/api/src/routes/v1/duplicates.integration.test.ts:13",
         "apps/api/src/routes/v1/duplicates.integration.test.ts:43"
@@ -224,7 +224,7 @@
         "apps/api/src/routes/v1/imports.ts:21"
       ],
       "tests": [
-        "apps/api/src/__tests__/api.integration.test.ts:1233",
+        "apps/api/src/__tests__/api.integration.test.ts:1258",
         "apps/api/src/middleware/error.test.ts:3"
       ],
       "documents": [
@@ -241,7 +241,7 @@
         "apps/api/src/routes/v1/resumes.ts:994"
       ],
       "tests": [
-        "apps/api/src/__tests__/api.integration.test.ts:1184",
+        "apps/api/src/__tests__/api.integration.test.ts:1209",
         "apps/api/src/routes/v1/resumes.integration.test.ts:2",
         "apps/api/src/routes/v1/resumes.integration.test.ts:35"
       ],
@@ -261,7 +261,7 @@
         "apps/web/src/routes/ExportPage.tsx:53"
       ],
       "tests": [
-        "apps/api/src/__tests__/api.integration.test.ts:1263",
+        "apps/api/src/__tests__/api.integration.test.ts:1288",
         "apps/api/src/routes/v1/export.integration.test.ts:37"
       ],
       "documents": [
@@ -279,7 +279,7 @@
       "evidence": "tested-only",
       "sources": [],
       "tests": [
-        "apps/api/src/__tests__/api.integration.test.ts:1102",
+        "apps/api/src/__tests__/api.integration.test.ts:1127",
         "packages/core/src/forms/descriptors.test.ts:78"
       ],
       "documents": [
@@ -410,7 +410,7 @@
       "evidence": "tested-only",
       "sources": [],
       "tests": [
-        "apps/api/src/__tests__/api.integration.test.ts:1209",
+        "apps/api/src/__tests__/api.integration.test.ts:1234",
         "apps/api/src/routes/v1/export.integration.test.ts:13"
       ],
       "documents": [
@@ -458,20 +458,25 @@
       "capability": "CAP-PLATFORM",
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
-      "evidence": "implemented-untested",
+      "evidence": "implemented-and-tested",
       "sources": [
         "apps/api/src/app.ts:55",
         "apps/api/src/db/timezone.ts:2",
+        "apps/api/src/db/timezone.ts:53",
+        "apps/api/src/routes/v1/capture.ts:14",
         "apps/api/src/routes/v1/composer.ts:99",
         "apps/api/src/routes/v1/dashboard.ts:23",
         "apps/api/src/routes/v1/habits.ts:14",
         "apps/api/src/routes/v1/interactions.ts:83",
         "apps/api/src/routes/v1/reminders.ts:41",
+        "apps/api/src/services/capture.ts:26",
         "apps/web/src/features/RemindersDrawer.tsx:27",
         "apps/web/src/lib/api.ts:51",
         "apps/web/src/lib/dates.ts:2"
       ],
-      "tests": [],
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts:132"
+      ],
       "documents": [
         "docs/observatory/architecture/request-lifecycle.md:26",
         "docs/observatory/use/track-applications.md:23"
@@ -575,7 +580,7 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-untested",
       "sources": [
-        "apps/api/src/routes/v1/capture.ts:17",
+        "apps/api/src/routes/v1/capture.ts:19",
         "apps/api/src/services/capture.ts:2",
         "apps/web/src/features/QuickAdd.tsx:12",
         "packages/core/src/algorithms/capture-grammar.ts:2"
@@ -608,7 +613,7 @@
         "packages/ui/src/styles/components.css:537"
       ],
       "tests": [
-        "apps/api/src/__tests__/api.integration.test.ts:190",
+        "apps/api/src/__tests__/api.integration.test.ts:215",
         "packages/core/src/schema/validate.test.ts:20"
       ],
       "documents": [
@@ -631,7 +636,7 @@
         "apps/web/src/features/forms/SuggestTextInput.tsx:2"
       ],
       "tests": [
-        "apps/api/src/__tests__/api.integration.test.ts:303",
+        "apps/api/src/__tests__/api.integration.test.ts:328",
         "apps/api/src/routes/v1/suggest.integration.test.ts:2"
       ],
       "documents": [
@@ -669,7 +674,7 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-untested",
       "sources": [
-        "apps/api/src/services/capture.ts:28"
+        "apps/api/src/services/capture.ts:30"
       ],
       "tests": [],
       "documents": [
@@ -813,7 +818,7 @@
       "evidence": "implemented-untested",
       "sources": [
         "apps/api/src/routes/v1/interactions.ts:13",
-        "apps/api/src/services/capture.ts:171",
+        "apps/api/src/services/capture.ts:173",
         "apps/web/src/features/InteractionLogger.tsx:31"
       ],
       "tests": [],
@@ -1573,7 +1578,7 @@
         "packages/core/src/schema/resume.ts:243"
       ],
       "tests": [
-        "apps/api/src/__tests__/api.integration.test.ts:657",
+        "apps/api/src/__tests__/api.integration.test.ts:682",
         "apps/api/src/routes/v1/letters.integration.test.ts:2"
       ],
       "documents": [
@@ -2372,6 +2377,7 @@
       "FR-012",
       "FR-013",
       "FR-021",
+      "FR-025",
       "FR-CAP-002",
       "FR-CAP-003",
       "FR-RES-020"
@@ -2431,6 +2437,7 @@
       "FR-SET-001"
     ],
     "apps/api/src/routes/v1/capture.ts": [
+      "FR-025",
       "FR-CAP-001"
     ],
     "apps/api/src/routes/v1/composer.ts": [
@@ -2555,6 +2562,7 @@
     ],
     "apps/api/src/services/capture.ts": [
       "FR-002",
+      "FR-025",
       "FR-CAP-001",
       "FR-CAP-008",
       "FR-CON-003"
