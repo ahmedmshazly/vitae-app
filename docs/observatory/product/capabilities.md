@@ -6,7 +6,7 @@ audience: [maintainer, developer]
 domain: product
 type: reference
 status: verified
-verified_at: 2026-08-24
+verified_at: 2026-08-26
 sources:
   - docs/registry/capabilities.json
   - docs/registry/requirements.json
@@ -142,15 +142,13 @@ because the hosted control plane shipped without ever appearing on the roadmap.
 That is recorded as `DOC-D-011` in the [documentation inventory](../meta/index.md),
 along with the missing architecture decision record it implies.
 
-**The `surfaces` field is not checked and is partly wrong.** Each row lists the
-routes through which its capability is reached. Seven of the seventeen entries
-name a path the router does not mount: the search capability points at
-`/data/search` when the mounted route is `/search`, the export capability points
-at `/settings/export` when the mounted routes are `/data/exports` and its legacy
-alias, and five others are similar near-misses. They read like an earlier
-information architecture that the route tree moved past. Do not treat a
-`surfaces` value as an address until it has been checked against
-`docs/generated/routes.json`.
+**The `surfaces` field is not machine-checked.** Each row lists the routes
+through which its capability is reached. Seven of the entries used to name
+paths the router does not mount — an earlier information architecture the route
+tree moved past — and were corrected against `docs/generated/routes.json` on
+2026-08-26. No gate holds them there: a future route move can silently strand
+them again, so treat a `surfaces` value as a claim to spot-check against
+`docs/generated/routes.json`, not as a checked address.
 
 ## What is checked, and what is not
 

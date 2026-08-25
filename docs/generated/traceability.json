@@ -20,7 +20,7 @@
   },
   "totals": {
     "registered": 99,
-    "citations": 512,
+    "citations": 522,
     "implemented_and_tested": 19,
     "implemented_untested": 57,
     "tested_only": 2,
@@ -184,6 +184,7 @@
       ],
       "tests": [],
       "documents": [
+        "docs/ARCHITECTURE.md:142",
         "docs/observatory/use/import-and-export.md:24"
       ]
     },
@@ -557,6 +558,7 @@
       ],
       "tests": [],
       "documents": [
+        "docs/ARCHITECTURE.md:145",
         "docs/ROADMAP.md:15",
         "docs/observatory/architecture/algorithms.md:35",
         "docs/observatory/use/build-your-graph.md:29",
@@ -706,6 +708,7 @@
       ],
       "tests": [],
       "documents": [
+        "docs/ARCHITECTURE.md:138",
         "docs/ROADMAP.md:18",
         "docs/observatory/architecture/algorithms.md:35"
       ]
@@ -738,6 +741,7 @@
         "packages/core/src/algorithms/who-to-call.test.ts:48"
       ],
       "documents": [
+        "docs/ARCHITECTURE.md:139",
         "docs/ROADMAP.md:18",
         "docs/ROADMAP.md:19",
         "docs/observatory/architecture/algorithms.md:35",
@@ -785,6 +789,7 @@
       ],
       "tests": [],
       "documents": [
+        "docs/ARCHITECTURE.md:137",
         "docs/ROADMAP.md:18",
         "docs/ROADMAP.md:19",
         "docs/observatory/use/build-your-graph.md:29"
@@ -1040,6 +1045,7 @@
       ],
       "tests": [],
       "documents": [
+        "docs/ARCHITECTURE.md:140",
         "docs/ROADMAP.md:23",
         "docs/observatory/architecture/resume-pipeline.md:26",
         "docs/observatory/use/write-a-resume.md:30"
@@ -1078,6 +1084,7 @@
         "packages/core/src/algorithms/atom-scoring.test.ts:46"
       ],
       "documents": [
+        "docs/ARCHITECTURE.md:141",
         "docs/ROADMAP.md:23",
         "docs/observatory/architecture/algorithms.md:35",
         "docs/observatory/use/write-a-resume.md:30"
@@ -1099,6 +1106,7 @@
         "packages/core/src/algorithms/selection.test.ts:84"
       ],
       "documents": [
+        "docs/ARCHITECTURE.md:141",
         "docs/ROADMAP.md:23",
         "docs/observatory/architecture/algorithms.md:35",
         "docs/observatory/architecture/resume-pipeline.md:26",
@@ -1122,6 +1130,7 @@
         "packages/core/src/algorithms/line-model.test.ts:12"
       ],
       "documents": [
+        "docs/ARCHITECTURE.md:143",
         "docs/ROADMAP.md:23",
         "docs/observatory/architecture/algorithms.md:35",
         "docs/observatory/architecture/resume-pipeline.md:26",
@@ -1172,6 +1181,7 @@
         "packages/core/src/algorithms/latex-escape.test.ts:105"
       ],
       "documents": [
+        "docs/ARCHITECTURE.md:144",
         "docs/ROADMAP.md:23",
         "docs/observatory/architecture/algorithms.md:35",
         "docs/observatory/architecture/resume-pipeline.md:26",
@@ -2114,6 +2124,16 @@
       "FR-027"
     ],
     "docs/ARCHITECTURE.md": [
+      "FR-008",
+      "FR-CAP-001",
+      "FR-CON-004",
+      "FR-CON-006",
+      "FR-CON-009",
+      "FR-RES-005",
+      "FR-RES-007",
+      "FR-RES-008",
+      "FR-RES-009",
+      "FR-RES-012",
       "FR-SRCH-002"
     ],
     "docs/ROADMAP.md": [

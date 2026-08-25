@@ -6,7 +6,7 @@ audience: [user, designer]
 domain: use
 type: reference
 status: verified
-verified_at: 2026-08-24
+verified_at: 2026-08-26
 sources:
   - apps/web/src/App.tsx
   - apps/web/src/app/routes.ts
@@ -320,7 +320,12 @@ with a retry, not eleven separately broken panels.
 open tasks and dated records grouped by day. Its empty state is *"The horizon
 is clear."*
 
-The signed-in root, `/`, is not a screen. It redirects to `/today`.
+The signed-in root, `/`, is not an application screen — and it does not
+redirect. No signed-in route is mounted at `/`, so a signed-in visitor who
+lands there sees the public marketing page. A comment in `apps/web/src/App.tsx`
+records this as an open product question rather than an accident: an earlier
+redirect attempt cost a defect apiece in the shell and its spec before anyone
+noticed it could not run.
 
 ## Network
 

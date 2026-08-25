@@ -39,7 +39,7 @@
       "summary": "Typed nodes and typed edges validated per type, written transactionally, versioned by revision, and soft-deleted rather than destroyed.",
       "status": "implemented",
       "surfaces": [
-        "/data/record/:id"
+        "/n/:id"
       ],
       "evidence": [
         "packages/core/src/schema/envelope.ts",
@@ -81,7 +81,7 @@
       "summary": "Unified full-text search, a composable filter grammar, and a fuzzy quick-switcher, all scoped to the active data space.",
       "status": "implemented",
       "surfaces": [
-        "/data/search"
+        "/search"
       ],
       "evidence": [
         "apps/api/src/db/search-index.ts",
@@ -95,7 +95,7 @@
       "summary": "Typed relationship editing, one-tap interaction logging, Hawkes tie strength, reconnect ordering, and explainable contact ranking with warm-introduction paths.",
       "status": "implemented",
       "surfaces": [
-        "/network/ask"
+        "/network/intelligence"
       ],
       "evidence": [
         "packages/core/src/algorithms/tie-strength.ts",
@@ -125,7 +125,7 @@
       "summary": "External sources staged into reviewable batches that are idempotent, committable, rollbackable, and attributable to their origin.",
       "status": "implemented",
       "surfaces": [
-        "/data/import"
+        "/data/imports"
       ],
       "evidence": [
         "apps/api/src/services/imports.ts",
@@ -138,7 +138,7 @@
       "summary": "A duplicate candidate queue scored on shared evidence, an evidence-led merge, learned aliases, merge history, and a conflict-aware undo.",
       "status": "implemented",
       "surfaces": [
-        "/data/duplicates"
+        "/data/identity"
       ],
       "evidence": [
         "packages/core/src/algorithms/dedup.ts",
@@ -152,7 +152,7 @@
       "status": "implemented",
       "surfaces": [
         "/career/resume",
-        "/career/tailor"
+        "/career/resume/tailor"
       ],
       "evidence": [
         "packages/core/src/algorithms/atom-scoring.ts",
@@ -180,7 +180,7 @@
       "summary": "A self-describing JSONL and Markdown bundle with checksums and a manifest, and a restore path that validates before it writes.",
       "status": "implemented",
       "surfaces": [
-        "/settings/export"
+        "/data/exports"
       ],
       "evidence": [
         "apps/api/src/services/export.ts",

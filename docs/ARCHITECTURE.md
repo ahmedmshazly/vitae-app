@@ -17,14 +17,14 @@ a closed-form algorithm with visible evidence. **No AI, no LLMs**.
 ## 2. Monorepo layout
 
 ```
-packages/core     Zod schemas (the data model) + the §10.7 algorithms (the science).
+packages/core     Zod schemas (the data model) + the deterministic algorithms (the science).
                   Pure TypeScript, no I/O. Imported by BOTH api and web.
 packages/ui       Design system: tokens, primitives, entity glyphs.
 packages/config   Zod-validated environment schema + shared tsconfig/eslint.
 apps/api          Express REST API (/api/v1) over Postgres.
-apps/web          React 18 + Vite SPA.
+apps/web          React 19 + Vite SPA.
 services/buildsvc Dockerized Tectonic + poppler (LaTeX → PDF), HMAC-gated.
-templates/*       LaTeX résumé templates (Onyx, Argon) + line models.
+templates/*       LaTeX résumé templates (Onyx, Argon, Cobalt) + line models.
 ```
 
 The critical design choice is that **the intelligence lives in `packages/core`**,
@@ -133,15 +133,15 @@ Each module implements one deterministic method as a pure, tested function:
 
 | Module | Method | SRS |
 |---|---|---|
-| `tie-strength.ts` | Hawkes exponential-kernel intensity + adaptive decay | §10.7.1 |
-| `reconnect.ts` | Spaced-repetition review-intensity ordering | §10.7.2 |
-| `who-to-call.ts` + `pagerank.ts` | Expert-finding: BM25 evidence + Personalized PageRank | §10.7.3 |
-| `jd-parser.ts` + `aho-corasick.ts` | BM25F structured-document term weighting | §10.7.4 |
-| `atom-scoring.ts` + `selection.ts` | Budgeted submodular maximization (knapsack) | §10.7.5 |
-| `dedup.ts` | Fellegi-Sunter probabilistic record linkage | §10.7.6 |
-| `line-model.ts` | Template line budget → live page meter | §6.6 |
-| `latex-escape.ts` | Security-critical LaTeX sanitization (fuzz-tested) | §8.4 |
-| `capture-grammar.ts` | The ⌘K quick-add mini-language | §5.1 |
+| `tie-strength.ts` | Hawkes exponential-kernel intensity + adaptive decay | FR-CON-009 |
+| `reconnect.ts` | Spaced-repetition review-intensity ordering | FR-CON-004 |
+| `who-to-call.ts` + `pagerank.ts` | Expert-finding: BM25 evidence + Personalized PageRank | FR-CON-006 |
+| `jd-parser.ts` + `aho-corasick.ts` | BM25F structured-document term weighting | FR-RES-005 |
+| `atom-scoring.ts` + `selection.ts` | Budgeted submodular maximization (knapsack) | FR-RES-007, FR-RES-008 |
+| `dedup.ts` | Fellegi-Sunter probabilistic record linkage | FR-008 |
+| `line-model.ts` | Template line budget → live page meter | FR-RES-009 |
+| `latex-escape.ts` | Security-critical LaTeX sanitization (fuzz-tested) | FR-RES-012 |
+| `capture-grammar.ts` | The ⌘K quick-add mini-language | FR-CAP-001 |
 | `filter-grammar.ts` | The search filter AST | FR-SRCH-002 |
 
 Every score returned by these functions **decomposes exactly** into the factor
