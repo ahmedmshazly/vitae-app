@@ -19,12 +19,12 @@
     }
   },
   "totals": {
-    "registered": 99,
-    "citations": 522,
+    "registered": 115,
+    "citations": 543,
     "implemented_and_tested": 19,
-    "implemented_untested": 57,
+    "implemented_untested": 59,
     "tested_only": 2,
-    "documents_only": 21,
+    "documents_only": 35,
     "uncited": 0,
     "unregistered_identifiers": 0,
     "capabilities": 16,
@@ -632,7 +632,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:15",
-        "docs/specs/srs.md:915"
+        "docs/specs/srs.md:1083"
       ]
     },
     "FR-CAP-008": {
@@ -722,7 +722,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:18",
-        "docs/specs/srs.md:915"
+        "docs/specs/srs.md:1083"
       ]
     },
     "FR-CON-006": {
@@ -776,7 +776,7 @@
         "docs/ROADMAP.md:18",
         "docs/ROADMAP.md:19",
         "docs/observatory/use/track-applications.md:23",
-        "docs/specs/srs.md:920"
+        "docs/specs/srs.md:1088"
       ]
     },
     "FR-CON-009": {
@@ -821,7 +821,7 @@
       "documents": [
         "docs/ROADMAP.md:40",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
-        "docs/specs/srs.md:921"
+        "docs/specs/srs.md:1089"
       ]
     },
     "FR-EXP-013": {
@@ -834,7 +834,7 @@
       "documents": [
         "docs/ROADMAP.md:40",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
-        "docs/specs/srs.md:922"
+        "docs/specs/srs.md:1090"
       ]
     },
     "FR-IMP-001": {
@@ -848,7 +848,7 @@
         "docs/ROADMAP.md:21",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
         "docs/observatory/use/import-and-export.md:24",
-        "docs/specs/srs.md:916"
+        "docs/specs/srs.md:1084"
       ]
     },
     "FR-IMP-002": {
@@ -862,7 +862,7 @@
         "docs/ROADMAP.md:21",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
         "docs/observatory/use/import-and-export.md:24",
-        "docs/specs/srs.md:916"
+        "docs/specs/srs.md:1084"
       ]
     },
     "FR-IMP-003": {
@@ -875,7 +875,7 @@
       "documents": [
         "docs/ROADMAP.md:21",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
-        "docs/specs/srs.md:916"
+        "docs/specs/srs.md:1084"
       ]
     },
     "FR-IMP-004": {
@@ -888,7 +888,7 @@
       "documents": [
         "docs/ROADMAP.md:21",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
-        "docs/specs/srs.md:916"
+        "docs/specs/srs.md:1084"
       ]
     },
     "FR-IMP-005": {
@@ -901,7 +901,7 @@
       "documents": [
         "docs/ROADMAP.md:21",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
-        "docs/specs/srs.md:916"
+        "docs/specs/srs.md:1084"
       ]
     },
     "FR-IMP-006": {
@@ -914,7 +914,7 @@
       "documents": [
         "docs/ROADMAP.md:21",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
-        "docs/specs/srs.md:916"
+        "docs/specs/srs.md:1084"
       ]
     },
     "FR-ORG-001": {
@@ -926,7 +926,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:16",
-        "docs/specs/srs.md:917"
+        "docs/specs/srs.md:1085"
       ]
     },
     "FR-ORG-002": {
@@ -967,7 +967,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:16",
-        "docs/specs/srs.md:917"
+        "docs/specs/srs.md:1085"
       ]
     },
     "FR-ORG-008": {
@@ -979,7 +979,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:22",
-        "docs/specs/srs.md:922"
+        "docs/specs/srs.md:1090"
       ]
     },
     "FR-RES-001": {
@@ -991,7 +991,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:23",
-        "docs/specs/srs.md:917"
+        "docs/specs/srs.md:1085"
       ]
     },
     "FR-RES-002": {
@@ -1004,7 +1004,7 @@
       "documents": [
         "docs/ROADMAP.md:23",
         "docs/observatory/meta/coverage-and-contradictions.md:714",
-        "docs/specs/srs.md:917"
+        "docs/specs/srs.md:1085"
       ]
     },
     "FR-RES-003": {
@@ -1017,7 +1017,7 @@
       "documents": [
         "docs/ROADMAP.md:23",
         "docs/observatory/meta/coverage-and-contradictions.md:714",
-        "docs/specs/srs.md:917"
+        "docs/specs/srs.md:1085"
       ]
     },
     "FR-RES-004": {
@@ -1149,7 +1149,7 @@
       "documents": [
         "docs/ROADMAP.md:23",
         "docs/observatory/meta/coverage-and-contradictions.md:714",
-        "docs/specs/srs.md:917"
+        "docs/specs/srs.md:1085"
       ]
     },
     "FR-RES-011": {
@@ -1254,7 +1254,7 @@
       "documents": [
         "docs/ROADMAP.md:23",
         "docs/observatory/meta/coverage-and-contradictions.md:714",
-        "docs/specs/srs.md:918"
+        "docs/specs/srs.md:1086"
       ]
     },
     "FR-RES-017": {
@@ -1267,7 +1267,7 @@
       "documents": [
         "docs/ROADMAP.md:23",
         "docs/observatory/meta/coverage-and-contradictions.md:714",
-        "docs/specs/srs.md:918"
+        "docs/specs/srs.md:1086"
       ]
     },
     "FR-RES-018": {
@@ -1534,7 +1534,41 @@
         "docs/observatory/design/accessibility.md:20",
         "docs/observatory/meta/coverage-and-contradictions.md:425",
         "docs/observatory/meta/coverage-and-contradictions.md:428",
-        "docs/observatory/meta/coverage-and-contradictions.md:718"
+        "docs/observatory/meta/coverage-and-contradictions.md:718",
+        "docs/specs/srs.md:1034"
+      ]
+    },
+    "NFR-A11Y-002": {
+      "capability": "CAP-PLATFORM",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "evidence": "documents-only",
+      "sources": [],
+      "tests": [],
+      "documents": [
+        "docs/specs/srs.md:1037"
+      ]
+    },
+    "NFR-COMP-001": {
+      "capability": "CAP-EXPORT",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "evidence": "documents-only",
+      "sources": [],
+      "tests": [],
+      "documents": [
+        "docs/specs/srs.md:1040"
+      ]
+    },
+    "NFR-COMP-002": {
+      "capability": "CAP-RESUME",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "evidence": "documents-only",
+      "sources": [],
+      "tests": [],
+      "documents": [
+        "docs/specs/srs.md:1042"
       ]
     },
     "NFR-MNT-002": {
@@ -1549,7 +1583,96 @@
       "documents": [
         "docs/observatory/architecture/system-overview.md:21",
         "docs/observatory/develop/where-to-change.md:168",
-        "docs/observatory/meta/coverage-and-contradictions.md:714"
+        "docs/observatory/meta/coverage-and-contradictions.md:714",
+        "docs/specs/srs.md:1043"
+      ]
+    },
+    "NFR-MNT-003": {
+      "capability": "CAP-PLATFORM",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "evidence": "documents-only",
+      "sources": [],
+      "tests": [],
+      "documents": [
+        "docs/specs/srs.md:1045"
+      ]
+    },
+    "NFR-OPS-001": {
+      "capability": "CAP-OPERATE",
+      "implementation_status": "partial",
+      "definition_provenance": "reconstructed",
+      "evidence": "documents-only",
+      "sources": [],
+      "tests": [],
+      "documents": [
+        "docs/specs/srs.md:1047"
+      ]
+    },
+    "NFR-OPS-002": {
+      "capability": "CAP-CLOUD",
+      "implementation_status": "partial",
+      "definition_provenance": "reconstructed",
+      "evidence": "documents-only",
+      "sources": [],
+      "tests": [],
+      "documents": [
+        "docs/specs/srs.md:1049"
+      ]
+    },
+    "NFR-PERF-001": {
+      "capability": "CAP-PLATFORM",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "evidence": "documents-only",
+      "sources": [],
+      "tests": [],
+      "documents": [
+        "docs/specs/srs.md:1051"
+      ]
+    },
+    "NFR-PERF-002": {
+      "capability": "CAP-PLATFORM",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "evidence": "documents-only",
+      "sources": [],
+      "tests": [],
+      "documents": [
+        "docs/specs/srs.md:1053"
+      ]
+    },
+    "NFR-PRIV-001": {
+      "capability": "CAP-PLATFORM",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "evidence": "documents-only",
+      "sources": [],
+      "tests": [],
+      "documents": [
+        "docs/specs/srs.md:96"
+      ]
+    },
+    "NFR-PRIV-002": {
+      "capability": "CAP-PLATFORM",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "evidence": "documents-only",
+      "sources": [],
+      "tests": [],
+      "documents": [
+        "docs/specs/srs.md:98"
+      ]
+    },
+    "NFR-PRIV-003": {
+      "capability": "CAP-PLATFORM",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "evidence": "documents-only",
+      "sources": [],
+      "tests": [],
+      "documents": [
+        "docs/specs/srs.md:100"
       ]
     },
     "NFR-REL-003": {
@@ -1563,7 +1686,67 @@
       "tests": [],
       "documents": [
         "docs/observatory/architecture/persistence.md:25",
-        "docs/observatory/meta/coverage-and-contradictions.md:382"
+        "docs/observatory/meta/coverage-and-contradictions.md:382",
+        "docs/specs/srs.md:1054"
+      ]
+    },
+    "NFR-REL-004": {
+      "capability": "CAP-PLATFORM",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "evidence": "documents-only",
+      "sources": [],
+      "tests": [],
+      "documents": [
+        "docs/specs/srs.md:1056"
+      ]
+    },
+    "NFR-SEC-001": {
+      "capability": "CAP-AUTH",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "evidence": "implemented-untested",
+      "sources": [
+        "apps/api/src/middleware/auth.ts:2"
+      ],
+      "tests": [],
+      "documents": [
+        "docs/specs/srs.md:77"
+      ]
+    },
+    "NFR-SEC-002": {
+      "capability": "CAP-OPERATE",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "evidence": "implemented-untested",
+      "sources": [
+        "apps/api/src/services/storage/adapter.ts:2"
+      ],
+      "tests": [],
+      "documents": [
+        "docs/specs/srs.md:83"
+      ]
+    },
+    "NFR-SEC-003": {
+      "capability": "CAP-OPERATE",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "evidence": "documents-only",
+      "sources": [],
+      "tests": [],
+      "documents": [
+        "docs/specs/srs.md:86"
+      ]
+    },
+    "NFR-SEC-004": {
+      "capability": "CAP-OPERATE",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "evidence": "documents-only",
+      "sources": [],
+      "tests": [],
+      "documents": [
+        "docs/specs/srs.md:91"
       ]
     },
     "INT-1": {
@@ -1632,7 +1815,7 @@
       "tests": [],
       "documents": [
         "docs/specs/merge-plan.md:3",
-        "docs/specs/srs.md:918"
+        "docs/specs/srs.md:1086"
       ]
     }
   },
@@ -1641,6 +1824,7 @@
     "CAP-AUTH": [
       "FR-015",
       "FR-SET-001",
+      "NFR-SEC-001",
       "INT-1"
     ],
     "CAP-DATA-CORE": [
@@ -1723,7 +1907,8 @@
       "FR-RES-017",
       "FR-RES-018",
       "FR-RES-019",
-      "FR-RES-020"
+      "FR-RES-020",
+      "NFR-COMP-002"
     ],
     "CAP-CAREER": [],
     "CAP-EXPORT": [
@@ -1732,7 +1917,8 @@
       "FR-012",
       "FR-021",
       "FR-EXP-010",
-      "FR-SET-007"
+      "FR-SET-007",
+      "NFR-COMP-001"
     ],
     "CAP-OPERATE": [
       "FR-004",
@@ -1742,10 +1928,15 @@
       "FR-EXP-012",
       "FR-EXP-013",
       "FR-SET-006",
+      "NFR-OPS-001",
+      "NFR-SEC-002",
+      "NFR-SEC-003",
+      "NFR-SEC-004",
       "INT-5"
     ],
     "CAP-CLOUD": [
-      "FR-105"
+      "FR-105",
+      "NFR-OPS-002"
     ],
     "CAP-PLATFORM": [
       "FR-007",
@@ -1761,7 +1952,15 @@
       "FR-SET-004",
       "FR-VIS-004",
       "NFR-A11Y-001",
+      "NFR-A11Y-002",
       "NFR-MNT-002",
+      "NFR-MNT-003",
+      "NFR-PERF-001",
+      "NFR-PERF-002",
+      "NFR-PRIV-001",
+      "NFR-PRIV-002",
+      "NFR-PRIV-003",
+      "NFR-REL-004",
       "INT-2",
       "INT-3",
       "INT-6"
@@ -1816,6 +2015,7 @@
     ],
     "apps/api/src/middleware/auth.ts": [
       "FR-SET-001",
+      "NFR-SEC-001",
       "INT-1"
     ],
     "apps/api/src/middleware/error.test.ts": [
@@ -2009,6 +2209,7 @@
     ],
     "apps/api/src/services/storage/adapter.ts": [
       "FR-CAP-004",
+      "NFR-SEC-002",
       "INT-5"
     ],
     "apps/api/src/services/suggest.ts": [
@@ -2439,6 +2640,25 @@
       "FR-RES-010",
       "FR-RES-016",
       "FR-RES-017",
+      "NFR-A11Y-001",
+      "NFR-A11Y-002",
+      "NFR-COMP-001",
+      "NFR-COMP-002",
+      "NFR-MNT-002",
+      "NFR-MNT-003",
+      "NFR-OPS-001",
+      "NFR-OPS-002",
+      "NFR-PERF-001",
+      "NFR-PERF-002",
+      "NFR-PRIV-001",
+      "NFR-PRIV-002",
+      "NFR-PRIV-003",
+      "NFR-REL-003",
+      "NFR-REL-004",
+      "NFR-SEC-001",
+      "NFR-SEC-002",
+      "NFR-SEC-003",
+      "NFR-SEC-004",
       "INT-6"
     ],
     "docs/testing/e2e-review-2026-08-25.md": [

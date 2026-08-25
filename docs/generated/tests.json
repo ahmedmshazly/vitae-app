@@ -7010,8 +7010,24 @@
       "INT-5",
       "INT-6",
       "NFR-A11Y-001",
+      "NFR-A11Y-002",
+      "NFR-COMP-001",
+      "NFR-COMP-002",
       "NFR-MNT-002",
-      "NFR-REL-003"
+      "NFR-MNT-003",
+      "NFR-OPS-001",
+      "NFR-OPS-002",
+      "NFR-PERF-001",
+      "NFR-PERF-002",
+      "NFR-PRIV-001",
+      "NFR-PRIV-002",
+      "NFR-PRIV-003",
+      "NFR-REL-003",
+      "NFR-REL-004",
+      "NFR-SEC-001",
+      "NFR-SEC-002",
+      "NFR-SEC-003",
+      "NFR-SEC-004"
     ]
   }
 }

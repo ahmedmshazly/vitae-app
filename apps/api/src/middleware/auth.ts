@@ -1,5 +1,5 @@
 /**
- * Authentication & authorization (SRS INT-1, FR-SET-001, T1).
+ * Authentication & authorization (SRS INT-1, FR-SET-001, NFR-SEC-001, T1).
  *
  * DEFAULT-DENY: every route is gated except those explicitly registered as
  * public (`/health`, `/api/v1/auth/*`). A request is authorized only if it

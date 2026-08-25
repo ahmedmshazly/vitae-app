@@ -1,5 +1,5 @@
 /**
- * Storage abstraction (SRS INT-5, T5). The rest of the app talks to this
+ * Storage abstraction (SRS INT-5, NFR-SEC-002, T5). The rest of the app talks to this
  * interface only, so Cloudinary can be swapped for R2 / Firebase Storage by
  * changing one binding. Uploads are content-addressed by SHA-256 for dedup
  * (FR-CAP-004); delivery is private with short-lived signed URLs.

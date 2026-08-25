@@ -71,18 +71,34 @@ are staged, reviewable, idempotent, and can be rolled back as a batch.
 
 ## Security and privacy requirements
 
-- Requests are denied by default. Production access requires a verified identity
-  whose email equals `OWNER_EMAIL`.
-- Development sign-in is loopback-only and must be disabled in production.
-- The API uses security headers and a nonce-based content security policy.
-- The compiler accepts only authenticated API requests and runs in an isolated
-  container. User content is escaped before it reaches LaTeX.
-- Secrets do not belong in application records or Git. Runtime secrets come
-  from environment variables or a protected local secret store.
-- Postgres connections use certificate verification in production. Backups are
-  sensitive exports and require encryption plus tested restore procedures.
-- The project collects no behavioural analytics and makes no runtime calls to
-  AI providers.
+The security posture is four defended boundaries, and the privacy posture is
+three refusals. Each carries a numbered requirement in the register below.
+
+- **The identity boundary is default-deny** (NFR-SEC-001). Requests are denied
+  unless a verified identity is admitted by authorization: the configured
+  `OWNER_EMAIL` on a self-hosted install, a server-resolved workspace
+  membership when the hosted plane is enabled. Failures are neutral and never
+  reveal the allow-list. Development sign-in is loopback-only and must be
+  disabled in production.
+- **The storage boundary is a single adapter** (NFR-SEC-002). Object storage
+  is reached through one interface; uploads are content-addressed and delivery
+  uses short-lived signed URLs, never public object URLs.
+- **The compiler is sandboxed and authenticated** (NFR-SEC-003). Compilation
+  accepts only requests signed with a shared-secret message authentication
+  code, runs in an isolated container with no network egress, and user content
+  is escaped before it reaches LaTeX. The API itself uses security headers and
+  a nonce-based content security policy.
+- **Secrets stay out of records and history** (NFR-SEC-004). Runtime secrets
+  come from environment variables or a protected secret store, never from
+  application records or Git; surfaces report a credential's presence, never
+  its value. Postgres connections use certificate verification in production,
+  and backups are sensitive exports requiring encryption plus tested restores.
+- **No runtime AI** (NFR-PRIV-001). No runtime call to an external AI provider,
+  and no AI-provider client in any dependency manifest.
+- **No telemetry** (NFR-PRIV-002). No behavioural analytics, no tracking
+  client, nothing sent to a service the operator did not configure.
+- **Every ranking explains itself** (NFR-PRIV-003). A ranked or derived number
+  must decompose into the named factors the interface presents.
 
 See [SECURITY.md](../../SECURITY.md) for reporting and supported-version policy.
 
@@ -133,6 +149,14 @@ Status: implemented · Evidence: cited by source · Provenance: reconstructed, n
 Every request must be authenticated against a verified identity and authorized against the configured owner, denying by default. The development sign-in shortcut is available only behind an explicit flag.
 
 Status: implemented · Evidence: cited by source · Provenance: reconstructed, needs-review
+
+#### NFR-SEC-001 — The identity boundary is default-deny
+
+Every request is denied unless it carries a verified identity that authorization admits: the configured owner on a self-hosted install, a server-resolved workspace membership when the hosted plane is enabled. Authorization failures are neutral and never reveal the allow-list. The development sign-in shortcut answers loopback requests only and is off in production.
+
+Status: implemented · Evidence: cited by source · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007, modelling the trust boundary the T1 marker sits on; cited beside that marker in the header of apps/api/src/middleware/auth.ts. FR-015 and FR-SET-001 state the functional behaviors; this entry states the boundary they defend.
 
 #### INT-1 — Google identity provider integration
 
@@ -604,6 +628,14 @@ Status: partial · Evidence: cited by source and by tests · Provenance: reconst
 
 > The model and the generation interface are shipped. docs/ROADMAP.md records LaTeX and PDF compilation of a cover letter as deferred, so the requirement is partially implemented.
 
+#### NFR-COMP-002 — Compiled documents are reproducible and parseable
+
+Compiling the same document twice with a pinned source date must produce byte-identical artifacts, so an operator can prove that an archived file is the one they sent. Compiled output must stay parseable by applicant tracking systems: one page, standard fonts, no content that only a human renderer can read.
+
+Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007. Enforced by SOURCE_DATE_EPOCH handling in services/buildsvc and the template contract's strict mode; the enforcing code does not cite this identifier, so the attribution is recorded here.
+
 ### Export and restore
 
 `CAP-EXPORT` · A self-describing JSONL and Markdown bundle with checksums and a manifest, and a restore path that validates before it writes.
@@ -643,6 +675,14 @@ Status: implemented · Evidence: cited by source · Provenance: reconstructed, n
 Records marked sensitive must be excluded from an export unless the operator explicitly opts in.
 
 Status: implemented · Evidence: cited by source · Provenance: reconstructed, needs-review
+
+#### NFR-COMP-001 — Leaving is a supported feature
+
+The complete graph must export to open formats — JSON Lines per collection and a Markdown vault readable by plain-text tools — with a checksummed manifest, and a restore from that bundle must round-trip document identity. No commercial state may degrade export: a locked workspace keeps its way out.
+
+Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007. The behavior is enforced by apps/api/src/services/export.ts and services/restore.ts, and the locked-workspace escape hatch by the entitlement gate in apps/api/src/middleware/workspace.ts; none of them cites this identifier, so the attribution is recorded here. FR-001, FR-EXP-010 and FR-SET-007 state the functional halves; this entry states the portability promise they add up to.
 
 ### Operate and observe
 
@@ -694,6 +734,38 @@ A status route must report the health of the database, storage, and build servic
 
 Status: implemented · Evidence: cited by source · Provenance: reconstructed, needs-review
 
+#### NFR-OPS-001 — Stated and rehearsed recovery objectives
+
+A production or hosted deployment must state its recovery point and recovery time objectives, take scheduled encrypted backups to storage off the application host, and demonstrate the stated objectives by a rehearsed restore drill on a recorded cadence.
+
+Status: partial · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007. The mechanics exist — scripts/backup-to-s3.sh, docs/runbooks/restore-drill.md, FR-EXP-012 and FR-EXP-013 — but the objectives themselves are numbers this repository cannot supply: backup retention and recovery targets are among the operational facts docs/CLOUD-LAUNCH.md records as needing outside confirmation. The stated remainder is exactly those numbers and their cadence.
+
+#### NFR-SEC-002 — The storage boundary is a single adapter
+
+Object storage is reached only through one adapter interface: uploads are content-addressed, delivery uses short-lived signed URLs, and no public object URL is ever handed out. Swapping the provider is a change to one binding, not a search across the application.
+
+Status: implemented · Evidence: cited by source · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007, modelling the trust boundary the T5 marker sits on; cited beside that marker in the header of apps/api/src/services/storage/adapter.ts. INT-5 and FR-CAP-004 state the interface and the dedup rule; this entry states the boundary posture.
+
+#### NFR-SEC-003 — The compiler is sandboxed and authenticated
+
+Document compilation accepts only requests signed with a shared-secret message authentication code, runs untrusted input in an isolated container with no network egress, works in a per-request scratch directory, and ships no published fallback key. Operator content is escaped before it reaches the compiler.
+
+Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007. Enforced by services/buildsvc/src/server.ts together with FR-027, FR-RES-012, and FR-RES-013, which state three of its clauses individually; the isolation posture as a whole had no identifier until this one.
+
+#### NFR-SEC-004 — Secrets stay out of records and history
+
+Credentials live in the environment or a protected secret store, never in application records, exports, or version control. A surface reports a credential's presence, never its value. A stored third-party token is encrypted at rest and is never returned to the browser.
+
+Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007. FR-004 states the storage rule and the presence-not-value rule for one surface; apps/api/src/services/secrets.ts enforces the store and the GitHub token path enforces encryption at rest. The enforcing code does not cite this identifier, so the attribution is recorded here.
+
 #### INT-5 — Attachment storage is reached only through an adapter
 
 The application talks to object storage through one interface, so the provider can be replaced by changing a single binding. Uploads are content-addressed so identical bytes are stored once, and delivery is private through short-lived signed URLs rather than public object URLs.
@@ -713,6 +785,14 @@ Status: implemented · Evidence: cited by source · Provenance: reconstructed, n
 Export must take a per-workspace lock so that one workspace export cannot block another.
 
 Status: implemented · Evidence: cited by source · Provenance: reconstructed, needs-review
+
+#### NFR-OPS-002 — A lapsed workspace stays readable, exportable, and honest
+
+When payment lapses, a hosted workspace becomes read-only rather than deleted: reads, export, billing, and sign-out keep working while every other mutation is refused by the server with the access state and the way out named in the refusal. The interface must present the lock at the controls it disables, not only announce it globally.
+
+Status: partial · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007. The server half is enforced by the method-based entitlement gate in apps/api/src/middleware/workspace.ts and the shell banner names the lock; the stated remainder is the second sentence — the write controls themselves are still enabled across the routes, which the commit that added the banner records in as many words.
 
 ### Cross-cutting platform behavior
 
@@ -800,6 +880,14 @@ Status: implemented · Evidence: cited by source · Provenance: reconstructed, n
 
 > Recovered from packages/ui/src/styles/base.css:123, its only citation in the repository, which reads "Visible focus everywhere (WCAG 2.1 AA: NFR-A11Y-001)" above a bare :focus-visible rule that replaces the user-agent outline with var(--ae-focus-ring), defined at packages/ui/src/styles/tokens.css:131 as a two-pixel background halo and a two-pixel accent ring. The word "everywhere" and the unqualified selector are the evidence for the scope; the @media (forced-colors: active) block at base.css:151, which restores an outline because a box-shadow is discarded in that mode, is the evidence that the indicator was required to survive rather than merely to exist. Like NFR-MNT-002, this identifier was missed by an earlier pass of this register, but for a different reason: the citation reader's family pattern could not spell A11Y, so the citation was unreadable rather than unread. See the FAMILY constant in scripts/docs/lib/citations.mjs.
 
+#### NFR-A11Y-002 — Every routed screen is scanned for accessibility
+
+Every route the application mounts must be scanned by an automated accessibility check in the end-to-end suite, and the count of scanned screens is a ratchet: it may grow and must not silently shrink. Visual surfaces — the graph, the timeline, the map — must each keep a keyboard-operable list equivalent, and motion must respect the reduced-motion preference.
+
+Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007, not recovered from a citation. Enforced by the end-to-end ratchets in docs/testing/e2e-ratchets.json, which check accessibility coverage by screen, and by the list equivalents the explore surfaces ship; the enforcing files do not cite this identifier, so the attribution is recorded here.
+
 #### NFR-MNT-002 — The module boundary is enforced, not merely agreed
 
 No workspace outside packages/core may import another workspace's internal modules. The boundary must be machine-enforced so that a violation fails the build rather than depending on review to notice it.
@@ -807,6 +895,62 @@ No workspace outside packages/core may import another workspace's internal modul
 Status: implemented · Evidence: cited by source · Provenance: reconstructed, needs-review
 
 > Recovered from the header of eslint.config.js, which names this identifier beside INT-2 and states the rule the configuration enforces. This identifier was missed by the first pass of this register, which read only the source trees; a root-level configuration file carried the sole citation. It was recovered by docs/generated/traceability.json, which reads every tracked file, and it is the reason that generator scans the whole repository rather than a chosen subset.
+
+#### NFR-MNT-003 — Undocumented surfaces fail the build
+
+A route, package, algorithm, runbook, or template added without prose documentation must fail continuous integration: prose coverage is a ratchet whose undocumented list may only shrink. A source module without a colocated test fails the coverage map the same way. Documentation and tests are not favors to the future; they are the price of merging.
+
+Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007. Enforced by scripts/check-docs-coverage.mjs and scripts/check-test-coverage-map.mjs; neither cites this identifier, so the attribution is recorded here.
+
+#### NFR-PERF-001 — The web bundle is budgeted
+
+The production web bundle must stay inside enforced size budgets, heavy visualization libraries must load only on the routes that use them, and a build carrying development artifacts must be refused before its size is even measured.
+
+Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007. Enforced by scripts/check-web-budgets.mjs against docs/testing/web-budgets.json and by route-level lazy loading in apps/web/src/App.tsx; the enforcing files do not cite this identifier, so the attribution is recorded here.
+
+#### NFR-PERF-002 — The interactive envelope is fifty thousand nodes
+
+Interactive surfaces must stay responsive against a graph of about fifty thousand nodes and two hundred and fifty thousand edges. Inside that envelope, the whole graph is read at most once per request, per-type counts come from grouped queries, and a rendered view that caps its elements must say that it capped rather than degrade silently.
+
+Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007, naming the design envelope the code already assumes: FR-102 and FR-104 state the read rules, and the explore services cap their elements. The envelope number itself appears in no source file; recording it here is what makes exceeding it a requirements change rather than a surprise.
+
+#### NFR-PRIV-001 — No runtime AI, as a numbered requirement
+
+The product must make no runtime call to an external AI provider and must carry no AI-provider client in any dependency manifest. Every intelligent behavior is a deterministic function whose inputs and factors the operator can inspect. This is the boundary ADR 0003 chose; it is restated as a numbered requirement so that changing it is a requirements change, not a drift.
+
+Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007. Verifiable by inspection of every dependency manifest under apps/, packages/, and services/, and asserted in prose by README.md, PRODUCT.md, and docs/adr/0003-deterministic-intelligence.md; no code cites the identifier because the requirement is the absence of code.
+
+#### NFR-PRIV-002 — No telemetry
+
+The product must collect no behavioural analytics, embed no tracking or telemetry client, and send no operator content to any service the operator did not configure. What an operator does with their own record is not data for anyone else.
+
+Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007. Verifiable by the absence of any analytics dependency in the manifests and asserted by docs/PRIVACY.md; the error boundary in apps/web/src/components/ErrorBoundary.tsx states in prose that no telemetry pipeline exists to report to.
+
+#### NFR-PRIV-003 — Every ranking explains itself
+
+Any ranked or derived number shown to the operator must decompose into named factors the interface presents, and where a sum is claimed the parts must sum exactly. A recommendation that cannot show its arithmetic must not ship.
+
+Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007, generalizing what FR-CON-006 and FR-RES-007 each state for one surface into the rule every future surface is held to. Enforced today by the factor-chip decompositions across the ask, intros, tailor, and dashboard surfaces.
+
+#### NFR-REL-004 — No mutation fails silently
+
+Every failed mutation must surface to the operator: a global handler guarantees an error report whenever no local handler takes responsibility, and loading, empty, over-filtered, and failed must be four distinct presentations on every surface. A failed load must never render as an empty list.
+
+Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007. Enforced by the mutation-cache error net in apps/web/src/main.tsx and by the feedback grammar the end-to-end suite asserts screen by screen — the four-state distinction is its most-tested invariant; the enforcing code does not cite this identifier, so the attribution is recorded here.
 
 #### INT-2 — Vitae is a module that owns its data plane
 
@@ -848,7 +992,7 @@ is indistinguishable from a gap that does not exist.
 | `FR-EXP-001 to FR-EXP-009, FR-EXP-011` | No citations. The lowest cited member of the family is FR-EXP-010. |
 | `FR-ORG-003, FR-ORG-004, FR-ORG-006` | No citations. FR-ORG-005, FR-ORG-007 and FR-ORG-008 are cited, so the family extends past the gaps. |
 | `FR-SET-002, FR-SET-003, FR-SET-005` | No citations. |
-| `NFR-REL-001, NFR-REL-002` | No citations. Only two non-functional identifiers are cited anywhere in the repository, NFR-REL-003 and NFR-MNT-002, so almost the entire non-functional requirement set is unrecovered. The two that survive come from different families, which suggests the original set was organized by quality attribute rather than numbered in one sequence. |
+| `NFR-REL-001, NFR-REL-002` | No citations. When this register was recovered, only two non-functional identifiers were cited anywhere in the repository, NFR-REL-003 and NFR-MNT-002 — the original set was organized by quality attribute rather than numbered in one sequence, and almost all of it was lost. The non-functional set that exists today was authored forward under ADR 0007 on 2026-08-26; these two numbers stay unallocated because reusing them for new statements would counterfeit recovery. |
 | `INT-4` | No citation. INT-1, INT-2, INT-3, INT-5 and INT-6 are all cited, so the interface family was allocated at least six identifiers and exactly one of them left no trace. INT-3 and INT-5 were invisible until the family was declared to the citation reader, which is why the declaration is recorded in this register rather than hard-coded in the generator. |
 
 #### Alternative spellings
@@ -875,7 +1019,7 @@ docs/ROADMAP.md writes three families without the FR- prefix. VIS and EXP are no
 | --- | --- | --- |
 | `INT` | Interface and integration requirements | One to three digits, without zero padding, unlike the FR and NFR families. |
 
-**`T1, T5`** — T1 is cited beside SRS INT-1 and FR-SET-001 in the authentication middleware; T5 beside SRS INT-5 in the storage adapter. Two members of one shape, each attached to a different subsystem boundary, which suggests a threat or trust-boundary numbering. Two citations still cannot establish what the family asserts, and a single letter followed by a digit cannot be harvested without matching unrelated text throughout the repository. Recorded so the markers are discoverable rather than silently dropped.
+**`T1, T5`** — T1 is cited beside SRS INT-1 and FR-SET-001 in the authentication middleware; T5 beside SRS INT-5 in the storage adapter. Two members of one shape, each attached to a different subsystem boundary, which suggests a threat or trust-boundary numbering. Two citations still cannot establish what the family asserts, and a single letter followed by a digit cannot be harvested without matching unrelated text throughout the repository. As of 2026-08-26 the two boundaries the markers sit on are modelled by NFR-SEC-001 and NFR-SEC-002, cited on the same source lines; the T markers themselves stay unmodelled and are kept for archaeology.
 
 Cited at `apps/api/src/middleware/auth.ts:2`, `apps/api/src/services/storage/adapter.ts:2`.
 
@@ -883,15 +1027,39 @@ Cited at `apps/api/src/middleware/auth.ts:2`, `apps/api/src/services/storage/ada
 
 ## Quality requirements
 
-- Node `22.23.x` and pnpm `9.15.x` are the supported toolchain.
-- Type checking, linting, unit tests, accessibility tests, public-data checks,
-  dependency auditing, and production builds are required CI gates.
-- API integration tests run against an isolated `vitae_test` Postgres database.
-- The web application must preserve keyboard access, visible focus, reduced
-  motion support, and WCAG AA-oriented contrast.
-- Production images are digest-pinned and the build service must not have
-  direct public access.
-- Releases follow [RELEASE.md](../../RELEASE.md) and use semantic versioning.
+Since 2026-08 the quality attributes carry numbered requirements in the
+register, one family per attribute.
+
+- **Accessibility.** Keyboard focus is always visible and survives forced
+  colors (NFR-A11Y-001); every routed screen is scanned by an automated
+  accessibility check whose coverage is ratcheted, visual surfaces keep
+  keyboard-operable list equivalents, and motion respects the reduced-motion
+  preference (NFR-A11Y-002).
+- **Portability.** Leaving is a supported feature: full-fidelity export to
+  open formats with a checksummed manifest, undegraded by commercial state
+  (NFR-COMP-001); compiled documents are reproducible byte-for-byte under a
+  pinned source date and stay parseable by applicant tracking systems
+  (NFR-COMP-002).
+- **Maintainability.** The module boundary is machine-enforced (NFR-MNT-002),
+  and an undocumented or untested surface fails continuous integration —
+  prose coverage and the source-to-test map are ratchets (NFR-MNT-003).
+- **Operability.** Recovery objectives are stated and rehearsed, with
+  scheduled encrypted off-box backups (NFR-OPS-001 — partial until the
+  retention and recovery numbers are confirmed); a lapsed hosted workspace
+  stays readable, exportable, and honest about its lock (NFR-OPS-002).
+- **Performance.** The production bundle is budgeted and heavy libraries are
+  route-lazy (NFR-PERF-001); the interactive envelope is about fifty thousand
+  nodes, inside which the graph is read once per request and capped views say
+  they capped (NFR-PERF-002).
+- **Reliability.** Multi-document writes are atomic and audited (NFR-REL-003),
+  and no mutation fails silently: loading, empty, over-filtered, and failed
+  are four distinct presentations everywhere (NFR-REL-004).
+- **Toolchain.** Node `22.23.x` and pnpm `9.15.x`; type checking, linting,
+  unit tests, accessibility tests, public-data checks, dependency auditing,
+  and production builds are required CI gates; API integration tests run
+  against an isolated `vitae_test` database; production images are
+  digest-pinned and the build service has no direct public access; releases
+  follow [RELEASE.md](../../RELEASE.md) and semantic versioning.
 
 ## Deterministic algorithms
 

@@ -1,8 +1,8 @@
 {
   "$schema": "./schema/requirements.schema.json",
-  "note": "Curated requirement register. docs/specs/srs.md defines no identifiers, so every statement here is recovered from the code, tests, workflows and roadmap rows that cite the identifier. Identifiers are adopted verbatim and are never renumbered, because renumbering would invalidate live citations across source and continuous integration. Every entry carries review \"needs-review\": the statements are evidenced, but none has been confirmed against an authored specification, because none survives.",
+  "note": "Curated requirement register. The register began as pure recovery: docs/specs/srs.md defined no identifiers, so every statement was recovered from the code, tests, workflows and roadmap rows that cite the identifier. Since 2026-08-26 it carries a second regime under ADR 0007: statements authored forward as product decisions, each marked as authored in its reconstruction note and carrying review \"confirmed\". Recovered statements keep review \"needs-review\", because none has been confirmed against an authored specification that survives. Identifiers are adopted verbatim and are never renumbered, because renumbering would invalidate live citations across source and continuous integration.",
   "provenance_vocabulary": {
-    "reconstructed": "A statement recovered from at least one citation that names this identifier and describes a single behavior.",
+    "reconstructed": "A statement recovered from at least one citation that names this identifier and describes a single behavior — or, where the reconstruction note says so, a statement authored as a product decision under ADR 0007.",
     "unrecoverable": "The identifier is asserted by a grouped or ranged citation, but no individual statement can be attributed without inventing the split. No statement is recorded."
   },
   "implementation_status_vocabulary": {
@@ -39,7 +39,7 @@
         "apps/api/src/middleware/auth.ts:2",
         "apps/api/src/services/storage/adapter.ts:2"
       ],
-      "observation": "T1 is cited beside SRS INT-1 and FR-SET-001 in the authentication middleware; T5 beside SRS INT-5 in the storage adapter. Two members of one shape, each attached to a different subsystem boundary, which suggests a threat or trust-boundary numbering. Two citations still cannot establish what the family asserts, and a single letter followed by a digit cannot be harvested without matching unrelated text throughout the repository. Recorded so the markers are discoverable rather than silently dropped."
+      "observation": "T1 is cited beside SRS INT-1 and FR-SET-001 in the authentication middleware; T5 beside SRS INT-5 in the storage adapter. Two members of one shape, each attached to a different subsystem boundary, which suggests a threat or trust-boundary numbering. Two citations still cannot establish what the family asserts, and a single letter followed by a digit cannot be harvested without matching unrelated text throughout the repository. As of 2026-08-26 the two boundaries the markers sit on are modelled by NFR-SEC-001 and NFR-SEC-002, cited on the same source lines; the T markers themselves stay unmodelled and are kept for archaeology."
     }
   ],
   "numbering_gaps": [
@@ -73,7 +73,7 @@
     },
     {
       "range": "NFR-REL-001, NFR-REL-002",
-      "observation": "No citations. Only two non-functional identifiers are cited anywhere in the repository, NFR-REL-003 and NFR-MNT-002, so almost the entire non-functional requirement set is unrecovered. The two that survive come from different families, which suggests the original set was organized by quality attribute rather than numbered in one sequence."
+      "observation": "No citations. When this register was recovered, only two non-functional identifiers were cited anywhere in the repository, NFR-REL-003 and NFR-MNT-002 — the original set was organized by quality attribute rather than numbered in one sequence, and almost all of it was lost. The non-functional set that exists today was authored forward under ADR 0007 on 2026-08-26; these two numbers stay unallocated because reusing them for new statements would counterfeit recovery."
     },
     {
       "range": "INT-4",
@@ -1027,6 +1027,39 @@
       "reconstruction_note": "Recovered from packages/ui/src/styles/base.css:123, its only citation in the repository, which reads \"Visible focus everywhere (WCAG 2.1 AA: NFR-A11Y-001)\" above a bare :focus-visible rule that replaces the user-agent outline with var(--ae-focus-ring), defined at packages/ui/src/styles/tokens.css:131 as a two-pixel background halo and a two-pixel accent ring. The word \"everywhere\" and the unqualified selector are the evidence for the scope; the @media (forced-colors: active) block at base.css:151, which restores an outline because a box-shadow is discarded in that mode, is the evidence that the indicator was required to survive rather than merely to exist. Like NFR-MNT-002, this identifier was missed by an earlier pass of this register, but for a different reason: the citation reader's family pattern could not spell A11Y, so the citation was unreadable rather than unread. See the FAMILY constant in scripts/docs/lib/citations.mjs."
     },
     {
+      "id": "NFR-A11Y-002",
+      "capability": "CAP-PLATFORM",
+      "kind": "non-functional",
+      "title": "Every routed screen is scanned for accessibility",
+      "statement": "Every route the application mounts must be scanned by an automated accessibility check in the end-to-end suite, and the count of scanned screens is a ratchet: it may grow and must not silently shrink. Visual surfaces — the graph, the timeline, the map — must each keep a keyboard-operable list equivalent, and motion must respect the reduced-motion preference.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007, not recovered from a citation. Enforced by the end-to-end ratchets in docs/testing/e2e-ratchets.json, which check accessibility coverage by screen, and by the list equivalents the explore surfaces ship; the enforcing files do not cite this identifier, so the attribution is recorded here."
+    },
+    {
+      "id": "NFR-COMP-001",
+      "capability": "CAP-EXPORT",
+      "kind": "non-functional",
+      "title": "Leaving is a supported feature",
+      "statement": "The complete graph must export to open formats — JSON Lines per collection and a Markdown vault readable by plain-text tools — with a checksummed manifest, and a restore from that bundle must round-trip document identity. No commercial state may degrade export: a locked workspace keeps its way out.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. The behavior is enforced by apps/api/src/services/export.ts and services/restore.ts, and the locked-workspace escape hatch by the entitlement gate in apps/api/src/middleware/workspace.ts; none of them cites this identifier, so the attribution is recorded here. FR-001, FR-EXP-010 and FR-SET-007 state the functional halves; this entry states the portability promise they add up to."
+    },
+    {
+      "id": "NFR-COMP-002",
+      "capability": "CAP-RESUME",
+      "kind": "non-functional",
+      "title": "Compiled documents are reproducible and parseable",
+      "statement": "Compiling the same document twice with a pinned source date must produce byte-identical artifacts, so an operator can prove that an archived file is the one they sent. Compiled output must stay parseable by applicant tracking systems: one page, standard fonts, no content that only a human renderer can read.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. Enforced by SOURCE_DATE_EPOCH handling in services/buildsvc and the template contract's strict mode; the enforcing code does not cite this identifier, so the attribution is recorded here."
+    },
+    {
       "id": "NFR-MNT-002",
       "capability": "CAP-PLATFORM",
       "kind": "non-functional",
@@ -1038,6 +1071,94 @@
       "reconstruction_note": "Recovered from the header of eslint.config.js, which names this identifier beside INT-2 and states the rule the configuration enforces. This identifier was missed by the first pass of this register, which read only the source trees; a root-level configuration file carried the sole citation. It was recovered by docs/generated/traceability.json, which reads every tracked file, and it is the reason that generator scans the whole repository rather than a chosen subset."
     },
     {
+      "id": "NFR-MNT-003",
+      "capability": "CAP-PLATFORM",
+      "kind": "non-functional",
+      "title": "Undocumented surfaces fail the build",
+      "statement": "A route, package, algorithm, runbook, or template added without prose documentation must fail continuous integration: prose coverage is a ratchet whose undocumented list may only shrink. A source module without a colocated test fails the coverage map the same way. Documentation and tests are not favors to the future; they are the price of merging.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. Enforced by scripts/check-docs-coverage.mjs and scripts/check-test-coverage-map.mjs; neither cites this identifier, so the attribution is recorded here."
+    },
+    {
+      "id": "NFR-OPS-001",
+      "capability": "CAP-OPERATE",
+      "kind": "non-functional",
+      "title": "Stated and rehearsed recovery objectives",
+      "statement": "A production or hosted deployment must state its recovery point and recovery time objectives, take scheduled encrypted backups to storage off the application host, and demonstrate the stated objectives by a rehearsed restore drill on a recorded cadence.",
+      "implementation_status": "partial",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. The mechanics exist — scripts/backup-to-s3.sh, docs/runbooks/restore-drill.md, FR-EXP-012 and FR-EXP-013 — but the objectives themselves are numbers this repository cannot supply: backup retention and recovery targets are among the operational facts docs/CLOUD-LAUNCH.md records as needing outside confirmation. The stated remainder is exactly those numbers and their cadence."
+    },
+    {
+      "id": "NFR-OPS-002",
+      "capability": "CAP-CLOUD",
+      "kind": "non-functional",
+      "title": "A lapsed workspace stays readable, exportable, and honest",
+      "statement": "When payment lapses, a hosted workspace becomes read-only rather than deleted: reads, export, billing, and sign-out keep working while every other mutation is refused by the server with the access state and the way out named in the refusal. The interface must present the lock at the controls it disables, not only announce it globally.",
+      "implementation_status": "partial",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. The server half is enforced by the method-based entitlement gate in apps/api/src/middleware/workspace.ts and the shell banner names the lock; the stated remainder is the second sentence — the write controls themselves are still enabled across the routes, which the commit that added the banner records in as many words."
+    },
+    {
+      "id": "NFR-PERF-001",
+      "capability": "CAP-PLATFORM",
+      "kind": "non-functional",
+      "title": "The web bundle is budgeted",
+      "statement": "The production web bundle must stay inside enforced size budgets, heavy visualization libraries must load only on the routes that use them, and a build carrying development artifacts must be refused before its size is even measured.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. Enforced by scripts/check-web-budgets.mjs against docs/testing/web-budgets.json and by route-level lazy loading in apps/web/src/App.tsx; the enforcing files do not cite this identifier, so the attribution is recorded here."
+    },
+    {
+      "id": "NFR-PERF-002",
+      "capability": "CAP-PLATFORM",
+      "kind": "non-functional",
+      "title": "The interactive envelope is fifty thousand nodes",
+      "statement": "Interactive surfaces must stay responsive against a graph of about fifty thousand nodes and two hundred and fifty thousand edges. Inside that envelope, the whole graph is read at most once per request, per-type counts come from grouped queries, and a rendered view that caps its elements must say that it capped rather than degrade silently.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007, naming the design envelope the code already assumes: FR-102 and FR-104 state the read rules, and the explore services cap their elements. The envelope number itself appears in no source file; recording it here is what makes exceeding it a requirements change rather than a surprise."
+    },
+    {
+      "id": "NFR-PRIV-001",
+      "capability": "CAP-PLATFORM",
+      "kind": "non-functional",
+      "title": "No runtime AI, as a numbered requirement",
+      "statement": "The product must make no runtime call to an external AI provider and must carry no AI-provider client in any dependency manifest. Every intelligent behavior is a deterministic function whose inputs and factors the operator can inspect. This is the boundary ADR 0003 chose; it is restated as a numbered requirement so that changing it is a requirements change, not a drift.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. Verifiable by inspection of every dependency manifest under apps/, packages/, and services/, and asserted in prose by README.md, PRODUCT.md, and docs/adr/0003-deterministic-intelligence.md; no code cites the identifier because the requirement is the absence of code."
+    },
+    {
+      "id": "NFR-PRIV-002",
+      "capability": "CAP-PLATFORM",
+      "kind": "non-functional",
+      "title": "No telemetry",
+      "statement": "The product must collect no behavioural analytics, embed no tracking or telemetry client, and send no operator content to any service the operator did not configure. What an operator does with their own record is not data for anyone else.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. Verifiable by the absence of any analytics dependency in the manifests and asserted by docs/PRIVACY.md; the error boundary in apps/web/src/components/ErrorBoundary.tsx states in prose that no telemetry pipeline exists to report to."
+    },
+    {
+      "id": "NFR-PRIV-003",
+      "capability": "CAP-PLATFORM",
+      "kind": "non-functional",
+      "title": "Every ranking explains itself",
+      "statement": "Any ranked or derived number shown to the operator must decompose into named factors the interface presents, and where a sum is claimed the parts must sum exactly. A recommendation that cannot show its arithmetic must not ship.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007, generalizing what FR-CON-006 and FR-RES-007 each state for one surface into the rule every future surface is held to. Enforced today by the factor-chip decompositions across the ask, intros, tailor, and dashboard surfaces."
+    },
+    {
       "id": "NFR-REL-003",
       "capability": "CAP-DATA-CORE",
       "kind": "non-functional",
@@ -1046,6 +1167,61 @@
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "needs-review"
+    },
+    {
+      "id": "NFR-REL-004",
+      "capability": "CAP-PLATFORM",
+      "kind": "non-functional",
+      "title": "No mutation fails silently",
+      "statement": "Every failed mutation must surface to the operator: a global handler guarantees an error report whenever no local handler takes responsibility, and loading, empty, over-filtered, and failed must be four distinct presentations on every surface. A failed load must never render as an empty list.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. Enforced by the mutation-cache error net in apps/web/src/main.tsx and by the feedback grammar the end-to-end suite asserts screen by screen — the four-state distinction is its most-tested invariant; the enforcing code does not cite this identifier, so the attribution is recorded here."
+    },
+    {
+      "id": "NFR-SEC-001",
+      "capability": "CAP-AUTH",
+      "kind": "non-functional",
+      "title": "The identity boundary is default-deny",
+      "statement": "Every request is denied unless it carries a verified identity that authorization admits: the configured owner on a self-hosted install, a server-resolved workspace membership when the hosted plane is enabled. Authorization failures are neutral and never reveal the allow-list. The development sign-in shortcut answers loopback requests only and is off in production.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007, modelling the trust boundary the T1 marker sits on; cited beside that marker in the header of apps/api/src/middleware/auth.ts. FR-015 and FR-SET-001 state the functional behaviors; this entry states the boundary they defend."
+    },
+    {
+      "id": "NFR-SEC-002",
+      "capability": "CAP-OPERATE",
+      "kind": "non-functional",
+      "title": "The storage boundary is a single adapter",
+      "statement": "Object storage is reached only through one adapter interface: uploads are content-addressed, delivery uses short-lived signed URLs, and no public object URL is ever handed out. Swapping the provider is a change to one binding, not a search across the application.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007, modelling the trust boundary the T5 marker sits on; cited beside that marker in the header of apps/api/src/services/storage/adapter.ts. INT-5 and FR-CAP-004 state the interface and the dedup rule; this entry states the boundary posture."
+    },
+    {
+      "id": "NFR-SEC-003",
+      "capability": "CAP-OPERATE",
+      "kind": "non-functional",
+      "title": "The compiler is sandboxed and authenticated",
+      "statement": "Document compilation accepts only requests signed with a shared-secret message authentication code, runs untrusted input in an isolated container with no network egress, works in a per-request scratch directory, and ships no published fallback key. Operator content is escaped before it reaches the compiler.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. Enforced by services/buildsvc/src/server.ts together with FR-027, FR-RES-012, and FR-RES-013, which state three of its clauses individually; the isolation posture as a whole had no identifier until this one."
+    },
+    {
+      "id": "NFR-SEC-004",
+      "capability": "CAP-OPERATE",
+      "kind": "non-functional",
+      "title": "Secrets stay out of records and history",
+      "statement": "Credentials live in the environment or a protected secret store, never in application records, exports, or version control. A surface reports a credential's presence, never its value. A stored third-party token is encrypted at rest and is never returned to the browser.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. FR-004 states the storage rule and the presence-not-value rule for one surface; apps/api/src/services/secrets.ts enforces the store and the GitHub token path enforces encryption at rest. The enforcing code does not cite this identifier, so the attribution is recorded here."
     },
     {
       "id": "INT-1",
