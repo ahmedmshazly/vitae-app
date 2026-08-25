@@ -82,9 +82,13 @@ export function SignIn() {
                 onClick={() => void run('dev', signInDev)}
               >
                 {pending === 'dev' ? 'Signing in…' : 'Developer sign-in'}
+                {/* Inherit the button's own foreground rather than --ae-muted.
+                    That token is documented at 7.6:1 against the application's
+                    dark ground; on this button's near-white fill it measures
+                    2.41:1, which axe reports as a serious contrast failure. */}
                 <span
                   aria-hidden="true"
-                  className="rounded-sm border border-strong px-1 font-mono text-xs text-muted"
+                  className="rounded-sm border border-strong px-1 font-mono text-xs"
                 >
                   DEV
                 </span>

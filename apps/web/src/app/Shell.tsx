@@ -140,7 +140,11 @@ export function Shell({ children }: { children: ReactNode }) {
     setSpace(next);
     setSpaceState(next);
     queryClient.clear();
-    navigate('/');
+    // Today, not `/`. The root path is the public marketing route
+    // (App.tsx mounts Landing there and AuthGate only at `path="*"`), so
+    // navigating to it dropped a signed-in person out of the application and
+    // onto the marketing site, taking the demo banner with it.
+    navigate('/today');
   }
 
   useEffect(() => {

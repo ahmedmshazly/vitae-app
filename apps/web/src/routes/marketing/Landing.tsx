@@ -261,7 +261,11 @@ export function Landing() {
           <div className="mk-compare">
             <div className="mk-compare__copy">
               <div className="mk-command" aria-label="Example quick capture">
-                <code>p Lina Farouk @@DevFest #ml &gt; met at the speaker dinner</code>
+                {/* The line overflows on a narrow viewport, which makes it a
+                    scrollable region. Without a tab stop a keyboard user cannot
+                    reach the rest of it (axe scrollable-region-focusable,
+                    WCAG 2.1 A). */}
+                <code tabIndex={0}>p Lina Farouk @@DevFest #ml &gt; met at the speaker dinner</code>
                 <span>Capture → inspect → save</span>
               </div>
               <ol className="mk-ledger" aria-label="What the capture preserves">
