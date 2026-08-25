@@ -41,17 +41,33 @@ export async function expectNoA11yViolations(page: Page, within?: string): Promi
   // ink and reported contrast the settled screen never shows: a 27px heading
   // at 2.19:1, a primary button at 4.33:1. Run every animation to its end
   // first, so the scan reads the page the user actually sits with.
+  //
+  // Finishing once is not enough. A row that mounts a frame later starts its
+  // entrance after the first pass, and the scan then samples a half-faded
+  // colour: `text-muted` read as #60605e on #0f0f0f, 3.04:1, on a token that is
+  // 7.6:1 when it has settled. So this repeats until a pass finds nothing left
+  // to finish, bounded so an infinite animation cannot hold the scan open.
   await page.evaluate(async () => {
-    for (const a of document.getAnimations()) {
-      // An infinite animation has no end to jump to, and finish() throws on
-      // one. It also never settles, so nothing here could wait for it.
-      try {
-        a.finish();
-      } catch {
-        /* leave it running */
+    let quiet = 0;
+    for (let pass = 0; pass < 20 && quiet < 2; pass += 1) {
+      let finished = 0;
+      for (const animation of document.getAnimations()) {
+        // An infinite animation has no end to jump to, and finish() throws on
+        // one. It also never settles, so nothing here could wait for it.
+        try {
+          animation.finish();
+          finished += 1;
+        } catch {
+          /* leave it running */
+        }
       }
+      // Two consecutive quiet frames, not one. A row that mounts on the next
+      // frame has nothing to finish yet, so a single empty pass reads as
+      // settled and the scan catches that row's fade instead: 1.47:1 on ink
+      // that is 7.6:1 once it arrives.
+      quiet = finished === 0 ? quiet + 1 : 0;
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
     }
-    await new Promise((r) => requestAnimationFrame(() => r(null)));
   });
   let builder = new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']);
   if (within) builder = builder.include(within);

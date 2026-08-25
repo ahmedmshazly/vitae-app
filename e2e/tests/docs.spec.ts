@@ -315,6 +315,7 @@ for (const [label, width, height] of [
 
 test('the reading surface has no serious a11y violations', async ({ page }) => {
   await page.goto('/docs/meta');
+  await page.getByRole('heading', { level: 1 }).waitFor();
   await expectNoA11yViolations(page);
 });
 
