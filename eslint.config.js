@@ -4,6 +4,7 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import reactHooks from 'eslint-plugin-react-hooks';
+import playwright from 'eslint-plugin-playwright';
 import globals from 'globals';
 
 export default tseslint.config(
@@ -30,6 +31,10 @@ export default tseslint.config(
       '**/reports/mutation/**',
       '**/*.config.js',
       '**/*.config.ts',
+      // The Playwright config is not build tooling. It carries the clock the
+      // suite agrees on, the timeouts, and the guard that refuses a focused
+      // test, so it is exactly the file worth linting.
+      '!e2e/playwright.config.ts',
     ],
   },
   js.configs.recommended,
@@ -95,6 +100,46 @@ export default tseslint.config(
     files: ['e2e/**/*.mjs'],
     languageOptions: {
       globals: { ...globals.node, ...globals.browser },
+    },
+  },
+  {
+    // The rules that keep the end-to-end suite honest used to be grep commands
+    // in a hand-maintained test plan, run by hand or not at all. These are the
+    // same ratchets, applied by the linter on the way in.
+    ...playwright.configs['flat/recommended'],
+    files: ['e2e/tests/**/*.ts', 'e2e/playwright.config.ts'],
+    rules: {
+      ...playwright.configs['flat/recommended'].rules,
+      // A focused or skipped test is how a green run stops meaning anything.
+      // `forbidOnly` in the Playwright config catches the first when the gate
+      // runs; catching both at review time is cheaper than catching them late.
+      'playwright/no-focused-test': 'error',
+      'playwright/no-skipped-test': 'error',
+      // page.pause() halts a headless run until the test times out.
+      'playwright/no-page-pause': 'error',
+      // Element handles read once. Locators retry, which is what a
+      // client-rendered app needs; reading once reads too early.
+      'playwright/no-element-handle': 'error',
+      'playwright/valid-expect': 'error',
+      // A test that asserts nothing passes for free. The rule cannot see this
+      // repository's assertion helpers by itself, and without these names it
+      // reported all ten a11y-only tests as empty.
+      'playwright/expect-expect': [
+        'error',
+        { assertFunctionNames: ['expectNoA11yViolations', 'expectOkJson'] },
+      ],
+      // Reading with getAttribute() or innerText() takes one sample; the
+      // toHave* form retries. Five sites still read once, listed in
+      // docs/testing/e2e-review-2026-08-25.md. Converting them rewrites
+      // existing assertions, which was out of scope for that review, so this
+      // is a warning until someone takes that decision.
+      'playwright/prefer-web-first-assertions': 'warn',
+      // Both of the following have honest uses in this suite and stay warnings.
+      // ask.spec.ts waits 500ms to prove a request was never sent, which no
+      // assertion can express, and a few specs branch on what the shared graph
+      // happens to hold. A new one still deserves a second look.
+      'playwright/no-wait-for-timeout': 'warn',
+      'playwright/no-conditional-in-test': 'warn',
     },
   },
   {
