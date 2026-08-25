@@ -1,9 +1,10 @@
 {
   "$schema": "./schema/journeys.schema.json",
-  "note": "Curated journey register. Only J1, J4 and J8 are named anywhere in the repository: in the header and test titles of e2e/tests/journeys.spec.ts, in two API integration test titles, and in the continuous-integration step that runs them. The numbering implies five further journeys. They are listed here with status unknown so that the gap is discoverable, and no statement is invented for them. This is DOC-D-029 in docs/observatory/meta/coverage-and-contradictions.md.",
+  "note": "Curated journey register. J1, J4 and J8 were recovered: they are named in the header and test titles of e2e/tests/journeys.spec.ts, in two API integration test titles, and in the continuous-integration step that runs them. J2, J3, J5, J6 and J7 were empty rows implied by the numbering until 2026-08-26, when they were authored as product decisions under ADR 0007 — closing DOC-D-029. An authored journey lists no e2e spec until a spec names its identifier; the gate requires the identifier inside any spec listed here.",
   "status_vocabulary": {
     "verified": "Named in the repository and exercised end to end by a browser test that runs in continuous integration.",
-    "partial": "Named in the repository with some steps covered by tests.",
+    "partial": "The journey's steps ship and tests cover them, but no spec names the journey's identifier, so the register cannot claim it end to end.",
+    "planned": "Authored under ADR 0007 with a statement and capabilities; some or all of its capabilities are registered intent, not shipped code.",
     "unknown": "Implied by numbering only. No source in the repository states what this journey is."
   },
   "journeys": [
@@ -24,23 +25,28 @@
     },
     {
       "id": "J2",
-      "title": null,
-      "statement": null,
-      "status": "unknown",
-      "capabilities": [],
-      "target": null,
+      "title": "Keep a valued tie warm",
+      "statement": "The reconnect lane surfaces a tie drifting past its cadence; the operator opens the person, sees the history and why the tie ranks where it does, composes an outreach draft from real relationship facts, sends and logs it, and watches the strength recompute in the same sitting.",
+      "status": "partial",
+      "capabilities": [
+        "CAP-RELATIONSHIPS"
+      ],
+      "target": "A drifting tie is noticed, understood, and re-engaged in one sitting, without the operator maintaining any list by hand.",
       "e2e": [],
-      "note": "Implied by the numbering of J1, J4 and J8. No document, test or comment in the repository names this journey. Recorded as a gap rather than reconstructed, because inventing a journey statement would be indistinguishable from inventing a product claim."
+      "note": "Authored 2026-08-26 under ADR 0007. Every step ships and e2e/tests/exploration.spec.ts exercises the sequence — reconnect lane, interaction log, strength recompute, composer send-and-log — without naming this identifier, which is why the register cannot claim it verified. Naming the journey in a spec title is implementation-wave work."
     },
     {
       "id": "J3",
-      "title": null,
-      "statement": null,
-      "status": "unknown",
-      "capabilities": [],
-      "target": null,
+      "title": "Bring the past in without wrecking the graph",
+      "statement": "The operator stages a LinkedIn or contacts export, reviews rows with per-row accept and skip and per-row subject assignment, commits the batch, works the duplicate queue on shared evidence, merges with an undo window, and can roll the whole batch back — ending with a graph that gained history without gaining a second self.",
+      "status": "partial",
+      "capabilities": [
+        "CAP-IMPORT",
+        "CAP-IDENTITY"
+      ],
+      "target": "A first import lands as reviewed records with no silent duplicate surviving the first pass.",
       "e2e": [],
-      "note": "Implied by the numbering of J1, J4 and J8. No document, test or comment in the repository names this journey."
+      "note": "Authored 2026-08-26 under ADR 0007. The steps ship and are covered piecemeal by e2e/tests/import.spec.ts, duplicates.spec.ts and exploration.spec.ts, none of which names this identifier."
     },
     {
       "id": "J4",
@@ -58,33 +64,42 @@
     },
     {
       "id": "J5",
-      "title": null,
-      "statement": null,
-      "status": "unknown",
-      "capabilities": [],
-      "target": null,
+      "title": "Prove it with a dossier",
+      "statement": "Facing a promotion review, a petition, or a reinvestigation, the operator selects the evidence records that carry the claim, chooses the audience template, and compiles a single-subject packet whose every claim cites its records, closed by a provenance appendix — from a graph that was already capturing the evidence as it happened.",
+      "status": "planned",
+      "capabilities": [
+        "CAP-DOSSIER",
+        "CAP-PROV",
+        "CAP-RESUME"
+      ],
+      "target": "A review-season packet that once took a weekend of archaeology compiles from already-captured evidence in under an hour.",
       "e2e": [],
-      "note": "Implied by the numbering of J1, J4 and J8. No document, test or comment in the repository names this journey."
+      "note": "Authored 2026-08-26 under ADR 0007 for the periodic-prover persona. CAP-DOSSIER and CAP-PROV are registered intent; the selection and compile machinery this journey reuses ships today under CAP-RESUME."
     },
     {
       "id": "J6",
-      "title": null,
-      "statement": null,
-      "status": "unknown",
-      "capabilities": [],
-      "target": null,
+      "title": "Leave with everything",
+      "statement": "The operator exports the complete graph — every collection as JSON Lines, a Markdown vault readable anywhere, a checksummed manifest — verifies the checksums, restores the bundle on a fresh install with identity intact, and reads the vault in a plain-text editor with no Vitae anywhere in sight.",
+      "status": "partial",
+      "capabilities": [
+        "CAP-EXPORT"
+      ],
+      "target": "The bundle restores on a fresh install with document identity intact, and the vault reads in any plain-text editor.",
       "e2e": [],
-      "note": "Implied by the numbering of J1, J4 and J8. No document, test or comment in the repository names this journey."
+      "note": "Authored 2026-08-26 under ADR 0007. Export, checksums, and the sensitive-records boundary are covered by e2e/tests/export.spec.ts without naming this identifier; the restore half is exercised by the documented drill rather than a browser test."
     },
     {
       "id": "J7",
-      "title": null,
-      "statement": null,
-      "status": "unknown",
-      "capabilities": [],
-      "target": null,
+      "title": "See the correspondence truth",
+      "statement": "The operator opens the correspondence rollup, sees reciprocity and reply-latency facts they could not have tallied by hand, finds the dormant-but-once-strong ties ranked with their evidence, picks one they would not have thought of, and steps into a warm re-introduction with the history in front of them.",
+      "status": "planned",
+      "capabilities": [
+        "CAP-COMMS",
+        "CAP-RELATIONSHIPS"
+      ],
+      "target": "The rollup names at least one dormant-but-once-strong tie the operator had not thought of, with the evidence to act on it.",
       "e2e": [],
-      "note": "Implied by the numbering of J1, J4 and J8. No document, test or comment in the repository names this journey."
+      "note": "Authored 2026-08-26 under ADR 0007. CAP-COMMS is registered intent; the tie-strength substrate and the composer it hands off to ship today."
     },
     {
       "id": "J8",

@@ -6,7 +6,7 @@ audience: [user, designer, developer, maintainer]
 domain: product
 type: index
 status: verified
-verified_at: 2026-08-24
+verified_at: 2026-08-26
 ---
 
 # Product
@@ -29,6 +29,7 @@ Nothing here explains how a thing is built. That is the next section along.
 | [Who Vitae is for](who-it-serves.md) | Who signs in, and who is only ever a record? | Anyone |
 | [The capability map](capabilities.md) | What are the units of product scope, and what proves each one? | Maintainers |
 | [The journeys that must work](journeys.md) | Which paths through the product are held by a test? | Maintainers |
+| [The stories behind the journeys](stories.md) | Who wants each journey, and how would we know it worked? | Maintainers |
 | [What Vitae does not do](boundaries.md) | Where does the product stop, and why there? | Anyone |
 
 Read them in that order the first time. After that they are independent: the

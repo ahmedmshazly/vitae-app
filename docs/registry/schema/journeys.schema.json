@@ -20,7 +20,7 @@
           "id": { "type": "string", "pattern": "^J[0-9]{1,2}$" },
           "title": { "type": ["string", "null"], "minLength": 1 },
           "statement": { "type": ["string", "null"], "minLength": 1 },
-          "status": { "enum": ["verified", "partial", "unknown"] },
+          "status": { "enum": ["verified", "partial", "planned", "unknown"] },
           "capabilities": { "type": "array", "items": { "type": "string", "pattern": "^CAP-[A-Z-]+$" } },
           "target": { "type": ["string", "null"], "minLength": 1 },
           "e2e": { "type": "array", "items": { "type": "string", "pattern": "^[^/].*" } },
@@ -35,6 +35,16 @@
                 "title": { "type": "null" }, "statement": { "type": "null" },
                 "capabilities": { "maxItems": 0 }, "e2e": { "maxItems": 0 },
                 "note": { "type": "string" }
+              }
+            }
+          },
+          {
+            "description": "A planned journey is authored intent: it must carry a statement and may not claim coverage.",
+            "if": { "properties": { "status": { "const": "planned" } } },
+            "then": {
+              "properties": {
+                "title": { "type": "string" }, "statement": { "type": "string" },
+                "e2e": { "maxItems": 0 }
               }
             }
           },

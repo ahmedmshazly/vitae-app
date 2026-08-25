@@ -602,6 +602,17 @@
       "review": "needs-review"
     },
     {
+      "id": "FR-CON-010",
+      "capability": "CAP-RELATIONSHIPS",
+      "kind": "functional",
+      "title": "The favor ledger is part of the relationship record",
+      "statement": "A favor must be recordable on the relationship it belongs to, in either direction — owed to the operator or owed by them — with a settle state and dates. The ledger is visible on the person and editable without leaving them, and a concurrent edit to the relationship is refused rather than silently overwritten.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007 — the ledger shipped with no requirement naming it. Enforced by the favor properties on the relationship edge in packages/core/src/schema/edge-props.ts and the favors route in apps/api/src/routes/v1/favors.ts, whose concurrency refusal is the EDGE_CHANGED conflict; neither cites this identifier, so the attribution is recorded here."
+    },
+    {
       "id": "FR-DOS-001",
       "capability": "CAP-DOSSIER",
       "kind": "functional",

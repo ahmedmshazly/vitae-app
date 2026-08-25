@@ -1,14 +1,15 @@
 ---
 id: PRD-JOURNEYS
 title: The journeys that must work
-summary: The register defines eight journey identifiers. Three carry a statement and an executable test; five are empty placeholders the numbering implies.
+summary: All eight journey identifiers now carry statements — three verified end to end, three whose shipped steps await a spec that names them, and two authored for planned capabilities.
 audience: [maintainer, developer]
 domain: product
 type: reference
 status: verified
-verified_at: 2026-08-24
+verified_at: 2026-08-26
 sources:
   - docs/registry/journeys.json
+  - docs/adr/0007-product-definition-regeneration.md
   - docs/generated/traceability.json
   - docs/generated/tests.json
   - e2e/tests/journeys.spec.ts
@@ -39,43 +40,42 @@ refuses to contain.
 
 ## What the register defines
 
-Eight identifiers, `J1` through `J8`. Three have a title, a statement, the
-capabilities they cross, and an executable end-to-end test. Five have none of
-those.
+Eight identifiers, `J1` through `J8`, and every one of them now has a title,
+a statement, and the capabilities it crosses.
 
 | Journey | State | Crosses |
 | --- | --- | --- |
 | `J1` — capture a person in under a minute | Verified end to end | `CAP-CAPTURE`, `CAP-SEARCH` |
-| `J2` | No statement exists | — |
-| `J3` | No statement exists | — |
+| `J2` — keep a valued tie warm | Partial: steps ship, no spec names it | `CAP-RELATIONSHIPS` |
+| `J3` — bring the past in without wrecking the graph | Partial: steps ship, no spec names it | `CAP-IMPORT`, `CAP-IDENTITY` |
 | `J4` — turn a job description into a tailored résumé | Verified end to end | `CAP-RESUME` |
-| `J5` | No statement exists | — |
-| `J6` | No statement exists | — |
-| `J7` | No statement exists | — |
+| `J5` — prove it with a dossier | Planned | `CAP-DOSSIER`, `CAP-PROV`, `CAP-RESUME` |
+| `J6` — leave with everything | Partial: steps ship, no spec names it | `CAP-EXPORT` |
+| `J7` — see the correspondence truth | Planned | `CAP-COMMS`, `CAP-RELATIONSHIPS` |
 | `J8` — recover a deleted record from trash | Verified end to end | `CAP-ORGANIZE`, `CAP-DATA-CORE` |
 
-Between them, the three journeys name five of the sixteen capabilities. Eleven
-capabilities — including relationships, import, identity, export and everything
-the hosted plane does — are crossed by no registered journey. That is a gap in
-the journey register, not a gap in testing: the browser suite has dedicated specs
-for most of those areas. It means nobody has written down which end-to-end path
-through them must never break.
+Between them, the eight journeys cross twelve of the nineteen capabilities.
+Seven remain journey-less — foundation, platform, and operate by their
+cross-cutting nature; auth, career, explore, and the hosted plane as honest
+gaps a future journey may still claim.
 
-## The five that have no statement
+## The five that were empty rows
 
-`J2`, `J3`, `J5`, `J6` and `J7` exist because the numbering says they do.
-Nothing else in the repository names them — no document, no test, no comment.
-
-They are recorded as empty rows with status `unknown` rather than being quietly
-renumbered away or filled in. Renumbering would break the live citations that
-`J1`, `J4` and `J8` already have in test titles and in continuous integration.
-Filling them in would be worse: a reconstructed journey statement is
-indistinguishable, once written, from a real product commitment, and there is no
-evidence to reconstruct one from. An empty row is the only honest option, and it
-makes the gap discoverable instead of invisible.
-
-The gap itself is recorded as `DOC-D-029` in the
+Until 2026-08-26, `J2`, `J3`, `J5`, `J6` and `J7` existed only because the
+numbering said they did — empty rows with status `unknown`, held open because
+inventing a statement would have been indistinguishable from recovering one.
+That refusal was recorded as `DOC-D-029` in the
 [documentation inventory](../meta/index.md).
+
+[ADR 0007](../decisions/catalog.md) changed the rule rather than breaking it:
+the five statements were *authored* as product decisions, marked authored in
+the register, never presented as recovered. Two distinctions keep the entries
+honest. A journey whose steps all ship but whose identifier appears in no spec
+title is `partial` — the register does not claim end-to-end coverage it cannot
+point to, even where dedicated specs exercise every step unnamed. A journey
+that rides on capabilities registered as intent is `planned`. Each journey's
+stories, with acceptance criteria citing the requirement register, live in
+[the stories behind the journeys](stories.md).
 
 ## The three journeys with executable coverage
 
@@ -147,6 +147,9 @@ What the gate cannot do is notice a journey that should exist and does not. That
 is the whole reason the five empty rows are written down.
 
 ## Related
+
+[The stories behind the journeys](stories.md) says who wants each journey and
+how we would know it worked, criterion by criterion.
 
 [The capability map](capabilities.md) defines the capabilities these journeys
 cross, and explains the requirement-to-code-to-test spine that sits underneath

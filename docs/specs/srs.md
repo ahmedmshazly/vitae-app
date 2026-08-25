@@ -364,6 +364,14 @@ Logging an interaction must recompute and persist the affected tie strength with
 
 Status: implemented · Evidence: cited by source · Provenance: reconstructed, needs-review
 
+#### FR-CON-010 — The favor ledger is part of the relationship record
+
+A favor must be recordable on the relationship it belongs to, in either direction — owed to the operator or owed by them — with a settle state and dates. The ledger is visible on the person and editable without leaving them, and a concurrent edit to the relationship is refused rather than silently overwritten.
+
+Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+
+> Authored 2026-08-26 as a product decision under ADR 0007 — the ledger shipped with no requirement naming it. Enforced by the favor properties on the relationship edge in packages/core/src/schema/edge-props.ts and the favors route in apps/api/src/routes/v1/favors.ts, whose concurrency refusal is the EDGE_CHANGED conflict; neither cites this identifier, so the attribution is recorded here.
+
 ### Correspondence intelligence
 
 `CAP-COMMS` · Deterministic analytics over logged interactions: reciprocity, reply latency, unanswered inbound, introduction events, brokers, and dormant-but-once-strong ties, computed with the constants the relationship algorithms already ship.
