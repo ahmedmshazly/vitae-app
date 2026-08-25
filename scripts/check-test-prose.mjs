@@ -21,6 +21,7 @@ const ROOTS = [
   'apps/api/src',
   'apps/web/src',
   'e2e/tests',
+  'e2e/cloud',
 ];
 
 const BAD_PHRASES = [

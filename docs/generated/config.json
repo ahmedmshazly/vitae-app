@@ -76,14 +76,19 @@
       "requirements": [],
       "source": "packages/config/src/env.ts:17",
       "reads": [
-        "scripts/ci-local.sh:103",
-        "scripts/ci-local.sh:338",
-        "scripts/ci-local.sh:370",
-        "scripts/ci-local.sh:374",
-        "scripts/ci-local.sh:385",
-        "scripts/ci-local.sh:401",
-        "scripts/ci-local.sh:406",
-        "scripts/ci-local.sh:99"
+        "scripts/ci-local.sh:101",
+        "scripts/ci-local.sh:105",
+        "scripts/ci-local.sh:340",
+        "scripts/ci-local.sh:372",
+        "scripts/ci-local.sh:376",
+        "scripts/ci-local.sh:387",
+        "scripts/ci-local.sh:403",
+        "scripts/ci-local.sh:408",
+        "scripts/ci-local.sh:447",
+        "scripts/ci-local.sh:449",
+        "scripts/ci-local.sh:455",
+        "scripts/ci-local.sh:463",
+        "scripts/ci-local.sh:471"
       ],
       "read_by": [
         "deploy"
@@ -402,7 +407,7 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "e2e/playwright.config.ts:73",
+      "source": "e2e/playwright.cloud.config.ts:34",
       "reads": [],
       "read_by": [
         "e2e"
@@ -696,6 +701,31 @@
       "description": null,
       "requirements": [],
       "source": "e2e/landing-assets.mjs:11",
+      "reads": [],
+      "read_by": [
+        "e2e"
+      ],
+      "read_via": "process.env",
+      "test_only": true,
+      "surface": "tooling",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "E2E_PADDLE_WEBHOOK_SECRET",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "e2e/cloud/helpers/cloud.ts:21",
       "reads": [],
       "read_by": [
         "e2e"
@@ -1165,10 +1195,13 @@
       "requirements": [],
       "source": "apps/api/src/cloud/config.ts:47",
       "reads": [
-        "apps/api/src/cloud/config.ts:47"
+        "apps/api/src/cloud/config.ts:47",
+        "scripts/ci-local.sh:459",
+        "scripts/ci-local.sh:472"
       ],
       "read_by": [
-        "api"
+        "api",
+        "deploy"
       ],
       "read_via": "process.env",
       "test_only": false,
@@ -1446,9 +1479,9 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/ci-local.sh:284",
+      "source": "scripts/ci-local.sh:286",
       "reads": [
-        "scripts/ci-local.sh:284"
+        "scripts/ci-local.sh:286"
       ],
       "read_by": [
         "deploy"
@@ -1597,7 +1630,7 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "e2e/playwright.config.ts:60",
+      "source": "e2e/playwright.cloud.config.ts:31",
       "reads": [],
       "read_by": [
         "e2e"
@@ -1650,10 +1683,10 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/ci-local.sh:398",
+      "source": "scripts/ci-local.sh:400",
       "reads": [
-        "scripts/ci-local.sh:398",
-        "scripts/ci-local.sh:402"
+        "scripts/ci-local.sh:400",
+        "scripts/ci-local.sh:404"
       ],
       "read_by": [
         "deploy"
@@ -1678,7 +1711,7 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "e2e/playwright.config.ts:25",
+      "source": "e2e/playwright.cloud.config.ts:21",
       "reads": [],
       "read_by": [
         "e2e"
@@ -1982,6 +2015,34 @@
       "reads": [
         "scripts/check-web-budgets.mjs:36",
         "scripts/check-web-budgets.mjs:37"
+      ],
+      "read_by": [
+        "scripts"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "tooling",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_WORKFLOW_ROOT",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/check-workflow.mjs:33",
+      "reads": [
+        "scripts/check-workflow.mjs:33",
+        "scripts/check-workflow.mjs:34"
       ],
       "read_by": [
         "scripts"
@@ -2445,9 +2506,9 @@
     "Storage: Cloudinary (SRS T5; owner-provided)"
   ],
   "summary": {
-    "total": 83,
+    "total": 85,
     "by_scope": {
-      "server": 51,
+      "server": 53,
       "deploy": 19,
       "web-build": 13
     },
@@ -2507,6 +2568,7 @@
       "CI",
       "E2E_API_BASE_URL",
       "E2E_BASE_URL",
+      "E2E_PADDLE_WEBHOOK_SECRET",
       "OUT_DIR",
       "SHOT_DIR",
       "VITAE_CI_MIRROR_ROOT",
@@ -2518,7 +2580,8 @@
       "VITAE_MAP_ROOT",
       "VITAE_REQUIRE_BUDGETS",
       "VITAE_REQUIRE_TEST_LAYERS",
-      "VITAE_WEB_ROOT"
+      "VITAE_WEB_ROOT",
+      "VITAE_WORKFLOW_ROOT"
     ]
   }
 }

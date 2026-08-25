@@ -49,6 +49,8 @@ SERVICE_PIDS=()
 BUILDSVC_CONTAINER=""
 BUILDSVC_IMAGE="vitae/buildsvc:ci-local"
 API_LOG="$(mktemp -t vitae-ci-api.XXXXXX.log)"
+API_CLOUD_LOG="$(mktemp -t vitae-ci-api-cloud.XXXXXX.log)"
+PADDLE_WEBHOOK_SECRET=ci-paddle-secret
 WEB_LOG="$(mktemp -t vitae-ci-web.XXXXXX.log)"
 
 PASSED=(); FAILED=()
@@ -419,10 +421,72 @@ e2e_local() {
   return "$status"
 }
 
+# Cloud mode is a second suite, run after the first and against the same web
+# bundle. It has to be separate: VITAE_CLOUD_ENABLED=true makes
+# apps/api/src/db/space.ts ignore the x-vitae-space header, which silently
+# points every signInDemo spec at the real graph while the banner still says
+# demo. Only the API restarts, because `cloudEnabled` reaches the browser from
+# GET /auth/me at run time rather than from a VITE_ flag at build time.
+e2e_cloud() {
+  # Start from the post-migration state so a previous run's provider events
+  # cannot order ahead of this one's. applyPaddleWebhook drops anything not
+  # newer than what it holds, and a leftover future timestamp would make every
+  # transition here a silent no-op.
+  docker compose exec -T postgres psql -q -U vitae -d "$E2E_DATABASE_NAME" <<'SQL' >/dev/null || return 1
+DELETE FROM billing_events;
+DELETE FROM billing_subscriptions;
+DELETE FROM billing_customers;
+DELETE FROM workspace_lifecycle_events;
+DELETE FROM workspace_members;
+UPDATE workspaces SET owner_user_id = NULL WHERE id = 'workspace-legacy-real';
+UPDATE workspace_lifecycles
+   SET access_state = 'active', trial_ends_at = NULL, grace_ends_at = NULL, deletion_scheduled_at = NULL
+ WHERE workspace_id = 'workspace-legacy-real';
+SQL
+
+  reap_port "$API_PORT"
+  local waited=0
+  while port_open "$API_PORT" && [ "$waited" -lt 10 ]; do
+    sleep 1
+    waited=$((waited + 1))
+  done
+
+  VITAE_CI_DATABASE_URL="$E2E_DATABASE_URL" ci_env setsid env \
+    API_PORT="$API_PORT" \
+    WEB_ORIGIN="http://127.0.0.1:$WEB_PORT" \
+    BUILDSVC_URL="http://127.0.0.1:$BUILDSVC_PORT" \
+    VITAE_CLOUD_ENABLED=true \
+    PADDLE_WEBHOOK_SECRET="$PADDLE_WEBHOOK_SECRET" \
+    pnpm --filter @vitae/api start >"$API_CLOUD_LOG" 2>&1 &
+  SERVICE_PIDS+=("$!")
+
+  if ! wait_http "API (cloud mode)" "http://127.0.0.1:$API_PORT/ready"; then
+    tail -80 "$API_CLOUD_LOG" >&2
+    return 1
+  fi
+
+  local status=0
+  CI=1 \
+  E2E_BASE_URL="http://127.0.0.1:$WEB_PORT" \
+  E2E_API_BASE_URL="http://127.0.0.1:$API_PORT/api/v1" \
+  E2E_PADDLE_WEBHOOK_SECRET="$PADDLE_WEBHOOK_SECRET" \
+    pnpm --filter @vitae/e2e exec playwright test --config playwright.cloud.config.ts || status=$?
+
+  if [ "$status" != "0" ]; then
+    echo
+    echo "Cloud E2E failed. The evidence is on disk:"
+    echo "  report  e2e/playwright-report-cloud/index.html"
+    echo "  traces  e2e/test-results-cloud/"
+    echo "  api log $API_CLOUD_LOG"
+  fi
+  return "$status"
+}
+
 if [ "$FULL" = "1" ]; then
   run_step "Docker image · api"      docker build -q -f apps/api/Dockerfile .
   run_step "Docker image · buildsvc" build_buildsvc_image
   run_step "E2E (Playwright)"        e2e_local
+  run_step "E2E cloud mode"          e2e_cloud
 fi
 
 echo

@@ -184,7 +184,7 @@ test('elsewhere', async ({ page }) => {
   },
 }, {
   exit: 1,
-  expect: ['a11y: /unscanned is reached by b.spec.ts and scanned by nothing'],
+  expect: ['a11y: /unscanned is reached by e2e/tests/b.spec.ts and scanned by nothing'],
 });
 
 check('a spec with no scan passes when another spec scans that screen', {

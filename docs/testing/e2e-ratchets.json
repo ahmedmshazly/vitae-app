@@ -5,12 +5,13 @@
     "Ceilings may only be lowered. Each is a compromise the suite has agreed to carry, not a target.",
     "test_blocks counts `test(` calls only, excluding `test.describe(` and friends, which is why it reads lower than a bare grep for 'test('.",
     "sleeps counts both `waitForTimeout(` and hand-rolled `setTimeout(`. The coverage plan published 1 for years; there were 3, because the grep it named never matched the second form.",
-    "Accessibility is checked by screen, not by file. A spec without expectNoA11yViolations is fine when every route it visits is scanned by the spec that owns that screen. Counting files reported 12 uncovered specs while 0 screens were actually uncovered."
+    "Accessibility is checked by screen, not by file. A spec without expectNoA11yViolations is fine when every route it visits is scanned by the spec that owns that screen. Counting files reported 12 uncovered specs while 0 screens were actually uncovered.",
+    "Both suites count: e2e/tests runs against a self-hosted stack, e2e/cloud against the same stack with VITAE_CLOUD_ENABLED=true. They run as separate Playwright invocations because the flag breaks the first suite by design, but one set of rules governs both."
   ],
   "floors": {
-    "spec_files": 46,
-    "test_blocks": 262,
-    "expect_lines": 917
+    "spec_files": 48,
+    "test_blocks": 272,
+    "expect_lines": 943
   },
   "ceilings": {
     "sleeps": 3,

@@ -29,7 +29,10 @@ const root = process.env.VITAE_E2E_RATCHET_ROOT
   : resolve(import.meta.dirname, '..');
 
 const baselinePath = join(root, 'docs/testing/e2e-ratchets.json');
-const testsDir = join(root, 'e2e/tests');
+// Both suites. Cloud runs in its own Playwright invocation because the flag
+// that turns it on breaks the default suite by design, but the rules that keep
+// a suite honest do not change with the flag.
+const suiteDirs = ['e2e/tests', 'e2e/cloud'].map((rel) => join(root, rel));
 
 if (!existsSync(baselinePath)) {
   console.error(`missing ${basename(baselinePath)}; nothing to ratchet against`);
@@ -37,13 +40,17 @@ if (!existsSync(baselinePath)) {
 }
 const baseline = JSON.parse(readFileSync(baselinePath, 'utf8'));
 
-const specs = existsSync(testsDir)
-  ? readdirSync(testsDir)
+const specs = suiteDirs
+  .filter((dir) => existsSync(dir))
+  .flatMap((dir) =>
+    readdirSync(dir)
       .filter((name) => name.endsWith('.spec.ts'))
-      .sort()
-  : [];
+      .map((name) => join(dir, name)),
+  )
+  .sort();
 
-const sourceOf = new Map(specs.map((name) => [name, readFileSync(join(testsDir, name), 'utf8')]));
+const label = (path) => path.slice(root.length + 1);
+const sourceOf = new Map(specs.map((path) => [label(path), readFileSync(path, 'utf8')]));
 const all = [...sourceOf.values()].join('\n');
 
 const countAll = (re) => (all.match(re) ?? []).length;
@@ -84,7 +91,7 @@ for (const key of ['sleeps', 'weak_truthy']) {
 
 /** A number with one permitted value. */
 if (measured.quarantined !== 0) {
-  const where = specs.filter((name) => QUARANTINE.test(sourceOf.get(name) ?? ''));
+  const where = [...sourceOf.keys()].filter((name) => QUARANTINE.test(sourceOf.get(name) ?? ''));
   QUARANTINE.lastIndex = 0;
   findings.push(`quarantined: ${measured.quarantined} focused or skipped test(s) in ${where.join(', ')}. Must be 0.`);
 }

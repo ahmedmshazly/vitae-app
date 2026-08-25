@@ -19,7 +19,9 @@ export default tseslint.config(
       // from minified bundles on any machine that has run a build.
       '**/.vercel/**',
       '**/playwright-report/**',
+      '**/playwright-report-cloud/**',
       '**/test-results/**',
+      '**/test-results-cloud/**',
       // Design-system export artifacts: `.ds-sync` is the vendored converter
       // and `ds-bundle` is its generated upload tree (compiled bundles and
       // emitted .d.ts). Same reason as .vercel above: generated, gitignored,
@@ -31,10 +33,11 @@ export default tseslint.config(
       '**/reports/mutation/**',
       '**/*.config.js',
       '**/*.config.ts',
-      // The Playwright config is not build tooling. It carries the clock the
-      // suite agrees on, the timeouts, and the guard that refuses a focused
-      // test, so it is exactly the file worth linting.
+      // The Playwright configs are not build tooling. They carry the clock the
+      // suites agree on, the timeouts, and the guard that refuses a focused
+      // test, so they are exactly the files worth linting.
       '!e2e/playwright.config.ts',
+      '!e2e/playwright.cloud.config.ts',
     ],
   },
   js.configs.recommended,
@@ -107,7 +110,7 @@ export default tseslint.config(
     // in a hand-maintained test plan, run by hand or not at all. These are the
     // same ratchets, applied by the linter on the way in.
     ...playwright.configs['flat/recommended'],
-    files: ['e2e/tests/**/*.ts', 'e2e/playwright.config.ts'],
+    files: ['e2e/tests/**/*.ts', 'e2e/cloud/**/*.ts', 'e2e/*.config.ts'],
     rules: {
       ...playwright.configs['flat/recommended'].rules,
       // A focused or skipped test is how a green run stops meaning anything.

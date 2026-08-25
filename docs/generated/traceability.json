@@ -2,8 +2,8 @@
   "generated_by": "scripts/docs/gen-traceability.mjs",
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
-    "files_scanned": 856,
-    "files_citing": 158,
+    "files_scanned": 860,
+    "files_citing": 160,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,7 +20,7 @@
   },
   "totals": {
     "registered": 99,
-    "citations": 489,
+    "citations": 491,
     "implemented_and_tested": 19,
     "implemented_untested": 57,
     "tested_only": 2,
@@ -309,11 +309,13 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-untested",
       "sources": [
-        ".github/workflows/ci.yml:7"
+        ".github/workflows/ci.yml:7",
+        "scripts/check-workflow.mjs:16"
       ],
       "tests": [],
       "documents": [
-        "docs/observatory/operate/deploy.md:25"
+        "docs/observatory/operate/deploy.md:25",
+        "docs/testing/e2e-review-2026-08-25.md:408"
       ]
     },
     "FR-017": {
@@ -420,7 +422,7 @@
         "apps/web/src/features/QuickSwitcher.tsx:23",
         "apps/web/src/routes/ImportHub.tsx:850",
         "apps/web/src/routes/Settings.tsx:456",
-        "apps/web/src/styles/app.css:2208"
+        "apps/web/src/styles/app.css:2219"
       ],
       "tests": [],
       "documents": [
@@ -570,7 +572,7 @@
         "apps/web/src/features/forms/EdgeSubEditorRow.tsx:2",
         "apps/web/src/features/forms/EntityForm.tsx:2",
         "apps/web/src/features/forms/NewEntityMenu.tsx:4",
-        "apps/web/src/styles/app.css:2265",
+        "apps/web/src/styles/app.css:2276",
         "packages/core/src/forms/node-forms.ts:2",
         "packages/core/src/forms/types.ts:2",
         "packages/core/src/schema/validate.ts:4",
@@ -651,7 +653,7 @@
       "sources": [
         "apps/api/src/routes/v1/people.ts:43",
         "apps/web/src/features/forms/KnowsEditor.tsx:2",
-        "apps/web/src/styles/app.css:2479"
+        "apps/web/src/styles/app.css:2490"
       ],
       "tests": [],
       "documents": [
@@ -2375,6 +2377,9 @@
       "INT-2",
       "INT-6"
     ],
+    "docs/testing/e2e-review-2026-08-25.md": [
+      "FR-016"
+    ],
     "eslint.config.js": [
       "NFR-MNT-002",
       "INT-2"
@@ -2485,6 +2490,9 @@
     ],
     "packages/ui/src/styles/tokens.css": [
       "INT-3"
+    ],
+    "scripts/check-workflow.mjs": [
+      "FR-016"
     ],
     "services/buildsvc/src/calibrate.ts": [
       "FR-RES-009"

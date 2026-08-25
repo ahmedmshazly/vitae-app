@@ -1228,11 +1228,12 @@
     {
       "file": "apps/web/src/app/Shell.test.tsx",
       "package": "@vitae/web",
-      "cases": 5,
+      "cases": 8,
       "skipped": 0,
       "todo": 0,
       "suites": [
-        "Shell"
+        "Shell",
+        "Shell, when the workspace is read-only"
       ],
       "subjects": [
         "./Shell.js"
@@ -1243,7 +1244,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 104
+      "lines": 177
     },
     {
       "file": "apps/web/src/components/BulkBar.test.tsx",
@@ -4497,6 +4498,79 @@
       "lines": 18
     },
     {
+      "file": "e2e/cloud/access.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "../tests/helpers/a11y",
+        "../tests/helpers/api",
+        "./helpers/cloud"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 111
+    },
+    {
+      "file": "e2e/cloud/billing.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "../tests/helpers/a11y",
+        "./helpers/cloud"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 74
+    },
+    {
+      "file": "e2e/cloud/helpers/cloud.ts",
+      "package": "@vitae/e2e",
+      "cases": 0,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "../../tests/helpers/api"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 147
+    },
+    {
+      "file": "e2e/playwright.cloud.config.ts",
+      "package": "@vitae/e2e",
+      "cases": 0,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 51
+    },
+    {
       "file": "e2e/playwright.config.ts",
       "package": "@vitae/e2e",
       "cases": 0,
@@ -4663,7 +4737,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 332
+      "lines": 333
     },
     {
       "file": "e2e/tests/document-editor.spec.ts",
@@ -4847,7 +4921,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 61
+      "lines": 77
     },
     {
       "file": "e2e/tests/helpers/api.ts",
@@ -6791,23 +6865,23 @@
     }
   ],
   "summary": {
-    "files": 318,
-    "cases": 2087,
+    "files": 322,
+    "cases": 2102,
     "skipped": 0,
     "todo": 0,
     "by_package": {
       "@vitae/api": 212,
-      "@vitae/web": 1101,
-      "@vitae/e2e": 268,
+      "@vitae/web": 1104,
+      "@vitae/e2e": 280,
       "@vitae/core": 273,
       "@vitae/testkit": 7,
       "@vitae/ui": 226
     },
     "by_script": {
-      "test": 318,
+      "test": 322,
       "test:web": 159,
+      "test:e2e": 57,
       "test:api": 53,
-      "test:e2e": 53,
       "test:unit": 44,
       "test:coverage": 44,
       "test:core": 42,
@@ -6834,7 +6908,8 @@
       "test:resilience",
       "test:security",
       "test:unit",
-      "test:web"
+      "test:web",
+      "test:workflow"
     ],
     "ci_filtered_workspaces": [
       "@vitae/api",
@@ -6846,6 +6921,8 @@
     "cases_absent_from_ci": 0,
     "files_absent_from_ci": [],
     "empty": [
+      "e2e/cloud/helpers/cloud.ts",
+      "e2e/playwright.cloud.config.ts",
       "e2e/playwright.config.ts",
       "e2e/tests/helpers/a11y.ts",
       "e2e/tests/helpers/api.ts",
