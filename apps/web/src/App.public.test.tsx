@@ -10,6 +10,9 @@ const auth = vi.hoisted(() => ({ useAuth: vi.fn() }));
 vi.mock('./lib/auth.js', () => ({
   AuthProvider: ({ children }: { children: ReactNode }) => children,
   useAuth: auth.useAuth,
+  // The public home renders for a visitor with no remembered session; the
+  // returning-session redirect is asserted end to end in shell.spec.ts.
+  hasSessionHint: () => false,
 }));
 
 vi.mock('./routes/marketing/Landing.js', () => ({

@@ -320,12 +320,15 @@ with a retry, not eleven separately broken panels.
 open tasks and dated records grouped by day. Its empty state is *"The horizon
 is clear."*
 
-The signed-in root, `/`, is not an application screen — and it does not
-redirect. No signed-in route is mounted at `/`, so a signed-in visitor who
-lands there sees the public marketing page. A comment in `apps/web/src/App.tsx`
-records this as an open product question rather than an accident: an earlier
-redirect attempt cost a defect apiece in the shell and its spec before anyone
-noticed it could not run.
+The signed-in root, `/`, is not an application screen, but it now recognises
+you. The public root reads a synchronous session hint — set only when a
+usable session was last seen in this browser — and sends a returning visitor
+to `/today` without waiting on anything. A first-time or signed-out visitor
+gets the marketing page exactly as before, and the auth gate remains the
+authority: a stale hint costs one hop back to the landing page. This answers
+the product question `apps/web/src/App.tsx` held open after an earlier
+redirect attempt, placed where that comment said it belonged — on the public
+route.
 
 ## Network
 

@@ -218,6 +218,19 @@ test('mobile dock, capture, search, and More sheet keep every workspace reachabl
   await expectNoA11yViolations(page);
 });
 
+test('the root recognises a returning session and goes to Today', async ({ page }) => {
+  await signIn(page);
+  // A returning visitor types the bare address. The public root reads the
+  // session hint synchronously — it still never waits on Firebase or the
+  // API — and hands them to Today instead of the marketing page. The auth
+  // gate stays the authority; the signIn above is what made the hint honest.
+  await page.goto('/');
+  await expect(page).toHaveURL(/\/today$/);
+  await expect(page.getByRole('img', { name: /^Days of this week/ })).toBeVisible({
+    timeout: 10_000,
+  });
+});
+
 test('demo-space toggle carries an accessible name in every state', async ({ page }) => {
   await signIn(page);
   const toggle = page.getByRole('button', { name: 'View demo' });

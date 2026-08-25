@@ -17,6 +17,34 @@ import {
 } from './firebase.js';
 import { isLocalDeveloperRuntime } from './runtime.js';
 
+/**
+ * A synchronous hint that a usable session recently existed in this browser,
+ * so the public root can recognise a returning visitor without waiting on
+ * Firebase or the API — public routes must never wait. It is a hint, not an
+ * authority: the auth gate still decides, and a stale hint costs one honest
+ * hop through the splash back to the landing page. It deliberately tracks
+ * *usable* sessions (a Cloud account stuck at the door does not count), so
+ * the root and the gate can never bounce a visitor between each other.
+ */
+const SESSION_HINT_KEY = 'vitae.v1.session-hint';
+
+export function hasSessionHint(): boolean {
+  try {
+    return localStorage.getItem(SESSION_HINT_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function rememberSession(usable: boolean) {
+  try {
+    if (usable) localStorage.setItem(SESSION_HINT_KEY, '1');
+    else localStorage.removeItem(SESSION_HINT_KEY);
+  } catch {
+    // Storage can be unavailable (private windows); the hint is optional.
+  }
+}
+
 export interface User {
   uid?: string;
   email: string;
@@ -79,6 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCloudEnabled(isCloud);
     setAccountError(setupError);
     setDevLoginEnabled(me.devLoginEnabled);
+    rememberSession(me.user !== null && (!isCloud || me.workspace != null));
     return { user: me.user, accountError: setupError };
   }
 
@@ -106,6 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
         setWorkspace(null);
         setAccountError(null);
+        rememberSession(false);
       }
       // Unauthenticated: only local dev builds may offer the dev shortcut.
       setDevLoginEnabled(isLocalDeveloperRuntime);
@@ -170,6 +200,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setWorkspace(null);
     setAccountError(null);
+    rememberSession(false);
   }
 
   return (

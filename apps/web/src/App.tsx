@@ -7,7 +7,7 @@ import {
   useParams,
   useSearchParams,
 } from 'react-router-dom';
-import { AuthProvider, useAuth } from './lib/auth.js';
+import { AuthProvider, hasSessionHint, useAuth } from './lib/auth.js';
 import { Shell } from './app/Shell.js';
 import { ToastProvider } from './features/Toast.js';
 import { ErrorBoundary, ShellErrorFallback } from './components/ErrorBoundary.js';
@@ -104,6 +104,22 @@ function PublicPage({ children, metadataPath }: { children: ReactNode; metadataP
   );
 }
 
+/**
+ * The public root recognises a returning session. The hint is synchronous, so
+ * this route still never waits on Firebase or the API: a visitor whose last
+ * known session was usable goes straight to Today — the auth gate remains the
+ * authority, and a stale hint costs one honest hop back to this door — while
+ * everyone else gets the landing page in the same paint they always did.
+ */
+function RootDoor() {
+  if (hasSessionHint()) return <Navigate to="/today" replace />;
+  return (
+    <PublicPage metadataPath="/">
+      <Landing />
+    </PublicPage>
+  );
+}
+
 /** Preserve inbound campaign parameters while retiring the old public home address. */
 function LegacyWelcomeRedirect() {
   const { search, hash } = useLocation();
@@ -163,14 +179,7 @@ export function App() {
   return (
     <Routes>
       {/* These routes are fully public and must never wait on Firebase or the API. */}
-      <Route
-        path="/"
-        element={
-          <PublicPage metadataPath="/">
-            <Landing />
-          </PublicPage>
-        }
-      />
+      <Route path="/" element={<RootDoor />} />
       <Route path="/welcome" element={<LegacyWelcomeRedirect />} />
       <Route path="/product" element={<Navigate to="/how-it-works" replace />} />
       <Route
@@ -335,14 +344,15 @@ function AuthedApp() {
               }
             >
               <Routes>
-                {/* No `/` here. AuthGate is mounted at `path="*"`, which ranks
-                    below the exact `/` above it, so the root never reaches this
-                    tree: a signed-in visitor to `/` gets the marketing page.
-                    A redirect here used to record the opposite, and cost a
-                    defect apiece in Shell.tsx and shell.spec.ts before anyone
-                    noticed it could not run. Whether `/` should recognise a
-                    signed-in visitor is a product question, and the place to
-                    answer it is the public route, not this one. */}
+                {/* No `/` here, and there must never be one. AuthGate is
+                    mounted at `path="*"`, which ranks below the exact `/`
+                    above it, so the root never reaches this tree — a redirect
+                    here once cost a defect apiece in Shell.tsx and
+                    shell.spec.ts before anyone noticed it could not run. The
+                    product question it left open is now answered where the
+                    comment said to answer it: `RootDoor`, on the public
+                    route, recognises a returning session synchronously and
+                    sends it to Today. */}
                 <Route path="/today" element={<Dashboard />} />
 
                 {/* Canonical task-led workspaces. Compatibility routes remain

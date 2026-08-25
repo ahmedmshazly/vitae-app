@@ -1142,7 +1142,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 48
+      "lines": 51
     },
     {
       "file": "apps/web/src/App.test.tsx",
@@ -5339,7 +5339,7 @@
     {
       "file": "e2e/tests/shell.spec.ts",
       "package": "@vitae/e2e",
-      "cases": 6,
+      "cases": 7,
       "skipped": 0,
       "todo": 0,
       "suites": [],
@@ -5353,7 +5353,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 229
+      "lines": 242
     },
     {
       "file": "e2e/tests/signin.spec.ts",
@@ -6866,13 +6866,13 @@
   ],
   "summary": {
     "files": 322,
-    "cases": 2102,
+    "cases": 2103,
     "skipped": 0,
     "todo": 0,
     "by_package": {
       "@vitae/api": 212,
       "@vitae/web": 1104,
-      "@vitae/e2e": 280,
+      "@vitae/e2e": 281,
       "@vitae/core": 273,
       "@vitae/testkit": 7,
       "@vitae/ui": 226
