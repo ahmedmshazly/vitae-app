@@ -77,12 +77,12 @@
       "source": "packages/config/src/env.ts:17",
       "reads": [
         "scripts/ci-local.sh:103",
-        "scripts/ci-local.sh:329",
-        "scripts/ci-local.sh:361",
-        "scripts/ci-local.sh:365",
-        "scripts/ci-local.sh:376",
-        "scripts/ci-local.sh:392",
-        "scripts/ci-local.sh:397",
+        "scripts/ci-local.sh:338",
+        "scripts/ci-local.sh:370",
+        "scripts/ci-local.sh:374",
+        "scripts/ci-local.sh:385",
+        "scripts/ci-local.sh:401",
+        "scripts/ci-local.sh:406",
         "scripts/ci-local.sh:99"
       ],
       "read_by": [
@@ -1446,9 +1446,9 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/ci-local.sh:275",
+      "source": "scripts/ci-local.sh:284",
       "reads": [
-        "scripts/ci-local.sh:275"
+        "scripts/ci-local.sh:284"
       ],
       "read_by": [
         "deploy"
@@ -1456,6 +1456,34 @@
       "read_via": "shell",
       "test_only": false,
       "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_CI_MIRROR_ROOT",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/check-ci-mirror.mjs:30",
+      "reads": [
+        "scripts/check-ci-mirror.mjs:30",
+        "scripts/check-ci-mirror.mjs:31"
+      ],
+      "read_by": [
+        "scripts"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "tooling",
       "documented": false,
       "example": null
     },
@@ -1581,6 +1609,34 @@
       "example": null
     },
     {
+      "name": "VITAE_E2E_RATCHET_ROOT",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/check-e2e-ratchets.mjs:27",
+      "reads": [
+        "scripts/check-e2e-ratchets.mjs:27",
+        "scripts/check-e2e-ratchets.mjs:28"
+      ],
+      "read_by": [
+        "scripts"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "tooling",
+      "documented": false,
+      "example": null
+    },
+    {
       "name": "VITAE_E2E_TESTS",
       "scope": "deploy",
       "declared_in": null,
@@ -1594,10 +1650,10 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/ci-local.sh:389",
+      "source": "scripts/ci-local.sh:398",
       "reads": [
-        "scripts/ci-local.sh:389",
-        "scripts/ci-local.sh:393"
+        "scripts/ci-local.sh:398",
+        "scripts/ci-local.sh:402"
       ],
       "read_by": [
         "deploy"
@@ -2389,9 +2445,9 @@
     "Storage: Cloudinary (SRS T5; owner-provided)"
   ],
   "summary": {
-    "total": 81,
+    "total": 83,
     "by_scope": {
-      "server": 49,
+      "server": 51,
       "deploy": 19,
       "web-build": 13
     },
@@ -2453,9 +2509,11 @@
       "E2E_BASE_URL",
       "OUT_DIR",
       "SHOT_DIR",
+      "VITAE_CI_MIRROR_ROOT",
       "VITAE_DOCS_ROOT",
       "VITAE_E2E_BROWSERS",
       "VITAE_E2E_FOCUS",
+      "VITAE_E2E_RATCHET_ROOT",
       "VITAE_E2E_TZ",
       "VITAE_MAP_ROOT",
       "VITAE_REQUIRE_BUDGETS",

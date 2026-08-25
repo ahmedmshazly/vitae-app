@@ -69,6 +69,11 @@ jobs:
         # docs:check runs its own self-tests first, for the same reason
         # test:map does: a gate is only trustworthy once seen to fail.
         run: pnpm docs:check
+      # The suite's own ratchets, and the check that scripts/ci-local.sh still
+      # mirrors this file. Both were prose until 2026-08-25, and both were
+      # wrong while they were.
+      - name: Harness gates (CI mirror, e2e ratchets)
+        run: pnpm test:mirror && pnpm test:ratchets
       - name: Reject high and critical dependency vulnerabilities
         run: pnpm audit --audit-level=high
       - name: Unit + property-fuzz tests (packages/core + testkit)

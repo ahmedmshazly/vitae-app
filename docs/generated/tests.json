@@ -4529,7 +4529,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 208
+      "lines": 211
     },
     {
       "file": "e2e/tests/atlas.spec.ts",
@@ -4607,7 +4607,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 54
+      "lines": 53
     },
     {
       "file": "e2e/tests/demo-mode.spec.ts",
@@ -4617,6 +4617,7 @@
       "todo": 0,
       "suites": [],
       "subjects": [
+        "./helpers/a11y",
         "./helpers/auth"
       ],
       "requirements": [],
@@ -4625,7 +4626,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 34
+      "lines": 41
     },
     {
       "file": "e2e/tests/directories.spec.ts",
@@ -4644,7 +4645,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 160
+      "lines": 159
     },
     {
       "file": "e2e/tests/docs.spec.ts",
@@ -4680,7 +4681,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 43
+      "lines": 42
     },
     {
       "file": "e2e/tests/duplicates.spec.ts",
@@ -4846,7 +4847,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 40
+      "lines": 61
     },
     {
       "file": "e2e/tests/helpers/api.ts",
@@ -4862,7 +4863,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 60
+      "lines": 90
     },
     {
       "file": "e2e/tests/helpers/auth.ts",
@@ -4871,14 +4872,16 @@
       "skipped": 0,
       "todo": 0,
       "suites": [],
-      "subjects": [],
+      "subjects": [
+        "./api"
+      ],
       "requirements": [],
       "run_by": [
         "test:e2e",
         "test"
       ],
       "run_in_ci": true,
-      "lines": 34
+      "lines": 52
     },
     {
       "file": "e2e/tests/helpers/controls.ts",
@@ -5099,7 +5102,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 134
+      "lines": 131
     },
     {
       "file": "e2e/tests/overlays.spec.ts",
@@ -5159,7 +5162,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 181
+      "lines": 188
     },
     {
       "file": "e2e/tests/repositories.spec.ts",
@@ -5217,7 +5220,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 126
+      "lines": 129
     },
     {
       "file": "e2e/tests/search.spec.ts",
@@ -5388,7 +5391,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 234
+      "lines": 242
     },
     {
       "file": "e2e/tests/timeline.spec.ts",
@@ -5408,7 +5411,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 165
+      "lines": 174
     },
     {
       "file": "e2e/tests/today.spec.ts",
@@ -5429,7 +5432,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 186
+      "lines": 193
     },
     {
       "file": "e2e/tests/tour.spec.ts",
@@ -6822,10 +6825,12 @@
       "test:brand",
       "test:contract",
       "test:map",
+      "test:mirror",
       "test:performance",
       "test:property",
       "test:prose",
       "test:public",
+      "test:ratchets",
       "test:resilience",
       "test:security",
       "test:unit",

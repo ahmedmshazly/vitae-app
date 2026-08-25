@@ -201,6 +201,14 @@ repository_gates() {
   pnpm test:map && pnpm test:prose && pnpm test:public && pnpm test:brand
 }
 
+# The two gates that guard this script and the suite it runs. test:mirror fails
+# when the workflow gains a step this file does not; test:ratchets fails when
+# the suite loses coverage. Both carry their own self-tests, because a gate
+# nobody has seen fail is a gate nobody should trust.
+harness_gates() {
+  pnpm test:mirror && pnpm test:ratchets
+}
+
 # The web bundle is measured, not guessed. The repository .env carries
 # NODE_ENV=development, and Vite captures `isNodeEnvSet` before it loads the
 # config, so a value in .env outranks `vite build` and the result is a
@@ -239,9 +247,10 @@ run_step "Typecheck"                 pnpm typecheck
 run_step "Lint"                      pnpm lint
 run_step "Repository gates (map, prose, public, brand)" repository_gates
 run_step "Generated documentation"   pnpm docs:check
+run_step "Harness gates (mirror, ratchets)" harness_gates
 run_step "Unit tests (core + testkit)" pnpm test:unit
 run_step "Design system (@vitae/ui)" pnpm --filter @vitae/ui test
-run_step "Web unit tests"            pnpm --filter @vitae/web test
+run_step "Web unit tests"            pnpm test:web
 run_step "Web accessibility (axe)"   pnpm test:a11y
 
 if [ "$QUICK" = "0" ]; then

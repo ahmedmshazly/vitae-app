@@ -2,7 +2,7 @@
   "generated_by": "scripts/docs/gen-traceability.mjs",
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
-    "files_scanned": 853,
+    "files_scanned": 856,
     "files_citing": 158,
     "excluded": {
       "self_referential": [
@@ -166,7 +166,7 @@
       "evidence": "implemented-untested",
       "sources": [
         ".github/workflows/ci.yml:3",
-        ".github/workflows/ci.yml:213"
+        ".github/workflows/ci.yml:218"
       ],
       "tests": [],
       "documents": [
@@ -1092,7 +1092,7 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-and-tested",
       "sources": [
-        ".github/workflows/ci.yml:224",
+        ".github/workflows/ci.yml:229",
         "apps/api/src/routes/v1/resumes.ts:137",
         "packages/core/src/algorithms/line-model.ts:2",
         "packages/core/src/algorithms/line-model.ts:46",

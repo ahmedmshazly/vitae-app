@@ -212,7 +212,7 @@
       ],
       "source_files": 172,
       "test_files": 159,
-      "source_lines": 46366,
+      "source_lines": 46373,
       "exports": 738,
       "dependents": [],
       "imported_by": [],
@@ -654,7 +654,7 @@
     "packages": 8,
     "source_files": 348,
     "test_files": 318,
-    "source_lines": 79002,
+    "source_lines": 79009,
     "layers": 2,
     "cyclic": [],
     "workspace_typecheck": {

@@ -2,11 +2,11 @@
   "generated_by": "scripts/docs/gen-routes.mjs",
   "note": "Derived from the JSX route tree in apps/web/src/App.tsx. Do not edit by hand.",
   "totals": {
-    "routes": 85,
+    "routes": 84,
     "public": 23,
-    "private": 60,
+    "private": 59,
     "lazy": 57,
-    "redirects": 3,
+    "redirects": 2,
     "with_params": 8,
     "prerendered": 18
   },
@@ -21,7 +21,7 @@
     },
     {
       "name": "AuthedApp",
-      "routes": 60
+      "routes": 59
     }
   ],
   "routes": [
@@ -350,20 +350,7 @@
       "module": "./routes/NotFound.js",
       "lazy": true,
       "note": "A dead URL used to render the Dashboard, so a broken link looked exactly like a successful navigation home.",
-      "source": "apps/web/src/App.tsx:404"
-    },
-    {
-      "path": "/",
-      "params": [],
-      "wildcard": false,
-      "block": "AuthedApp",
-      "access": "private",
-      "element": "Navigate",
-      "redirect_to": "/today",
-      "module": null,
-      "lazy": null,
-      "note": null,
-      "source": "apps/web/src/App.tsx:338"
+      "source": "apps/web/src/App.tsx:411"
     },
     {
       "path": "/ask/people",
@@ -376,7 +363,7 @@
       "module": "./routes/Ask.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:382"
+      "source": "apps/web/src/App.tsx:389"
     },
     {
       "path": "/browse/:type",
@@ -391,7 +378,7 @@
       "module": "apps/web/src/App.tsx",
       "lazy": false,
       "note": null,
-      "source": "apps/web/src/App.tsx:386"
+      "source": "apps/web/src/App.tsx:393"
     },
     {
       "path": "/career",
@@ -404,7 +391,7 @@
       "module": "./routes/career/index.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:350"
+      "source": "apps/web/src/App.tsx:357"
     },
     {
       "path": "/career/applications",
@@ -417,7 +404,7 @@
       "module": "./routes/career/index.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:351"
+      "source": "apps/web/src/App.tsx:358"
     },
     {
       "path": "/career/applications/:id",
@@ -432,7 +419,7 @@
       "module": "./routes/career/index.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:352"
+      "source": "apps/web/src/App.tsx:359"
     },
     {
       "path": "/career/resume",
@@ -445,7 +432,7 @@
       "module": "./routes/ResumeHub.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:353"
+      "source": "apps/web/src/App.tsx:360"
     },
     {
       "path": "/career/resume/evidence",
@@ -458,7 +445,7 @@
       "module": "./routes/Atoms.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:354"
+      "source": "apps/web/src/App.tsx:361"
     },
     {
       "path": "/career/resume/letters",
@@ -471,7 +458,7 @@
       "module": "./routes/Letters.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:357"
+      "source": "apps/web/src/App.tsx:364"
     },
     {
       "path": "/career/resume/outputs",
@@ -484,7 +471,7 @@
       "module": "./routes/Outputs.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:356"
+      "source": "apps/web/src/App.tsx:363"
     },
     {
       "path": "/career/resume/tailor",
@@ -497,7 +484,7 @@
       "module": "./routes/tailor/Tailor.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:355"
+      "source": "apps/web/src/App.tsx:362"
     },
     {
       "path": "/career/resume/templates",
@@ -510,7 +497,7 @@
       "module": "./routes/Templates.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:358"
+      "source": "apps/web/src/App.tsx:365"
     },
     {
       "path": "/collections",
@@ -523,7 +510,7 @@
       "module": "./routes/Collections.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:384"
+      "source": "apps/web/src/App.tsx:391"
     },
     {
       "path": "/data",
@@ -536,7 +523,7 @@
       "module": "./routes/workspaces/WorkspaceHomes.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:364"
+      "source": "apps/web/src/App.tsx:371"
     },
     {
       "path": "/data/exports",
@@ -549,7 +536,7 @@
       "module": "./routes/ExportPage.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:368"
+      "source": "apps/web/src/App.tsx:375"
     },
     {
       "path": "/data/identity",
@@ -562,7 +549,7 @@
       "module": "./routes/Duplicates.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:366"
+      "source": "apps/web/src/App.tsx:373"
     },
     {
       "path": "/data/imports",
@@ -575,7 +562,7 @@
       "module": "./routes/ImportHub.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:365"
+      "source": "apps/web/src/App.tsx:372"
     },
     {
       "path": "/data/sources/github",
@@ -588,7 +575,7 @@
       "module": "./routes/Repositories.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:367"
+      "source": "apps/web/src/App.tsx:374"
     },
     {
       "path": "/data/trash",
@@ -601,7 +588,7 @@
       "module": "./routes/Trash.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:369"
+      "source": "apps/web/src/App.tsx:376"
     },
     {
       "path": "/explore",
@@ -614,7 +601,7 @@
       "module": "./routes/workspaces/WorkspaceHomes.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:359"
+      "source": "apps/web/src/App.tsx:366"
     },
     {
       "path": "/explore/atlas",
@@ -627,7 +614,7 @@
       "module": "./routes/MapView.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:363"
+      "source": "apps/web/src/App.tsx:370"
     },
     {
       "path": "/explore/graph",
@@ -640,7 +627,7 @@
       "module": "./routes/GraphView.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:361"
+      "source": "apps/web/src/App.tsx:368"
     },
     {
       "path": "/explore/library",
@@ -653,7 +640,7 @@
       "module": "./routes/Collections.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:360"
+      "source": "apps/web/src/App.tsx:367"
     },
     {
       "path": "/explore/timeline",
@@ -666,7 +653,7 @@
       "module": "./routes/Timeline.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:362"
+      "source": "apps/web/src/App.tsx:369"
     },
     {
       "path": "/export",
@@ -679,7 +666,7 @@
       "module": "./routes/ExportPage.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:394"
+      "source": "apps/web/src/App.tsx:401"
     },
     {
       "path": "/graph",
@@ -692,7 +679,7 @@
       "module": "./routes/GraphView.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:389"
+      "source": "apps/web/src/App.tsx:396"
     },
     {
       "path": "/help",
@@ -705,7 +692,7 @@
       "module": "./routes/workspaces/WorkspaceHomes.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:375"
+      "source": "apps/web/src/App.tsx:382"
     },
     {
       "path": "/import",
@@ -718,7 +705,7 @@
       "module": "./routes/ImportHub.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:392"
+      "source": "apps/web/src/App.tsx:399"
     },
     {
       "path": "/import/duplicates",
@@ -731,7 +718,7 @@
       "module": "./routes/Duplicates.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:393"
+      "source": "apps/web/src/App.tsx:400"
     },
     {
       "path": "/intros",
@@ -744,7 +731,7 @@
       "module": "./routes/Intros.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:383"
+      "source": "apps/web/src/App.tsx:390"
     },
     {
       "path": "/map",
@@ -757,7 +744,7 @@
       "module": "./routes/MapView.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:391"
+      "source": "apps/web/src/App.tsx:398"
     },
     {
       "path": "/n/:id",
@@ -772,7 +759,7 @@
       "module": "./routes/Record.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:387"
+      "source": "apps/web/src/App.tsx:394"
     },
     {
       "path": "/network",
@@ -785,7 +772,7 @@
       "module": "./routes/workspaces/WorkspaceHomes.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:344"
+      "source": "apps/web/src/App.tsx:351"
     },
     {
       "path": "/network/intelligence",
@@ -798,7 +785,7 @@
       "module": "apps/web/src/App.tsx",
       "lazy": false,
       "note": null,
-      "source": "apps/web/src/App.tsx:349"
+      "source": "apps/web/src/App.tsx:356"
     },
     {
       "path": "/network/organizations",
@@ -811,7 +798,7 @@
       "module": "./routes/Orgs.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:347"
+      "source": "apps/web/src/App.tsx:354"
     },
     {
       "path": "/network/organizations/:id",
@@ -826,7 +813,7 @@
       "module": "./routes/Org.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:348"
+      "source": "apps/web/src/App.tsx:355"
     },
     {
       "path": "/network/people",
@@ -839,7 +826,7 @@
       "module": "./routes/People.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:345"
+      "source": "apps/web/src/App.tsx:352"
     },
     {
       "path": "/network/people/:id",
@@ -854,7 +841,7 @@
       "module": "./routes/Person.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:346"
+      "source": "apps/web/src/App.tsx:353"
     },
     {
       "path": "/orgs",
@@ -867,7 +854,7 @@
       "module": "./routes/Orgs.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:380"
+      "source": "apps/web/src/App.tsx:387"
     },
     {
       "path": "/orgs/:id",
@@ -882,7 +869,7 @@
       "module": "./routes/Org.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:381"
+      "source": "apps/web/src/App.tsx:388"
     },
     {
       "path": "/people",
@@ -895,7 +882,7 @@
       "module": "./routes/People.js",
       "lazy": true,
       "note": "Stable legacy addresses.",
-      "source": "apps/web/src/App.tsx:378"
+      "source": "apps/web/src/App.tsx:385"
     },
     {
       "path": "/people/:id",
@@ -910,7 +897,7 @@
       "module": "./routes/Person.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:379"
+      "source": "apps/web/src/App.tsx:386"
     },
     {
       "path": "/repositories",
@@ -923,7 +910,7 @@
       "module": "./routes/Repositories.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:385"
+      "source": "apps/web/src/App.tsx:392"
     },
     {
       "path": "/resume",
@@ -936,7 +923,7 @@
       "module": "./routes/ResumeHub.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:395"
+      "source": "apps/web/src/App.tsx:402"
     },
     {
       "path": "/resume/atoms",
@@ -949,7 +936,7 @@
       "module": "./routes/Atoms.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:396"
+      "source": "apps/web/src/App.tsx:403"
     },
     {
       "path": "/resume/letters",
@@ -962,7 +949,7 @@
       "module": "./routes/Letters.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:399"
+      "source": "apps/web/src/App.tsx:406"
     },
     {
       "path": "/resume/outputs",
@@ -975,7 +962,7 @@
       "module": "./routes/Outputs.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:398"
+      "source": "apps/web/src/App.tsx:405"
     },
     {
       "path": "/resume/tailor",
@@ -988,7 +975,7 @@
       "module": "./routes/tailor/Tailor.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:397"
+      "source": "apps/web/src/App.tsx:404"
     },
     {
       "path": "/resume/templates",
@@ -1001,7 +988,7 @@
       "module": "./routes/Templates.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:400"
+      "source": "apps/web/src/App.tsx:407"
     },
     {
       "path": "/search",
@@ -1014,7 +1001,7 @@
       "module": "./routes/SearchResults.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:388"
+      "source": "apps/web/src/App.tsx:395"
     },
     {
       "path": "/settings",
@@ -1027,7 +1014,7 @@
       "module": "./routes/workspaces/WorkspaceHomes.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:370"
+      "source": "apps/web/src/App.tsx:377"
     },
     {
       "path": "/settings/billing",
@@ -1040,7 +1027,7 @@
       "module": "./routes/Billing.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:374"
+      "source": "apps/web/src/App.tsx:381"
     },
     {
       "path": "/settings/preferences",
@@ -1053,7 +1040,7 @@
       "module": "./routes/Settings.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:372"
+      "source": "apps/web/src/App.tsx:379"
     },
     {
       "path": "/settings/profile",
@@ -1066,7 +1053,7 @@
       "module": "./routes/Settings.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:371"
+      "source": "apps/web/src/App.tsx:378"
     },
     {
       "path": "/settings/system",
@@ -1079,7 +1066,7 @@
       "module": "./routes/Settings.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:373"
+      "source": "apps/web/src/App.tsx:380"
     },
     {
       "path": "/timeline",
@@ -1092,7 +1079,7 @@
       "module": "./routes/Timeline.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:390"
+      "source": "apps/web/src/App.tsx:397"
     },
     {
       "path": "/today",
@@ -1104,8 +1091,8 @@
       "redirect_to": null,
       "module": "./routes/Dashboard.js",
       "lazy": true,
-      "note": null,
-      "source": "apps/web/src/App.tsx:339"
+      "note": "No `/` here. AuthGate is mounted at `path=\"*\"`, which ranks below the exact `/` above it, so the root never reaches this tree: a signed-in visitor to `/` gets the marketing page. A redirect here used to record the opposite, and cost a defect apiece in Shell.tsx and shell.spec.ts before anyone noticed it could not run. Whether `/` should recognise a signed-in visitor is a product question, and the place to answer it is the public route, not this one.",
+      "source": "apps/web/src/App.tsx:346"
     },
     {
       "path": "/today/planner",
@@ -1118,7 +1105,7 @@
       "module": "./routes/workspaces/Planner.js",
       "lazy": true,
       "note": "Canonical task-led workspaces. Compatibility routes remain mounted below so bookmarks and shared record links survive.",
-      "source": "apps/web/src/App.tsx:343"
+      "source": "apps/web/src/App.tsx:350"
     },
     {
       "path": "/trash",
@@ -1131,7 +1118,7 @@
       "module": "./routes/Trash.js",
       "lazy": true,
       "note": null,
-      "source": "apps/web/src/App.tsx:401"
+      "source": "apps/web/src/App.tsx:408"
     },
     {
       "path": "*",
