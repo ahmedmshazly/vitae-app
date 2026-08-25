@@ -12,12 +12,14 @@ test('the manifesto leads with the quiet instrument claim and holdings', async (
   await page.goto('/manifesto');
 
   await expect(
-    page.getByRole('heading', { name: 'A quiet instrument for a loud life.' }),
+    page.getByRole('heading', {
+      name: 'A career move deserves more than a document rewritten from memory.',
+    }),
   ).toBeVisible();
-  await expect(page.getByRole('list', { name: 'What we hold ourselves to' })).toBeVisible();
-  await expect(page.getByText('The data is yours.')).toBeVisible();
-  await expect(page.getByText(/no ads and never will be/i)).toBeVisible();
-  await expect(page.getByText('Vitae · built in Cairo · 2026')).toBeVisible();
+  await expect(page.getByRole('list', { name: 'What Vitae holds itself to' })).toBeVisible();
+  await expect(page.getByText('The record remains yours.')).toBeVisible();
+  await expect(page.getByText(/engagement theater/i)).toBeVisible();
+  await expect(page.getByText(/a quiet instrument for the work behind the work/i)).toBeVisible();
 });
 
 test('rules and principle markers stay flat: no gradients', async ({ page }) => {
@@ -36,18 +38,23 @@ test('rules and principle markers stay flat: no gradients', async ({ page }) => 
 test('sign-in and tour are reachable from the closing CTAs', async ({ page }) => {
   await page.goto('/manifesto');
 
-  await page.getByRole('link', { name: 'Get started' }).click();
+  await page
+    .getByRole('navigation', { name: 'Primary' })
+    .getByRole('link', { name: 'Sign in' })
+    .click();
   await expect(page).toHaveURL(/\/signin/);
 
   await page.goto('/manifesto');
-  await page.getByRole('link', { name: 'Take the tour' }).click();
+  await page.getByRole('link', { name: 'Take the product tour' }).first().click();
   await expect(page).toHaveURL(/\/tour/);
 });
 
 test('the manifesto page has no automated a11y violations', async ({ page }) => {
   await page.goto('/manifesto');
   await expect(
-    page.getByRole('heading', { name: 'A quiet instrument for a loud life.' }),
+    page.getByRole('heading', {
+      name: 'A career move deserves more than a document rewritten from memory.',
+    }),
   ).toBeVisible();
   await expectNoA11yViolations(page);
 });

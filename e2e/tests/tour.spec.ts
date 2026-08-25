@@ -7,22 +7,26 @@ import { expectNoA11yViolations } from './helpers/a11y';
  * Quiet walkthrough: stop rail + one product frame. No glow on the active
  * stop, no brand-gradient progress fill, and Today copy that matches the
  * rebuilt momentum score (not a ring).
+ *
+ * The rail carries seven stops, keyed `01 · CAPTURE` through `07 · KEEP`.
+ * Their titles are the accessible names; the keys are decoration.
  */
 
 test('the first stop shows capture with a quiet progress bar', async ({ page }) => {
   await page.goto('/tour');
 
   await expect(page.getByRole('main')).toHaveCount(1);
-  await expect(page.getByRole('heading', { name: 'Five stops, two minutes.' })).toBeVisible();
-  await expect(page.getByRole('tab', { name: /Capture anything in one line/i })).toHaveAttribute(
-    'aria-selected',
-    'true',
-  );
-  await expect(page.getByRole('img', { name: /capture bar/i })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Previous stop' })).toBeDisabled();
-  await expect(page.getByRole('button', { name: 'Next stop' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Seven stops from a fresh detail to a career move.' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('tab', { name: /Capture the detail before it goes vague/i }),
+  ).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('img', { name: /command capture/i })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Previous/ })).toBeDisabled();
+  await expect(page.getByRole('button', { name: /Next stop/ })).toBeVisible();
 
-  const progress = page.getByRole('progressbar', { name: /Stop 1 of 5/i });
+  const progress = page.getByRole('progressbar', { name: /Stop 1 of 7/i });
   await expect(progress).toBeVisible();
   const fill = page.locator('.mk-tour__progressfill');
   const fillImage = await fill.evaluate((el) => getComputedStyle(el).backgroundImage);
@@ -36,36 +40,44 @@ test('the first stop shows capture with a quiet progress bar', async ({ page }) 
   ).toBeTruthy();
 });
 
-test('rail, next, and arrow keys advance stops; last stop offers sign-in', async ({ page }) => {
+test('rail, next, and arrow keys advance stops; sign-in stays reachable', async ({ page }) => {
   await page.goto('/tour');
 
-  await page.getByRole('tab', { name: /A day with momentum/i }).click();
+  await page.getByRole('tab', { name: /Return to the next useful action/i }).click();
   await expect(page.getByRole('img', { name: /momentum score/i })).toBeVisible();
-  await expect(page.getByText(/momentum score/i).first()).toBeVisible();
+  // The score is named in the frame's own label now, not in the body prose.
+  await expect(page.getByText(/the daily operating view/i).first()).toBeVisible();
   await expect(page.getByText(/momentum ring/i)).toHaveCount(0);
   await expect(page.getByText(/flame/i)).toHaveCount(0);
 
-  await page.getByRole('button', { name: 'Next stop' }).click();
+  await page.getByRole('button', { name: /Next stop/ }).click();
   await expect(
-    page.getByRole('tab', { name: /Relationships with instrumentation/i }),
+    page.getByRole('tab', { name: /Keep the output and the exit path/i }),
   ).toHaveAttribute('aria-selected', 'true');
 
-  const peopleTab = page.getByRole('tab', { name: /Relationships with instrumentation/i });
-  await peopleTab.focus();
+  const connectTab = page.getByRole('tab', { name: /See the record through its relationships/i });
+  await connectTab.click();
+  await connectTab.focus();
   await page.keyboard.press('ArrowRight');
-  await expect(page.getByRole('tab', { name: /The shape of your life/i })).toHaveAttribute(
-    'aria-selected',
-    'true',
-  );
+  await expect(
+    page.getByRole('tab', { name: /Read a warm route before you make an ask/i }),
+  ).toHaveAttribute('aria-selected', 'true');
 
-  await page.getByRole('tab', { name: /Forms when you want depth/i }).click();
-  await expect(page.getByRole('link', { name: /Get started/i })).toBeVisible();
-  await page.getByRole('link', { name: /Get started/i }).click();
+  // The last stop closes on the tour CTA; the way into the product is the
+  // primary nav, which the walkthrough never takes away.
+  await page.getByRole('tab', { name: /Keep the output and the exit path/i }).click();
+  await expect(page.getByRole('link', { name: 'Take the product tour' }).first()).toBeVisible();
+  await page
+    .getByRole('navigation', { name: 'Primary' })
+    .getByRole('link', { name: 'Sign in' })
+    .click();
   await expect(page).toHaveURL(/\/signin/);
 });
 
 test('the tour page has no automated a11y violations', async ({ page }) => {
   await page.goto('/tour');
-  await expect(page.getByRole('heading', { name: 'Five stops, two minutes.' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Seven stops from a fresh detail to a career move.' }),
+  ).toBeVisible();
   await expectNoA11yViolations(page);
 });

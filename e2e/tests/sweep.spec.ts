@@ -13,9 +13,9 @@ test('landing no longer ships constellation or aurora hero chrome', async ({ pag
   await expect(page.locator('.mk-hero__sky')).toHaveCount(0);
   await expect(page.locator('.mk-grad')).toHaveCount(0);
 
-  const today = page.getByRole('img', { name: /Today dashboard/i });
-  await expect(today).toBeVisible();
-  const natural = await today.evaluate((img: HTMLImageElement) => ({
+  const shot = page.getByRole('img', { name: /person record/i });
+  await expect(shot).toBeVisible();
+  const natural = await shot.evaluate((img: HTMLImageElement) => ({
     w: img.naturalWidth,
     h: img.naturalHeight,
   }));

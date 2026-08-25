@@ -118,29 +118,35 @@ test('a failed sign-in names the failure and leaves both ways in usable', async 
 
   await page.unroute(DEV_LOGIN);
   await dev.click();
-  await expect(page).toHaveURL(/\/$/);
+  // A successful sign-in lands on Today. The bare root only redirects there.
+  await expect(page).toHaveURL(/\/today$/);
 });
 
 test('is operable from the keyboard, in visual order, with a visible ring', async ({ page }) => {
   await page.goto('/signin');
   await page.getByRole('button', { name: /developer sign-in/i }).waitFor();
 
+  // Google sign-in cannot appear in the artifact this gate builds. lib/firebase.ts
+  // offers it only when the Auth emulator is wired, and that requires
+  // import.meta.env.DEV, which is false in anything Vite builds for production.
+  // The comment there is explicit that no environment variable can switch it on
+  // in a shipped SPA, so the door has one way in and the order starts there.
+  await expect(page.getByRole('button', { name: 'Continue with Google' })).toHaveCount(0);
+
   const order: string[] = [];
-  for (let i = 0; i < 4; i += 1) {
+  for (let i = 0; i < 3; i += 1) {
     await page.keyboard.press('Tab');
     order.push(await page.evaluate(() => document.activeElement?.textContent?.trim() ?? ''));
   }
-  expect(order[0]).toContain('Continue with Google');
-  expect(order[1]).toContain('Developer sign-in');
-  expect(order[2]).toContain('Take the tour');
-  expect(order[3]).toContain('What is Vitae?');
+  expect(order[0]).toContain('Developer sign-in');
+  expect(order[1]).toContain('Take the tour');
+  expect(order[2]).toContain('What is Vitae?');
 
-  const google = page.getByRole('button', { name: 'Continue with Google' });
+  const dev = page.getByRole('button', { name: /developer sign-in/i });
   await page.keyboard.press('Shift+Tab');
   await page.keyboard.press('Shift+Tab');
-  await page.keyboard.press('Shift+Tab');
-  await expect(google).toBeFocused();
-  await expect(google).not.toHaveCSS('box-shadow', 'none');
+  await expect(dev).toBeFocused();
+  await expect(dev).not.toHaveCSS('box-shadow', 'none');
 
   await expectNoA11yViolations(page);
 });

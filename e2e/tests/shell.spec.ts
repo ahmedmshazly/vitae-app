@@ -10,7 +10,7 @@ import { expectNoA11yViolations } from './helpers/a11y';
  */
 
 const hubs = [
-  { label: 'Today', description: 'Agenda and daily momentum', href: '/' },
+  { label: 'Today', description: 'Agenda and daily momentum', href: '/today' },
   { label: 'Network', description: 'Relationships and reach', href: '/network' },
   { label: 'Career', description: 'Applications and documents', href: '/career' },
   { label: 'Explore', description: 'Graph, time, and place', href: '/explore' },
@@ -182,7 +182,7 @@ test('mobile dock, capture, search, and More sheet keep every workspace reachabl
   const dock = page.getByRole('navigation', { name: 'Primary' }).last();
   await expect(dock).toBeVisible();
   for (const item of [
-    { label: 'Today', href: '/' },
+    { label: 'Today', href: '/today' },
     { label: 'Network', href: '/network' },
     { label: 'Explore', href: '/explore' },
     { label: 'Career', href: '/career' },
