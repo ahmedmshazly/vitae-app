@@ -6,6 +6,10 @@ import { signInDemo } from './helpers/auth';
  * selection with checkboxes, compile to a real PDF, finalize, and see the
  * output in the library. Requires `pnpm seed:demo` + the buildsvc container.
  */
+// A real Tectonic compile sits in the middle of this journey, and the waits on
+// the preview iframe already ask for 30s apiece. The default budget is 30s for
+// the whole test, so those waits could never be reached.
+test.describe.configure({ timeout: 90_000 });
 
 test('manual selection → compile → finalize → appears in Outputs', async ({ page }) => {
   await signInDemo(page);

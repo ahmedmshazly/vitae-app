@@ -5,6 +5,10 @@ import { chooseOption } from './helpers/controls';
 /**
  * Tailor wording emphasis + accent controls. Requires demo seed + buildsvc.
  */
+// The preview iframe waits 30s for a Tectonic compile, which the 30s default
+// budget for the whole test cannot contain.
+test.describe.configure({ timeout: 90_000 });
+
 test('tailor exposes wording emphasis and accent controls before compile', async ({ page }) => {
   await signInDemo(page);
   await page.goto('/resume/tailor');
