@@ -335,7 +335,14 @@ function AuthedApp() {
               }
             >
               <Routes>
-                <Route path="/" element={<Navigate to="/today" replace />} />
+                {/* No `/` here. AuthGate is mounted at `path="*"`, which ranks
+                    below the exact `/` above it, so the root never reaches this
+                    tree: a signed-in visitor to `/` gets the marketing page.
+                    A redirect here used to record the opposite, and cost a
+                    defect apiece in Shell.tsx and shell.spec.ts before anyone
+                    noticed it could not run. Whether `/` should recognise a
+                    signed-in visitor is a product question, and the place to
+                    answer it is the public route, not this one. */}
                 <Route path="/today" element={<Dashboard />} />
 
                 {/* Canonical task-led workspaces. Compatibility routes remain
