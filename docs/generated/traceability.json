@@ -3,7 +3,7 @@
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
     "files_scanned": 853,
-    "files_citing": 159,
+    "files_citing": 158,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,7 +20,7 @@
   },
   "totals": {
     "registered": 99,
-    "citations": 490,
+    "citations": 489,
     "implemented_and_tested": 19,
     "implemented_untested": 57,
     "tested_only": 2,
@@ -166,8 +166,7 @@
       "evidence": "implemented-untested",
       "sources": [
         ".github/workflows/ci.yml:3",
-        ".github/workflows/ci.yml:208",
-        "e2e/playwright.config.ts:38"
+        ".github/workflows/ci.yml:213"
       ],
       "tests": [],
       "documents": [
@@ -1093,7 +1092,7 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-and-tested",
       "sources": [
-        ".github/workflows/ci.yml:219",
+        ".github/workflows/ci.yml:224",
         "apps/api/src/routes/v1/resumes.ts:137",
         "packages/core/src/algorithms/line-model.ts:2",
         "packages/core/src/algorithms/line-model.ts:46",
@@ -2375,9 +2374,6 @@
     "docs/specs/merge-plan.md": [
       "INT-2",
       "INT-6"
-    ],
-    "e2e/playwright.config.ts": [
-      "FR-007"
     ],
     "eslint.config.js": [
       "NFR-MNT-002",

@@ -4504,15 +4504,13 @@
       "todo": 0,
       "suites": [],
       "subjects": [],
-      "requirements": [
-        "FR-007"
-      ],
+      "requirements": [],
       "run_by": [
         "test:e2e",
         "test"
       ],
       "run_in_ci": true,
-      "lines": 53
+      "lines": 100
     },
     {
       "file": "e2e/tests/ask.spec.ts",
@@ -5004,7 +5002,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 67
+      "lines": 69
     },
     {
       "file": "e2e/tests/letters.spec.ts",
@@ -5041,7 +5039,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 54
+      "lines": 61
     },
     {
       "file": "e2e/tests/negative.spec.ts",
@@ -5140,7 +5138,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 147
+      "lines": 151
     },
     {
       "file": "e2e/tests/record.spec.ts",
@@ -5199,7 +5197,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 60
+      "lines": 64
     },
     {
       "file": "e2e/tests/resume-hub.spec.ts",
@@ -5296,7 +5294,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 147
+      "lines": 153
     },
     {
       "file": "e2e/tests/sweep.spec.ts",
@@ -5331,7 +5329,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 42
+      "lines": 46
     },
     {
       "file": "e2e/tests/tailor.spec.ts",
@@ -5410,7 +5408,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 162
+      "lines": 165
     },
     {
       "file": "e2e/tests/today.spec.ts",
@@ -5449,7 +5447,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 72
+      "lines": 84
     },
     {
       "file": "e2e/tests/trash.spec.ts",
@@ -5485,7 +5483,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 36
+      "lines": 41
     },
     {
       "file": "packages/core/src/algorithms/aho-corasick.test.ts",
@@ -6598,7 +6596,7 @@
       "run_by": [
         "test"
       ],
-      "run_in_ci": false,
+      "run_in_ci": true,
       "lines": 643
     },
     {
@@ -6623,7 +6621,7 @@
       "run_by": [
         "test"
       ],
-      "run_in_ci": false,
+      "run_in_ci": true,
       "lines": 254
     },
     {
@@ -6646,7 +6644,7 @@
       "run_by": [
         "test"
       ],
-      "run_in_ci": false,
+      "run_in_ci": true,
       "lines": 109
     },
     {
@@ -6667,7 +6665,7 @@
       "run_by": [
         "test"
       ],
-      "run_in_ci": false,
+      "run_in_ci": true,
       "lines": 94
     },
     {
@@ -6692,7 +6690,7 @@
       "run_by": [
         "test"
       ],
-      "run_in_ci": false,
+      "run_in_ci": true,
       "lines": 710
     },
     {
@@ -6717,7 +6715,7 @@
       "run_by": [
         "test"
       ],
-      "run_in_ci": false,
+      "run_in_ci": true,
       "lines": 286
     },
     {
@@ -6744,7 +6742,7 @@
       "run_by": [
         "test"
       ],
-      "run_in_ci": false,
+      "run_in_ci": true,
       "lines": 466
     },
     {
@@ -6766,7 +6764,7 @@
       "run_by": [
         "test"
       ],
-      "run_in_ci": false,
+      "run_in_ci": true,
       "lines": 393
     },
     {
@@ -6785,7 +6783,7 @@
       "run_by": [
         "test"
       ],
-      "run_in_ci": false,
+      "run_in_ci": true,
       "lines": 140
     }
   ],
@@ -6836,23 +6834,12 @@
     "ci_filtered_workspaces": [
       "@vitae/api",
       "@vitae/e2e",
+      "@vitae/ui",
       "@vitae/web"
     ],
-    "workspaces_absent_from_ci": [
-      "@vitae/ui"
-    ],
-    "cases_absent_from_ci": 226,
-    "files_absent_from_ci": [
-      "packages/ui/src/combobox.test.tsx",
-      "packages/ui/src/components.test.tsx",
-      "packages/ui/src/feedback.test.tsx",
-      "packages/ui/src/forms.test.tsx",
-      "packages/ui/src/layout.test.tsx",
-      "packages/ui/src/overlay.test.tsx",
-      "packages/ui/src/toast.test.tsx",
-      "packages/ui/src/use-animated-number.test.ts",
-      "packages/ui/src/use-reduced-motion.test.ts"
-    ],
+    "workspaces_absent_from_ci": [],
+    "cases_absent_from_ci": 0,
+    "files_absent_from_ci": [],
     "empty": [
       "e2e/playwright.config.ts",
       "e2e/tests/helpers/a11y.ts",
@@ -6863,10 +6850,11 @@
       "e2e/tests/helpers/toast.ts"
     ],
     "with_skips": [],
-    "requirements_proven": 22,
+    "requirements_proven": 21,
     "requirements_unproven": [
       "FR-004",
       "FR-005",
+      "FR-007",
       "FR-008",
       "FR-009",
       "FR-014",

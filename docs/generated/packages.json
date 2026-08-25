@@ -212,7 +212,7 @@
       ],
       "source_files": 172,
       "test_files": 159,
-      "source_lines": 46354,
+      "source_lines": 46366,
       "exports": 738,
       "dependents": [],
       "imported_by": [],
@@ -231,9 +231,10 @@
       "entry": {
         "./env": "./src/env.ts"
       },
-      "scripts": [],
+      "scripts": [
+        "typecheck"
+      ],
       "missing_fleet_scripts": [
-        "typecheck",
         "test",
         "build",
         "lint"
@@ -258,7 +259,7 @@
       ],
       "unused_manifest_deps": [],
       "undeclared_imports": [],
-      "workspace_typecheck": "transitive",
+      "workspace_typecheck": "direct",
       "layer": 0
     },
     {
@@ -476,10 +477,11 @@
       "entry": null,
       "scripts": [
         "install-browsers",
-        "test"
+        "install-browsers:all",
+        "test",
+        "typecheck"
       ],
       "missing_fleet_scripts": [
-        "typecheck",
         "build",
         "lint"
       ],
@@ -494,7 +496,7 @@
       "imported_by": [],
       "unused_manifest_deps": [],
       "undeclared_imports": [],
-      "workspace_typecheck": "none",
+      "workspace_typecheck": "direct",
       "layer": 0
     }
   ],
@@ -652,23 +654,22 @@
     "packages": 8,
     "source_files": 348,
     "test_files": 318,
-    "source_lines": 78990,
+    "source_lines": 79002,
     "layers": 2,
     "cyclic": [],
     "workspace_typecheck": {
       "direct": [
         "@vitae/api",
         "@vitae/web",
+        "@vitae/config",
         "@vitae/core",
         "@vitae/testkit",
-        "@vitae/ui"
-      ],
-      "transitive": [
-        "@vitae/config"
-      ],
-      "none": [
-        "@vitae/buildsvc",
+        "@vitae/ui",
         "@vitae/e2e"
+      ],
+      "transitive": [],
+      "none": [
+        "@vitae/buildsvc"
       ]
     },
     "untested": [
@@ -677,9 +678,7 @@
     ],
     "skipped_by": {
       "typecheck": [
-        "@vitae/config",
-        "@vitae/buildsvc",
-        "@vitae/e2e"
+        "@vitae/buildsvc"
       ],
       "test": [
         "@vitae/config",

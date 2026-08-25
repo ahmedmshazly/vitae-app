@@ -12,8 +12,12 @@ must land in an executable layer below. Update
 | `packages/core` | 37 | 32 colocated `*.test.ts` |
 | `apps/api` (non-scripts) | 77 | 13 (`*.test.ts` + `__tests__`) |
 | `apps/web` | 122 | 36 |
-| Playwright e2e | — | 43 specs |
+| Playwright e2e | — | 46 specs |
 | `@vitae/testkit` | new | unit tests for clock/factories |
+
+The Playwright row was re-measured on 2026-08-25 with
+`ls e2e/tests/*.spec.ts | wc -l`; the rest of the table is the 2026-08-09
+snapshot.
 
 ## Risk classes
 

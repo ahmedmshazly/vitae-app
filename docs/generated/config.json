@@ -76,12 +76,14 @@
       "requirements": [],
       "source": "packages/config/src/env.ts:17",
       "reads": [
-        "scripts/ci-local.sh:247",
-        "scripts/ci-local.sh:274",
-        "scripts/ci-local.sh:278",
-        "scripts/ci-local.sh:289",
-        "scripts/ci-local.sh:300",
-        "scripts/ci-local.sh:304"
+        "scripts/ci-local.sh:103",
+        "scripts/ci-local.sh:329",
+        "scripts/ci-local.sh:361",
+        "scripts/ci-local.sh:365",
+        "scripts/ci-local.sh:376",
+        "scripts/ci-local.sh:392",
+        "scripts/ci-local.sh:397",
+        "scripts/ci-local.sh:99"
       ],
       "read_by": [
         "deploy"
@@ -400,7 +402,7 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "e2e/playwright.config.ts:37",
+      "source": "e2e/playwright.config.ts:73",
       "reads": [],
       "read_by": [
         "e2e"
@@ -1367,7 +1369,8 @@
         "apps/api/src/db/timezone.ts:18"
       ],
       "read_by": [
-        "api"
+        "api",
+        "e2e"
       ],
       "read_via": "process.env",
       "test_only": false,
@@ -1443,9 +1446,9 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/ci-local.sh:209",
+      "source": "scripts/ci-local.sh:275",
       "reads": [
-        "scripts/ci-local.sh:209"
+        "scripts/ci-local.sh:275"
       ],
       "read_by": [
         "deploy"
@@ -1541,7 +1544,32 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "e2e/playwright.config.ts:12",
+      "source": "e2e/playwright.config.ts:28",
+      "reads": [],
+      "read_by": [
+        "e2e"
+      ],
+      "read_via": "process.env",
+      "test_only": true,
+      "surface": "tooling",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_E2E_FOCUS",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "e2e/playwright.config.ts:60",
       "reads": [],
       "read_by": [
         "e2e"
@@ -1566,10 +1594,10 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/ci-local.sh:298",
+      "source": "scripts/ci-local.sh:389",
       "reads": [
-        "scripts/ci-local.sh:298",
-        "scripts/ci-local.sh:301"
+        "scripts/ci-local.sh:389",
+        "scripts/ci-local.sh:393"
       ],
       "read_by": [
         "deploy"
@@ -1577,6 +1605,31 @@
       "read_via": "shell",
       "test_only": false,
       "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_E2E_TZ",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "e2e/playwright.config.ts:25",
+      "reads": [],
+      "read_by": [
+        "e2e"
+      ],
+      "read_via": "process.env",
+      "test_only": true,
+      "surface": "tooling",
       "documented": false,
       "example": null
     },
@@ -2336,9 +2389,9 @@
     "Storage: Cloudinary (SRS T5; owner-provided)"
   ],
   "summary": {
-    "total": 79,
+    "total": 81,
     "by_scope": {
-      "server": 47,
+      "server": 49,
       "deploy": 19,
       "web-build": 13
     },
@@ -2402,6 +2455,8 @@
       "SHOT_DIR",
       "VITAE_DOCS_ROOT",
       "VITAE_E2E_BROWSERS",
+      "VITAE_E2E_FOCUS",
+      "VITAE_E2E_TZ",
       "VITAE_MAP_ROOT",
       "VITAE_REQUIRE_BUDGETS",
       "VITAE_REQUIRE_TEST_LAYERS",

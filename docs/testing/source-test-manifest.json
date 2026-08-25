@@ -7,11 +7,12 @@
     "api_tests": 14,
     "web_prod": 122,
     "web_tests": 37,
-    "e2e_specs": 43,
+    "e2e_specs": 46,
     "mapped_modules": 232
   },
   "notes": [
     "Authoritative ownership lives in source-test-map.json; this file is a snapshot of counts.",
+    "e2e_specs re-measured 2026-08-25 with `ls e2e/tests/*.spec.ts | wc -l`; the other counts remain the 2026-08-09 snapshot.",
     "API/web modules may be status=deferred until route-focused and component suites land.",
     "Core coverage with all:false reports ~96% lines on exercised modules; ratchet thresholds in vitest configs."
   ]
