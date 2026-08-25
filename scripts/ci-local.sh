@@ -206,7 +206,7 @@ repository_gates() {
 # the suite loses coverage. Both carry their own self-tests, because a gate
 # nobody has seen fail is a gate nobody should trust.
 harness_gates() {
-  pnpm test:mirror && pnpm test:ratchets
+  pnpm test:mirror && pnpm test:ratchets && pnpm test:workflow
 }
 
 # The web bundle is measured, not guessed. The repository .env carries
