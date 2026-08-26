@@ -911,6 +911,7 @@
       "requirements": [
         "FR-COMM-001",
         "FR-COMM-002",
+        "FR-COMM-003",
         "NFR-PRIV-003"
       ],
       "request_schemas": [],

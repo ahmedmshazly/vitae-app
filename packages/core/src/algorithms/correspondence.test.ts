@@ -5,7 +5,7 @@
  * the met_via labels as written.
  */
 import { describe, expect, it } from 'vitest';
-import { brokerTally, correspondenceProfile, rankReactivation } from './correspondence.js';
+import { brokerTally, correspondenceProfile, introductionTally, rankReactivation } from './correspondence.js';
 
 const NOW = new Date('2026-07-11T12:00:00.000Z');
 const day = (n: number) => new Date(NOW.getTime() - n * 86_400_000).toISOString();
@@ -169,5 +169,22 @@ describe('correspondenceProfile', () => {
     // Day 400 sits outside the window; days 3 and 3.2 share a calendar day.
     expect(counted).toBe(2);
     expect(p.contactDays.totalDays).toBe(3);
+  });
+});
+
+describe('introductionTally', () => {
+  it('tallies recorded introductions by broker, carrying the edges behind each count', () => {
+    expect(
+      introductionTally([
+        { edgeId: 'e2', via: 'person-nadia' },
+        { edgeId: 'e1', via: 'person-nadia' },
+        { edgeId: 'e3', via: 'person-amr' },
+        { edgeId: 'e4', via: '  ' },
+        { edgeId: 'e5' },
+      ]),
+    ).toEqual([
+      { via: 'person-nadia', count: 2, edgeIds: ['e1', 'e2'] },
+      { via: 'person-amr', count: 1, edgeIds: ['e3'] },
+    ]);
   });
 });

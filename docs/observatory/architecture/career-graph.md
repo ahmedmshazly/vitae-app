@@ -1,7 +1,7 @@
 ---
 id: ARC-GRAPH
 title: The typed career graph
-summary: Thirty-four node types, twenty-eight edge types, one shared envelope, and the ownership rule that decides whose record a record is.
+summary: Thirty-four node types, twenty-nine edge types, one shared envelope, and the ownership rule that decides whose record a record is.
 audience: [developer, maintainer]
 domain: architecture
 type: explanation
@@ -68,10 +68,10 @@ stranger's credentials on someone's résumé.
 
 ### How many types there are
 
-**Thirty-four node types and twenty-eight edge types.** Counted from the source
+**Thirty-four node types and twenty-nine edge types.** Counted from the source
 of truth, `packages/core/src/types.ts`, where `NODE_TYPES` is composed from
 three arrays: 16 career-core, 11 life-core and 7 proposed. `EDGE_TYPES` is a
-single array of 28.
+single array of 29 — INTRODUCED joined it on 2026-08-26 (FR-COMM-003).
 
 Three documents in this repository disagree with that, and all three are wrong:
 

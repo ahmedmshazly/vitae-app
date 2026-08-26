@@ -2872,6 +2872,28 @@
           }
         },
         "notes": "Src is the org in hand (e.g. Acme → parent → HoldingCo)."
+      },
+      "INTRODUCED": {
+        "label": "Introduced",
+        "src": [
+          "person"
+        ],
+        "dst": [
+          "person"
+        ],
+        "props": {
+          "via": {
+            "type": "string",
+            "note": "The credited broker; a person id when recorded from a profile"
+          },
+          "occurred_on": {
+            "type": "date"
+          },
+          "context": {
+            "type": "string"
+          }
+        },
+        "notes": "The two people connected by an introduction (FR-COMM-003); the warm-path search reads it as a hop."
       }
     },
     "PERSON_RELATIONS": [

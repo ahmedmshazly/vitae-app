@@ -269,7 +269,7 @@ lowest for following.
 Limits: the caller is responsible for supplying an undirected relationship in
 both directions; the algorithm does not symmetrise. Edges whose computed weight
 is zero or negative are skipped entirely. The weight table covers nineteen of
-the twenty-eight edge types, and an unlisted type falls back to a weight of 1 —
+the twenty-nine edge types, and an unlisted type falls back to a weight of 1 —
 which is *higher* than six of the weights that are listed, so a new edge type is
 a stronger conduit than a skill or an authorship link until someone adds it to
 the table.

@@ -54,6 +54,8 @@ export const CORRESPONDENCE = {
   replyPairMaxGapDays: 60,
   /** The contact-day distribution spans this many trailing calendar months. */
   contactWindowMonths: 12,
+  /** A tie needs this many directional events before its balance is a fact worth ranking. */
+  minDirectionalForImbalance: 4,
 } as const;
 
 /** Who-to-call ranking weights (SRS §10.4-A / §10.7.3). */

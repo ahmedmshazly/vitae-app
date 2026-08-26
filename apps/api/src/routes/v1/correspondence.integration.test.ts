@@ -116,6 +116,80 @@ describe('correspondence route', () => {
     expect(tally).toEqual({ via: broker, count: 1 });
   });
 
+  it('groups recorded introductions apart from met-via credits (FR-COMM-003)', async () => {
+    const { app, token } = await getAuthedApp();
+    const stamp = Date.now();
+    const person = async (title: string) => {
+      const created = await request(app)
+        .post('/api/v1/nodes')
+        .set(authHeader(token))
+        .send({ type: 'person', title, props: {} })
+        .expect(201);
+      return created.body.node.id as string;
+    };
+    const selfId = await ensureSelf(app, token);
+    const introducedId = await person(`Introduced contact ${stamp}`);
+    const brokerId = await person(`Broker ${stamp}`);
+    await knowsEdge(app, token, selfId, introducedId);
+
+    const edge = await request(app)
+      .post('/api/v1/edges')
+      .set(authHeader(token))
+      .send({
+        type: 'INTRODUCED',
+        src: selfId,
+        dst: introducedId,
+        props: { via: brokerId, occurred_on: '2026-05-01', context: 'guild thread' },
+      })
+      .expect(201);
+
+    const res = await request(app).get('/api/v1/correspondence').set(authHeader(token)).expect(200);
+    const recorded = res.body.introduced_brokers.find(
+      (b: { person_id: string | null }) => b.person_id === brokerId,
+    );
+    expect(recorded, 'the broker is tallied from the INTRODUCED edge').not.toBe(undefined);
+    expect(recorded.label).toBe(`Broker ${stamp}`);
+    expect(recorded.edge_ids).toContain(edge.body.edge.id);
+    // The free-text met-via group never absorbs the structured one.
+    expect(res.body.brokers.some((b: { via: string }) => b.via === brokerId)).toBe(false);
+  });
+
+  it('ranks reciprocity imbalance from the same profile the person panel shows', async () => {
+    const { app, token } = await getAuthedApp();
+    const stamp = Date.now();
+    const created = await request(app)
+      .post('/api/v1/nodes')
+      .set(authHeader(token))
+      .send({ type: 'person', title: `One-sided ${stamp}`, props: {} })
+      .expect(201);
+    const personId = created.body.node.id as string;
+    const selfId = await ensureSelf(app, token);
+    await knowsEdge(app, token, selfId, personId);
+    for (let i = 0; i < 5; i += 1) {
+      await request(app)
+        .post('/api/v1/interactions')
+        .set(authHeader(token))
+        .send({
+          personId,
+          kind: 'email',
+          summary: `Unanswered nudge ${i}`,
+          occurredAt: new Date(Date.now() - (30 - i) * DAY).toISOString(),
+          initiatedBy: 'me',
+          idempotencyKey: `imb-${stamp}-${i}`,
+        })
+        .expect(201);
+    }
+
+    const res = await request(app).get('/api/v1/correspondence').set(authHeader(token)).expect(200);
+    const row = res.body.out_of_balance.find(
+      (r: { person: { id: string } }) => r.person.id === personId,
+    );
+    expect(row, 'a fully one-sided tie ranks as out of balance').not.toBe(undefined);
+    expect(row.ratio).toBe(1);
+    expect(row.outbound).toBe(5);
+    expect(row.inbound).toBe(0);
+  });
+
   it('rejects an unauthenticated read', async () => {
     const { app } = await getAuthedApp();
     const res = await request(app).get('/api/v1/correspondence');

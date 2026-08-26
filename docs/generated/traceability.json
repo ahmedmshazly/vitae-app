@@ -3,7 +3,7 @@
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
     "files_scanned": 891,
-    "files_citing": 190,
+    "files_citing": 193,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,11 +20,11 @@
   },
   "totals": {
     "registered": 131,
-    "citations": 791,
-    "implemented_and_tested": 25,
+    "citations": 801,
+    "implemented_and_tested": 26,
     "implemented_untested": 60,
     "tested_only": 3,
-    "documents_only": 43,
+    "documents_only": 42,
     "uncited": 0,
     "unregistered_identifiers": 0,
     "capabilities": 19,
@@ -739,7 +739,9 @@
       "evidence": "implemented-untested",
       "sources": [
         "apps/api/src/routes/v1/correspondence.ts:13",
+        "apps/api/src/routes/v1/correspondence.ts:42",
         "apps/api/src/routes/v1/people.ts:55",
+        "apps/api/src/services/crm.ts:698",
         "apps/web/src/features/CorrespondencePanel.tsx:6",
         "apps/web/src/routes/Person.tsx:954",
         "packages/core/src/algorithms/correspondence.ts:178"
@@ -763,7 +765,7 @@
       "evidence": "implemented-and-tested",
       "sources": [
         "apps/api/src/routes/v1/correspondence.ts:8",
-        "apps/api/src/services/crm.ts:639",
+        "apps/api/src/services/crm.ts:641",
         "apps/web/src/routes/Correspondence.tsx:32",
         "packages/core/src/algorithms/constants.ts:40",
         "packages/core/src/algorithms/correspondence.ts:2"
@@ -786,11 +788,21 @@
       "capability": "CAP-COMMS",
       "implementation_status": "planned",
       "definition_provenance": "reconstructed",
-      "evidence": "documents-only",
-      "sources": [],
-      "tests": [],
+      "evidence": "implemented-and-tested",
+      "sources": [
+        "apps/api/src/routes/v1/correspondence.ts:32",
+        "apps/api/src/services/crm.ts:776",
+        "packages/core/src/algorithms/correspondence.ts:263",
+        "packages/core/src/forms/edge-forms.ts:350",
+        "packages/core/src/schema/edge-props.ts:176"
+      ],
+      "tests": [
+        "apps/api/src/routes/v1/correspondence.integration.test.ts:119"
+      ],
       "documents": [
         "docs/ROADMAP.md:47",
+        "docs/entity-catalog.template.json:2896",
+        "docs/observatory/architecture/career-graph.md:74",
         "docs/observatory/product/blueprint/network.md:64",
         "docs/observatory/product/blueprint/network.md:91",
         "docs/observatory/product/blueprint/network.md:104",
@@ -1387,7 +1399,7 @@
       "evidence": "implemented-and-tested",
       "sources": [
         "apps/api/src/routes/v1/resumes.ts:137",
-        "packages/core/src/algorithms/constants.ts:138",
+        "packages/core/src/algorithms/constants.ts:140",
         "packages/core/src/algorithms/selection.ts:3",
         "packages/core/src/algorithms/selection.ts:170",
         "packages/core/src/algorithms/selection.ts:218"
@@ -1510,7 +1522,7 @@
       "evidence": "implemented-and-tested",
       "sources": [
         "apps/api/src/routes/v1/resumes.ts:265",
-        "packages/core/src/algorithms/constants.ts:141",
+        "packages/core/src/algorithms/constants.ts:143",
         "packages/core/src/algorithms/fit-loop.ts:2",
         "packages/core/src/algorithms/selection.ts:3"
       ],
@@ -2498,11 +2510,13 @@
     ],
     "apps/api/src/routes/v1/correspondence.integration.test.ts": [
       "FR-COMM-002",
+      "FR-COMM-003",
       "FR-CON-001"
     ],
     "apps/api/src/routes/v1/correspondence.ts": [
       "FR-COMM-001",
       "FR-COMM-002",
+      "FR-COMM-003",
       "NFR-PRIV-003"
     ],
     "apps/api/src/routes/v1/dashboard.ts": [
@@ -2635,7 +2649,9 @@
       "FR-CON-003"
     ],
     "apps/api/src/services/crm.ts": [
-      "FR-COMM-002"
+      "FR-COMM-001",
+      "FR-COMM-002",
+      "FR-COMM-003"
     ],
     "apps/api/src/services/duplicates.ts": [
       "FR-002",
@@ -2930,6 +2946,9 @@
     "docs/design/addenda/P25-graph-explorer-v2.md": [
       "FR-VIS-001"
     ],
+    "docs/entity-catalog.template.json": [
+      "FR-COMM-003"
+    ],
     "docs/observatory/architecture/algorithms.md": [
       "FR-018",
       "FR-CAP-001",
@@ -2951,7 +2970,8 @@
     "docs/observatory/architecture/career-graph.md": [
       "FR-013",
       "FR-019",
-      "FR-CAP-002"
+      "FR-CAP-002",
+      "FR-COMM-003"
     ],
     "docs/observatory/architecture/cloud-plane.md": [
       "FR-105"
@@ -3402,6 +3422,7 @@
     "packages/core/src/algorithms/correspondence.ts": [
       "FR-COMM-001",
       "FR-COMM-002",
+      "FR-COMM-003",
       "NFR-PRIV-003"
     ],
     "packages/core/src/algorithms/filter-grammar.test.ts": [
@@ -3453,6 +3474,9 @@
     "packages/core/src/forms/descriptors.test.ts": [
       "FR-013"
     ],
+    "packages/core/src/forms/edge-forms.ts": [
+      "FR-COMM-003"
+    ],
     "packages/core/src/forms/node-forms.ts": [
       "FR-CAP-002"
     ],
@@ -3461,6 +3485,9 @@
     ],
     "packages/core/src/places/index.ts": [
       "FR-VIS-003"
+    ],
+    "packages/core/src/schema/edge-props.ts": [
+      "FR-COMM-003"
     ],
     "packages/core/src/schema/resume.ts": [
       "FR-RES-020"

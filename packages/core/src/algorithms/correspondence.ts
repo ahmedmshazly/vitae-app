@@ -246,3 +246,36 @@ export function correspondenceProfile(
     contactDays: { totalDays: dayKeys.size, months },
   };
 }
+
+/** One recorded introduction: the connected pair, the credited broker, the edge. */
+export interface IntroductionFact {
+  edgeId: string;
+  via?: string | null;
+}
+
+export interface RecordedBrokerTally {
+  via: string;
+  count: number;
+  edgeIds: string[];
+}
+
+/**
+ * Brokers by recorded introduction (SRS FR-COMM-003): a tally over INTRODUCED
+ * edges' `via`, each count carrying the edges behind it. Distinct from
+ * `brokerTally`, which counts free-text met-via credits — the two are
+ * presented as separate labeled groups, never fuzzy-merged, because equating
+ * a person id with a matching string would be a guess.
+ */
+export function introductionTally(intros: IntroductionFact[]): RecordedBrokerTally[] {
+  const groups = new Map<string, string[]>();
+  for (const intro of intros) {
+    const via = (intro.via ?? '').trim();
+    if (!via) continue;
+    const list = groups.get(via) ?? [];
+    list.push(intro.edgeId);
+    groups.set(via, list);
+  }
+  return [...groups.entries()]
+    .map(([via, edgeIds]) => ({ via, count: edgeIds.length, edgeIds: [...edgeIds].sort() }))
+    .sort((a, b) => b.count - a.count || a.via.localeCompare(b.via));
+}

@@ -88,7 +88,7 @@ validate against it and an unknown type is rejected at the boundary.
 | Life | 11 | The things that happen around the career: events, interactions, tasks, goals, habits, writing, links, documents |
 | Long-tail | 7 | Places, trips, media, highlights, assets, health logs, accounts |
 
-That is 34 node types, joined by 28 edge types. Every one of them is creatable
+That is 34 node types, joined by 29 edge types. Every one of them is creatable
 and editable through the schema-driven entity form; a test asserts that the
 new-entity menu offers exactly the type catalog, so a type cannot be added and
 left reachable only through an import. What the long-tail tier lacks is a

@@ -343,6 +343,25 @@ export const EDGE_FORM_DESCRIPTORS: Record<EdgeType, EdgeFormDescriptor> = {
       { key: 'note', label: 'Note', widget: 'text', placeholder: 'Optional context' },
     ],
   },
+  INTRODUCED: {
+    type: 'INTRODUCED',
+    label: 'Introduced',
+    description:
+      'Person ↔ person who met through an introduction; `via` credits the broker (FR-COMM-003).',
+    srcTypes: ['person'],
+    dstTypes: ['person'],
+    fields: [
+      {
+        key: 'via',
+        label: 'Via',
+        widget: 'text',
+        placeholder: 'the broker',
+        help: 'Person id when recorded from a profile; kept as written otherwise.',
+      },
+      { key: 'occurred_on', label: 'On', widget: 'date', mono: true },
+      { key: 'context', label: 'Context', widget: 'text', placeholder: 'conference hallway, a thread, …' },
+    ],
+  },
 };
 
 export function edgeFormDescriptor(type: EdgeType): EdgeFormDescriptor {

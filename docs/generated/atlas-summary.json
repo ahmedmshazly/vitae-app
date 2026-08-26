@@ -2,9 +2,9 @@
   "by_package": {
     "@vitae/api": {
       "files": 109,
-      "lines": 20033,
-      "exports": 373,
-      "undocumented": 279
+      "lines": 20132,
+      "exports": 374,
+      "undocumented": 280
     },
     "@vitae/web": {
       "files": 175,
@@ -20,9 +20,9 @@
     },
     "@vitae/core": {
       "files": 47,
-      "lines": 8516,
-      "exports": 442,
-      "undocumented": 310
+      "lines": 8584,
+      "exports": 446,
+      "undocumented": 311
     },
     "@vitae/testkit": {
       "files": 5,
@@ -46,7 +46,7 @@
   "by_kind": {
     "module": {
       "files": 64,
-      "lines": 9411,
+      "lines": 9431,
       "exports": 359,
       "undocumented": 204
     },
@@ -82,7 +82,7 @@
     },
     "route": {
       "files": 47,
-      "lines": 8430,
+      "lines": 8448,
       "exports": 226,
       "undocumented": 178
     },
@@ -94,9 +94,9 @@
     },
     "service": {
       "files": 24,
-      "lines": 7606,
-      "exports": 205,
-      "undocumented": 149
+      "lines": 7687,
+      "exports": 206,
+      "undocumented": 150
     },
     "component": {
       "files": 66,
@@ -118,15 +118,15 @@
     },
     "schema": {
       "files": 9,
-      "lines": 1736,
-      "exports": 179,
+      "lines": 1749,
+      "exports": 180,
       "undocumented": 146
     },
     "algorithm": {
       "files": 21,
-      "lines": 3396,
-      "exports": 153,
-      "undocumented": 100
+      "lines": 3431,
+      "exports": 156,
+      "undocumented": 101
     }
   },
   "public_surface": {
@@ -233,6 +233,7 @@
       "InteractionEvent",
       "InteractionKind",
       "IntroPath",
+      "IntroductionFact",
       "JD_PARSER_VERSION",
       "JdCorpus",
       "JdSection",
@@ -285,6 +286,7 @@
       "ReactivationTieInput",
       "ReconnectInput",
       "ReconnectScore",
+      "RecordedBrokerTally",
       "ReplySample",
       "Resume",
       "ResumeConfig",
@@ -413,6 +415,8 @@
       "interactionProps",
       "interviewForProps",
       "interviewProps",
+      "introducedProps",
+      "introductionTally",
       "isCloudIndividualBillingPeriod",
       "isEdgeType",
       "isNodeType",
@@ -689,9 +693,9 @@
   "summary": {
     "files": 354,
     "test_files": 330,
-    "lines": 80373,
-    "exports": 1738,
-    "undocumented_exports": 1228,
+    "lines": 80540,
+    "exports": 1743,
+    "undocumented_exports": 1230,
     "edges": 1580,
     "untested": 140,
     "no_consumer": [],

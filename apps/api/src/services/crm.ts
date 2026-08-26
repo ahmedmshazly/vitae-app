@@ -9,6 +9,7 @@ import {
   brokerTally,
   computeTieStrength,
   correspondenceProfile,
+  introductionTally,
   normalizeForMatch,
   personalizedPageRank,
   rankReactivation,
@@ -25,6 +26,7 @@ import {
   type ProfileEvent,
   type RankedPerson,
   type RankOptions,
+  CORRESPONDENCE,
   PAGERANK,
 } from '@vitae/core';
 import { repository } from '../db/repository.js';
@@ -653,10 +655,26 @@ export async function correspondenceRollup(preloaded?: Graph): Promise<{
   }>;
   consideredDormant: number;
   brokers: BrokerTally[];
+  introducedBrokers: Array<{
+    via: string;
+    personId: string | null;
+    label: string;
+    count: number;
+    edgeIds: string[];
+  }>;
+  outOfBalance: Array<{
+    person: NodeRecord;
+    ratio: number;
+    outbound: number;
+    inbound: number;
+    unansweredInbound: number;
+  }>;
 }> {
   const graph = preloaded ?? (await loadGraph());
   const self = await getSelf();
-  if (!self) return { candidates: [], consideredDormant: 0, brokers: [] };
+  if (!self) {
+    return { candidates: [], consideredDormant: 0, brokers: [], introducedBrokers: [], outOfBalance: [] };
+  }
   const knowsEdges = graph.edges.filter(
     (e) => e.type === 'KNOWS' && (e.src === self.id || e.dst === self.id),
   );
@@ -677,7 +695,38 @@ export async function correspondenceRollup(preloaded?: Graph): Promise<{
     knowsEdges.map((e) => ((e.props ?? {}) as Record<string, unknown>).met_via as string | undefined),
   );
 
+  // Reciprocity imbalance across the whole graph (FR-COMM-001 figures at
+  // rollup scale): ties with enough directional history, ranked by how far
+  // their outbound share sits from even. Same profile function as the
+  // per-person panel, so the two surfaces cannot disagree.
+  const outOfBalance = ties
+    .map((tie) => {
+      const profile = correspondenceProfile(profileEvents(graph, tie.personId));
+      const person = graph.nodes.get(tie.personId);
+      return { person, profile };
+    })
+    .filter(
+      (row): row is { person: NodeRecord; profile: CorrespondenceProfile } =>
+        Boolean(row.person) &&
+        row.profile.reciprocity.ratio !== null &&
+        row.profile.coverage.withDirection >= CORRESPONDENCE.minDirectionalForImbalance,
+    )
+    .map(({ person, profile }) => ({
+      person,
+      ratio: profile.reciprocity.ratio!,
+      outbound: profile.reciprocity.outbound,
+      inbound: profile.reciprocity.inbound,
+      unansweredInbound: profile.unansweredInbound.count,
+    }))
+    .sort(
+      (a, b) =>
+        Math.abs(b.ratio - 0.5) - Math.abs(a.ratio - 0.5) || a.person.id.localeCompare(b.person.id),
+    )
+    .slice(0, 10);
+
   return {
+    introducedBrokers: recordedIntroductions(graph),
+    outOfBalance,
     candidates: rollup.candidates.flatMap((c) => {
       const person = graph.nodes.get(c.personId);
       if (!person) return [];
@@ -704,12 +753,8 @@ export async function correspondenceRollup(preloaded?: Graph): Promise<{
  * person's logged interactions with their stated directions. Interactions
  * without a stated direction are reported in `coverage`, never guessed at.
  */
-export async function personCorrespondence(
-  personId: string,
-  preloaded?: Graph,
-): Promise<CorrespondenceProfile> {
-  const graph = preloaded ?? (await loadGraph());
-  const events: ProfileEvent[] = interactionsFor(graph, personId).map((node) => {
+function profileEvents(graph: Graph, personId: string): ProfileEvent[] {
+  return interactionsFor(graph, personId).map((node) => {
     const props = node.props as Record<string, unknown>;
     return {
       id: node.id,
@@ -717,5 +762,41 @@ export async function personCorrespondence(
       initiatedBy: (props.initiated_by as 'me' | 'them' | undefined) ?? null,
     };
   });
-  return correspondenceProfile(events);
+}
+
+export async function personCorrespondence(
+  personId: string,
+  preloaded?: Graph,
+): Promise<CorrespondenceProfile> {
+  const graph = preloaded ?? (await loadGraph());
+  return correspondenceProfile(profileEvents(graph, personId));
+}
+
+/**
+ * Brokers by recorded introduction (FR-COMM-003): the INTRODUCED edges'
+ * `via` values tallied, each resolved to a live person where the value is a
+ * person id and kept as written where it is not. Presented beside the
+ * free-text met-via tally as a separate labeled group, never merged.
+ */
+export function recordedIntroductions(graph: Graph): Array<{
+  via: string;
+  personId: string | null;
+  label: string;
+  count: number;
+  edgeIds: string[];
+}> {
+  const intros = graph.edges.filter((e) => e.type === 'INTRODUCED');
+  return introductionTally(
+    intros.map((e) => ({
+      edgeId: e.id,
+      via: ((e.props ?? {}) as Record<string, unknown>).via as string | undefined,
+    })),
+  ).map((tally) => {
+    const person = graph.nodes.get(tally.via);
+    return {
+      ...tally,
+      personId: person && person.type === 'person' ? person.id : null,
+      label: person && person.type === 'person' ? person.title : tally.via,
+    };
+  });
 }

@@ -484,7 +484,7 @@
     {
       "file": "apps/api/src/routes/v1/correspondence.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 3,
+      "cases": 5,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -495,6 +495,7 @@
       ],
       "requirements": [
         "FR-COMM-002",
+        "FR-COMM-003",
         "FR-CON-001"
       ],
       "run_by": [
@@ -502,7 +503,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 125
+      "lines": 199
     },
     {
       "file": "apps/api/src/routes/v1/dashboard.integration.test.ts",
@@ -5842,13 +5843,14 @@
     {
       "file": "packages/core/src/algorithms/correspondence.test.ts",
       "package": "@vitae/core",
-      "cases": 10,
+      "cases": 11,
       "skipped": 0,
       "todo": 0,
       "suites": [
         "rankReactivation",
         "brokerTally",
-        "correspondenceProfile"
+        "correspondenceProfile",
+        "introductionTally"
       ],
       "subjects": [
         "./correspondence.js"
@@ -5862,7 +5864,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 174
+      "lines": 191
     },
     {
       "file": "packages/core/src/algorithms/dedup.test.ts",
@@ -7048,14 +7050,14 @@
   ],
   "summary": {
     "files": 330,
-    "cases": 2146,
+    "cases": 2149,
     "skipped": 0,
     "todo": 0,
     "by_package": {
-      "@vitae/api": 223,
+      "@vitae/api": 225,
       "@vitae/web": 1117,
       "@vitae/e2e": 290,
-      "@vitae/core": 283,
+      "@vitae/core": 284,
       "@vitae/testkit": 7,
       "@vitae/ui": 226
     },
@@ -7114,7 +7116,7 @@
       "e2e/tests/helpers/toast.ts"
     ],
     "with_skips": [],
-    "requirements_proven": 28,
+    "requirements_proven": 29,
     "requirements_unproven": [
       "FR-004",
       "FR-005",
@@ -7143,7 +7145,6 @@
       "FR-CAR-003",
       "FR-CAR-004",
       "FR-COMM-001",
-      "FR-COMM-003",
       "FR-CON-002",
       "FR-CON-003",
       "FR-CON-004",

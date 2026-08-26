@@ -91,6 +91,7 @@ export const EDGE_TYPES = [
   'FOUNDED',
   'REPORTS_TO',
   'ORG_RELATED',
+  'INTRODUCED',
 ] as const;
 
 export type EdgeType = (typeof EDGE_TYPES)[number];

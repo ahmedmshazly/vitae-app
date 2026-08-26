@@ -29,6 +29,24 @@ correspondenceRouter.get(
       })),
       considered_dormant: rollup.consideredDormant,
       brokers: rollup.brokers,
+      // FR-COMM-003: brokers by recorded INTRODUCED edges — a separate labeled
+      // group from the free-text met-via credits above, never merged.
+      introduced_brokers: rollup.introducedBrokers.map((b) => ({
+        via: b.via,
+        person_id: b.personId,
+        label: b.label,
+        count: b.count,
+        edge_ids: b.edgeIds,
+      })),
+      // Reciprocity imbalance at rollup scale, from the same profile function
+      // as the per-person panel (FR-COMM-001).
+      out_of_balance: rollup.outOfBalance.map((row) => ({
+        person: { id: row.person.id, title: row.person.title, type: row.person.type },
+        ratio: row.ratio,
+        outbound: row.outbound,
+        inbound: row.inbound,
+        unanswered_inbound: row.unansweredInbound,
+      })),
     });
   }),
 );
