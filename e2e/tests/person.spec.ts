@@ -169,11 +169,22 @@ test('the correspondence panel computes from stated directions and shows its evi
     await log({ personId: node.id, kind: 'email', note: `I answered ${stamp}`, occurredAt: day(4), initiatedBy: 'me', idempotencyKey: `corr-${stamp}-b` }),
     'outbound interaction',
   );
+  await expectOkJson(
+    await log({ personId: node.id, kind: 'coffee', note: `Direction unstated ${stamp}`, occurredAt: day(2), idempotencyKey: `corr-${stamp}-c` }),
+    'directionless interaction',
+  );
 
   await page.goto(`/people/${node.id}`);
   const panel = page.getByRole('region', { name: 'Correspondence' });
   await expect(panel.getByText('you 1 · them 1')).toBeVisible();
+  // The coverage line owns up to the directionless third interaction.
+  await expect(
+    panel.getByText('2 of 3 interactions state a direction; the rest count as contact only.'),
+  ).toBeVisible();
   await panel.getByText('Reply latency').click();
-  await expect(panel.getByText(/your reply in 2 days/)).toBeVisible();
-  await expect(panel.getByText(new RegExp(`They wrote ${stamp}`))).toBeVisible();
+  // One anchored assertion: the reciprocity list cites the same interaction
+  // title from a closed disclosure, so an unanchored match resolves twice.
+  await expect(
+    panel.getByText(new RegExp(`your reply in 2 days: .*They wrote ${stamp}`)),
+  ).toBeVisible();
 });

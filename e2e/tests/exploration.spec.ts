@@ -43,7 +43,9 @@ test('J2: log an interaction from a person page — strength recomputes', async 
   await page.getByPlaceholder('One line: what happened?').fill(note);
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page.getByText('strength recomputed', { exact: false })).toBeVisible();
-  await expect(page.getByText(note)).toBeVisible();
+  // Scoped to the log: the correspondence panel's evidence lists cite the
+  // same note text, so a page-wide match resolves twice.
+  await expect(page.getByRole('region', { name: /^Interactions/ }).getByText(note)).toBeVisible();
 });
 
 test('J2: ask → why-panel → composer → send & log', async ({ page }) => {
