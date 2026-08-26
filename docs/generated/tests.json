@@ -419,7 +419,7 @@
     {
       "file": "apps/api/src/routes/v1/capture.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 4,
+      "cases": 6,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -434,7 +434,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 58
+      "lines": 93
     },
     {
       "file": "apps/api/src/routes/v1/cloud.integration.test.ts",
@@ -700,7 +700,7 @@
     {
       "file": "apps/api/src/routes/v1/interactions.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 1,
+      "cases": 2,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -717,7 +717,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 44
+      "lines": 69
     },
     {
       "file": "apps/api/src/routes/v1/intros.integration.test.ts",
@@ -2237,7 +2237,7 @@
     {
       "file": "apps/web/src/features/InteractionLogger.test.tsx",
       "package": "@vitae/web",
-      "cases": 4,
+      "cases": 5,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -2252,7 +2252,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 101
+      "lines": 119
     },
     {
       "file": "apps/web/src/features/map/AtlasCanvas.error.test.tsx",
@@ -7026,12 +7026,12 @@
   ],
   "summary": {
     "files": 329,
-    "cases": 2131,
+    "cases": 2135,
     "skipped": 0,
     "todo": 0,
     "by_package": {
-      "@vitae/api": 219,
-      "@vitae/web": 1113,
+      "@vitae/api": 222,
+      "@vitae/web": 1114,
       "@vitae/e2e": 289,
       "@vitae/core": 277,
       "@vitae/testkit": 7,

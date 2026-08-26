@@ -86,7 +86,9 @@ composerRouter.post(
     const nodeInput = repository.parseNodeCreate({
       type: 'interaction',
       title: `Outreach: ${kind ?? 'message'} via ${channel ?? 'email'}`,
-      props: { kind: 'outreach', ask_kind: kind ?? null, channel: channel ?? 'email', occurred_at: nowIso(), note: String(body) },
+      // Outreach is by definition operator-initiated, so the direction is a
+      // fact here, not a guess.
+      props: { kind: 'outreach', ask_kind: kind ?? null, channel: channel ?? 'email', occurred_at: nowIso(), note: String(body), initiated_by: 'me' },
       source: 'manual',
     });
     const edgeInput = repository.parseEdgeCreate({

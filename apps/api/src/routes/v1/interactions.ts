@@ -22,7 +22,7 @@ export const interactionsRouter: Router = Router();
 interactionsRouter.post(
   '/',
   asyncHandler(async (req, res) => {
-    const { personId, kind, summary, note, occurredAt, followUps, followUpDate, idempotencyKey } = req.body ?? {};
+    const { personId, kind, summary, note, occurredAt, initiatedBy, followUps, followUpDate, idempotencyKey } = req.body ?? {};
     if (!personId || !kind) throw new HttpError(400, 'BAD_REQUEST', 'personId and kind are required.');
 
     // Normalize the one-tap logger shape ({note, followUpDate}) onto the full shape.
@@ -41,7 +41,14 @@ interactionsRouter.post(
     const nodeInput = repository.parseNodeCreate({
       type: 'interaction',
       title: summary || note || `${kind}`,
-      props: { kind, occurred_at: occurredAt ?? nowIso(), note: note ?? '', follow_ups: allFollowUps },
+      props: {
+        kind,
+        occurred_at: occurredAt ?? nowIso(),
+        note: note ?? '',
+        follow_ups: allFollowUps,
+        // Direction is an operator-stated fact, never inferred; absent stays absent.
+        ...(initiatedBy ? { initiated_by: initiatedBy } : {}),
+      },
       source: 'manual',
     });
     const edgeInput = repository.parseEdgeCreate({

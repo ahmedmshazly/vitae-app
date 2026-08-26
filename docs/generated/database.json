@@ -2982,7 +2982,7 @@
           "file": "apps/api/src/routes/v1/composer.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 108,
+          "line": 110,
           "test": false
         },
         {
@@ -2996,7 +2996,7 @@
           "file": "apps/api/src/routes/v1/interactions.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 78,
+          "line": 85,
           "test": false
         },
         {

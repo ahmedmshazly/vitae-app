@@ -59,6 +59,31 @@ export function userCalendarNow(now: Date = new Date()): Date {
   return new Date(year, month - 1, day);
 }
 
+/**
+ * The UTC instant that reads as noon on `dateIso` in the request's timezone.
+ * A dated capture must land on the calendar day the operator named (FR-025);
+ * noon keeps the instant inside that day across every real UTC offset, where
+ * a bare `T00:00Z` walks into the previous day for zones east of Greenwich.
+ */
+export function noonIso(dateIso: string): string {
+  const [year, month, day] = dateIso.split('-').map(Number);
+  const guess = Date.UTC(year!, month! - 1, day!, 12);
+  const parts = new Intl.DateTimeFormat('en', {
+    timeZone: currentTimezone(),
+    hour12: false,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).formatToParts(new Date(guess));
+  const value = (type: Intl.DateTimeFormatPartTypes): number =>
+    Number(parts.find((part) => part.type === type)?.value ?? '0');
+  const wall = Date.UTC(value('year'), value('month') - 1, value('day'), value('hour') % 24, value('minute'));
+  // wall − guess is the zone offset at that instant; shift the guess back by it.
+  return new Date(2 * guess - wall).toISOString();
+}
+
 /** The calendar date `days` from today, in the request's timezone. */
 export function isoDateIn(days: number, now: Date = new Date()): string {
   const [year, month, day] = todayIso(now).split('-').map(Number);

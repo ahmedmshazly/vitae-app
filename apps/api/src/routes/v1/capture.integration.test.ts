@@ -54,4 +54,39 @@ describe('POST /api/v1/capture', () => {
       }),
     );
   });
+
+  it('commits an interaction capture, defaulting kind and occurrence', async () => {
+    const { app, token } = await getAuthedApp();
+    const stamp = Date.now();
+    const res = await request(app)
+      .post('/api/v1/capture')
+      .set(authHeader(token))
+      .send({ raw: `int coffee debrief ${stamp} @Int Capture ${stamp}` });
+    expect(res.status).toBe(201);
+    const node = await request(app)
+      .get(`/api/v1/nodes/${res.body.primaryId}`)
+      .set(authHeader(token))
+      .expect(200);
+    expect(node.body.node.props.kind).toBe('coffee');
+    expect(typeof node.body.node.props.occurred_at).toBe('string');
+  });
+
+  it('a dated interaction capture lands on the calendar day the request timezone names', async () => {
+    const { app, token } = await getAuthedApp();
+    const stamp = Date.now();
+    const tz = 'Etc/GMT+12'; // UTC-12: the host clock runs up to a day ahead of this calendar.
+    const day = (at: Date): string =>
+      new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(at);
+    const res = await request(app)
+      .post('/api/v1/capture')
+      .set(authHeader(token))
+      .set('x-vitae-tz', tz)
+      .send({ raw: `int call sync ${stamp} @Tz Capture ${stamp} ^today` });
+    expect(res.status).toBe(201);
+    const node = await request(app)
+      .get(`/api/v1/nodes/${res.body.primaryId}`)
+      .set(authHeader(token))
+      .expect(200);
+    expect(day(new Date(String(node.body.node.props.occurred_at)))).toBe(day(new Date()));
+  });
 });

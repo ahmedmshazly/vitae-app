@@ -20,7 +20,7 @@
   },
   "totals": {
     "registered": 131,
-    "citations": 780,
+    "citations": 782,
     "implemented_and_tested": 25,
     "implemented_untested": 60,
     "tested_only": 3,
@@ -426,7 +426,7 @@
       "evidence": "implemented-untested",
       "sources": [
         "apps/web/src/features/Composer.tsx:45",
-        "apps/web/src/features/InteractionLogger.tsx:34",
+        "apps/web/src/features/InteractionLogger.tsx:47",
         "apps/web/src/features/QuickAdd.tsx:15",
         "apps/web/src/features/QuickSwitcher.tsx:23",
         "packages/ui/src/overlay.tsx:82"
@@ -443,7 +443,7 @@
       "evidence": "implemented-untested",
       "sources": [
         "apps/web/src/features/Composer.tsx:45",
-        "apps/web/src/features/InteractionLogger.tsx:34",
+        "apps/web/src/features/InteractionLogger.tsx:47",
         "apps/web/src/features/QuickSwitcher.tsx:23",
         "apps/web/src/routes/ImportHub.tsx:850",
         "apps/web/src/routes/Settings.tsx:456",
@@ -463,13 +463,15 @@
         "apps/api/src/app.ts:55",
         "apps/api/src/db/timezone.ts:2",
         "apps/api/src/db/timezone.ts:53",
+        "apps/api/src/db/timezone.ts:64",
         "apps/api/src/routes/v1/capture.ts:14",
-        "apps/api/src/routes/v1/composer.ts:99",
+        "apps/api/src/routes/v1/composer.ts:101",
         "apps/api/src/routes/v1/dashboard.ts:23",
         "apps/api/src/routes/v1/habits.ts:14",
-        "apps/api/src/routes/v1/interactions.ts:83",
+        "apps/api/src/routes/v1/interactions.ts:90",
         "apps/api/src/routes/v1/reminders.ts:41",
         "apps/api/src/services/capture.ts:26",
+        "apps/api/src/services/capture.ts:205",
         "apps/web/src/features/RemindersDrawer.tsx:27",
         "apps/web/src/lib/api.ts:51",
         "apps/web/src/lib/dates.ts:2"
@@ -529,7 +531,7 @@
       "sources": [
         "apps/api/src/routes/v1/composer.ts:19",
         "apps/api/src/routes/v1/dashboard.ts:24",
-        "apps/api/src/routes/v1/interactions.ts:98",
+        "apps/api/src/routes/v1/interactions.ts:105",
         "apps/api/src/routes/v1/people.ts:26"
       ],
       "tests": [],
@@ -816,7 +818,7 @@
       "evidence": "implemented-untested",
       "sources": [
         "apps/api/src/routes/v1/interactions.ts:13",
-        "apps/web/src/features/InteractionLogger.tsx:31"
+        "apps/web/src/features/InteractionLogger.tsx:44"
       ],
       "tests": [],
       "documents": [
@@ -835,7 +837,7 @@
       "sources": [
         "apps/api/src/routes/v1/interactions.ts:13",
         "apps/api/src/services/capture.ts:173",
-        "apps/web/src/features/InteractionLogger.tsx:31"
+        "apps/web/src/features/InteractionLogger.tsx:44"
       ],
       "tests": [],
       "documents": [
@@ -939,7 +941,7 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-untested",
       "sources": [
-        "apps/api/src/routes/v1/interactions.ts:102"
+        "apps/api/src/routes/v1/interactions.ts:109"
       ],
       "tests": [],
       "documents": [

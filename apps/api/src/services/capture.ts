@@ -6,10 +6,10 @@
  * (FR-002). Ids are pre-allocated so related records can reference each other
  * inside that transaction.
  */
-import { parseCapture, type CapturePlan, type EdgeCreateInput, type NodeType } from '@vitae/core';
+import { INTERACTION_KINDS, parseCapture, type CapturePlan, type EdgeCreateInput, type NodeType } from '@vitae/core';
 import { repository } from '../db/repository.js';
 import { newId, nowIso } from '../db/util.js';
-import { todayIso, userCalendarNow } from '../db/timezone.js';
+import { noonIso, todayIso, userCalendarNow } from '../db/timezone.js';
 import { getSelf } from './self.js';
 import { searchIndex } from '../db/search-index.js';
 
@@ -198,6 +198,15 @@ function withTypeDefaults(type: NodeType, props: Record<string, unknown>, plan: 
   if (type === 'journal_entry') return { entry_date: plan.date?.iso ?? todayIso(), ...props };
   if (type === 'goal') return { goal_status: 'active', horizon: 'quarter', ...props };
   if (type === 'habit') return { cadence: 'daily', active: true, ...props };
+  if (type === 'interaction') {
+    // `interactionProps` requires kind and occurred_at, so `int …` used to fail
+    // validation with an empty props object. The leading title word names the
+    // kind when it is one ("int coffee @Sarah"); a dated capture lands at noon
+    // on the named day in the request's timezone (FR-025).
+    const first = plan.title.trim().split(/\s+/)[0]?.toLowerCase() ?? '';
+    const kind = (INTERACTION_KINDS as readonly string[]).includes(first) ? first : 'meeting';
+    return { kind, occurred_at: plan.date ? noonIso(plan.date.iso) : nowIso(), ...props };
+  }
   return props;
 }
 

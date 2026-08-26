@@ -1909,7 +1909,7 @@
       "path": "/api/v1/interactions/{id}",
       "express_path": "/api/v1/interactions/:id",
       "mount": "/interactions",
-      "source": "apps/api/src/routes/v1/interactions.ts:122",
+      "source": "apps/api/src/routes/v1/interactions.ts:129",
       "summary": "Undo a just-logged interaction: soft-delete it and re-derive strength.",
       "requirements": [],
       "request_schemas": [],

@@ -40,4 +40,29 @@ describe('interactions routes', () => {
       .expect(200);
     expect(search.body.nodes.some((n: { title: string }) => n.title === 'orphan probe split')).toBe(false);
   });
+
+  it('persists the initiator when stated, and records nothing when it is not', async () => {
+    const { app, token } = await getAuthedApp();
+    const person = await request(app)
+      .post('/api/v1/nodes')
+      .set(authHeader(token))
+      .send({ type: 'person', title: `Directional ${Date.now()}`, props: {} })
+      .expect(201);
+    const personId = person.body.node.id;
+
+    const stated = await request(app)
+      .post('/api/v1/interactions')
+      .set(authHeader(token))
+      .send({ personId, kind: 'call', note: 'they rang first', initiatedBy: 'them' })
+      .expect(201);
+    expect(stated.body.interaction.props.initiated_by).toBe('them');
+
+    // Direction is an operator-stated fact; an unstated one stays unstated.
+    const unstated = await request(app)
+      .post('/api/v1/interactions')
+      .set(authHeader(token))
+      .send({ personId, kind: 'call', note: 'direction unstated' })
+      .expect(201);
+    expect(unstated.body.interaction.props.initiated_by).toBeUndefined();
+  });
 });

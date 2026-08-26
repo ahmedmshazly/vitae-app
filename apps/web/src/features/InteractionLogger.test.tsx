@@ -44,11 +44,29 @@ describe('InteractionLogger', () => {
     await waitFor(() => {
       expect(mockApi.post).toHaveBeenCalledWith(
         '/interactions',
-        expect.objectContaining({ personId: 'p1', kind: 'call', note: 'Quick sync' }),
+        expect.objectContaining({ personId: 'p1', kind: 'call', note: 'Quick sync', initiatedBy: 'me' }),
       );
     });
     await waitFor(() => {
       expect(onClose).toHaveBeenCalledOnce();
+    });
+  });
+
+  it('sends the stated initiator when the operator flips it', async () => {
+    const user = userEvent.setup();
+    mockApi.post.mockResolvedValue({ interaction: { id: 'i2' }, strength: { strength: 0.4 } });
+    renderLogger();
+
+    expect(screen.getByRole('group', { name: 'Who reached out' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'they did' }));
+    await user.type(screen.getByLabelText(/What happened\?/), 'They pinged me');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith(
+        '/interactions',
+        expect.objectContaining({ initiatedBy: 'them' }),
+      );
     });
   });
 

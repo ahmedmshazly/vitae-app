@@ -22,6 +22,19 @@ const KINDS = [
 
 type Kind = (typeof KINDS)[number]['key'];
 
+/**
+ * Direction is an operator-stated fact the correspondence figures build on.
+ * The control is visible and confirmed on Save, so the default is an
+ * affirmative choice, not an inference — and it feeds `initiated_by`, which
+ * older interactions simply lack.
+ */
+const INITIATORS = [
+  { key: 'me', label: 'I did' },
+  { key: 'them', label: 'they did' },
+] as const;
+
+type Initiator = (typeof INITIATORS)[number]['key'];
+
 interface LogResponse {
   interaction: { id: string };
   strength: { strength: number };
@@ -56,6 +69,7 @@ export function InteractionLogger({
   onClose: () => void;
 }) {
   const [kind, setKind] = useState<Kind>('coffee');
+  const [initiatedBy, setInitiatedBy] = useState<Initiator>('me');
   const [note, setNote] = useState('');
   const [followDue, setFollowDue] = useState('');
   const idempotencyKey = useRef(crypto.randomUUID());
@@ -68,6 +82,7 @@ export function InteractionLogger({
       api.post<LogResponse>('/interactions', {
         personId,
         kind,
+        initiatedBy,
         note,
         occurredAt: new Date().toISOString(),
         followUpDate: followDue || undefined,
@@ -120,6 +135,16 @@ export function InteractionLogger({
         <div className="vt-fld">
           <span className="vt-fld__label">Kind</span>
           <FilterGroup label="Kind" options={KINDS} value={kind} onChange={setKind} />
+        </div>
+
+        <div className="vt-fld">
+          <span className="vt-fld__label">Who reached out</span>
+          <FilterGroup
+            label="Who reached out"
+            options={INITIATORS}
+            value={initiatedBy}
+            onChange={setInitiatedBy}
+          />
         </div>
 
         <Field label="What happened?" htmlFor={`${ids}-note`} required>
