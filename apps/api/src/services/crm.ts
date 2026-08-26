@@ -8,6 +8,7 @@
 import {
   brokerTally,
   computeTieStrength,
+  correspondenceProfile,
   normalizeForMatch,
   personalizedPageRank,
   rankReactivation,
@@ -15,11 +16,13 @@ import {
   whoToCall,
   type BrokerTally,
   type CandidatePerson,
+  type CorrespondenceProfile,
   type EdgeRecord,
   type GraphEdge,
   type Intent,
   type InteractionEvent,
   type NodeRecord,
+  type ProfileEvent,
   type RankedPerson,
   type RankOptions,
   PAGERANK,
@@ -693,4 +696,26 @@ export async function correspondenceRollup(preloaded?: Graph): Promise<{
     consideredDormant: rollup.consideredDormant,
     brokers,
   };
+}
+
+/**
+ * The per-person correspondence profile: reciprocity, per-direction reply
+ * latency, unanswered inbound, contact-day distribution — computed from the
+ * person's logged interactions with their stated directions. Interactions
+ * without a stated direction are reported in `coverage`, never guessed at.
+ */
+export async function personCorrespondence(
+  personId: string,
+  preloaded?: Graph,
+): Promise<CorrespondenceProfile> {
+  const graph = preloaded ?? (await loadGraph());
+  const events: ProfileEvent[] = interactionsFor(graph, personId).map((node) => {
+    const props = node.props as Record<string, unknown>;
+    return {
+      id: node.id,
+      occurredAt: (props.occurred_at as string) ?? node.created_at,
+      initiatedBy: (props.initiated_by as 'me' | 'them' | undefined) ?? null,
+    };
+  });
+  return correspondenceProfile(events);
 }

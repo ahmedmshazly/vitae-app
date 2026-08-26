@@ -5,7 +5,7 @@
  * the met_via labels as written.
  */
 import { describe, expect, it } from 'vitest';
-import { brokerTally, rankReactivation } from './correspondence.js';
+import { brokerTally, correspondenceProfile, rankReactivation } from './correspondence.js';
 
 const NOW = new Date('2026-07-11T12:00:00.000Z');
 const day = (n: number) => new Date(NOW.getTime() - n * 86_400_000).toISOString();
@@ -92,5 +92,82 @@ describe('brokerTally', () => {
       { via: 'Nadia', count: 2 },
       { via: 'Amr', count: 1 },
     ]);
+  });
+});
+
+describe('correspondenceProfile', () => {
+  const at = (n: number, id: string, initiatedBy?: 'me' | 'them') => ({
+    id,
+    occurredAt: day(n),
+    ...(initiatedBy ? { initiatedBy } : {}),
+  });
+
+  it('returns the empty profile for no events, with nulls rather than zeros-as-facts', () => {
+    const p = correspondenceProfile([], { now: NOW });
+    expect(p.coverage).toEqual({ withDirection: 0, total: 0 });
+    expect(p.reciprocity.ratio).toBeNull();
+    expect(p.replyLatency.mine.medianDays).toBeNull();
+    expect(p.replyLatency.theirs.medianDays).toBeNull();
+    expect(p.unansweredInbound).toEqual({ count: 0, eventIds: [] });
+    expect(p.contactDays.totalDays).toBe(0);
+  });
+
+  it('tallies a conversation: reciprocity, per-direction medians, and the ids behind each figure', () => {
+    const p = correspondenceProfile(
+      [at(10, 'a', 'them'), at(9, 'b', 'me'), at(5, 'c', 'them'), at(2, 'd', 'me')],
+      { now: NOW },
+    );
+    expect(p.coverage).toEqual({ withDirection: 4, total: 4 });
+    expect(p.reciprocity).toMatchObject({ outbound: 2, inbound: 2, ratio: 0.5 });
+    expect(p.reciprocity.inboundIds).toEqual(['a', 'c']);
+    // My replies: a→b (1 day), c→d (3 days) → median 2. Theirs: b→c (4 days).
+    expect(p.replyLatency.mine.medianDays).toBe(2);
+    expect(p.replyLatency.mine.samples).toEqual([
+      { fromId: 'a', toId: 'b', days: 1 },
+      { fromId: 'c', toId: 'd', days: 3 },
+    ]);
+    expect(p.replyLatency.theirs.medianDays).toBe(4);
+    expect(p.unansweredInbound.count).toBe(0);
+  });
+
+  it('counts the trailing inbound run as unanswered, by id', () => {
+    const p = correspondenceProfile(
+      [at(20, 'a', 'me'), at(10, 'b', 'them'), at(8, 'c', 'them')],
+      { now: NOW },
+    );
+    expect(p.unansweredInbound).toEqual({ count: 2, eventIds: ['b', 'c'] });
+    // Their reply a→b (10 days) is still a reply; the run after it is the debt.
+    expect(p.replyLatency.theirs.medianDays).toBe(10);
+  });
+
+  it('excludes directionless events from directional figures but never from contact', () => {
+    const p = correspondenceProfile(
+      [at(15, 'a'), at(10, 'b', 'them'), at(9, 'c', 'me'), at(4, 'd'), at(3, 'e')],
+      { now: NOW },
+    );
+    expect(p.coverage).toEqual({ withDirection: 2, total: 5 });
+    expect(p.reciprocity).toMatchObject({ outbound: 1, inbound: 1 });
+    expect(p.contactDays.totalDays).toBe(5);
+  });
+
+  it('does not read a months-later direction change as a reply', () => {
+    const p = correspondenceProfile([at(300, 'a', 'them'), at(2, 'b', 'me')], { now: NOW });
+    expect(p.replyLatency.mine.medianDays).toBeNull();
+    expect(p.replyLatency.mine.samples).toEqual([]);
+    // The old inbound was answered late, not never: the trailing run is mine.
+    expect(p.unansweredInbound.count).toBe(0);
+  });
+
+  it('buckets distinct contact days into the trailing twelve months', () => {
+    const p = correspondenceProfile(
+      [at(3, 'a', 'me'), at(3.2, 'b', 'them'), at(40, 'c', 'me'), at(400, 'd', 'me')],
+      { now: NOW },
+    );
+    expect(p.contactDays.months).toHaveLength(12);
+    expect(p.contactDays.months[11]!.month).toBe('2026-07');
+    const counted = p.contactDays.months.reduce((sum, m) => sum + m.days, 0);
+    // Day 400 sits outside the window; days 3 and 3.2 share a calendar day.
+    expect(counted).toBe(2);
+    expect(p.contactDays.totalDays).toBe(3);
   });
 });

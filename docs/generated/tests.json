@@ -826,7 +826,7 @@
     {
       "file": "apps/api/src/routes/v1/people.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 2,
+      "cases": 3,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -841,7 +841,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 48
+      "lines": 82
     },
     {
       "file": "apps/api/src/routes/v1/places.integration.test.ts",
@@ -5821,12 +5821,13 @@
     {
       "file": "packages/core/src/algorithms/correspondence.test.ts",
       "package": "@vitae/core",
-      "cases": 4,
+      "cases": 10,
       "skipped": 0,
       "todo": 0,
       "suites": [
         "rankReactivation",
-        "brokerTally"
+        "brokerTally",
+        "correspondenceProfile"
       ],
       "subjects": [
         "./correspondence.js"
@@ -5840,7 +5841,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 97
+      "lines": 174
     },
     {
       "file": "packages/core/src/algorithms/dedup.test.ts",
@@ -7026,14 +7027,14 @@
   ],
   "summary": {
     "files": 329,
-    "cases": 2135,
+    "cases": 2142,
     "skipped": 0,
     "todo": 0,
     "by_package": {
-      "@vitae/api": 222,
+      "@vitae/api": 223,
       "@vitae/web": 1114,
       "@vitae/e2e": 289,
-      "@vitae/core": 277,
+      "@vitae/core": 283,
       "@vitae/testkit": 7,
       "@vitae/ui": 226
     },

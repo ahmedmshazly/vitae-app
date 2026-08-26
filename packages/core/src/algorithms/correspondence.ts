@@ -127,3 +127,121 @@ export function brokerTally(metVia: Array<string | null | undefined>): BrokerTal
     .map(([via, count]) => ({ via, count }))
     .sort((a, b) => b.count - a.count || a.via.localeCompare(b.via));
 }
+
+/** One interaction as the profile sees it: an instant, an id, maybe a stated direction. */
+export interface ProfileEvent {
+  id: string;
+  occurredAt: string | Date;
+  /** Operator-stated; absent means unstated, never assumed. */
+  initiatedBy?: 'me' | 'them' | null;
+}
+
+export interface ReplySample {
+  fromId: string;
+  toId: string;
+  days: number;
+}
+
+export interface CorrespondenceProfile {
+  /** The honesty header: how much of the history carries a direction at all. */
+  coverage: { withDirection: number; total: number };
+  reciprocity: {
+    outbound: number;
+    inbound: number;
+    /** Share of directional events the operator initiated; null with no directional history. */
+    ratio: number | null;
+    outboundIds: string[];
+    inboundIds: string[];
+  };
+  replyLatency: {
+    mine: { medianDays: number | null; samples: ReplySample[] };
+    theirs: { medianDays: number | null; samples: ReplySample[] };
+  };
+  unansweredInbound: { count: number; eventIds: string[] };
+  contactDays: {
+    totalDays: number;
+    /** Trailing months, oldest first, zero-filled — chart-ready, no gaps. */
+    months: Array<{ month: string; days: number }>;
+  };
+}
+
+const DAY_MS = 86_400_000;
+
+function median(values: number[]): number | null {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 1 ? sorted[mid]! : (sorted[mid - 1]! + sorted[mid]!) / 2;
+}
+
+/**
+ * The per-person correspondence profile: reciprocity, per-direction reply
+ * latency, unanswered inbound, and the contact-day distribution — every
+ * figure carrying the interaction ids that produced it (NFR-PRIV-003).
+ *
+ * Reply pairs derive from direction alternation in the time-ordered
+ * directional history: the last event of one run and the first event of the
+ * next opposite run form a reply, unless the gap exceeds
+ * `CORRESPONDENCE.replyPairMaxGapDays`. Events without a stated direction
+ * are excluded from directional figures and reported in `coverage` — they
+ * still count as contact.
+ */
+export function correspondenceProfile(
+  events: ProfileEvent[],
+  opts: { now?: Date } = {},
+): CorrespondenceProfile {
+  const now = opts.now ?? new Date();
+  const dated = events
+    .map((event) => ({ ...event, at: new Date(event.occurredAt).getTime() }))
+    .filter((event) => Number.isFinite(event.at))
+    .sort((a, b) => a.at - b.at || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+
+  const directional = dated.filter((e) => e.initiatedBy === 'me' || e.initiatedBy === 'them');
+  const outbound = directional.filter((e) => e.initiatedBy === 'me');
+  const inbound = directional.filter((e) => e.initiatedBy === 'them');
+
+  const mine: ReplySample[] = [];
+  const theirs: ReplySample[] = [];
+  for (let i = 1; i < directional.length; i++) {
+    const prev = directional[i - 1]!;
+    const curr = directional[i]!;
+    if (prev.initiatedBy === curr.initiatedBy) continue;
+    const days = Math.round(((curr.at - prev.at) / DAY_MS) * 100) / 100;
+    if (days > CORRESPONDENCE.replyPairMaxGapDays) continue;
+    (curr.initiatedBy === 'me' ? mine : theirs).push({ fromId: prev.id, toId: curr.id, days });
+  }
+
+  const unansweredIds: string[] = [];
+  for (let i = directional.length - 1; i >= 0; i--) {
+    if (directional[i]!.initiatedBy !== 'them') break;
+    unansweredIds.unshift(directional[i]!.id);
+  }
+
+  const dayKeys = new Set(dated.map((e) => new Date(e.at).toISOString().slice(0, 10)));
+  const months: Array<{ month: string; days: number }> = [];
+  for (let back = CORRESPONDENCE.contactWindowMonths - 1; back >= 0; back--) {
+    const key = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - back, 1))
+      .toISOString()
+      .slice(0, 7);
+    let days = 0;
+    for (const dayKey of dayKeys) if (dayKey.startsWith(key)) days++;
+    months.push({ month: key, days });
+  }
+
+  return {
+    coverage: { withDirection: directional.length, total: dated.length },
+    reciprocity: {
+      outbound: outbound.length,
+      inbound: inbound.length,
+      ratio: directional.length === 0 ? null : Math.round((outbound.length / directional.length) * 100) / 100,
+      outboundIds: outbound.map((e) => e.id),
+      inboundIds: inbound.map((e) => e.id),
+    },
+    replyLatency: {
+      mine: { medianDays: median(mine.map((s) => s.days)), samples: mine },
+      theirs: { medianDays: median(theirs.map((s) => s.days)), samples: theirs },
+    },
+    unansweredInbound: { count: unansweredIds.length, eventIds: unansweredIds },
+    contactDays: { totalDays: dayKeys.size, months },
+  };
+}

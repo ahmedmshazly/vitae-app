@@ -2,17 +2,17 @@
   "generated_by": "scripts/docs/gen-api.mjs",
   "note": "Derived from the Express routers, not from docs/api/openapi.json. Do not edit by hand.",
   "totals": {
-    "endpoints": 139,
+    "endpoints": 140,
     "mounts": 36,
     "declared_mount_prefixes": 36,
     "public_endpoints": 3,
     "outside_auth_gate": 3,
     "blocked_when_read_only": 70,
     "documented_in_openapi": 49,
-    "undocumented_in_openapi": 90,
+    "undocumented_in_openapi": 91,
     "openapi_operations": 55,
     "documented_but_not_registered": 6,
-    "endpoints_with_tests": 132,
+    "endpoints_with_tests": 133,
     "endpoints_citing_requirements": 30
   },
   "gates": {
@@ -163,7 +163,7 @@
       "prefix": "/people",
       "router": "peopleRouter",
       "source": "apps/api/src/routes/v1/people.ts",
-      "endpoints": 3
+      "endpoints": 4
     },
     {
       "prefix": "/people/:personId/favors",
@@ -2538,13 +2538,43 @@
       "openapi": true
     },
     {
+      "id": "GET /api/v1/people/{id}/correspondence",
+      "slug": "get-api-v1-people-id-correspondence",
+      "method": "GET",
+      "path": "/api/v1/people/{id}/correspondence",
+      "express_path": "/api/v1/people/:id/correspondence",
+      "mount": "/people",
+      "source": "apps/api/src/routes/v1/people.ts:60",
+      "summary": "The correspondence profile with this person: reciprocity, per-direction reply latency, unanswered inbound, and the contact-day rhythm — every figure decomposing into the interactions behind it, with a coverage header saying how much of the history carries a stated direction at all.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "personCorrespondence"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/people.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
       "id": "GET /api/v1/people/{id}/profile",
       "slug": "get-api-v1-people-id-profile",
       "method": "GET",
       "path": "/api/v1/people/{id}/profile",
       "express_path": "/api/v1/people/:id/profile",
       "mount": "/people",
-      "source": "apps/api/src/routes/v1/people.ts:61",
+      "source": "apps/api/src/routes/v1/people.ts:76",
       "summary": "The records this person owns, grouped the way a CV reads. Distinct from `/summary`, which answers \"what is my relationship with them\". This answers \"what have they done\", and it is the surface that makes the imported profiles useful instead of merely present.",
       "requirements": [],
       "request_schemas": [],
@@ -4189,6 +4219,7 @@
     "GET /api/v1/nodes/{id}/revisions",
     "GET /api/v1/nodes/counts",
     "GET /api/v1/orgs/{id}",
+    "GET /api/v1/people/{id}/correspondence",
     "GET /api/v1/people/{id}/profile",
     "GET /api/v1/people/{id}/summary",
     "POST /api/v1/people/{personId}/favors",

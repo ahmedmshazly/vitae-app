@@ -2,8 +2,8 @@
   "by_package": {
     "@vitae/api": {
       "files": 109,
-      "lines": 19992,
-      "exports": 372,
+      "lines": 20032,
+      "exports": 373,
       "undocumented": 279
     },
     "@vitae/web": {
@@ -20,9 +20,9 @@
     },
     "@vitae/core": {
       "files": 47,
-      "lines": 8389,
-      "exports": 438,
-      "undocumented": 308
+      "lines": 8515,
+      "exports": 442,
+      "undocumented": 310
     },
     "@vitae/testkit": {
       "files": 5,
@@ -82,7 +82,7 @@
     },
     "route": {
       "files": 47,
-      "lines": 8414,
+      "lines": 8429,
       "exports": 226,
       "undocumented": 178
     },
@@ -94,8 +94,8 @@
     },
     "service": {
       "files": 24,
-      "lines": 7581,
-      "exports": 204,
+      "lines": 7606,
+      "exports": 205,
       "undocumented": 149
     },
     "component": {
@@ -124,9 +124,9 @@
     },
     "algorithm": {
       "files": 21,
-      "lines": 3269,
-      "exports": 149,
-      "undocumented": 98
+      "lines": 3395,
+      "exports": 153,
+      "undocumented": 100
     }
   },
   "public_surface": {
@@ -185,6 +185,7 @@
       "ConnectionOption",
       "ConnectionOptionGroup",
       "Constants",
+      "CorrespondenceProfile",
       "DEDUP",
       "DEFAULT_JD_CORPUS",
       "DatePrecision",
@@ -274,6 +275,7 @@
       "PersonLike",
       "PersonRelation",
       "PrimaryKind",
+      "ProfileEvent",
       "RECIPROCITY",
       "REVISION_OPS",
       "RankOptions",
@@ -283,6 +285,7 @@
       "ReactivationTieInput",
       "ReconnectInput",
       "ReconnectScore",
+      "ReplySample",
       "Resume",
       "ResumeConfig",
       "RevisionOp",
@@ -368,6 +371,7 @@
       "connectionOptionLabel",
       "connectionOptionSelectLabel",
       "connectionOptionsFor",
+      "correspondenceProfile",
       "courseProps",
       "datePrecisionSchema",
       "defaultVariantText",
@@ -685,9 +689,9 @@
   "summary": {
     "files": 353,
     "test_files": 329,
-    "lines": 80005,
-    "exports": 1730,
-    "undocumented_exports": 1224,
+    "lines": 80171,
+    "exports": 1735,
+    "undocumented_exports": 1226,
     "edges": 1575,
     "untested": 140,
     "no_consumer": [],

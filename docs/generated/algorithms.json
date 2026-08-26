@@ -332,65 +332,65 @@
         {
           "name": "WHO_TO_CALL_WEIGHTS",
           "kind": "object",
-          "line": 52,
+          "line": 60,
           "doc": "Who-to-call ranking weights (SRS §10.4-A / §10.7.3).",
-          "source": "packages/core/src/algorithms/constants.ts:52"
+          "source": "packages/core/src/algorithms/constants.ts:60"
         },
         {
           "name": "AFFILIATION",
           "kind": "object",
-          "line": 63,
+          "line": 71,
           "doc": "Affiliation sub-scores.",
-          "source": "packages/core/src/algorithms/constants.ts:63"
+          "source": "packages/core/src/algorithms/constants.ts:71"
         },
         {
           "name": "GEO",
           "kind": "object",
-          "line": 65,
+          "line": 73,
           "doc": "Geography sub-scores.",
-          "source": "packages/core/src/algorithms/constants.ts:65"
+          "source": "packages/core/src/algorithms/constants.ts:73"
         },
         {
           "name": "RECIPROCITY",
           "kind": "object",
-          "line": 67,
+          "line": 75,
           "doc": "Reciprocity adjustments.",
-          "source": "packages/core/src/algorithms/constants.ts:67"
+          "source": "packages/core/src/algorithms/constants.ts:75"
         },
         {
           "name": "PAGERANK",
           "kind": "object",
-          "line": 70,
+          "line": 78,
           "doc": "Personalized PageRank (SRS §10.7.3).",
-          "source": "packages/core/src/algorithms/constants.ts:70"
+          "source": "packages/core/src/algorithms/constants.ts:78"
         },
         {
           "name": "BM25F",
           "kind": "object",
-          "line": 99,
+          "line": 107,
           "doc": "BM25F JD parsing (SRS §10.7.4).",
-          "source": "packages/core/src/algorithms/constants.ts:99"
+          "source": "packages/core/src/algorithms/constants.ts:107"
         },
         {
           "name": "SELECTION",
           "kind": "object",
-          "line": 117,
+          "line": 125,
           "doc": "Atom scoring + submodular selection (SRS §10.7.5).",
-          "source": "packages/core/src/algorithms/constants.ts:117"
+          "source": "packages/core/src/algorithms/constants.ts:125"
         },
         {
           "name": "DEDUP",
           "kind": "object",
-          "line": 142,
+          "line": 150,
           "doc": "Fellegi-Sunter record-linkage m/u probabilities per field (SRS §10.7.6).",
-          "source": "packages/core/src/algorithms/constants.ts:142"
+          "source": "packages/core/src/algorithms/constants.ts:150"
         },
         {
           "name": "Constants",
           "kind": "type",
-          "line": 155,
+          "line": 163,
           "doc": null,
-          "source": "packages/core/src/algorithms/constants.ts:155"
+          "source": "packages/core/src/algorithms/constants.ts:163"
         }
       ],
       "constants": [
@@ -543,6 +543,34 @@
           "line": 119,
           "doc": "Who introductions have flowed through: a tally of the `met_via` labels the relationship edges already carry.",
           "source": "packages/core/src/algorithms/correspondence.ts:119"
+        },
+        {
+          "name": "ProfileEvent",
+          "kind": "interface",
+          "line": 132,
+          "doc": "One interaction as the profile sees it: an instant, an id, maybe a stated direction.",
+          "source": "packages/core/src/algorithms/correspondence.ts:132"
+        },
+        {
+          "name": "ReplySample",
+          "kind": "interface",
+          "line": 139,
+          "doc": null,
+          "source": "packages/core/src/algorithms/correspondence.ts:139"
+        },
+        {
+          "name": "CorrespondenceProfile",
+          "kind": "interface",
+          "line": 145,
+          "doc": null,
+          "source": "packages/core/src/algorithms/correspondence.ts:145"
+        },
+        {
+          "name": "correspondenceProfile",
+          "kind": "function",
+          "line": 189,
+          "doc": "The per-person correspondence profile: reciprocity, per-direction reply latency, unanswered inbound, and the contact-day distribution — every figure carrying the interaction ids that produced it (NFR-PRIV-003).",
+          "source": "packages/core/src/algorithms/correspondence.ts:189"
         }
       ],
       "constants": [
@@ -568,6 +596,21 @@
         },
         {
           "file": "apps/api/src/services/crm.ts",
+          "symbol": "correspondenceProfile",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/crm.ts",
+          "symbol": "CorrespondenceProfile",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/crm.ts",
+          "symbol": "ProfileEvent",
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/crm.ts",
           "symbol": "rankReactivation",
           "test": false
         },
@@ -578,13 +621,18 @@
         },
         {
           "file": "packages/core/src/algorithms/correspondence.test.ts",
+          "symbol": "correspondenceProfile",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/algorithms/correspondence.test.ts",
           "symbol": "rankReactivation",
           "test": true
         }
       ],
       "consumer_count": {
-        "product": 3,
-        "test": 2
+        "product": 6,
+        "test": 3
       }
     },
     {
@@ -2469,6 +2517,18 @@
           "value": "25",
           "doc": "Candidates shown; the register says how many were considered.",
           "line": 48
+        },
+        {
+          "path": "replyPairMaxGapDays",
+          "value": "60",
+          "doc": "A direction change further apart than this is a new thread, not a reply — without the cap, answering an eight-month-old message would record an eight-month \"reply latency\", which is dormancy wearing the wrong label.",
+          "line": 54
+        },
+        {
+          "path": "contactWindowMonths",
+          "value": "12",
+          "doc": "The contact-day distribution spans this many trailing calendar months.",
+          "line": 56
         }
       ]
     },
@@ -2476,49 +2536,49 @@
       "name": "WHO_TO_CALL_WEIGHTS",
       "description": "Who-to-call ranking weights (SRS §10.4-A / §10.7.3).",
       "requirements": [],
-      "source": "packages/core/src/algorithms/constants.ts:52",
+      "source": "packages/core/src/algorithms/constants.ts:60",
       "values": [
         {
           "path": "affiliation",
           "value": "2.0",
           "doc": null,
-          "line": 53
+          "line": 61
         },
         {
           "path": "topic",
           "value": "1.6",
           "doc": null,
-          "line": 54
+          "line": 62
         },
         {
           "path": "strength",
           "value": "1.2",
           "doc": null,
-          "line": 55
+          "line": 63
         },
         {
           "path": "geo",
           "value": "0.6",
           "doc": null,
-          "line": 56
+          "line": 64
         },
         {
           "path": "reciprocity",
           "value": "0.4",
           "doc": null,
-          "line": 57
+          "line": 65
         },
         {
           "path": "graph",
           "value": "0.8",
           "doc": null,
-          "line": 58
+          "line": 66
         },
         {
           "path": "pinned",
           "value": "1.0",
           "doc": null,
-          "line": 59
+          "line": 67
         }
       ]
     },
@@ -2526,19 +2586,19 @@
       "name": "AFFILIATION",
       "description": "Affiliation sub-scores.",
       "requirements": [],
-      "source": "packages/core/src/algorithms/constants.ts:63",
+      "source": "packages/core/src/algorithms/constants.ts:71",
       "values": [
         {
           "path": "current",
           "value": "1.0",
           "doc": null,
-          "line": 63
+          "line": 71
         },
         {
           "path": "past",
           "value": "0.6",
           "doc": null,
-          "line": 63
+          "line": 71
         }
       ]
     },
@@ -2546,19 +2606,19 @@
       "name": "GEO",
       "description": "Geography sub-scores.",
       "requirements": [],
-      "source": "packages/core/src/algorithms/constants.ts:65",
+      "source": "packages/core/src/algorithms/constants.ts:73",
       "values": [
         {
           "path": "sameCity",
           "value": "1.0",
           "doc": null,
-          "line": 65
+          "line": 73
         },
         {
           "path": "sameCountry",
           "value": "0.5",
           "doc": null,
-          "line": 65
+          "line": 73
         }
       ]
     },
@@ -2566,25 +2626,25 @@
       "name": "RECIPROCITY",
       "description": "Reciprocity adjustments.",
       "requirements": [],
-      "source": "packages/core/src/algorithms/constants.ts:67",
+      "source": "packages/core/src/algorithms/constants.ts:75",
       "values": [
         {
           "path": "unsettledOwedToMe",
           "value": "0.5",
           "doc": null,
-          "line": 67
+          "line": 75
         },
         {
           "path": "askedRecently",
           "value": "-0.5",
           "doc": null,
-          "line": 67
+          "line": 75
         },
         {
           "path": "recentDays",
           "value": "30",
           "doc": null,
-          "line": 67
+          "line": 75
         }
       ]
     },
@@ -2592,139 +2652,139 @@
       "name": "PAGERANK",
       "description": "Personalized PageRank (SRS §10.7.3).",
       "requirements": [],
-      "source": "packages/core/src/algorithms/constants.ts:70",
+      "source": "packages/core/src/algorithms/constants.ts:78",
       "values": [
         {
           "path": "alpha",
           "value": "0.15",
           "doc": null,
-          "line": 71
+          "line": 79
         },
         {
           "path": "maxIterations",
           "value": "50",
           "doc": null,
-          "line": 72
+          "line": 80
         },
         {
           "path": "tolerance",
           "value": "1e-6",
           "doc": null,
-          "line": 73
+          "line": 81
         },
         {
           "path": "edgeWeights.KNOWS",
           "value": "3.0",
           "doc": null,
-          "line": 76
+          "line": 84
         },
         {
           "path": "edgeWeights.WORKED_ON",
           "value": "2.0",
           "doc": null,
-          "line": 77
+          "line": 85
         },
         {
           "path": "edgeWeights.ROLE_AT",
           "value": "1.5",
           "doc": null,
-          "line": 78
+          "line": 86
         },
         {
           "path": "edgeWeights.HELD",
           "value": "1.5",
           "doc": null,
-          "line": 79
+          "line": 87
         },
         {
           "path": "edgeWeights.FOUNDED",
           "value": "2.2",
           "doc": null,
-          "line": 80
+          "line": 88
         },
         {
           "path": "edgeWeights.STUDIED_AT",
           "value": "1.4",
           "doc": null,
-          "line": 81
+          "line": 89
         },
         {
           "path": "edgeWeights.REPORTS_TO",
           "value": "1.8",
           "doc": null,
-          "line": 82
+          "line": 90
         },
         {
           "path": "edgeWeights.PART_OF",
           "value": "1.2",
           "doc": null,
-          "line": 83
+          "line": 91
         },
         {
           "path": "edgeWeights.ATTENDED",
           "value": "1.0",
           "doc": null,
-          "line": 84
+          "line": 92
         },
         {
           "path": "edgeWeights.USES_SKILL",
           "value": "0.8",
           "doc": null,
-          "line": 85
+          "line": 93
         },
         {
           "path": "edgeWeights.AUTHORED",
           "value": "0.8",
           "doc": null,
-          "line": 86
+          "line": 94
         },
         {
           "path": "edgeWeights.WITH",
           "value": "1.0",
           "doc": null,
-          "line": 87
+          "line": 95
         },
         {
           "path": "edgeWeights.ABOUT",
           "value": "0.5",
           "doc": null,
-          "line": 88
+          "line": 96
         },
         {
           "path": "edgeWeights.RELATES_TO",
           "value": "0.5",
           "doc": null,
-          "line": 89
+          "line": 97
         },
         {
           "path": "edgeWeights.MEMBER_OF",
           "value": "1.2",
           "doc": null,
-          "line": 90
+          "line": 98
         },
         {
           "path": "edgeWeights.ORG_RELATED",
           "value": "1.2",
           "doc": null,
-          "line": 91
+          "line": 99
         },
         {
           "path": "edgeWeights.FOLLOWS",
           "value": "0.4",
           "doc": null,
-          "line": 92
+          "line": 100
         },
         {
           "path": "edgeWeights.EARNED",
           "value": "1.0",
           "doc": null,
-          "line": 93
+          "line": 101
         },
         {
           "path": "edgeWeights.COMPLETED",
           "value": "0.9",
           "doc": null,
-          "line": 94
+          "line": 102
         }
       ]
     },
@@ -2732,67 +2792,67 @@
       "name": "BM25F",
       "description": "BM25F JD parsing (SRS §10.7.4).",
       "requirements": [],
-      "source": "packages/core/src/algorithms/constants.ts:99",
+      "source": "packages/core/src/algorithms/constants.ts:107",
       "values": [
         {
           "path": "k1",
           "value": "1.2",
           "doc": null,
-          "line": 100
+          "line": 108
         },
         {
           "path": "b",
           "value": "0.75",
           "doc": null,
-          "line": 101
+          "line": 109
         },
         {
           "path": "sectionWeights.title",
           "value": "1.5",
           "doc": null,
-          "line": 104
+          "line": 112
         },
         {
           "path": "sectionWeights.requirements",
           "value": "1.0",
           "doc": null,
-          "line": 105
+          "line": 113
         },
         {
           "path": "sectionWeights.responsibilities",
           "value": "0.7",
           "doc": null,
-          "line": 106
+          "line": 114
         },
         {
           "path": "sectionWeights.nice_to_have",
           "value": "0.4",
           "doc": null,
-          "line": 107
+          "line": 115
         },
         {
           "path": "sectionWeights.about",
           "value": "0.2",
           "doc": null,
-          "line": 108
+          "line": 116
         },
         {
           "path": "maxKeywords",
           "value": "40",
           "doc": null,
-          "line": 110
+          "line": 118
         },
         {
           "path": "minGram",
           "value": "1",
           "doc": "n-gram sizes to consider for phrase matching.",
-          "line": 112
+          "line": 120
         },
         {
           "path": "maxGram",
           "value": "3",
           "doc": null,
-          "line": 113
+          "line": 121
         }
       ]
     },
@@ -2800,73 +2860,73 @@
       "name": "SELECTION",
       "description": "Atom scoring + submodular selection (SRS §10.7.5).",
       "requirements": [],
-      "source": "packages/core/src/algorithms/constants.ts:117",
+      "source": "packages/core/src/algorithms/constants.ts:125",
       "values": [
         {
           "path": "skillHit",
           "value": "1.0",
           "doc": "Per-keyword hit strength.",
-          "line": 119
+          "line": 127
         },
         {
           "path": "textHit",
           "value": "0.6",
           "doc": null,
-          "line": 120
+          "line": 128
         },
         {
           "path": "recencyTauYears",
           "value": "8",
           "doc": "Recency: exp(-yearsSinceEnd / recencyTau), floored.",
-          "line": 122
+          "line": 130
         },
         {
           "path": "recencyFloor",
           "value": "0.35",
           "doc": null,
-          "line": 123
+          "line": 131
         },
         {
           "path": "metricCoeff",
           "value": "0.15",
           "doc": "Metric bonus: 1 + metricCoeff·min(metricCount, metricCap).",
-          "line": 125
+          "line": 133
         },
         {
           "path": "metricCap",
           "value": "2",
           "doc": null,
-          "line": 126
+          "line": 134
         },
         {
           "path": "lambda",
           "value": "1",
           "doc": "Submodular coverage saturation rate λ and quality weight μ.",
-          "line": 128
+          "line": 136
         },
         {
           "path": "mu",
           "value": "0.5",
           "doc": null,
-          "line": 129
+          "line": 137
         },
         {
           "path": "minBulletsPerRole",
           "value": "2",
           "doc": "Bullets-per-included-role partition constraint (SRS FR-RES-008).",
-          "line": 131
+          "line": 139
         },
         {
           "path": "maxBulletsPerRole",
           "value": "4",
           "doc": null,
-          "line": 132
+          "line": 140
         },
         {
           "path": "maxFitIterations",
           "value": "3",
           "doc": "One-page fit loop cap (SRS FR-RES-014).",
-          "line": 134
+          "line": 142
         }
       ]
     },
@@ -2874,88 +2934,88 @@
       "name": "DEDUP",
       "description": "Fellegi-Sunter record-linkage m/u probabilities per field (SRS §10.7.6).",
       "requirements": [],
-      "source": "packages/core/src/algorithms/constants.ts:142",
+      "source": "packages/core/src/algorithms/constants.ts:150",
       "values": [
         {
           "path": "fields.email.m",
           "value": "0.95",
           "doc": null,
-          "line": 144
+          "line": 152
         },
         {
           "path": "fields.email.u",
           "value": "0.0001",
           "doc": null,
-          "line": 144
+          "line": 152
         },
         {
           "path": "fields.name_trigram.m",
           "value": "0.9",
           "doc": null,
-          "line": 145
+          "line": 153
         },
         {
           "path": "fields.name_trigram.u",
           "value": "0.02",
           "doc": null,
-          "line": 145
+          "line": 153
         },
         {
           "path": "fields.org_domain.m",
           "value": "0.92",
           "doc": null,
-          "line": 146
+          "line": 154
         },
         {
           "path": "fields.org_domain.u",
           "value": "0.001",
           "doc": null,
-          "line": 146
+          "line": 154
         },
         {
           "path": "fields.shared_event.m",
           "value": "0.7",
           "doc": null,
-          "line": 147
+          "line": 155
         },
         {
           "path": "fields.shared_event.u",
           "value": "0.05",
           "doc": null,
-          "line": 147
+          "line": 155
         },
         {
           "path": "fields.phone.m",
           "value": "0.93",
           "doc": null,
-          "line": 148
+          "line": 156
         },
         {
           "path": "fields.phone.u",
           "value": "0.0005",
           "doc": null,
-          "line": 148
+          "line": 156
         },
         {
           "path": "possibleThreshold",
           "value": "4",
           "doc": "Two thresholds (in summed log2 weight) partition the pair space.",
-          "line": 151
+          "line": 159
         },
         {
           "path": "probableThreshold",
           "value": "10",
           "doc": null,
-          "line": 152
+          "line": 160
         }
       ]
     }
   ],
   "summary": {
     "modules": 20,
-    "exported_symbols": 129,
+    "exported_symbols": 133,
     "constant_groups": 10,
-    "constant_values": 89,
+    "constant_values": 91,
     "untested": [],
     "unused_in_product": [],
     "impure": []

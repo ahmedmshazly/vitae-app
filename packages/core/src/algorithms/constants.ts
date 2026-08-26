@@ -46,6 +46,14 @@ export const CORRESPONDENCE = {
   minPeakStrength: 0.55,
   /** Candidates shown; the register says how many were considered. */
   maxCandidates: 25,
+  /**
+   * A direction change further apart than this is a new thread, not a reply —
+   * without the cap, answering an eight-month-old message would record an
+   * eight-month "reply latency", which is dormancy wearing the wrong label.
+   */
+  replyPairMaxGapDays: 60,
+  /** The contact-day distribution spans this many trailing calendar months. */
+  contactWindowMonths: 12,
 } as const;
 
 /** Who-to-call ranking weights (SRS §10.4-A / §10.7.3). */

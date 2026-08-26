@@ -20,7 +20,7 @@
   },
   "totals": {
     "registered": 131,
-    "citations": 782,
+    "citations": 783,
     "implemented_and_tested": 25,
     "implemented_untested": 60,
     "tested_only": 3,
@@ -757,7 +757,7 @@
       "evidence": "implemented-and-tested",
       "sources": [
         "apps/api/src/routes/v1/correspondence.ts:8",
-        "apps/api/src/services/crm.ts:636",
+        "apps/api/src/services/crm.ts:639",
         "apps/web/src/routes/Correspondence.tsx:32",
         "packages/core/src/algorithms/constants.ts:40",
         "packages/core/src/algorithms/correspondence.ts:2"
@@ -1381,7 +1381,7 @@
       "evidence": "implemented-and-tested",
       "sources": [
         "apps/api/src/routes/v1/resumes.ts:137",
-        "packages/core/src/algorithms/constants.ts:130",
+        "packages/core/src/algorithms/constants.ts:138",
         "packages/core/src/algorithms/selection.ts:3",
         "packages/core/src/algorithms/selection.ts:170",
         "packages/core/src/algorithms/selection.ts:218"
@@ -1504,7 +1504,7 @@
       "evidence": "implemented-and-tested",
       "sources": [
         "apps/api/src/routes/v1/resumes.ts:265",
-        "packages/core/src/algorithms/constants.ts:133",
+        "packages/core/src/algorithms/constants.ts:141",
         "packages/core/src/algorithms/fit-loop.ts:2",
         "packages/core/src/algorithms/selection.ts:3"
       ],
@@ -2054,7 +2054,8 @@
       "sources": [
         "apps/api/src/routes/v1/correspondence.ts:11",
         "apps/web/src/routes/Correspondence.tsx:37",
-        "packages/core/src/algorithms/correspondence.ts:12"
+        "packages/core/src/algorithms/correspondence.ts:12",
+        "packages/core/src/algorithms/correspondence.ts:180"
       ],
       "tests": [
         "apps/web/src/routes/Correspondence.states.test.tsx:4"

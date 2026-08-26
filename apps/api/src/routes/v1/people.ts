@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { asyncHandler, HttpError } from '../../middleware/error.js';
-import { findKnowsEdge, loadGraph, peopleList, personStrength } from '../../services/crm.js';
+import { findKnowsEdge, loadGraph, peopleList, personCorrespondence, personStrength } from '../../services/crm.js';
 import { personProfile } from '../../services/profile.js';
 import { repository } from '../../db/repository.js';
 
@@ -48,6 +48,21 @@ peopleRouter.get(
       },
       favors: (kprops.favors as unknown[]) ?? [],
     });
+  }),
+);
+
+/**
+ * The correspondence profile with this person: reciprocity, per-direction
+ * reply latency, unanswered inbound, and the contact-day rhythm — every
+ * figure decomposing into the interactions behind it, with a coverage
+ * header saying how much of the history carries a stated direction at all.
+ */
+peopleRouter.get(
+  '/:id/correspondence',
+  asyncHandler(async (req, res) => {
+    const person = await repository.getNode(req.params.id);
+    if (!person || person.type !== 'person') throw new HttpError(404, 'NOT_FOUND', 'Person not found.');
+    res.json({ profile: await personCorrespondence(req.params.id) });
   }),
 );
 
