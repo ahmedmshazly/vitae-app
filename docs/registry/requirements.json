@@ -493,10 +493,10 @@
       "kind": "functional",
       "title": "A network rollup of correspondence health",
       "statement": "A network-level correspondence rollup must rank dormant-but-once-strong ties for reactivation and name the brokers through whom introductions have historically flowed, computed with the same constants the relationship algorithms ship with, so the rollup and the per-tie views cannot disagree.",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
-      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007."
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007 and shipped the same day: packages/core/src/algorithms/correspondence.ts ranks reactivation by re-reading each tie's history with the tie-strength kernel itself, and /network/correspondence presents the rollup with its factor decomposition. Brokers tally the met_via labels the relationship edges already carry."
     },
     {
       "id": "FR-COMM-003",

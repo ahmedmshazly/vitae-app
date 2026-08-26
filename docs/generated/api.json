@@ -2,18 +2,18 @@
   "generated_by": "scripts/docs/gen-api.mjs",
   "note": "Derived from the Express routers, not from docs/api/openapi.json. Do not edit by hand.",
   "totals": {
-    "endpoints": 138,
-    "mounts": 35,
-    "declared_mount_prefixes": 35,
+    "endpoints": 139,
+    "mounts": 36,
+    "declared_mount_prefixes": 36,
     "public_endpoints": 3,
     "outside_auth_gate": 3,
     "blocked_when_read_only": 70,
-    "documented_in_openapi": 48,
+    "documented_in_openapi": 49,
     "undocumented_in_openapi": 90,
-    "openapi_operations": 54,
+    "openapi_operations": 55,
     "documented_but_not_registered": 6,
-    "endpoints_with_tests": 131,
-    "endpoints_citing_requirements": 29
+    "endpoints_with_tests": 132,
+    "endpoints_citing_requirements": 30
   },
   "gates": {
     "auth": "/api",
@@ -62,6 +62,12 @@
       "router": "composerRouter",
       "source": "apps/api/src/routes/v1/composer.ts",
       "endpoints": 2
+    },
+    {
+      "prefix": "/correspondence",
+      "router": "correspondenceRouter",
+      "source": "apps/api/src/routes/v1/correspondence.ts",
+      "endpoints": 1
     },
     {
       "prefix": "/dashboard",
@@ -892,6 +898,35 @@
         "apps/api/src/routes/v1/composer.integration.test.ts"
       ],
       "openapi": false
+    },
+    {
+      "id": "GET /api/v1/correspondence",
+      "slug": "get-api-v1-correspondence",
+      "method": "GET",
+      "path": "/api/v1/correspondence",
+      "express_path": "/api/v1/correspondence",
+      "mount": "/correspondence",
+      "source": "apps/api/src/routes/v1/correspondence.ts:15",
+      "summary": "The correspondence rollup (SRS FR-COMM-002): dormant-but-once-strong ties ranked for reactivation, with the evidence for each — peak strength and when it stood, current strength, quiet days, and the factor decomposition the interface shows (NFR-PRIV-003) — plus the brokers the relationship edges credit for introductions. Reciprocity and reply latency belong to FR-COMM-001 and wait on directional interaction data by design.",
+      "requirements": [
+        "FR-COMM-001",
+        "FR-COMM-002",
+        "NFR-PRIV-003"
+      ],
+      "request_schemas": [],
+      "services": [
+        "correspondenceRollup"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/correspondence.integration.test.ts"
+      ],
+      "openapi": true
     },
     {
       "id": "GET /api/v1/dashboard",

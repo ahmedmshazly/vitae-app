@@ -83,6 +83,13 @@ export function buildCommands({
       run: go(ROUTES.ledger.path),
     },
     {
+      id: 'correspondence',
+      label: 'Open Correspondence',
+      glyph: ROUTES.correspondence.glyph,
+      keywords: 'dormant reactivate reconnect brokers introductions ties quiet',
+      run: go(ROUTES.correspondence.path),
+    },
+    {
       id: 'network',
       label: 'Open Network',
       glyph: ROUTES.network.glyph,

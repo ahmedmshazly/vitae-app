@@ -1,16 +1,16 @@
 {
   "by_package": {
     "@vitae/api": {
-      "files": 108,
-      "lines": 19846,
-      "exports": 369,
-      "undocumented": 278
+      "files": 109,
+      "lines": 19949,
+      "exports": 371,
+      "undocumented": 279
     },
     "@vitae/web": {
-      "files": 173,
-      "lines": 46773,
-      "exports": 744,
-      "undocumented": 507
+      "files": 174,
+      "lines": 46961,
+      "exports": 746,
+      "undocumented": 508
     },
     "@vitae/config": {
       "files": 1,
@@ -19,10 +19,10 @@
       "undocumented": 1
     },
     "@vitae/core": {
-      "files": 46,
-      "lines": 8246,
-      "exports": 430,
-      "undocumented": 303
+      "files": 47,
+      "lines": 8389,
+      "exports": 438,
+      "undocumented": 308
     },
     "@vitae/testkit": {
       "files": 5,
@@ -46,7 +46,7 @@
   "by_kind": {
     "module": {
       "files": 64,
-      "lines": 9391,
+      "lines": 9411,
       "exports": 359,
       "undocumented": 204
     },
@@ -76,15 +76,15 @@
     },
     "contract": {
       "files": 3,
-      "lines": 905,
+      "lines": 906,
       "exports": 3,
       "undocumented": 2
     },
     "route": {
-      "files": 46,
-      "lines": 8369,
-      "exports": 225,
-      "undocumented": 177
+      "files": 47,
+      "lines": 8405,
+      "exports": 226,
+      "undocumented": 178
     },
     "script": {
       "files": 12,
@@ -94,21 +94,21 @@
     },
     "service": {
       "files": 24,
-      "lines": 7506,
-      "exports": 203,
+      "lines": 7572,
+      "exports": 204,
       "undocumented": 149
     },
     "component": {
       "files": 65,
-      "lines": 16782,
+      "lines": 16784,
       "exports": 294,
       "undocumented": 229
     },
     "screen": {
-      "files": 68,
-      "lines": 25294,
-      "exports": 174,
-      "undocumented": 109
+      "files": 69,
+      "lines": 25460,
+      "exports": 176,
+      "undocumented": 110
     },
     "test-support": {
       "files": 7,
@@ -123,10 +123,10 @@
       "undocumented": 146
     },
     "algorithm": {
-      "files": 20,
-      "lines": 3126,
-      "exports": 141,
-      "undocumented": 93
+      "files": 21,
+      "lines": 3269,
+      "exports": 149,
+      "undocumented": 98
     }
   },
   "public_surface": {
@@ -163,6 +163,7 @@
       "BUNDLE_MAX_NODES",
       "BUNDLE_SCHEMA_VERSION",
       "Bookmark",
+      "BrokerTally",
       "BundleEdge",
       "BundleNode",
       "CADENCE_BY_CLOSENESS",
@@ -170,6 +171,7 @@
       "CLOUD_INDIVIDUAL_BILLING_PERIODS",
       "CLOUD_INDIVIDUAL_ENTITLEMENTS",
       "CLOUD_INDIVIDUAL_PLAN",
+      "CORRESPONDENCE",
       "CandidatePerson",
       "CaptureChip",
       "CapturePlan",
@@ -276,6 +278,9 @@
       "REVISION_OPS",
       "RankOptions",
       "RankedPerson",
+      "ReactivationCandidate",
+      "ReactivationRollup",
+      "ReactivationTieInput",
       "ReconnectInput",
       "ReconnectScore",
       "Resume",
@@ -341,6 +346,7 @@
       "attendedProps",
       "authoredProps",
       "awardProps",
+      "brokerTally",
       "bundleEdgeSchema",
       "bundleNodeSchema",
       "bundleRef",
@@ -468,6 +474,7 @@
       "projectProps",
       "propsSchemaFor",
       "publicationProps",
+      "rankReactivation",
       "rankReconnect",
       "reactedToProps",
       "recencyFactor",
@@ -676,13 +683,13 @@
     ]
   },
   "summary": {
-    "files": 350,
-    "test_files": 325,
-    "lines": 79503,
-    "exports": 1717,
-    "undocumented_exports": 1217,
-    "edges": 1562,
-    "untested": 139,
+    "files": 353,
+    "test_files": 329,
+    "lines": 79937,
+    "exports": 1729,
+    "undocumented_exports": 1224,
+    "edges": 1575,
+    "untested": 140,
     "no_consumer": [],
     "consumed_only_by_tests": [
       "apps/web/src/components/ListToolbar.tsx",
@@ -694,11 +701,11 @@
     "most_depended_on": [
       {
         "file": "packages/ui/src/index.ts",
-        "dependents": 108
+        "dependents": 109
       },
       {
         "file": "packages/ui/src/components.tsx",
-        "dependents": 81
+        "dependents": 82
       },
       {
         "file": "packages/core/src/index.ts",
@@ -706,15 +713,15 @@
       },
       {
         "file": "packages/ui/src/feedback.tsx",
-        "dependents": 71
+        "dependents": 72
       },
       {
         "file": "apps/web/src/lib/api.ts",
-        "dependents": 54
+        "dependents": 55
       },
       {
         "file": "packages/ui/src/overlay.tsx",
-        "dependents": 53
+        "dependents": 54
       },
       {
         "file": "apps/api/src/db/repository.ts",
@@ -725,12 +732,12 @@
         "dependents": 40
       },
       {
-        "file": "packages/ui/src/glyphs.tsx",
+        "file": "apps/api/src/middleware/error.ts",
         "dependents": 38
       },
       {
-        "file": "apps/api/src/middleware/error.ts",
-        "dependents": 37
+        "file": "packages/ui/src/glyphs.tsx",
+        "dependents": 38
       },
       {
         "file": "packages/ui/src/forms.tsx",
@@ -760,6 +767,6 @@
       "@vitae/web → @vitae/core",
       "@vitae/web → @vitae/ui"
     ],
-    "dynamic_edges": 60
+    "dynamic_edges": 61
   }
 }

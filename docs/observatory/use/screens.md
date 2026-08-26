@@ -94,6 +94,7 @@ covers:
   - route:/map
   - route:/n/:id
   - route:/network
+  - route:/network/correspondence
   - route:/network/intelligence
   - route:/network/organizations
   - route:/network/organizations/:id
@@ -349,6 +350,7 @@ route.
 | Organizations | `/network/organizations`, also `/orgs` |
 | An organisation | `/network/organizations/:id`, also `/orgs/:id` |
 | Network intelligence | `/network/intelligence`, also `/ask/people` and `/intros` |
+| Correspondence | `/network/correspondence` |
 
 **Network home** is an index, not a dashboard. It states what the workspace is
 for — *"A relationship is not a contact card. It is a history, a rhythm, and a
@@ -401,6 +403,16 @@ relationship decision, chosen by a query parameter.
   [organisation] yet"* and tells you which record would create one.
 
 `/ask/people` and `/intros` are the older addresses for the two lenses.
+
+**Correspondence** is the hub's reactivation lens: dormant ties that were
+once strong, ranked by their historical peak — the same model that scores a
+tie today, re-read at each logged interaction, so the peak and the present
+cannot disagree. Each candidate shows its peak, when it stood, how quiet it
+has been, and the factor chips behind the number; a second register tallies
+the brokers the relationship edges credit for introductions. Two empties are
+told apart: *"No dormant ties"* when cadence is holding, and *"Nothing worth
+reactivating"* — with the considered count — when dormant ties exist but none
+was once strong enough to rank.
 
 ## Career
 

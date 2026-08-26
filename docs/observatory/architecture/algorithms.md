@@ -6,7 +6,7 @@ audience: [developer, maintainer]
 domain: architecture
 type: explanation
 status: verified
-verified_at: 2026-08-24
+verified_at: 2026-08-26
 sources:
   - packages/core/src/algorithms/constants.ts
   - packages/core/src/algorithms/text.ts
@@ -39,6 +39,7 @@ covers:
   - algorithm:capture-grammar
   - algorithm:composer
   - algorithm:constants
+  - algorithm:correspondence
   - algorithm:dedup
   - algorithm:filter-grammar
   - algorithm:fit-loop
@@ -203,6 +204,35 @@ Constants: `TIE_STRENGTH.rNorm`, the same divisor of 3, from
 Limits: the input carries a status and a days-since-last that the score does not
 use — only closeness and intensity enter the formula. It inherits every
 assumption of tie strength, because its second term is that module's output.
+
+### Correspondence reactivation
+
+Inputs: the same ties the reconnect lane reads — closeness, cadence target,
+and interaction events — plus a reference now.
+
+There is no new formula, and that is the point. A tie's history is re-read
+with `computeTieStrength` itself, evaluated at each interaction instant plus
+one millisecond so the event counts itself; the largest of those readings is
+the tie's peak. A tie is a reactivation candidate when its current status is
+`dormant` and its peak strength reached `CORRESPONDENCE.minPeakStrength`.
+Candidates rank by peak strength descending, then by days quiet, then by
+identifier for stability, and the result carries the number of dormant ties
+considered so the cap can never read as a census. Brokers are a plain tally
+of the `met_via` labels on the relationship edges, sorted by count then
+label.
+
+Constants: `CORRESPONDENCE.minPeakStrength` (0.55) and
+`CORRESPONDENCE.maxCandidates` (25), beside every other tunable in
+`constants.ts`.
+
+Limits: evaluating the kernel at every interaction instant is quadratic in a
+tie's event count — fine at the interactive envelope, and the reason the
+rollup is a request-time read rather than a per-keystroke one. A tie with a
+single logged interaction can never be dormant (the adaptive threshold needs
+a gap history), so it can never be a candidate — which is the model being
+honest about how little it knows. Reciprocity and reply latency are absent
+deliberately: they need directional interaction data the schema does not yet
+carry, and nothing here guesses.
 
 ### Graph proximity
 

@@ -376,8 +376,6 @@ Status: implemented · Evidence: cited by documents only · Provenance: reconstr
 
 `CAP-COMMS` · Deterministic analytics over logged interactions: reciprocity, reply latency, unanswered inbound, introduction events, brokers, and dormant-but-once-strong ties, computed with the constants the relationship algorithms already ship.
 
-**Status: planned.** Planned under ADR 0007. The mathematics ships in packages/core (tie strength, decay, cadence constants); the import runbook specifies the analytics in full; no in-app surface computes or presents them yet.
-
 #### FR-COMM-001 — A correspondence profile per person
 
 For any person with logged interactions, a correspondence profile must be computable deterministically: reciprocity ratio, median reply latency in each direction, unanswered inbound count, and the distribution of contact days — each figure decomposing into the interactions that produced it.
@@ -390,9 +388,9 @@ Status: planned · Evidence: cited by documents only · Provenance: reconstructe
 
 A network-level correspondence rollup must rank dormant-but-once-strong ties for reactivation and name the brokers through whom introductions have historically flowed, computed with the same constants the relationship algorithms ship with, so the rollup and the per-tie views cannot disagree.
 
-Status: planned · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+Status: implemented · Evidence: cited by source · Provenance: reconstructed, confirmed
 
-> Authored 2026-08-26 as a product decision under ADR 0007.
+> Authored 2026-08-26 as a product decision under ADR 0007 and shipped the same day: packages/core/src/algorithms/correspondence.ts ranks reactivation by re-reading each tie's history with the tie-strength kernel itself, and /network/correspondence presents the rollup with its factor decomposition. Brokers tally the met_via labels the relationship edges already carry.
 
 #### FR-COMM-003 — Introductions are first-class facts
 

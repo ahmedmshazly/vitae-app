@@ -3,6 +3,7 @@ export * from './text.js';
 export * from './latex-escape.js';
 export * from './tie-strength.js';
 export * from './reconnect.js';
+export * from './correspondence.js';
 export * from './pagerank.js';
 export * from './who-to-call.js';
 export * from './aho-corasick.js';

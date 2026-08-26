@@ -134,6 +134,14 @@ export function NetworkHome() {
           detail: 'Compare explainable introduction paths hop by hop.',
           accent: 'time',
         },
+        {
+          href: '/network/correspondence',
+          glyph: 'interaction',
+          eyebrow: 'Reactivate',
+          title: 'Correspondence',
+          detail: 'Dormant ties that were once strong, ranked with their evidence, and the brokers introductions flowed through.',
+          accent: 'relationship',
+        },
       ]}
     />
   );

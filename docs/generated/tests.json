@@ -482,6 +482,29 @@
       "lines": 43
     },
     {
+      "file": "apps/api/src/routes/v1/correspondence.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "correspondence route"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [
+        "FR-COMM-002",
+        "FR-CON-001"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 125
+    },
+    {
       "file": "apps/api/src/routes/v1/dashboard.integration.test.ts",
       "package": "@vitae/api",
       "cases": 2,
@@ -3079,6 +3102,29 @@
       "lines": 11
     },
     {
+      "file": "apps/web/src/routes/Correspondence.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Correspondence states"
+      ],
+      "subjects": [
+        "./Correspondence.js"
+      ],
+      "requirements": [
+        "NFR-PRIV-003",
+        "NFR-REL-004"
+      ],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 75
+    },
+    {
       "file": "apps/web/src/routes/Dashboard.queue.test.ts",
       "package": "@vitae/web",
       "cases": 8,
@@ -4729,6 +4775,27 @@
       "lines": 53
     },
     {
+      "file": "e2e/tests/correspondence.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/auth"
+      ],
+      "requirements": [
+        "FR-COMM-002"
+      ],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 42
+    },
+    {
       "file": "e2e/tests/demo-mode.spec.ts",
       "package": "@vitae/e2e",
       "cases": 1,
@@ -5148,7 +5215,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 60
+      "lines": 61
     },
     {
       "file": "e2e/tests/letters.spec.ts",
@@ -5750,6 +5817,30 @@
       ],
       "run_in_ci": true,
       "lines": 44
+    },
+    {
+      "file": "packages/core/src/algorithms/correspondence.test.ts",
+      "package": "@vitae/core",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "rankReactivation",
+        "brokerTally"
+      ],
+      "subjects": [
+        "./correspondence.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 97
     },
     {
       "file": "packages/core/src/algorithms/dedup.test.ts",
@@ -6934,27 +7025,27 @@
     }
   ],
   "summary": {
-    "files": 325,
-    "cases": 2118,
+    "files": 329,
+    "cases": 2131,
     "skipped": 0,
     "todo": 0,
     "by_package": {
-      "@vitae/api": 216,
-      "@vitae/web": 1110,
-      "@vitae/e2e": 286,
-      "@vitae/core": 273,
+      "@vitae/api": 219,
+      "@vitae/web": 1113,
+      "@vitae/e2e": 289,
+      "@vitae/core": 277,
       "@vitae/testkit": 7,
       "@vitae/ui": 226
     },
     "by_script": {
-      "test": 325,
-      "test:web": 160,
-      "test:e2e": 58,
-      "test:api": 54,
-      "test:unit": 44,
-      "test:coverage": 44,
-      "test:core": 42,
-      "test:mutation": 42,
+      "test": 329,
+      "test:web": 161,
+      "test:e2e": 59,
+      "test:api": 55,
+      "test:unit": 45,
+      "test:coverage": 45,
+      "test:core": 43,
+      "test:mutation": 43,
       "test:property": 5,
       "test:security": 3,
       "test:a11y": 3,
@@ -7001,7 +7092,7 @@
       "e2e/tests/helpers/toast.ts"
     ],
     "with_skips": [],
-    "requirements_proven": 25,
+    "requirements_proven": 28,
     "requirements_unproven": [
       "FR-004",
       "FR-005",
@@ -7030,9 +7121,7 @@
       "FR-CAR-003",
       "FR-CAR-004",
       "FR-COMM-001",
-      "FR-COMM-002",
       "FR-COMM-003",
-      "FR-CON-001",
       "FR-CON-002",
       "FR-CON-003",
       "FR-CON-004",
@@ -7103,7 +7192,6 @@
       "NFR-PERF-002",
       "NFR-PRIV-001",
       "NFR-PRIV-002",
-      "NFR-PRIV-003",
       "NFR-REL-003",
       "NFR-SEC-001",
       "NFR-SEC-002",

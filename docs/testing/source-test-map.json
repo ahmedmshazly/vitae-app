@@ -517,6 +517,16 @@
         "apps/api/src/routes/v1/favors.integration.test.ts"
       ]
     },
+    "apps/api/src/routes/v1/correspondence.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/correspondence.integration.test.ts"
+      ]
+    },
     "apps/api/src/routes/v1/ledger.ts": {
       "risk": "medium",
       "layers": [

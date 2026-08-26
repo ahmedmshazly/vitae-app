@@ -23,7 +23,7 @@ test('a capture appears in the ledger and links back to its record', async ({ pa
   };
   const matches = body.results.filter((r) => r.title === title);
   expect(matches, 'the captured record is findable').toHaveLength(1);
-  const id = matches[0].id;
+  const id = matches[0]!.id;
   await expectOkJson(await apiPatch(page, `/nodes/${id}`, { title: `${title} renamed` }), 'rename');
 
   await page.goto('/today/ledger');

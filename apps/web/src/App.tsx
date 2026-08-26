@@ -62,6 +62,7 @@ const ExportPage = lazyNamed(() => import('./routes/ExportPage.js'), 'ExportPage
 const NotFound = lazyNamed(() => import('./routes/NotFound.js'), 'NotFound');
 const Planner = lazyNamed(() => import('./routes/workspaces/Planner.js'), 'Planner');
 const Ledger = lazyNamed(() => import('./routes/Ledger.js'), 'Ledger');
+const Correspondence = lazyNamed(() => import('./routes/Correspondence.js'), 'Correspondence');
 const NetworkHome = lazyNamed(() => import('./routes/workspaces/WorkspaceHomes.js'), 'NetworkHome');
 const ExploreHome = lazyNamed(() => import('./routes/workspaces/WorkspaceHomes.js'), 'ExploreHome');
 const DataHome = lazyNamed(() => import('./routes/workspaces/WorkspaceHomes.js'), 'DataHome');
@@ -361,6 +362,7 @@ function AuthedApp() {
                 <Route path="/today/planner" element={<Planner />} />
                 <Route path="/today/ledger" element={<Ledger />} />
                 <Route path="/network" element={<NetworkHome />} />
+                <Route path="/network/correspondence" element={<Correspondence />} />
                 <Route path="/network/people" element={<People />} />
                 <Route path="/network/people/:id" element={<Person />} />
                 <Route path="/network/organizations" element={<Orgs />} />

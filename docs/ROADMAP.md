@@ -28,6 +28,7 @@ canonical registered spellings; the register itself is
 | Export               | JSONL + Markdown vault + checksummed manifest ZIP                                                                                                                                              | FR-EXP-010, NFR-COMP-001         |
 | Ops                  | /status health page; Cloudinary storage adapter; Tectonic build service w/ graceful fallback                                                                                                   | FR-SET-006, NFR-SEC-002/003      |
 | Provenance & history | Source+confidence chips across surfaces, the source reference on the record header, the Ledger feed under Today, and field-level diffs in record history                                        | FR-PROV-001, FR-PROV-002, FR-PROV-003 |
+| Correspondence       | Dormant-but-once-strong ties ranked for reactivation by the tie-strength kernel re-read over each tie's history, with factor chips and the considered count; brokers tallied from met_via       | FR-COMM-002                      |
 
 ## The algorithms (the "science"): all unit-tested
 
@@ -43,7 +44,7 @@ line of code. Statuses live in the register; this table is the reader's map.
 
 | Area | What is intended | SRS |
 | ---- | ----------------- | --- |
-| Correspondence intelligence | Per-person correspondence profile (reciprocity, reply latency, unanswered inbound, contact days); network rollup naming dormant-but-once-strong ties and brokers; introductions as first-class facts | FR-COMM-001, FR-COMM-002, FR-COMM-003 |
+| Correspondence intelligence | Per-person correspondence profile (reciprocity, reply latency, unanswered inbound, contact days — waits on directional interaction data); introductions as first-class facts | FR-COMM-001, FR-COMM-003 |
 | Evidence dossiers | Single-subject evidence packets with a provenance appendix; audience templates for a promotion review, a petition exhibit list, a clearance history | FR-DOS-001, FR-DOS-002 |
 | Longitudinal imports | Field-level update proposals on identity-key matches; re-import that counts created/updated/unchanged/skipped | FR-SYNC-001, FR-SYNC-002 |
 | Career writes | First-class application endpoints validating the status machine | FR-CAR-003 |

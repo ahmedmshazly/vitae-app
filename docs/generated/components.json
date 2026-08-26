@@ -1018,6 +1018,7 @@
         "apps/web/src/routes/Atoms.tsx",
         "apps/web/src/routes/Browse.tsx",
         "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Correspondence.tsx",
         "apps/web/src/routes/Dashboard.tsx",
         "apps/web/src/routes/Duplicates.tsx",
         "apps/web/src/routes/ExportPage.tsx",
@@ -1048,7 +1049,7 @@
         "apps/web/src/routes/tailor/TargetRail.tsx",
         "apps/web/src/routes/workspaces/Planner.tsx"
       ],
-      "uses": 41,
+      "uses": 42,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/components.css"
@@ -1215,6 +1216,7 @@
         "apps/web/src/features/timeline/TimelineView.tsx",
         "apps/web/src/routes/Ask.tsx",
         "apps/web/src/routes/Billing.tsx",
+        "apps/web/src/routes/Correspondence.tsx",
         "apps/web/src/routes/Dashboard.tsx",
         "apps/web/src/routes/Duplicates.tsx",
         "apps/web/src/routes/ExportPage.tsx",
@@ -1241,7 +1243,7 @@
         "apps/web/src/routes/tailor/TargetRail.tsx",
         "apps/web/src/routes/workspaces/Planner.tsx"
       ],
-      "uses": 38,
+      "uses": 39,
       "tested": true,
       "styled_in": [
         "apps/web/src/styles/explore-workspace.css",
@@ -1332,10 +1334,11 @@
       "aria": [],
       "renders_jsx": true,
       "used_by": [
+        "apps/web/src/routes/Correspondence.tsx",
         "apps/web/src/routes/Person.tsx",
         "apps/web/src/routes/tailor/ScoreBreakdown.tsx"
       ],
-      "uses": 2,
+      "uses": 3,
       "tested": false,
       "styled_in": [
         "packages/ui/src/styles/components.css"
@@ -1686,6 +1689,7 @@
       "used_by": [
         "apps/web/src/features/graph/GraphToolbar.tsx",
         "apps/web/src/routes/Ask.tsx",
+        "apps/web/src/routes/Correspondence.tsx",
         "apps/web/src/routes/Dashboard.tsx",
         "apps/web/src/routes/Duplicates.tsx",
         "apps/web/src/routes/ExportPage.tsx",
@@ -1700,7 +1704,7 @@
         "apps/web/src/routes/Trash.tsx",
         "apps/web/src/routes/tailor/Tailor.tsx"
       ],
-      "uses": 15,
+      "uses": 16,
       "tested": false,
       "styled_in": [
         "packages/ui/src/styles/components.css"
@@ -2288,6 +2292,7 @@
         "apps/web/src/routes/Billing.tsx",
         "apps/web/src/routes/Browse.tsx",
         "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Correspondence.tsx",
         "apps/web/src/routes/Dashboard.tsx",
         "apps/web/src/routes/Duplicates.tsx",
         "apps/web/src/routes/ExportPage.tsx",
@@ -2319,7 +2324,7 @@
         "apps/web/src/routes/tailor/TargetRail.tsx",
         "apps/web/src/routes/workspaces/Planner.tsx"
       ],
-      "uses": 49,
+      "uses": 50,
       "tested": false,
       "styled_in": [],
       "unstyled_classes": []
@@ -2374,6 +2379,7 @@
         "apps/web/src/routes/Billing.tsx",
         "apps/web/src/routes/Browse.tsx",
         "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Correspondence.tsx",
         "apps/web/src/routes/Dashboard.tsx",
         "apps/web/src/routes/Duplicates.tsx",
         "apps/web/src/routes/ExportPage.tsx",
@@ -2400,7 +2406,7 @@
         "apps/web/src/routes/workspaces/Planner.tsx",
         "apps/web/src/routes/workspaces/WorkspaceHomes.tsx"
       ],
-      "uses": 30,
+      "uses": 31,
       "tested": true,
       "styled_in": [
         "apps/web/src/styles/app.css",
@@ -2770,6 +2776,7 @@
         "apps/web/src/routes/Billing.tsx",
         "apps/web/src/routes/Browse.tsx",
         "apps/web/src/routes/Collections.tsx",
+        "apps/web/src/routes/Correspondence.tsx",
         "apps/web/src/routes/Dashboard.tsx",
         "apps/web/src/routes/Duplicates.tsx",
         "apps/web/src/routes/ExportPage.tsx",
@@ -2792,7 +2799,7 @@
         "apps/web/src/routes/career/ApplicationDossier.tsx",
         "apps/web/src/routes/career/CareerOverview.tsx"
       ],
-      "uses": 26,
+      "uses": 27,
       "tested": true,
       "styled_in": [
         "apps/web/src/styles/app.css",
@@ -3139,6 +3146,7 @@
         "apps/web/src/features/timeline/TimelineView.tsx",
         "apps/web/src/routes/Ask.tsx",
         "apps/web/src/routes/Billing.tsx",
+        "apps/web/src/routes/Correspondence.tsx",
         "apps/web/src/routes/Dashboard.tsx",
         "apps/web/src/routes/Duplicates.tsx",
         "apps/web/src/routes/ExportPage.tsx",
@@ -3161,7 +3169,7 @@
         "apps/web/src/routes/tailor/TargetRail.tsx",
         "apps/web/src/routes/workspaces/Planner.tsx"
       ],
-      "uses": 29,
+      "uses": 30,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/components.css"

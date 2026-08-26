@@ -92,7 +92,13 @@ facts (FR-COMM-003), recorded introduction events join the hop evidence.
 
 ## Correspondence — ADD, the hub's fourth lens
 
-**Verdict: ADD.** Route under Network beside Contact and Reach.
+**Verdict: ADD — the rollup half delivered 2026-08-26** at
+`/network/correspondence`, on the hub, in the strip and the palette:
+dormant-but-once-strong reactivation with factor chips and the considered
+count, and brokers from met_via (FR-COMM-002). The per-person profile
+(FR-COMM-001) and first-class introductions (FR-COMM-003) remain the open
+half — reciprocity and reply latency wait on directional interaction data,
+and nothing shipped guesses.
 
 The rollup the import runbook already specifies, computed with the constants
 `@vitae/core` ships (zero new mathematics): dormant-but-once-strong ties

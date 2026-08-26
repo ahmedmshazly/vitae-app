@@ -6,11 +6,14 @@
  * is well within budget at single-user scale (SRS A5).
  */
 import {
+  brokerTally,
   computeTieStrength,
   normalizeForMatch,
   personalizedPageRank,
+  rankReactivation,
   rankReconnect,
   whoToCall,
+  type BrokerTally,
   type CandidatePerson,
   type EdgeRecord,
   type GraphEdge,
@@ -626,5 +629,68 @@ function buildAskPack(graph: Graph, selfId: string | undefined, personId: string
     followUps: followUps.slice(0, 5),
     shared: shared.slice(0, 8),
     topics: topics.slice(0, 8),
+  };
+}
+
+/**
+ * The correspondence rollup (SRS FR-COMM-002): dormant-but-once-strong ties
+ * ranked for reactivation by the same kernel that scores them today, and the
+ * brokers the relationship edges credit for introductions. Same assembly as
+ * the reconnect lane, so the two surfaces read one substrate.
+ */
+export async function correspondenceRollup(preloaded?: Graph): Promise<{
+  candidates: Array<{
+    person: NodeRecord;
+    score: number;
+    peakStrength: number;
+    peakAt: string;
+    currentStrength: number;
+    daysSinceLast: number | null;
+    factors: { closeness: number; intensity: number };
+  }>;
+  consideredDormant: number;
+  brokers: BrokerTally[];
+}> {
+  const graph = preloaded ?? (await loadGraph());
+  const self = await getSelf();
+  if (!self) return { candidates: [], consideredDormant: 0, brokers: [] };
+  const knowsEdges = graph.edges.filter(
+    (e) => e.type === 'KNOWS' && (e.src === self.id || e.dst === self.id),
+  );
+
+  const ties = knowsEdges.map((e) => {
+    const personId = e.src === self.id ? e.dst : e.src;
+    const props = (e.props ?? {}) as Record<string, unknown>;
+    return {
+      personId,
+      closeness: (props.closeness as number) ?? null,
+      cadenceTargetDays: (props.cadence_target_days as number) ?? null,
+      interactions: toEvents(interactionsFor(graph, personId)),
+    };
+  });
+
+  const rollup = rankReactivation(ties);
+  const brokers = brokerTally(
+    knowsEdges.map((e) => ((e.props ?? {}) as Record<string, unknown>).met_via as string | undefined),
+  );
+
+  return {
+    candidates: rollup.candidates.flatMap((c) => {
+      const person = graph.nodes.get(c.personId);
+      if (!person) return [];
+      return [
+        {
+          person,
+          score: c.score,
+          peakStrength: c.peak.strength,
+          peakAt: c.peakAt,
+          currentStrength: c.current.strength,
+          daysSinceLast: c.current.daysSinceLast,
+          factors: c.peak.factors,
+        },
+      ];
+    }),
+    consideredDormant: rollup.consideredDormant,
+    brokers,
   };
 }

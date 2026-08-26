@@ -31,6 +31,12 @@ export const ROUTES = {
   ledger: { path: '/today/ledger', label: 'Ledger', glyph: 'journal', hub: 'today' },
 
   network: { path: '/network', label: 'Network', glyph: 'person', hub: 'network', end: true },
+  correspondence: {
+    path: '/network/correspondence',
+    label: 'Correspondence',
+    glyph: 'interaction',
+    hub: 'network',
+  },
   people: { path: '/network/people', label: 'People', glyph: 'person', hub: 'network' },
   orgs: {
     path: '/network/organizations',
@@ -154,7 +160,14 @@ export const HUBS: HubEntry[] = [
 
 export const WORKSPACE_NAV: Record<HubId, RouteEntry[]> = {
   today: [ROUTES.today, ROUTES.planner, ROUTES.ledger],
-  network: [ROUTES.network, ROUTES.people, ROUTES.orgs, ROUTES.askPeople, ROUTES.intros],
+  network: [
+    ROUTES.network,
+    ROUTES.people,
+    ROUTES.orgs,
+    ROUTES.askPeople,
+    ROUTES.intros,
+    ROUTES.correspondence,
+  ],
   career: [
     ROUTES.career,
     ROUTES.applications,

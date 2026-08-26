@@ -36,6 +36,18 @@ export const TIE_STRENGTH = {
   dormantGapMultiplier: 8,
 } as const;
 
+/**
+ * Correspondence rollup (SRS FR-COMM-002): which dormant ties were once
+ * strong enough to be worth reactivating, and how many candidates a rollup
+ * shows before it stops being a ranking and starts being a directory.
+ */
+export const CORRESPONDENCE = {
+  /** A tie's historical peak strength must have reached this to count as "once strong". */
+  minPeakStrength: 0.55,
+  /** Candidates shown; the register says how many were considered. */
+  maxCandidates: 25,
+} as const;
+
 /** Who-to-call ranking weights (SRS §10.4-A / §10.7.3). */
 export const WHO_TO_CALL_WEIGHTS = {
   affiliation: 2.0,
