@@ -46,11 +46,11 @@ a statement, and the capabilities it crosses.
 | Journey | State | Crosses |
 | --- | --- | --- |
 | `J1` — capture a person in under a minute | Verified end to end | `CAP-CAPTURE`, `CAP-SEARCH` |
-| `J2` — keep a valued tie warm | Partial: steps ship, no spec names it | `CAP-RELATIONSHIPS` |
-| `J3` — bring the past in without wrecking the graph | Partial: steps ship, no spec names it | `CAP-IMPORT`, `CAP-IDENTITY` |
+| `J2` — keep a valued tie warm | Verified end to end | `CAP-RELATIONSHIPS` |
+| `J3` — bring the past in without wrecking the graph | Verified end to end | `CAP-IMPORT`, `CAP-IDENTITY` |
 | `J4` — turn a job description into a tailored résumé | Verified end to end | `CAP-RESUME` |
 | `J5` — prove it with a dossier | Planned | `CAP-DOSSIER`, `CAP-PROV`, `CAP-RESUME` |
-| `J6` — leave with everything | Partial: steps ship, no spec names it | `CAP-EXPORT` |
+| `J6` — leave with everything | Partial: export half named in its spec; restore is the drill | `CAP-EXPORT` |
 | `J7` — see the correspondence truth | Planned | `CAP-COMMS`, `CAP-RELATIONSHIPS` |
 | `J8` — recover a deleted record from trash | Verified end to end | `CAP-ORGANIZE`, `CAP-DATA-CORE` |
 

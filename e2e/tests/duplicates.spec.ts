@@ -5,6 +5,10 @@ import { expectNoA11yViolations } from './helpers/a11y';
 /**
  * Screen 24: Identity audit / Duplicates.
  *
+ * Covers the duplicate-queue states of journey J3 (evidence-named clusters,
+ * undoable merges) against a mocked API; the end-to-end J3 walk lives in
+ * exploration.spec.ts.
+ *
  * Failed loads keep page chrome and an ErrorState. A clean graph is a true
  * empty, not a card-shaped void. Audit / Undo controls need distinct names;
  * merge history and alias failures must surface.

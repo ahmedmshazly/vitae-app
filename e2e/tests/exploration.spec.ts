@@ -5,6 +5,9 @@ import { signIn } from './helpers/auth';
  * E2E journeys for the reference-parity build (Phases 5-8):
  *   Today dashboard · log interaction · ask → composer → send ·
  *   graph navigation · import commit/rollback · duplicate merge/undo.
+ * Carries the register's J2 walk (reconnect lane → interaction log with live
+ * strength recompute → ask → composer send-and-log) and the J3 walk (stage →
+ * commit → rollback; duplicate → merge → undo) against the real stack.
  * Requires the running stack (emulators + api + web) and a fresh `pnpm seed`.
  */
 
@@ -27,7 +30,7 @@ test('Today: queue, habits, reconnect, and the reference tier', async ({ page })
   await expect(page.getByRole('button', { name: /^(Check|Uncheck) Deep work 2h/ })).toBeVisible();
 });
 
-test('Log an interaction from a person page: strength recomputes', async ({ page }) => {
+test('J2: log an interaction from a person page — strength recomputes', async ({ page }) => {
   await signIn(page);
   await page.goto('/people');
   // A row's checkbox carries a visually-hidden "Select <name>" label, so the
@@ -43,7 +46,7 @@ test('Log an interaction from a person page: strength recomputes', async ({ page
   await expect(page.getByText(note)).toBeVisible();
 });
 
-test('Ask → why-panel → composer → send & log', async ({ page }) => {
+test('J2: ask → why-panel → composer → send & log', async ({ page }) => {
   await signIn(page);
   await page.goto('/ask/people');
   await page.getByLabel('Topics').fill('reinforcement learning');
@@ -78,7 +81,7 @@ EMAIL:playwright.import@e2e.test
 ORG:E2E Test Org
 END:VCARD`;
 
-test('Import: stage a vCard, commit, then roll the batch back', async ({ page }) => {
+test('J3: import — stage a vCard, commit, then roll the batch back', async ({ page }) => {
   await signIn(page);
   await page.goto('/import');
 
@@ -138,7 +141,7 @@ async function rollbackCommittedImports(page: Page, filename: string) {
   }
 }
 
-test('Duplicates: import a duplicate, merge it, undo the merge', async ({ page }) => {
+test('J3: duplicates — import a duplicate, merge it, undo the merge', async ({ page }) => {
   await signIn(page);
   // A failed assertion must not poison later runs with another Sarah import.
   await rollbackCommittedImports(page, 'dup.vcf');

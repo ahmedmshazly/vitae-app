@@ -3490,21 +3490,33 @@
       ]
     },
     "J2": {
-      "status": "partial",
+      "status": "verified",
       "capabilities": [
         "CAP-RELATIONSHIPS"
       ],
-      "e2e": [],
-      "e2e_present": []
+      "e2e": [
+        "e2e/tests/exploration.spec.ts"
+      ],
+      "e2e_present": [
+        "e2e/tests/exploration.spec.ts"
+      ]
     },
     "J3": {
-      "status": "partial",
+      "status": "verified",
       "capabilities": [
         "CAP-IMPORT",
         "CAP-IDENTITY"
       ],
-      "e2e": [],
-      "e2e_present": []
+      "e2e": [
+        "e2e/tests/exploration.spec.ts",
+        "e2e/tests/import.spec.ts",
+        "e2e/tests/duplicates.spec.ts"
+      ],
+      "e2e_present": [
+        "e2e/tests/exploration.spec.ts",
+        "e2e/tests/import.spec.ts",
+        "e2e/tests/duplicates.spec.ts"
+      ]
     },
     "J4": {
       "status": "verified",
@@ -3533,8 +3545,12 @@
       "capabilities": [
         "CAP-EXPORT"
       ],
-      "e2e": [],
-      "e2e_present": []
+      "e2e": [
+        "e2e/tests/export.spec.ts"
+      ],
+      "e2e_present": [
+        "e2e/tests/export.spec.ts"
+      ]
     },
     "J7": {
       "status": "planned",

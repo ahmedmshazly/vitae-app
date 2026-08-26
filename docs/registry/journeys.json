@@ -27,26 +27,32 @@
       "id": "J2",
       "title": "Keep a valued tie warm",
       "statement": "The reconnect lane surfaces a tie drifting past its cadence; the operator opens the person, sees the history and why the tie ranks where it does, composes an outreach draft from real relationship facts, sends and logs it, and watches the strength recompute in the same sitting.",
-      "status": "partial",
+      "status": "verified",
       "capabilities": [
         "CAP-RELATIONSHIPS"
       ],
       "target": "A drifting tie is noticed, understood, and re-engaged in one sitting, without the operator maintaining any list by hand.",
-      "e2e": [],
-      "note": "Authored 2026-08-26 under ADR 0007. Every step ships and e2e/tests/exploration.spec.ts exercises the sequence — reconnect lane, interaction log, strength recompute, composer send-and-log — without naming this identifier, which is why the register cannot claim it verified. Naming the journey in a spec title is implementation-wave work."
+      "e2e": [
+        "e2e/tests/exploration.spec.ts"
+      ],
+      "note": "Authored 2026-08-26 under ADR 0007; verified the same day when e2e/tests/exploration.spec.ts named the journey in the tests that walk it — reconnect lane on Today, interaction log with live strength recompute, ask with its factor decomposition, composer send-and-log."
     },
     {
       "id": "J3",
       "title": "Bring the past in without wrecking the graph",
       "statement": "The operator stages a LinkedIn or contacts export, reviews rows with per-row accept and skip and per-row subject assignment, commits the batch, works the duplicate queue on shared evidence, merges with an undo window, and can roll the whole batch back — ending with a graph that gained history without gaining a second self.",
-      "status": "partial",
+      "status": "verified",
       "capabilities": [
         "CAP-IMPORT",
         "CAP-IDENTITY"
       ],
       "target": "A first import lands as reviewed records with no silent duplicate surviving the first pass.",
-      "e2e": [],
-      "note": "Authored 2026-08-26 under ADR 0007. The steps ship and are covered piecemeal by e2e/tests/import.spec.ts, duplicates.spec.ts and exploration.spec.ts, none of which names this identifier."
+      "e2e": [
+        "e2e/tests/exploration.spec.ts",
+        "e2e/tests/import.spec.ts",
+        "e2e/tests/duplicates.spec.ts"
+      ],
+      "note": "Authored 2026-08-26 under ADR 0007; verified the same day. exploration.spec.ts walks stage → commit → rollback and duplicate → merge → undo against the real stack; import.spec.ts and duplicates.spec.ts cover the review-screen states. Per-row subject assignment is exercised by unit coverage rather than a browser walk — recorded here so the claim stays inspectable."
     },
     {
       "id": "J4",
@@ -85,8 +91,10 @@
         "CAP-EXPORT"
       ],
       "target": "The bundle restores on a fresh install with document identity intact, and the vault reads in any plain-text editor.",
-      "e2e": [],
-      "note": "Authored 2026-08-26 under ADR 0007. Export, checksums, and the sensitive-records boundary are covered by e2e/tests/export.spec.ts without naming this identifier; the restore half is exercised by the documented drill rather than a browser test."
+      "e2e": [
+        "e2e/tests/export.spec.ts"
+      ],
+      "note": "Authored 2026-08-26 under ADR 0007. Export, checksums, and the sensitive-records boundary are named in e2e/tests/export.spec.ts; the restore half is exercised by the documented drill rather than a browser test, which is why the journey stays partial rather than verified."
     },
     {
       "id": "J7",

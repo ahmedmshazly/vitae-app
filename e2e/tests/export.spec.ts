@@ -6,7 +6,9 @@ import { expectNoA11yViolations } from './helpers/a11y';
  * Screen 26: Export & backups.
  *
  * Backup status and saved-view failures must surface as errors, not a spinner
- * or blank card. CSV actions need distinct accessible names.
+ * or blank card. CSV actions need distinct accessible names. This is the
+ * export half of journey J6; the restore half is the documented drill, which
+ * is why the register keeps J6 partial.
  */
 
 const STATUS = '**/api/v1/export/status';

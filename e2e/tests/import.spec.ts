@@ -5,6 +5,10 @@ import { expectNoA11yViolations } from './helpers/a11y';
 /**
  * Screen 23: Import hub.
  *
+ * Covers the review-screen states of journey J3 (per-row accept and skip,
+ * batch rollback naming) against a mocked API; the end-to-end J3 walk lives
+ * in exploration.spec.ts.
+ *
  * The page's job is to make bulk seeding feel reversible: every source stages,
  * review accepts or skips, commit writes, rollback undoes the batch. The old
  * screen hid a failed history load as "No imports yet", painted GitHub as
