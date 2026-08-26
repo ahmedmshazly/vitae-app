@@ -9,7 +9,11 @@ describe('Workspace home semantics', () => {
     const { container } = renderWithApp(<NetworkHome />, { route: '/network' });
     const destinations = screen.getByRole('list', { name: 'Network destinations' });
 
-    expect(within(destinations).getAllByRole('listitem')).toHaveLength(3);
+    expect(within(destinations).getAllByRole('listitem')).toHaveLength(4);
+    expect(within(destinations).getByRole('link', { name: /Correspondence/ })).toHaveAttribute(
+      'href',
+      '/network/correspondence',
+    );
     expect(within(destinations).getByRole('link', { name: /People/ })).toHaveAttribute(
       'href',
       '/network/people',

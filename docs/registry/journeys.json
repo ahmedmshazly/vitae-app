@@ -74,7 +74,7 @@
       ],
       "target": "A review-season packet that once took a weekend of archaeology compiles from already-captured evidence in under an hour.",
       "e2e": [],
-      "note": "Authored 2026-08-26 under ADR 0007 for the periodic-prover persona. CAP-DOSSIER and CAP-PROV are registered intent; the selection and compile machinery this journey reuses ships today under CAP-RESUME."
+      "note": "Authored 2026-08-26 under ADR 0007 for the periodic-prover persona. CAP-DOSSIER is registered intent; CAP-PROV shipped its surfaces the same day (the Ledger, history diffs, the source reference), and the selection and compile machinery this journey reuses ships today under CAP-RESUME."
     },
     {
       "id": "J6",
@@ -99,7 +99,7 @@
       ],
       "target": "The rollup names at least one dormant-but-once-strong tie the operator had not thought of, with the evidence to act on it.",
       "e2e": [],
-      "note": "Authored 2026-08-26 under ADR 0007. CAP-COMMS is registered intent; the tie-strength substrate and the composer it hands off to ship today."
+      "note": "Authored 2026-08-26 under ADR 0007. The rollup half of CAP-COMMS shipped the same day (FR-COMM-002); the reciprocity and reply-latency facts this journey opens with wait on FR-COMM-001 and directional interaction data, which is why the journey stays planned rather than partial. The tie-strength substrate and the composer it hands off to ship today."
     },
     {
       "id": "J8",

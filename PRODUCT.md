@@ -97,13 +97,15 @@ reinvestigation — compile evidence dossiers from the same graph.
   compilation, letters, and templates already exist.
 - Job applications are represented as graph nodes connected to target
   organizations, referrers, interviews, and résumé variants.
-- Planned under ADR 0007 and registered in the requirement register before
-  being built: correspondence intelligence (deterministic analytics over
-  logged interactions), evidence dossiers (the résumé pipeline generalized to
-  promotion, petition, and clearance audiences), provenance surfacing and a
-  change ledger over the existing revision history, longitudinal field-level
-  updates through staged imports, first-class application writes, and letter
-  compilation parity.
+- Registered under ADR 0007 before being built, with the first deliveries
+  already landed: provenance surfacing, the change ledger over the revision
+  history, and the correspondence rollup (dormant-but-once-strong
+  reactivation with brokers) shipped in the same cycle. Still registered
+  intent: the per-person correspondence profile and first-class introductions
+  (reciprocity and reply latency wait on directional interaction data),
+  evidence dossiers (the résumé pipeline generalized to promotion, petition,
+  and clearance audiences), longitudinal field-level updates through staged
+  imports, first-class application writes, and letter compilation parity.
 - The product is single-operator and self-hosted; privacy, local ownership,
   deterministic behavior, and data portability are durable constraints.
 - A future Cloud release is one private workspace per verified person at

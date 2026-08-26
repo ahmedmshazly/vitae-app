@@ -4548,7 +4548,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 29
+      "lines": 33
     },
     {
       "file": "apps/web/src/styles/network.test.ts",

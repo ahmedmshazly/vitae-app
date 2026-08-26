@@ -310,7 +310,7 @@ Status: implemented · Evidence: cited by source · Provenance: reconstructed, n
 
 A person-to-person relationship must be editable as a record in its own right, carrying its own properties such as topics. A patch replaces properties wholesale, so the client merges before sending.
 
-Status: implemented · Evidence: cited by source · Provenance: reconstructed, needs-review
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, needs-review
 
 #### FR-CON-002 — One-tap interaction logging
 
@@ -380,7 +380,7 @@ Status: implemented · Evidence: cited by documents only · Provenance: reconstr
 
 For any person with logged interactions, a correspondence profile must be computable deterministically: reciprocity ratio, median reply latency in each direction, unanswered inbound count, and the distribution of contact days — each figure decomposing into the interactions that produced it.
 
-Status: planned · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+Status: planned · Evidence: cited by source · Provenance: reconstructed, confirmed
 
 > Authored 2026-08-26 as a product decision under ADR 0007. The constants and the interaction substrate ship in packages/core; no surface computes or presents the profile yet.
 
@@ -388,7 +388,7 @@ Status: planned · Evidence: cited by documents only · Provenance: reconstructe
 
 A network-level correspondence rollup must rank dormant-but-once-strong ties for reactivation and name the brokers through whom introductions have historically flowed, computed with the same constants the relationship algorithms ship with, so the rollup and the per-tie views cannot disagree.
 
-Status: implemented · Evidence: cited by source · Provenance: reconstructed, confirmed
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
 > Authored 2026-08-26 as a product decision under ADR 0007 and shipped the same day: packages/core/src/algorithms/correspondence.ts ranks reactivation by re-reading each tie's history with the tie-strength kernel itself, and /network/correspondence presents the rollup with its factor decomposition. Brokers tally the met_via labels the relationship edges already carry.
 
@@ -1086,7 +1086,7 @@ Status: implemented · Evidence: cited by documents only · Provenance: reconstr
 
 Any ranked or derived number shown to the operator must decompose into named factors the interface presents, and where a sum is claimed the parts must sum exactly. A recommendation that cannot show its arithmetic must not ship.
 
-Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
 > Authored 2026-08-26 as a product decision under ADR 0007, generalizing what FR-CON-006 and FR-RES-007 each state for one surface into the rule every future surface is held to. Enforced today by the factor-chip decompositions across the ask, intros, tailor, and dashboard surfaces.
 
