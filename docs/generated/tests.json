@@ -3143,7 +3143,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 75
+      "lines": 92
     },
     {
       "file": "apps/web/src/routes/Dashboard.queue.test.ts",
@@ -4798,12 +4798,13 @@
     {
       "file": "e2e/tests/correspondence.spec.ts",
       "package": "@vitae/e2e",
-      "cases": 3,
+      "cases": 4,
       "skipped": 0,
       "todo": 0,
       "suites": [],
       "subjects": [
         "./helpers/a11y",
+        "./helpers/api.js",
         "./helpers/auth"
       ],
       "requirements": [
@@ -4814,7 +4815,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 42
+      "lines": 114
     },
     {
       "file": "e2e/tests/demo-mode.spec.ts",
@@ -7050,13 +7051,13 @@
   ],
   "summary": {
     "files": 330,
-    "cases": 2149,
+    "cases": 2150,
     "skipped": 0,
     "todo": 0,
     "by_package": {
       "@vitae/api": 225,
       "@vitae/web": 1117,
-      "@vitae/e2e": 290,
+      "@vitae/e2e": 291,
       "@vitae/core": 284,
       "@vitae/testkit": 7,
       "@vitae/ui": 226

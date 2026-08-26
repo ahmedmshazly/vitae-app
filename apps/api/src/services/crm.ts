@@ -773,6 +773,71 @@ export async function personCorrespondence(
 }
 
 /**
+ * The introductions a person figures in (FR-COMM-003): the INTRODUCED edges
+ * they are an endpoint of, and the ones that credit them as the broker.
+ */
+export function personIntroductions(
+  graph: Graph,
+  personId: string,
+): {
+  connected: Array<{
+    edgeId: string;
+    otherId: string;
+    otherTitle: string | null;
+    viaId: string | null;
+    viaLabel: string | null;
+    occurredOn: string | null;
+    context: string | null;
+  }>;
+  brokered: Array<{
+    edgeId: string;
+    srcId: string;
+    srcTitle: string | null;
+    dstId: string;
+    dstTitle: string | null;
+    occurredOn: string | null;
+    context: string | null;
+  }>;
+} {
+  const intros = graph.edges.filter((e) => e.type === 'INTRODUCED');
+  const title = (id: string): string | null => graph.nodes.get(id)?.title ?? null;
+  const connected = intros
+    .filter((e) => e.src === personId || e.dst === personId)
+    .map((e) => {
+      const props = (e.props ?? {}) as Record<string, unknown>;
+      const via = ((props.via as string) ?? '').trim();
+      const viaPerson = via ? graph.nodes.get(via) : undefined;
+      const otherId = e.src === personId ? e.dst : e.src;
+      return {
+        edgeId: e.id,
+        otherId,
+        otherTitle: title(otherId),
+        viaId: viaPerson && viaPerson.type === 'person' ? viaPerson.id : null,
+        viaLabel: viaPerson && viaPerson.type === 'person' ? viaPerson.title : via || null,
+        occurredOn: (props.occurred_on as string) ?? null,
+        context: (props.context as string) ?? null,
+      };
+    })
+    .sort((a, b) => (b.occurredOn ?? '').localeCompare(a.occurredOn ?? '') || a.edgeId.localeCompare(b.edgeId));
+  const brokered = intros
+    .filter((e) => (((e.props ?? {}) as Record<string, unknown>).via as string | undefined) === personId)
+    .map((e) => {
+      const props = (e.props ?? {}) as Record<string, unknown>;
+      return {
+        edgeId: e.id,
+        srcId: e.src,
+        srcTitle: title(e.src),
+        dstId: e.dst,
+        dstTitle: title(e.dst),
+        occurredOn: (props.occurred_on as string) ?? null,
+        context: (props.context as string) ?? null,
+      };
+    })
+    .sort((a, b) => (b.occurredOn ?? '').localeCompare(a.occurredOn ?? '') || a.edgeId.localeCompare(b.edgeId));
+  return { connected, brokered };
+}
+
+/**
  * Brokers by recorded introduction (FR-COMM-003): the INTRODUCED edges'
  * `via` values tallied, each resolved to a live person where the value is a
  * person id and kept as written where it is not. Presented beside the

@@ -26,6 +26,7 @@ import { edgeTypeGroup, personRelationLabel } from '@vitae/core';
 import { api } from '../lib/api.js';
 import { CorrespondencePanel } from '../features/CorrespondencePanel.js';
 import { InteractionLogger } from '../features/InteractionLogger.js';
+import { LogIntroduction } from '../features/LogIntroduction.js';
 import { AddConnection } from '../features/forms/AddConnection.js';
 import { ConnectionRow } from '../features/forms/ConnectionRow.js';
 import { KnowsEditor } from '../features/forms/KnowsEditor.js';
@@ -206,6 +207,7 @@ export function Person() {
     queryFn: () => api.get<Profile>(`/people/${id}/profile`),
   });
   const [logging, setLogging] = useState(false);
+  const [introducing, setIntroducing] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editingRel, setEditingRel] = useState(false);
   const [addingConn, setAddingConn] = useState(false);
@@ -952,8 +954,16 @@ export function Person() {
           </Section>
 
           {/* SRS FR-COMM-001: the correspondence profile, beside the log it
-              derives from so every figure can name its interactions. */}
-          <Section title="Correspondence">
+              derives from so every figure can name its interactions; the
+              introduction recorder is FR-COMM-003's surface. */}
+          <Section
+            title="Correspondence"
+            actions={
+              <Button size="sm" variant="ghost" onClick={() => setIntroducing(true)}>
+                Log introduction
+              </Button>
+            }
+          >
             <CorrespondencePanel personId={id!} interactions={interactions} />
           </Section>
 
@@ -1011,6 +1021,14 @@ export function Person() {
           personId={id}
           personName={node.title}
           onClose={() => setLogging(false)}
+        />
+      )}
+      {introducing && (
+        <LogIntroduction
+          open
+          onOpenChange={(next) => !next && setIntroducing(false)}
+          personId={id}
+          personName={node.title}
         />
       )}
       <AddConnection

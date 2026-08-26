@@ -61,9 +61,10 @@ Elevations, each carried by a registered requirement:
 - **Provenance chips** on every profile fact (FR-PROV-001): which import,
   which capture, what confidence. P3's trust requirement, everyone's
   debugging tool.
-- **Introductions become visible** (FR-COMM-003): who introduced this person,
-  whom this person has introduced — the met-via data the edge already stores,
-  surfaced.
+- **Introductions become visible** (FR-COMM-003) — **delivered 2026-08-26**:
+  the INTRODUCED edge records who was connected and who brokered it; the
+  profile logs one in a dialog that can credit the broker's favor ledger in
+  the same gesture, and lists the introductions the person figures in.
 
 Acceptance: every new panel fails independently like the existing ones; every
 number decomposes on inspection; nothing new is colour-only.
@@ -87,8 +88,10 @@ same constants file, never a second code path.
 ## `/network/intelligence?lens=reach` — Warm paths
 
 **Verdict: KEEP.** Per-hop evidence, product-of-strengths ranking
-(FR-CON-008), destination in the URL. When introductions become first-class
-facts (FR-COMM-003), recorded introduction events join the hop evidence.
+(FR-CON-008), destination in the URL. Introductions are first-class facts now
+(FR-COMM-003), and recorded INTRODUCED edges join the hop evidence — the
+"Introduced" hop factor the screen always knew how to render finally has
+edges to show.
 
 ## Correspondence — ADD, the hub's fourth lens
 
@@ -100,8 +103,10 @@ count, and brokers from met_via (FR-COMM-002). **The per-person profile
 `initiated_by`, and the person profile's correspondence panel computes
 reciprocity, per-direction reply latency, unanswered inbound, and the
 contact-day rhythm from it — with a coverage header owning up to the
-directionless history instead of guessing it. First-class introductions
-(FR-COMM-003) remain the open half.
+directionless history instead of guessing it. **First-class introductions
+(FR-COMM-003) closed the set the same day**: recorded INTRODUCED edges feed
+a broker register kept apart from the free-text met-via tally, and an
+out-of-balance register ranks reciprocity imbalance at rollup scale.
 
 The rollup the import runbook already specifies, computed with the constants
 `@vitae/core` ships (zero new mathematics): dormant-but-once-strong ties

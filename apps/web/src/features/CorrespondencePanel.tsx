@@ -43,6 +43,28 @@ export interface InteractionRef {
   at: string;
 }
 
+/** The introductions this person figures in (FR-COMM-003). */
+export interface IntroductionsDto {
+  connected: Array<{
+    edgeId: string;
+    otherId: string;
+    otherTitle: string | null;
+    viaId: string | null;
+    viaLabel: string | null;
+    occurredOn: string | null;
+    context: string | null;
+  }>;
+  brokered: Array<{
+    edgeId: string;
+    srcId: string;
+    srcTitle: string | null;
+    dstId: string;
+    dstTitle: string | null;
+    occurredOn: string | null;
+    context: string | null;
+  }>;
+}
+
 function days(value: number | null): string {
   if (value === null) return '—';
   return value < 1 ? '<1 day' : `${Math.round(value * 10) / 10} days`;
@@ -57,7 +79,10 @@ export function CorrespondencePanel({
 }) {
   const query = useQuery({
     queryKey: ['person-correspondence', personId],
-    queryFn: () => api.get<{ profile: CorrespondenceProfileDto }>(`/people/${personId}/correspondence`),
+    queryFn: () =>
+      api.get<{ profile: CorrespondenceProfileDto; introductions?: IntroductionsDto }>(
+        `/people/${personId}/correspondence`,
+      ),
   });
 
   if (query.isPending) return <SkeletonRows rows={3} />;
@@ -75,6 +100,34 @@ export function CorrespondencePanel({
   if (!profile?.coverage) {
     return <ErrorState title="Correspondence unavailable" detail="The response carried no profile." />;
   }
+  const introductions = query.data?.introductions;
+  const introductionsBlock =
+    introductions && (introductions.connected.length > 0 || introductions.brokered.length > 0) ? (
+      <details>
+        <summary className="cursor-pointer">
+          Introductions{' '}
+          <Mono className="text-xs">
+            {introductions.connected.length + introductions.brokered.length}
+          </Mono>
+        </summary>
+        <ul className="mt-2 text-xs text-muted" aria-label="Recorded introductions">
+          {introductions.connected.map((intro) => (
+            <li key={intro.edgeId}>
+              connected to {intro.otherTitle ?? intro.otherId}
+              {intro.viaLabel ? ` via ${intro.viaLabel}` : ''}
+              {intro.occurredOn ? ` · ${intro.occurredOn}` : ''}
+              {intro.context ? ` · ${intro.context}` : ''}
+            </li>
+          ))}
+          {introductions.brokered.map((intro) => (
+            <li key={intro.edgeId}>
+              brokered {intro.srcTitle ?? intro.srcId} ↔ {intro.dstTitle ?? intro.dstId}
+              {intro.occurredOn ? ` · ${intro.occurredOn}` : ''}
+            </li>
+          ))}
+        </ul>
+      </details>
+    ) : null;
   const byId = new Map(interactions.map((i) => [i.id, i]));
   const name = (id: string): string => {
     const hit = byId.get(id);
@@ -83,21 +136,27 @@ export function CorrespondencePanel({
 
   if (profile.coverage.total === 0) {
     return (
-      <EmptyState
-        glyph="interaction"
-        title="No interactions logged"
-        hint="The correspondence profile computes from logged interactions; there are none yet."
-      />
+      <div className="space-y-3">
+        <EmptyState
+          glyph="interaction"
+          title="No interactions logged"
+          hint="The correspondence profile computes from logged interactions; there are none yet."
+        />
+        {introductionsBlock}
+      </div>
     );
   }
 
   if (profile.coverage.withDirection === 0) {
     return (
-      <EmptyState
-        glyph="interaction"
-        title="No stated directions yet"
-        hint={`None of the ${profile.coverage.total} logged interactions says who reached out. New logs carry a who-reached-out control; older entries stay uncounted rather than guessed.`}
-      />
+      <div className="space-y-3">
+        <EmptyState
+          glyph="interaction"
+          title="No stated directions yet"
+          hint={`None of the ${profile.coverage.total} logged interactions says who reached out. New logs carry a who-reached-out control; older entries stay uncounted rather than guessed.`}
+        />
+        {introductionsBlock}
+      </div>
     );
   }
 
@@ -187,6 +246,8 @@ export function CorrespondencePanel({
           )}
         </ul>
       </details>
+
+      {introductionsBlock}
     </div>
   );
 }

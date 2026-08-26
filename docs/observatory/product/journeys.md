@@ -51,7 +51,7 @@ a statement, and the capabilities it crosses.
 | `J4` — turn a job description into a tailored résumé | Verified end to end | `CAP-RESUME` |
 | `J5` — prove it with a dossier | Planned | `CAP-DOSSIER`, `CAP-PROV`, `CAP-RESUME` |
 | `J6` — leave with everything | Partial: export half named in its spec; restore is the drill | `CAP-EXPORT` |
-| `J7` — see the correspondence truth | Planned | `CAP-COMMS`, `CAP-RELATIONSHIPS` |
+| `J7` — see the correspondence truth | Verified end to end | `CAP-COMMS`, `CAP-RELATIONSHIPS` |
 | `J8` — recover a deleted record from trash | Verified end to end | `CAP-ORGANIZE`, `CAP-DATA-CORE` |
 
 Between them, the eight journeys cross twelve of the nineteen capabilities.

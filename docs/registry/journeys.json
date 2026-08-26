@@ -100,14 +100,16 @@
       "id": "J7",
       "title": "See the correspondence truth",
       "statement": "The operator opens the correspondence rollup, sees reciprocity and reply-latency facts they could not have tallied by hand, finds the dormant-but-once-strong ties ranked with their evidence, picks one they would not have thought of, and steps into a warm re-introduction with the history in front of them.",
-      "status": "planned",
+      "status": "verified",
       "capabilities": [
         "CAP-COMMS",
         "CAP-RELATIONSHIPS"
       ],
       "target": "The rollup names at least one dormant-but-once-strong tie the operator had not thought of, with the evidence to act on it.",
-      "e2e": [],
-      "note": "Authored 2026-08-26 under ADR 0007. The rollup half of CAP-COMMS shipped the same day (FR-COMM-002); the reciprocity and reply-latency facts this journey opens with wait on FR-COMM-001 and directional interaction data, which is why the journey stays planned rather than partial. The tie-strength substrate and the composer it hands off to ship today."
+      "e2e": [
+        "e2e/tests/correspondence.spec.ts"
+      ],
+      "note": "Authored 2026-08-26 under ADR 0007; verified the same day, once interactions carried operator-stated direction. correspondence.spec.ts names the journey and walks it: the rollup's imbalance and recorded-broker registers, then the step into the person profile whose panel shows the same figures from the same function."
     },
     {
       "id": "J8",

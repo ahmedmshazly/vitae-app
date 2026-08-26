@@ -2,8 +2,8 @@
   "generated_by": "scripts/docs/gen-traceability.mjs",
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
-    "files_scanned": 891,
-    "files_citing": 193,
+    "files_scanned": 892,
+    "files_citing": 194,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,7 +20,7 @@
   },
   "totals": {
     "registered": 131,
-    "citations": 801,
+    "citations": 810,
     "implemented_and_tested": 26,
     "implemented_untested": 60,
     "tested_only": 3,
@@ -532,7 +532,7 @@
         "apps/api/src/routes/v1/composer.ts:19",
         "apps/api/src/routes/v1/dashboard.ts:24",
         "apps/api/src/routes/v1/interactions.ts:105",
-        "apps/api/src/routes/v1/people.ts:26"
+        "apps/api/src/routes/v1/people.ts:33"
       ],
       "tests": [],
       "documents": [
@@ -716,7 +716,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:50",
+        "docs/ROADMAP.md:49",
         "docs/observatory/product/blueprint/career-and-resume.md:33"
       ]
     },
@@ -740,10 +740,10 @@
       "sources": [
         "apps/api/src/routes/v1/correspondence.ts:13",
         "apps/api/src/routes/v1/correspondence.ts:42",
-        "apps/api/src/routes/v1/people.ts:55",
+        "apps/api/src/routes/v1/people.ts:62",
         "apps/api/src/services/crm.ts:698",
         "apps/web/src/features/CorrespondencePanel.tsx:6",
-        "apps/web/src/routes/Person.tsx:954",
+        "apps/web/src/routes/Person.tsx:956",
         "packages/core/src/algorithms/correspondence.ts:178"
       ],
       "tests": [],
@@ -752,10 +752,11 @@
         "docs/observatory/architecture/algorithms.md:241",
         "docs/observatory/product/blueprint/index.md:49",
         "docs/observatory/product/blueprint/network.md:56",
-        "docs/observatory/product/blueprint/network.md:99",
-        "docs/observatory/product/blueprint/network.md:119",
+        "docs/observatory/product/blueprint/network.md:102",
+        "docs/observatory/product/blueprint/network.md:124",
         "docs/observatory/product/stories.md:180",
-        "docs/observatory/use/screens.md:380"
+        "docs/observatory/use/screens.md:380",
+        "docs/observatory/use/screens.md:422"
       ]
     },
     "FR-COMM-002": {
@@ -766,32 +767,38 @@
       "sources": [
         "apps/api/src/routes/v1/correspondence.ts:8",
         "apps/api/src/services/crm.ts:641",
-        "apps/web/src/routes/Correspondence.tsx:32",
+        "apps/web/src/routes/Correspondence.tsx:46",
         "packages/core/src/algorithms/constants.ts:40",
         "packages/core/src/algorithms/correspondence.ts:2"
       ],
       "tests": [
         "apps/api/src/routes/v1/correspondence.integration.test.ts:2",
-        "e2e/tests/correspondence.spec.ts:6"
+        "e2e/tests/correspondence.spec.ts:7"
       ],
       "documents": [
         "docs/ROADMAP.md:31",
         "docs/observatory/product/blueprint/index.md:50",
-        "docs/observatory/product/blueprint/network.md:98",
-        "docs/observatory/product/blueprint/network.md:110",
-        "docs/observatory/product/blueprint/network.md:119",
+        "docs/observatory/product/blueprint/network.md:101",
+        "docs/observatory/product/blueprint/network.md:115",
+        "docs/observatory/product/blueprint/network.md:124",
         "docs/observatory/product/blueprint/today-and-planner.md:42",
         "docs/observatory/product/stories.md:183"
       ]
     },
     "FR-COMM-003": {
       "capability": "CAP-COMMS",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "evidence": "implemented-and-tested",
       "sources": [
         "apps/api/src/routes/v1/correspondence.ts:32",
+        "apps/api/src/routes/v1/people.ts:75",
         "apps/api/src/services/crm.ts:776",
+        "apps/api/src/services/crm.ts:841",
+        "apps/web/src/features/CorrespondencePanel.tsx:46",
+        "apps/web/src/features/LogIntroduction.tsx:10",
+        "apps/web/src/routes/Correspondence.tsx:200",
+        "apps/web/src/routes/Person.tsx:958",
         "packages/core/src/algorithms/correspondence.ts:263",
         "packages/core/src/forms/edge-forms.ts:350",
         "packages/core/src/schema/edge-props.ts:176"
@@ -800,13 +807,15 @@
         "apps/api/src/routes/v1/correspondence.integration.test.ts:119"
       ],
       "documents": [
-        "docs/ROADMAP.md:47",
+        "docs/ROADMAP.md:31",
         "docs/entity-catalog.template.json:2896",
         "docs/observatory/architecture/career-graph.md:74",
         "docs/observatory/product/blueprint/network.md:64",
-        "docs/observatory/product/blueprint/network.md:91",
-        "docs/observatory/product/blueprint/network.md:104",
-        "docs/observatory/product/stories.md:186"
+        "docs/observatory/product/blueprint/network.md:92",
+        "docs/observatory/product/blueprint/network.md:107",
+        "docs/observatory/product/stories.md:186",
+        "docs/observatory/use/screens.md:386",
+        "docs/observatory/use/screens.md:424"
       ]
     },
     "FR-CON-001": {
@@ -815,7 +824,7 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-and-tested",
       "sources": [
-        "apps/api/src/routes/v1/people.ts:43",
+        "apps/api/src/routes/v1/people.ts:50",
         "apps/web/src/features/forms/KnowsEditor.tsx:2",
         "apps/web/src/styles/app.css:2490"
       ],
@@ -916,7 +925,7 @@
         "docs/ROADMAP.md:21",
         "docs/ROADMAP.md:22",
         "docs/observatory/architecture/algorithms.md:35",
-        "docs/observatory/product/blueprint/network.md:83",
+        "docs/observatory/product/blueprint/network.md:84",
         "docs/observatory/use/track-applications.md:23"
       ]
     },
@@ -934,7 +943,7 @@
         "docs/ROADMAP.md:21",
         "docs/ROADMAP.md:22",
         "docs/observatory/architecture/algorithms.md:35",
-        "docs/observatory/product/blueprint/network.md:83",
+        "docs/observatory/product/blueprint/network.md:84",
         "docs/observatory/use/track-applications.md:23"
       ]
     },
@@ -948,7 +957,7 @@
       "documents": [
         "docs/ROADMAP.md:21",
         "docs/ROADMAP.md:22",
-        "docs/observatory/product/blueprint/network.md:90",
+        "docs/observatory/product/blueprint/network.md:91",
         "docs/observatory/use/track-applications.md:23",
         "docs/specs/srs.md:1234"
       ]
@@ -990,7 +999,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:48",
+        "docs/ROADMAP.md:47",
         "docs/observatory/product/blueprint/career-and-resume.md:111",
         "docs/observatory/product/blueprint/explore.md:32",
         "docs/observatory/product/blueprint/index.md:50",
@@ -1005,7 +1014,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:48",
+        "docs/ROADMAP.md:47",
         "docs/observatory/product/blueprint/career-and-resume.md:101",
         "docs/observatory/product/blueprint/career-and-resume.md:111",
         "docs/observatory/product/blueprint/index.md:50",
@@ -1038,7 +1047,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:53",
+        "docs/ROADMAP.md:52",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
         "docs/observatory/meta/coverage-and-contradictions.md:724",
         "docs/specs/srs.md:1235"
@@ -1052,7 +1061,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:53",
+        "docs/ROADMAP.md:52",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
         "docs/observatory/meta/coverage-and-contradictions.md:724",
         "docs/specs/srs.md:1236"
@@ -1226,7 +1235,7 @@
         "docs/observatory/product/blueprint/explore.md:38",
         "docs/observatory/product/blueprint/index.md:53",
         "docs/observatory/product/blueprint/network.md:61",
-        "docs/observatory/product/blueprint/network.md:76",
+        "docs/observatory/product/blueprint/network.md:77",
         "docs/observatory/product/blueprint/record-and-collections.md:35",
         "docs/observatory/product/blueprint/record-and-collections.md:54",
         "docs/observatory/product/blueprint/today-and-planner.md:56",
@@ -1632,7 +1641,7 @@
         "apps/api/src/routes/v1/letters.integration.test.ts:2"
       ],
       "documents": [
-        "docs/ROADMAP.md:51",
+        "docs/ROADMAP.md:50",
         "docs/observatory/product/blueprint/career-and-resume.md:94",
         "docs/observatory/product/stories.md:135",
         "docs/observatory/use/write-a-resume.md:30"
@@ -1646,7 +1655,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:51",
+        "docs/ROADMAP.md:50",
         "docs/observatory/product/blueprint/career-and-resume.md:94",
         "docs/observatory/product/stories.md:135"
       ]
@@ -1801,8 +1810,8 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:49",
-        "docs/ROADMAP.md:69",
+        "docs/ROADMAP.md:48",
+        "docs/ROADMAP.md:68",
         "docs/observatory/product/blueprint/data-import-export.md:29",
         "docs/observatory/product/stories.md:105"
       ]
@@ -1815,8 +1824,8 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:49",
-        "docs/ROADMAP.md:69",
+        "docs/ROADMAP.md:48",
+        "docs/ROADMAP.md:68",
         "docs/observatory/product/blueprint/data-import-export.md:32",
         "docs/observatory/product/blueprint/data-import-export.md:52",
         "docs/observatory/product/stories.md:107"
@@ -1921,7 +1930,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/observatory/product/blueprint/network.md:121",
+        "docs/observatory/product/blueprint/network.md:126",
         "docs/observatory/product/blueprint/today-and-planner.md:47",
         "docs/specs/srs.md:1183"
       ]
@@ -1992,7 +2001,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:53",
+        "docs/ROADMAP.md:52",
         "docs/observatory/meta/coverage-and-contradictions.md:724",
         "docs/specs/srs.md:1193"
       ]
@@ -2008,7 +2017,7 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:52",
+        "docs/ROADMAP.md:51",
         "docs/observatory/product/blueprint/index.md:47",
         "docs/observatory/product/blueprint/settings-and-system.md:58",
         "docs/observatory/product/stories.md:171",
@@ -2046,7 +2055,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:68",
+        "docs/ROADMAP.md:67",
         "docs/observatory/product/blueprint/public-and-marketing.md:63",
         "docs/specs/srs.md:96"
       ]
@@ -2072,7 +2081,7 @@
       "sources": [
         "apps/api/src/routes/v1/correspondence.ts:11",
         "apps/web/src/features/CorrespondencePanel.tsx:8",
-        "apps/web/src/routes/Correspondence.tsx:37",
+        "apps/web/src/routes/Correspondence.tsx:51",
         "packages/core/src/algorithms/correspondence.ts:12",
         "packages/core/src/algorithms/correspondence.ts:181"
       ],
@@ -2083,7 +2092,7 @@
         "docs/observatory/architecture/algorithms.md:249",
         "docs/observatory/product/blueprint/explore.md:36",
         "docs/observatory/product/blueprint/network.md:59",
-        "docs/observatory/product/blueprint/network.md:83",
+        "docs/observatory/product/blueprint/network.md:84",
         "docs/observatory/product/blueprint/public-and-marketing.md:63",
         "docs/observatory/product/blueprint/today-and-planner.md:29",
         "docs/observatory/product/stories.md:61",
@@ -2123,7 +2132,7 @@
       ],
       "documents": [
         "docs/observatory/product/blueprint/capture-and-search.md:80",
-        "docs/observatory/product/blueprint/network.md:121",
+        "docs/observatory/product/blueprint/network.md:126",
         "docs/observatory/product/blueprint/record-and-collections.md:47",
         "docs/observatory/product/blueprint/today-and-planner.md:79",
         "docs/specs/srs.md:1202"
@@ -2579,6 +2588,7 @@
     "apps/api/src/routes/v1/people.ts": [
       "FR-102",
       "FR-COMM-001",
+      "FR-COMM-003",
       "FR-CON-001"
     ],
     "apps/api/src/routes/v1/reminders.ts": [
@@ -2709,6 +2719,7 @@
     ],
     "apps/web/src/features/CorrespondencePanel.tsx": [
       "FR-COMM-001",
+      "FR-COMM-003",
       "NFR-PRIV-003"
     ],
     "apps/web/src/features/InteractionLogger.tsx": [
@@ -2716,6 +2727,9 @@
       "FR-023",
       "FR-CON-002",
       "FR-CON-003"
+    ],
+    "apps/web/src/features/LogIntroduction.tsx": [
+      "FR-COMM-003"
     ],
     "apps/web/src/features/QuickAdd.tsx": [
       "FR-022",
@@ -2784,6 +2798,7 @@
     ],
     "apps/web/src/routes/Correspondence.tsx": [
       "FR-COMM-002",
+      "FR-COMM-003",
       "NFR-PRIV-003"
     ],
     "apps/web/src/routes/ExportPage.tsx": [
@@ -2801,7 +2816,8 @@
       "FR-PROV-002"
     ],
     "apps/web/src/routes/Person.tsx": [
-      "FR-COMM-001"
+      "FR-COMM-001",
+      "FR-COMM-003"
     ],
     "apps/web/src/routes/Record.tsx": [
       "FR-PROV-001",
@@ -3296,7 +3312,8 @@
       "FR-SET-007"
     ],
     "docs/observatory/use/screens.md": [
-      "FR-COMM-001"
+      "FR-COMM-001",
+      "FR-COMM-003"
     ],
     "docs/observatory/use/track-applications.md": [
       "FR-025",
@@ -3605,13 +3622,17 @@
       ]
     },
     "J7": {
-      "status": "planned",
+      "status": "verified",
       "capabilities": [
         "CAP-COMMS",
         "CAP-RELATIONSHIPS"
       ],
-      "e2e": [],
-      "e2e_present": []
+      "e2e": [
+        "e2e/tests/correspondence.spec.ts"
+      ],
+      "e2e_present": [
+        "e2e/tests/correspondence.spec.ts"
+      ]
     },
     "J8": {
       "status": "verified",

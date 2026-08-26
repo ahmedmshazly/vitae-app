@@ -29,6 +29,7 @@
         "apps/web/src/components/QueryBoundary.tsx",
         "apps/web/src/features/Composer.tsx",
         "apps/web/src/features/InteractionLogger.tsx",
+        "apps/web/src/features/LogIntroduction.tsx",
         "apps/web/src/features/map/PlaceResolvePanel.tsx",
         "apps/web/src/routes/Ask.tsx",
         "apps/web/src/routes/Atoms.tsx",
@@ -44,7 +45,7 @@
         "apps/web/src/routes/reference/EntityCatalog.tsx",
         "apps/web/src/routes/tailor/PreviewPane.tsx"
       ],
-      "uses": 17,
+      "uses": 18,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/layout.css"
@@ -77,6 +78,7 @@
         "apps/web/src/features/Composer.tsx",
         "apps/web/src/features/FirstRun.tsx",
         "apps/web/src/features/InteractionLogger.tsx",
+        "apps/web/src/features/LogIntroduction.tsx",
         "apps/web/src/features/RemindersDrawer.tsx",
         "apps/web/src/features/forms/AddConnection.tsx",
         "apps/web/src/features/forms/ConnectionComposer.tsx",
@@ -130,7 +132,7 @@
         "apps/web/src/routes/tailor/TargetRail.tsx",
         "packages/ui/src/overlay.tsx"
       ],
-      "uses": 62,
+      "uses": 63,
       "tested": true,
       "styled_in": [],
       "unstyled_classes": []
@@ -359,6 +361,7 @@
         "apps/web/src/components/ListToolbar.tsx",
         "apps/web/src/features/Composer.tsx",
         "apps/web/src/features/CorrespondencePanel.tsx",
+        "apps/web/src/features/LogIntroduction.tsx",
         "apps/web/src/features/QuickAdd.tsx",
         "apps/web/src/features/forms/AddConnection.tsx",
         "apps/web/src/features/forms/ConnectionComposer.tsx",
@@ -396,7 +399,7 @@
         "apps/web/src/routes/tailor/SelectionPane.tsx",
         "apps/web/src/routes/tailor/TargetRail.tsx"
       ],
-      "uses": 39,
+      "uses": 40,
       "tested": false,
       "styled_in": [
         "apps/web/src/styles/resume-paper.css",
@@ -1409,6 +1412,7 @@
       "used_by": [
         "apps/web/src/features/Composer.tsx",
         "apps/web/src/features/InteractionLogger.tsx",
+        "apps/web/src/features/LogIntroduction.tsx",
         "apps/web/src/features/forms/AddConnection.tsx",
         "apps/web/src/features/forms/ConnectionComposer.tsx",
         "apps/web/src/features/forms/ConnectionRow.tsx",
@@ -1424,7 +1428,7 @@
         "apps/web/src/routes/reference/EntityObservatoryControls.tsx",
         "apps/web/src/routes/tailor/PreviewPane.tsx"
       ],
-      "uses": 16,
+      "uses": 17,
       "tested": false,
       "styled_in": [
         "packages/ui/src/styles/components.css"
@@ -1773,6 +1777,7 @@
       "used_by": [
         "apps/web/src/components/ListToolbar.tsx",
         "apps/web/src/features/InteractionLogger.tsx",
+        "apps/web/src/features/LogIntroduction.tsx",
         "apps/web/src/features/forms/EdgeSubEditorRow.tsx",
         "apps/web/src/features/forms/EntityForm.tsx",
         "apps/web/src/features/forms/FieldRenderer.tsx",
@@ -1795,7 +1800,7 @@
         "apps/web/src/routes/tailor/PreviewPane.tsx",
         "apps/web/src/routes/tailor/TargetRail.tsx"
       ],
-      "uses": 23,
+      "uses": 24,
       "tested": true,
       "styled_in": [
         "apps/web/src/styles/network.css",
@@ -2184,13 +2189,14 @@
         "apps/web/src/features/Composer.tsx",
         "apps/web/src/features/FirstRun.tsx",
         "apps/web/src/features/InteractionLogger.tsx",
+        "apps/web/src/features/LogIntroduction.tsx",
         "apps/web/src/features/forms/AddConnection.tsx",
         "apps/web/src/features/forms/NodeFormDialog.tsx",
         "apps/web/src/lib/unsaved-changes.tsx",
         "apps/web/src/routes/Collections.tsx",
         "apps/web/src/routes/Duplicates.tsx"
       ],
-      "uses": 8,
+      "uses": 9,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/components.css",
@@ -3296,11 +3302,12 @@
       "renders_jsx": true,
       "used_by": [
         "apps/web/src/features/InteractionLogger.tsx",
+        "apps/web/src/features/LogIntroduction.tsx",
         "apps/web/src/features/forms/AddConnection.tsx",
         "apps/web/src/features/graph/GraphDisplayPrefs.tsx",
         "apps/web/src/routes/Atoms.tsx"
       ],
-      "uses": 4,
+      "uses": 5,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/layout.css"
@@ -4006,6 +4013,7 @@
         "apps/web/src/features/BulkNodeDelete.tsx",
         "apps/web/src/features/Composer.tsx",
         "apps/web/src/features/InteractionLogger.tsx",
+        "apps/web/src/features/LogIntroduction.tsx",
         "apps/web/src/features/QuickAdd.tsx",
         "apps/web/src/features/RemindersDrawer.tsx",
         "apps/web/src/features/Toast.tsx",
@@ -4032,7 +4040,7 @@
         "apps/web/src/routes/Templates.tsx",
         "apps/web/src/routes/Trash.tsx"
       ],
-      "uses": 29,
+      "uses": 30,
       "tested": true
     }
   ],

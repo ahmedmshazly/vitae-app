@@ -504,10 +504,10 @@
       "kind": "functional",
       "title": "Introductions are first-class facts",
       "statement": "An introduction must be recordable as a first-class fact — who introduced whom, when, in what context — feeding broker detection, warm-path evidence, and the favor ledger.",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
-      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. The relationship edge already stores met_via and an intro_path; this requirement is the recording surface and the computation over it, not new storage."
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007; delivered the same day. The INTRODUCED edge (the twenty-ninth type) records the connected pair with the broker in via; the person profile's log-an-introduction dialog is the recording surface, optionally crediting the broker's favor ledger; the rollup tallies recorded brokers apart from free-text met-via credits; the warm-path search's existing INTRODUCED branch lights up with real edges."
     },
     {
       "id": "FR-CON-001",

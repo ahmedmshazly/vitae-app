@@ -51,19 +51,36 @@ describe('Correspondence states', () => {
       candidates: [CANDIDATE],
       considered_dormant: 5,
       brokers: [{ via: 'DevFest', count: 2 }],
+      introduced_brokers: [
+        { via: 'p9', person_id: 'p9', label: 'Nadia Broker', count: 1, edge_ids: ['e1'] },
+      ],
+      out_of_balance: [
+        {
+          person: { id: 'p1', title: 'Tarek Aziz', type: 'person' },
+          ratio: 1,
+          outbound: 5,
+          inbound: 0,
+          unanswered_inbound: 0,
+        },
+      ],
     });
     renderWithApp(<Correspondence />);
-    expect(await screen.findByRole('link', { name: 'Tarek Aziz' })).toHaveAttribute(
-      'href',
-      '/network/people/p1',
-    );
+    expect(await screen.findAllByRole('link', { name: 'Tarek Aziz' })).toHaveLength(2);
     expect(screen.getByText('0.71')).toBeInTheDocument();
     expect(screen.getByText('210d')).toBeInTheDocument();
     expect(screen.getByText('closeness')).toBeInTheDocument();
     expect(screen.getByText('intensity')).toBeInTheDocument();
     expect(screen.getByText('5 dormant ties considered.')).toBeInTheDocument();
+    // The two broker groups stay labeled apart: recorded edges vs met-via text.
+    expect(screen.getByRole('link', { name: 'Nadia Broker' })).toHaveAttribute(
+      'href',
+      '/network/people/p9',
+    );
+    expect(screen.getByText('1 introduction')).toBeInTheDocument();
     expect(screen.getByText('DevFest')).toBeInTheDocument();
-    expect(screen.getByText('2 introductions')).toBeInTheDocument();
+    expect(screen.getByText('2 credits')).toBeInTheDocument();
+    // Imbalance rows come from the same profile the person panel shows.
+    expect(screen.getByText('100% yours')).toBeInTheDocument();
   });
 });
 

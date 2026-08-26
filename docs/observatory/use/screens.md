@@ -382,7 +382,10 @@ work happens:
   latency in each direction, unanswered inbound, and contact days by month —
   each figure opening into the interactions behind it, under a coverage line
   that says how much of the history states a direction at all. A history with
-  no stated directions gets an explanation, never a guessed ratio.
+  no stated directions gets an explanation, never a guessed ratio. The same
+  panel lists recorded introductions, and **Log introduction** (FR-COMM-003)
+  records one — who brokered it, when, in what context — optionally crediting
+  the broker's favor ledger in the same gesture.
 
 Each of those panels is a separate query, and each fails on its own: a broken
 favour ledger shows a banner over a page whose other panels are still true.
@@ -414,11 +417,16 @@ relationship decision, chosen by a query parameter.
 once strong, ranked by their historical peak — the same model that scores a
 tie today, re-read at each logged interaction, so the peak and the present
 cannot disagree. Each candidate shows its peak, when it stood, how quiet it
-has been, and the factor chips behind the number; a second register tallies
-the brokers the relationship edges credit for introductions. Two empties are
-told apart: *"No dormant ties"* when cadence is holding, and *"Nothing worth
-reactivating"* — with the considered count — when dormant ties exist but none
-was once strong enough to rank.
+has been, and the factor chips behind the number. An **Out of balance**
+register ranks ties by reciprocity imbalance, computed by the same profile
+function the person page shows (FR-COMM-001) — a tie needs four
+direction-stated interactions before its balance counts as a fact. The
+**Brokers** register keeps two labeled groups apart by design (FR-COMM-003):
+brokers tallied from recorded INTRODUCED edges, linked as people, and the
+free-text met-via credits as written — merging them on a matching string
+would be a guess. Two empties are told apart: *"No dormant ties"* when
+cadence is holding, and *"Nothing worth reactivating"* — with the considered
+count — when dormant ties exist but none was once strong enough to rank.
 
 ## Career
 

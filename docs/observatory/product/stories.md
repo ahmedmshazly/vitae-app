@@ -170,7 +170,7 @@ in the graph.
   (FR-001); the export never degrades with commercial state — a locked hosted
   workspace keeps its way out (NFR-COMP-001, NFR-OPS-002).
 
-## J7 — See the correspondence truth *(planned)*
+## J7 — See the correspondence truth
 
 **As P1**, I think I know who I talk to. The record disagrees, and the record
 is right.

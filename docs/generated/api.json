@@ -2520,7 +2520,7 @@
       "path": "/api/v1/people",
       "express_path": "/api/v1/people",
       "mount": "/people",
-      "source": "apps/api/src/routes/v1/people.ts:10",
+      "source": "apps/api/src/routes/v1/people.ts:17",
       "summary": "People list with live tie-strengths (reference P: people).",
       "requirements": [],
       "request_schemas": [],
@@ -2545,14 +2545,17 @@
       "path": "/api/v1/people/{id}/correspondence",
       "express_path": "/api/v1/people/:id/correspondence",
       "mount": "/people",
-      "source": "apps/api/src/routes/v1/people.ts:60",
+      "source": "apps/api/src/routes/v1/people.ts:67",
       "summary": "The correspondence profile with this person (SRS FR-COMM-001): reciprocity, per-direction reply latency, unanswered inbound, and the contact-day rhythm — every figure decomposing into the interactions behind it, with a coverage header saying how much of the history carries a stated direction at all.",
       "requirements": [
-        "FR-COMM-001"
+        "FR-COMM-001",
+        "FR-COMM-003"
       ],
       "request_schemas": [],
       "services": [
-        "personCorrespondence"
+        "loadGraph",
+        "personCorrespondence",
+        "personIntroductions"
       ],
       "success_status": 200,
       "errors": [
@@ -2577,7 +2580,7 @@
       "path": "/api/v1/people/{id}/profile",
       "express_path": "/api/v1/people/:id/profile",
       "mount": "/people",
-      "source": "apps/api/src/routes/v1/people.ts:76",
+      "source": "apps/api/src/routes/v1/people.ts:88",
       "summary": "The records this person owns, grouped the way a CV reads. Distinct from `/summary`, which answers \"what is my relationship with them\". This answers \"what have they done\", and it is the surface that makes the imported profiles useful instead of merely present.",
       "requirements": [],
       "request_schemas": [],
@@ -2607,7 +2610,7 @@
       "path": "/api/v1/people/{id}/summary",
       "express_path": "/api/v1/people/:id/summary",
       "mount": "/people",
-      "source": "apps/api/src/routes/v1/people.ts:21",
+      "source": "apps/api/src/routes/v1/people.ts:28",
       "summary": "One-call person summary for the profile page: strength decomposition, relationship props (closeness/cadence/topics/met), and the favor ledger.",
       "requirements": [
         "FR-102",
