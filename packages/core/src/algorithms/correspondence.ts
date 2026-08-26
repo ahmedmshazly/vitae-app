@@ -175,9 +175,10 @@ function median(values: number[]): number | null {
 }
 
 /**
- * The per-person correspondence profile: reciprocity, per-direction reply
- * latency, unanswered inbound, and the contact-day distribution — every
- * figure carrying the interaction ids that produced it (NFR-PRIV-003).
+ * The per-person correspondence profile (SRS FR-COMM-001): reciprocity,
+ * per-direction reply latency, unanswered inbound, and the contact-day
+ * distribution — every figure carrying the interaction ids that produced it
+ * (NFR-PRIV-003).
  *
  * Reply pairs derive from direction alternation in the time-ordered
  * directional history: the last event of one run and the first event of the

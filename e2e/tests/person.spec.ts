@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { signIn } from './helpers/auth';
 import { expectNoA11yViolations } from './helpers/a11y';
 import { logInteractions } from './helpers/fixtures';
+import { apiPost, expectOkJson } from './helpers/api.js';
 
 /**
  * Screen 7: person profile. The interaction log is the reason this page
@@ -147,4 +148,32 @@ test('the person page has no automated a11y violations', async ({ page }) => {
   await signIn(page);
   await openPerson(page, 'Sarah Chen');
   await expectNoA11yViolations(page);
+});
+
+test('the correspondence panel computes from stated directions and shows its evidence', async ({ page }) => {
+  await signIn(page);
+  const stamp = Date.now();
+  const created = await apiPost(page, '/nodes', {
+    type: 'person',
+    title: `Corr Person ${stamp}`,
+    props: {},
+  });
+  const { node } = await expectOkJson<{ node: { id: string } }>(created, 'correspondence person');
+  const day = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
+  const log = (body: Record<string, unknown>) => apiPost(page, '/interactions', body);
+  await expectOkJson(
+    await log({ personId: node.id, kind: 'email', note: `They wrote ${stamp}`, occurredAt: day(6), initiatedBy: 'them', idempotencyKey: `corr-${stamp}-a` }),
+    'inbound interaction',
+  );
+  await expectOkJson(
+    await log({ personId: node.id, kind: 'email', note: `I answered ${stamp}`, occurredAt: day(4), initiatedBy: 'me', idempotencyKey: `corr-${stamp}-b` }),
+    'outbound interaction',
+  );
+
+  await page.goto(`/people/${node.id}`);
+  const panel = page.getByRole('region', { name: 'Correspondence' });
+  await expect(panel.getByText('you 1 · them 1')).toBeVisible();
+  await panel.getByText('Reply latency').click();
+  await expect(panel.getByText(/your reply in 2 days/)).toBeVisible();
+  await expect(panel.getByText(new RegExp(`They wrote ${stamp}`))).toBeVisible();
 });

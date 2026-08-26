@@ -59,7 +59,13 @@ function serve(over: { summary?: unknown; profile?: unknown; record?: unknown } 
   const prof = 'profile' in over ? over.profile : profile;
   const rec = 'record' in over ? over.record : record;
   mockApi.get.mockImplementation(async (path: string) => {
-    const value = path.endsWith('/summary') ? summary : path.endsWith('/profile') ? prof : rec;
+    const value = path.endsWith('/summary')
+      ? summary
+      : path.endsWith('/profile')
+        ? prof
+        : path.endsWith('/correspondence')
+          ? { profile: { coverage: { withDirection: 0, total: 0 } } }
+          : rec;
     if (value instanceof Error) throw value;
     return value;
   });

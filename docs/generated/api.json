@@ -13,7 +13,7 @@
     "openapi_operations": 55,
     "documented_but_not_registered": 6,
     "endpoints_with_tests": 133,
-    "endpoints_citing_requirements": 30
+    "endpoints_citing_requirements": 31
   },
   "gates": {
     "auth": "/api",
@@ -906,8 +906,8 @@
       "path": "/api/v1/correspondence",
       "express_path": "/api/v1/correspondence",
       "mount": "/correspondence",
-      "source": "apps/api/src/routes/v1/correspondence.ts:15",
-      "summary": "The correspondence rollup (SRS FR-COMM-002): dormant-but-once-strong ties ranked for reactivation, with the evidence for each — peak strength and when it stood, current strength, quiet days, and the factor decomposition the interface shows (NFR-PRIV-003) — plus the brokers the relationship edges credit for introductions. Reciprocity and reply latency belong to FR-COMM-001 and wait on directional interaction data by design.",
+      "source": "apps/api/src/routes/v1/correspondence.ts:16",
+      "summary": "The correspondence rollup (SRS FR-COMM-002): dormant-but-once-strong ties ranked for reactivation, with the evidence for each — peak strength and when it stood, current strength, quiet days, and the factor decomposition the interface shows (NFR-PRIV-003) — plus the brokers the relationship edges credit for introductions. Reciprocity and reply latency live on the per-person profile at /people/:id/correspondence (FR-COMM-001), computed from operator-stated directions and never from a guess.",
       "requirements": [
         "FR-COMM-001",
         "FR-COMM-002",
@@ -2545,8 +2545,10 @@
       "express_path": "/api/v1/people/:id/correspondence",
       "mount": "/people",
       "source": "apps/api/src/routes/v1/people.ts:60",
-      "summary": "The correspondence profile with this person: reciprocity, per-direction reply latency, unanswered inbound, and the contact-day rhythm — every figure decomposing into the interactions behind it, with a coverage header saying how much of the history carries a stated direction at all.",
-      "requirements": [],
+      "summary": "The correspondence profile with this person (SRS FR-COMM-001): reciprocity, per-direction reply latency, unanswered inbound, and the contact-day rhythm — every figure decomposing into the interactions behind it, with a coverage header saying how much of the history carries a stated direction at all.",
+      "requirements": [
+        "FR-COMM-001"
+      ],
       "request_schemas": [],
       "services": [
         "personCorrespondence"

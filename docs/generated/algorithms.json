@@ -568,9 +568,9 @@
         {
           "name": "correspondenceProfile",
           "kind": "function",
-          "line": 189,
-          "doc": "The per-person correspondence profile: reciprocity, per-direction reply latency, unanswered inbound, and the contact-day distribution — every figure carrying the interaction ids that produced it (NFR-PRIV-003).",
-          "source": "packages/core/src/algorithms/correspondence.ts:189"
+          "line": 190,
+          "doc": "The per-person correspondence profile (SRS FR-COMM-001): reciprocity, per-direction reply latency, unanswered inbound, and the contact-day distribution — every figure carrying the interaction ids that produced it (NFR-PRIV-003).",
+          "source": "packages/core/src/algorithms/correspondence.ts:190"
         }
       ],
       "constants": [

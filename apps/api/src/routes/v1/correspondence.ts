@@ -9,8 +9,9 @@ export const correspondenceRouter: Router = Router();
  * ranked for reactivation, with the evidence for each — peak strength and
  * when it stood, current strength, quiet days, and the factor decomposition
  * the interface shows (NFR-PRIV-003) — plus the brokers the relationship
- * edges credit for introductions. Reciprocity and reply latency belong to
- * FR-COMM-001 and wait on directional interaction data by design.
+ * edges credit for introductions. Reciprocity and reply latency live on the
+ * per-person profile at /people/:id/correspondence (FR-COMM-001), computed
+ * from operator-stated directions and never from a guess.
  */
 correspondenceRouter.get(
   '/',

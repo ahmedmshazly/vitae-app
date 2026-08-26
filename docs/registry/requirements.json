@@ -482,10 +482,10 @@
       "kind": "functional",
       "title": "A correspondence profile per person",
       "statement": "For any person with logged interactions, a correspondence profile must be computable deterministically: reciprocity ratio, median reply latency in each direction, unanswered inbound count, and the distribution of contact days — each figure decomposing into the interactions that produced it.",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
-      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. The constants and the interaction substrate ship in packages/core; no surface computes or presents the profile yet."
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007; delivered the same day. correspondenceProfile in packages/core computes the four figures from operator-stated initiated_by directions; GET /people/:id/correspondence serves them; the person profile's correspondence panel opens each figure into the interactions behind it, under a coverage header that owns up to directionless history instead of guessing it."
     },
     {
       "id": "FR-COMM-002",

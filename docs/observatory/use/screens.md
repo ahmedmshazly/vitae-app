@@ -377,6 +377,12 @@ work happens:
   settle an entry.
 - **Interactions** and **Connections**, both dated and both linked to the
   records they came from.
+- **Correspondence** (FR-COMM-001), computed from the interactions whose
+  who-reached-out direction the operator stated: reciprocity, median reply
+  latency in each direction, unanswered inbound, and contact days by month —
+  each figure opening into the interactions behind it, under a coverage line
+  that says how much of the history states a direction at all. A history with
+  no stated directions gets an explanation, never a guessed ratio.
 
 Each of those panels is a separate query, and each fails on its own: a broken
 favour ledger shows a banner over a page whose other panels are still true.

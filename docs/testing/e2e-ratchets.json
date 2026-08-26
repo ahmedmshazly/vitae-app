@@ -10,8 +10,8 @@
   ],
   "floors": {
     "spec_files": 50,
-    "test_blocks": 281,
-    "expect_lines": 969
+    "test_blocks": 282,
+    "expect_lines": 973
   },
   "ceilings": {
     "sleeps": 3,

@@ -2,8 +2,8 @@
   "generated_by": "scripts/docs/gen-traceability.mjs",
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
-    "files_scanned": 889,
-    "files_citing": 187,
+    "files_scanned": 891,
+    "files_citing": 190,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,7 +20,7 @@
   },
   "totals": {
     "registered": 131,
-    "citations": 783,
+    "citations": 791,
     "implemented_and_tested": 25,
     "implemented_untested": 60,
     "tested_only": 3,
@@ -365,7 +365,7 @@
       ],
       "documents": [
         "docs/observatory/architecture/algorithms.md:35",
-        "docs/observatory/architecture/algorithms.md:407",
+        "docs/observatory/architecture/algorithms.md:423",
         "docs/observatory/architecture/resume-pipeline.md:26",
         "docs/observatory/use/write-a-resume.md:30"
       ]
@@ -734,20 +734,26 @@
     },
     "FR-COMM-001": {
       "capability": "CAP-COMMS",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "evidence": "implemented-untested",
       "sources": [
-        "apps/api/src/routes/v1/correspondence.ts:13"
+        "apps/api/src/routes/v1/correspondence.ts:13",
+        "apps/api/src/routes/v1/people.ts:55",
+        "apps/web/src/features/CorrespondencePanel.tsx:6",
+        "apps/web/src/routes/Person.tsx:954",
+        "packages/core/src/algorithms/correspondence.ts:178"
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:47",
+        "docs/ROADMAP.md:31",
+        "docs/observatory/architecture/algorithms.md:241",
         "docs/observatory/product/blueprint/index.md:49",
         "docs/observatory/product/blueprint/network.md:56",
         "docs/observatory/product/blueprint/network.md:99",
-        "docs/observatory/product/blueprint/network.md:116",
-        "docs/observatory/product/stories.md:180"
+        "docs/observatory/product/blueprint/network.md:119",
+        "docs/observatory/product/stories.md:180",
+        "docs/observatory/use/screens.md:380"
       ]
     },
     "FR-COMM-002": {
@@ -770,8 +776,8 @@
         "docs/ROADMAP.md:31",
         "docs/observatory/product/blueprint/index.md:50",
         "docs/observatory/product/blueprint/network.md:98",
-        "docs/observatory/product/blueprint/network.md:107",
-        "docs/observatory/product/blueprint/network.md:116",
+        "docs/observatory/product/blueprint/network.md:110",
+        "docs/observatory/product/blueprint/network.md:119",
         "docs/observatory/product/blueprint/today-and-planner.md:42",
         "docs/observatory/product/stories.md:183"
       ]
@@ -787,7 +793,7 @@
         "docs/ROADMAP.md:47",
         "docs/observatory/product/blueprint/network.md:64",
         "docs/observatory/product/blueprint/network.md:91",
-        "docs/observatory/product/blueprint/network.md:99",
+        "docs/observatory/product/blueprint/network.md:104",
         "docs/observatory/product/stories.md:186"
       ]
     },
@@ -1662,7 +1668,7 @@
       "documents": [
         "docs/adr/0003-deterministic-intelligence.md:30",
         "docs/observatory/architecture/algorithms.md:35",
-        "docs/observatory/architecture/algorithms.md:644",
+        "docs/observatory/architecture/algorithms.md:660",
         "docs/observatory/decisions/catalog.md:148",
         "docs/observatory/product/blueprint/settings-and-system.md:20",
         "docs/observatory/product/blueprint/settings-and-system.md:28"
@@ -1903,7 +1909,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/observatory/product/blueprint/network.md:118",
+        "docs/observatory/product/blueprint/network.md:121",
         "docs/observatory/product/blueprint/today-and-planner.md:47",
         "docs/specs/srs.md:1183"
       ]
@@ -2053,16 +2059,18 @@
       "evidence": "implemented-and-tested",
       "sources": [
         "apps/api/src/routes/v1/correspondence.ts:11",
+        "apps/web/src/features/CorrespondencePanel.tsx:8",
         "apps/web/src/routes/Correspondence.tsx:37",
         "packages/core/src/algorithms/correspondence.ts:12",
-        "packages/core/src/algorithms/correspondence.ts:180"
+        "packages/core/src/algorithms/correspondence.ts:181"
       ],
       "tests": [
         "apps/web/src/routes/Correspondence.states.test.tsx:4"
       ],
       "documents": [
+        "docs/observatory/architecture/algorithms.md:249",
         "docs/observatory/product/blueprint/explore.md:36",
-        "docs/observatory/product/blueprint/network.md:58",
+        "docs/observatory/product/blueprint/network.md:59",
         "docs/observatory/product/blueprint/network.md:83",
         "docs/observatory/product/blueprint/public-and-marketing.md:63",
         "docs/observatory/product/blueprint/today-and-planner.md:29",
@@ -2103,7 +2111,7 @@
       ],
       "documents": [
         "docs/observatory/product/blueprint/capture-and-search.md:80",
-        "docs/observatory/product/blueprint/network.md:118",
+        "docs/observatory/product/blueprint/network.md:121",
         "docs/observatory/product/blueprint/record-and-collections.md:47",
         "docs/observatory/product/blueprint/today-and-planner.md:79",
         "docs/specs/srs.md:1202"
@@ -2556,6 +2564,7 @@
     ],
     "apps/api/src/routes/v1/people.ts": [
       "FR-102",
+      "FR-COMM-001",
       "FR-CON-001"
     ],
     "apps/api/src/routes/v1/reminders.ts": [
@@ -2682,6 +2691,10 @@
       "FR-022",
       "FR-023"
     ],
+    "apps/web/src/features/CorrespondencePanel.tsx": [
+      "FR-COMM-001",
+      "NFR-PRIV-003"
+    ],
     "apps/web/src/features/InteractionLogger.tsx": [
       "FR-022",
       "FR-023",
@@ -2770,6 +2783,9 @@
     ],
     "apps/web/src/routes/Ledger.tsx": [
       "FR-PROV-002"
+    ],
+    "apps/web/src/routes/Person.tsx": [
+      "FR-COMM-001"
     ],
     "apps/web/src/routes/Record.tsx": [
       "FR-PROV-001",
@@ -2917,6 +2933,7 @@
     "docs/observatory/architecture/algorithms.md": [
       "FR-018",
       "FR-CAP-001",
+      "FR-COMM-001",
       "FR-CON-004",
       "FR-CON-006",
       "FR-CON-007",
@@ -2928,7 +2945,8 @@
       "FR-RES-012",
       "FR-RES-014",
       "FR-SET-004",
-      "FR-SRCH-002"
+      "FR-SRCH-002",
+      "NFR-PRIV-003"
     ],
     "docs/observatory/architecture/career-graph.md": [
       "FR-013",
@@ -3257,6 +3275,9 @@
       "FR-ORG-002",
       "FR-SET-007"
     ],
+    "docs/observatory/use/screens.md": [
+      "FR-COMM-001"
+    ],
     "docs/observatory/use/track-applications.md": [
       "FR-025",
       "FR-CON-003",
@@ -3379,6 +3400,7 @@
       "FR-SET-004"
     ],
     "packages/core/src/algorithms/correspondence.ts": [
+      "FR-COMM-001",
       "FR-COMM-002",
       "NFR-PRIV-003"
     ],

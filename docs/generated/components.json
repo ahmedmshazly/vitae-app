@@ -358,6 +358,7 @@
       "used_by": [
         "apps/web/src/components/ListToolbar.tsx",
         "apps/web/src/features/Composer.tsx",
+        "apps/web/src/features/CorrespondencePanel.tsx",
         "apps/web/src/features/QuickAdd.tsx",
         "apps/web/src/features/forms/AddConnection.tsx",
         "apps/web/src/features/forms/ConnectionComposer.tsx",
@@ -395,7 +396,7 @@
         "apps/web/src/routes/tailor/SelectionPane.tsx",
         "apps/web/src/routes/tailor/TargetRail.tsx"
       ],
-      "uses": 38,
+      "uses": 39,
       "tested": false,
       "styled_in": [
         "apps/web/src/styles/resume-paper.css",
@@ -1006,6 +1007,7 @@
       "aria": [],
       "renders_jsx": true,
       "used_by": [
+        "apps/web/src/features/CorrespondencePanel.tsx",
         "apps/web/src/features/graph/GraphPeek.tsx",
         "apps/web/src/features/graph/GraphSearch.tsx",
         "apps/web/src/features/graph/GraphView.tsx",
@@ -1049,7 +1051,7 @@
         "apps/web/src/routes/tailor/TargetRail.tsx",
         "apps/web/src/routes/workspaces/Planner.tsx"
       ],
-      "uses": 42,
+      "uses": 43,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/components.css"
@@ -1206,6 +1208,7 @@
         "apps/web/src/components/ErrorBoundary.tsx",
         "apps/web/src/components/QueryBoundary.tsx",
         "apps/web/src/features/Composer.tsx",
+        "apps/web/src/features/CorrespondencePanel.tsx",
         "apps/web/src/features/RemindersDrawer.tsx",
         "apps/web/src/features/graph/GraphPeek.tsx",
         "apps/web/src/features/graph/GraphView.tsx",
@@ -1243,7 +1246,7 @@
         "apps/web/src/routes/tailor/TargetRail.tsx",
         "apps/web/src/routes/workspaces/Planner.tsx"
       ],
-      "uses": 39,
+      "uses": 40,
       "tested": true,
       "styled_in": [
         "apps/web/src/styles/explore-workspace.css",
@@ -2276,6 +2279,7 @@
         "apps/web/src/components/BulkBar.tsx",
         "apps/web/src/components/EntityPicker.tsx",
         "apps/web/src/components/ListToolbar.tsx",
+        "apps/web/src/features/CorrespondencePanel.tsx",
         "apps/web/src/features/GettingStarted.tsx",
         "apps/web/src/features/QuickSwitcher.tsx",
         "apps/web/src/features/RemindersDrawer.tsx",
@@ -2324,7 +2328,7 @@
         "apps/web/src/routes/tailor/TargetRail.tsx",
         "apps/web/src/routes/workspaces/Planner.tsx"
       ],
-      "uses": 50,
+      "uses": 51,
       "tested": false,
       "styled_in": [],
       "unstyled_classes": []
@@ -3139,6 +3143,7 @@
       "renders_jsx": true,
       "used_by": [
         "apps/web/src/components/QueryBoundary.tsx",
+        "apps/web/src/features/CorrespondencePanel.tsx",
         "apps/web/src/features/RemindersDrawer.tsx",
         "apps/web/src/features/graph/GraphView.tsx",
         "apps/web/src/features/map/AtlasView.tsx",
@@ -3169,7 +3174,7 @@
         "apps/web/src/routes/tailor/TargetRail.tsx",
         "apps/web/src/routes/workspaces/Planner.tsx"
       ],
-      "uses": 30,
+      "uses": 31,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/components.css"

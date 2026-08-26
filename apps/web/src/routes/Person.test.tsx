@@ -68,6 +68,8 @@ describe('person relationship dossier', () => {
       if (path.endsWith('/summary'))
         return Promise.reject(new Error('strength service unavailable'));
       if (path.endsWith('/profile')) return Promise.resolve(profile);
+      if (path.endsWith('/correspondence'))
+        return Promise.resolve({ profile: { coverage: { withDirection: 0, total: 0 } } });
       return Promise.resolve(record);
     });
     renderPerson();
@@ -87,6 +89,8 @@ describe('person relationship dossier', () => {
     mockApi.get.mockImplementation((path: string) => {
       if (path.endsWith('/summary')) return Promise.resolve(summary);
       if (path.endsWith('/profile')) return Promise.resolve(profile);
+      if (path.endsWith('/correspondence'))
+        return Promise.resolve({ profile: { coverage: { withDirection: 0, total: 0 } } });
       return Promise.resolve(record);
     });
     mockApi.post.mockResolvedValue({});

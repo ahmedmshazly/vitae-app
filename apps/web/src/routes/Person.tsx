@@ -24,6 +24,7 @@ import {
 } from '@vitae/ui';
 import { edgeTypeGroup, personRelationLabel } from '@vitae/core';
 import { api } from '../lib/api.js';
+import { CorrespondencePanel } from '../features/CorrespondencePanel.js';
 import { InteractionLogger } from '../features/InteractionLogger.js';
 import { AddConnection } from '../features/forms/AddConnection.js';
 import { ConnectionRow } from '../features/forms/ConnectionRow.js';
@@ -948,6 +949,12 @@ export function Person() {
                 )}
               </>
             )}
+          </Section>
+
+          {/* SRS FR-COMM-001: the correspondence profile, beside the log it
+              derives from so every figure can name its interactions. */}
+          <Section title="Correspondence">
+            <CorrespondencePanel personId={id!} interactions={interactions} />
           </Section>
 
           <Section

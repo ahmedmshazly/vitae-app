@@ -53,11 +53,11 @@ Elevations, each carried by a registered requirement:
 - **The favor ledger moves up.** It is modelled end to end (FR-CON-010) and
   buried. It becomes a first-class panel beside strength — direction, settle
   state, dates — because favors are the currency P2 runs a practice on.
-- **A correspondence panel** (FR-COMM-001): reciprocity, median reply latency
-  both ways, unanswered inbound, contact-day distribution — each figure
-  decomposing into the interactions behind it (NFR-PRIV-003). This is the
-  panel that makes the profile say something the operator did not already
-  believe.
+- **A correspondence panel** (FR-COMM-001) — **delivered 2026-08-26**:
+  reciprocity, median reply latency both ways, unanswered inbound,
+  contact-day distribution — each figure decomposing into the interactions
+  behind it (NFR-PRIV-003). This is the panel that makes the profile say
+  something the operator did not already believe.
 - **Provenance chips** on every profile fact (FR-PROV-001): which import,
   which capture, what confidence. P3's trust requirement, everyone's
   debugging tool.
@@ -95,10 +95,13 @@ facts (FR-COMM-003), recorded introduction events join the hop evidence.
 **Verdict: ADD — the rollup half delivered 2026-08-26** at
 `/network/correspondence`, on the hub, in the strip and the palette:
 dormant-but-once-strong reactivation with factor chips and the considered
-count, and brokers from met_via (FR-COMM-002). The per-person profile
-(FR-COMM-001) and first-class introductions (FR-COMM-003) remain the open
-half — reciprocity and reply latency wait on directional interaction data,
-and nothing shipped guesses.
+count, and brokers from met_via (FR-COMM-002). **The per-person profile
+(FR-COMM-001) followed the same day**: interactions carry an operator-stated
+`initiated_by`, and the person profile's correspondence panel computes
+reciprocity, per-direction reply latency, unanswered inbound, and the
+contact-day rhythm from it — with a coverage header owning up to the
+directionless history instead of guessing it. First-class introductions
+(FR-COMM-003) remain the open half.
 
 The rollup the import runbook already specifies, computed with the constants
 `@vitae/core` ships (zero new mathematics): dormant-but-once-strong ties

@@ -230,9 +230,25 @@ tie's event count — fine at the interactive envelope, and the reason the
 rollup is a request-time read rather than a per-keystroke one. A tie with a
 single logged interaction can never be dormant (the adaptive threshold needs
 a gap history), so it can never be a candidate — which is the model being
-honest about how little it knows. Reciprocity and reply latency are absent
-deliberately: they need directional interaction data the schema does not yet
-carry, and nothing here guesses.
+honest about how little it knows.
+
+### Correspondence profile
+
+Inputs: a person's interactions as `{id, occurredAt, initiatedBy?}`, where
+`initiatedBy` is the operator-stated `me`/`them` on the interaction record —
+stated at logging time, never inferred afterwards.
+
+`correspondenceProfile` (FR-COMM-001) computes reciprocity (outbound and
+inbound counts with the operator's share), median reply latency in each
+direction, the unanswered-inbound tail, and a twelve-month contact-day
+distribution. Reply pairs derive from direction alternation in the
+time-ordered history — the last event of one run and the first of the next
+opposite run — capped at `CORRESPONDENCE.replyPairMaxGapDays` (60) so
+answering a months-old message reads as dormancy ending rather than as a
+months-long reply latency. Every figure carries the interaction ids that
+produced it (NFR-PRIV-003), and a coverage header states how much of the
+history carries a direction at all: directionless interactions are excluded
+from directional figures, still count as contact, and are never guessed at.
 
 ### Graph proximity
 

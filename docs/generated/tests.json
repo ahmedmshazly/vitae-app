@@ -1494,6 +1494,26 @@
       "lines": 63
     },
     {
+      "file": "apps/web/src/features/CorrespondencePanel.test.tsx",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "CorrespondencePanel"
+      ],
+      "subjects": [
+        "./CorrespondencePanel.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 88
+    },
+    {
       "file": "apps/web/src/features/FirstRun.test.tsx",
       "package": "@vitae/web",
       "cases": 1,
@@ -3941,7 +3961,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 266
+      "lines": 272
     },
     {
       "file": "apps/web/src/routes/Person.test.tsx",
@@ -3961,7 +3981,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 104
+      "lines": 108
     },
     {
       "file": "apps/web/src/routes/Record.test.ts",
@@ -5336,12 +5356,13 @@
     {
       "file": "e2e/tests/person.spec.ts",
       "package": "@vitae/e2e",
-      "cases": 7,
+      "cases": 8,
       "skipped": 0,
       "todo": 0,
       "suites": [],
       "subjects": [
         "./helpers/a11y",
+        "./helpers/api.js",
         "./helpers/auth",
         "./helpers/fixtures"
       ],
@@ -5351,7 +5372,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 151
+      "lines": 180
     },
     {
       "file": "e2e/tests/record.spec.ts",
@@ -7026,21 +7047,21 @@
     }
   ],
   "summary": {
-    "files": 329,
-    "cases": 2142,
+    "files": 330,
+    "cases": 2146,
     "skipped": 0,
     "todo": 0,
     "by_package": {
       "@vitae/api": 223,
-      "@vitae/web": 1114,
-      "@vitae/e2e": 289,
+      "@vitae/web": 1117,
+      "@vitae/e2e": 290,
       "@vitae/core": 283,
       "@vitae/testkit": 7,
       "@vitae/ui": 226
     },
     "by_script": {
-      "test": 329,
-      "test:web": 161,
+      "test": 330,
+      "test:web": 162,
       "test:e2e": 59,
       "test:api": 55,
       "test:unit": 45,
