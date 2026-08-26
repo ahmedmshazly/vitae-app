@@ -127,6 +127,7 @@ covers:
   - route:/status
   - route:/timeline
   - route:/today
+  - route:/today/ledger
   - route:/today/planner
   - route:/tour
   - route:/trash
@@ -319,6 +320,14 @@ with a retry, not eleven separately broken panels.
 **Planner** is the same dated material laid out forward in time: reminders,
 open tasks and dated records grouped by day. Its empty state is *"The horizon
 is clear."*
+
+**The Ledger** is the history every write already keeps, read back as a feed:
+what changed, newest first. Each entry speaks its operation as a verb, links a
+record entry to its record, lists the fields that moved, and carries the
+source it came from — labelled from its own stored snapshot, so a deleted
+record still shows the name it had. Older pages load on request. Its empty
+state is *"No changes yet"*, and a failed load says so rather than posing as
+an empty history.
 
 The signed-in root, `/`, is not an application screen, but it now recognises
 you. The public root reads a synchronous session hint — set only when a

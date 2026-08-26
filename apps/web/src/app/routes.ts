@@ -28,6 +28,7 @@ export interface HubEntry extends RouteEntry {
 export const ROUTES = {
   today: { path: '/today', label: 'Today', glyph: 'today', hub: 'today', end: true },
   planner: { path: '/today/planner', label: 'Planner', glyph: 'calendar', hub: 'today' },
+  ledger: { path: '/today/ledger', label: 'Ledger', glyph: 'journal', hub: 'today' },
 
   network: { path: '/network', label: 'Network', glyph: 'person', hub: 'network', end: true },
   people: { path: '/network/people', label: 'People', glyph: 'person', hub: 'network' },
@@ -152,7 +153,7 @@ export const HUBS: HubEntry[] = [
 ];
 
 export const WORKSPACE_NAV: Record<HubId, RouteEntry[]> = {
-  today: [ROUTES.today, ROUTES.planner],
+  today: [ROUTES.today, ROUTES.planner, ROUTES.ledger],
   network: [ROUTES.network, ROUTES.people, ROUTES.orgs, ROUTES.askPeople, ROUTES.intros],
   career: [
     ROUTES.career,

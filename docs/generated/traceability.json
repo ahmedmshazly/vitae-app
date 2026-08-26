@@ -2,8 +2,8 @@
   "generated_by": "scripts/docs/gen-traceability.mjs",
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
-    "files_scanned": 877,
-    "files_citing": 174,
+    "files_scanned": 881,
+    "files_citing": 179,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,11 +20,11 @@
   },
   "totals": {
     "registered": 131,
-    "citations": 753,
-    "implemented_and_tested": 20,
-    "implemented_untested": 59,
-    "tested_only": 2,
-    "documents_only": 50,
+    "citations": 762,
+    "implemented_and_tested": 22,
+    "implemented_untested": 60,
+    "tested_only": 3,
+    "documents_only": 46,
     "uncited": 0,
     "unregistered_identifiers": 0,
     "capabilities": 19,
@@ -665,7 +665,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:18",
-        "docs/specs/srs.md:1233"
+        "docs/specs/srs.md:1231"
       ]
     },
     "FR-CAP-008": {
@@ -738,7 +738,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:45",
+        "docs/ROADMAP.md:46",
         "docs/observatory/product/blueprint/index.md:49",
         "docs/observatory/product/blueprint/network.md:56",
         "docs/observatory/product/blueprint/network.md:110",
@@ -753,7 +753,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:45",
+        "docs/ROADMAP.md:46",
         "docs/observatory/product/blueprint/index.md:50",
         "docs/observatory/product/blueprint/network.md:101",
         "docs/observatory/product/blueprint/network.md:110",
@@ -769,7 +769,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:45",
+        "docs/ROADMAP.md:46",
         "docs/observatory/product/blueprint/network.md:64",
         "docs/observatory/product/blueprint/network.md:91",
         "docs/observatory/product/stories.md:186"
@@ -857,7 +857,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:21",
-        "docs/specs/srs.md:1233"
+        "docs/specs/srs.md:1231"
       ]
     },
     "FR-CON-006": {
@@ -914,7 +914,7 @@
         "docs/ROADMAP.md:22",
         "docs/observatory/product/blueprint/network.md:90",
         "docs/observatory/use/track-applications.md:23",
-        "docs/specs/srs.md:1238"
+        "docs/specs/srs.md:1236"
       ]
     },
     "FR-CON-009": {
@@ -954,7 +954,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:46",
+        "docs/ROADMAP.md:47",
         "docs/observatory/product/blueprint/career-and-resume.md:111",
         "docs/observatory/product/blueprint/explore.md:32",
         "docs/observatory/product/blueprint/index.md:50",
@@ -969,7 +969,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:46",
+        "docs/ROADMAP.md:47",
         "docs/observatory/product/blueprint/career-and-resume.md:101",
         "docs/observatory/product/blueprint/career-and-resume.md:111",
         "docs/observatory/product/blueprint/index.md:50",
@@ -1005,7 +1005,7 @@
         "docs/ROADMAP.md:52",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
         "docs/observatory/meta/coverage-and-contradictions.md:724",
-        "docs/specs/srs.md:1239"
+        "docs/specs/srs.md:1237"
       ]
     },
     "FR-EXP-013": {
@@ -1019,7 +1019,7 @@
         "docs/ROADMAP.md:52",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
         "docs/observatory/meta/coverage-and-contradictions.md:724",
-        "docs/specs/srs.md:1240"
+        "docs/specs/srs.md:1238"
       ]
     },
     "FR-IMP-001": {
@@ -1033,7 +1033,7 @@
         "docs/ROADMAP.md:24",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
         "docs/observatory/use/import-and-export.md:24",
-        "docs/specs/srs.md:1234"
+        "docs/specs/srs.md:1232"
       ]
     },
     "FR-IMP-002": {
@@ -1047,7 +1047,7 @@
         "docs/ROADMAP.md:24",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
         "docs/observatory/use/import-and-export.md:24",
-        "docs/specs/srs.md:1234"
+        "docs/specs/srs.md:1232"
       ]
     },
     "FR-IMP-003": {
@@ -1060,7 +1060,7 @@
       "documents": [
         "docs/ROADMAP.md:24",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
-        "docs/specs/srs.md:1234"
+        "docs/specs/srs.md:1232"
       ]
     },
     "FR-IMP-004": {
@@ -1073,7 +1073,7 @@
       "documents": [
         "docs/ROADMAP.md:24",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
-        "docs/specs/srs.md:1234"
+        "docs/specs/srs.md:1232"
       ]
     },
     "FR-IMP-005": {
@@ -1086,7 +1086,7 @@
       "documents": [
         "docs/ROADMAP.md:24",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
-        "docs/specs/srs.md:1234"
+        "docs/specs/srs.md:1232"
       ]
     },
     "FR-IMP-006": {
@@ -1099,7 +1099,7 @@
       "documents": [
         "docs/ROADMAP.md:24",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
-        "docs/specs/srs.md:1234"
+        "docs/specs/srs.md:1232"
       ]
     },
     "FR-ORG-001": {
@@ -1111,7 +1111,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:19",
-        "docs/specs/srs.md:1235"
+        "docs/specs/srs.md:1233"
       ]
     },
     "FR-ORG-002": {
@@ -1155,7 +1155,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:19",
-        "docs/specs/srs.md:1235"
+        "docs/specs/srs.md:1233"
       ]
     },
     "FR-ORG-008": {
@@ -1169,18 +1169,20 @@
         "docs/ROADMAP.md:25",
         "docs/observatory/product/blueprint/data-import-export.md:45",
         "docs/observatory/product/stories.md:96",
-        "docs/specs/srs.md:1240"
+        "docs/specs/srs.md:1238"
       ]
     },
     "FR-PROV-001": {
       "capability": "CAP-PROV",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
-      "evidence": "documents-only",
-      "sources": [],
+      "evidence": "implemented-untested",
+      "sources": [
+        "apps/web/src/routes/Record.tsx:203"
+      ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:47",
+        "docs/ROADMAP.md:30",
         "docs/observatory/product/blueprint/capture-and-search.md:34",
         "docs/observatory/product/blueprint/capture-and-search.md:67",
         "docs/observatory/product/blueprint/career-and-resume.md:46",
@@ -1189,41 +1191,52 @@
         "docs/observatory/product/blueprint/index.md:53",
         "docs/observatory/product/blueprint/network.md:61",
         "docs/observatory/product/blueprint/network.md:76",
-        "docs/observatory/product/blueprint/record-and-collections.md:31",
-        "docs/observatory/product/blueprint/record-and-collections.md:49",
+        "docs/observatory/product/blueprint/record-and-collections.md:35",
+        "docs/observatory/product/blueprint/record-and-collections.md:54",
         "docs/observatory/product/blueprint/today-and-planner.md:56",
         "docs/observatory/product/stories.md:148"
       ]
     },
     "FR-PROV-002": {
       "capability": "CAP-PROV",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
-      "evidence": "documents-only",
-      "sources": [],
-      "tests": [],
+      "evidence": "implemented-and-tested",
+      "sources": [
+        "apps/api/src/db/repository.ts:623",
+        "apps/api/src/routes/v1/ledger.ts:8",
+        "apps/web/src/routes/Ledger.tsx:58"
+      ],
+      "tests": [
+        "e2e/tests/ledger.spec.ts:8"
+      ],
       "documents": [
-        "docs/ROADMAP.md:47",
+        "docs/ROADMAP.md:30",
         "docs/observatory/product/blueprint/data-import-export.md:39",
         "docs/observatory/product/blueprint/explore.md:52",
         "docs/observatory/product/blueprint/index.md:49",
         "docs/observatory/product/blueprint/today-and-planner.md:35",
         "docs/observatory/product/blueprint/today-and-planner.md:46",
-        "docs/observatory/product/blueprint/today-and-planner.md:68"
+        "docs/observatory/product/blueprint/today-and-planner.md:69"
       ]
     },
     "FR-PROV-003": {
       "capability": "CAP-PROV",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
-      "evidence": "documents-only",
-      "sources": [],
-      "tests": [],
+      "evidence": "implemented-and-tested",
+      "sources": [
+        "apps/web/src/routes/Record.tsx:67",
+        "apps/web/src/routes/Record.tsx:393"
+      ],
+      "tests": [
+        "e2e/tests/ledger.spec.ts:10"
+      ],
       "documents": [
-        "docs/ROADMAP.md:47",
-        "docs/observatory/product/blueprint/record-and-collections.md:35",
+        "docs/ROADMAP.md:30",
+        "docs/observatory/product/blueprint/record-and-collections.md:40",
         "docs/observatory/product/blueprint/today-and-planner.md:46",
-        "docs/observatory/product/blueprint/today-and-planner.md:68"
+        "docs/observatory/product/blueprint/today-and-planner.md:69"
       ]
     },
     "FR-RES-001": {
@@ -1235,7 +1248,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:26",
-        "docs/specs/srs.md:1235"
+        "docs/specs/srs.md:1233"
       ]
     },
     "FR-RES-002": {
@@ -1248,7 +1261,7 @@
       "documents": [
         "docs/ROADMAP.md:26",
         "docs/observatory/meta/coverage-and-contradictions.md:714",
-        "docs/specs/srs.md:1235"
+        "docs/specs/srs.md:1233"
       ]
     },
     "FR-RES-003": {
@@ -1261,7 +1274,7 @@
       "documents": [
         "docs/ROADMAP.md:26",
         "docs/observatory/meta/coverage-and-contradictions.md:714",
-        "docs/specs/srs.md:1235"
+        "docs/specs/srs.md:1233"
       ]
     },
     "FR-RES-004": {
@@ -1405,7 +1418,7 @@
       "documents": [
         "docs/ROADMAP.md:26",
         "docs/observatory/meta/coverage-and-contradictions.md:714",
-        "docs/specs/srs.md:1235"
+        "docs/specs/srs.md:1233"
       ]
     },
     "FR-RES-011": {
@@ -1516,7 +1529,7 @@
       "documents": [
         "docs/ROADMAP.md:26",
         "docs/observatory/meta/coverage-and-contradictions.md:714",
-        "docs/specs/srs.md:1236"
+        "docs/specs/srs.md:1234"
       ]
     },
     "FR-RES-017": {
@@ -1529,7 +1542,7 @@
       "documents": [
         "docs/ROADMAP.md:26",
         "docs/observatory/meta/coverage-and-contradictions.md:714",
-        "docs/specs/srs.md:1236"
+        "docs/specs/srs.md:1234"
       ]
     },
     "FR-RES-018": {
@@ -1860,7 +1873,7 @@
         "docs/observatory/meta/coverage-and-contradictions.md:425",
         "docs/observatory/meta/coverage-and-contradictions.md:428",
         "docs/observatory/meta/coverage-and-contradictions.md:718",
-        "docs/specs/srs.md:1184"
+        "docs/specs/srs.md:1182"
       ]
     },
     "NFR-A11Y-002": {
@@ -1873,7 +1886,7 @@
       "documents": [
         "docs/observatory/product/blueprint/network.md:112",
         "docs/observatory/product/blueprint/today-and-planner.md:47",
-        "docs/specs/srs.md:1187"
+        "docs/specs/srs.md:1185"
       ]
     },
     "NFR-COMP-001": {
@@ -1887,7 +1900,7 @@
         "docs/ROADMAP.md:28",
         "docs/observatory/product/blueprint/public-and-marketing.md:63",
         "docs/observatory/product/stories.md:171",
-        "docs/specs/srs.md:1190"
+        "docs/specs/srs.md:1188"
       ]
     },
     "NFR-COMP-002": {
@@ -1902,7 +1915,7 @@
         "docs/observatory/product/blueprint/career-and-resume.md:113",
         "docs/observatory/product/stories.md:133",
         "docs/observatory/product/stories.md:151",
-        "docs/specs/srs.md:1192"
+        "docs/specs/srs.md:1190"
       ]
     },
     "NFR-MNT-002": {
@@ -1919,7 +1932,7 @@
         "docs/observatory/architecture/system-overview.md:21",
         "docs/observatory/develop/where-to-change.md:168",
         "docs/observatory/meta/coverage-and-contradictions.md:714",
-        "docs/specs/srs.md:1193"
+        "docs/specs/srs.md:1191"
       ]
     },
     "NFR-MNT-003": {
@@ -1931,7 +1944,7 @@
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:15",
-        "docs/specs/srs.md:1195"
+        "docs/specs/srs.md:1193"
       ]
     },
     "NFR-OPS-001": {
@@ -1944,7 +1957,7 @@
       "documents": [
         "docs/ROADMAP.md:52",
         "docs/observatory/meta/coverage-and-contradictions.md:724",
-        "docs/specs/srs.md:1197"
+        "docs/specs/srs.md:1195"
       ]
     },
     "NFR-OPS-002": {
@@ -1962,7 +1975,7 @@
         "docs/observatory/product/blueprint/index.md:47",
         "docs/observatory/product/blueprint/settings-and-system.md:58",
         "docs/observatory/product/stories.md:171",
-        "docs/specs/srs.md:1199"
+        "docs/specs/srs.md:1197"
       ]
     },
     "NFR-PERF-001": {
@@ -1973,7 +1986,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/specs/srs.md:1201"
+        "docs/specs/srs.md:1199"
       ]
     },
     "NFR-PERF-002": {
@@ -1985,7 +1998,7 @@
       "tests": [],
       "documents": [
         "docs/observatory/product/blueprint/explore.md:44",
-        "docs/specs/srs.md:1203"
+        "docs/specs/srs.md:1201"
       ]
     },
     "NFR-PRIV-001": {
@@ -2049,22 +2062,24 @@
         "docs/observatory/product/blueprint/data-import-export.md:38",
         "docs/observatory/product/stories.md:91",
         "docs/observatory/product/stories.md:205",
-        "docs/specs/srs.md:1204"
+        "docs/specs/srs.md:1202"
       ]
     },
     "NFR-REL-004": {
       "capability": "CAP-PLATFORM",
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
-      "evidence": "documents-only",
+      "evidence": "tested-only",
       "sources": [],
-      "tests": [],
+      "tests": [
+        "apps/web/src/routes/Ledger.states.test.tsx:3"
+      ],
       "documents": [
         "docs/observatory/product/blueprint/capture-and-search.md:80",
         "docs/observatory/product/blueprint/network.md:112",
-        "docs/observatory/product/blueprint/record-and-collections.md:42",
-        "docs/observatory/product/blueprint/today-and-planner.md:78",
-        "docs/specs/srs.md:1206"
+        "docs/observatory/product/blueprint/record-and-collections.md:47",
+        "docs/observatory/product/blueprint/today-and-planner.md:79",
+        "docs/specs/srs.md:1204"
       ]
     },
     "NFR-SEC-001": {
@@ -2188,7 +2203,7 @@
       "tests": [],
       "documents": [
         "docs/specs/merge-plan.md:3",
-        "docs/specs/srs.md:1236"
+        "docs/specs/srs.md:1234"
       ]
     }
   },
@@ -2394,6 +2409,7 @@
       "FR-002",
       "FR-005",
       "FR-104",
+      "FR-PROV-002",
       "NFR-REL-003"
     ],
     "apps/api/src/db/search-index.ts": [
@@ -2486,6 +2502,9 @@
       "FR-CON-002",
       "FR-CON-003",
       "FR-CON-009"
+    ],
+    "apps/api/src/routes/v1/ledger.ts": [
+      "FR-PROV-002"
     ],
     "apps/api/src/routes/v1/letters.integration.test.ts": [
       "FR-RES-020"
@@ -2695,6 +2714,16 @@
     ],
     "apps/web/src/routes/ImportHub.tsx": [
       "FR-023"
+    ],
+    "apps/web/src/routes/Ledger.states.test.tsx": [
+      "NFR-REL-004"
+    ],
+    "apps/web/src/routes/Ledger.tsx": [
+      "FR-PROV-002"
+    ],
+    "apps/web/src/routes/Record.tsx": [
+      "FR-PROV-001",
+      "FR-PROV-003"
     ],
     "apps/web/src/routes/SearchResults.tsx": [
       "FR-ORG-005",
@@ -3265,6 +3294,10 @@
     ],
     "docs/testing/e2e-review-2026-08-25.md": [
       "FR-016"
+    ],
+    "e2e/tests/ledger.spec.ts": [
+      "FR-PROV-002",
+      "FR-PROV-003"
     ],
     "eslint.config.js": [
       "NFR-MNT-002",

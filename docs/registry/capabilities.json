@@ -161,13 +161,18 @@
       "id": "CAP-PROV",
       "title": "Provenance and change history",
       "summary": "Surfacing what every record already carries: where a fact came from, how confident it is, and what changed since the operator last looked, over the in-transaction revision history.",
-      "status": "planned",
-      "surfaces": [],
-      "evidence": [
-        "docs/ROADMAP.md",
-        "PRODUCT.md"
+      "status": "implemented",
+      "surfaces": [
+        "/today/ledger",
+        "/n/:id"
       ],
-      "note": "Planned under ADR 0007. Source, source reference, and confidence ship on every envelope, and every mutation writes a revision with a stored diff; the surfaces that would show them do not exist yet."
+      "evidence": [
+        "apps/api/src/routes/v1/ledger.ts",
+        "apps/web/src/routes/Ledger.tsx",
+        "apps/web/src/routes/Record.tsx",
+        "docs/ROADMAP.md"
+      ],
+      "note": "Registered as intent under ADR 0007 and shipped in the same cycle. The source-and-confidence chip predated the capability as a design-system primitive; the Ledger feed, the field-level history diffs, and the source reference on the record are what the capability added."
     },
     {
       "id": "CAP-RESUME",

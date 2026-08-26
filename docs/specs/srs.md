@@ -534,31 +534,29 @@ Status: implemented · Evidence: cited by documents only · Provenance: reconstr
 
 `CAP-PROV` · Surfacing what every record already carries: where a fact came from, how confident it is, and what changed since the operator last looked, over the in-transaction revision history.
 
-**Status: planned.** Planned under ADR 0007. Source, source reference, and confidence ship on every envelope, and every mutation writes a revision with a stored diff; the surfaces that would show them do not exist yet.
-
 #### FR-PROV-001 — Provenance is visible on the record
 
 Every record surface must be able to show where a fact came from — source, source reference, and confidence — as inspectable provenance rather than hidden columns, and provenance must be filterable wherever records are searched.
 
-Status: planned · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+Status: implemented · Evidence: cited by source · Provenance: reconstructed, confirmed
 
-> Authored 2026-08-26 as a product decision under ADR 0007. The fields ship on every envelope and the search grammar already filters on source; the record surfaces do not yet present them.
+> Authored 2026-08-26 as a product decision under ADR 0007, and corrected the same day: the first note claimed the surfaces did not present provenance, which undersold shipped reality — the source-and-confidence chip was already a design-system primitive on eight screens. What was genuinely missing, the source reference, now renders on the record header beside the chip, and the search grammar filters on source. The chip predates this identifier; the reference cites it in apps/web/src/routes/Record.tsx.
 
 #### FR-PROV-002 — The ledger answers what changed
 
 A ledger must answer what changed since the operator last looked: a reverse-chronological feed over the revision history, each entry naming the operation and linking to its record and its diff.
 
-Status: planned · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
-> Authored 2026-08-26 as a product decision under ADR 0007. Every mutation already writes a revision carrying snapshot, diff, operation, and source in the same transaction; the feed is a read surface over what exists.
+> Authored 2026-08-26 as a product decision under ADR 0007 and shipped the same day: apps/api/src/routes/v1/ledger.ts reads the feed, apps/web/src/routes/Ledger.tsx presents it under the Today hub, and entries label themselves from their stored snapshots so deleted records keep their names. The revision substrate predates the surface by design.
 
 #### FR-PROV-003 — History opens into field-level diffs
 
 A record's history must open into field-level diffs between revisions — what changed, from what, to what — not only a count of revision ticks.
 
-Status: planned · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
-> Authored 2026-08-26 as a product decision under ADR 0007. The stored revision rows already carry the field diff.
+> Authored 2026-08-26 as a product decision under ADR 0007 and shipped the same day: the record screen's history rows disclose the stored field diff — a row with changes unfolds, a row without stays a row. The diffs were in the revision rows all along.
 
 ### Resume evidence and tailoring
 
@@ -1098,7 +1096,7 @@ Status: implemented · Evidence: cited by documents only · Provenance: reconstr
 
 Every failed mutation must surface to the operator: a global handler guarantees an error report whenever no local handler takes responsibility, and loading, empty, over-filtered, and failed must be four distinct presentations on every surface. A failed load must never render as an empty list.
 
-Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+Status: implemented · Evidence: cited by tests only · Provenance: reconstructed, confirmed
 
 > Authored 2026-08-26 as a product decision under ADR 0007. Enforced by the mutation-cache error net in apps/web/src/main.tsx and by the feedback grammar the end-to-end suite asserts screen by screen — the four-state distinction is its most-tested invariant; the enforcing code does not cite this identifier, so the attribution is recorded here.
 

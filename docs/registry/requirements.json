@@ -791,10 +791,10 @@
       "kind": "functional",
       "title": "Provenance is visible on the record",
       "statement": "Every record surface must be able to show where a fact came from — source, source reference, and confidence — as inspectable provenance rather than hidden columns, and provenance must be filterable wherever records are searched.",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
-      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. The fields ship on every envelope and the search grammar already filters on source; the record surfaces do not yet present them."
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007, and corrected the same day: the first note claimed the surfaces did not present provenance, which undersold shipped reality — the source-and-confidence chip was already a design-system primitive on eight screens. What was genuinely missing, the source reference, now renders on the record header beside the chip, and the search grammar filters on source. The chip predates this identifier; the reference cites it in apps/web/src/routes/Record.tsx."
     },
     {
       "id": "FR-PROV-002",
@@ -802,10 +802,10 @@
       "kind": "functional",
       "title": "The ledger answers what changed",
       "statement": "A ledger must answer what changed since the operator last looked: a reverse-chronological feed over the revision history, each entry naming the operation and linking to its record and its diff.",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
-      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. Every mutation already writes a revision carrying snapshot, diff, operation, and source in the same transaction; the feed is a read surface over what exists."
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007 and shipped the same day: apps/api/src/routes/v1/ledger.ts reads the feed, apps/web/src/routes/Ledger.tsx presents it under the Today hub, and entries label themselves from their stored snapshots so deleted records keep their names. The revision substrate predates the surface by design."
     },
     {
       "id": "FR-PROV-003",
@@ -813,10 +813,10 @@
       "kind": "functional",
       "title": "History opens into field-level diffs",
       "statement": "A record's history must open into field-level diffs between revisions — what changed, from what, to what — not only a count of revision ticks.",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
-      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. The stored revision rows already carry the field diff."
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007 and shipped the same day: the record screen's history rows disclose the stored field diff — a row with changes unfolds, a row without stays a row. The diffs were in the revision rows all along."
     },
     {
       "id": "FR-RES-001",

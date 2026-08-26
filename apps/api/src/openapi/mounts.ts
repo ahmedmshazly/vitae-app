@@ -37,6 +37,7 @@ export const V1_MOUNT_PREFIXES = [
   '/map',
   '/places',
   '/views',
+  '/ledger',
   '/imports',
   '/duplicates',
   '/retention',

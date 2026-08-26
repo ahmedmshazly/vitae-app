@@ -2,18 +2,18 @@
   "generated_by": "scripts/docs/gen-api.mjs",
   "note": "Derived from the Express routers, not from docs/api/openapi.json. Do not edit by hand.",
   "totals": {
-    "endpoints": 137,
-    "mounts": 34,
-    "declared_mount_prefixes": 34,
+    "endpoints": 138,
+    "mounts": 35,
+    "declared_mount_prefixes": 35,
     "public_endpoints": 3,
     "outside_auth_gate": 3,
     "blocked_when_read_only": 70,
-    "documented_in_openapi": 47,
+    "documented_in_openapi": 48,
     "undocumented_in_openapi": 90,
-    "openapi_operations": 53,
+    "openapi_operations": 54,
     "documented_but_not_registered": 6,
-    "endpoints_with_tests": 130,
-    "endpoints_citing_requirements": 28
+    "endpoints_with_tests": 131,
+    "endpoints_citing_requirements": 29
   },
   "gates": {
     "auth": "/api",
@@ -122,6 +122,12 @@
       "router": "introsRouter",
       "source": "apps/api/src/routes/v1/intros.ts",
       "endpoints": 2
+    },
+    {
+      "prefix": "/ledger",
+      "router": "ledgerRouter",
+      "source": "apps/api/src/routes/v1/ledger.ts",
+      "endpoints": 1
     },
     {
       "prefix": "/letters",
@@ -1950,6 +1956,31 @@
         "apps/api/src/routes/v1/intros.integration.test.ts"
       ],
       "openapi": false
+    },
+    {
+      "id": "GET /api/v1/ledger",
+      "slug": "get-api-v1-ledger",
+      "method": "GET",
+      "path": "/api/v1/ledger",
+      "express_path": "/api/v1/ledger",
+      "mount": "/ledger",
+      "source": "apps/api/src/routes/v1/ledger.ts:15",
+      "summary": "What changed since the operator last looked (SRS FR-PROV-002). Every mutation already writes a revision in the same transaction; this reads that history back as a feed. Each entry names the operation, the subject, and the fields its diff touched, and labels itself from its own snapshot — a stored title cannot go stale the way a join against the live record can, and it still names records that have since been deleted.",
+      "requirements": [
+        "FR-PROV-002"
+      ],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/ledger.integration.test.ts"
+      ],
+      "openapi": true
     },
     {
       "id": "GET /api/v1/letters",

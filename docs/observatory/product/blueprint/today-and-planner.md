@@ -57,8 +57,9 @@ surface gains (FR-PROV-001).
 
 ## The Ledger — ADD, under Today
 
-**Verdict: ADD.** Route under the Today hub; reachable from the "since you
-were away" strip and the workspace strip.
+**Verdict: ADD — delivered 2026-08-26** at `/today/ledger`, in the workspace
+strip and the palette. The "since you were away" strip on Today remains the
+open half of this page's SHARPEN verdict.
 
 The system writes a complete, in-transaction revision history for every
 mutation and then never shows it. The Ledger is that history as a surface: a

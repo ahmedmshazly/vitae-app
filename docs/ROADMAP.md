@@ -27,6 +27,7 @@ canonical registered spellings; the register itself is
 | Career tracking      | Application graph records, pipeline overview, linked posting/target/résumé/company/referrer/interview context, and application dossiers                                                        | FR-CAR-001, FR-CAR-002, FR-CAR-004 |
 | Export               | JSONL + Markdown vault + checksummed manifest ZIP                                                                                                                                              | FR-EXP-010, NFR-COMP-001         |
 | Ops                  | /status health page; Cloudinary storage adapter; Tectonic build service w/ graceful fallback                                                                                                   | FR-SET-006, NFR-SEC-002/003      |
+| Provenance & history | Source+confidence chips across surfaces, the source reference on the record header, the Ledger feed under Today, and field-level diffs in record history                                        | FR-PROV-001, FR-PROV-002, FR-PROV-003 |
 
 ## The algorithms (the "science"): all unit-tested
 
@@ -44,7 +45,6 @@ line of code. Statuses live in the register; this table is the reader's map.
 | ---- | ----------------- | --- |
 | Correspondence intelligence | Per-person correspondence profile (reciprocity, reply latency, unanswered inbound, contact days); network rollup naming dormant-but-once-strong ties and brokers; introductions as first-class facts | FR-COMM-001, FR-COMM-002, FR-COMM-003 |
 | Evidence dossiers | Single-subject evidence packets with a provenance appendix; audience templates for a promotion review, a petition exhibit list, a clearance history | FR-DOS-001, FR-DOS-002 |
-| Provenance & the ledger | Source/confidence visible on record surfaces; a what-changed feed over revisions; field-level diffs in history | FR-PROV-001, FR-PROV-002, FR-PROV-003 |
 | Longitudinal imports | Field-level update proposals on identity-key matches; re-import that counts created/updated/unchanged/skipped | FR-SYNC-001, FR-SYNC-002 |
 | Career writes | First-class application endpoints validating the status machine | FR-CAR-003 |
 | Letters | LaTeX/PDF compile parity with résumés (authoring UI already ships) | FR-RES-021, FR-RES-020 |

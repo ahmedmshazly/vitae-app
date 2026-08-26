@@ -102,10 +102,10 @@
           "range": "^3.24.1"
         }
       ],
-      "source_files": 107,
-      "test_files": 53,
-      "source_lines": 19768,
-      "exports": 368,
+      "source_files": 108,
+      "test_files": 54,
+      "source_lines": 19846,
+      "exports": 369,
       "dependents": [],
       "imported_by": [],
       "unused_manifest_deps": [],
@@ -210,10 +210,10 @@
           "range": "^3.24.1"
         }
       ],
-      "source_files": 172,
-      "test_files": 159,
-      "source_lines": 46543,
-      "exports": 741,
+      "source_files": 173,
+      "test_files": 160,
+      "source_lines": 46773,
+      "exports": 744,
       "dependents": [],
       "imported_by": [],
       "unused_manifest_deps": [],
@@ -489,7 +489,7 @@
       "dev_depends_on": [],
       "external_dependencies": [],
       "source_files": 0,
-      "test_files": 57,
+      "test_files": 58,
       "source_lines": 0,
       "exports": 0,
       "dependents": [],
@@ -652,9 +652,9 @@
   ],
   "summary": {
     "packages": 8,
-    "source_files": 348,
-    "test_files": 322,
-    "source_lines": 79195,
+    "source_files": 350,
+    "test_files": 325,
+    "source_lines": 79503,
     "layers": 2,
     "cyclic": [],
     "workspace_typecheck": {

@@ -618,6 +618,27 @@ export class Repository {
     await this.writeRevision(tx, args.kind, args.id, args.rev, args.op, args.snapshot, args.diff, args.source, args.actor);
   }
 
+  /**
+   * The ledger: the newest revisions across every record, one page at a time
+   * (SRS FR-PROV-002). `before` pages by the ISO timestamp the previous page
+   * ended on, with id as the tiebreak so a page boundary cannot drop or
+   * repeat an entry written in the same millisecond.
+   */
+  async ledger(limit: number, before?: string): Promise<Array<Record<string, unknown>>> {
+    let q = db
+      .selectFrom('revisions')
+      .select('data')
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId);
+    if (before) q = q.where(sql<boolean>`data->>'at' < ${before}`);
+    const rows = await q
+      .orderBy(sql`data->>'at'`, 'desc')
+      .orderBy('id', 'desc')
+      .limit(limit)
+      .execute();
+    return rows.map((r) => r.data as Record<string, unknown>);
+  }
+
   async revisionsFor(subjectId: string): Promise<Array<Record<string, unknown>>> {
     const rows = await db
       .selectFrom('revisions')

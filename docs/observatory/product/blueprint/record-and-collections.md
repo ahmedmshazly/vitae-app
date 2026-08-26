@@ -26,15 +26,20 @@ screen in the product: improving it improves nineteen types at once.
 Stays: labelled properties, notes, the connections editor, pin with rollback,
 delete to trash, per-section failure isolation.
 
-Elevations, both reading data every record already carries:
+Elevations, both reading data every record already carries — and both
+**delivered 2026-08-26** (an honesty note: the source-and-confidence chip
+turned out to predate this blueprint as a design-system primitive on eight
+screens; what the elevation genuinely added was the source reference and the
+diffs):
 
-- **A provenance header** (FR-PROV-001): source, source reference, and
-  confidence as first-class chips — *this came from the 2026-03 LinkedIn
-  import, confidence 0.8* — with the source linking to its batch where one
-  exists. For P3 this is the difference between a note and an exhibit.
-- **History opens** (FR-PROV-003): the revision ticks become entries; an
-  entry opens into its field-level diff — what changed, from what, to what,
-  by which operation. The stored revision rows already carry all of it.
+- **A provenance header** (FR-PROV-001): source and confidence as the
+  existing chip, now joined by the source reference — *which batch, which
+  upload, which sync this fact arrived in*. Linking the reference to its
+  import batch remains follow-on polish. For P3 this is the difference
+  between a note and an exhibit.
+- **History opens** (FR-PROV-003): revision rows with changes disclose their
+  field-level diff — what changed, from what, to what, by which operation.
+  The stored revision rows carried all of it all along.
 
 Acceptance: provenance renders on every type including the long-tail ones;
 a record with no stated source says so plainly rather than showing an empty

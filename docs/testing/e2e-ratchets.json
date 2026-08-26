@@ -9,9 +9,9 @@
     "Both suites count: e2e/tests runs against a self-hosted stack, e2e/cloud against the same stack with VITAE_CLOUD_ENABLED=true. They run as separate Playwright invocations because the flag breaks the first suite by design, but one set of rules governs both."
   ],
   "floors": {
-    "spec_files": 48,
-    "test_blocks": 275,
-    "expect_lines": 952
+    "spec_files": 49,
+    "test_blocks": 278,
+    "expect_lines": 961
   },
   "ceilings": {
     "sleeps": 3,

@@ -7,7 +7,7 @@
  * the header carries one tick per revision, which is the brand book's own
  * worked example of a rule that encodes something true.
  */
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -40,6 +40,7 @@ interface NodeFull {
   props: Record<string, unknown>;
   notes_md: string;
   source: string;
+  source_ref?: string;
   confidence: number;
   pinned: boolean;
   created_at: string;
@@ -63,6 +64,8 @@ interface Revision {
   at: string;
   rev: number;
   source?: string;
+  /** Field-level changes the write recorded, `{field: {from, to}}` (FR-PROV-003). */
+  diff?: Record<string, { from: unknown; to: unknown }>;
 }
 
 /** More ticks than this stops reading as a scale and starts reading as noise. */
@@ -196,6 +199,13 @@ export function Record() {
         actions={
           <>
             <ProvenanceChip source={node.source} confidence={node.confidence} />
+            {node.source_ref && (
+              // The reference completes the provenance story (FR-PROV-001):
+              // which batch, which upload, which sync this fact arrived in.
+              <Mono className="text-xs text-faint" title="Source reference">
+                {node.source_ref}
+              </Mono>
+            )}
             {!node.deleted_at && (
               <>
                 {isNodeType(node.type) && (
@@ -364,18 +374,54 @@ export function Record() {
               <p className="text-sm text-muted">No revisions retained for this record.</p>
             ) : (
               <ul className="m-0 list-none p-0">
-                {revisions.map((r) => (
-                  <li
-                    key={r.rev}
-                    className="flex min-h-9 items-center gap-3 border-b border-hairline py-2 last:border-b-0"
-                  >
-                    <Chip mono>{r.op}</Chip>
-                    {r.source && <span className="text-sm text-muted">{r.source}</span>}
-                    <Mono className="ml-auto text-xs text-faint">
-                      {r.at.slice(0, 19).replace('T', ' ')}
-                    </Mono>
-                  </li>
-                ))}
+                {revisions.map((r) => {
+                  const fields = Object.entries(r.diff ?? {});
+                  const row = (
+                    <>
+                      <Chip mono>{r.op}</Chip>
+                      {r.source && <span className="text-sm text-muted">{r.source}</span>}
+                      {fields.length > 0 && (
+                        <span className="text-xs text-faint">
+                          {fields.length} field{fields.length === 1 ? '' : 's'}
+                        </span>
+                      )}
+                      <Mono className="ml-auto text-xs text-faint">
+                        {r.at.slice(0, 19).replace('T', ' ')}
+                      </Mono>
+                    </>
+                  );
+                  // History opens into what actually changed (FR-PROV-003):
+                  // the stored revision carries the field diff, so a row with
+                  // one is a disclosure, and a row without one stays a row.
+                  return (
+                    <li key={r.rev} className="border-b border-hairline last:border-b-0">
+                      {fields.length > 0 ? (
+                        <details className="record-history__entry">
+                          <summary className="flex min-h-9 cursor-pointer list-none items-center gap-3 py-2">
+                            {row}
+                          </summary>
+                          <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 pb-2 pl-1 text-sm">
+                            {fields.map(([field, change]) => (
+                              <Fragment key={field}>
+                                <dt className="text-muted">{humanizeKey(field)}</dt>
+                                <dd className="m-0">
+                                  {change.from != null && change.from !== '' && (
+                                    <>
+                                      <s className="text-faint">{formatVal(change.from)}</s>{' '}
+                                    </>
+                                  )}
+                                  <span>{formatVal(change.to)}</span>
+                                </dd>
+                              </Fragment>
+                            ))}
+                          </dl>
+                        </details>
+                      ) : (
+                        <div className="flex min-h-9 items-center gap-3 py-2">{row}</div>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </Section>

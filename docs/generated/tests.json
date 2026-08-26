@@ -717,6 +717,28 @@
       "lines": 132
     },
     {
+      "file": "apps/api/src/routes/v1/ledger.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "ledger route"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [
+        "FR-PROV-002"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 64
+    },
+    {
       "file": "apps/api/src/routes/v1/letters.integration.test.ts",
       "package": "@vitae/api",
       "cases": 1,
@@ -3486,6 +3508,28 @@
       "lines": 110
     },
     {
+      "file": "apps/web/src/routes/Ledger.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Ledger states"
+      ],
+      "subjects": [
+        "./Ledger.js"
+      ],
+      "requirements": [
+        "NFR-REL-004"
+      ],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 87
+    },
+    {
       "file": "apps/web/src/routes/Letters.states.test.tsx",
       "package": "@vitae/web",
       "cases": 5,
@@ -5081,6 +5125,30 @@
       ],
       "run_in_ci": true,
       "lines": 69
+    },
+    {
+      "file": "e2e/tests/ledger.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/api",
+        "./helpers/auth",
+        "./helpers/fixtures"
+      ],
+      "requirements": [
+        "FR-PROV-002",
+        "FR-PROV-003"
+      ],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 60
     },
     {
       "file": "e2e/tests/letters.spec.ts",
@@ -6866,23 +6934,23 @@
     }
   ],
   "summary": {
-    "files": 322,
-    "cases": 2106,
+    "files": 325,
+    "cases": 2118,
     "skipped": 0,
     "todo": 0,
     "by_package": {
-      "@vitae/api": 213,
-      "@vitae/web": 1104,
-      "@vitae/e2e": 283,
+      "@vitae/api": 216,
+      "@vitae/web": 1110,
+      "@vitae/e2e": 286,
       "@vitae/core": 273,
       "@vitae/testkit": 7,
       "@vitae/ui": 226
     },
     "by_script": {
-      "test": 322,
-      "test:web": 159,
-      "test:e2e": 57,
-      "test:api": 53,
+      "test": 325,
+      "test:web": 160,
+      "test:e2e": 58,
+      "test:api": 54,
       "test:unit": 44,
       "test:coverage": 44,
       "test:core": 42,
@@ -6933,7 +7001,7 @@
       "e2e/tests/helpers/toast.ts"
     ],
     "with_skips": [],
-    "requirements_proven": 22,
+    "requirements_proven": 25,
     "requirements_unproven": [
       "FR-004",
       "FR-005",
@@ -6990,8 +7058,6 @@
       "FR-ORG-007",
       "FR-ORG-008",
       "FR-PROV-001",
-      "FR-PROV-002",
-      "FR-PROV-003",
       "FR-RES-001",
       "FR-RES-002",
       "FR-RES-003",
@@ -7039,7 +7105,6 @@
       "NFR-PRIV-002",
       "NFR-PRIV-003",
       "NFR-REL-003",
-      "NFR-REL-004",
       "NFR-SEC-001",
       "NFR-SEC-002",
       "NFR-SEC-003",

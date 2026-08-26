@@ -76,6 +76,13 @@ export function buildCommands({
       run: go(ROUTES.planner.path),
     },
     {
+      id: 'ledger',
+      label: 'Open the Ledger',
+      glyph: ROUTES.ledger.glyph,
+      keywords: 'changed history revisions activity what happened audit',
+      run: go(ROUTES.ledger.path),
+    },
+    {
       id: 'network',
       label: 'Open Network',
       glyph: ROUTES.network.glyph,
