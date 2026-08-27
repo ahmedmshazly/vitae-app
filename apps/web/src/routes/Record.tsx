@@ -25,6 +25,7 @@ import {
 } from '@vitae/ui';
 import { isNodeType } from '@vitae/core';
 import { api } from '../lib/api.js';
+import { fieldLabel } from '../lib/revision-fields.js';
 import { AddConnection } from '../features/forms/AddConnection.js';
 import { ConnectionRow } from '../features/forms/ConnectionRow.js';
 import { NodeFormDialog } from '../features/forms/NodeFormDialog.js';
@@ -403,7 +404,7 @@ export function Record() {
                           <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 pb-2 pl-1 text-sm">
                             {fields.map(([field, change]) => (
                               <Fragment key={field}>
-                                <dt className="text-muted">{humanizeKey(field)}</dt>
+                                <dt className="text-muted">{humanizeKey(fieldLabel(field))}</dt>
                                 <dd className="m-0">
                                   {change.from != null && change.from !== '' && (
                                     <>

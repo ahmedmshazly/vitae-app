@@ -216,13 +216,15 @@
     "apps/api/src/db/util.ts": {
       "risk": "medium",
       "layers": [
+        "unit",
         "integration"
       ],
-      "status": "deferred",
+      "status": "covered",
       "tests": [
+        "apps/api/src/db/util.test.ts",
         "apps/api/src/__tests__/api.integration.test.ts"
       ],
-      "note": "Covered by the monolith integration suite until route-focused splits land."
+      "note": "The revision diff is pinned directly; the rest of the module is still exercised through the monolith integration suite."
     },
     "apps/api/src/db/write-signal.ts": {
       "risk": "medium",

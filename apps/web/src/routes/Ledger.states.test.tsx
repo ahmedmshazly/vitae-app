@@ -77,6 +77,16 @@ describe('Ledger states', () => {
     expect(opLabel('restore')).toBe('restored');
     expect(opLabel('custom_op')).toBe('custom_op');
   });
+
+  it('shows which field a change touched, not just that props changed', async () => {
+    mockApi.get.mockResolvedValue({
+      entries: [{ ...ENTRY, changed: ['props.status', 'props.next_step'] }],
+      next_before: null,
+    });
+    renderWithApp(<Ledger />);
+    expect(await screen.findByText('status')).toBeInTheDocument();
+    expect(screen.getByText('next_step')).toBeInTheDocument();
+  });
 });
 
 vi.mock('../lib/auth.js', () => ({

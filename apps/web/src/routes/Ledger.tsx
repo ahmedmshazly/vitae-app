@@ -15,6 +15,7 @@ import {
   SkeletonRows,
 } from '@vitae/ui';
 import { api } from '../lib/api.js';
+import { fieldLabel } from '../lib/revision-fields.js';
 
 export interface LedgerEntry {
   id: string;
@@ -139,7 +140,7 @@ export function Ledger() {
                           ·{' '}
                           {entry.changed.slice(0, 4).map((field) => (
                             <Chip key={field} mono>
-                              {field}
+                              {fieldLabel(field)}
                             </Chip>
                           ))}
                           {entry.changed.length > 4 && (
