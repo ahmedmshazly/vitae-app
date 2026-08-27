@@ -85,6 +85,28 @@ export function canTransition(from: ApplicationStatus, to: ApplicationStatus): b
   return from === to || APPLICATION_STATUS_FLOW[from].includes(to);
 }
 
+/**
+ * What a writer says when it refuses a move.
+ *
+ * The sentence names the move, because an operator who hits a guard has to be
+ * able to tell which rule they hit without reading the source; "invalid status"
+ * would send them looking for a typo in a value that was spelled correctly.
+ * The second half names the door out. A status entered wrongly is corrected,
+ * not walked back, and a guard whose error does not mention that leaves the
+ * operator holding a record they can no longer fix.
+ *
+ * Only two kinds of move ever reach here, which is why two sentences cover it:
+ * from a closed record (nothing leaves an outcome) and backwards down the
+ * pipeline (every forward stage and every outcome is already permitted).
+ */
+export function illegalTransitionMessage(from: ApplicationStatus, to: ApplicationStatus): string {
+  const closed = (APPLICATION_OUTCOMES as readonly ApplicationStatus[]).includes(from);
+  const remedy = `If ${from} was recorded by mistake, correct the status instead of moving it.`;
+  return closed
+    ? `An application that was ${from} cannot move to ${to}. An outcome closes the record. ${remedy}`
+    : `An application at ${from} cannot move back to ${to}. The pipeline only runs forwards. ${remedy}`;
+}
+
 export const applicationEntityRefSchema = z.object({
   id: z.string(),
   type: z.string(),

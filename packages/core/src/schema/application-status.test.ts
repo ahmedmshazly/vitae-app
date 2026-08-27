@@ -16,6 +16,7 @@ import {
   APPLICATION_STATUS_FLOW,
   applicationStatusSchema,
   canTransition,
+  illegalTransitionMessage,
   type ApplicationStatus,
 } from './application.js';
 
@@ -91,5 +92,32 @@ describe('the application status machine', () => {
   it('names a destination for every status the enum can hold', () => {
     const mapped = Object.keys(APPLICATION_STATUS_FLOW) as ApplicationStatus[];
     expect(mapped.sort()).toEqual([...APPLICATION_STATUSES].sort());
+  });
+});
+
+describe('the sentence a refused move gets', () => {
+  it('names both ends of the move an operator just tried to make', () => {
+    expect(illegalTransitionMessage('rejected', 'screening')).toContain(
+      'An application that was rejected cannot move to screening',
+    );
+    expect(illegalTransitionMessage('interview', 'applied')).toContain(
+      'An application at interview cannot move back to applied',
+    );
+  });
+
+  it('states the rule that refused it, so the error explains itself', () => {
+    expect(illegalTransitionMessage('accepted', 'offer')).toContain('An outcome closes the record');
+    expect(illegalTransitionMessage('offer', 'draft')).toContain('The pipeline only runs forwards');
+  });
+
+  it('points at the correction, because a guard with no way out traps real data', () => {
+    for (const from of APPLICATION_STATUSES) {
+      for (const to of APPLICATION_STATUSES) {
+        if (canTransition(from, to)) continue;
+        expect(illegalTransitionMessage(from, to)).toContain(
+          `If ${from} was recorded by mistake, correct the status instead of moving it.`,
+        );
+      }
+    }
   });
 });

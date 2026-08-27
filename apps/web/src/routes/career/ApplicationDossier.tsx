@@ -17,6 +17,7 @@ import {
 } from '@vitae/ui';
 import { api } from '../../lib/api.js';
 import { EditApplicationButton } from './ApplicationActions.js';
+import { ApplicationStatusControl } from './ApplicationStatusControl.js';
 import {
   attentionLabel,
   nextMove,
@@ -90,6 +91,8 @@ export function ApplicationDossier() {
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1.45fr)_minmax(280px,0.75fr)]">
         <div className="min-w-0">
+          <ApplicationStatusControl id={application.id} status={application.status} />
+
           <section aria-labelledby="next-move-title" className="mb-8 border-y border-hairline py-5">
             <div className="mb-2 flex items-baseline justify-between gap-4">
               <h2 id="next-move-title" className="text-sm font-medium text-muted">

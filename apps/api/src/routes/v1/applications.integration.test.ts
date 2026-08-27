@@ -132,3 +132,251 @@ describe('application routes', () => {
       .expect(404);
   });
 });
+
+/**
+ * The write path (FR-CAR-003). Applications used to be creatable and editable
+ * only through the generic node API, which validates the status enum and
+ * nothing else, so a record could jump from draft straight to accepted and no
+ * server ever said otherwise.
+ */
+describe('application write endpoints', () => {
+  const create = async (
+    props: Record<string, unknown> = {},
+    body: Record<string, unknown> = {},
+  ) => {
+    const { app, token } = await getAuthedApp();
+    const res = await request(app)
+      .post('/api/v1/applications')
+      .set(authHeader(token))
+      .send({
+        title: `Guard fixture ${Date.now()}-${Math.random()}`,
+        props: { role_title: 'Staff Engineer', status: 'applied', ...props },
+        ...body,
+      })
+      .expect(201);
+    return applicationDetailResponseSchema.parse(res.body).application;
+  };
+
+  it('creates an application and answers with the dossier the next GET would give', async () => {
+    const { app, token } = await getAuthedApp();
+    const created = await create({ deadline: '2026-09-01' });
+    expect(created.status).toBe('applied');
+    expect(created.role_title).toBe('Staff Engineer');
+
+    const fetched = await request(app)
+      .get(`/api/v1/applications/${created.id}`)
+      .set(authHeader(token))
+      .expect(200);
+    expect(applicationDetailResponseSchema.parse(fetched.body).application).toEqual(created);
+  });
+
+  it('names the role title as the record title when the caller states it only once', async () => {
+    const { app, token } = await getAuthedApp();
+    const res = await request(app)
+      .post('/api/v1/applications')
+      .set(authHeader(token))
+      .send({ props: { role_title: 'Principal Engineer', status: 'draft' } })
+      .expect(201);
+    expect(applicationDetailResponseSchema.parse(res.body).application.title).toBe(
+      'Principal Engineer',
+    );
+  });
+
+  it('records an application that was already closed when it was entered', async () => {
+    // Logging a rejection you received last month is a fact, not a transition.
+    const created = await create({ status: 'rejected' });
+    expect(created.status).toBe('rejected');
+  });
+
+  it('refuses a create whose props the schema cannot accept, naming the field', async () => {
+    const { app, token } = await getAuthedApp();
+    const res = await request(app)
+      .post('/api/v1/applications')
+      .set(authHeader(token))
+      .send({ title: 'No status', props: { role_title: 'Staff Engineer' } })
+      .expect(422);
+    expect(
+      (res.body.error.details as Array<{ path: string }>).some((d) => d.path === 'props.status'),
+    ).toBe(true);
+  });
+
+  it('merges an edit onto stored props instead of replacing them', async () => {
+    const { app, token } = await getAuthedApp();
+    const created = await create({ deadline: '2026-09-01', salary_range: '$180k' });
+    const patched = await request(app)
+      .patch(`/api/v1/applications/${created.id}`)
+      .set(authHeader(token))
+      .send({ props: { next_step: 'Architecture interview' } })
+      .expect(200);
+    const application = applicationDetailResponseSchema.parse(patched.body).application;
+    expect(application.next_step).toBe('Architecture interview');
+    // The generic patch replaces props wholesale, which is how an edit that
+    // named one field used to erase the four it did not.
+    expect(application.role_title).toBe('Staff Engineer');
+    expect(application.salary_range).toBe('$180k');
+    expect(application.deadline).toBe('2026-09-01');
+  });
+
+  it('clears a field when the caller sends it as null', async () => {
+    const { app, token } = await getAuthedApp();
+    const created = await create({ deadline: '2026-09-01' });
+    const patched = await request(app)
+      .patch(`/api/v1/applications/${created.id}`)
+      .set(authHeader(token))
+      .send({ props: { deadline: null } })
+      .expect(200);
+    expect(applicationDetailResponseSchema.parse(patched.body).application.deadline).toBeNull();
+  });
+
+  it('puts a status moved by an edit through the same machine', async () => {
+    const { app, token } = await getAuthedApp();
+    const created = await create({ status: 'interview' });
+    const res = await request(app)
+      .patch(`/api/v1/applications/${created.id}`)
+      .set(authHeader(token))
+      .send({ props: { status: 'applied' } })
+      .expect(422);
+    expect(res.body.error.code).toBe('ILLEGAL_TRANSITION');
+    expect(res.body.error.message).toContain('An application at interview cannot move back');
+  });
+
+  it('records a forward move and reports both ends of what it recorded', async () => {
+    const { app, token } = await getAuthedApp();
+    const created = await create({ status: 'applied' });
+    const res = await request(app)
+      .post(`/api/v1/applications/${created.id}/status`)
+      .set(authHeader(token))
+      .send({ status: 'interview' })
+      .expect(200);
+    expect(res.body.transition).toEqual({
+      from: 'applied',
+      to: 'interview',
+      correction: false,
+      recorded: true,
+    });
+    expect(applicationDetailResponseSchema.parse(res.body).application.status).toBe('interview');
+  });
+
+  it('refuses to reopen a closed application, and the error alone explains why', async () => {
+    const { app, token } = await getAuthedApp();
+    const created = await create({ status: 'rejected' });
+    const res = await request(app)
+      .post(`/api/v1/applications/${created.id}/status`)
+      .set(authHeader(token))
+      .send({ status: 'screening' })
+      .expect(422);
+    expect(res.body.error.code).toBe('ILLEGAL_TRANSITION');
+    expect(res.body.error.message).toBe(
+      'An application that was rejected cannot move to screening. An outcome closes the record. If rejected was recorded by mistake, correct the status instead of moving it.',
+    );
+  });
+
+  it('lets a correction undo a status that was set wrongly in the first place', async () => {
+    const { app, token } = await getAuthedApp();
+    const created = await create({ status: 'applied' });
+    await request(app)
+      .post(`/api/v1/applications/${created.id}/status`)
+      .set(authHeader(token))
+      .send({ status: 'rejected' })
+      .expect(200);
+
+    const corrected = await request(app)
+      .post(`/api/v1/applications/${created.id}/status`)
+      .set(authHeader(token))
+      .send({ status: 'screening', correction: true })
+      .expect(200);
+    expect(corrected.body.transition).toMatchObject({
+      from: 'rejected',
+      to: 'screening',
+      correction: true,
+      recorded: true,
+    });
+    expect(applicationDetailResponseSchema.parse(corrected.body).application.status).toBe(
+      'screening',
+    );
+  });
+
+  it('leaves a correction distinguishable from a move in the history it writes', async () => {
+    const { app, token } = await getAuthedApp();
+    const created = await create({ status: 'applied' });
+    await request(app)
+      .post(`/api/v1/applications/${created.id}/status`)
+      .set(authHeader(token))
+      .send({ status: 'rejected' })
+      .expect(200);
+    await request(app)
+      .post(`/api/v1/applications/${created.id}/status`)
+      .set(authHeader(token))
+      .send({ status: 'offer', correction: true })
+      .expect(200);
+
+    const history = await request(app)
+      .get(`/api/v1/nodes/${created.id}/revisions`)
+      .set(authHeader(token))
+      .expect(200);
+    const revisions = history.body.revisions as Array<{
+      source: string;
+      diff?: Record<string, { from: unknown; to: unknown }>;
+    }>;
+    const move = revisions.find((r) => r.diff?.['props.status']?.to === 'rejected');
+    const correction = revisions.find((r) => r.diff?.['props.status']?.to === 'offer');
+    // Both changed the same field. Only the second says it was a mistake being
+    // fixed, and a history that could not tell them apart would be claiming the
+    // application had really passed through rejected.
+    expect(move?.source).toBe('manual');
+    expect(correction?.source).toBe('correction');
+    expect(correction?.diff?.['props.status']?.from).toBe('rejected');
+  });
+
+  it('writes nothing when a status is resubmitted as itself', async () => {
+    const { app, token } = await getAuthedApp();
+    const created = await create({ status: 'interview' });
+    const before = await request(app)
+      .get(`/api/v1/nodes/${created.id}/revisions`)
+      .set(authHeader(token))
+      .expect(200);
+
+    const res = await request(app)
+      .post(`/api/v1/applications/${created.id}/status`)
+      .set(authHeader(token))
+      .send({ status: 'interview' })
+      .expect(200);
+    expect(res.body.transition).toMatchObject({ recorded: false });
+
+    const after = await request(app)
+      .get(`/api/v1/nodes/${created.id}/revisions`)
+      .set(authHeader(token))
+      .expect(200);
+    expect(after.body.revisions).toHaveLength(before.body.revisions.length);
+  });
+
+  it('refuses a status the enum does not hold, before it ever reaches the machine', async () => {
+    const { app, token } = await getAuthedApp();
+    const created = await create();
+    await request(app)
+      .post(`/api/v1/applications/${created.id}/status`)
+      .set(authHeader(token))
+      .send({ status: 'ghosted' })
+      .expect(422);
+  });
+
+  it('will not write through an id that is not an application', async () => {
+    const { app, token } = await getAuthedApp();
+    const person = await request(app)
+      .post('/api/v1/nodes')
+      .set(authHeader(token))
+      .send({ type: 'person', title: `Not an application ${Date.now()}`, props: {} })
+      .expect(201);
+    const id = person.body.node.id as string;
+    await request(app)
+      .post(`/api/v1/applications/${id}/status`)
+      .set(authHeader(token))
+      .send({ status: 'applied' })
+      .expect(404);
+    await request(app)
+      .patch(`/api/v1/applications/${id}`)
+      .set(authHeader(token))
+      .send({ title: 'Renamed' })
+      .expect(404);
+  });
+});

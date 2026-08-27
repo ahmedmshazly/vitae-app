@@ -7,6 +7,7 @@ import { asyncHandler, HttpError } from '../../middleware/error.js';
 import { invalidateDuplicateScan } from '../../services/duplicates.js';
 import { loadGraph } from '../../services/resume-model.js';
 import { buildOwnerIndex } from '../../services/subjects.js';
+import { applicationTransitionRefusal } from './applications.js';
 
 export const nodesRouter: Router = Router();
 
@@ -229,6 +230,15 @@ nodesRouter.patch(
     // can never set them; props are validated against the type's schema.
     const parsed = validateNodeUpdate(existing.type, req.body);
     if (!parsed.ok) throw new ValidationError('invalid node update', parsed.errors);
+    // An application's status machine runs here too. The dedicated endpoints
+    // would otherwise be a front door with the back door standing open: this is
+    // the patch the application form itself sends, so a guard it skipped would
+    // be a guard nothing in the product actually obeyed. The check is silent
+    // unless the incoming props name a status different from the stored one, so
+    // re-saving an unchanged record still passes and a patch that never
+    // mentions status is untouched.
+    const refusal = applicationTransitionRefusal(existing, parsed.value.props);
+    if (refusal) throw new HttpError(422, 'ILLEGAL_TRANSITION', refusal);
     const node = await repository.updateNode(req.params.id, parsed.value, { actor: req.user?.email });
     searchIndex.markDirty();
     await invalidateDuplicateScan();

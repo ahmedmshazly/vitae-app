@@ -1,6 +1,6 @@
 import '../../test/api-mock.js';
 import { Route, Routes } from 'react-router-dom';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { ApplicationDetailResponse } from '@vitae/core';
 import { mockApi, resetMockApi } from '../../test/api-mock.js';
@@ -115,6 +115,15 @@ describe('Application dossier', () => {
       screen.getByRole('link', { name: /Résumé sent Northstar · Staff Engineer/ }),
     ).toHaveAttribute('href', '/career/resume/outputs?focus=resume-1');
     expect(screen.getByText('Review distributed-systems trade-offs.')).toBeInTheDocument();
+  });
+
+  it('carries the status control, so a move can be recorded where the record is read', async () => {
+    mockApi.get.mockResolvedValue(response);
+    renderDossier();
+
+    const group = await screen.findByRole('group', { name: 'Record a status move' });
+    expect(within(group).getByRole('button', { name: 'Offer' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Correct status' })).toBeInTheDocument();
   });
 
   it('keeps a failed dossier distinct from a missing application', async () => {

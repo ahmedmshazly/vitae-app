@@ -58,6 +58,91 @@ describe('POST/GET /api/v1/nodes', () => {
     expect(res.status).toBeLessThan(500);
   });
 
+  /**
+   * The generic patch is the back door on the application status machine
+   * (FR-CAR-003). It is also the patch the application form itself sends, so a
+   * guard that ran only on the dedicated endpoints would be a guard nothing in
+   * the product obeyed.
+   */
+  describe('the application status machine, through the generic patch', () => {
+    const application = async (status: string): Promise<string> => {
+      const res = await request(app)
+        .post('/api/v1/nodes')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          type: 'application',
+          title: `Back door ${status} ${Date.now()}-${Math.random()}`,
+          props: { role_title: 'Staff Engineer', status },
+        })
+        .expect(201);
+      return res.body.node.id as string;
+    };
+
+    it('refuses a move it would refuse at the front door, with the same sentence', async () => {
+      const id = await application('rejected');
+      const res = await request(app)
+        .patch(`/api/v1/nodes/${id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ props: { role_title: 'Staff Engineer', status: 'screening' } });
+      expect(res.status).toBe(422);
+      expect(res.body.error.code).toBe('ILLEGAL_TRANSITION');
+      expect(res.body.error.message).toContain(
+        'An application that was rejected cannot move to screening',
+      );
+    });
+
+    it('lets a record be re-saved at the status it already holds', async () => {
+      // Editing the deadline on a closed application resubmits the whole
+      // record, status included. Refusing that would make a rejected
+      // application uneditable forever.
+      const id = await application('rejected');
+      await request(app)
+        .patch(`/api/v1/nodes/${id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ props: { role_title: 'Staff Engineer', status: 'rejected', deadline: '2026-09-01' } })
+        .expect(200);
+    });
+
+    it('leaves a patch that never mentions props alone', async () => {
+      const id = await application('rejected');
+      await request(app)
+        .patch(`/api/v1/nodes/${id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ notes_md: 'Debrief written up.' })
+        .expect(200);
+    });
+
+    it('still records a move that skips a stage nobody held', async () => {
+      // Not every role has a recruiter screen.
+      const id = await application('applied');
+      const res = await request(app)
+        .patch(`/api/v1/nodes/${id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ props: { role_title: 'Staff Engineer', status: 'offer' } })
+        .expect(200);
+      expect(res.body.node.props.status).toBe('offer');
+    });
+
+    it('governs applications only, and no other type that carries a status', async () => {
+      const posting = await request(app)
+        .post('/api/v1/nodes')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          type: 'job_posting',
+          title: `Posting ${Date.now()}`,
+          props: { company: 'Northstar', role_title: 'Staff Engineer', posting_status: 'closed' },
+        })
+        .expect(201);
+      await request(app)
+        .patch(`/api/v1/nodes/${posting.body.node.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          props: { company: 'Northstar', role_title: 'Staff Engineer', posting_status: 'watching' },
+        })
+        .expect(200);
+    });
+  });
+
   it('keeps demo-space nodes out of the real graph', async () => {
     const payload = buildNodeCreate({ type: 'person', title: `demo-only-${Date.now()}` });
     const create = await request(app)
