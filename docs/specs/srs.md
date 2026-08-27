@@ -492,17 +492,17 @@ Status: implemented · Evidence: cited by documents only · Provenance: unrecove
 
 A staged import that matches an existing record by identity key must be able to propose field-level updates, presented as a per-field diff for review; nothing updates without acceptance, and a rejected proposal leaves the record untouched.
 
-Status: planned · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
-> Authored 2026-08-26 as a product decision under ADR 0007. Today a repeat identity key returns the existing record unchanged, so longitudinal updates are impossible through any importer — the gap that forces manual reconciliation of every re-import.
+> Authored 2026-08-26 under ADR 0007; delivered 2026-08-27. The blocker was upstream of the proposal: the identity-key machinery and its GIN index had been in the repository the whole time and no non-bundle importer ever populated a key, so nothing could match on a second run and every staged row could only ever be new. vCard, iCal, LinkedIn and bookmarks now synthesize a key from what the source genuinely identifies a row by, and a row carrying nothing identifying stays a create rather than being matched on a hash of its display name. A matched row becomes a proposal carrying a per-field diff; nothing is written without acceptance and rejecting one leaves the record byte-identical.
 
 #### FR-SYNC-002 — Re-import is longitudinal
 
 Re-importing from the same source must be longitudinal: unchanged rows converge silently on their identity keys, changed rows become update proposals, and the batch report counts created, updated, unchanged, and skipped separately.
 
-Status: planned · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
-> Authored 2026-08-26 as a product decision under ADR 0007. Deterministic identifiers derived from identity keys already make convergence possible; the update path is what is missing.
+> Authored 2026-08-26 under ADR 0007; delivered 2026-08-27. The batch report counts created, updated, unchanged and skipped apart, which needed the sync bookkeeping fields excluded from the comparison first: last_synced_at moves on every run, so a byte-identical row looked changed and the unchanged bucket would have read zero forever while appearing to satisfy this requirement. Rollback is per node and rev-guarded, so a record edited since the import is reported as skipped with the reason and the rest of the batch still rolls back.
 
 ### Identity integrity
 
@@ -734,17 +734,17 @@ Status: implemented · Evidence: cited by documents only · Provenance: reconstr
 
 A dossier is a named, single-subject selection of evidence records compiled deterministically into a document whose every claim cites the records behind it, closed by a provenance appendix carrying each claim's source, confidence, and revision trail.
 
-Status: planned · Evidence: cited by source · Provenance: reconstructed, confirmed
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
-> Authored 2026-08-26 as a product decision under ADR 0007, for the periodic-prover persona. Selection, compilation, reproducibility, and the single-subject rule reuse the résumé machinery and its requirements.
+> Authored 2026-08-26 under ADR 0007; delivered 2026-08-27. A dossier stores claims and, for each claim, the records it rests on; compiling one resolves every citation against the live graph and closes the document with a provenance appendix carrying each record's source, confidence and revision trail. Nothing is copied into the selection, so a dossier cannot keep asserting the old title of something renamed. The appendix keeps three answers apart rather than two: a record in the graph, one withdrawn after being cited, and an id nothing ever carried. A withdrawn record still prints, with its history, which is also why a missing citation does not block the compile while a missing required section does.
 
 #### FR-DOS-002 — Dossier templates address named audiences
 
 Dossier templates must address named audiences — a promotion review, a petition exhibit list, a clearance or background history — each with its own section grammar and inclusion rules, sharing one selection and compile pipeline underneath.
 
-Status: planned · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
-> Authored 2026-08-26 as a product decision under ADR 0007.
+> Authored 2026-08-26 under ADR 0007; delivered 2026-08-27. Three audiences over one selection format, each with its own section grammar declared as data rather than code: a promotion review argues, so its claims carry several pieces of evidence; an exhibit list enumerates, so an entry is exactly one record and the numbering means something; a background history is read for gaps, so it admits only records that carry dates. GET /dossiers/audiences publishes the grammar and the editor reads it, because the Career workspace's pipeline ordering once lived in the browser and drifted from the server.
 
 ### Career tracking
 

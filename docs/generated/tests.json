@@ -578,7 +578,7 @@
     {
       "file": "apps/api/src/routes/v1/dossiers.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 7,
+      "cases": 8,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -596,7 +596,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 220
+      "lines": 269
     },
     {
       "file": "apps/api/src/routes/v1/duplicates.integration.test.ts",
@@ -1404,7 +1404,7 @@
     {
       "file": "apps/web/src/app/routes.test.ts",
       "package": "@vitae/web",
-      "cases": 5,
+      "cases": 6,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -1419,7 +1419,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 36
+      "lines": 46
     },
     {
       "file": "apps/web/src/app/Shell.test.tsx",
@@ -1440,7 +1440,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 179
+      "lines": 182
     },
     {
       "file": "apps/web/src/components/BulkBar.test.tsx",
@@ -5323,6 +5323,29 @@
       "lines": 42
     },
     {
+      "file": "e2e/tests/dossier.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/a11y",
+        "./helpers/api.js",
+        "./helpers/auth"
+      ],
+      "requirements": [
+        "FR-DOS-001",
+        "FR-DOS-002"
+      ],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 156
+    },
+    {
       "file": "e2e/tests/duplicates.spec.ts",
       "package": "@vitae/e2e",
       "cases": 6,
@@ -7617,23 +7640,23 @@
     }
   ],
   "summary": {
-    "files": 354,
-    "cases": 2435,
+    "files": 355,
+    "cases": 2442,
     "skipped": 0,
     "todo": 0,
     "by_package": {
-      "@vitae/api": 325,
-      "@vitae/web": 1209,
-      "@vitae/e2e": 296,
+      "@vitae/api": 326,
+      "@vitae/web": 1210,
+      "@vitae/e2e": 301,
       "@vitae/core": 372,
       "@vitae/testkit": 7,
       "@vitae/ui": 226
     },
     "by_script": {
-      "test": 354,
+      "test": 355,
       "test:web": 174,
       "test:api": 61,
-      "test:e2e": 60,
+      "test:e2e": 61,
       "test:unit": 50,
       "test:coverage": 50,
       "test:core": 48,

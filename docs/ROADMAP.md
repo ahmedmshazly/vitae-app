@@ -46,8 +46,6 @@ beside them below rather than quietly deleted.
 
 | Area | What is intended | SRS |
 | ---- | ----------------- | --- |
-| Evidence dossiers | Single-subject evidence packets with a provenance appendix; audience templates for a promotion review, a petition exhibit list, a clearance history | FR-DOS-001, FR-DOS-002 |
-| Longitudinal imports | Field-level update proposals on identity-key matches; re-import that counts created/updated/unchanged/skipped | FR-SYNC-001, FR-SYNC-002 |
 | Locked-workspace honesty | Write controls disabled at the point of use on a read-only workspace, not only refused by the server | NFR-OPS-002 |
 | Recovery objectives | Stated RPO/RTO with rehearsed drills; `scripts/backup-to-s3.sh` ships and is wired to `pnpm backup:s3`, the cadence and numbers await operational confirmation | NFR-OPS-001, FR-EXP-012, FR-EXP-013 |
 
@@ -66,6 +64,25 @@ mis-clicks `rejected` would have every forward move refused for a record that
 was never rejected, so correcting a status is a separate act with its own door
 and its own provenance, and the history can still tell a move from a fixed
 mistake.
+
+**Evidence dossiers** (FR-DOS-001, FR-DOS-002) shipped 2026-08-27. The design
+question was what an appendix owes a reader when the evidence moves. A dossier
+stores only a kind and an id per citation and resolves it at compile time, so it
+cannot keep asserting the old title of a renamed record; and the appendix keeps
+three answers apart rather than two, because a record that was withdrawn after
+being cited and an id nothing ever carried are different facts about a claim.
+A withdrawn record still prints, with its history. That is also why a missing
+citation does not block a compile while a missing required section does: one is
+a fact worth printing, the other is a packet that is not yet a document.
+
+**Longitudinal imports** (FR-SYNC-001, FR-SYNC-002) shipped 2026-08-27, and
+again the blocker was upstream of the row. The identity-key machinery and its
+GIN index had been in the repository the whole time and no non-bundle importer
+ever populated a key, so nothing could match on a second run and every staged
+row could only ever be new. The second trap was quieter: `last_synced_at` moves
+on every run, so a byte-identical row looked changed, and without excluding the
+sync bookkeeping fields the "unchanged" count would have read zero forever
+while appearing to satisfy the requirement.
 
 **Letters** (FR-RES-021, closing FR-RES-020) shipped 2026-08-27, and the
 blocker was not in the letters code at all. `services/buildsvc/src/calibrate.ts`

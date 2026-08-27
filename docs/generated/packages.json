@@ -212,7 +212,7 @@
       ],
       "source_files": 185,
       "test_files": 174,
-      "source_lines": 49701,
+      "source_lines": 49715,
       "exports": 781,
       "dependents": [],
       "imported_by": [],
@@ -489,7 +489,7 @@
       "dev_depends_on": [],
       "external_dependencies": [],
       "source_files": 0,
-      "test_files": 60,
+      "test_files": 61,
       "source_lines": 0,
       "exports": 0,
       "dependents": [],
@@ -653,8 +653,8 @@
   "summary": {
     "packages": 8,
     "source_files": 370,
-    "test_files": 354,
-    "source_lines": 86453,
+    "test_files": 355,
+    "source_lines": 86467,
     "layers": 2,
     "cyclic": [],
     "workspace_typecheck": {

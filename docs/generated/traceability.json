@@ -2,8 +2,8 @@
   "generated_by": "scripts/docs/gen-traceability.mjs",
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
-    "files_scanned": 914,
-    "files_citing": 216,
+    "files_scanned": 937,
+    "files_citing": 230,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,9 +20,9 @@
   },
   "totals": {
     "registered": 131,
-    "citations": 871,
-    "implemented_and_tested": 31,
-    "implemented_untested": 61,
+    "citations": 894,
+    "implemented_and_tested": 32,
+    "implemented_untested": 60,
     "tested_only": 3,
     "documents_only": 36,
     "uncited": 0,
@@ -727,7 +727,7 @@
         "e2e/tests/application-status.spec.ts:6"
       ],
       "documents": [
-        "docs/ROADMAP.md:59",
+        "docs/ROADMAP.md:57",
         "docs/observatory/product/blueprint/career-and-resume.md:33"
       ]
     },
@@ -766,8 +766,8 @@
         "docs/observatory/product/blueprint/network.md:102",
         "docs/observatory/product/blueprint/network.md:124",
         "docs/observatory/product/stories.md:180",
-        "docs/observatory/use/screens.md:380",
-        "docs/observatory/use/screens.md:422"
+        "docs/observatory/use/screens.md:382",
+        "docs/observatory/use/screens.md:424"
       ]
     },
     "FR-COMM-002": {
@@ -826,8 +826,8 @@
         "docs/observatory/product/blueprint/network.md:92",
         "docs/observatory/product/blueprint/network.md:107",
         "docs/observatory/product/stories.md:186",
-        "docs/observatory/use/screens.md:386",
-        "docs/observatory/use/screens.md:424"
+        "docs/observatory/use/screens.md:388",
+        "docs/observatory/use/screens.md:426"
       ]
     },
     "FR-CON-001": {
@@ -1005,17 +1005,26 @@
     },
     "FR-DOS-001": {
       "capability": "CAP-DOSSIER",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
-      "evidence": "implemented-untested",
+      "evidence": "implemented-and-tested",
       "sources": [
         "apps/api/src/db/migrations/011-dossiers.ts:2",
+        "apps/api/src/routes/v1/dossiers.ts:2",
+        "apps/api/src/services/dossier.ts:2",
         "apps/api/src/services/export.ts:62",
+        "apps/web/src/features/DossierAppendix.tsx:2",
+        "apps/web/src/features/DossierClaimForm.tsx:2",
+        "apps/web/src/features/DossierGrammar.ts:2",
+        "apps/web/src/routes/DossierEditor.tsx:3",
+        "apps/web/src/routes/Dossiers.tsx:2",
         "packages/core/src/schema/dossier.ts:2"
       ],
-      "tests": [],
+      "tests": [
+        "apps/api/src/routes/v1/dossiers.integration.test.ts:2"
+      ],
       "documents": [
-        "docs/ROADMAP.md:49",
+        "docs/ROADMAP.md:68",
         "docs/observatory/product/blueprint/career-and-resume.md:111",
         "docs/observatory/product/blueprint/explore.md:32",
         "docs/observatory/product/blueprint/index.md:50",
@@ -1024,20 +1033,26 @@
     },
     "FR-DOS-002": {
       "capability": "CAP-DOSSIER",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "evidence": "implemented-and-tested",
       "sources": [
         "apps/api/src/db/migrations/011-dossiers.ts:2",
+        "apps/api/src/routes/v1/dossiers.ts:3",
+        "apps/api/src/services/dossier.ts:2",
+        "apps/web/src/features/DossierGrammar.ts:3",
+        "apps/web/src/routes/DossierEditor.tsx:3",
+        "apps/web/src/routes/Dossiers.tsx:2",
         "packages/core/src/schema/dossier.ts:2",
         "packages/core/src/schema/dossier.ts:16"
       ],
       "tests": [
+        "apps/api/src/routes/v1/dossiers.integration.test.ts:2",
         "packages/core/src/schema/dossier.test.ts:4",
         "packages/core/src/schema/dossier.test.ts:248"
       ],
       "documents": [
-        "docs/ROADMAP.md:49",
+        "docs/ROADMAP.md:68",
         "docs/observatory/product/blueprint/career-and-resume.md:101",
         "docs/observatory/product/blueprint/career-and-resume.md:111",
         "docs/observatory/product/blueprint/index.md:50",
@@ -1070,7 +1085,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:52",
+        "docs/ROADMAP.md:50",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
         "docs/observatory/meta/coverage-and-contradictions.md:724",
         "docs/specs/srs.md:1235"
@@ -1084,7 +1099,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:52",
+        "docs/ROADMAP.md:50",
         "docs/observatory/meta/coverage-and-contradictions.md:397",
         "docs/observatory/meta/coverage-and-contradictions.md:724",
         "docs/specs/srs.md:1236"
@@ -1671,7 +1686,7 @@
         "packages/core/src/schema/resume.test.ts:2"
       ],
       "documents": [
-        "docs/ROADMAP.md:70",
+        "docs/ROADMAP.md:87",
         "docs/observatory/product/blueprint/career-and-resume.md:94",
         "docs/observatory/product/stories.md:135",
         "docs/observatory/use/write-a-resume.md:30"
@@ -1702,7 +1717,7 @@
         "packages/core/src/schema/resume.test.ts:2"
       ],
       "documents": [
-        "docs/ROADMAP.md:70",
+        "docs/ROADMAP.md:87",
         "docs/observatory/product/blueprint/career-and-resume.md:94",
         "docs/observatory/product/stories.md:135"
       ]
@@ -1851,7 +1866,7 @@
     },
     "FR-SYNC-001": {
       "capability": "CAP-IMPORT",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "evidence": "implemented-and-tested",
       "sources": [
@@ -1862,21 +1877,24 @@
         "apps/api/src/services/imports.ts:988",
         "apps/api/src/services/imports.ts:1133",
         "apps/api/src/services/imports.ts:1229",
-        "apps/web/src/routes/ImportHub.tsx:354"
+        "apps/web/src/features/ImportProposalDiff.tsx:5",
+        "apps/web/src/routes/ImportHub.tsx:354",
+        "packages/core/src/importers/convergence.ts:3"
       ],
       "tests": [
-        "apps/api/src/routes/v1/imports.integration.test.ts:3"
+        "apps/api/src/routes/v1/imports.integration.test.ts:3",
+        "apps/api/src/services/imports.test.ts:4"
       ],
       "documents": [
-        "docs/ROADMAP.md:50",
-        "docs/ROADMAP.md:94",
+        "docs/ROADMAP.md:78",
+        "docs/ROADMAP.md:111",
         "docs/observatory/product/blueprint/data-import-export.md:29",
         "docs/observatory/product/stories.md:105"
       ]
     },
     "FR-SYNC-002": {
       "capability": "CAP-IMPORT",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "evidence": "implemented-and-tested",
       "sources": [
@@ -1887,17 +1905,21 @@
         "apps/web/src/routes/ImportHub.tsx:44",
         "apps/web/src/routes/ImportHub.tsx:58",
         "apps/web/src/routes/ImportHub.tsx:172",
+        "packages/core/src/importers/convergence.ts:3",
+        "packages/core/src/importers/convergence.ts:21",
         "packages/core/src/importers/ics.ts:21",
+        "packages/core/src/importers/identity.ts:2",
         "packages/core/src/importers/linkedin.ts:38",
         "packages/core/src/importers/netscape-bookmarks.ts:19",
         "packages/core/src/importers/vcard.ts:27"
       ],
       "tests": [
-        "apps/api/src/routes/v1/imports.integration.test.ts:3"
+        "apps/api/src/routes/v1/imports.integration.test.ts:3",
+        "apps/api/src/services/imports.test.ts:4"
       ],
       "documents": [
-        "docs/ROADMAP.md:50",
-        "docs/ROADMAP.md:94",
+        "docs/ROADMAP.md:78",
+        "docs/ROADMAP.md:111",
         "docs/observatory/product/blueprint/data-import-export.md:32",
         "docs/observatory/product/blueprint/data-import-export.md:52",
         "docs/observatory/product/stories.md:107"
@@ -2073,7 +2095,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:52",
+        "docs/ROADMAP.md:50",
         "docs/observatory/meta/coverage-and-contradictions.md:724",
         "docs/specs/srs.md:1193"
       ]
@@ -2089,7 +2111,7 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:51",
+        "docs/ROADMAP.md:49",
         "docs/observatory/product/blueprint/index.md:47",
         "docs/observatory/product/blueprint/settings-and-system.md:58",
         "docs/observatory/product/stories.md:171",
@@ -2127,7 +2149,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:93",
+        "docs/ROADMAP.md:110",
         "docs/observatory/product/blueprint/public-and-marketing.md:63",
         "docs/specs/srs.md:96"
       ]
@@ -2200,6 +2222,8 @@
       "sources": [],
       "tests": [
         "apps/web/src/routes/Correspondence.states.test.tsx:3",
+        "apps/web/src/routes/DossierEditor.states.test.tsx:2",
+        "apps/web/src/routes/Dossiers.states.test.tsx:2",
         "apps/web/src/routes/Ledger.states.test.tsx:3"
       ],
       "documents": [
@@ -2616,6 +2640,14 @@
       "FR-102",
       "FR-VIS-004"
     ],
+    "apps/api/src/routes/v1/dossiers.integration.test.ts": [
+      "FR-DOS-001",
+      "FR-DOS-002"
+    ],
+    "apps/api/src/routes/v1/dossiers.ts": [
+      "FR-DOS-001",
+      "FR-DOS-002"
+    ],
     "apps/api/src/routes/v1/duplicates.integration.test.ts": [
       "FR-002",
       "FR-003"
@@ -2757,6 +2789,10 @@
       "FR-COMM-002",
       "FR-COMM-003"
     ],
+    "apps/api/src/services/dossier.ts": [
+      "FR-DOS-001",
+      "FR-DOS-002"
+    ],
     "apps/api/src/services/duplicates.ts": [
       "FR-002",
       "FR-003",
@@ -2771,6 +2807,10 @@
     ],
     "apps/api/src/services/http.ts": [
       "FR-026"
+    ],
+    "apps/api/src/services/imports.test.ts": [
+      "FR-SYNC-001",
+      "FR-SYNC-002"
     ],
     "apps/api/src/services/imports.ts": [
       "FR-002",
@@ -2830,6 +2870,19 @@
       "FR-COMM-001",
       "FR-COMM-003",
       "NFR-PRIV-003"
+    ],
+    "apps/web/src/features/DossierAppendix.tsx": [
+      "FR-DOS-001"
+    ],
+    "apps/web/src/features/DossierClaimForm.tsx": [
+      "FR-DOS-001"
+    ],
+    "apps/web/src/features/DossierGrammar.ts": [
+      "FR-DOS-001",
+      "FR-DOS-002"
+    ],
+    "apps/web/src/features/ImportProposalDiff.tsx": [
+      "FR-SYNC-001"
     ],
     "apps/web/src/features/InteractionLogger.tsx": [
       "FR-022",
@@ -2920,6 +2973,20 @@
       "FR-COMM-002",
       "FR-COMM-003",
       "NFR-PRIV-003"
+    ],
+    "apps/web/src/routes/DossierEditor.states.test.tsx": [
+      "NFR-REL-004"
+    ],
+    "apps/web/src/routes/DossierEditor.tsx": [
+      "FR-DOS-001",
+      "FR-DOS-002"
+    ],
+    "apps/web/src/routes/Dossiers.states.test.tsx": [
+      "NFR-REL-004"
+    ],
+    "apps/web/src/routes/Dossiers.tsx": [
+      "FR-DOS-001",
+      "FR-DOS-002"
     ],
     "apps/web/src/routes/ExportPage.tsx": [
       "FR-001",
@@ -3634,7 +3701,14 @@
     "packages/core/src/forms/types.ts": [
       "FR-CAP-002"
     ],
+    "packages/core/src/importers/convergence.ts": [
+      "FR-SYNC-001",
+      "FR-SYNC-002"
+    ],
     "packages/core/src/importers/ics.ts": [
+      "FR-SYNC-002"
+    ],
+    "packages/core/src/importers/identity.ts": [
       "FR-SYNC-002"
     ],
     "packages/core/src/importers/linkedin.ts": [
@@ -3758,14 +3832,18 @@
       ]
     },
     "J5": {
-      "status": "planned",
+      "status": "verified",
       "capabilities": [
         "CAP-DOSSIER",
         "CAP-PROV",
         "CAP-RESUME"
       ],
-      "e2e": [],
-      "e2e_present": []
+      "e2e": [
+        "e2e/tests/dossier.spec.ts"
+      ],
+      "e2e_present": [
+        "e2e/tests/dossier.spec.ts"
+      ]
     },
     "J6": {
       "status": "partial",

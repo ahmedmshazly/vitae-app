@@ -72,15 +72,17 @@
       "id": "J5",
       "title": "Prove it with a dossier",
       "statement": "Facing a promotion review, a petition, or a reinvestigation, the operator selects the evidence records that carry the claim, chooses the audience template, and compiles a single-subject packet whose every claim cites its records, closed by a provenance appendix — from a graph that was already capturing the evidence as it happened.",
-      "status": "planned",
+      "status": "verified",
       "capabilities": [
         "CAP-DOSSIER",
         "CAP-PROV",
         "CAP-RESUME"
       ],
       "target": "A review-season packet that once took a weekend of archaeology compiles from already-captured evidence in under an hour.",
-      "e2e": [],
-      "note": "Authored 2026-08-26 under ADR 0007 for the periodic-prover persona. CAP-DOSSIER is registered intent; CAP-PROV shipped its surfaces the same day (the Ledger, history diffs, the source reference), and the selection and compile machinery this journey reuses ships today under CAP-RESUME."
+      "e2e": [
+        "e2e/tests/dossier.spec.ts"
+      ],
+      "note": "Authored 2026-08-26 under ADR 0007 for the periodic-prover persona; verified 2026-08-27. dossier.spec.ts names the journey and walks it: the list naming each packet by the audience it is written for, a claim's marker resolving into the appendix entry that names its record and opens its revision trail, and the three audiences differing in what their sections demand. The walk that carries the journey is the third one, where a cited record is deleted and the packet is reopened: the citation still prints, marked withdrawn, and the document still compiles, which is the difference between a provenance appendix and a bibliography."
     },
     {
       "id": "J6",

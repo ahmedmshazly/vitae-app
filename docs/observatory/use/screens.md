@@ -58,6 +58,8 @@ covers:
   - route:/career
   - route:/career/applications
   - route:/career/applications/:id
+  - route:/career/dossiers
+  - route:/career/dossiers/:id
   - route:/career/resume
   - route:/career/resume/evidence
   - route:/career/resume/letters
@@ -435,6 +437,8 @@ count — when dormant ties exist but none was once strong enough to rank.
 | Career | `/career` |
 | Applications | `/career/applications` |
 | An application | `/career/applications/:id` |
+| Dossiers | `/career/dossiers` |
+| A dossier | `/career/dossiers/:id` |
 | Résumé hub | `/career/resume`, also `/resume` |
 | Atom library | `/career/resume/evidence`, also `/resume/atoms` |
 | Tailor | `/career/resume/tailor`, also `/resume/tailor` |
@@ -458,6 +462,51 @@ notes, the application register of dates and channel, the people and company
 involved, and the materials — job posting, tailoring target, résumé sent. With
 none of those linked it says so in one line rather than showing three empty
 panels.
+
+**Dossiers** lists the evidence packets you have compiled about yourself,
+newest first, each named by the audience it is written for rather than by a
+format. A dossier is not a résumé and does not sit in the résumé pipeline: a
+résumé argues for a role, and a dossier answers a reader who is entitled to
+check. Three audiences ship — a promotion review, a petition exhibit list, and
+a background history — and choosing between them shows you each one's sections
+and what they are for before you commit, because the audience decides what the
+document will ask you for.
+
+Its empty state names the choice rather than the record: *"Pick the audience a
+document is written for, and its sections tell you what evidence it wants."*
+There is a fourth state here that most lists do not have. A dossier is about
+one person, so if Vitae does not yet know which record is you, the screen says
+so and points at Profile settings instead of offering a New dossier button
+that could only fail.
+
+**A dossier** is the editor and the compiled document on one page, in four
+parts.
+
+*Work to do* lists what the audience's grammar asks for and has not got, each
+one naming the section and saying what is missing. It distinguishes two
+situations that look alike and are not: a packet with a required section
+missing is *"a selection, not yet a document"*, while one whose only problem is
+a cited record that has since been deleted *"compiles, with evidence a reader
+cannot follow"*. The second still produces a document, because a withdrawn
+piece of evidence is a fact worth printing.
+
+*The selection* shows every section the audience declares, including ones you
+have put nothing in, each with its purpose and, in plain sentences, what it
+will admit and how much evidence an entry needs. Adding an entry means writing
+the sentence it asserts and attaching the records it rests on; the record
+search offers only the kinds that section admits.
+
+*The compiled document* is those entries in the order the grammar declares,
+each citation a numbered marker into the appendix.
+
+*The provenance appendix* is the reason the format exists. Every cited record
+appears once, with where it came from, how confident that record is, and its
+full revision history. It keeps three answers apart rather than two: a record
+that is in the graph, one that was withdrawn after being cited, and an id
+nothing has ever carried. A withdrawn record still prints, with its history,
+because a reader is better served knowing the evidence was withdrawn than not
+knowing it was ever there. Résumé atoms cited as evidence say plainly that they
+keep no revision trail, rather than showing an empty column.
 
 **Résumé hub** is the front door to the résumé workspace: counts of atoms,
 targets and outputs, the five workflow shortcuts, and the most recent outputs.
