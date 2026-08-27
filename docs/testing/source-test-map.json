@@ -480,6 +480,16 @@
       ],
       "note": "The documentation corpus is private and this route is the only thing making that true. The suite covers the allow-list (anonymous and non-owner both refused) and the file access, including a symlink inside the corpus pointing out of it, which an earlier version of this router happily served."
     },
+    "apps/api/src/routes/v1/dossiers.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/dossiers.integration.test.ts"
+      ]
+    },
     "apps/api/src/routes/v1/duplicates.ts": {
       "risk": "medium",
       "layers": [
