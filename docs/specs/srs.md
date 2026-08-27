@@ -492,7 +492,7 @@ Status: implemented · Evidence: cited by documents only · Provenance: unrecove
 
 A staged import that matches an existing record by identity key must be able to propose field-level updates, presented as a per-field diff for review; nothing updates without acceptance, and a rejected proposal leaves the record untouched.
 
-Status: planned · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+Status: planned · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
 > Authored 2026-08-26 as a product decision under ADR 0007. Today a repeat identity key returns the existing record unchanged, so longitudinal updates are impossible through any importer — the gap that forces manual reconciliation of every re-import.
 
@@ -500,7 +500,7 @@ Status: planned · Evidence: cited by documents only · Provenance: reconstructe
 
 Re-importing from the same source must be longitudinal: unchanged rows converge silently on their identity keys, changed rows become update proposals, and the batch report counts created, updated, unchanged, and skipped separately.
 
-Status: planned · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+Status: planned · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
 > Authored 2026-08-26 as a product decision under ADR 0007. Deterministic identifiers derived from identity keys already make convergence possible; the update path is what is missing.
 
@@ -704,17 +704,17 @@ Status: implemented · Evidence: cited by source · Provenance: reconstructed, n
 
 A cover letter must be storable against a target as structured blocks of hook, body, and closer, each sourced from text or from an atom, with full create, read, update, and delete support.
 
-Status: partial · Evidence: cited by source and by tests · Provenance: reconstructed, needs-review
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, needs-review
 
-> The model and the generation interface are shipped. docs/ROADMAP.md records LaTeX and PDF compilation of a cover letter as deferred, so the requirement is partially implemented.
+> The model, the generation interface and now the compile pair are all shipped. The deferral this note used to record closed with FR-RES-021: a letter stores its recipient, salutation and closing, and finalize keeps the PDF and the source as its artifacts.
 
 #### FR-RES-021 — Letters compile like résumés
 
 A finalized cover letter must compile to the same artifact pair as a résumé — PDF plus source — through the same sandboxed compiler, with the same escape guarantees and the same graceful degradation when the compiler is unreachable.
 
-Status: planned · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
-> Authored 2026-08-26 as a product decision under ADR 0007, closing the parity gap FR-RES-020 records: the letters surface ships authoring without compilation, and shipping half a document pipeline silently was the alternative being declined.
+> Authored 2026-08-26 as a product decision under ADR 0007; delivered 2026-08-27. The blocker was upstream of the letter: the build service calibrated every template in templates/ at Docker image build and hard-failed anything that was not a one-page résumé, so the first letter template would have failed the image build before it could be used. Calibration is now per template, declared in each directory's calibration.json, and a directory without one fails loudly rather than being skipped. On top of that, templates/letter-classic, a renderer that goes through the same LaTeX escape path résumés use rather than a second one, and compile, finalize and artifact routes that mirror the résumé pair, including answering 200 with the source and leaving the letter in draft when the compiler is unreachable.
 
 #### NFR-COMP-002 — Compiled documents are reproducible and parseable
 
@@ -734,7 +734,7 @@ Status: implemented · Evidence: cited by documents only · Provenance: reconstr
 
 A dossier is a named, single-subject selection of evidence records compiled deterministically into a document whose every claim cites the records behind it, closed by a provenance appendix carrying each claim's source, confidence, and revision trail.
 
-Status: planned · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+Status: planned · Evidence: cited by source · Provenance: reconstructed, confirmed
 
 > Authored 2026-08-26 as a product decision under ADR 0007, for the periodic-prover persona. Selection, compilation, reproducibility, and the single-subject rule reuse the résumé machinery and its requirements.
 
@@ -742,7 +742,7 @@ Status: planned · Evidence: cited by documents only · Provenance: reconstructe
 
 Dossier templates must address named audiences — a promotion review, a petition exhibit list, a clearance or background history — each with its own section grammar and inclusion rules, sharing one selection and compile pipeline underneath.
 
-Status: planned · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+Status: planned · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
 > Authored 2026-08-26 as a product decision under ADR 0007.
 
@@ -770,9 +770,9 @@ Status: implemented · Evidence: cited by documents only · Provenance: reconstr
 
 Applications must be creatable and editable through first-class endpoints that validate the status machine and its transitions, not only through the generic record API.
 
-Status: planned · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
-> Authored 2026-08-26 as a product decision under ADR 0007. Today the application list is read-only at the API surface and writes travel through the generic node endpoints, so a status transition is validated as a property shape rather than as a transition.
+> Authored 2026-08-26 as a product decision under ADR 0007; delivered 2026-08-27. POST and PATCH /applications and POST /applications/:id/status are the first-class doors, and the generic node patch runs the same guard, because the application form's own save goes through it and a guard the back door skips is not a guard. The machine is forward-permissive: any later stage or any outcome is recordable, since plenty of roles have no recruiter screen and refusing to record applied straight to interview would be refusing something that happened; walking backwards and reopening a closed record are what it refuses, and the refusal names both ends of the move. Correction is a separate act with its own door and its own provenance, so an operator who mis-set a record to rejected is not held there and the history can still tell a move from a fixed mistake. The status control offers exactly the moves the server would accept.
 
 #### FR-CAR-004 — The runway leads with next moves
 

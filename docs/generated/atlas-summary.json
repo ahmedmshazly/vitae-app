@@ -1,16 +1,16 @@
 {
   "by_package": {
     "@vitae/api": {
-      "files": 109,
-      "lines": 20185,
-      "exports": 375,
-      "undocumented": 280
+      "files": 112,
+      "lines": 22503,
+      "exports": 408,
+      "undocumented": 295
     },
     "@vitae/web": {
-      "files": 176,
-      "lines": 47525,
-      "exports": 751,
-      "undocumented": 510
+      "files": 185,
+      "lines": 49701,
+      "exports": 781,
+      "undocumented": 520
     },
     "@vitae/config": {
       "files": 1,
@@ -19,10 +19,10 @@
       "undocumented": 1
     },
     "@vitae/core": {
-      "files": 47,
-      "lines": 8632,
-      "exports": 451,
-      "undocumented": 311
+      "files": 50,
+      "lines": 9460,
+      "exports": 490,
+      "undocumented": 333
     },
     "@vitae/testkit": {
       "files": 5,
@@ -38,35 +38,35 @@
     },
     "@vitae/buildsvc": {
       "files": 2,
-      "lines": 470,
+      "lines": 584,
       "exports": 0,
       "undocumented": 0
     }
   },
   "by_kind": {
     "module": {
-      "files": 64,
-      "lines": 9423,
-      "exports": 359,
-      "undocumented": 204
+      "files": 68,
+      "lines": 10117,
+      "exports": 383,
+      "undocumented": 208
     },
     "migration": {
-      "files": 10,
-      "lines": 837,
-      "exports": 20,
-      "undocumented": 20
+      "files": 11,
+      "lines": 904,
+      "exports": 22,
+      "undocumented": 22
     },
     "database": {
       "files": 8,
-      "lines": 1758,
+      "lines": 1796,
       "exports": 53,
       "undocumented": 33
     },
     "entry": {
       "files": 8,
-      "lines": 450,
-      "exports": 40,
-      "undocumented": 34
+      "lines": 452,
+      "exports": 42,
+      "undocumented": 36
     },
     "middleware": {
       "files": 6,
@@ -76,39 +76,39 @@
     },
     "contract": {
       "files": 3,
-      "lines": 882,
+      "lines": 1144,
       "exports": 3,
       "undocumented": 2
     },
     "route": {
-      "files": 47,
-      "lines": 8468,
-      "exports": 226,
-      "undocumented": 178
+      "files": 48,
+      "lines": 8884,
+      "exports": 228,
+      "undocumented": 179
     },
     "script": {
       "files": 12,
-      "lines": 2530,
+      "lines": 2902,
       "exports": 0,
       "undocumented": 0
     },
     "service": {
-      "files": 24,
-      "lines": 7752,
-      "exports": 207,
-      "undocumented": 150
+      "files": 25,
+      "lines": 8915,
+      "exports": 236,
+      "undocumented": 162
     },
     "component": {
-      "files": 67,
-      "lines": 17222,
-      "exports": 299,
-      "undocumented": 231
+      "files": 71,
+      "lines": 17954,
+      "exports": 314,
+      "undocumented": 238
     },
     "screen": {
-      "files": 69,
-      "lines": 25578,
-      "exports": 176,
-      "undocumented": 110
+      "files": 72,
+      "lines": 26815,
+      "exports": 180,
+      "undocumented": 112
     },
     "test-support": {
       "files": 7,
@@ -117,10 +117,10 @@
       "undocumented": 8
     },
     "schema": {
-      "files": 9,
-      "lines": 1805,
-      "exports": 185,
-      "undocumented": 146
+      "files": 10,
+      "lines": 2258,
+      "exports": 209,
+      "undocumented": 163
     },
     "algorithm": {
       "files": 21,
@@ -192,7 +192,18 @@
       "CorrespondenceProfile",
       "DEDUP",
       "DEFAULT_JD_CORPUS",
+      "DOSSIER_AUDIENCES",
+      "DOSSIER_GRAMMAR",
       "DatePrecision",
+      "Dossier",
+      "DossierAudience",
+      "DossierCitation",
+      "DossierClaim",
+      "DossierCreateInput",
+      "DossierSection",
+      "DossierSectionGrammar",
+      "DossierViolation",
+      "DossierViolationRule",
       "EDGE_FORM_DESCRIPTORS",
       "EDGE_PROPS_SCHEMAS",
       "EDGE_TYPES",
@@ -213,6 +224,7 @@
       "FILTER_FIELDS",
       "FactorChip",
       "FavorEntry",
+      "FieldChange",
       "FieldComparison",
       "FieldDescriptor",
       "FieldError",
@@ -246,6 +258,7 @@
       "Letter",
       "LetterBlock",
       "LetterCreateInput",
+      "LetterRecipient",
       "LetterStatus",
       "LineModel",
       "LinkedInConnection",
@@ -292,6 +305,7 @@
       "ReconnectScore",
       "RecordedBrokerTally",
       "ReplySample",
+      "ResolvedCitation",
       "Resume",
       "ResumeConfig",
       "RevisionOp",
@@ -300,6 +314,7 @@
       "STATIC_PLACE_ALIASES",
       "STOPWORDS",
       "SUBJECT_BEARING_TYPES",
+      "SYNC_BOOKKEEPING_FIELDS",
       "ScorableAtom",
       "SelectOption",
       "SelectOptions",
@@ -355,6 +370,7 @@
       "attendedProps",
       "authoredProps",
       "awardProps",
+      "bookmarkUrlKey",
       "brokerTally",
       "bundleEdgeSchema",
       "bundleNodeSchema",
@@ -366,6 +382,7 @@
       "canonicalOrganizationName",
       "canonicalPersonName",
       "certificationProps",
+      "changedFields",
       "cloudIndividualAnnualSavingsMinorUnits",
       "compareEntities",
       "comparePersons",
@@ -378,11 +395,20 @@
       "connectionOptionLabel",
       "connectionOptionSelectLabel",
       "connectionOptionsFor",
+      "contactEmailKey",
       "correspondenceProfile",
       "courseProps",
       "datePrecisionSchema",
+      "deepEqual",
       "defaultVariantText",
       "documentProps",
+      "dossierAudienceSchema",
+      "dossierCitationSchema",
+      "dossierClaimSchema",
+      "dossierCreateSchema",
+      "dossierSchema",
+      "dossierSectionGrammar",
+      "dossierSectionSchema",
       "edgeCreateEnvelope",
       "edgeDisplayLabel",
       "edgeEndpointsAllowed",
@@ -415,8 +441,11 @@
       "habitProps",
       "healthLogProps",
       "highlightProps",
+      "icsEventKey",
       "ideaProps",
       "identityKey",
+      "identityKeyFor",
+      "illegalTransitionMessage",
       "interactionProps",
       "interviewForProps",
       "interviewProps",
@@ -437,10 +466,12 @@
       "knowsProps",
       "letterBlockSchema",
       "letterCreateSchema",
+      "letterRecipientSchema",
       "letterSchema",
       "letterStatusSchema",
       "lineModelSchema",
       "linkProps",
+      "linkedinProfileKey",
       "locationProps",
       "lookupBuiltinCity",
       "mediaItemProps",
@@ -477,6 +508,7 @@
       "parseVcards",
       "parsedJdSchema",
       "parsedKeywordSchema",
+      "patchForFields",
       "personProps",
       "personRelationLabel",
       "personalizedPageRank",
@@ -490,6 +522,7 @@
       "rankReactivation",
       "rankReconnect",
       "reactedToProps",
+      "readField",
       "recencyFactor",
       "recommendsProps",
       "reconnectPriority",
@@ -513,6 +546,7 @@
       "sharedByProps",
       "skillProps",
       "sourceSchema",
+      "statedFieldsOnly",
       "stem",
       "studiedAtProps",
       "subjectAssignment",
@@ -533,10 +567,12 @@
       "trigrams",
       "tripProps",
       "usesSkillProps",
+      "validateDossier",
       "validateEdgeCreate",
       "validateEdgeUpdate",
       "validateNodeCreate",
       "validateNodeUpdate",
+      "vcardUidKey",
       "whoToCall",
       "workedOnProps"
     ],
@@ -696,13 +732,13 @@
     ]
   },
   "summary": {
-    "files": 355,
-    "test_files": 332,
-    "lines": 80980,
-    "exports": 1751,
-    "undocumented_exports": 1230,
-    "edges": 1593,
-    "untested": 140,
+    "files": 370,
+    "test_files": 354,
+    "lines": 86416,
+    "exports": 1853,
+    "undocumented_exports": 1277,
+    "edges": 1694,
+    "untested": 138,
     "no_consumer": [],
     "consumed_only_by_tests": [
       "apps/web/src/components/ListToolbar.tsx",
@@ -714,63 +750,63 @@
     "most_depended_on": [
       {
         "file": "packages/ui/src/index.ts",
-        "dependents": 111
+        "dependents": 118
       },
       {
         "file": "packages/ui/src/components.tsx",
-        "dependents": 84
+        "dependents": 91
       },
       {
         "file": "packages/core/src/index.ts",
-        "dependents": 80
+        "dependents": 87
       },
       {
         "file": "packages/ui/src/feedback.tsx",
-        "dependents": 73
+        "dependents": 76
       },
       {
         "file": "apps/web/src/lib/api.ts",
-        "dependents": 57
+        "dependents": 63
       },
       {
         "file": "packages/ui/src/overlay.tsx",
-        "dependents": 55
+        "dependents": 58
       },
       {
         "file": "apps/api/src/db/repository.ts",
-        "dependents": 43
+        "dependents": 45
       },
       {
         "file": "packages/core/src/types.ts",
-        "dependents": 40
+        "dependents": 42
       },
       {
         "file": "apps/api/src/middleware/error.ts",
-        "dependents": 38
+        "dependents": 40
+      },
+      {
+        "file": "packages/ui/src/layout.tsx",
+        "dependents": 40
+      },
+      {
+        "file": "packages/ui/src/forms.tsx",
+        "dependents": 39
       },
       {
         "file": "packages/ui/src/glyphs.tsx",
         "dependents": 38
       },
       {
-        "file": "packages/ui/src/forms.tsx",
-        "dependents": 36
-      },
-      {
-        "file": "packages/ui/src/layout.tsx",
-        "dependents": 34
-      },
-      {
         "file": "apps/web/src/features/Toast.tsx",
-        "dependents": 32
-      },
-      {
-        "file": "apps/api/src/env.ts",
-        "dependents": 25
+        "dependents": 35
       },
       {
         "file": "apps/web/src/lib/entity-href.ts",
-        "dependents": 25
+        "dependents": 27
+      },
+      {
+        "file": "apps/api/src/env.ts",
+        "dependents": 26
       }
     ],
     "cross_package_edges": [
@@ -780,6 +816,6 @@
       "@vitae/web → @vitae/core",
       "@vitae/web → @vitae/ui"
     ],
-    "dynamic_edges": 61
+    "dynamic_edges": 63
   }
 }

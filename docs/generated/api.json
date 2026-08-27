@@ -2,18 +2,18 @@
   "generated_by": "scripts/docs/gen-api.mjs",
   "note": "Derived from the Express routers, not from docs/api/openapi.json. Do not edit by hand.",
   "totals": {
-    "endpoints": 140,
-    "mounts": 36,
-    "declared_mount_prefixes": 36,
+    "endpoints": 153,
+    "mounts": 37,
+    "declared_mount_prefixes": 37,
     "public_endpoints": 3,
     "outside_auth_gate": 3,
-    "blocked_when_read_only": 70,
-    "documented_in_openapi": 49,
-    "undocumented_in_openapi": 91,
-    "openapi_operations": 55,
+    "blocked_when_read_only": 78,
+    "documented_in_openapi": 55,
+    "undocumented_in_openapi": 98,
+    "openapi_operations": 61,
     "documented_but_not_registered": 6,
-    "endpoints_with_tests": 133,
-    "endpoints_citing_requirements": 31
+    "endpoints_with_tests": 146,
+    "endpoints_citing_requirements": 36
   },
   "gates": {
     "auth": "/api",
@@ -25,7 +25,7 @@
       "prefix": "/applications",
       "router": "applicationsRouter",
       "source": "apps/api/src/routes/v1/applications.ts",
-      "endpoints": 2
+      "endpoints": 5
     },
     {
       "prefix": "/ask",
@@ -80,6 +80,12 @@
       "router": "docsRouter",
       "source": "apps/api/src/routes/v1/docs.ts",
       "endpoints": 2
+    },
+    {
+      "prefix": "/dossiers",
+      "router": "dossiersRouter",
+      "source": "apps/api/src/routes/v1/dossiers.ts",
+      "endpoints": 7
     },
     {
       "prefix": "/duplicates",
@@ -139,7 +145,7 @@
       "prefix": "/letters",
       "router": "lettersRouter",
       "source": "apps/api/src/routes/v1/letters.ts",
-      "endpoints": 6
+      "endpoints": 9
     },
     {
       "prefix": "/map",
@@ -249,7 +255,7 @@
       "path": "/api/v1/applications",
       "express_path": "/api/v1/applications",
       "mount": "/applications",
-      "source": "apps/api/src/routes/v1/applications.ts:272",
+      "source": "apps/api/src/routes/v1/applications.ts:386",
       "summary": "The complete application runway, including terminal outcomes.",
       "requirements": [],
       "request_schemas": [
@@ -274,13 +280,42 @@
       "openapi": true
     },
     {
+      "id": "POST /api/v1/applications",
+      "slug": "post-api-v1-applications",
+      "method": "POST",
+      "path": "/api/v1/applications",
+      "express_path": "/api/v1/applications",
+      "mount": "/applications",
+      "source": "apps/api/src/routes/v1/applications.ts:452",
+      "summary": "Create an application (FR-CAR-003). Until this existed the only way to make one was `POST /nodes`, which knows nothing about applications beyond the props schema. Any status the enum holds is a legal starting point. An application entered after the fact may already have been rejected, and a create endpoint that insisted every record begin at `draft` would be refusing to record something that happened. The machine governs moves between statuses, not the first one.",
+      "requirements": [
+        "FR-CAR-003"
+      ],
+      "request_schemas": [
+        "applicationDetailResponseSchema"
+      ],
+      "services": [
+        "invalidateDuplicateScan"
+      ],
+      "success_status": 201,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/applications.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
       "id": "GET /api/v1/applications/{id}",
       "slug": "get-api-v1-applications-id",
       "method": "GET",
       "path": "/api/v1/applications/{id}",
       "express_path": "/api/v1/applications/:id",
       "mount": "/applications",
-      "source": "apps/api/src/routes/v1/applications.ts:319",
+      "source": "apps/api/src/routes/v1/applications.ts:433",
       "summary": "One application with every linked artifact and relationship the graph has.",
       "requirements": [],
       "request_schemas": [
@@ -288,14 +323,78 @@
       ],
       "services": [],
       "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/applications.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "PATCH /api/v1/applications/{id}",
+      "slug": "patch-api-v1-applications-id",
+      "method": "PATCH",
+      "path": "/api/v1/applications/{id}",
+      "express_path": "/api/v1/applications/:id",
+      "mount": "/applications",
+      "source": "apps/api/src/routes/v1/applications.ts:483",
+      "summary": "Edit an application (FR-CAR-003). `props` merges onto what is stored rather than replacing it, so a caller can change a deadline without resending the role title, and a `null` clears a field. A status that moves is put through the same machine as the dedicated status endpoint; there is no correction here, because correcting a status is a different act from editing the record and gets its own door.",
+      "requirements": [
+        "FR-CAR-003"
+      ],
+      "request_schemas": [
+        "applicationDetailResponseSchema"
+      ],
+      "services": [
+        "invalidateDuplicateScan"
+      ],
+      "success_status": 200,
       "errors": [
         {
-          "status": 404,
-          "code": "NOT_FOUND"
+          "status": 422,
+          "code": "ILLEGAL_TRANSITION"
         }
       ],
       "auth": "authenticated",
-      "entitlement": "read-always-allowed",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/applications.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/applications/{id}/status",
+      "slug": "post-api-v1-applications-id-status",
+      "method": "POST",
+      "path": "/api/v1/applications/{id}/status",
+      "express_path": "/api/v1/applications/:id/status",
+      "mount": "/applications",
+      "source": "apps/api/src/routes/v1/applications.ts:524",
+      "summary": "Record a status change (FR-CAR-003). A move the machine refuses comes back as a 422 naming both ends of it. A correction skips the machine and is marked in the revision it writes, so the two acts stay distinguishable in the ledger afterwards: a transition is sourced `manual` like any other edit, a correction is sourced `correction`, and both carry the `props.status` from/to pair in their diff. Marking it that way costs nothing and answers the only question the history could not otherwise answer, which is whether the record moved or whether the last entry had simply been wrong.",
+      "requirements": [
+        "FR-CAR-003"
+      ],
+      "request_schemas": [
+        "applicationDetailResponseSchema",
+        "statusChangeSchema"
+      ],
+      "services": [
+        "invalidateDuplicateScan"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 422,
+          "code": "ILLEGAL_TRANSITION"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
       "handler": null,
       "handler_source": null,
       "tests": [
@@ -1008,6 +1107,184 @@
       "handler_source": null,
       "tests": [
         "apps/api/src/routes/v1/docs.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/dossiers",
+      "slug": "get-api-v1-dossiers",
+      "method": "GET",
+      "path": "/api/v1/dossiers",
+      "express_path": "/api/v1/dossiers",
+      "mount": "/dossiers",
+      "source": "apps/api/src/routes/v1/dossiers.ts:31",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "listDossiers"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/dossiers.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/dossiers",
+      "slug": "post-api-v1-dossiers",
+      "method": "POST",
+      "path": "/api/v1/dossiers",
+      "express_path": "/api/v1/dossiers",
+      "mount": "/dossiers",
+      "source": "apps/api/src/routes/v1/dossiers.ts:53",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "createDossier"
+      ],
+      "success_status": 201,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/dossiers.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "DELETE /api/v1/dossiers/{id}",
+      "slug": "delete-api-v1-dossiers-id",
+      "method": "DELETE",
+      "path": "/api/v1/dossiers/{id}",
+      "express_path": "/api/v1/dossiers/:id",
+      "mount": "/dossiers",
+      "source": "apps/api/src/routes/v1/dossiers.ts:76",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "deleteDossier"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/dossiers.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/dossiers/{id}",
+      "slug": "get-api-v1-dossiers-id",
+      "method": "GET",
+      "path": "/api/v1/dossiers/{id}",
+      "express_path": "/api/v1/dossiers/:id",
+      "mount": "/dossiers",
+      "source": "apps/api/src/routes/v1/dossiers.ts:60",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "getDossier"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/dossiers.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "PATCH /api/v1/dossiers/{id}",
+      "slug": "patch-api-v1-dossiers-id",
+      "method": "PATCH",
+      "path": "/api/v1/dossiers/{id}",
+      "express_path": "/api/v1/dossiers/:id",
+      "mount": "/dossiers",
+      "source": "apps/api/src/routes/v1/dossiers.ts:69",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "updateDossier"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/dossiers.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/dossiers/{id}/compile",
+      "slug": "get-api-v1-dossiers-id-compile",
+      "method": "GET",
+      "path": "/api/v1/dossiers/{id}/compile",
+      "express_path": "/api/v1/dossiers/:id/compile",
+      "mount": "/dossiers",
+      "source": "apps/api/src/routes/v1/dossiers.ts:83",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "compileDossier"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/dossiers.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/dossiers/audiences",
+      "slug": "get-api-v1-dossiers-audiences",
+      "method": "GET",
+      "path": "/api/v1/dossiers/audiences",
+      "express_path": "/api/v1/dossiers/audiences",
+      "mount": "/dossiers",
+      "source": "apps/api/src/routes/v1/dossiers.ts:44",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/dossiers.integration.test.ts"
       ],
       "openapi": false
     },
@@ -1732,7 +2009,7 @@
       "path": "/api/v1/imports/{id}/commit",
       "express_path": "/api/v1/imports/:id/commit",
       "mount": "/imports",
-      "source": "apps/api/src/routes/v1/imports.ts:92",
+      "source": "apps/api/src/routes/v1/imports.ts:109",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -1757,7 +2034,7 @@
       "path": "/api/v1/imports/{id}/discard",
       "express_path": "/api/v1/imports/:id/discard",
       "mount": "/imports",
-      "source": "apps/api/src/routes/v1/imports.ts:110",
+      "source": "apps/api/src/routes/v1/imports.ts:127",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -1782,7 +2059,7 @@
       "path": "/api/v1/imports/{id}/rollback",
       "express_path": "/api/v1/imports/:id/rollback",
       "mount": "/imports",
-      "source": "apps/api/src/routes/v1/imports.ts:101",
+      "source": "apps/api/src/routes/v1/imports.ts:118",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -1807,10 +2084,12 @@
       "path": "/api/v1/imports/{id}/rows/{rowId}",
       "express_path": "/api/v1/imports/:id/rows/:rowId",
       "mount": "/imports",
-      "source": "apps/api/src/routes/v1/imports.ts:82",
-      "summary": "Flip a staged row between accept/skip; optionally patch its payload.",
+      "source": "apps/api/src/routes/v1/imports.ts:93",
+      "summary": null,
       "requirements": [],
-      "request_schemas": [],
+      "request_schemas": [
+        "rowDecisionSchema"
+      ],
       "services": [
         "setRowDecision"
       ],
@@ -2025,7 +2304,7 @@
       "path": "/api/v1/letters",
       "express_path": "/api/v1/letters",
       "mount": "/letters",
-      "source": "apps/api/src/routes/v1/letters.ts:17",
+      "source": "apps/api/src/routes/v1/letters.ts:42",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -2041,7 +2320,7 @@
       "tests": [
         "apps/api/src/routes/v1/letters.integration.test.ts"
       ],
-      "openapi": true
+      "openapi": false
     },
     {
       "id": "POST /api/v1/letters",
@@ -2050,7 +2329,7 @@
       "path": "/api/v1/letters",
       "express_path": "/api/v1/letters",
       "mount": "/letters",
-      "source": "apps/api/src/routes/v1/letters.ts:29",
+      "source": "apps/api/src/routes/v1/letters.ts:54",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -2075,7 +2354,7 @@
       "path": "/api/v1/letters/{id}",
       "express_path": "/api/v1/letters/:id",
       "mount": "/letters",
-      "source": "apps/api/src/routes/v1/letters.ts:56",
+      "source": "apps/api/src/routes/v1/letters.ts:81",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -2100,7 +2379,7 @@
       "path": "/api/v1/letters/{id}",
       "express_path": "/api/v1/letters/:id",
       "mount": "/letters",
-      "source": "apps/api/src/routes/v1/letters.ts:37",
+      "source": "apps/api/src/routes/v1/letters.ts:62",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -2130,7 +2409,7 @@
       "path": "/api/v1/letters/{id}",
       "express_path": "/api/v1/letters/:id",
       "mount": "/letters",
-      "source": "apps/api/src/routes/v1/letters.ts:48",
+      "source": "apps/api/src/routes/v1/letters.ts:73",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -2149,13 +2428,101 @@
       "openapi": false
     },
     {
+      "id": "GET /api/v1/letters/{id}/artifacts/{kind}",
+      "slug": "get-api-v1-letters-id-artifacts-kind",
+      "method": "GET",
+      "path": "/api/v1/letters/{id}/artifacts/{kind}",
+      "express_path": "/api/v1/letters/:id/artifacts/:kind",
+      "mount": "/letters",
+      "source": "apps/api/src/routes/v1/letters.ts:118",
+      "summary": "A short-lived signed URL for one stored artifact, mirroring the résumé route. The 409 is the honest answer for a letter that was finalized while storage was unreachable: the record exists, the file does not.",
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "getLetter"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        },
+        {
+          "status": 409,
+          "code": "ARTIFACT_UNAVAILABLE"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/letters.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/letters/{id}/compile",
+      "slug": "post-api-v1-letters-id-compile",
+      "method": "POST",
+      "path": "/api/v1/letters/{id}/compile",
+      "express_path": "/api/v1/letters/:id/compile",
+      "mount": "/letters",
+      "source": "apps/api/src/routes/v1/letters.ts:98",
+      "summary": "Render + compile for preview. Stores nothing (FR-RES-021).",
+      "requirements": [
+        "FR-RES-021"
+      ],
+      "request_schemas": [],
+      "services": [
+        "compileLetter"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/letters.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/letters/{id}/finalize",
+      "slug": "post-api-v1-letters-id-finalize",
+      "method": "POST",
+      "path": "/api/v1/letters/{id}/finalize",
+      "express_path": "/api/v1/letters/:id/finalize",
+      "mount": "/letters",
+      "source": "apps/api/src/routes/v1/letters.ts:106",
+      "summary": "Compile and keep the PDF + source as this letter's artifacts (FR-RES-021).",
+      "requirements": [
+        "FR-RES-021"
+      ],
+      "request_schemas": [],
+      "services": [
+        "finalizeLetter"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/letters.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
       "id": "POST /api/v1/letters/{id}/restore",
       "slug": "post-api-v1-letters-id-restore",
       "method": "POST",
       "path": "/api/v1/letters/{id}/restore",
       "express_path": "/api/v1/letters/:id/restore",
       "mount": "/letters",
-      "source": "apps/api/src/routes/v1/letters.ts:64",
+      "source": "apps/api/src/routes/v1/letters.ts:89",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -2226,7 +2593,7 @@
       "path": "/api/v1/nodes",
       "express_path": "/api/v1/nodes",
       "mount": "/nodes",
-      "source": "apps/api/src/routes/v1/nodes.ts:33",
+      "source": "apps/api/src/routes/v1/nodes.ts:34",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -2252,7 +2619,7 @@
       "path": "/api/v1/nodes",
       "express_path": "/api/v1/nodes",
       "mount": "/nodes",
-      "source": "apps/api/src/routes/v1/nodes.ts:87",
+      "source": "apps/api/src/routes/v1/nodes.ts:88",
       "summary": null,
       "requirements": [],
       "request_schemas": [
@@ -2284,7 +2651,7 @@
       "path": "/api/v1/nodes/{id}",
       "express_path": "/api/v1/nodes/:id",
       "mount": "/nodes",
-      "source": "apps/api/src/routes/v1/nodes.ts:239",
+      "source": "apps/api/src/routes/v1/nodes.ts:249",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -2309,7 +2676,7 @@
       "path": "/api/v1/nodes/{id}",
       "express_path": "/api/v1/nodes/:id",
       "mount": "/nodes",
-      "source": "apps/api/src/routes/v1/nodes.ts:189",
+      "source": "apps/api/src/routes/v1/nodes.ts:190",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -2337,7 +2704,7 @@
       "path": "/api/v1/nodes/{id}",
       "express_path": "/api/v1/nodes/:id",
       "mount": "/nodes",
-      "source": "apps/api/src/routes/v1/nodes.ts:223",
+      "source": "apps/api/src/routes/v1/nodes.ts:224",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -2349,6 +2716,10 @@
         {
           "status": 404,
           "code": "NOT_FOUND"
+        },
+        {
+          "status": 422,
+          "code": "ILLEGAL_TRANSITION"
         }
       ],
       "auth": "authenticated",
@@ -2367,7 +2738,7 @@
       "path": "/api/v1/nodes/{id}/archive",
       "express_path": "/api/v1/nodes/:id/archive",
       "mount": "/nodes",
-      "source": "apps/api/src/routes/v1/nodes.ts:259",
+      "source": "apps/api/src/routes/v1/nodes.ts:269",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -2392,7 +2763,7 @@
       "path": "/api/v1/nodes/{id}/restore",
       "express_path": "/api/v1/nodes/:id/restore",
       "mount": "/nodes",
-      "source": "apps/api/src/routes/v1/nodes.ts:249",
+      "source": "apps/api/src/routes/v1/nodes.ts:259",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -2417,7 +2788,7 @@
       "path": "/api/v1/nodes/{id}/revisions",
       "express_path": "/api/v1/nodes/:id/revisions",
       "mount": "/nodes",
-      "source": "apps/api/src/routes/v1/nodes.ts:271",
+      "source": "apps/api/src/routes/v1/nodes.ts:281",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -2440,7 +2811,7 @@
       "path": "/api/v1/nodes/counts",
       "express_path": "/api/v1/nodes/counts",
       "mount": "/nodes",
-      "source": "apps/api/src/routes/v1/nodes.ts:79",
+      "source": "apps/api/src/routes/v1/nodes.ts:80",
       "summary": "Live node counts per type, the Collections tiles. FR-104: per-type aggregation counts instead of loading the whole collection to tally it.",
       "requirements": [
         "FR-104"
@@ -4189,6 +4560,12 @@
     "POST /api/v1/composer/draft",
     "POST /api/v1/composer/send",
     "GET /api/v1/docs/*",
+    "POST /api/v1/dossiers",
+    "DELETE /api/v1/dossiers/{id}",
+    "GET /api/v1/dossiers/{id}",
+    "PATCH /api/v1/dossiers/{id}",
+    "GET /api/v1/dossiers/{id}/compile",
+    "GET /api/v1/dossiers/audiences",
     "GET /api/v1/duplicates/aliases",
     "DELETE /api/v1/duplicates/aliases/{id}",
     "POST /api/v1/duplicates/check",
@@ -4215,6 +4592,7 @@
     "DELETE /api/v1/interactions/{id}",
     "GET /api/v1/intros/paths",
     "GET /api/v1/intros/targets",
+    "GET /api/v1/letters",
     "POST /api/v1/letters",
     "DELETE /api/v1/letters/{id}",
     "GET /api/v1/letters/{id}",

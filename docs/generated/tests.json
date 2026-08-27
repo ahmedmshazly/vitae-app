@@ -250,6 +250,27 @@
       "lines": 68
     },
     {
+      "file": "apps/api/src/db/util.test.ts",
+      "package": "@vitae/api",
+      "cases": 9,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "shallowDiff",
+        "stripUndefined"
+      ],
+      "subjects": [
+        "./util.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 93
+    },
+    {
       "file": "apps/api/src/middleware/auth.test.ts",
       "package": "@vitae/api",
       "cases": 6,
@@ -338,23 +359,26 @@
     {
       "file": "apps/api/src/routes/v1/applications.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 2,
+      "cases": 16,
       "skipped": 0,
       "todo": 0,
       "suites": [
-        "application routes"
+        "application routes",
+        "application write endpoints"
       ],
       "subjects": [
         "../../__tests__/helpers/app.js",
         "@vitae/core"
       ],
-      "requirements": [],
+      "requirements": [
+        "FR-CAR-003"
+      ],
       "run_by": [
         "test:api",
         "test"
       ],
       "run_in_ci": true,
-      "lines": 135
+      "lines": 383
     },
     {
       "file": "apps/api/src/routes/v1/ask.integration.test.ts",
@@ -552,6 +576,29 @@
       "lines": 256
     },
     {
+      "file": "apps/api/src/routes/v1/dossiers.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "dossiers route"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [
+        "FR-DOS-001",
+        "FR-DOS-002"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 220
+    },
+    {
       "file": "apps/api/src/routes/v1/duplicates.integration.test.ts",
       "package": "@vitae/api",
       "cases": 2,
@@ -681,22 +728,26 @@
     {
       "file": "apps/api/src/routes/v1/imports.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 2,
+      "cases": 7,
       "skipped": 0,
       "todo": 0,
       "suites": [
-        "imports routes"
+        "imports routes",
+        "re-import is longitudinal"
       ],
       "subjects": [
         "../../__tests__/helpers/app.js"
       ],
-      "requirements": [],
+      "requirements": [
+        "FR-SYNC-001",
+        "FR-SYNC-002"
+      ],
       "run_by": [
         "test:api",
         "test"
       ],
       "run_in_ci": true,
-      "lines": 35
+      "lines": 276
     },
     {
       "file": "apps/api/src/routes/v1/interactions.integration.test.ts",
@@ -765,7 +816,7 @@
     {
       "file": "apps/api/src/routes/v1/letters.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 1,
+      "cases": 4,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -775,34 +826,39 @@
         "../../__tests__/helpers/app.js"
       ],
       "requirements": [
-        "FR-RES-020"
+        "FR-RES-013",
+        "FR-RES-020",
+        "FR-RES-021"
       ],
       "run_by": [
         "test:api",
         "test"
       ],
       "run_in_ci": true,
-      "lines": 63
+      "lines": 165
     },
     {
       "file": "apps/api/src/routes/v1/nodes.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 4,
+      "cases": 9,
       "skipped": 0,
       "todo": 0,
       "suites": [
-        "POST/GET /api/v1/nodes"
+        "POST/GET /api/v1/nodes",
+        "the application status machine, through the generic patch"
       ],
       "subjects": [
         "../../__tests__/helpers/app.js"
       ],
-      "requirements": [],
+      "requirements": [
+        "FR-CAR-003"
+      ],
       "run_by": [
         "test:api",
         "test"
       ],
       "run_in_ci": true,
-      "lines": 84
+      "lines": 169
     },
     {
       "file": "apps/api/src/routes/v1/orgs.integration.test.ts",
@@ -1055,7 +1111,7 @@
     {
       "file": "apps/api/src/services/buildsvc-client.test.ts",
       "package": "@vitae/api",
-      "cases": 3,
+      "cases": 5,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -1071,7 +1127,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 65
+      "lines": 94
     },
     {
       "file": "apps/api/src/services/crm.test.ts",
@@ -1092,6 +1148,73 @@
       ],
       "run_in_ci": true,
       "lines": 58
+    },
+    {
+      "file": "apps/api/src/services/dossier.test.ts",
+      "package": "@vitae/api",
+      "cases": 9,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "compileDossier"
+      ],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 193
+    },
+    {
+      "file": "apps/api/src/services/imports.test.ts",
+      "package": "@vitae/api",
+      "cases": 13,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "nodeDraftFor",
+        "resolveIdentity",
+        "buildProposal"
+      ],
+      "subjects": [
+        "./imports.js",
+        "@vitae/core"
+      ],
+      "requirements": [
+        "FR-SYNC-001",
+        "FR-SYNC-002"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 184
+    },
+    {
+      "file": "apps/api/src/services/letters.test.ts",
+      "package": "@vitae/api",
+      "cases": 16,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "letterDateLine",
+        "renderLetterTex",
+        "compileLetter",
+        "finalizeLetter"
+      ],
+      "subjects": [],
+      "requirements": [
+        "FR-RES-021"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 269
     },
     {
       "file": "apps/api/src/services/restore.integration.test.ts",
@@ -1170,6 +1293,32 @@
       ],
       "run_in_ci": true,
       "lines": 151
+    },
+    {
+      "file": "apps/api/src/services/template-renderers.test.ts",
+      "package": "@vitae/api",
+      "cases": 15,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "letterParagraphs",
+        "letterTokens",
+        "the letter template and its renderer agree",
+        "every shipped template carries its own calibration fixture"
+      ],
+      "subjects": [
+        "./template-renderers.js"
+      ],
+      "requirements": [
+        "FR-RES-009",
+        "FR-RES-021"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 167
     },
     {
       "file": "apps/web/src/App.public.test.tsx",
@@ -1513,6 +1662,70 @@
       ],
       "run_in_ci": true,
       "lines": 88
+    },
+    {
+      "file": "apps/web/src/features/DossierAppendix.test.tsx",
+      "package": "@vitae/web",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "provenance appendix"
+      ],
+      "subjects": [
+        "./DossierAppendix.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 123
+    },
+    {
+      "file": "apps/web/src/features/DossierClaimForm.test.tsx",
+      "package": "@vitae/web",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "dossier claim form"
+      ],
+      "subjects": [
+        "./DossierClaimForm.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 165
+    },
+    {
+      "file": "apps/web/src/features/DossierGrammar.test.ts",
+      "package": "@vitae/web",
+      "cases": 10,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "dossier phrasing",
+        "dossier limits, in words",
+        "editing the selection"
+      ],
+      "subjects": [
+        "./DossierGrammar.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 114
     },
     {
       "file": "apps/web/src/features/FirstRun.test.tsx",
@@ -2256,6 +2469,28 @@
       "lines": 18
     },
     {
+      "file": "apps/web/src/features/ImportProposalDiff.test.tsx",
+      "package": "@vitae/web",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "fieldLabel",
+        "formatFieldValue",
+        "ImportProposalDiff"
+      ],
+      "subjects": [
+        "./ImportProposalDiff.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 95
+    },
+    {
       "file": "apps/web/src/features/InteractionLogger.test.tsx",
       "package": "@vitae/web",
       "cases": 5,
@@ -2274,6 +2509,29 @@
       ],
       "run_in_ci": true,
       "lines": 119
+    },
+    {
+      "file": "apps/web/src/features/LetterCompilePanel.test.tsx",
+      "package": "@vitae/web",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "LetterCompilePanel"
+      ],
+      "subjects": [
+        "./LetterCompilePanel.js"
+      ],
+      "requirements": [
+        "FR-RES-013",
+        "FR-RES-021"
+      ],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 157
     },
     {
       "file": "apps/web/src/features/LogIntroduction.test.tsx",
@@ -2808,6 +3066,26 @@
       "lines": 337
     },
     {
+      "file": "apps/web/src/lib/revision-fields.test.ts",
+      "package": "@vitae/web",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "fieldLabel"
+      ],
+      "subjects": [
+        "./revision-fields.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 23
+    },
+    {
       "file": "apps/web/src/lib/runtime.test.ts",
       "package": "@vitae/web",
       "cases": 1,
@@ -3044,7 +3322,7 @@
     {
       "file": "apps/web/src/routes/career/ApplicationDossier.test.tsx",
       "package": "@vitae/web",
-      "cases": 2,
+      "cases": 3,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -3060,7 +3338,29 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 127
+      "lines": 136
+    },
+    {
+      "file": "apps/web/src/routes/career/ApplicationStatusControl.test.tsx",
+      "package": "@vitae/web",
+      "cases": 9,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Application status control"
+      ],
+      "subjects": [
+        "./ApplicationStatusControl.js"
+      ],
+      "requirements": [
+        "FR-CAR-003"
+      ],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 120
     },
     {
       "file": "apps/web/src/routes/career/CareerOverview.test.tsx",
@@ -3494,6 +3794,91 @@
       "lines": 198
     },
     {
+      "file": "apps/web/src/routes/DossierEditor.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "DossierEditor states"
+      ],
+      "subjects": [
+        "../lib/api.js",
+        "./DossierEditor.js"
+      ],
+      "requirements": [
+        "NFR-REL-004"
+      ],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 261
+    },
+    {
+      "file": "apps/web/src/routes/DossierEditor.test.tsx",
+      "package": "@vitae/web",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "DossierEditor"
+      ],
+      "subjects": [
+        "./DossierEditor.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 284
+    },
+    {
+      "file": "apps/web/src/routes/Dossiers.states.test.tsx",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Dossiers states"
+      ],
+      "subjects": [
+        "./Dossiers.js"
+      ],
+      "requirements": [
+        "NFR-REL-004"
+      ],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 114
+    },
+    {
+      "file": "apps/web/src/routes/Dossiers.test.tsx",
+      "package": "@vitae/web",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Dossiers"
+      ],
+      "subjects": [
+        "./Dossiers.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 221
+    },
+    {
       "file": "apps/web/src/routes/Duplicates.audit.test.tsx",
       "package": "@vitae/web",
       "cases": 2,
@@ -3556,11 +3941,12 @@
     {
       "file": "apps/web/src/routes/ImportHub.test.ts",
       "package": "@vitae/web",
-      "cases": 4,
+      "cases": 8,
       "skipped": 0,
       "todo": 0,
       "suites": [
-        "sourceStatus"
+        "sourceStatus",
+        "commitAction"
       ],
       "subjects": [
         "./ImportHub.js"
@@ -3571,7 +3957,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 56
+      "lines": 80
     },
     {
       "file": "apps/web/src/routes/Intros.test.ts",
@@ -3599,7 +3985,7 @@
     {
       "file": "apps/web/src/routes/Ledger.states.test.tsx",
       "package": "@vitae/web",
-      "cases": 6,
+      "cases": 7,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -3616,12 +4002,12 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 87
+      "lines": 97
     },
     {
       "file": "apps/web/src/routes/Letters.states.test.tsx",
       "package": "@vitae/web",
-      "cases": 5,
+      "cases": 9,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -3630,13 +4016,15 @@
       "subjects": [
         "./Letters.js"
       ],
-      "requirements": [],
+      "requirements": [
+        "FR-RES-021"
+      ],
       "run_by": [
         "test:web",
         "test"
       ],
       "run_in_ci": true,
-      "lines": 103
+      "lines": 159
     },
     {
       "file": "apps/web/src/routes/marketing/Chrome.test.tsx",
@@ -4719,6 +5107,27 @@
       ],
       "run_in_ci": true,
       "lines": 100
+    },
+    {
+      "file": "e2e/tests/application-status.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/api.js",
+        "./helpers/auth"
+      ],
+      "requirements": [
+        "FR-CAR-003"
+      ],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 113
     },
     {
       "file": "e2e/tests/ask.spec.ts",
@@ -6451,6 +6860,34 @@
       "lines": 60
     },
     {
+      "file": "packages/core/src/importers/convergence.test.ts",
+      "package": "@vitae/core",
+      "cases": 21,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "changedFields",
+        "SYNC_BOOKKEEPING_FIELDS",
+        "statedFieldsOnly",
+        "patchForFields",
+        "readField",
+        "deepEqual"
+      ],
+      "subjects": [
+        "./convergence.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 171
+    },
+    {
       "file": "packages/core/src/importers/csv.test.ts",
       "package": "@vitae/core",
       "cases": 7,
@@ -6478,7 +6915,7 @@
     {
       "file": "packages/core/src/importers/ics.test.ts",
       "package": "@vitae/core",
-      "cases": 3,
+      "cases": 5,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -6496,12 +6933,41 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 51
+      "lines": 62
+    },
+    {
+      "file": "packages/core/src/importers/identity.test.ts",
+      "package": "@vitae/core",
+      "cases": 20,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "identityKeyFor",
+        "contactEmailKey",
+        "vcardUidKey",
+        "icsEventKey",
+        "linkedinProfileKey",
+        "bookmarkUrlKey"
+      ],
+      "subjects": [
+        "../schema/envelope.js",
+        "./identity.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 130
     },
     {
       "file": "packages/core/src/importers/linkedin.test.ts",
       "package": "@vitae/core",
-      "cases": 5,
+      "cases": 8,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -6523,12 +6989,12 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 54
+      "lines": 72
     },
     {
       "file": "packages/core/src/importers/netscape-bookmarks.test.ts",
       "package": "@vitae/core",
-      "cases": 2,
+      "cases": 3,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -6546,12 +7012,12 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 40
+      "lines": 48
     },
     {
       "file": "packages/core/src/importers/vcard.test.ts",
       "package": "@vitae/core",
-      "cases": 4,
+      "cases": 8,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -6569,7 +7035,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 63
+      "lines": 88
     },
     {
       "file": "packages/core/src/places/index.test.ts",
@@ -6599,12 +7065,13 @@
     {
       "file": "packages/core/src/schema/application-status.test.ts",
       "package": "@vitae/core",
-      "cases": 9,
+      "cases": 12,
       "skipped": 0,
       "todo": 0,
       "suites": [
         "the application status vocabulary",
-        "the application status machine"
+        "the application status machine",
+        "the sentence a refused move gets"
       ],
       "subjects": [
         "./application.js"
@@ -6618,7 +7085,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 96
+      "lines": 124
     },
     {
       "file": "packages/core/src/schema/application.test.ts",
@@ -6668,6 +7135,33 @@
       ],
       "run_in_ci": true,
       "lines": 170
+    },
+    {
+      "file": "packages/core/src/schema/dossier.test.ts",
+      "package": "@vitae/core",
+      "cases": 17,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "the dossier selection format",
+        "the audience grammars",
+        "validateDossier"
+      ],
+      "subjects": [
+        "./dossier.js"
+      ],
+      "requirements": [
+        "FR-DOS-002"
+      ],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 256
     },
     {
       "file": "packages/core/src/schema/edge-props.relations.test.ts",
@@ -6762,6 +7256,33 @@
       ],
       "run_in_ci": true,
       "lines": 99
+    },
+    {
+      "file": "packages/core/src/schema/resume.test.ts",
+      "package": "@vitae/core",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "letterCreateSchema",
+        "letterSchema"
+      ],
+      "subjects": [
+        "./resume.js"
+      ],
+      "requirements": [
+        "FR-RES-020",
+        "FR-RES-021"
+      ],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 98
     },
     {
       "file": "packages/core/src/schema/template-gallery.test.ts",
@@ -7096,27 +7617,27 @@
     }
   ],
   "summary": {
-    "files": 332,
-    "cases": 2162,
+    "files": 354,
+    "cases": 2433,
     "skipped": 0,
     "todo": 0,
     "by_package": {
-      "@vitae/api": 225,
-      "@vitae/web": 1120,
-      "@vitae/e2e": 291,
-      "@vitae/core": 293,
+      "@vitae/api": 323,
+      "@vitae/web": 1209,
+      "@vitae/e2e": 296,
+      "@vitae/core": 372,
       "@vitae/testkit": 7,
       "@vitae/ui": 226
     },
     "by_script": {
-      "test": 332,
-      "test:web": 163,
-      "test:e2e": 59,
-      "test:api": 55,
-      "test:unit": 46,
-      "test:coverage": 46,
-      "test:core": 44,
-      "test:mutation": 44,
+      "test": 354,
+      "test:web": 174,
+      "test:api": 61,
+      "test:e2e": 60,
+      "test:unit": 50,
+      "test:coverage": 50,
+      "test:core": 48,
+      "test:mutation": 48,
       "test:property": 5,
       "test:security": 3,
       "test:a11y": 3,
@@ -7163,7 +7684,7 @@
       "e2e/tests/helpers/toast.ts"
     ],
     "with_skips": [],
-    "requirements_proven": 29,
+    "requirements_proven": 35,
     "requirements_unproven": [
       "FR-004",
       "FR-005",
@@ -7189,7 +7710,6 @@
       "FR-CAP-008",
       "FR-CAR-001",
       "FR-CAR-002",
-      "FR-CAR-003",
       "FR-CAR-004",
       "FR-COMM-001",
       "FR-CON-002",
@@ -7200,8 +7720,6 @@
       "FR-CON-008",
       "FR-CON-009",
       "FR-CON-010",
-      "FR-DOS-001",
-      "FR-DOS-002",
       "FR-EXP-010",
       "FR-EXP-012",
       "FR-EXP-013",
@@ -7230,7 +7748,6 @@
       "FR-RES-017",
       "FR-RES-018",
       "FR-RES-019",
-      "FR-RES-021",
       "FR-SET-001",
       "FR-SET-004",
       "FR-SET-006",
@@ -7238,8 +7755,6 @@
       "FR-SRCH-001",
       "FR-SRCH-003",
       "FR-SRCH-004",
-      "FR-SYNC-001",
-      "FR-SYNC-002",
       "FR-VIS-001",
       "FR-VIS-002",
       "FR-VIS-003",

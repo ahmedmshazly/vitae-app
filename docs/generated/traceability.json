@@ -2,8 +2,8 @@
   "generated_by": "scripts/docs/gen-traceability.mjs",
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
-    "files_scanned": 893,
-    "files_citing": 195,
+    "files_scanned": 914,
+    "files_citing": 216,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,11 +20,11 @@
   },
   "totals": {
     "registered": 131,
-    "citations": 811,
-    "implemented_and_tested": 26,
-    "implemented_untested": 60,
+    "citations": 871,
+    "implemented_and_tested": 31,
+    "implemented_untested": 61,
     "tested_only": 3,
-    "documents_only": 42,
+    "documents_only": 36,
     "uncited": 0,
     "unregistered_identifiers": 0,
     "capabilities": 19,
@@ -66,7 +66,7 @@
         "apps/api/src/routes/v1/interactions.ts:17",
         "apps/api/src/services/capture.ts:6",
         "apps/api/src/services/duplicates.ts:9",
-        "apps/api/src/services/imports.ts:842"
+        "apps/api/src/services/imports.ts:1275"
       ],
       "tests": [
         "apps/api/src/__tests__/api.integration.test.ts:1171",
@@ -115,7 +115,7 @@
       "sources": [
         "apps/api/src/routes/v1/dashboard.ts:139",
         "apps/api/src/routes/v1/settings.ts:50",
-        "apps/api/src/services/imports.ts:1180",
+        "apps/api/src/services/imports.ts:1591",
         "apps/api/src/services/secrets.ts:2",
         "apps/api/src/services/settings.ts:5",
         "apps/api/src/services/settings.ts:60",
@@ -150,11 +150,12 @@
         "apps/api/src/index.ts:20",
         "apps/api/src/routes/v1/retention.ts:8",
         "apps/api/src/scripts/purge.ts:2",
-        "apps/api/src/services/imports.ts:10",
-        "apps/api/src/services/imports.ts:544",
-        "apps/api/src/services/imports.ts:1083",
-        "apps/api/src/services/imports.ts:1100",
-        "apps/api/src/services/imports.ts:1112",
+        "apps/api/src/services/imports.ts:12",
+        "apps/api/src/services/imports.ts:835",
+        "apps/api/src/services/imports.ts:1433",
+        "apps/api/src/services/imports.ts:1466",
+        "apps/api/src/services/imports.ts:1479",
+        "apps/api/src/services/imports.ts:1492",
         "apps/api/src/services/retention.ts:2",
         "apps/web/src/routes/Trash.tsx:61"
       ],
@@ -208,7 +209,7 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-untested",
       "sources": [
-        "apps/api/src/services/export.ts:217"
+        "apps/api/src/services/export.ts:219"
       ],
       "tests": [],
       "documents": []
@@ -391,9 +392,9 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-untested",
       "sources": [
-        "apps/api/src/services/imports.ts:815",
-        "apps/api/src/services/imports.ts:816",
-        "apps/api/src/services/imports.ts:1082"
+        "apps/api/src/services/imports.ts:1248",
+        "apps/api/src/services/imports.ts:1249",
+        "apps/api/src/services/imports.ts:1432"
       ],
       "tests": [],
       "documents": [
@@ -445,7 +446,7 @@
         "apps/web/src/features/Composer.tsx:45",
         "apps/web/src/features/InteractionLogger.tsx:47",
         "apps/web/src/features/QuickSwitcher.tsx:23",
-        "apps/web/src/routes/ImportHub.tsx:850",
+        "apps/web/src/routes/ImportHub.tsx:984",
         "apps/web/src/routes/Settings.tsx:456",
         "apps/web/src/styles/app.css:2219"
       ],
@@ -495,7 +496,7 @@
         "apps/api/src/middleware/health.ts:2",
         "apps/api/src/middleware/request-context.ts:2",
         "apps/api/src/services/http.ts:2",
-        "apps/api/src/services/imports.ts:1191"
+        "apps/api/src/services/imports.ts:1602"
       ],
       "tests": [],
       "documents": [
@@ -548,7 +549,7 @@
       "evidence": "implemented-untested",
       "sources": [
         "apps/api/src/db/repository.ts:541",
-        "apps/api/src/routes/v1/nodes.ts:77"
+        "apps/api/src/routes/v1/nodes.ts:78"
       ],
       "tests": [],
       "documents": [
@@ -710,11 +711,21 @@
     },
     "FR-CAR-003": {
       "capability": "CAP-CAREER",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
-      "evidence": "documents-only",
-      "sources": [],
-      "tests": [],
+      "evidence": "implemented-and-tested",
+      "sources": [
+        "apps/api/src/routes/v1/applications.ts:443",
+        "apps/api/src/routes/v1/applications.ts:475",
+        "apps/api/src/routes/v1/applications.ts:513",
+        "apps/web/src/routes/career/ApplicationStatusControl.tsx:15"
+      ],
+      "tests": [
+        "apps/api/src/routes/v1/applications.integration.test.ts:137",
+        "apps/api/src/routes/v1/nodes.integration.test.ts:63",
+        "apps/web/src/routes/career/ApplicationStatusControl.test.tsx:2",
+        "e2e/tests/application-status.spec.ts:6"
+      ],
       "documents": [
         "docs/ROADMAP.md:49",
         "docs/observatory/product/blueprint/career-and-resume.md:33"
@@ -996,8 +1007,12 @@
       "capability": "CAP-DOSSIER",
       "implementation_status": "planned",
       "definition_provenance": "reconstructed",
-      "evidence": "documents-only",
-      "sources": [],
+      "evidence": "implemented-untested",
+      "sources": [
+        "apps/api/src/db/migrations/011-dossiers.ts:2",
+        "apps/api/src/services/export.ts:62",
+        "packages/core/src/schema/dossier.ts:2"
+      ],
       "tests": [],
       "documents": [
         "docs/ROADMAP.md:47",
@@ -1011,9 +1026,16 @@
       "capability": "CAP-DOSSIER",
       "implementation_status": "planned",
       "definition_provenance": "reconstructed",
-      "evidence": "documents-only",
-      "sources": [],
-      "tests": [],
+      "evidence": "implemented-and-tested",
+      "sources": [
+        "apps/api/src/db/migrations/011-dossiers.ts:2",
+        "packages/core/src/schema/dossier.ts:2",
+        "packages/core/src/schema/dossier.ts:16"
+      ],
+      "tests": [
+        "packages/core/src/schema/dossier.test.ts:4",
+        "packages/core/src/schema/dossier.test.ts:248"
+      ],
       "documents": [
         "docs/ROADMAP.md:47",
         "docs/observatory/product/blueprint/career-and-resume.md:101",
@@ -1224,7 +1246,7 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-untested",
       "sources": [
-        "apps/web/src/routes/Record.tsx:203"
+        "apps/web/src/routes/Record.tsx:204"
       ],
       "tests": [],
       "documents": [
@@ -1251,7 +1273,7 @@
       "sources": [
         "apps/api/src/db/repository.ts:623",
         "apps/api/src/routes/v1/ledger.ts:8",
-        "apps/web/src/routes/Ledger.tsx:58"
+        "apps/web/src/routes/Ledger.tsx:59"
       ],
       "tests": [
         "apps/api/src/routes/v1/ledger.integration.test.ts:2",
@@ -1273,8 +1295,8 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-and-tested",
       "sources": [
-        "apps/web/src/routes/Record.tsx:67",
-        "apps/web/src/routes/Record.tsx:393"
+        "apps/web/src/routes/Record.tsx:68",
+        "apps/web/src/routes/Record.tsx:394"
       ],
       "tests": [
         "e2e/tests/ledger.spec.ts:10"
@@ -1441,6 +1463,7 @@
         "services/buildsvc/src/calibrate.ts:2"
       ],
       "tests": [
+        "apps/api/src/services/template-renderers.test.ts:3",
         "packages/core/src/algorithms/line-model.test.ts:12"
       ],
       "documents": [
@@ -1510,11 +1533,16 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-and-tested",
       "sources": [
+        "apps/api/src/routes/v1/letters.ts:7",
         "apps/api/src/routes/v1/resumes.ts:235",
-        "apps/api/src/services/buildsvc-client.ts:8"
+        "apps/api/src/services/buildsvc-client.ts:8",
+        "apps/api/src/services/letters.ts:9",
+        "apps/web/src/features/LetterCompilePanel.tsx:90"
       ],
       "tests": [
-        "apps/api/src/services/buildsvc-client.test.ts:2"
+        "apps/api/src/routes/v1/letters.integration.test.ts:7",
+        "apps/api/src/services/buildsvc-client.test.ts:2",
+        "apps/web/src/features/LetterCompilePanel.test.tsx:4"
       ],
       "documents": [
         "docs/ROADMAP.md:26",
@@ -1626,7 +1654,7 @@
     },
     "FR-RES-020": {
       "capability": "CAP-RESUME",
-      "implementation_status": "partial",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "evidence": "implemented-and-tested",
       "sources": [
@@ -1635,11 +1663,12 @@
         "apps/api/src/services/export.ts:60",
         "apps/api/src/services/letters.ts:2",
         "packages/core/src/schema/resume.ts:223",
-        "packages/core/src/schema/resume.ts:243"
+        "packages/core/src/schema/resume.ts:257"
       ],
       "tests": [
         "apps/api/src/__tests__/api.integration.test.ts:682",
-        "apps/api/src/routes/v1/letters.integration.test.ts:2"
+        "apps/api/src/routes/v1/letters.integration.test.ts:2",
+        "packages/core/src/schema/resume.test.ts:2"
       ],
       "documents": [
         "docs/ROADMAP.md:50",
@@ -1650,11 +1679,28 @@
     },
     "FR-RES-021": {
       "capability": "CAP-RESUME",
-      "implementation_status": "planned",
+      "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
-      "evidence": "documents-only",
-      "sources": [],
-      "tests": [],
+      "evidence": "implemented-and-tested",
+      "sources": [
+        "apps/api/src/routes/v1/letters.ts:2",
+        "apps/api/src/routes/v1/letters.ts:97",
+        "apps/api/src/routes/v1/letters.ts:105",
+        "apps/api/src/services/letters.ts:2",
+        "apps/api/src/services/letters.ts:228",
+        "apps/api/src/services/template-renderers.ts:139",
+        "apps/web/src/features/LetterCompilePanel.tsx:6",
+        "apps/web/src/features/LetterCompilePanel.tsx:84",
+        "packages/core/src/schema/resume.ts:244"
+      ],
+      "tests": [
+        "apps/api/src/routes/v1/letters.integration.test.ts:3",
+        "apps/api/src/services/letters.test.ts:2",
+        "apps/api/src/services/template-renderers.test.ts:2",
+        "apps/web/src/features/LetterCompilePanel.test.tsx:2",
+        "apps/web/src/routes/Letters.states.test.tsx:103",
+        "packages/core/src/schema/resume.test.ts:2"
+      ],
       "documents": [
         "docs/ROADMAP.md:50",
         "docs/observatory/product/blueprint/career-and-resume.md:94",
@@ -1807,9 +1853,20 @@
       "capability": "CAP-IMPORT",
       "implementation_status": "planned",
       "definition_provenance": "reconstructed",
-      "evidence": "documents-only",
-      "sources": [],
-      "tests": [],
+      "evidence": "implemented-and-tested",
+      "sources": [
+        "apps/api/src/routes/v1/imports.ts:83",
+        "apps/api/src/services/imports.ts:17",
+        "apps/api/src/services/imports.ts:90",
+        "apps/api/src/services/imports.ts:894",
+        "apps/api/src/services/imports.ts:988",
+        "apps/api/src/services/imports.ts:1133",
+        "apps/api/src/services/imports.ts:1229",
+        "apps/web/src/routes/ImportHub.tsx:354"
+      ],
+      "tests": [
+        "apps/api/src/routes/v1/imports.integration.test.ts:3"
+      ],
       "documents": [
         "docs/ROADMAP.md:48",
         "docs/ROADMAP.md:68",
@@ -1821,9 +1878,23 @@
       "capability": "CAP-IMPORT",
       "implementation_status": "planned",
       "definition_provenance": "reconstructed",
-      "evidence": "documents-only",
-      "sources": [],
-      "tests": [],
+      "evidence": "implemented-and-tested",
+      "sources": [
+        "apps/api/src/services/imports.ts:17",
+        "apps/api/src/services/imports.ts:140",
+        "apps/api/src/services/imports.ts:1172",
+        "apps/api/src/services/imports.ts:1217",
+        "apps/web/src/routes/ImportHub.tsx:44",
+        "apps/web/src/routes/ImportHub.tsx:58",
+        "apps/web/src/routes/ImportHub.tsx:172",
+        "packages/core/src/importers/ics.ts:21",
+        "packages/core/src/importers/linkedin.ts:38",
+        "packages/core/src/importers/netscape-bookmarks.ts:19",
+        "packages/core/src/importers/vcard.ts:27"
+      ],
+      "tests": [
+        "apps/api/src/routes/v1/imports.integration.test.ts:3"
+      ],
       "documents": [
         "docs/ROADMAP.md:48",
         "docs/ROADMAP.md:68",
@@ -2462,6 +2533,10 @@
     "apps/api/src/db/migrations/006-letters.ts": [
       "FR-RES-020"
     ],
+    "apps/api/src/db/migrations/011-dossiers.ts": [
+      "FR-DOS-001",
+      "FR-DOS-002"
+    ],
     "apps/api/src/db/repository.ts": [
       "FR-002",
       "FR-005",
@@ -2499,6 +2574,12 @@
     ],
     "apps/api/src/middleware/request-context.ts": [
       "FR-026"
+    ],
+    "apps/api/src/routes/v1/applications.integration.test.ts": [
+      "FR-CAR-003"
+    ],
+    "apps/api/src/routes/v1/applications.ts": [
+      "FR-CAR-003"
     ],
     "apps/api/src/routes/v1/ask.ts": [
       "FR-CON-004",
@@ -2557,8 +2638,13 @@
     "apps/api/src/routes/v1/habits.ts": [
       "FR-025"
     ],
+    "apps/api/src/routes/v1/imports.integration.test.ts": [
+      "FR-SYNC-001",
+      "FR-SYNC-002"
+    ],
     "apps/api/src/routes/v1/imports.ts": [
-      "FR-010"
+      "FR-010",
+      "FR-SYNC-001"
     ],
     "apps/api/src/routes/v1/interactions.integration.test.ts": [
       "FR-002"
@@ -2578,10 +2664,17 @@
       "FR-PROV-002"
     ],
     "apps/api/src/routes/v1/letters.integration.test.ts": [
-      "FR-RES-020"
+      "FR-RES-013",
+      "FR-RES-020",
+      "FR-RES-021"
     ],
     "apps/api/src/routes/v1/letters.ts": [
-      "FR-RES-020"
+      "FR-RES-013",
+      "FR-RES-020",
+      "FR-RES-021"
+    ],
+    "apps/api/src/routes/v1/nodes.integration.test.ts": [
+      "FR-CAR-003"
     ],
     "apps/api/src/routes/v1/nodes.ts": [
       "FR-104"
@@ -2671,6 +2764,7 @@
     ],
     "apps/api/src/services/export.ts": [
       "FR-009",
+      "FR-DOS-001",
       "FR-EXP-010",
       "FR-RES-020",
       "FR-SET-007"
@@ -2683,10 +2777,17 @@
       "FR-004",
       "FR-006",
       "FR-020",
-      "FR-026"
+      "FR-026",
+      "FR-SYNC-001",
+      "FR-SYNC-002"
+    ],
+    "apps/api/src/services/letters.test.ts": [
+      "FR-RES-021"
     ],
     "apps/api/src/services/letters.ts": [
-      "FR-RES-020"
+      "FR-RES-013",
+      "FR-RES-020",
+      "FR-RES-021"
     ],
     "apps/api/src/services/restore.integration.test.ts": [
       "FR-001"
@@ -2711,6 +2812,13 @@
     "apps/api/src/services/suggest.ts": [
       "FR-CAP-003"
     ],
+    "apps/api/src/services/template-renderers.test.ts": [
+      "FR-RES-009",
+      "FR-RES-021"
+    ],
+    "apps/api/src/services/template-renderers.ts": [
+      "FR-RES-021"
+    ],
     "apps/web/src/components/EntityPicker.tsx": [
       "FR-CAP-003"
     ],
@@ -2728,6 +2836,14 @@
       "FR-023",
       "FR-CON-002",
       "FR-CON-003"
+    ],
+    "apps/web/src/features/LetterCompilePanel.test.tsx": [
+      "FR-RES-013",
+      "FR-RES-021"
+    ],
+    "apps/web/src/features/LetterCompilePanel.tsx": [
+      "FR-RES-013",
+      "FR-RES-021"
     ],
     "apps/web/src/features/LogIntroduction.test.tsx": [
       "FR-COMM-003"
@@ -2811,13 +2927,18 @@
       "FR-014"
     ],
     "apps/web/src/routes/ImportHub.tsx": [
-      "FR-023"
+      "FR-023",
+      "FR-SYNC-001",
+      "FR-SYNC-002"
     ],
     "apps/web/src/routes/Ledger.states.test.tsx": [
       "NFR-REL-004"
     ],
     "apps/web/src/routes/Ledger.tsx": [
       "FR-PROV-002"
+    ],
+    "apps/web/src/routes/Letters.states.test.tsx": [
+      "FR-RES-021"
     ],
     "apps/web/src/routes/Person.tsx": [
       "FR-COMM-001",
@@ -2840,6 +2961,12 @@
     "apps/web/src/routes/Trash.tsx": [
       "FR-006",
       "FR-ORG-002"
+    ],
+    "apps/web/src/routes/career/ApplicationStatusControl.test.tsx": [
+      "FR-CAR-003"
+    ],
+    "apps/web/src/routes/career/ApplicationStatusControl.tsx": [
+      "FR-CAR-003"
     ],
     "apps/web/src/routes/tailor/ScoreBreakdown.tsx": [
       "FR-RES-007"
@@ -3407,6 +3534,9 @@
     "docs/testing/e2e-review-2026-08-25.md": [
       "FR-016"
     ],
+    "e2e/tests/application-status.spec.ts": [
+      "FR-CAR-003"
+    ],
     "e2e/tests/correspondence.spec.ts": [
       "FR-COMM-002"
     ],
@@ -3504,14 +3634,38 @@
     "packages/core/src/forms/types.ts": [
       "FR-CAP-002"
     ],
+    "packages/core/src/importers/ics.ts": [
+      "FR-SYNC-002"
+    ],
+    "packages/core/src/importers/linkedin.ts": [
+      "FR-SYNC-002"
+    ],
+    "packages/core/src/importers/netscape-bookmarks.ts": [
+      "FR-SYNC-002"
+    ],
+    "packages/core/src/importers/vcard.ts": [
+      "FR-SYNC-002"
+    ],
     "packages/core/src/places/index.ts": [
       "FR-VIS-003"
+    ],
+    "packages/core/src/schema/dossier.test.ts": [
+      "FR-DOS-002"
+    ],
+    "packages/core/src/schema/dossier.ts": [
+      "FR-DOS-001",
+      "FR-DOS-002"
     ],
     "packages/core/src/schema/edge-props.ts": [
       "FR-COMM-003"
     ],
+    "packages/core/src/schema/resume.test.ts": [
+      "FR-RES-020",
+      "FR-RES-021"
+    ],
     "packages/core/src/schema/resume.ts": [
-      "FR-RES-020"
+      "FR-RES-020",
+      "FR-RES-021"
     ],
     "packages/core/src/schema/validate.test.ts": [
       "FR-CAP-002"

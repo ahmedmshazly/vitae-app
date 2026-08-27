@@ -139,7 +139,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:214",
+      "source": "apps/api/src/db/schema.ts:220",
       "reads": 5,
       "writes": 5
     },
@@ -258,6 +258,13 @@
           "test": false
         },
         {
+          "file": "apps/api/src/services/dossier.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 232,
+          "test": false
+        },
+        {
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
@@ -268,7 +275,14 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 852,
+          "line": 1285,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/letters.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 243,
           "test": false
         },
         {
@@ -279,8 +293,8 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:213",
-      "reads": 5,
+      "source": "apps/api/src/db/schema.ts:219",
+      "reads": 7,
       "writes": 6
     },
     {
@@ -418,10 +432,17 @@
           "test": false
         },
         {
+          "file": "apps/api/src/services/dossier.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 230,
+          "test": false
+        },
+        {
           "file": "apps/api/src/services/export.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 226,
+          "line": 228,
           "test": false
         },
         {
@@ -435,28 +456,28 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 1136,
+          "line": 1515,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1140,
+          "line": 1519,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 1133,
+          "line": 1512,
           "test": false
         },
         {
           "file": "apps/api/src/services/letters.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 26,
+          "line": 88,
           "test": false
         },
         {
@@ -488,8 +509,8 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:212",
-      "reads": 12,
+      "source": "apps/api/src/db/schema.ts:218",
+      "reads": 13,
       "writes": 6
     },
     {
@@ -545,7 +566,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:177"
+          "source": "apps/api/src/db/schema.ts:183"
         },
         {
           "name": "gc_pending",
@@ -555,7 +576,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:178"
+          "source": "apps/api/src/db/schema.ts:184"
         }
       ],
       "requirements": [],
@@ -567,6 +588,13 @@
       ],
       "indexes": [],
       "queried_by": [
+        {
+          "file": "apps/api/src/routes/v1/letters.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 128,
+          "test": false
+        },
         {
           "file": "apps/api/src/routes/v1/resumes.ts",
           "method": "docDelete",
@@ -599,14 +627,21 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 66,
+          "line": 68,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/letters.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 445,
           "test": false
         },
         {
           "file": "apps/api/src/services/restore.ts",
           "method": "docMerge",
           "access": "repository",
-          "line": 248,
+          "line": 258,
           "test": false
         },
         {
@@ -645,9 +680,9 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:222",
-      "reads": 6,
-      "writes": 6
+      "source": "apps/api/src/db/schema.ts:229",
+      "reads": 7,
+      "writes": 7
     },
     {
       "name": "billing_customers",
@@ -750,7 +785,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:205",
+      "source": "apps/api/src/db/schema.ts:211",
       "reads": 2,
       "writes": 2
     },
@@ -861,7 +896,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:207",
+      "source": "apps/api/src/db/schema.ts:213",
       "reads": 0,
       "writes": 2
     },
@@ -1021,7 +1056,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:206",
+      "source": "apps/api/src/db/schema.ts:212",
       "reads": 2,
       "writes": 1
     },
@@ -1078,7 +1113,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:185"
+          "source": "apps/api/src/db/schema.ts:191"
         }
       ],
       "requirements": [],
@@ -1136,11 +1171,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 75,
+          "line": 77,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:232",
+      "source": "apps/api/src/db/schema.ts:239",
       "reads": 3,
       "writes": 3
     },
@@ -1259,12 +1294,167 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 72,
+          "line": 74,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:231",
+      "source": "apps/api/src/db/schema.ts:238",
       "reads": 2,
+      "writes": 2
+    },
+    {
+      "name": "dossiers",
+      "interface": "DossierTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "subject_node",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:165"
+        },
+        {
+          "name": "audience",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:166"
+        },
+        {
+          "name": "updated_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:167"
+        },
+        {
+          "name": "deleted_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:168"
+        }
+      ],
+      "requirements": [],
+      "created_in": "011-dossiers",
+      "altered_in": [],
+      "indexes": [
+        {
+          "name": "dossiers_live_updated",
+          "table": "dossiers",
+          "unique": false,
+          "partial": true,
+          "method": "btree",
+          "definition": "CREATE INDEX dossiers_live_updated ON dossiers (workspace_id, space, updated_at DESC) WHERE deleted_at IS NULL",
+          "migration": "011-dossiers",
+          "source": "apps/api/src/db/migrations/011-dossiers.ts:49"
+        },
+        {
+          "name": "dossiers_subject",
+          "table": "dossiers",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX dossiers_subject ON dossiers (workspace_id, space, subject_node, audience)",
+          "migration": "011-dossiers",
+          "source": "apps/api/src/db/migrations/011-dossiers.ts:45"
+        },
+        {
+          "name": "dossiers_workspace_id_idx",
+          "table": "dossiers",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX dossiers_workspace_id_idx ON dossiers (workspace_id)",
+          "migration": "011-dossiers",
+          "source": "apps/api/src/db/migrations/011-dossiers.ts:44"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/dossier.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 141,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/dossier.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 100,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/dossier.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 173,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 63,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:224",
+      "reads": 3,
       "writes": 2
     },
     {
@@ -1435,7 +1625,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 356,
+          "line": 365,
           "test": false
         },
         {
@@ -1446,7 +1636,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:210",
+      "source": "apps/api/src/db/schema.ts:216",
       "reads": 3,
       "writes": 4
     },
@@ -1580,11 +1770,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 71,
+          "line": 73,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:230",
+      "source": "apps/api/src/db/schema.ts:237",
       "reads": 4,
       "writes": 5
     },
@@ -1641,7 +1831,7 @@
           "optional": false,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:193"
+          "source": "apps/api/src/db/schema.ts:199"
         }
       ],
       "requirements": [],
@@ -1671,25 +1861,25 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docBulkPut",
           "access": "repository",
-          "line": 622,
+          "line": 929,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docDeleteMany",
           "access": "repository",
-          "line": 543,
+          "line": 834,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docIdsWhereIn",
           "access": "repository",
-          "line": 542,
+          "line": 833,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:226",
+      "source": "apps/api/src/db/schema.ts:233",
       "reads": 3,
       "writes": 4
     },
@@ -1746,7 +1936,7 @@
           "optional": false,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:193"
+          "source": "apps/api/src/db/schema.ts:199"
         }
       ],
       "requirements": [],
@@ -1790,32 +1980,32 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docBulkPut",
           "access": "repository",
-          "line": 630,
+          "line": 937,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 669,
+          "line": 1001,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docMerge",
           "access": "repository",
-          "line": 1073,
+          "line": 1423,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 650,
+          "line": 963,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:225",
+      "source": "apps/api/src/db/schema.ts:232",
       "reads": 4,
       "writes": 4
     },
@@ -1872,7 +2062,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:188"
+          "source": "apps/api/src/db/schema.ts:194"
         },
         {
           "name": "created_at",
@@ -1882,7 +2072,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:189"
+          "source": "apps/api/src/db/schema.ts:195"
         }
       ],
       "requirements": [],
@@ -1923,38 +2113,52 @@
           "test": true
         },
         {
+          "file": "apps/api/src/routes/v1/imports.integration.test.ts",
+          "method": "docDeleteMany",
+          "access": "repository",
+          "line": 150,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/routes/v1/imports.integration.test.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 149,
+          "test": true
+        },
+        {
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 68,
+          "line": 70,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 656,
+          "line": 974,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docList",
           "access": "repository",
-          "line": 661,
+          "line": 979,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docMerge",
           "access": "repository",
-          "line": 1153,
+          "line": 1554,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 614,
+          "line": 921,
           "test": false
         },
         {
@@ -1972,7 +2176,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:224",
+      "source": "apps/api/src/db/schema.ts:231",
       "reads": 4,
       "writes": 4
     },
@@ -2133,25 +2337,25 @@
           "file": "apps/api/src/services/letters.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 134,
+          "line": 425,
           "test": false
         },
         {
           "file": "apps/api/src/services/letters.ts",
           "method": "docList",
           "access": "repository",
-          "line": 38,
+          "line": 100,
           "test": false
         },
         {
           "file": "apps/api/src/services/letters.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 142,
+          "line": 443,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:217",
+      "source": "apps/api/src/db/schema.ts:223",
       "reads": 3,
       "writes": 2
     },
@@ -2208,7 +2412,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:181"
+          "source": "apps/api/src/db/schema.ts:187"
         },
         {
           "name": "drop_id",
@@ -2218,7 +2422,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:182"
+          "source": "apps/api/src/db/schema.ts:188"
         }
       ],
       "requirements": [],
@@ -2262,11 +2466,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 67,
+          "line": 69,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:223",
+      "source": "apps/api/src/db/schema.ts:230",
       "reads": 3,
       "writes": 3
     },
@@ -2441,7 +2645,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 70,
+          "line": 72,
           "test": false
         },
         {
@@ -2473,7 +2677,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:228",
+      "source": "apps/api/src/db/schema.ts:235",
       "reads": 8,
       "writes": 11
     },
@@ -2530,7 +2734,7 @@
           "optional": false,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:196"
+          "source": "apps/api/src/db/schema.ts:202"
         },
         {
           "name": "run_id",
@@ -2540,7 +2744,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:197"
+          "source": "apps/api/src/db/schema.ts:203"
         }
       ],
       "requirements": [],
@@ -2628,7 +2832,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:229",
+      "source": "apps/api/src/db/schema.ts:236",
       "reads": 4,
       "writes": 5
     },
@@ -2889,7 +3093,7 @@
           "test": true
         }
       ],
-      "source": "apps/api/src/db/schema.ts:209",
+      "source": "apps/api/src/db/schema.ts:215",
       "reads": 2,
       "writes": 4
     },
@@ -2946,7 +3150,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:165"
+          "source": "apps/api/src/db/schema.ts:171"
         },
         {
           "name": "due_on",
@@ -2956,7 +3160,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:166"
+          "source": "apps/api/src/db/schema.ts:172"
         },
         {
           "name": "subject_id",
@@ -2966,7 +3170,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:167"
+          "source": "apps/api/src/db/schema.ts:173"
         }
       ],
       "requirements": [],
@@ -3024,11 +3228,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 63,
+          "line": 65,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:219",
+      "source": "apps/api/src/db/schema.ts:226",
       "reads": 3,
       "writes": 5
     },
@@ -3183,7 +3387,7 @@
           "file": "apps/api/src/routes/v1/applications.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 331,
+          "line": 298,
           "test": false
         },
         {
@@ -3239,11 +3443,11 @@
           "file": "apps/api/src/services/letters.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 19,
+          "line": 81,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:216",
+      "source": "apps/api/src/db/schema.ts:222",
       "reads": 6,
       "writes": 4
     },
@@ -3368,7 +3572,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:211",
+      "source": "apps/api/src/db/schema.ts:217",
       "reads": 3,
       "writes": 3
     },
@@ -3480,11 +3684,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 69,
+          "line": 71,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:227",
+      "source": "apps/api/src/db/schema.ts:234",
       "reads": 3,
       "writes": 4
     },
@@ -3541,7 +3745,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:173"
+          "source": "apps/api/src/db/schema.ts:179"
         },
         {
           "name": "subject_id",
@@ -3551,7 +3755,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:174"
+          "source": "apps/api/src/db/schema.ts:180"
         }
       ],
       "requirements": [],
@@ -3574,25 +3778,25 @@
           "file": "apps/api/src/services/export.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 272,
+          "line": 281,
           "test": false
         },
         {
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 65,
+          "line": 67,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1050,
+          "line": 1398,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:221",
+      "source": "apps/api/src/db/schema.ts:228",
       "reads": 2,
       "writes": 3
     },
@@ -3649,7 +3853,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:170"
+          "source": "apps/api/src/db/schema.ts:176"
         }
       ],
       "requirements": [],
@@ -3679,25 +3883,25 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 64,
+          "line": 66,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1303,
+          "line": 1733,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 1300,
+          "line": 1730,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:220",
+      "source": "apps/api/src/db/schema.ts:227",
       "reads": 3,
       "writes": 3
     },
@@ -3812,7 +4016,7 @@
           "file": "apps/api/src/routes/v1/applications.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 328,
+          "line": 295,
           "test": false
         },
         {
@@ -3872,7 +4076,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:215",
+      "source": "apps/api/src/db/schema.ts:221",
       "reads": 6,
       "writes": 4
     },
@@ -3935,11 +4139,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 62,
+          "line": 64,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:218",
+      "source": "apps/api/src/db/schema.ts:225",
       "reads": 1,
       "writes": 1
     },
@@ -4040,7 +4244,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:201",
+      "source": "apps/api/src/db/schema.ts:207",
       "reads": 1,
       "writes": 1
     },
@@ -4124,7 +4328,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:208",
+      "source": "apps/api/src/db/schema.ts:214",
       "reads": 0,
       "writes": 1
     },
@@ -4242,7 +4446,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:204",
+      "source": "apps/api/src/db/schema.ts:210",
       "reads": 2,
       "writes": 2
     },
@@ -4316,7 +4520,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:203",
+      "source": "apps/api/src/db/schema.ts:209",
       "reads": 0,
       "writes": 1
     },
@@ -4427,7 +4631,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:202",
+      "source": "apps/api/src/db/schema.ts:208",
       "reads": 2,
       "writes": 2
     }
@@ -4713,6 +4917,27 @@
       "indexes": [],
       "extensions": [],
       "reversible": true
+    },
+    {
+      "id": "011-dossiers",
+      "file": "apps/api/src/db/migrations/011-dossiers.ts",
+      "title": "Dossiers table (SRS FR-DOS-001, FR-DOS-002 / §4.5).",
+      "description": "Dossiers table (SRS FR-DOS-001, FR-DOS-002 / §4.5). A dossier is a selection, not a document: it stores which records each claim rests on, and the compiled artifact is derived from that selection every time. So the row is the same three-column document shape the rest of the workspace uses, with the columns a reader filters on generated from `data` rather than written beside it, which is what keeps the index and the document from ever disagreeing. The tenancy wiring is not optional decoration and is not copied from the `letters` migration, which predates it. Migrations 007 through 010 moved every document table onto `(workspace_id, id)` as its real identity, gave it a foreign key into `workspaces`, and hung a trigger on it so a legacy script inserting a `demo` row still lands in the demo workspace. A new table created after all of that has to arrive with the finished shape, or it becomes the one table whose rows can collide between two Cloud workspaces. `subject_node` is indexed because every dossier is about exactly one subject and the only listing anyone asks for is \"what have I compiled about this person\"; `audience` joins it because the second question is always which packet, and a promotion review and an exhibit list are not interchangeable.",
+      "requirements": [
+        "FR-DOS-001",
+        "FR-DOS-002"
+      ],
+      "creates": [
+        "dossiers"
+      ],
+      "alters": [],
+      "indexes": [
+        "dossiers_workspace_id_idx",
+        "dossiers_subject",
+        "dossiers_live_updated"
+      ],
+      "extensions": [],
+      "reversible": true
     }
   ],
   "indexes": [
@@ -4775,6 +5000,36 @@
       "definition": "CREATE INDEX dedup_dismissals_b ON dedup_dismissals (space, b)",
       "migration": "002-retention-columns",
       "source": "apps/api/src/db/migrations/002-retention-columns.ts:30"
+    },
+    {
+      "name": "dossiers_live_updated",
+      "table": "dossiers",
+      "unique": false,
+      "partial": true,
+      "method": "btree",
+      "definition": "CREATE INDEX dossiers_live_updated ON dossiers (workspace_id, space, updated_at DESC) WHERE deleted_at IS NULL",
+      "migration": "011-dossiers",
+      "source": "apps/api/src/db/migrations/011-dossiers.ts:49"
+    },
+    {
+      "name": "dossiers_subject",
+      "table": "dossiers",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX dossiers_subject ON dossiers (workspace_id, space, subject_node, audience)",
+      "migration": "011-dossiers",
+      "source": "apps/api/src/db/migrations/011-dossiers.ts:45"
+    },
+    {
+      "name": "dossiers_workspace_id_idx",
+      "table": "dossiers",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX dossiers_workspace_id_idx ON dossiers (workspace_id)",
+      "migration": "011-dossiers",
+      "source": "apps/api/src/db/migrations/011-dossiers.ts:44"
     },
     {
       "name": "edges_dst",
@@ -5018,11 +5273,11 @@
     }
   ],
   "summary": {
-    "tables": 32,
-    "columns": 199,
-    "indexes": 30,
-    "partial_indexes": 11,
-    "migrations": 10,
+    "tables": 33,
+    "columns": 207,
+    "indexes": 33,
+    "partial_indexes": 12,
+    "migrations": 11,
     "irreversible": [],
     "extensions": [
       "pg_trgm"

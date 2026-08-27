@@ -1424,6 +1424,11 @@
       ],
       "consumers": [
         {
+          "file": "apps/api/src/services/letters.ts",
+          "symbol": "assertNoUnresolvedTokens",
+          "test": false
+        },
+        {
           "file": "apps/api/src/services/resume.ts",
           "symbol": "assertNoUnresolvedTokens",
           "test": false
@@ -1500,7 +1505,7 @@
         }
       ],
       "consumer_count": {
-        "product": 7,
+        "product": 8,
         "test": 8
       }
     },
