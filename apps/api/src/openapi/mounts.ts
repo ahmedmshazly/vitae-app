@@ -18,6 +18,7 @@ export const V1_MOUNT_PREFIXES = [
   '/atoms',
   '/targets',
   '/resumes',
+  '/dossiers',
   '/letters',
   '/reminders',
   '/dashboard',

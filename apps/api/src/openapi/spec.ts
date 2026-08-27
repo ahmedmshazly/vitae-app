@@ -265,7 +265,14 @@ function detailedPaths(): PathsObject {
         responses: {
           '200': { description: 'Updated' },
           '404': errorResponse('Not found'),
-          '422': errorResponse('Validation failed'),
+          // ILLEGAL_TRANSITION shares this code because it is the same kind of
+          // refusal: the body was well formed and the change it asked for is
+          // not one the record may make. It reaches this generic path because
+          // the application form's own save comes through here, and a guard
+          // only the dedicated endpoints ran would be no guard at all.
+          '422': errorResponse(
+            'Validation failed, or an application status move the machine refuses (ILLEGAL_TRANSITION)',
+          ),
         },
       }),
       delete: op('deleteNode', 'Soft-delete a node', {
@@ -419,6 +426,28 @@ function detailedPaths(): PathsObject {
           '422': errorResponse('Unknown application status'),
         },
       }),
+      post: op('createApplication', 'Create an application', {
+        tags: ['applications'],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ApplicationWrite' },
+            },
+          },
+        },
+        responses: {
+          '201': {
+            description: 'Application created',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ApplicationDetailResponse' },
+              },
+            },
+          },
+          '422': errorResponse('Invalid application'),
+        },
+      }),
     },
     '/applications/{id}': {
       get: op('getApplicationDossier', 'Application dossier with linked career evidence', {
@@ -434,6 +463,143 @@ function detailedPaths(): PathsObject {
             },
           },
           '404': errorResponse('Application not found'),
+        },
+      }),
+      patch: op('updateApplication', 'Edit an application; props merge onto what is stored', {
+        tags: ['applications'],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ApplicationWrite' },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Application updated',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ApplicationDetailResponse' },
+              },
+            },
+          },
+          '404': errorResponse('Application not found'),
+          '422': errorResponse('Invalid update, or a status move the machine refuses'),
+        },
+      }),
+    },
+    '/applications/{id}/status': {
+      post: op('recordApplicationStatus', 'Record a status move, or correct a wrong one', {
+        tags: ['applications'],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ApplicationStatusChange' },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description:
+              'The dossier, plus what was recorded. `recorded` is false when the status was resubmitted as itself, in which case nothing was written.',
+            content: {
+              'application/json': {
+                schema: {
+                  allOf: [
+                    { $ref: '#/components/schemas/ApplicationDetailResponse' },
+                    {
+                      type: 'object',
+                      required: ['transition'],
+                      properties: {
+                        transition: { $ref: '#/components/schemas/ApplicationTransition' },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          '404': errorResponse('Application not found'),
+          '422': errorResponse('Unknown status, or a move the machine refuses'),
+        },
+      }),
+    },
+    '/letters/{id}/compile': {
+      post: op('compileLetter', 'Render and compile a letter for preview; stores nothing', {
+        tags: ['letters'],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': {
+            description:
+              'The compile result. A build service that cannot be reached still answers 200, with `offline` true and the full source, so a compiler being down does not take the flow with it.',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/LetterCompileResult' },
+              },
+            },
+          },
+          '404': errorResponse('Letter not found'),
+          '422': errorResponse('Letter has nothing to compile, or its target or an atom is gone'),
+        },
+      }),
+    },
+    '/letters/{id}/finalize': {
+      post: op('finalizeLetter', 'Compile and keep the PDF and source as this letter’s artifacts', {
+        tags: ['letters'],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': {
+            description:
+              'The compile result. On success the letter comes back final with its artifacts filled; offline, it comes back untouched and still a draft.',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/LetterCompileResult' },
+              },
+            },
+          },
+          '404': errorResponse('Letter not found'),
+          '422': errorResponse('Letter has nothing to compile, or its target or an atom is gone'),
+        },
+      }),
+    },
+    '/letters/{id}/artifacts/{kind}': {
+      get: op('getLetterArtifact', 'Short-lived signed URL for one stored letter artifact', {
+        tags: ['letters'],
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'string' } },
+          {
+            name: 'kind',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', enum: ['pdf', 'tex'] },
+          },
+        ],
+        responses: {
+          '200': {
+            description: 'A signed URL and what it points at',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['url', 'expiresIn', 'filename', 'sha256'],
+                  properties: {
+                    url: { type: 'string' },
+                    expiresIn: { type: 'integer' },
+                    filename: { type: 'string' },
+                    sha256: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+          '404': errorResponse('Unknown artifact kind, or letter not found'),
+          '409': errorResponse(
+            'The record exists and the file does not, which is what a finalize during a storage outage leaves behind',
+          ),
         },
       }),
     },
@@ -791,6 +957,101 @@ export function buildOpenApiDocument(): OpenAPIObject {
           required: ['application'],
           properties: {
             application: { $ref: '#/components/schemas/ApplicationDossier' },
+          },
+        },
+        ApplicationWrite: {
+          type: 'object',
+          description:
+            'The node envelope without `type`. On PATCH, `props` merges onto what is stored and an explicit null clears a key, which is not how the generic node patch behaves. Note that the application status is `props.status`; the envelope has an unrelated top-level `status` of its own, and setting it there does nothing.',
+          properties: {
+            title: {
+              type: 'string',
+              description: 'Falls back to props.role_title when omitted or blank.',
+            },
+            props: { $ref: '#/components/schemas/ApplicationProps' },
+            subtitle: { type: 'string' },
+            notes_md: { type: 'string' },
+            start_date: { type: 'string' },
+            end_date: { type: 'string' },
+            pinned: { type: 'boolean' },
+            sensitivity: { type: 'string', enum: ['normal', 'sensitive'] },
+            source: { type: 'string', enum: [...SOURCE_TYPES] },
+            source_ref: { type: 'string' },
+            confidence: { type: 'number', minimum: 0, maximum: 1 },
+          },
+        },
+        ApplicationProps: {
+          type: 'object',
+          required: ['role_title', 'status'],
+          additionalProperties: true,
+          properties: {
+            role_title: { type: 'string' },
+            status: { $ref: '#/components/schemas/ApplicationStatus' },
+            applied_on: { type: 'string' },
+            deadline: { type: 'string' },
+            next_step: { type: 'string' },
+            next_step_date: { type: 'string' },
+            channel: { type: 'string', enum: ['referral', 'cold', 'recruiter', 'inbound'] },
+            location_mode: { type: 'string', enum: ['onsite', 'hybrid', 'remote'] },
+            salary_range: { type: 'string' },
+            job_url: { type: 'string' },
+            target_id: { type: 'string' },
+            resume_id: { type: 'string' },
+          },
+        },
+        ApplicationStatusChange: {
+          type: 'object',
+          required: ['status'],
+          properties: {
+            status: { $ref: '#/components/schemas/ApplicationStatus' },
+            correction: {
+              type: 'boolean',
+              default: false,
+              description:
+                'A correction says the recorded status was never true, rather than that the application moved. It skips the transition check and is available from a closed record, because an operator who mis-recorded an outcome would otherwise be held there. It cannot write a status outside the enum.',
+            },
+          },
+        },
+        ApplicationTransition: {
+          type: 'object',
+          required: ['from', 'to', 'correction', 'recorded'],
+          properties: {
+            from: { $ref: '#/components/schemas/ApplicationStatus' },
+            to: { $ref: '#/components/schemas/ApplicationStatus' },
+            correction: { type: 'boolean' },
+            recorded: {
+              type: 'boolean',
+              description:
+                'False when the status was resubmitted as itself. Nothing is written, because a revision recording a move that did not happen would be a false line in a history whose whole value is that every line is true.',
+            },
+          },
+        },
+        LetterCompileResult: {
+          type: 'object',
+          required: ['ok', 'pages', 'offline', 'error', 'logTail', 'pdfBase64', 'tex', 'template', 'letter'],
+          properties: {
+            ok: { type: 'boolean' },
+            pages: {
+              type: ['integer', 'null'],
+              description: 'Null where the page count could not be determined, rather than a zero that would read as "compiled, and came out empty".',
+            },
+            offline: { type: 'boolean' },
+            error: {
+              type: ['object', 'null'],
+              properties: {
+                code: { type: 'string' },
+                message: { type: 'string' },
+                section: { type: 'string' },
+              },
+            },
+            logTail: { type: ['string', 'null'] },
+            pdfBase64: { type: ['string', 'null'] },
+            tex: {
+              type: 'string',
+              description: 'Always present, including when the compile failed, so a download of the source is always available.',
+            },
+            template: { type: 'string', description: 'key@version, e.g. letter-classic@1.0.0' },
+            letter: { type: 'object', additionalProperties: true },
           },
         },
         Error: {
