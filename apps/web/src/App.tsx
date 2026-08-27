@@ -38,6 +38,8 @@ const ApplicationDossier = lazyNamed(
   () => import('./routes/career/index.js'),
   'ApplicationDossier',
 );
+const Dossiers = lazyNamed(() => import('./routes/Dossiers.js'), 'Dossiers');
+const DossierEditor = lazyNamed(() => import('./routes/DossierEditor.js'), 'DossierEditor');
 const Tailor = lazyNamed(() => import('./routes/tailor/Tailor.js'), 'Tailor');
 const Outputs = lazyNamed(() => import('./routes/Outputs.js'), 'Outputs');
 const Letters = lazyNamed(() => import('./routes/Letters.js'), 'Letters');
@@ -371,6 +373,8 @@ function AuthedApp() {
                 <Route path="/career" element={<CareerOverview />} />
                 <Route path="/career/applications" element={<Applications />} />
                 <Route path="/career/applications/:id" element={<ApplicationDossier />} />
+                <Route path="/career/dossiers" element={<Dossiers />} />
+                <Route path="/career/dossiers/:id" element={<DossierEditor />} />
                 <Route path="/career/resume" element={<ResumeHub />} />
                 <Route path="/career/resume/evidence" element={<Atoms />} />
                 <Route path="/career/resume/tailor" element={<Tailor />} />

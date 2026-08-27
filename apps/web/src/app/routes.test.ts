@@ -27,6 +27,16 @@ describe('workspace route registry', () => {
   it('marks dossiers as part of their collection while keeping hub roots exact', () => {
     expect(isRouteActive('/career/applications/application-1', ROUTES.applications)).toBe(true);
     expect(isRouteActive('/career/applications', ROUTES.career)).toBe(false);
+    expect(isRouteActive('/career/dossiers/dossier-1', ROUTES.dossiers)).toBe(true);
+  });
+
+  it('carries evidence dossiers in the Career strip, outside the résumé pipeline', () => {
+    // Beside applications rather than inside the résumé run, which is one
+    // contiguous pipeline and would read as though a dossier were a step in it.
+    expect(WORKSPACE_NAV.career).toContain(ROUTES.dossiers);
+    const strip = WORKSPACE_NAV.career;
+    expect(strip.indexOf(ROUTES.dossiers)).toBeGreaterThan(strip.indexOf(ROUTES.applications));
+    expect(strip.indexOf(ROUTES.dossiers)).toBeLessThan(strip.indexOf(ROUTES.resumeOverview));
   });
 
   it('exposes every résumé destination in the Career workspace strip', () => {

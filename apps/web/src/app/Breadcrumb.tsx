@@ -24,6 +24,7 @@ function crumbFor(pathname: string): Crumb {
     '/network/intelligence': { parent: 'Network', leaf: 'Intelligence', glyph: 'ask' },
     [ROUTES.career.path]: { parent: '', leaf: 'Career', glyph: 'application' },
     [ROUTES.applications.path]: { parent: 'Career', leaf: 'Applications', glyph: 'application' },
+    [ROUTES.dossiers.path]: { parent: 'Career', leaf: 'Dossiers', glyph: 'document' },
     [ROUTES.resumeOverview.path]: { parent: 'Career', leaf: 'Résumé', glyph: 'resume' },
     [ROUTES.resumeAtoms.path]: { parent: 'Résumé', leaf: 'Evidence', glyph: 'document' },
     [ROUTES.resumeTailor.path]: { parent: 'Résumé', leaf: 'Tailoring workspace', glyph: 'resume' },
@@ -79,8 +80,14 @@ function crumbFor(pathname: string): Crumb {
     return { parent: 'Network / People', leaf: 'Profile', glyph: 'person' };
   if (pathname.startsWith(`${ROUTES.orgs.path}/`))
     return { parent: 'Network / Organizations', leaf: 'Profile', glyph: 'org' };
+  // This leaf used to read "Dossier", which was fine while it was the only
+  // thing in the product with that name. It is not: an evidence dossier is a
+  // different object with its own screens, and two unrelated records answering
+  // to one crumb is a way to be lost while the breadcrumb reads correctly.
   if (pathname.startsWith(`${ROUTES.applications.path}/`))
-    return { parent: 'Career / Applications', leaf: 'Dossier', glyph: 'application' };
+    return { parent: 'Career / Applications', leaf: 'Application', glyph: 'application' };
+  if (pathname.startsWith(`${ROUTES.dossiers.path}/`))
+    return { parent: 'Career / Dossiers', leaf: 'Dossier', glyph: 'document' };
   if (pathname.startsWith('/people/'))
     return { parent: 'People', leaf: 'Profile', glyph: 'person' };
   if (pathname.startsWith('/orgs/'))

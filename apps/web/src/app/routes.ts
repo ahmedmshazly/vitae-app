@@ -67,6 +67,13 @@ export const ROUTES = {
     glyph: 'application',
     hub: 'career',
   },
+  dossiers: {
+    path: '/career/dossiers',
+    label: 'Dossiers',
+    glyph: 'document',
+    hub: 'career',
+    keywords: 'evidence provenance appendix promotion petition exhibits background packet',
+  },
   resumeOverview: {
     path: '/career/resume',
     label: 'Résumé',
@@ -171,6 +178,10 @@ export const WORKSPACE_NAV: Record<HubId, RouteEntry[]> = {
   career: [
     ROUTES.career,
     ROUTES.applications,
+    // Beside applications rather than inside the résumé run: a dossier is a
+    // document addressed to an audience, and the résumé entries below it are
+    // one continuous pipeline that reads wrong with something else in it.
+    ROUTES.dossiers,
     ROUTES.resumeOverview,
     ROUTES.resumeAtoms,
     ROUTES.resumeTailor,

@@ -86,7 +86,10 @@ describe('Shell', () => {
       { route: '/career/applications/application-1' },
     );
 
-    await waitFor(() => expect(document.title).toBe('Career / Applications, Dossier · Vitae'));
+    // "Application", not "Dossier". An evidence dossier is a different object
+    // with its own screens now, and one crumb answering for both is a way to be
+    // lost while the breadcrumb reads correctly.
+    await waitFor(() => expect(document.title).toBe('Career / Applications, Application · Vitae'));
   });
 
   it('gives the content region a focus target for a route change to move to', async () => {

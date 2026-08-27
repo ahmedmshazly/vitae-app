@@ -111,6 +111,13 @@ export function buildCommands({
       run: go(ROUTES.applications.path),
     },
     {
+      id: 'dossiers',
+      label: 'Open Dossiers',
+      glyph: ROUTES.dossiers.glyph,
+      keywords: ROUTES.dossiers.keywords ?? '',
+      run: go(ROUTES.dossiers.path),
+    },
+    {
       id: 'explore',
       label: 'Open Explore',
       glyph: ROUTES.explore.glyph,
