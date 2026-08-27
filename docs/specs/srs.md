@@ -380,9 +380,9 @@ Status: implemented · Evidence: cited by documents only · Provenance: reconstr
 
 For any person with logged interactions, a correspondence profile must be computable deterministically: reciprocity ratio, median reply latency in each direction, unanswered inbound count, and the distribution of contact days — each figure decomposing into the interactions that produced it.
 
-Status: planned · Evidence: cited by source · Provenance: reconstructed, confirmed
+Status: implemented · Evidence: cited by source · Provenance: reconstructed, confirmed
 
-> Authored 2026-08-26 as a product decision under ADR 0007. The constants and the interaction substrate ship in packages/core; no surface computes or presents the profile yet.
+> Authored 2026-08-26 as a product decision under ADR 0007; delivered the same day. correspondenceProfile in packages/core computes the four figures from operator-stated initiated_by directions; GET /people/:id/correspondence serves them; the person profile's correspondence panel opens each figure into the interactions behind it, under a coverage header that owns up to directionless history instead of guessing it.
 
 #### FR-COMM-002 — A network rollup of correspondence health
 
@@ -396,9 +396,9 @@ Status: implemented · Evidence: cited by source and by tests · Provenance: rec
 
 An introduction must be recordable as a first-class fact — who introduced whom, when, in what context — feeding broker detection, warm-path evidence, and the favor ledger.
 
-Status: planned · Evidence: cited by documents only · Provenance: reconstructed, confirmed
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
-> Authored 2026-08-26 as a product decision under ADR 0007. The relationship edge already stores met_via and an intro_path; this requirement is the recording surface and the computation over it, not new storage.
+> Authored 2026-08-26 as a product decision under ADR 0007; delivered the same day. The INTRODUCED edge (the twenty-ninth type) records the connected pair with the broker in via; the person profile's log-an-introduction dialog is the recording surface, optionally crediting the broker's favor ledger; the rollup tallies recorded brokers apart from free-text met-via credits; the warm-path search's existing INTRODUCED branch lights up with real edges.
 
 ### Explore
 

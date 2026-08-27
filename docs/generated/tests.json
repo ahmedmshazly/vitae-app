@@ -2276,6 +2276,28 @@
       "lines": 119
     },
     {
+      "file": "apps/web/src/features/LogIntroduction.test.tsx",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "LogIntroduction"
+      ],
+      "subjects": [
+        "./LogIntroduction.js"
+      ],
+      "requirements": [
+        "FR-COMM-003"
+      ],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 104
+    },
+    {
       "file": "apps/web/src/features/map/AtlasCanvas.error.test.tsx",
       "package": "@vitae/web",
       "cases": 6,
@@ -4964,7 +4986,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 187
+      "lines": 189
     },
     {
       "file": "e2e/tests/export.spec.ts",
@@ -5374,7 +5396,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 180
+      "lines": 191
     },
     {
       "file": "e2e/tests/record.spec.ts",
@@ -7050,21 +7072,21 @@
     }
   ],
   "summary": {
-    "files": 330,
-    "cases": 2150,
+    "files": 331,
+    "cases": 2153,
     "skipped": 0,
     "todo": 0,
     "by_package": {
       "@vitae/api": 225,
-      "@vitae/web": 1117,
+      "@vitae/web": 1120,
       "@vitae/e2e": 291,
       "@vitae/core": 284,
       "@vitae/testkit": 7,
       "@vitae/ui": 226
     },
     "by_script": {
-      "test": 330,
-      "test:web": 162,
+      "test": 331,
+      "test:web": 163,
       "test:e2e": 59,
       "test:api": 55,
       "test:unit": 45,
