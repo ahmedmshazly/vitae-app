@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -24,6 +24,7 @@ import {
 } from '@vitae/ui';
 import { edgeTypeGroup, personRelationLabel } from '@vitae/core';
 import { api } from '../lib/api.js';
+import { rememberViewed } from '../lib/last-viewed.js';
 import { CorrespondencePanel } from '../features/CorrespondencePanel.js';
 import { InteractionLogger } from '../features/InteractionLogger.js';
 import { LogIntroduction } from '../features/LogIntroduction.js';
@@ -194,6 +195,9 @@ export function Person() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { flash } = useToast();
+  useEffect(() => {
+    if (id) rememberViewed(id);
+  }, [id]);
   const rec = useQuery({
     queryKey: ['node', id],
     queryFn: () => api.get<RecordResp>(`/nodes/${id}`),

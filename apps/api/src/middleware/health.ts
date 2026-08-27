@@ -41,7 +41,7 @@ async function databaseReachable(): Promise<{ ok: boolean; detail: string }> {
   if (probeInFlight) return probeInFlight;
   const probe = ping()
     .then(() => ({ ok: true, detail: 'reachable' }))
-    .catch((e: unknown) => ({ ok: false, detail: String(e) }));
+    .catch(() => ({ ok: false, detail: 'unreachable' }));
   const timeout = new Promise<{ ok: boolean; detail: string }>((resolve) =>
     setTimeout(() => resolve({ ok: false, detail: `no response in ${PROBE_TIMEOUT_MS}ms` }), PROBE_TIMEOUT_MS).unref(),
   );

@@ -14,6 +14,10 @@ describe('restoreBundle', () => {
       import('./restore.js'),
       import('../db/repository.js'),
     ]);
+    // This file does not seed the graph. Leftover attachments from another
+    // suite (or a previous process) still have keys, and MemoryStorage does
+    // not. Empty the table so the export under test is self-contained.
+    await repository.docTruncate('attachments');
     const before = await buildExport({ includeSensitive: true });
     const nodeCount = await repository.docCount('nodes');
     const corrupt = { ...before.files, 'nodes.jsonl': `${String(before.files['nodes.jsonl'])}\n{}` };

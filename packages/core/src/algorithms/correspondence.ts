@@ -167,6 +167,38 @@ export interface CorrespondenceProfile {
 
 const DAY_MS = 86_400_000;
 
+/** Calendar date in an optional IANA zone; UTC when none is named. */
+function calendarDateIso(at: number, timeZone?: string): string {
+  if (!timeZone) return new Date(at).toISOString().slice(0, 10);
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date(at));
+}
+
+function yearMonthInZone(now: Date, timeZone?: string): { year: number; month: number } {
+  if (!timeZone) return { year: now.getUTCFullYear(), month: now.getUTCMonth() + 1 };
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+  }).formatToParts(now);
+  return {
+    year: Number(parts.find((part) => part.type === 'year')?.value),
+    month: Number(parts.find((part) => part.type === 'month')?.value),
+  };
+}
+
+function monthKey(now: Date, monthsBack: number, timeZone?: string): string {
+  const { year, month } = yearMonthInZone(now, timeZone);
+  const idx = year * 12 + (month - 1) - monthsBack;
+  const y = Math.floor(idx / 12);
+  const m = (idx % 12) + 1;
+  return `${y}-${String(m).padStart(2, '0')}`;
+}
+
 function median(values: number[]): number | null {
   if (values.length === 0) return null;
   const sorted = [...values].sort((a, b) => a - b);
@@ -189,9 +221,10 @@ function median(values: number[]): number | null {
  */
 export function correspondenceProfile(
   events: ProfileEvent[],
-  opts: { now?: Date } = {},
+  opts: { now?: Date; timeZone?: string } = {},
 ): CorrespondenceProfile {
   const now = opts.now ?? new Date();
+  const timeZone = opts.timeZone;
   const dated = events
     .map((event) => ({ ...event, at: new Date(event.occurredAt).getTime() }))
     .filter((event) => Number.isFinite(event.at))
@@ -218,12 +251,10 @@ export function correspondenceProfile(
     unansweredIds.unshift(directional[i]!.id);
   }
 
-  const dayKeys = new Set(dated.map((e) => new Date(e.at).toISOString().slice(0, 10)));
+  const dayKeys = new Set(dated.map((e) => calendarDateIso(e.at, timeZone)));
   const months: Array<{ month: string; days: number }> = [];
   for (let back = CORRESPONDENCE.contactWindowMonths - 1; back >= 0; back--) {
-    const key = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - back, 1))
-      .toISOString()
-      .slice(0, 7);
+    const key = monthKey(now, back, timeZone);
     let days = 0;
     for (const dayKey of dayKeys) if (dayKey.startsWith(key)) days++;
     months.push({ month: key, days });

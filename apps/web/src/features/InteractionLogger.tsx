@@ -2,6 +2,7 @@ import { useId, useRef, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Banner, Button, Field, FilterGroup, Input, Modal, Stack } from '@vitae/ui';
 import { api } from '../lib/api.js';
+import { useCanWrite, WRITE_LOCK_HINT } from '../lib/auth.js';
 import { useToast } from './Toast.js';
 
 /**
@@ -24,11 +25,12 @@ type Kind = (typeof KINDS)[number]['key'];
 
 /**
  * Direction is an operator-stated fact the correspondence figures build on.
- * The control is visible and confirmed on Save, so the default is an
- * affirmative choice, not an inference — and it feeds `initiated_by`, which
- * older interactions simply lack.
+ * Unstated is the default so the control never guesses (FR-COMM-001): capture
+ * omits `initiated_by` the same way. Choosing me/them posts the field; leaving
+ * it unstated omits it.
  */
 const INITIATORS = [
+  { key: 'unstated', label: 'unstated' },
   { key: 'me', label: 'I did' },
   { key: 'them', label: 'they did' },
 ] as const;
@@ -69,24 +71,25 @@ export function InteractionLogger({
   onClose: () => void;
 }) {
   const [kind, setKind] = useState<Kind>('coffee');
-  const [initiatedBy, setInitiatedBy] = useState<Initiator>('me');
+  const [initiatedBy, setInitiatedBy] = useState<Initiator>('unstated');
   const [note, setNote] = useState('');
   const [followDue, setFollowDue] = useState('');
   const idempotencyKey = useRef(crypto.randomUUID());
   const ids = useId();
   const qc = useQueryClient();
   const { flash } = useToast();
+  const canWrite = useCanWrite();
 
   const log = useMutation({
     mutationFn: () =>
       api.post<LogResponse>('/interactions', {
         personId,
         kind,
-        initiatedBy,
         note,
         occurredAt: new Date().toISOString(),
         followUpDate: followDue || undefined,
         idempotencyKey: idempotencyKey.current,
+        ...(initiatedBy !== 'unstated' ? { initiatedBy } : {}),
       }),
     onSuccess: async (res) => {
       onClose();
@@ -100,7 +103,7 @@ export function InteractionLogger({
     },
   });
 
-  const canSave = note.trim().length > 0 && !log.isPending;
+  const canSave = canWrite && note.trim().length > 0 && !log.isPending;
 
   return (
     <Modal
@@ -128,6 +131,7 @@ export function InteractionLogger({
               : 'The interaction could not be recorded. Try Save again.'}
           </Banner>
         )}
+        {!canWrite && <Banner tone="warning" title="This workspace is read-only">{WRITE_LOCK_HINT}</Banner>}
 
         {/* The Field shell without a Field: FilterGroup names its own group, so
             a <label> here would point at nothing. Reusing the class keeps this

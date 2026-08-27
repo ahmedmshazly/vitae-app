@@ -102,10 +102,10 @@
           "range": "^3.24.1"
         }
       ],
-      "source_files": 112,
-      "test_files": 61,
-      "source_lines": 22540,
-      "exports": 408,
+      "source_files": 113,
+      "test_files": 65,
+      "source_lines": 22775,
+      "exports": 413,
       "dependents": [],
       "imported_by": [],
       "unused_manifest_deps": [],
@@ -210,10 +210,10 @@
           "range": "^3.24.1"
         }
       ],
-      "source_files": 185,
-      "test_files": 174,
-      "source_lines": 49715,
-      "exports": 781,
+      "source_files": 186,
+      "test_files": 175,
+      "source_lines": 49780,
+      "exports": 783,
       "dependents": [],
       "imported_by": [],
       "unused_manifest_deps": [],
@@ -290,8 +290,8 @@
       ],
       "source_files": 50,
       "test_files": 48,
-      "source_lines": 9460,
-      "exports": 490,
+      "source_lines": 9535,
+      "exports": 493,
       "dependents": [
         "@vitae/api",
         "@vitae/web",
@@ -652,9 +652,9 @@
   ],
   "summary": {
     "packages": 8,
-    "source_files": 370,
-    "test_files": 355,
-    "source_lines": 86467,
+    "source_files": 372,
+    "test_files": 360,
+    "source_lines": 86842,
     "layers": 2,
     "cyclic": [],
     "workspace_typecheck": {

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { asyncHandler } from '../../middleware/error.js';
 import { repository } from '../../db/repository.js';
+import { ping } from '../../db/pg.js';
 import { env } from '../../env.js';
 import { storage } from '../../services/storage/cloudinary.js';
 import * as buildsvc from '../../services/buildsvc-client.js';
@@ -17,16 +18,24 @@ export const statusRouter: Router = Router();
  */
 statusRouter.get(
   '/',
-  asyncHandler(async (_req, res) => {
+  asyncHandler(async (req, res) => {
     const checks: Record<string, { ok: boolean; detail?: unknown }> = {};
 
     try {
       // A write, not a read: fail if the database is up but read-only
       // (failed-over replica, full volume), not only when it is unreachable.
-      await repository.docPut('meta', 'ping', { at: new Date().toISOString() });
+      // A locked Cloud workspace must not mutate on a GET (NFR-OPS-002).
+      const locked =
+        req.workspace?.accessState === 'read_only' ||
+        req.workspace?.accessState === 'deletion_pending';
+      if (locked) {
+        await ping();
+      } else {
+        await repository.docPut('meta', 'ping', { at: new Date().toISOString() });
+      }
       checks.database = { ok: true, detail: 'postgres' };
-    } catch (e) {
-      checks.database = { ok: false, detail: String(e) };
+    } catch {
+      checks.database = { ok: false, detail: 'unreachable' };
     }
     checks.storage = { ok: await storage.healthy().catch(() => false), detail: 'cloudinary' };
     checks.buildsvc = await buildsvc.healthz();

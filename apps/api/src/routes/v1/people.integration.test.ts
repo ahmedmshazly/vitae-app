@@ -45,7 +45,7 @@ describe('people routes', () => {
       .expect(404);
   });
 
-  it('computes the correspondence profile from stated directions, and owns up to unstated ones', async () => {
+  it('computes the correspondence profile from stated directions, and owns up to unstated ones (FR-COMM-001)', async () => {
     const { app, token } = await getAuthedApp();
     const created = await request(app)
       .post('/api/v1/nodes')

@@ -25,6 +25,22 @@ function isLoopback(req: Request): boolean {
   return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
 }
 
+function sessionCookie(): {
+  httpOnly: true;
+  sameSite: 'lax';
+  secure: boolean;
+  path: string;
+  maxAge?: number;
+} {
+  return {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: env.NODE_ENV === 'production',
+    path: '/',
+    maxAge: 24 * 60 * 60 * 1000,
+  };
+}
+
 /** Developer sign-in shortcut (SRS FR-SET-001, behind AUTH_ENABLE_DEV_LOGIN). */
 authRouter.post(
   '/dev-login',
@@ -36,12 +52,7 @@ authRouter.post(
       throw new HttpError(403, 'DEV_LOGIN_REMOTE', 'Developer sign-in only answers local requests.');
     }
     const token = issueDevToken();
-    res.cookie('vitae_session', token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+    res.cookie('vitae_session', token, sessionCookie());
     // The token is the session; it goes out as an httpOnly cookie. Echoing it in
     // the body would put an owner credential in JS reach and in every proxy log
     //, tests and the local web client read it from the cookie. The exception is
@@ -55,7 +66,13 @@ authRouter.post(
 );
 
 authRouter.post('/logout', (_req, res) => {
-  res.clearCookie('vitae_session');
+  const cookie = sessionCookie();
+  res.clearCookie('vitae_session', {
+    httpOnly: cookie.httpOnly,
+    sameSite: cookie.sameSite,
+    secure: cookie.secure,
+    path: cookie.path,
+  });
   res.json({ ok: true });
 });
 

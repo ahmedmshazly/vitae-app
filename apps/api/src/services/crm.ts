@@ -30,6 +30,7 @@ import {
   PAGERANK,
 } from '@vitae/core';
 import { repository } from '../db/repository.js';
+import { currentTimezone } from '../db/timezone.js';
 import { getSelf } from './self.js';
 import { buildOwnerIndex, ownableFrom } from './subjects.js';
 
@@ -701,7 +702,9 @@ export async function correspondenceRollup(preloaded?: Graph): Promise<{
   // per-person panel, so the two surfaces cannot disagree.
   const outOfBalance = ties
     .map((tie) => {
-      const profile = correspondenceProfile(profileEvents(graph, tie.personId));
+      const profile = correspondenceProfile(profileEvents(graph, tie.personId), {
+        timeZone: currentTimezone(),
+      });
       const person = graph.nodes.get(tie.personId);
       return { person, profile };
     })
@@ -769,7 +772,7 @@ export async function personCorrespondence(
   preloaded?: Graph,
 ): Promise<CorrespondenceProfile> {
   const graph = preloaded ?? (await loadGraph());
-  return correspondenceProfile(profileEvents(graph, personId));
+  return correspondenceProfile(profileEvents(graph, personId), { timeZone: currentTimezone() });
 }
 
 /**

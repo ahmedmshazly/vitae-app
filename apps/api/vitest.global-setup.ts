@@ -6,12 +6,19 @@
  * which is exactly what happened once before this file existed. `vitae_test` is
  * created on demand and migrated to the same schema as the real one.
  */
+import { mkdirSync, rmSync } from 'node:fs';
 import { Client } from 'pg';
+import { TEST_STORAGE_DIR } from './src/services/storage/memory.js';
 
 const ADMIN_URL = process.env.VITAE_TEST_ADMIN_URL ?? 'postgresql://vitae:vitae@127.0.0.1:5433/postgres';
 const TEST_DB = process.env.VITAE_TEST_DB ?? 'vitae_test';
 
 export default async function setup(): Promise<void> {
+  // Shared across Vitest file isolates the way Postgres is. Emptying it here
+  // keeps a previous run's objects from masquerading as this run's uploads.
+  rmSync(TEST_STORAGE_DIR, { recursive: true, force: true });
+  mkdirSync(TEST_STORAGE_DIR, { recursive: true });
+
   const admin = new Client({ connectionString: ADMIN_URL });
   try {
     await admin.connect();

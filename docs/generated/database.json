@@ -107,7 +107,7 @@
           "file": "apps/api/src/routes/v1/resumes.ts",
           "method": "docList",
           "access": "repository",
-          "line": 583,
+          "line": 590,
           "test": false
         },
         {
@@ -240,7 +240,7 @@
           "file": "apps/api/src/routes/v1/resumes.ts",
           "method": "docList",
           "access": "repository",
-          "line": 582,
+          "line": 589,
           "test": false
         },
         {
@@ -275,14 +275,14 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1285,
+          "line": 1286,
           "test": false
         },
         {
           "file": "apps/api/src/services/letters.ts",
           "method": "docList",
           "access": "repository",
-          "line": 243,
+          "line": 242,
           "test": false
         },
         {
@@ -414,7 +414,7 @@
           "file": "apps/api/src/routes/v1/resumes.ts",
           "method": "docList",
           "access": "repository",
-          "line": 581,
+          "line": 588,
           "test": false
         },
         {
@@ -456,28 +456,28 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 1515,
+          "line": 1516,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1519,
+          "line": 1520,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 1512,
+          "line": 1513,
           "test": false
         },
         {
           "file": "apps/api/src/services/letters.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 88,
+          "line": 87,
           "test": false
         },
         {
@@ -589,6 +589,20 @@
       "indexes": [],
       "queried_by": [
         {
+          "file": "apps/api/src/__tests__/api.integration.test.ts",
+          "method": "docTruncate",
+          "access": "repository",
+          "line": 1691,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/routes/v1/export.integration.test.ts",
+          "method": "docTruncate",
+          "access": "repository",
+          "line": 40,
+          "test": true
+        },
+        {
           "file": "apps/api/src/routes/v1/letters.ts",
           "method": "docGet",
           "access": "repository",
@@ -599,28 +613,28 @@
           "file": "apps/api/src/routes/v1/resumes.ts",
           "method": "docDelete",
           "access": "repository",
-          "line": 860,
+          "line": 861,
           "test": false
         },
         {
           "file": "apps/api/src/routes/v1/resumes.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 816,
+          "line": 818,
           "test": false
         },
         {
           "file": "apps/api/src/routes/v1/resumes.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 859,
+          "line": 860,
           "test": false
         },
         {
           "file": "apps/api/src/routes/v1/resumes.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 634,
+          "line": 641,
           "test": false
         },
         {
@@ -634,14 +648,21 @@
           "file": "apps/api/src/services/letters.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 445,
+          "line": 451,
           "test": false
+        },
+        {
+          "file": "apps/api/src/services/restore.integration.test.ts",
+          "method": "docTruncate",
+          "access": "repository",
+          "line": 20,
+          "test": true
         },
         {
           "file": "apps/api/src/services/restore.ts",
           "method": "docMerge",
           "access": "repository",
-          "line": 258,
+          "line": 268,
           "test": false
         },
         {
@@ -760,14 +781,14 @@
           "file": "apps/api/src/cloud/paddle.ts",
           "method": "insertInto",
           "access": "query-builder",
-          "line": 283,
+          "line": 303,
           "test": false
         },
         {
           "file": "apps/api/src/cloud/paddle.ts",
           "method": "selectFrom",
           "access": "query-builder",
-          "line": 120,
+          "line": 201,
           "test": false
         },
         {
@@ -885,14 +906,14 @@
           "file": "apps/api/src/cloud/paddle.ts",
           "method": "insertInto",
           "access": "query-builder",
-          "line": 221,
+          "line": 239,
           "test": false
         },
         {
           "file": "apps/api/src/cloud/paddle.ts",
           "method": "updateTable",
           "access": "query-builder",
-          "line": 334,
+          "line": 356,
           "test": false
         }
       ],
@@ -1038,14 +1059,14 @@
           "file": "apps/api/src/cloud/paddle.ts",
           "method": "insertInto",
           "access": "query-builder",
-          "line": 291,
+          "line": 312,
           "test": false
         },
         {
           "file": "apps/api/src/cloud/paddle.ts",
           "method": "selectFrom",
           "access": "query-builder",
-          "line": 267,
+          "line": 287,
           "test": false
         },
         {
@@ -1129,14 +1150,14 @@
           "file": "apps/api/src/__tests__/api.integration.test.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 1536,
+          "line": 1551,
           "test": true
         },
         {
           "file": "apps/api/src/__tests__/api.integration.test.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1513,
+          "line": 1528,
           "test": true
         },
         {
@@ -1861,21 +1882,21 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docBulkPut",
           "access": "repository",
-          "line": 929,
+          "line": 930,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docDeleteMany",
           "access": "repository",
-          "line": 834,
+          "line": 835,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docIdsWhereIn",
           "access": "repository",
-          "line": 833,
+          "line": 834,
           "test": false
         }
       ],
@@ -1980,28 +2001,28 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docBulkPut",
           "access": "repository",
-          "line": 937,
+          "line": 938,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 1001,
+          "line": 1002,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docMerge",
           "access": "repository",
-          "line": 1423,
+          "line": 1424,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 963,
+          "line": 964,
           "test": false
         }
       ],
@@ -2113,6 +2134,20 @@
           "test": true
         },
         {
+          "file": "apps/api/src/routes/v1/imports-ics.integration.test.ts",
+          "method": "docDeleteMany",
+          "access": "repository",
+          "line": 84,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/routes/v1/imports-ics.integration.test.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 83,
+          "test": true
+        },
+        {
           "file": "apps/api/src/routes/v1/imports.integration.test.ts",
           "method": "docDeleteMany",
           "access": "repository",
@@ -2137,28 +2172,28 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 974,
+          "line": 975,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docList",
           "access": "repository",
-          "line": 979,
+          "line": 980,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docMerge",
           "access": "repository",
-          "line": 1554,
+          "line": 1555,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 921,
+          "line": 922,
           "test": false
         },
         {
@@ -2337,21 +2372,21 @@
           "file": "apps/api/src/services/letters.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 425,
+          "line": 431,
           "test": false
         },
         {
           "file": "apps/api/src/services/letters.ts",
           "method": "docList",
           "access": "repository",
-          "line": 100,
+          "line": 99,
           "test": false
         },
         {
           "file": "apps/api/src/services/letters.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 443,
+          "line": 449,
           "test": false
         }
       ],
@@ -2610,7 +2645,7 @@
           "file": "apps/api/src/routes/v1/status.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 26,
+          "line": 34,
           "test": false
         },
         {
@@ -3026,7 +3061,7 @@
           "file": "apps/api/src/__tests__/api.integration.test.ts",
           "method": "docCount",
           "access": "repository",
-          "line": 1680,
+          "line": 1696,
           "test": true
         },
         {
@@ -3089,7 +3124,7 @@
           "file": "apps/api/src/services/restore.integration.test.ts",
           "method": "docCount",
           "access": "repository",
-          "line": 21,
+          "line": 25,
           "test": true
         }
       ],
@@ -3221,7 +3256,7 @@
           "file": "apps/api/src/services/capture.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 176,
+          "line": 177,
           "test": false
         },
         {
@@ -3443,7 +3478,7 @@
           "file": "apps/api/src/services/letters.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 81,
+          "line": 80,
           "test": false
         }
       ],
@@ -3635,14 +3670,14 @@
           "file": "apps/api/src/__tests__/api.integration.test.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 1532,
+          "line": 1547,
           "test": true
         },
         {
           "file": "apps/api/src/__tests__/api.integration.test.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1522,
+          "line": 1537,
           "test": true
         },
         {
@@ -3771,7 +3806,7 @@
           "file": "apps/api/src/services/capture.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 164,
+          "line": 165,
           "test": false
         },
         {
@@ -3792,7 +3827,7 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1398,
+          "line": 1399,
           "test": false
         }
       ],
@@ -3869,14 +3904,14 @@
           "file": "apps/api/src/services/capture.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 160,
+          "line": 161,
           "test": false
         },
         {
           "file": "apps/api/src/services/capture.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 140,
+          "line": 141,
           "test": false
         },
         {
@@ -3890,14 +3925,14 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1733,
+          "line": 1799,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 1730,
+          "line": 1796,
           "test": false
         }
       ],
@@ -4030,7 +4065,7 @@
           "file": "apps/api/src/routes/v1/resumes.ts",
           "method": "docList",
           "access": "repository",
-          "line": 584,
+          "line": 591,
           "test": false
         },
         {
@@ -4407,7 +4442,7 @@
           "file": "apps/api/src/cloud/paddle.ts",
           "method": "selectFrom",
           "access": "query-builder",
-          "line": 250,
+          "line": 268,
           "test": false
         },
         {
@@ -4599,7 +4634,7 @@
           "file": "apps/api/src/cloud/paddle.ts",
           "method": "selectFrom",
           "access": "query-builder",
-          "line": 218,
+          "line": 194,
           "test": false
         },
         {

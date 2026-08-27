@@ -11,7 +11,7 @@
 import { describe, expect, it } from 'vitest';
 import type { NodeRecord } from '@vitae/core';
 import { buildNodeRecord } from '@vitae/testkit';
-import { buildProposal, nodeDraftFor, resolveIdentity } from './imports.js';
+import { buildProposal, githubLinkNext, matchGithubRepository, nodeDraftFor, resolveIdentity } from './imports.js';
 
 function person(overrides: Parameters<typeof buildNodeRecord>[0] = {}): NodeRecord {
   return buildNodeRecord({ type: 'person', title: 'Sarah Chen', ...overrides });
@@ -179,5 +179,38 @@ describe('buildProposal', () => {
     expect(proposal.identity_key).toBe(identityKey);
     expect(proposal.accepted).toEqual(proposal.fields.map((f) => f.key));
     expect(proposal.fields.length).toBeGreaterThan(0);
+  });
+});
+
+describe('githubLinkNext', () => {
+  it('reads the next page from GitHub’s Link header', () => {
+    expect(
+      githubLinkNext(
+        '<https://api.github.com/user/repos?page=2>; rel="next", <https://api.github.com/user/repos?page=3>; rel="last"',
+      ),
+    ).toBe('https://api.github.com/user/repos?page=2');
+    expect(githubLinkNext(null)).toBeNull();
+    expect(githubLinkNext('')).toBeNull();
+  });
+});
+
+describe('matchGithubRepository', () => {
+  it('prefers the GitHub id identity key over a matching full_name', () => {
+    const byKey = person({
+      id: 'repo-id',
+      type: 'repository',
+      title: 'vitae',
+      identity_keys: ['github:repo:99'],
+      props: { full_name: 'old/vitae', github_id: 99 },
+    });
+    const byName = person({
+      id: 'repo-name',
+      type: 'repository',
+      title: 'other',
+      props: { full_name: 'new/vitae' },
+    });
+    expect(matchGithubRepository([byName, byKey], { id: 99, full_name: 'new/vitae' })?.id).toBe(
+      'repo-id',
+    );
   });
 });

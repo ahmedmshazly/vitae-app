@@ -44,9 +44,14 @@ describe('InteractionLogger', () => {
     await waitFor(() => {
       expect(mockApi.post).toHaveBeenCalledWith(
         '/interactions',
-        expect.objectContaining({ personId: 'p1', kind: 'call', note: 'Quick sync', initiatedBy: 'me' }),
+        expect.objectContaining({ personId: 'p1', kind: 'call', note: 'Quick sync' }),
       );
     });
+    const body = mockApi.post.mock.calls.find((call) => call[0] === '/interactions')?.[1] as Record<
+      string,
+      unknown
+    >;
+    expect(body).not.toHaveProperty('initiatedBy');
     await waitFor(() => {
       expect(onClose).toHaveBeenCalledOnce();
     });
@@ -66,6 +71,24 @@ describe('InteractionLogger', () => {
       expect(mockApi.post).toHaveBeenCalledWith(
         '/interactions',
         expect.objectContaining({ initiatedBy: 'them' }),
+      );
+    });
+  });
+
+  it('posts initiatedBy me only when the operator chooses it', async () => {
+    const user = userEvent.setup();
+    mockApi.post.mockResolvedValue({ interaction: { id: 'i3' }, strength: { strength: 0.4 } });
+    renderLogger();
+
+    expect(screen.getByRole('button', { name: 'unstated', pressed: true })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'I did' }));
+    await user.type(screen.getByLabelText(/What happened\?/), 'I reached out');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith(
+        '/interactions',
+        expect.objectContaining({ initiatedBy: 'me' }),
       );
     });
   });

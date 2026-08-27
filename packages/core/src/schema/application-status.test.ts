@@ -14,9 +14,11 @@ import {
   APPLICATION_PIPELINE,
   APPLICATION_STATUSES,
   APPLICATION_STATUS_FLOW,
+  applicationStatusOptionsFor,
   applicationStatusSchema,
   canTransition,
   illegalTransitionMessage,
+  isApplicationStatus,
   type ApplicationStatus,
 } from './application.js';
 
@@ -92,6 +94,23 @@ describe('the application status machine', () => {
   it('names a destination for every status the enum can hold', () => {
     const mapped = Object.keys(APPLICATION_STATUS_FLOW) as ApplicationStatus[];
     expect(mapped.sort()).toEqual([...APPLICATION_STATUSES].sort());
+  });
+
+  it('narrows unknown values and lists only legal form options', () => {
+    expect(isApplicationStatus('interview')).toBe(true);
+    expect(isApplicationStatus('pending')).toBe(false);
+    expect(applicationStatusOptionsFor('interview')).toEqual([
+      'interview',
+      'offer',
+      'accepted',
+      'rejected',
+      'withdrawn',
+    ]);
+    expect(applicationStatusOptionsFor('interview')).not.toContain('draft');
+    expect(applicationStatusOptionsFor('interview')).not.toContain('applied');
+    expect(applicationStatusOptionsFor('rejected')).toEqual(['rejected']);
+    // Create stays permissive: a past rejection is a fact, not a move.
+    expect(applicationStatusOptionsFor('draft')).toContain('accepted');
   });
 });
 

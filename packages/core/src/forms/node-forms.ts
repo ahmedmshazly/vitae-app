@@ -6,7 +6,11 @@
  * Edge directions follow the SRS §4.4 catalog (e.g. ROLE_AT: role → org,
  * HELD: person → role, WITH: interaction|trip → person).
  */
-import { APPLICATION_STATUSES } from '../schema/application.js';
+import {
+  APPLICATION_STATUSES,
+  applicationStatusOptionsFor,
+  type ApplicationStatus,
+} from '../schema/application.js';
 import { NODE_TYPES, type NodeType } from '../types.js';
 import type { EdgeSubEditor, FieldDescriptor, SelectOption, TypeFormDescriptor } from './types.js';
 
@@ -1527,8 +1531,25 @@ export const NODE_FORM_DESCRIPTORS: Record<NodeType, TypeFormDescriptor> = {
   },
 };
 
-export function nodeFormDescriptor(type: NodeType): TypeFormDescriptor {
-  return NODE_FORM_DESCRIPTORS[type];
+export function nodeFormDescriptor(
+  type: NodeType,
+  opts?: { applicationStatus?: ApplicationStatus },
+): TypeFormDescriptor {
+  const base = NODE_FORM_DESCRIPTORS[type];
+  if (type !== 'application' || !opts?.applicationStatus) return base;
+  const allowed = applicationStatusOptionsFor(opts.applicationStatus);
+  return {
+    ...base,
+    fields: base.fields.map((field) =>
+      field.key !== 'status'
+        ? field
+        : {
+            ...field,
+            options: sel(...allowed),
+            help: 'Legal next statuses only. To rewrite a status that was recorded by mistake, use Correct status on the dossier. This form cannot claim a correction.',
+          },
+    ),
+  };
 }
 
 /**

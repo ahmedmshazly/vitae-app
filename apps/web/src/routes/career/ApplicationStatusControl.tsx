@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { APPLICATION_STATUSES, APPLICATION_STATUS_FLOW, type ApplicationStatus } from '@vitae/core';
 import { Banner, Button, FilterGroup, Modal, Stack } from '@vitae/ui';
 import { api } from '../../lib/api.js';
+import { useCanWrite, WRITE_LOCK_HINT } from '../../lib/auth.js';
 import { useToast } from '../../features/Toast.js';
 import { STATUS_LABEL } from './application-view.js';
 
@@ -39,6 +40,7 @@ export function ApplicationStatusControl({
   const ids = useId();
   const qc = useQueryClient();
   const { flash } = useToast();
+  const canWrite = useCanWrite();
 
   const change = useMutation({
     mutationFn: (next: StatusChange) => api.post(`/applications/${id}/status`, next),
@@ -76,7 +78,9 @@ export function ApplicationStatusControl({
         </Banner>
       ) : null}
 
-      {onward.length > 0 ? (
+      {!canWrite ? (
+        <p className="m-0 mb-3 text-sm text-muted">{WRITE_LOCK_HINT}</p>
+      ) : onward.length > 0 ? (
         <div role="group" aria-label="Record a status move" className="flex flex-wrap gap-2">
           {onward.map((next) => (
             <Button
@@ -95,7 +99,7 @@ export function ApplicationStatusControl({
       )}
 
       <div className="mt-4 border-t border-hairline pt-3">
-        <Button variant="ghost" glyph="adjust" onClick={() => setCorrecting(true)}>
+        <Button variant="ghost" glyph="adjust" disabled={!canWrite} onClick={() => setCorrecting(true)}>
           Correct status
         </Button>
         <p className="mt-1 text-sm text-faint">

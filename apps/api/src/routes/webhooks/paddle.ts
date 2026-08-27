@@ -18,7 +18,7 @@ export async function paddleWebhookHandler(req: Request, res: Response, next: Ne
     const event = parsePaddleWebhook(req.body);
     if (!event) throw new HttpError(400, 'INVALID_WEBHOOK', 'Webhook payload is invalid.');
     const result = await applyPaddleWebhook(event);
-    res.status(200).json({ ok: true, duplicate: result.duplicate });
+    res.status(200).json({ ok: true, duplicate: result.duplicate, linked: result.linked });
   } catch (error) {
     next(error);
   }

@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { EDGE_TYPES, NODE_TYPES } from '../types.js';
+import { APPLICATION_STATUSES } from '../schema/application.js';
 import { NODE_PROPS_SCHEMAS } from '../schema/node-props.js';
 import { EDGE_PROPS_SCHEMAS } from '../schema/edge-props.js';
-import { NODE_FORM_DESCRIPTORS } from './node-forms.js';
+import { NODE_FORM_DESCRIPTORS, nodeFormDescriptor } from './node-forms.js';
 import { EDGE_FORM_DESCRIPTORS, edgeEndpointsAllowed } from './edge-forms.js';
 import {
   SUBJECT_BEARING_TYPES,
@@ -235,5 +236,28 @@ describe('form descriptors stay honest against the Zod schemas', () => {
       if (f.widget === 'object-list') expect(f.itemFields?.length, f.key).toBeGreaterThan(0);
       if (f.widget === 'suggest-list') expect(f.suggestKind, f.key).toBeTruthy();
     }
+  });
+
+  it('an existing application form offers only legal next statuses, not the full enum', () => {
+    const create = nodeFormDescriptor('application');
+    const createStatus = create.fields.find((f) => f.key === 'status');
+    expect(createStatus?.options?.map((o) => o.value)).toEqual([...APPLICATION_STATUSES]);
+
+    const interview = nodeFormDescriptor('application', { applicationStatus: 'interview' });
+    const interviewStatus = interview.fields.find((f) => f.key === 'status');
+    expect(interviewStatus?.options?.map((o) => o.value)).toEqual([
+      'interview',
+      'offer',
+      'accepted',
+      'rejected',
+      'withdrawn',
+    ]);
+    expect(interviewStatus?.options?.map((o) => o.value)).not.toContain('draft');
+    expect(interviewStatus?.help).toMatch(/Correct status/);
+
+    const rejected = nodeFormDescriptor('application', { applicationStatus: 'rejected' });
+    expect(rejected.fields.find((f) => f.key === 'status')?.options?.map((o) => o.value)).toEqual([
+      'rejected',
+    ]);
   });
 });

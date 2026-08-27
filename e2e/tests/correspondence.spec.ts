@@ -4,7 +4,7 @@ import { expectNoA11yViolations } from './helpers/a11y';
 import { apiGet, apiPost, expectOkJson } from './helpers/api.js';
 
 /**
- * Correspondence (FR-COMM-002): the rollup screen exists under Network,
+ * Correspondence (FR-COMM-002, FR-COMM-001): the rollup screen exists under Network,
  * reachable from the hub, honest in every state. The ranking's substance is
  * proven at the API layer (correspondence.integration.test.ts), where the
  * dormant-but-once-strong fixture is constructable; here the claims are the

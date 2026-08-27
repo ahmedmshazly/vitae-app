@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Banner, Button, Chip, ErrorState, Mono, StatusTrace } from '@vitae/ui';
 import { api } from '../lib/api.js';
+import { useCanWrite, WRITE_LOCK_HINT } from '../lib/auth.js';
 
 /** The shape both /compile and /finalize answer with (FR-RES-021). */
 export interface LetterCompileResponse {
@@ -92,6 +93,7 @@ function LetterPdf({ base64, letterId }: { base64: string; letterId: string }) {
 export function LetterCompilePanel({ letterId, letterStatus, hasStoredArtifacts, onFinalized }: Props) {
   const [result, setResult] = useState<LetterCompileResponse | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
+  const canWrite = useCanWrite();
 
   const run = useMutation({
     mutationFn: async (mode: 'compile' | 'finalize') =>
@@ -116,14 +118,15 @@ export function LetterCompilePanel({ letterId, letterStatus, hasStoredArtifacts,
   return (
     <section className="flex flex-col gap-3" aria-label="Compile this letter">
       <div className="flex flex-wrap items-center gap-2">
-        <Button size="sm" disabled={busy} onClick={() => run.mutate('compile')}>
+        <Button size="sm" disabled={busy || !canWrite} onClick={() => run.mutate('compile')}>
           Compile preview
         </Button>
-        <Button size="sm" variant="primary" disabled={busy} onClick={() => run.mutate('finalize')}>
+        <Button size="sm" variant="primary" disabled={busy || !canWrite} onClick={() => run.mutate('finalize')}>
           {letterStatus === 'draft' ? 'Finalize letter' : 'Rebuild artifacts'}
         </Button>
         {hasStoredArtifacts && <Chip mono>PDF and source stored</Chip>}
       </div>
+      {!canWrite ? <p className="m-0 text-sm text-muted">{WRITE_LOCK_HINT}</p> : null}
 
       {busy && (
         <StatusTrace

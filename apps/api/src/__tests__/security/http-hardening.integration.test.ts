@@ -30,16 +30,25 @@ describe('HTTP security hardening', () => {
     expect(res.headers['access-control-allow-origin']).toBeUndefined();
   });
 
-  it('allows the configured WEB_ORIGIN', async () => {
+  it('allows every comma-separated WEB_ORIGIN and treats 127.0.0.1 as a distinct origin', async () => {
     const { app, token } = await getAuthedApp();
     const { env } = await import('../../env.js');
-    const origin = env.WEB_ORIGIN.split(',')[0]?.trim();
-    expect(origin).toBeTruthy();
-    const res = await request(app)
-      .get('/api/v1/auth/me')
-      .set('Origin', origin!)
-      .set(authHeader(token));
-    expect(res.headers['access-control-allow-origin']).toBe(origin);
+    const origins = env.WEB_ORIGIN.split(',').map((s) => s.trim()).filter(Boolean);
+    expect(origins.length).toBeGreaterThanOrEqual(1);
+    for (const origin of origins) {
+      const res = await request(app).get('/api/v1/auth/me').set('Origin', origin).set(authHeader(token));
+      expect(res.headers['access-control-allow-origin'], origin).toBe(origin);
+    }
+    const listed = new Set(origins);
+    const twin = listed.has('http://localhost:5173')
+      ? 'http://127.0.0.1:5173'
+      : listed.has('http://127.0.0.1:5173')
+        ? 'http://localhost:5173'
+        : null;
+    if (twin && !listed.has(twin)) {
+      const res = await request(app).get('/api/v1/auth/me').set('Origin', twin).set(authHeader(token));
+      expect(res.headers['access-control-allow-origin']).toBeUndefined();
+    }
   });
 
   it('rejects a JSON body over the default 2mb limit', async () => {

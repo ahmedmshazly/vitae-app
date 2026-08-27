@@ -167,10 +167,11 @@ describe('letters routes', () => {
     } else {
       expect(after.body.letter.status).toBe('final');
       expect(after.body.letter.template_key).toBe('letter-classic');
-      // Artifacts are recorded only when storage actually kept them, and the
-      // upload is skipped under NODE_ENV=test. So what has to hold is that the
-      // key and the hash agree with each other: a letter claiming a stored PDF
-      // and no hash for it, or the reverse, is a record that cannot be honoured.
+      // Artifacts are recorded only when storage actually kept them. Tests stub
+      // the adapter; an unconfigured real adapter throws into the storage-outage
+      // branch. What has to hold is that the key and the hash agree with each
+      // other: a letter claiming a stored PDF and no hash for it, or the reverse,
+      // is a record that cannot be honoured.
       if (after.body.letter.pdf_key) {
         expect(after.body.letter.artifact_hashes.pdf).toEqual(expect.any(String));
       } else {

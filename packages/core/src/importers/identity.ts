@@ -107,6 +107,14 @@ export function bookmarkUrlKey(url: string | null | undefined): string | null {
   return normalized ? identityKeyFor('bookmark', 'link', normalized) : null;
 }
 
+/** `github:repo:<id>`: GitHub's numeric id survives a rename. */
+export function githubRepoKey(id: number | string | null | undefined): string | null {
+  if (id == null || id === '') return null;
+  const value = String(id).trim();
+  if (!/^\d+$/.test(value)) return null;
+  return identityKeyFor('github', 'repo', value);
+}
+
 /**
  * Canonical form of a URL for keying: scheme and host lowercased by `URL`
  * itself, the fragment dropped (it addresses a place inside one page, not a

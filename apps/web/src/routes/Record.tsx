@@ -7,7 +7,7 @@
  * the header carries one tick per revision, which is the brand book's own
  * worked example of a rule that encodes something true.
  */
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -25,6 +25,7 @@ import {
 } from '@vitae/ui';
 import { isNodeType } from '@vitae/core';
 import { api } from '../lib/api.js';
+import { rememberViewed } from '../lib/last-viewed.js';
 import { fieldLabel } from '../lib/revision-fields.js';
 import { AddConnection } from '../features/forms/AddConnection.js';
 import { ConnectionRow } from '../features/forms/ConnectionRow.js';
@@ -117,6 +118,9 @@ export function Record() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { flash } = useToast();
+  useEffect(() => {
+    if (id) rememberViewed(id);
+  }, [id]);
   const [editing, setEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [addingConn, setAddingConn] = useState(false);

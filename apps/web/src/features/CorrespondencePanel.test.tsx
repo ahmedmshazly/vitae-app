@@ -30,7 +30,7 @@ function profile(overrides: Partial<CorrespondenceProfileDto>): CorrespondencePr
   };
 }
 
-describe('CorrespondencePanel', () => {
+describe('CorrespondencePanel (FR-COMM-001)', () => {
   it('says no direction was ever stated instead of computing a ratio of nothing', async () => {
     mockApi.get.mockResolvedValue({ profile: profile({ coverage: { withDirection: 0, total: 4 } }) });
     renderWithApp(<CorrespondencePanel personId="p1" />);

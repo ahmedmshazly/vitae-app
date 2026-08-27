@@ -99,6 +99,7 @@ export const repositoryProps = z.object({
   topics: z.array(z.string()).default([]),
   default_branch: z.string().optional(),
   last_synced_at: isoDateTime.optional(),
+  github_id: z.number().int().positive().optional(),
 });
 
 export const skillProps = z.object({

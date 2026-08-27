@@ -8,7 +8,13 @@ import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Glyph, Modal, Skeleton, Spinner } from '@vitae/ui';
-import { NODE_FORM_DESCRIPTORS, subjectSubEditor, type NodeType } from '@vitae/core';
+import {
+  isApplicationStatus,
+  NODE_FORM_DESCRIPTORS,
+  nodeFormDescriptor,
+  subjectSubEditor,
+  type NodeType,
+} from '@vitae/core';
 import { api } from '../../lib/api.js';
 import { useCanWrite, WRITE_LOCK_HINT } from '../../lib/auth.js';
 import { useToast } from '../Toast.js';
@@ -86,7 +92,6 @@ export function NodeFormDialog({
   const [pendingSubmit, setPendingSubmit] = useState<EntityFormSubmit | null>(null);
   const [approvedFingerprint, setApprovedFingerprint] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const descriptor = NODE_FORM_DESCRIPTORS[type];
   // The actions live in the modal's sticky footer, so they need to reach the
   // form across the DOM, that is what the `form` attribute is for.
   const formId = useId();
@@ -96,6 +101,16 @@ export function NodeFormDialog({
     queryFn: () => api.get<NodeResp>(`/nodes/${nodeId}`),
     enabled: open && Boolean(nodeId),
   });
+
+  // Create may record any status (a past rejection is a fact). Edit offers
+  // only the moves the server would accept; correction lives on the dossier.
+  const descriptor = useMemo(() => {
+    if (type === 'application' && nodeId) {
+      const status = existing.data?.node.props.status;
+      if (isApplicationStatus(status)) return nodeFormDescriptor('application', { applicationStatus: status });
+    }
+    return NODE_FORM_DESCRIPTORS[type];
+  }, [type, nodeId, existing.data]);
 
   /** Existing edges that belong to a sub-editor become editable drafts. */
   const initialConnections = useMemo<ConnectionDraft[]>(() => {
@@ -425,6 +440,7 @@ export function NodeFormDialog({
           <EntityForm
             key={nodeId ?? 'create'}
             type={type}
+            descriptor={descriptor}
             defaultValues={defaultValues}
             initialConnections={initialConnections}
             formId={formId}

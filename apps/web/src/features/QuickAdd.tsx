@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Chip, CommandOverlay, Glyph, Kbd, StatusTrace } from '@vitae/ui';
 import { isNodeType, type CapturePlan, type NodeType } from '@vitae/core';
 import { api } from '../lib/api.js';
+import { lastViewedId } from '../lib/last-viewed.js';
 import { useCanWrite, WRITE_LOCK_HINT } from '../lib/auth.js';
 import { useToast } from './Toast.js';
 import { NodeFormDialog } from './forms/NodeFormDialog.js';
@@ -60,7 +61,7 @@ export function QuickAdd({ onClose }: { onClose: () => void }) {
     setBusy(true);
     setError(null);
     try {
-      await api.post('/capture', { raw: value });
+      await api.post('/capture', { raw: value, lastViewedId: lastViewedId() });
       await qc.invalidateQueries();
       onClose();
       // The control says Capture; the confirmation says Captured.

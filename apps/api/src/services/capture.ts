@@ -12,6 +12,7 @@ import { newId, nowIso } from '../db/util.js';
 import { noonIso, todayIso, userCalendarNow } from '../db/timezone.js';
 import { getSelf } from './self.js';
 import { searchIndex } from '../db/search-index.js';
+import { HttpError } from '../middleware/error.js';
 
 export interface CaptureResult {
   plan: CapturePlan;
@@ -29,9 +30,9 @@ export async function commitCapture(raw: string, opts: { lastViewedId?: string }
 
   // Note-append mode targets the last-viewed record (SRS FR-CAP-008).
   if (plan.primaryType === NOTE_APPEND) {
-    if (!opts.lastViewedId) throw new Error('note-append requires a last-viewed record');
+    if (!opts.lastViewedId) throw new HttpError(400, 'NOTE_APPEND_NO_TARGET', 'note-append requires a last-viewed record');
     const node = await repository.getNode(opts.lastViewedId);
-    if (!node) throw new Error('last-viewed record not found');
+    if (!node) throw new HttpError(404, 'NOT_FOUND', 'last-viewed record not found');
     const appended = `${node.notes_md ? node.notes_md + '\n' : ''}${plan.notes || plan.title}`;
     await repository.updateNode(node.id, { notes_md: appended }, { op: 'append', source: 'manual' });
     searchIndex.markDirty();

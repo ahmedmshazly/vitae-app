@@ -976,14 +976,21 @@ d('Vitae API (integration)', () => {
     const restored = await request(app).get('/api/v1/resumes').set('Authorization', `Bearer ${token}`).expect(200);
     expect(restored.body.resumes.some((resume: { id: string }) => resume.id === id)).toBe(true);
 
-    // No Cloudinary artifacts in test env, signed download stays unavailable.
-    await request(app)
+    // Dual-path: a stored blob yields a signed URL; an honest outage still 409s.
+    // Skipping upload in tests used to leave a row with no key, which is a
+    // state production cannot reach and which poisoned complete backups.
+    const pdf = await request(app)
       .get(`/api/v1/resumes/${id}/artifacts/pdf`)
-      .set('Authorization', `Bearer ${token}`)
-      .expect(409);
+      .set('Authorization', `Bearer ${token}`);
+    if (pdf.status === 200) {
+      expect(pdf.body.url).toBeTruthy();
+      expect(pdf.body.filename).toMatch(/\.pdf$/);
+    } else {
+      expect(pdf.status).toBe(409);
+      expect(pdf.body.error.code).toBe('ARTIFACT_UNAVAILABLE');
+    }
 
-    // Re-export stamps artifact ids on the résumé. Attachment rows are skipped
-    // in test (no Cloudinary) so later export/restore round-trips stay clean.
+    // Re-export needs a stored blob. Unconfigured storage is an honest 503.
     const reexported = await request(app)
       .post(`/api/v1/resumes/${id}/reexport`)
       .set('Authorization', `Bearer ${token}`);
@@ -1286,6 +1293,8 @@ d('Vitae API (integration)', () => {
   }, 60_000);
 
   it('exports every collection with identity, and filters sensitive records transitively (FR-001/FR-012)', async () => {
+    const { repository } = await import('../db/repository.js');
+    await repository.docTruncate('attachments');
     const marker = `Sensitive${Date.now()}`;
     const secret = await request(app)
       .post('/api/v1/nodes')
@@ -1453,6 +1462,7 @@ d('Vitae API (integration)', () => {
       import('../services/restore.js'),
       import('../db/repository.js'),
     ]);
+    await repository.docTruncate('attachments');
 
     const before = await buildExport({ includeSensitive: true });
     expect(before.manifest.includes_sensitive).toBe(true);
@@ -1467,9 +1477,13 @@ d('Vitae API (integration)', () => {
     }
 
     const restored = await restoreBundle(before.files);
-    expect(restored.total).toBe(
-      Object.values(before.manifest.counts).reduce((sum, count) => sum + count, 0),
-    );
+    // `counts.blobs` is files under blobs/, not JSONL rows. Restore reports
+    // document rows; comparing the two as one number only worked while the
+    // workspace had no stored artifacts.
+    const rowCounts = Object.entries(before.manifest.counts)
+      .filter(([name]) => name !== 'blobs')
+      .reduce((sum, [, count]) => sum + count, 0);
+    expect(restored.total).toBe(rowCounts);
 
     const after = await buildExport({ includeSensitive: true });
     expect(after.manifest.counts).toEqual(before.manifest.counts);
@@ -1490,6 +1504,7 @@ d('Vitae API (integration)', () => {
       import('../services/restore.js'),
       import('../db/repository.js'),
     ]);
+    await repository.docTruncate('attachments');
 
     const bundle = await buildExport({ includeSensitive: true });
 
@@ -1673,6 +1688,7 @@ d('Vitae API (integration)', () => {
       import('../services/restore.js'),
       import('../db/repository.js'),
     ]);
+    await repository.docTruncate('attachments');
     const before = await buildExport({ includeSensitive: true });
     const nodeCount = await repository.docCount('nodes');
     const corrupt = { ...before.files, 'nodes.jsonl': `${String(before.files['nodes.jsonl'])}\n{}` };

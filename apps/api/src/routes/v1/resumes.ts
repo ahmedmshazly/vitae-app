@@ -399,7 +399,7 @@ resumesRouter.post(
       : null;
 
     let artifacts: Array<Record<string, unknown>> = [];
-    if (env.NODE_ENV !== 'test' && compile.ok && compile.pdfBase64) {
+    if (compile.ok && compile.pdfBase64) {
       try {
         artifacts = await Promise.all([
           artifactRecord({
@@ -421,11 +421,9 @@ resumesRouter.post(
       }
     }
     // An attachments row asserts a blob was stored and can be fetched back, so
-    // a record with no storage key must not become one. The rebuild path below
-    // already refuses this through a NODE_ENV check; keying on the missing key
-    // instead says why rather than where, and also covers a storage adapter
-    // that answers without one. Without it the export guard refuses to back the
-    // whole workspace up rather than hand out a bundle it cannot honour.
+    // a record with no storage key must not become one. Keying on the missing
+    // key covers a storage adapter that answers without one, and keeps export
+    // from refusing the whole workspace over a bundle it cannot honour.
     artifacts = artifacts.filter((artifact) => artifact.storage_key);
     const artifactByKind = new Map(
       artifacts.map((artifact) => [String(artifact.artifact_kind), artifact]),
@@ -536,10 +534,12 @@ async function artifactRecord(params: {
   const mime = params.kind === 'pdf' ? 'application/pdf' : 'application/x-tex';
   const filename = `resume-${params.resumeId}.${params.kind}`;
   const sha256 = createHash('sha256').update(params.bytes).digest('hex');
-  const stored =
-    env.NODE_ENV === 'test'
-      ? null
-      : await storage.upload({ data: params.bytes, filename, mime, sha256 });
+  // No NODE_ENV branch. Unit tests stub the adapter; skipping the call here
+  // produced a record claiming a stored file with no key to fetch it by, which
+  // is a state production cannot reach. Integration tests run the real adapter
+  // unconfigured, so it throws and the caller's storage-outage branch catches
+  // it: the résumé compiled, and its artifacts were not kept.
+  const stored = await storage.upload({ data: params.bytes, filename, mime, sha256 });
   const id = newId();
   return {
     id,
@@ -798,12 +798,8 @@ resumesRouter.post(
       );
     }
 
-    // In tests we skip Cloudinary and do not write attachment rows (null
-    // storage_key would break later export/restore round-trips). Prod requires
-    // a real storage_key on every artifact.
-    if (env.NODE_ENV === 'test') {
-      artifacts = artifacts.map((artifact) => ({ ...artifact, storage_key: null }));
-    } else if (artifacts.some((a) => !a.storage_key)) {
+    artifacts = artifacts.filter((artifact) => artifact.storage_key);
+    if (artifacts.length === 0) {
       throw new HttpError(
         503,
         'STORAGE_UNAVAILABLE',
@@ -814,7 +810,6 @@ resumesRouter.post(
     const artifactByKind = new Map(
       artifacts.map((artifact) => [String(artifact.artifact_kind), artifact]),
     );
-    const persistAttachments = env.NODE_ENV !== 'test';
     const oldIds = Object.values(
       (resume.artifact_ids as Record<string, string> | undefined) ?? {},
     ).filter(Boolean);
@@ -861,11 +856,9 @@ resumesRouter.post(
 
     await repository.transaction(async (tx) => {
       await repository.docPut('resumes', id, next, {}, tx);
-      if (persistAttachments) {
-        for (const artifact of artifacts)
-          await repository.docPut('attachments', String(artifact.id), artifact, {}, tx);
-        for (const oldId of oldIds) await repository.docDelete('attachments', oldId, tx);
-      }
+      for (const artifact of artifacts)
+        await repository.docPut('attachments', String(artifact.id), artifact, {}, tx);
+      for (const oldId of oldIds) await repository.docDelete('attachments', oldId, tx);
       await repository.stageRevision(tx, {
         kind: 'resume',
         id,

@@ -422,11 +422,8 @@ export async function finalizeLetter(id: string, actor?: string): Promise<Letter
     artifacts = [];
   }
   // An attachments row asserts that a blob was stored and can be fetched back.
-  // The upload is skipped under NODE_ENV=test, which left rows claiming files
-  // nobody could fetch, and the export guard then refused to back the whole
-  // workspace up rather than hand out a bundle it could not honour. A record
-  // with no storage key is the same situation as the outage above: the letter
-  // compiled and its artifacts were not kept.
+  // A record with no storage key is the same situation as a storage outage:
+  // the letter compiled and its artifacts were not kept.
   artifacts = artifacts.filter((artifact) => artifact.storage_key);
   const byKind = new Map(artifacts.map((artifact) => [artifact.artifact_kind, artifact]));
 

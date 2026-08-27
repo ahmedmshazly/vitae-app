@@ -55,6 +55,38 @@ describe('POST /api/v1/capture', () => {
     );
   });
 
+  it('appends a note to the last-viewed record (FR-CAP-008)', async () => {
+    const { app, token } = await getAuthedApp();
+    const created = await request(app)
+      .post('/api/v1/nodes')
+      .set(authHeader(token))
+      .send({ type: 'person', title: `Note Append ${Date.now()}`, notes_md: 'already here', props: {} })
+      .expect(201);
+    const id = created.body.node.id as string;
+
+    const res = await request(app)
+      .post('/api/v1/capture')
+      .set(authHeader(token))
+      .send({ raw: 'n promised the RL paper', lastViewedId: id });
+    expect(res.status).toBe(201);
+    expect(res.body.plan.primaryType).toBe('note_append');
+    expect(res.body.primaryId).toBe(id);
+
+    const after = await request(app).get(`/api/v1/nodes/${id}`).set(authHeader(token)).expect(200);
+    expect(after.body.node.notes_md).toContain('already here');
+    expect(after.body.node.notes_md).toContain('promised the RL paper');
+  });
+
+  it('refuses note-append without a last-viewed record', async () => {
+    const { app, token } = await getAuthedApp();
+    const res = await request(app)
+      .post('/api/v1/capture')
+      .set(authHeader(token))
+      .send({ raw: 'n orphan note with no target' });
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('NOTE_APPEND_NO_TARGET');
+  });
+
   it('commits an interaction capture, defaulting kind and occurrence', async () => {
     const { app, token } = await getAuthedApp();
     const stamp = Date.now();

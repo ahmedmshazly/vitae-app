@@ -8,6 +8,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { env } from '../../env.js';
 import { currentWorkspaceId } from '../../db/space.js';
 import type { StorageAdapter, StoredObject } from './adapter.js';
+import { sharedMemoryStorage } from './memory.js';
 
 // The SDK auto-reads CLOUDINARY_URL from process.env; make it explicit + private.
 let configured = false;
@@ -91,4 +92,7 @@ export class CloudinaryStorage implements StorageAdapter {
   }
 }
 
-export const storage: StorageAdapter = new CloudinaryStorage();
+export const storage: StorageAdapter =
+  env.NODE_ENV === 'test' || process.env.VITEST === 'true'
+    ? sharedMemoryStorage()
+    : new CloudinaryStorage();

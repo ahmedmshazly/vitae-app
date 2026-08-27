@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { signIn } from './helpers/auth';
-import { apiPost, expectOkJson } from './helpers/api.js';
+import { apiPost, apiPatch, expectOkJson } from './helpers/api.js';
 
 /**
  * The application status machine, end to end (FR-CAR-003).
@@ -102,8 +102,8 @@ test('the generic record patch obeys the same machine as the dedicated endpoint'
   const id = await application(page, 'accepted');
   // Straight at the node API, which is the door the application form itself
   // uses. A guard only the dedicated endpoint ran would be no guard at all.
-  const refused = await page.request.patch(`/api/v1/nodes/${id}`, {
-    data: { props: { role_title: 'Status walk accepted', status: 'screening' } },
+  const refused = await apiPatch(page, `/nodes/${id}`, {
+    props: { role_title: 'Status walk accepted', status: 'screening' },
   });
   expect(refused.status(), 'the back door refuses the same move').toBe(422);
   const body = (await refused.json()) as { error: { message: string } };

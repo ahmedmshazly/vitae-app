@@ -86,10 +86,15 @@ test('each hop is weighted by its own tie, not by the path’s label', async ({ 
   await goIntros(page);
   const { paths } = (await (await pathsResponse).json()) as IntroPathsPayload;
 
-  const multi = reach(page).locator('article').filter({ hasText: 'chains into' }).first();
+  // Named hops, not “the first article that says chains into”: a richer seed
+  // can insert other multi-hop paths ahead of this one without changing the
+  // Lina → Karim sentence this spec is actually about.
+  const multi = reach(page)
+    .locator('article')
+    .filter({ hasText: 'Lina Farouk' })
+    .filter({ hasText: 'Karim Nabil' });
   await expect(multi).toBeVisible();
-  await expect(multi).toContainText('Lina Farouk');
-  await expect(multi).toContainText('Karim Nabil');
+  await expect(multi).toContainText('chains into');
   await expect(multi.getByText('works there', { exact: true })).toBeVisible();
 
   const lines = await multi.locator('.network-path__line').evaluateAll((els) =>
@@ -204,8 +209,9 @@ test('a chained path shows every server evidence factor', async ({ page }) => {
 
   const evidence = reach(page)
     .locator('article')
+    .filter({ hasText: 'Lina Farouk' })
+    .filter({ hasText: 'Karim Nabil' })
     .filter({ hasText: 'chains into' })
-    .first()
     .locator('[aria-label="Path evidence"]');
   await expect(evidence.locator('.vt-chip')).toHaveCount(4);
   await expect(evidence).toContainText('2 hops');

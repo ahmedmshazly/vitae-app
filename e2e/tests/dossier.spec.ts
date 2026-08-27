@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { signIn } from './helpers/auth';
 import { expectNoA11yViolations } from './helpers/a11y';
-import { apiPost, expectOkJson } from './helpers/api.js';
+import { apiPost, apiGet, apiDelete, expectOkJson } from './helpers/api.js';
 
 /**
  * J5, prove it with a dossier (FR-DOS-001, FR-DOS-002).
@@ -26,7 +26,7 @@ async function record(page: Page, type: string, title: string, props: Record<str
 /** A promotion packet that satisfies its grammar, so violations mean something. */
 async function dossier(page: Page, stamp: number) {
   const self = await expectOkJson<{ self: { id: string } | null }>(
-    await page.request.get('/api/v1/auth/me'),
+    await apiGet(page, '/auth/me'),
     'self',
   );
   expect(self.self, 'the seeded graph names a self record').not.toBeNull();
@@ -104,7 +104,7 @@ test('J5: a withdrawn record still prints, and the document still compiles', asy
   const { id, first } = await dossier(page, stamp);
   // Deleted after the dossier cited it, which is the case the appendix exists
   // to survive rather than to hide.
-  const removed = await page.request.delete(`/api/v1/nodes/${first}`);
+  const removed = await apiDelete(page, `/nodes/${first}`);
   expect(removed.ok(), 'the cited record was deleted').toBe(true);
 
   await page.goto(`/career/dossiers/${id}`);
@@ -133,7 +133,8 @@ test('J5: the audiences differ in what their sections demand', async ({ page }) 
   // FR-DOS-002 is this: one selection format, three audiences, different rules
   // underneath. The sections are on screen before the audience is chosen.
   for (const audience of ['Promotion review', 'Petition exhibits', 'Background history']) {
-    await expect(page.getByLabel(audience)).toBeVisible();
+    // The section list is aria-describedby the radio, so getByLabel matches both.
+    await expect(page.getByRole('radio', { name: audience })).toBeVisible();
     await expect(
       page.getByRole('list', { name: `Sections of a ${audience} dossier` }),
     ).toBeVisible();

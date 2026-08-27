@@ -100,11 +100,20 @@ export async function restoreBundle(
   const targetIds = ids('targets.jsonl');
   const tagIds = ids('tags.jsonl');
   const importIds = ids('imports.jsonl');
+  const resumeIds = ids('resumes.jsonl');
+  const letterIds = ids('letters.jsonl');
   const requireRef = (file: string, row: Record<string, unknown>, field: string, allowed: Set<string>): void => {
     const value = row[field];
     if (typeof value === 'string' && value && !allowed.has(value)) {
       throw new RestoreError(`${file}: ${field} references missing document ${value}`);
     }
+  };
+  const idsForSubjectKind = (kind: unknown): Set<string> => {
+    if (kind === 'edge') return edgeIds;
+    if (kind === 'atom') return atomIds;
+    if (kind === 'resume') return resumeIds;
+    if (kind === 'letter') return letterIds;
+    return nodeIds;
   };
   for (const row of rows['edges.jsonl']!) {
     requireRef('edges.jsonl', row, 'src', nodeIds);
@@ -118,14 +127,16 @@ export async function restoreBundle(
   }
   for (const row of rows['taggings.jsonl']!) {
     requireRef('taggings.jsonl', row, 'tag_id', tagIds);
-    const kind = row.subject_kind;
-    requireRef('taggings.jsonl', row, 'subject_id', kind === 'edge' ? edgeIds : kind === 'atom' ? atomIds : nodeIds);
+    requireRef('taggings.jsonl', row, 'subject_id', idsForSubjectKind(row.subject_kind));
   }
-  for (const file of ['reminders.jsonl', 'attachments.jsonl']) {
-    for (const row of rows[file]!) {
-      const kind = row.subject_kind;
-      requireRef(file, row, 'subject_id', kind === 'edge' ? edgeIds : kind === 'atom' ? atomIds : nodeIds);
-    }
+  for (const row of rows['reminders.jsonl']!) {
+    requireRef('reminders.jsonl', row, 'subject_id', idsForSubjectKind(row.subject_kind));
+  }
+  // Résumé and letter PDFs live on those documents, not on graph nodes. Treating
+  // every attachment as a node ref made a complete backup unrestorable the
+  // moment storage started keeping those blobs (FR-001).
+  for (const row of rows['attachments.jsonl']!) {
+    requireRef('attachments.jsonl', row, 'subject_id', idsForSubjectKind(row.subject_kind));
   }
   for (const row of rows['habit_checks.jsonl']!) requireRef('habit_checks.jsonl', row, 'habit_id', nodeIds);
   for (const row of rows['merges.jsonl']!) {
@@ -134,7 +145,6 @@ export async function restoreBundle(
   }
   for (const row of rows['resumes.jsonl']!) requireRef('resumes.jsonl', row, 'target_id', targetIds);
   if (rows['letters.jsonl']) {
-    const resumeIds = ids('resumes.jsonl');
     for (const row of rows['letters.jsonl']) {
       requireRef('letters.jsonl', row, 'target_id', targetIds);
       requireRef('letters.jsonl', row, 'resume_id', resumeIds);

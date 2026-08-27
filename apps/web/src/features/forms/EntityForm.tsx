@@ -15,6 +15,7 @@ import {
   propsSchemaFor,
   subjectSubEditor,
   type NodeType,
+  type TypeFormDescriptor,
 } from '@vitae/core';
 import { FieldRenderer, type AnyControl, type AnyRegister } from './FieldRenderer.js';
 import { EdgeSubEditorRow, newDraftKey, type ConnectionDraft } from './EdgeSubEditorRow.js';
@@ -78,6 +79,7 @@ function sanitizeValues(values: EntityFormValues): EntityFormValues {
 
 export function EntityForm({
   type,
+  descriptor: descriptorOverride,
   defaultValues,
   initialConnections = [],
   submitLabel = 'Save',
@@ -88,6 +90,8 @@ export function EntityForm({
   formId,
 }: {
   type: NodeType;
+  /** When given, replaces the catalog descriptor (edit-time status filtering). */
+  descriptor?: TypeFormDescriptor;
   defaultValues?: Partial<EntityFormValues>;
   initialConnections?: ConnectionDraft[];
   submitLabel?: string;
@@ -101,7 +105,7 @@ export function EntityForm({
    * a 692px body and the submit button was 719px past the bottom edge. */
   formId?: string;
 }) {
-  const descriptor = NODE_FORM_DESCRIPTORS[type];
+  const descriptor = descriptorOverride ?? NODE_FORM_DESCRIPTORS[type];
   const [connections, setConnections] = useState<ConnectionDraft[]>(initialConnections);
   const [subjectError, setSubjectError] = useState<string | undefined>();
 

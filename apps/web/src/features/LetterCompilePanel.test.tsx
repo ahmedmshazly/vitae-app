@@ -11,6 +11,15 @@ import { mockApi, resetMockApi } from '../test/api-mock.js';
 import { renderWithApp } from '../test/render.js';
 import { LetterCompilePanel } from './LetterCompilePanel.js';
 
+const writeGate = vi.hoisted(() => ({ canWrite: true }));
+vi.mock('../lib/auth.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../lib/auth.js')>();
+  return {
+    ...actual,
+    useCanWrite: () => writeGate.canWrite,
+  };
+});
+
 const TEX = '\\documentclass[11pt]{article}\\begin{document}Dear Hiring Team,\\end{document}';
 
 function compiled(over: Record<string, unknown> = {}) {
@@ -39,6 +48,7 @@ function renderPanel(over: Record<string, unknown> = {}) {
 }
 
 beforeEach(() => {
+  writeGate.canWrite = true;
   resetMockApi();
   // jsdom has no blob URLs, and the preview iframe needs one to exist.
   Object.assign(URL, {
@@ -152,5 +162,13 @@ describe('LetterCompilePanel', () => {
     renderPanel({ letterStatus: 'final', hasStoredArtifacts: true });
     expect(screen.getByRole('button', { name: 'Rebuild artifacts' })).toBeInTheDocument();
     expect(screen.getByText('PDF and source stored')).toBeInTheDocument();
+  });
+
+  it('disables compile and finalize on a locked workspace (NFR-OPS-002)', () => {
+    writeGate.canWrite = false;
+    renderPanel();
+    expect(screen.getByRole('button', { name: 'Compile preview' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Finalize letter' })).toBeDisabled();
+    expect(screen.getByText(/Read-only workspace/)).toBeInTheDocument();
   });
 });

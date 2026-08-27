@@ -1108,6 +1108,10 @@
         },
         "last_synced_at": {
           "type": "datetime"
+        },
+        "github_id": {
+          "type": "number",
+          "note": "Numeric GitHub repository id, stored for merge. Identity is github:repo:<id>, not this field alone."
         }
       },
       "create_subject": {

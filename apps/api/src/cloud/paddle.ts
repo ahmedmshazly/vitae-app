@@ -185,6 +185,28 @@ function workspaceIdFrom(event: PaddleWebhookEvent): string | null {
   return asString(asRecord(event.data.custom_data).workspace_id);
 }
 
+async function resolveWorkspaceId(
+  tx: typeof db,
+  event: PaddleWebhookEvent,
+): Promise<string | null> {
+  const supplied = workspaceIdFrom(event);
+  if (supplied) {
+    const row = await tx.selectFrom('workspaces').select('id').where('id', '=', supplied).executeTakeFirst();
+    if (row) return row.id;
+  }
+  const customerId =
+    asString(event.data.customer_id) ??
+    (event.event_type.startsWith('customer.') ? asString(event.data.id) : null);
+  if (!customerId) return null;
+  const billed = await tx
+    .selectFrom('billing_customers')
+    .select('workspace_id')
+    .where('provider', '=', PADDLE)
+    .where('provider_customer_id', '=', customerId)
+    .executeTakeFirst();
+  return billed?.workspace_id ?? null;
+}
+
 function periodFrom(event: PaddleWebhookEvent): BillingPeriod | null {
   const value = asString(asRecord(event.data.custom_data).billing_period);
   return isCloudIndividualBillingPeriod(value) ? value : null;
@@ -213,11 +235,7 @@ function providerTimestamp(event: PaddleWebhookEvent): string | null {
  */
 export async function applyPaddleWebhook(event: PaddleWebhookEvent): Promise<{ duplicate: boolean; linked: boolean }> {
   return db.transaction().execute(async (tx) => {
-    const suppliedWorkspaceId = workspaceIdFrom(event);
-    const workspace = suppliedWorkspaceId
-      ? await tx.selectFrom('workspaces').select('id').where('id', '=', suppliedWorkspaceId).executeTakeFirst()
-      : null;
-    const workspaceId = workspace?.id ?? null;
+    const workspaceId = await resolveWorkspaceId(tx, event);
     const inserted = await tx
       .insertInto('billing_events')
       .values({
@@ -255,8 +273,10 @@ export async function applyPaddleWebhook(event: PaddleWebhookEvent): Promise<{ d
       .executeTakeFirst();
 
     const data = event.data;
-    const subscriptionId = asString(data.id);
-    const customerId = asString(data.customer_id);
+    const isSubscriptionEvent = event.event_type.startsWith('subscription.');
+    const subscriptionId = isSubscriptionEvent ? asString(data.id) : null;
+    const customerId =
+      asString(data.customer_id) ?? (event.event_type.startsWith('customer.') ? asString(data.id) : null);
     const status = asString(data.status);
     const billingPeriod = periodFrom(event);
     const billingPeriodData = asRecord(data.current_billing_period);
@@ -288,22 +308,11 @@ export async function applyPaddleWebhook(event: PaddleWebhookEvent): Promise<{ d
           )
           .execute();
       }
-      await tx
-        .insertInto('billing_subscriptions')
-        .values({
-          workspace_id: workspaceId,
-          provider: PADDLE,
-          provider_subscription_id: subscriptionId,
-          provider_status: status,
-          billing_period: billingPeriod,
-          current_period_ends_at: periodEndsAt,
-          provider_updated_at: incomingProviderUpdatedAt,
-          cancel_at_period_end: cancelAtPeriodEnd,
-          raw: data,
-          updated_at: nowIso(),
-        })
-        .onConflict((oc) =>
-          oc.column('workspace_id').doUpdateSet({
+      if (isSubscriptionEvent && subscriptionId) {
+        await tx
+          .insertInto('billing_subscriptions')
+          .values({
+            workspace_id: workspaceId,
             provider: PADDLE,
             provider_subscription_id: subscriptionId,
             provider_status: status,
@@ -313,9 +322,22 @@ export async function applyPaddleWebhook(event: PaddleWebhookEvent): Promise<{ d
             cancel_at_period_end: cancelAtPeriodEnd,
             raw: data,
             updated_at: nowIso(),
-          }),
-        )
-        .execute();
+          })
+          .onConflict((oc) =>
+            oc.column('workspace_id').doUpdateSet({
+              provider: PADDLE,
+              provider_subscription_id: subscriptionId,
+              provider_status: status,
+              billing_period: billingPeriod,
+              current_period_ends_at: periodEndsAt,
+              provider_updated_at: incomingProviderUpdatedAt,
+              cancel_at_period_end: cancelAtPeriodEnd,
+              raw: data,
+              updated_at: nowIso(),
+            }),
+          )
+          .execute();
+      }
       const access = accessFrom(event);
       if (access) {
         await applyBillingAccess(

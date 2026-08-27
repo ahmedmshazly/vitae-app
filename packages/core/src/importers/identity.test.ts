@@ -4,6 +4,7 @@ import {
   bookmarkUrlKey,
   contactEmailKey,
   icsEventKey,
+  githubRepoKey,
   identityKeyFor,
   linkedinProfileKey,
   vcardUidKey,
@@ -125,5 +126,19 @@ describe('bookmarkUrlKey', () => {
 
   it('emits a key the envelope accepts', () => {
     expect(isStorable(bookmarkUrlKey('https://arxiv.org/abs/1706.03762')!)).toBe(true);
+  });
+});
+
+describe('githubRepoKey', () => {
+  it('keys a repository by GitHub numeric id so a rename cannot fork it', () => {
+    expect(githubRepoKey(123456)).toBe('github:repo:123456');
+    expect(githubRepoKey('123456')).toBe('github:repo:123456');
+    expect(isStorable(githubRepoKey(123456)!)).toBe(true);
+  });
+
+  it('yields nothing for a value that is not GitHub’s id', () => {
+    expect(githubRepoKey('owner/name')).toBeNull();
+    expect(githubRepoKey('')).toBeNull();
+    expect(githubRepoKey(null)).toBeNull();
   });
 });

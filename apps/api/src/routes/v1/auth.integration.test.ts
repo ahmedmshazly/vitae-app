@@ -39,5 +39,11 @@ describe('/api/v1/auth', () => {
     const res = await request(app).post('/api/v1/auth/logout').set(authHeader(token));
     expect(res.status).toBe(200);
     expect(res.body.ok).toBe(true);
+    const raw = res.headers['set-cookie'];
+    const cookies = Array.isArray(raw) ? raw : raw ? [raw] : [];
+    const cleared = cookies.find((c) => /^vitae_session=/.test(c));
+    expect(cleared, 'logout must emit a matching Set-Cookie').toBeTruthy();
+    expect(cleared).toMatch(/HttpOnly/i);
+    expect(cleared).toMatch(/SameSite=Lax/i);
   });
 });

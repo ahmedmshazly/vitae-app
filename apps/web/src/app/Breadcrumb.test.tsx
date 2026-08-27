@@ -23,4 +23,11 @@ describe('Breadcrumb', () => {
     expect(screen.getByText('Collections')).toBeInTheDocument();
     expect(screen.getByText('Record')).toBeInTheDocument();
   });
+
+  it('names the correspondence rollup instead of falling through to Not found', () => {
+    renderWithApp(<Breadcrumb />, { route: '/network/correspondence' });
+    expect(screen.getByText('Network')).toBeInTheDocument();
+    expect(screen.getByText('Correspondence')).toBeInTheDocument();
+    expect(screen.queryByText('Not found')).not.toBeInTheDocument();
+  });
 });

@@ -19,6 +19,7 @@ function crumbFor(pathname: string): Crumb {
     [ROUTES.today.path]: { parent: '', leaf: 'Today', glyph: 'today' },
     [ROUTES.planner.path]: { parent: 'Today', leaf: 'Planner', glyph: 'calendar' },
     [ROUTES.network.path]: { parent: '', leaf: 'Network', glyph: 'person' },
+    [ROUTES.correspondence.path]: { parent: 'Network', leaf: 'Correspondence', glyph: 'interaction' },
     [ROUTES.people.path]: { parent: 'Network', leaf: 'People', glyph: 'person' },
     [ROUTES.orgs.path]: { parent: 'Network', leaf: 'Organizations', glyph: 'org' },
     '/network/intelligence': { parent: 'Network', leaf: 'Intelligence', glyph: 'ask' },

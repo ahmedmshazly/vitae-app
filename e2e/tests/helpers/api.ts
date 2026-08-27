@@ -84,6 +84,11 @@ export async function apiDelete(page: Page, path: string): Promise<APIResponse> 
 
 /** Assert ok and return JSON; include status/body in the failure message. */
 export async function expectOkJson<T>(res: APIResponse, label: string): Promise<T> {
-  expect(res.ok(), `${label} failed: ${res.status()} ${await res.text()}`).toBe(true);
-  return (await res.json()) as T;
+  const text = await res.text();
+  expect(res.ok(), `${label} failed: ${res.status()} ${res.url()} ${text.slice(0, 300)}`).toBe(true);
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new Error(`${label} was not JSON (${res.status()} ${res.url()}): ${text.slice(0, 200)}`);
+  }
 }

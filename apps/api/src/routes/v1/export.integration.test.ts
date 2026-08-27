@@ -36,6 +36,8 @@ describe('export routes', () => {
 
   it('exports every collection with identity, and filters sensitive records (FR-001/FR-012)', async () => {
     const { app, token } = await getAuthedApp();
+    const { repository } = await import('../../db/repository.js');
+    await repository.docTruncate('attachments');
     const marker = `Sensitive${Date.now()}`;
     const secret = await request(app)
       .post('/api/v1/nodes')

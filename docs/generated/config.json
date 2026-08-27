@@ -26,7 +26,7 @@
       "example": {
         "value": "https://aperture.example.com",
         "commented": true,
-        "source": ".env.example:81"
+        "source": ".env.example:84"
       }
     },
     {
@@ -136,7 +136,7 @@
       "example": {
         "value": "true",
         "commented": false,
-        "source": ".env.example:69"
+        "source": ".env.example:72"
       }
     },
     {
@@ -174,7 +174,7 @@
       "example": {
         "value": "2026-07-16",
         "commented": true,
-        "source": ".env.example:136"
+        "source": ".env.example:139"
       }
     },
     {
@@ -267,7 +267,7 @@
       "example": {
         "value": "s3://vitae-backups/prod",
         "commented": true,
-        "source": ".env.example:135"
+        "source": ".env.example:138"
       }
     },
     {
@@ -299,7 +299,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:141"
+        "source": ".env.example:144"
       }
     },
     {
@@ -334,7 +334,7 @@
       "example": {
         "value": "change-me-to-a-shared-secret",
         "commented": false,
-        "source": ".env.example:121"
+        "source": ".env.example:124"
       }
     },
     {
@@ -390,7 +390,7 @@
       "example": {
         "value": "http://localhost:8787",
         "commented": false,
-        "source": ".env.example:116"
+        "source": ".env.example:119"
       }
     },
     {
@@ -442,7 +442,7 @@
       "example": {
         "value": "vitae",
         "commented": false,
-        "source": ".env.example:113"
+        "source": ".env.example:116"
       }
     },
     {
@@ -471,7 +471,7 @@
       "example": {
         "value": "cloudinary://your_key:your_secret@your_cloud",
         "commented": false,
-        "source": ".env.example:111"
+        "source": ".env.example:114"
       }
     },
     {
@@ -503,7 +503,7 @@
       "example": {
         "value": "YES",
         "commented": true,
-        "source": ".env.example:138"
+        "source": ".env.example:141"
       }
     },
     {
@@ -532,7 +532,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:90"
+        "source": ".env.example:93"
       }
     },
     {
@@ -587,7 +587,7 @@
       "example": {
         "value": "postgresql://vitae:vitae@127.0.0.1:5433/vitae",
         "commented": false,
-        "source": ".env.example:86"
+        "source": ".env.example:89"
       }
     },
     {
@@ -620,7 +620,7 @@
       "example": {
         "value": "docs/.compiled",
         "commented": false,
-        "source": ".env.example:67"
+        "source": ".env.example:70"
       }
     },
     {
@@ -658,7 +658,7 @@
       "example": {
         "value": "1",
         "commented": true,
-        "source": ".env.example:137"
+        "source": ".env.example:140"
       }
     },
     {
@@ -789,7 +789,7 @@
       "example": {
         "value": "127.0.0.1:9099",
         "commented": false,
-        "source": ".env.example:98"
+        "source": ".env.example:101"
       }
     },
     {
@@ -818,7 +818,7 @@
       "example": {
         "value": "vitae-local",
         "commented": false,
-        "source": ".env.example:96"
+        "source": ".env.example:99"
       }
     },
     {
@@ -879,7 +879,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:128"
+        "source": ".env.example:131"
       }
     },
     {
@@ -1050,7 +1050,7 @@
       "example": {
         "value": "owner@example.com",
         "commented": false,
-        "source": ".env.example:54"
+        "source": ".env.example:57"
       }
     },
     {
@@ -1081,7 +1081,7 @@
       "example": {
         "value": "pdl_sdbx_apikey_your_server_secret",
         "commented": true,
-        "source": ".env.example:46"
+        "source": ".env.example:49"
       }
     },
     {
@@ -1112,7 +1112,7 @@
       "example": {
         "value": "sandbox",
         "commented": false,
-        "source": ".env.example:45"
+        "source": ".env.example:48"
       }
     },
     {
@@ -1144,7 +1144,7 @@
       "example": {
         "value": "pri_your_annual_price",
         "commented": true,
-        "source": ".env.example:49"
+        "source": ".env.example:52"
       }
     },
     {
@@ -1176,7 +1176,7 @@
       "example": {
         "value": "pri_your_monthly_price",
         "commented": true,
-        "source": ".env.example:48"
+        "source": ".env.example:51"
       }
     },
     {
@@ -1210,7 +1210,7 @@
       "example": {
         "value": "pdl_ntfset_your_webhook_secret",
         "commented": true,
-        "source": ".env.example:47"
+        "source": ".env.example:50"
       }
     },
     {
@@ -1268,7 +1268,7 @@
       "example": {
         "value": "https://app.example.com",
         "commented": true,
-        "source": ".env.example:42"
+        "source": ".env.example:45"
       }
     },
     {
@@ -1297,7 +1297,7 @@
       "example": {
         "value": "change-me-to-a-long-random-string",
         "commented": false,
-        "source": ".env.example:71"
+        "source": ".env.example:74"
       }
     },
     {
@@ -1339,9 +1339,9 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "apps/api/src/services/letters.ts:39",
+      "source": "apps/api/src/services/letters.ts:38",
       "reads": [
-        "apps/api/src/services/letters.ts:39",
+        "apps/api/src/services/letters.ts:38",
         "apps/api/src/services/resume.ts:40",
         "services/buildsvc/src/calibrate.ts:32"
       ],
@@ -1381,7 +1381,7 @@
       "example": {
         "value": "companion-production",
         "commented": true,
-        "source": ".env.example:79"
+        "source": ".env.example:82"
       }
     },
     {
@@ -1549,7 +1549,7 @@
       "example": {
         "value": "false",
         "commented": false,
-        "source": ".env.example:40"
+        "source": ".env.example:43"
       }
     },
     {
@@ -1941,7 +1941,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:130"
+        "source": ".env.example:133"
       }
     },
     {
@@ -1993,6 +1993,33 @@
         "deploy"
       ],
       "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_TEST_STORAGE_DIR",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/services/storage/memory.ts:22",
+      "reads": [
+        "apps/api/src/services/storage/memory.ts:22"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
       "test_only": false,
       "surface": "deployment",
       "documented": false,
@@ -2082,7 +2109,7 @@
       "example": {
         "value": "http://localhost:4000/api/v1",
         "commented": false,
-        "source": ".env.example:18"
+        "source": ".env.example:21"
       }
     },
     {
@@ -2113,7 +2140,7 @@
       "example": {
         "value": "demo-api-key",
         "commented": false,
-        "source": ".env.example:100"
+        "source": ".env.example:103"
       }
     },
     {
@@ -2144,7 +2171,7 @@
       "example": {
         "value": "vitae-local.firebaseapp.com",
         "commented": false,
-        "source": ".env.example:101"
+        "source": ".env.example:104"
       }
     },
     {
@@ -2175,7 +2202,7 @@
       "example": {
         "value": "http://127.0.0.1:9099",
         "commented": false,
-        "source": ".env.example:107"
+        "source": ".env.example:110"
       }
     },
     {
@@ -2206,7 +2233,7 @@
       "example": {
         "value": "vitae-local",
         "commented": false,
-        "source": ".env.example:102"
+        "source": ".env.example:105"
       }
     },
     {
@@ -2237,7 +2264,7 @@
       "example": {
         "value": "true",
         "commented": false,
-        "source": ".env.example:103"
+        "source": ".env.example:106"
       }
     },
     {
@@ -2268,7 +2295,7 @@
       "example": {
         "value": "test_your_paddle_client_token",
         "commented": true,
-        "source": ".env.example:35"
+        "source": ".env.example:38"
       }
     },
     {
@@ -2295,7 +2322,7 @@
       "example": {
         "value": "false",
         "commented": false,
-        "source": ".env.example:28"
+        "source": ".env.example:31"
       }
     },
     {
@@ -2322,7 +2349,7 @@
       "example": {
         "value": "Example, Inc.",
         "commented": true,
-        "source": ".env.example:31"
+        "source": ".env.example:34"
       }
     },
     {
@@ -2349,7 +2376,7 @@
       "example": {
         "value": "2026-08-23",
         "commented": true,
-        "source": ".env.example:32"
+        "source": ".env.example:35"
       }
     },
     {
@@ -2380,7 +2407,7 @@
       "example": {
         "value": "https://github.com/your-org/vitae",
         "commented": true,
-        "source": ".env.example:21"
+        "source": ".env.example:24"
       }
     },
     {
@@ -2407,7 +2434,7 @@
       "example": {
         "value": "https://app.example.com",
         "commented": true,
-        "source": ".env.example:29"
+        "source": ".env.example:32"
       }
     },
     {
@@ -2434,8 +2461,35 @@
       "example": {
         "value": "support@example.com",
         "commented": true,
-        "source": ".env.example:30"
+        "source": ".env.example:33"
       }
+    },
+    {
+      "name": "VITEST",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/services/storage/cloudinary.ts:96",
+      "reads": [
+        "apps/api/src/services/storage/cloudinary.ts:96"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
     },
     {
       "name": "WARMED_MANIFEST_PATH",
@@ -2478,7 +2532,7 @@
       "constraints": [
         "min(1)"
       ],
-      "section": null,
+      "section": "Runtime",
       "description": "Comma-separated browser origins allowed by CORS (primary web + aliases).",
       "requirements": [],
       "source": "packages/config/src/env.ts:19",
@@ -2491,8 +2545,12 @@
       "read_via": "process.env",
       "test_only": false,
       "surface": "deployment",
-      "documented": false,
-      "example": null
+      "documented": true,
+      "example": {
+        "value": "http://localhost:5173,http://127.0.0.1:5173",
+        "commented": true,
+        "source": ".env.example:19"
+      }
     }
   ],
   "sections": [
@@ -2507,9 +2565,9 @@
     "Storage: Cloudinary (SRS T5; owner-provided)"
   ],
   "summary": {
-    "total": 85,
+    "total": 87,
     "by_scope": {
-      "server": 53,
+      "server": 55,
       "deploy": 19,
       "web-build": 13
     },
@@ -2531,6 +2589,8 @@
       "TZ",
       "VITAE_CLOUD_ENABLED",
       "VITAE_SPACE",
+      "VITAE_TEST_STORAGE_DIR",
+      "VITEST",
       "WARMED_MANIFEST_PATH"
     ],
     "undocumented": [
@@ -2558,8 +2618,9 @@
       "VITAE_KNOWN_HOSTS",
       "VITAE_SPACE",
       "VITAE_SSH_KEY",
-      "WARMED_MANIFEST_PATH",
-      "WEB_ORIGIN"
+      "VITAE_TEST_STORAGE_DIR",
+      "VITEST",
+      "WARMED_MANIFEST_PATH"
     ],
     "example_only": [
       "GCLOUD_PROJECT",

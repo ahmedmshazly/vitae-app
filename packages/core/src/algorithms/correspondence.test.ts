@@ -95,7 +95,7 @@ describe('brokerTally', () => {
   });
 });
 
-describe('correspondenceProfile', () => {
+describe('correspondenceProfile (FR-COMM-001)', () => {
   const at = (n: number, id: string, initiatedBy?: 'me' | 'them') => ({
     id,
     occurredAt: day(n),
@@ -169,6 +169,23 @@ describe('correspondenceProfile', () => {
     // Day 400 sits outside the window; days 3 and 3.2 share a calendar day.
     expect(counted).toBe(2);
     expect(p.contactDays.totalDays).toBe(3);
+  });
+
+  it('buckets contact days in the request timezone, not UTC (FR-COMM-001, FR-025)', () => {
+    // 02:00 UTC on 1 August is still 31 July in Los Angeles, so the event sits
+    // inside the trailing-twelve-months window only when the request timezone
+    // is used. UTC would drop it from July's bucket.
+    const boundary = {
+      id: 'b',
+      occurredAt: '2026-08-01T02:00:00.000Z',
+      initiatedBy: 'me' as const,
+    };
+    const utc = correspondenceProfile([boundary], { now: NOW });
+    const la = correspondenceProfile([boundary], { now: NOW, timeZone: 'America/Los_Angeles' });
+    const counted = (p: typeof utc) => p.contactDays.months.reduce((sum, m) => sum + m.days, 0);
+    expect(counted(utc)).toBe(0);
+    expect(counted(la)).toBe(1);
+    expect(la.contactDays.months.find((m) => m.month === '2026-07')?.days).toBe(1);
   });
 });
 

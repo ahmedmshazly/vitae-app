@@ -7,7 +7,8 @@ import { apiPost, expectOkJson } from './helpers/api.js';
 /**
  * Screen 7: person profile. The interaction log is the reason this page
  * exists, so most of this spec is about whether it can answer "when did I
- * last speak to this person".
+ * last speak to this person". The correspondence panel (FR-COMM-001) sits
+ * beside that log.
  */
 
 const SUMMARY = '**/api/v1/people/*/summary';
@@ -150,7 +151,7 @@ test('the person page has no automated a11y violations', async ({ page }) => {
   await expectNoA11yViolations(page);
 });
 
-test('the correspondence panel computes from stated directions and shows its evidence', async ({ page }) => {
+test('the correspondence panel computes from stated directions and shows its evidence (FR-COMM-001)', async ({ page }) => {
   await signIn(page);
   const stamp = Date.now();
   const created = await apiPost(page, '/nodes', {

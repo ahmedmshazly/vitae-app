@@ -874,10 +874,11 @@ export function buildOpenApiDocument(): OpenAPIObject {
         },
         PaddleWebhookResponse: {
           type: 'object',
-          required: ['ok', 'duplicate'],
+          required: ['ok', 'duplicate', 'linked'],
           properties: {
             ok: { type: 'boolean', const: true },
             duplicate: { type: 'boolean' },
+            linked: { type: 'boolean', description: 'Whether the event resolved to a known workspace' },
           },
         },
         ApplicationStatus: { type: 'string', enum: [...APPLICATION_STATUSES] },

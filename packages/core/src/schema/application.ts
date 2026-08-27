@@ -85,6 +85,20 @@ export function canTransition(from: ApplicationStatus, to: ApplicationStatus): b
   return from === to || APPLICATION_STATUS_FLOW[from].includes(to);
 }
 
+export function isApplicationStatus(value: unknown): value is ApplicationStatus {
+  return typeof value === 'string' && (APPLICATION_STATUSES as readonly string[]).includes(value);
+}
+
+/**
+ * Statuses the generic edit form may offer: the current value (re-saving other
+ * fields is not a transition) plus every legal onward move. Correction is a
+ * different claim and belongs to the dedicated control — a generic PATCH
+ * cannot send `correction: true`.
+ */
+export function applicationStatusOptionsFor(current: ApplicationStatus): readonly ApplicationStatus[] {
+  return [current, ...APPLICATION_STATUS_FLOW[current]];
+}
+
 /**
  * What a writer says when it refuses a move.
  *

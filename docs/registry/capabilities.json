@@ -117,7 +117,7 @@
         "apps/web/src/routes/Correspondence.tsx",
         "docs/ROADMAP.md"
       ],
-      "note": "Registered as intent under ADR 0007; the rollup half shipped in the same cycle (FR-COMM-002): dormant-but-once-strong reactivation ranked by the tie-strength kernel re-read over each tie's history, and brokers tallied from met_via. The per-person profile (FR-COMM-001) and first-class introductions (FR-COMM-003) stay planned — reciprocity and reply latency wait on directional interaction data by design, and nothing here guesses."
+      "note": "Registered as intent under ADR 0007; shipped in the same cycle. The rollup (FR-COMM-002) ranks dormant-but-once-strong reactivation and tallies brokers from met_via. The per-person profile (FR-COMM-001) and first-class introductions (FR-COMM-003) are implemented: reciprocity and reply latency come from operator-stated directions, never a guess, and INTRODUCED edges feed brokers, warm paths, and the favor ledger."
     },
     {
       "id": "CAP-EXPLORE",
@@ -198,13 +198,18 @@
       "id": "CAP-DOSSIER",
       "title": "Evidence dossiers",
       "summary": "Derived evidence packets that generalize the résumé pipeline for audiences beyond hiring: a promotion review, a petition exhibit list, a clearance history — single-subject, deterministic, with a provenance appendix.",
-      "status": "planned",
-      "surfaces": [],
-      "evidence": [
-        "docs/ROADMAP.md",
-        "PRODUCT.md"
+      "status": "implemented",
+      "surfaces": [
+        "/career/dossiers"
       ],
-      "note": "Planned under ADR 0007 for the periodic-prover persona. Selection, compilation, and reproducibility reuse the résumé machinery; what is new is the audience grammars and the provenance appendix."
+      "evidence": [
+        "apps/api/src/routes/v1/dossiers.ts",
+        "apps/api/src/services/dossier.ts",
+        "apps/web/src/routes/Dossiers.tsx",
+        "packages/core/src/schema/dossier.ts",
+        "e2e/tests/dossier.spec.ts"
+      ],
+      "note": "Shipped 2026-08-27 under ADR 0007. Selection, compilation, and reproducibility reuse the résumé machinery; what is new is the audience grammars and the provenance appendix. GET /dossiers/:id/compile returns JSON; typesetting a PDF is a later step."
     },
     {
       "id": "CAP-CAREER",

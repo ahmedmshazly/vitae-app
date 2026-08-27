@@ -29,6 +29,7 @@ import {
   comparePersons,
   compareEntities,
   contactEmailKey,
+  githubRepoKey,
   externalNodeId,
   parseGraphBundle,
   parseIcs,
@@ -1563,6 +1564,7 @@ export async function rollbackImport(
 // ── GitHub sync ───────────────────────────────────────────────────────────────
 
 interface GithubRepo {
+  id: number;
   full_name: string;
   name: string;
   description: string | null;
@@ -1585,6 +1587,56 @@ export interface GithubSyncResult {
 }
 
 const NOTHING_SYNCED = { created: 0, updated: 0, unchanged: 0, skipped: 0 };
+const GITHUB_PAGE_CAP = 10;
+
+/** First `rel="next"` URL in a GitHub Link header, or null. */
+export function githubLinkNext(link: string | null | undefined): string | null {
+  if (!link) return null;
+  for (const part of link.split(',')) {
+    const match = part.match(/<([^>]+)>\s*;\s*rel="next"/i);
+    if (match) return match[1]!;
+  }
+  return null;
+}
+
+/** Match by GitHub id (identity key or props), then by full_name. */
+export function matchGithubRepository(
+  existing: NodeRecord[],
+  repo: { id: number; full_name: string },
+): NodeRecord | undefined {
+  const key = githubRepoKey(repo.id);
+  if (key) {
+    const byKey = existing.find((n) => (n.identity_keys ?? []).includes(key));
+    if (byKey) return byKey;
+  }
+  return existing.find((n) => {
+    const props = n.props as Record<string, unknown>;
+    return props.github_id === repo.id || props.full_name === repo.full_name;
+  });
+}
+
+async function fetchGithubRepos(
+  headers: Record<string, string>,
+): Promise<{ status: number; repos: GithubRepo[]; etag: string | null }> {
+  const firstUrl = 'https://api.github.com/user/repos?per_page=100&sort=updated';
+  const first = await fetchWithDeadline(firstUrl, { headers, timeoutMs: 15_000 });
+  if (first.status === 304 || first.status === 401 || first.status === 403 || !first.ok) {
+    return { status: first.status, repos: [], etag: first.headers.get('etag') };
+  }
+  const repos = [...((await first.json()) as GithubRepo[])];
+  const pageHeaders = { ...headers };
+  delete pageHeaders['if-none-match'];
+  let next = githubLinkNext(first.headers.get('link'));
+  let pages = 1;
+  while (next && pages < GITHUB_PAGE_CAP) {
+    const page = await fetchWithDeadline(next, { headers: pageHeaders, timeoutMs: 15_000 });
+    if (!page.ok) throw new Error(`GitHub responded ${page.status}`);
+    repos.push(...((await page.json()) as GithubRepo[]));
+    next = githubLinkNext(page.headers.get('link'));
+    pages += 1;
+  }
+  return { status: first.status, repos, etag: first.headers.get('etag') };
+}
 
 export async function githubSync(): Promise<GithubSyncResult> {
   const settings = await getSettings();
@@ -1600,22 +1652,16 @@ export async function githubSync(): Promise<GithubSyncResult> {
   if (settings.github.etag) headers['if-none-match'] = settings.github.etag;
 
   // FR-026: a stalled GitHub connection must not hold the request open forever.
-  const res = await fetchWithDeadline('https://api.github.com/user/repos?per_page=100&sort=updated', {
-    headers,
-    timeoutMs: 15_000,
-  });
-  if (res.status === 304) {
+  const { status, repos, etag } = await fetchGithubRepos(headers);
+  if (status === 304) {
     await patchSettings({ github: { ...settings.github, lastSyncAt: nowIso() } });
     return { status: 'not_modified', ...NOTHING_SYNCED };
   }
-  if (res.status === 401 || res.status === 403) return { status: 'unauthorized', ...NOTHING_SYNCED };
-  if (!res.ok) throw new Error(`GitHub responded ${res.status}`);
+  if (status === 401 || status === 403) return { status: 'unauthorized', ...NOTHING_SYNCED };
+  if (status < 200 || status >= 300) throw new Error(`GitHub responded ${status}`);
 
-  const repos = (await res.json()) as GithubRepo[];
-  const etag = res.headers.get('etag');
   const self = await getSelf();
   const existing = (await repository.allLiveNodes()).filter((n) => n.type === 'repository');
-  const byFullName = new Map(existing.map((n) => [(n.props as Record<string, unknown>).full_name as string, n]));
   const skillCache = new Map<string, string>(
     (await repository.allLiveNodes()).filter((n) => n.type === 'skill').map((n) => [normalizeForMatch(n.title), n.id]),
   );
@@ -1631,6 +1677,8 @@ export async function githubSync(): Promise<GithubSyncResult> {
       skipped++;
       continue;
     }
+    const identityKey = githubRepoKey(r.id);
+    const identityKeys = identityKey ? [identityKey] : [];
     const props = {
       host: 'github',
       full_name: r.full_name,
@@ -1643,30 +1691,48 @@ export async function githubSync(): Promise<GithubSyncResult> {
       topics: r.topics ?? [],
       default_branch: r.default_branch,
       last_synced_at: nowIso(),
+      github_id: r.id,
     };
-    const prev = byFullName.get(r.full_name);
+    const prev = matchGithubRepository(existing, r);
     let repoNodeId: string;
     if (prev) {
       const before = prev.props as Record<string, unknown>;
       const merged = { ...before, ...props };
+      const nextKeys = [...new Set([...(prev.identity_keys ?? []), ...identityKeys])];
       // `last_synced_at` moves on every run whatever GitHub said, so comparing
       // it makes every repository look changed and the unchanged bucket read
       // zero forever. Excluding it also means the stamp is only written when
       // something else was, which is what makes it honest: it records when this
       // repository last took data from GitHub, not when a sync last ran.
       const changes = changedFields({ props: before }, { props: merged }, { ignore: SYNC_BOOKKEEPING_FIELDS });
+      const keysChanged = nextKeys.length !== (prev.identity_keys ?? []).length;
       repoNodeId = prev.id;
-      if (changes.length === 0) {
+      if (changes.length === 0 && !keysChanged) {
         unchanged++;
       } else {
-        await repository.updateNode(prev.id, { props: merged }, { actor: 'github-sync' });
+        await repository.updateNode(
+          prev.id,
+          { props: merged, identity_keys: nextKeys },
+          { actor: 'github-sync' },
+        );
+        prev.props = merged;
+        prev.identity_keys = nextKeys;
         updated++;
       }
     } else {
       const node = await repository.createNode(
-        { type: 'repository', title: r.name, subtitle: r.description ?? undefined, props, source: 'import_github', source_ref: 'github_sync' },
+        {
+          type: 'repository',
+          title: r.name,
+          subtitle: r.description ?? undefined,
+          props,
+          identity_keys: identityKeys,
+          source: 'import_github',
+          source_ref: 'github_sync',
+        },
         { actor: 'github-sync' },
       );
+      existing.push(node);
       repoNodeId = node.id;
       created++;
     }

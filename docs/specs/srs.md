@@ -228,7 +228,7 @@ Status: implemented · Evidence: cited by documents only · Provenance: unrecove
 
 Capture in note-append mode must attach the note to the record the operator viewed most recently.
 
-Status: implemented · Evidence: cited by source · Provenance: reconstructed, needs-review
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, needs-review
 
 ### Organize, trash, and retention
 
@@ -380,7 +380,7 @@ Status: implemented · Evidence: cited by documents only · Provenance: reconstr
 
 For any person with logged interactions, a correspondence profile must be computable deterministically: reciprocity ratio, median reply latency in each direction, unanswered inbound count, and the distribution of contact days — each figure decomposing into the interactions that produced it.
 
-Status: implemented · Evidence: cited by source · Provenance: reconstructed, confirmed
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
 > Authored 2026-08-26 as a product decision under ADR 0007; delivered the same day. correspondenceProfile in packages/core computes the four figures from operator-stated initiated_by directions; GET /people/:id/correspondence serves them; the person profile's correspondence panel opens each figure into the interactions behind it, under a coverage header that owns up to directionless history instead of guessing it.
 
@@ -728,8 +728,6 @@ Status: implemented · Evidence: cited by documents only · Provenance: reconstr
 
 `CAP-DOSSIER` · Derived evidence packets that generalize the résumé pipeline for audiences beyond hiring: a promotion review, a petition exhibit list, a clearance history — single-subject, deterministic, with a provenance appendix.
 
-**Status: planned.** Planned under ADR 0007 for the periodic-prover persona. Selection, compilation, and reproducibility reuse the résumé machinery; what is new is the audience grammars and the provenance appendix.
-
 #### FR-DOS-001 — A dossier is compiled evidence with a provenance appendix
 
 A dossier is a named, single-subject selection of evidence records compiled deterministically into a document whose every claim cites the records behind it, closed by a provenance appendix carrying each claim's source, confidence, and revision trail.
@@ -936,7 +934,7 @@ Status: implemented · Evidence: cited by source · Provenance: reconstructed, n
 
 When payment lapses, a hosted workspace becomes read-only rather than deleted: reads, export, billing, and sign-out keep working while every other mutation is refused by the server with the access state and the way out named in the refusal. The interface must present the lock at the controls it disables, not only announce it globally.
 
-Status: partial · Evidence: cited by source · Provenance: reconstructed, confirmed
+Status: partial · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
 > Authored 2026-08-26 as a product decision under ADR 0007. The server half is enforced by the method-based entitlement gate in apps/api/src/middleware/workspace.ts; the shell banner names the lock, and the shared write entry points — the new-record menu, both capture triggers, the entity form dialog, and the bulk bars — disable themselves with the lock explained at the control. The stated remainder is the long tail of per-screen inline mutations (the interaction logger, tailoring autosave, reminder completion), which still rely on the server refusal being surfaced rather than pre-empted.
 

@@ -164,3 +164,27 @@ describe('EntityForm, who owns the buttons', () => {
     expect(container.querySelector('form')).toHaveAttribute('id', 'nfd-1');
   });
 });
+
+describe('EntityForm, application status options follow the descriptor', () => {
+  it('an interview edit does not offer walking back to draft', async () => {
+    const user = userEvent.setup();
+    const { nodeFormDescriptor } = await import('@vitae/core');
+    renderForm(
+      <EntityForm
+        type="application"
+        descriptor={nodeFormDescriptor('application', { applicationStatus: 'interview' })}
+        defaultValues={{
+          title: 'Staff engineer',
+          props: { role_title: 'Staff engineer', status: 'interview' },
+        }}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole('combobox', { name: 'Status' }));
+    expect(screen.getByRole('option', { name: 'Interview' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Accepted' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Draft' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Applied' })).not.toBeInTheDocument();
+  });
+});

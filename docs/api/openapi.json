@@ -3640,7 +3640,8 @@
         "type": "object",
         "required": [
           "ok",
-          "duplicate"
+          "duplicate",
+          "linked"
         ],
         "properties": {
           "ok": {
@@ -3649,6 +3650,10 @@
           },
           "duplicate": {
             "type": "boolean"
+          },
+          "linked": {
+            "type": "boolean",
+            "description": "Whether the event resolved to a known workspace"
           }
         }
       },

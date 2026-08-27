@@ -206,4 +206,139 @@ describe('Vitae Cloud control plane', () => {
     expect(malformed.status).toBe(401);
     expect(malformed.body.error.code).toBe('INVALID_WEBHOOK_SIGNATURE');
   });
+
+  it('links a later cancel that omits custom_data to the stored customer id', async () => {
+    const { app, token } = await getAuthedApp();
+    await request(app).post('/api/v1/auth/bootstrap').set(authHeader(token)).expect(201);
+    const secret = 'paddle-test-secret';
+    process.env.PADDLE_WEBHOOK_SECRET = secret;
+    const timestamp = Math.floor(Date.now() / 1000);
+    const active = Buffer.from(
+      JSON.stringify({
+        event_id: 'evt-link-customer',
+        event_type: 'subscription.updated',
+        occurred_at: '2026-08-23T18:00:00.000Z',
+        data: {
+          id: 'sub-linked',
+          customer_id: 'cus-linked',
+          status: 'active',
+          updated_at: '2026-08-23T18:00:00.000Z',
+          custom_data: { workspace_id: LEGACY_WORKSPACE_ID, billing_period: 'monthly' },
+        },
+      }),
+    );
+    await request(app)
+      .post('/webhooks/paddle')
+      .set('content-type', 'application/json')
+      .set('paddle-signature', paddleSignature(active, secret, timestamp))
+      .send(active.toString('utf8'))
+      .expect(200);
+
+    const cancel = Buffer.from(
+      JSON.stringify({
+        event_id: 'evt-cancel-no-custom',
+        event_type: 'subscription.updated',
+        occurred_at: '2026-08-23T19:00:00.000Z',
+        data: {
+          id: 'sub-linked',
+          customer_id: 'cus-linked',
+          status: 'canceled',
+          updated_at: '2026-08-23T19:00:00.000Z',
+        },
+      }),
+    );
+    const delivered = await request(app)
+      .post('/webhooks/paddle')
+      .set('content-type', 'application/json')
+      .set('paddle-signature', paddleSignature(cancel, secret, timestamp))
+      .send(cancel.toString('utf8'));
+    expect(delivered.status).toBe(200);
+    expect(delivered.body.linked).toBe(true);
+
+    const billing = await request(app).get('/api/v1/billing').set(authHeader(token)).expect(200);
+    expect(billing.body.access.state).toBe('read_only');
+  });
+
+  it('cannot read another workspace’s dossiers, letters, or applications', async () => {
+    const { app, token: ownerToken } = await getAuthedApp();
+    await request(app).post('/api/v1/auth/bootstrap').set(authHeader(ownerToken)).expect(201);
+
+    const subject = await request(app)
+      .post('/api/v1/nodes')
+      .set(authHeader(ownerToken))
+      .send({ type: 'person', title: `Owner subject ${Date.now()}`, props: {} })
+      .expect(201);
+    const dossier = await request(app)
+      .post('/api/v1/dossiers')
+      .set(authHeader(ownerToken))
+      .send({
+        subject_node: subject.body.node.id,
+        audience: 'promotion_review',
+        title: 'Owner only',
+        sections: [],
+      })
+      .expect(201);
+    const target = await request(app)
+      .post('/api/v1/targets')
+      .set(authHeader(ownerToken))
+      .send({ role_title: `Owner letter ${Date.now()}`, jd_raw: 'Requirements\n- Isolation' })
+      .expect(201);
+    const letter = await request(app)
+      .post('/api/v1/letters')
+      .set(authHeader(ownerToken))
+      .send({
+        target_id: target.body.target.id,
+        blocks: [{ kind: 'hook', text: 'Secret letter.' }],
+      })
+      .expect(201);
+    const application = await request(app)
+      .post('/api/v1/nodes')
+      .set(authHeader(ownerToken))
+      .send({
+        type: 'application',
+        title: 'Owner application',
+        props: { role_title: 'Owner application', status: 'draft' },
+      })
+      .expect(201);
+
+    const customerToken = devToken('dev:customer-idor', 'idor@example.com');
+    await request(app).post('/api/v1/auth/bootstrap').set(authHeader(customerToken)).expect(201);
+
+    const hiddenDossier = await request(app)
+      .get(`/api/v1/dossiers/${dossier.body.dossier.id}`)
+      .set(authHeader(customerToken));
+    expect(hiddenDossier.status).toBe(404);
+    const patched = await request(app)
+      .patch(`/api/v1/dossiers/${dossier.body.dossier.id}`)
+      .set(authHeader(customerToken))
+      .send({ title: 'stolen' });
+    expect([404, 402]).toContain(patched.status);
+    const hiddenLetter = await request(app)
+      .get(`/api/v1/letters/${letter.body.letter.id}`)
+      .set(authHeader(customerToken));
+    expect(hiddenLetter.status).toBe(404);
+    const hiddenApp = await request(app)
+      .get(`/api/v1/nodes/${application.body.node.id}`)
+      .set(authHeader(customerToken));
+    expect(hiddenApp.status).toBe(404);
+    const stolenWorkspace = await request(app)
+      .get('/api/v1/nodes')
+      .set(authHeader(customerToken))
+      .set('x-vitae-workspace', LEGACY_WORKSPACE_ID);
+    expect(stolenWorkspace.status).toBe(404);
+
+    const stolenExport = await request(app)
+      .get('/api/v1/export/manifest')
+      .set(authHeader(customerToken))
+      .set('x-vitae-workspace', LEGACY_WORKSPACE_ID);
+    expect(stolenExport.status).toBe(404);
+
+    const ownNodes = await request(app)
+      .get('/api/v1/nodes?limit=200')
+      .set(authHeader(customerToken))
+      .expect(200);
+    const titles = (ownNodes.body.nodes as Array<{ title: string }>).map((n) => n.title);
+    expect(titles).not.toContain('Owner application');
+    expect(titles).not.toContain('Owner only');
+  });
 });

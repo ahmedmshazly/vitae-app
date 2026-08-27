@@ -6,12 +6,22 @@
 import '../../test/api-mock.js';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockApi, resetMockApi } from '../../test/api-mock.js';
 import { renderWithApp } from '../../test/render.js';
 import { ApplicationStatusControl } from './ApplicationStatusControl.js';
 
+const writeGate = vi.hoisted(() => ({ canWrite: true }));
+vi.mock('../../lib/auth.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../lib/auth.js')>();
+  return {
+    ...actual,
+    useCanWrite: () => writeGate.canWrite,
+  };
+});
+
 beforeEach(() => {
+  writeGate.canWrite = true;
   resetMockApi();
   mockApi.post.mockResolvedValue({});
 });
@@ -115,5 +125,13 @@ describe('Application status control', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'An application at interview cannot move back to applied.',
     );
+  });
+
+  it('hides onward moves and disables correction on a locked workspace (NFR-OPS-002)', () => {
+    writeGate.canWrite = false;
+    renderWithApp(<ApplicationStatusControl id="application-1" status="interview" />);
+    expect(screen.queryByRole('group', { name: 'Record a status move' })).not.toBeInTheDocument();
+    expect(screen.getByText(/Read-only workspace/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Correct status' })).toBeDisabled();
   });
 });

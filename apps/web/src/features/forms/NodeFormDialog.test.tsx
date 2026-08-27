@@ -135,3 +135,38 @@ describe('NodeFormDialog, the actions live in the footer', () => {
     expect(form.id).toBeTruthy();
   });
 });
+
+describe('NodeFormDialog, editing an application', () => {
+  it('does not offer illegal statuses from the current stage', async () => {
+    const user = userEvent.setup();
+    get.mockImplementation((path: string) => {
+      if (path === '/nodes/app-interview') {
+        return Promise.resolve({
+          node: {
+            id: 'app-interview',
+            type: 'application',
+            title: 'Staff engineer',
+            notes_md: '',
+            props: { role_title: 'Staff engineer', status: 'interview' },
+          },
+          edges: [],
+          neighbors: {},
+        });
+      }
+      return Promise.resolve({ user: null, node: null, edges: [], neighbors: {} });
+    });
+
+    render(
+      <Harness>
+        <NodeFormDialog open onOpenChange={vi.fn()} type="application" nodeId="app-interview" />
+      </Harness>,
+    );
+
+    const status = await screen.findByRole('combobox', { name: 'Status' });
+    await user.click(status);
+    expect(screen.getByRole('option', { name: 'Interview' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Offer' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Draft' })).not.toBeInTheDocument();
+    expect(screen.getByText(/Correct status on the dossier/)).toBeInTheDocument();
+  });
+});

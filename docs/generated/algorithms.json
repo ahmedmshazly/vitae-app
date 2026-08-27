@@ -573,30 +573,30 @@
         {
           "name": "correspondenceProfile",
           "kind": "function",
-          "line": 190,
+          "line": 222,
           "doc": "The per-person correspondence profile (SRS FR-COMM-001): reciprocity, per-direction reply latency, unanswered inbound, and the contact-day distribution — every figure carrying the interaction ids that produced it (NFR-PRIV-003).",
-          "source": "packages/core/src/algorithms/correspondence.ts:190"
+          "source": "packages/core/src/algorithms/correspondence.ts:222"
         },
         {
           "name": "IntroductionFact",
           "kind": "interface",
-          "line": 251,
+          "line": 282,
           "doc": "One recorded introduction: the connected pair, the credited broker, the edge.",
-          "source": "packages/core/src/algorithms/correspondence.ts:251"
+          "source": "packages/core/src/algorithms/correspondence.ts:282"
         },
         {
           "name": "RecordedBrokerTally",
           "kind": "interface",
-          "line": 256,
+          "line": 287,
           "doc": null,
-          "source": "packages/core/src/algorithms/correspondence.ts:256"
+          "source": "packages/core/src/algorithms/correspondence.ts:287"
         },
         {
           "name": "introductionTally",
           "kind": "function",
-          "line": 269,
+          "line": 300,
           "doc": "Brokers by recorded introduction (SRS FR-COMM-003): a tally over INTRODUCED edges' `via`, each count carrying the edges behind it.",
-          "source": "packages/core/src/algorithms/correspondence.ts:269"
+          "source": "packages/core/src/algorithms/correspondence.ts:300"
         }
       ],
       "constants": [

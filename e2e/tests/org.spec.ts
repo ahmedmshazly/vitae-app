@@ -89,8 +89,17 @@ test('inroad strength is one hue at varying weight, never two bands', async ({ p
 
 test('each empty region says something different, and something useful', async ({ page }) => {
   await signIn(page);
-  // A seeded org with no people, no roles and no org links.
-  await openOrg(page, 'Helio Health');
+  // Helio Health is no longer empty: the correspondence seed put Youssef and
+  // Rania there. Create a nameless org so this spec stays about the copy, not
+  // about who the seed happens to employ.
+  const created = await apiPost(page, '/nodes', {
+    type: 'organization',
+    title: `Empty org ${Date.now()}`,
+    props: { kind: 'company' },
+  });
+  const id = (await expectOkJson<{ node: { id: string } }>(created, 'empty org')).node.id;
+  await page.goto(`/orgs/${id}`);
+  await expect(page.getByRole('heading', { level: 1, name: /Empty org / })).toBeVisible();
 
   await expect(page.getByText('No inroads yet')).toBeVisible();
   await expect(page.getByText('No linked roles')).toBeVisible();

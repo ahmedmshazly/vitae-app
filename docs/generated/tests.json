@@ -47,7 +47,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 1683
+      "lines": 1699
     },
     {
       "file": "apps/api/src/__tests__/contracts/error-envelope.contract.test.ts",
@@ -177,7 +177,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 69
+      "lines": 78
     },
     {
       "file": "apps/api/src/cloud/config.test.ts",
@@ -248,6 +248,28 @@
       ],
       "run_in_ci": true,
       "lines": 68
+    },
+    {
+      "file": "apps/api/src/db/timezone.test.ts",
+      "package": "@vitae/api",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "noonIso"
+      ],
+      "subjects": [
+        "./timezone.js"
+      ],
+      "requirements": [
+        "FR-025"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 52
     },
     {
       "file": "apps/api/src/db/util.test.ts",
@@ -438,12 +460,12 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 44
+      "lines": 50
     },
     {
       "file": "apps/api/src/routes/v1/capture.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 6,
+      "cases": 8,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -452,18 +474,20 @@
       "subjects": [
         "../../__tests__/helpers/app.js"
       ],
-      "requirements": [],
+      "requirements": [
+        "FR-CAP-008"
+      ],
       "run_by": [
         "test:api",
         "test"
       ],
       "run_in_ci": true,
-      "lines": 93
+      "lines": 125
     },
     {
       "file": "apps/api/src/routes/v1/cloud.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 4,
+      "cases": 6,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -483,7 +507,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 210
+      "lines": 345
     },
     {
       "file": "apps/api/src/routes/v1/composer.integration.test.ts",
@@ -683,7 +707,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 89
+      "lines": 91
     },
     {
       "file": "apps/api/src/routes/v1/favors.integration.test.ts",
@@ -706,6 +730,26 @@
       "lines": 51
     },
     {
+      "file": "apps/api/src/routes/v1/github-sync.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "GitHub sync"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 150
+    },
+    {
       "file": "apps/api/src/routes/v1/habits.integration.test.ts",
       "package": "@vitae/api",
       "cases": 2,
@@ -724,6 +768,29 @@
       ],
       "run_in_ci": true,
       "lines": 53
+    },
+    {
+      "file": "apps/api/src/routes/v1/imports-ics.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "ICS re-import is longitudinal"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [
+        "FR-SYNC-001",
+        "FR-SYNC-002"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 151
     },
     {
       "file": "apps/api/src/routes/v1/imports.integration.test.ts",
@@ -835,7 +902,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 182
+      "lines": 191
     },
     {
       "file": "apps/api/src/routes/v1/nodes.integration.test.ts",
@@ -892,7 +959,9 @@
       "subjects": [
         "../../__tests__/helpers/app.js"
       ],
-      "requirements": [],
+      "requirements": [
+        "FR-COMM-001"
+      ],
       "run_by": [
         "test:api",
         "test"
@@ -1170,13 +1239,15 @@
     {
       "file": "apps/api/src/services/imports.test.ts",
       "package": "@vitae/api",
-      "cases": 13,
+      "cases": 15,
       "skipped": 0,
       "todo": 0,
       "suites": [
         "nodeDraftFor",
         "resolveIdentity",
-        "buildProposal"
+        "buildProposal",
+        "githubLinkNext",
+        "matchGithubRepository"
       ],
       "subjects": [
         "./imports.js",
@@ -1191,7 +1262,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 184
+      "lines": 217
     },
     {
       "file": "apps/api/src/services/letters.test.ts",
@@ -1234,7 +1305,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 24
+      "lines": 28
     },
     {
       "file": "apps/api/src/services/secrets.test.ts",
@@ -1253,6 +1324,26 @@
       ],
       "run_in_ci": true,
       "lines": 48
+    },
+    {
+      "file": "apps/api/src/services/storage/memory.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "MemoryStorage"
+      ],
+      "subjects": [
+        "./memory.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 44
     },
     {
       "file": "apps/api/src/services/subjects.test.ts",
@@ -1363,7 +1454,7 @@
     {
       "file": "apps/web/src/app/Breadcrumb.test.tsx",
       "package": "@vitae/web",
-      "cases": 3,
+      "cases": 4,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -1378,7 +1469,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 27
+      "lines": 34
     },
     {
       "file": "apps/web/src/app/commands.test.ts",
@@ -1650,12 +1741,14 @@
       "skipped": 0,
       "todo": 0,
       "suites": [
-        "CorrespondencePanel"
+        "CorrespondencePanel (FR-COMM-001)"
       ],
       "subjects": [
         "./CorrespondencePanel.js"
       ],
-      "requirements": [],
+      "requirements": [
+        "FR-COMM-001"
+      ],
       "run_by": [
         "test:web",
         "test"
@@ -1875,7 +1968,7 @@
     {
       "file": "apps/web/src/features/forms/EntityForm.test.tsx",
       "package": "@vitae/web",
-      "cases": 10,
+      "cases": 11,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -1883,7 +1976,8 @@
         "EntityForm, subject-bearing types demand an owner",
         "EntityForm, a type with no required props submits on title alone",
         "EntityForm, validation waits for the user",
-        "EntityForm, who owns the buttons"
+        "EntityForm, who owns the buttons",
+        "EntityForm, application status options follow the descriptor"
       ],
       "subjects": [
         "./EntityForm.js",
@@ -1895,7 +1989,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 167
+      "lines": 191
     },
     {
       "file": "apps/web/src/features/forms/FieldRenderer.test.tsx",
@@ -2024,13 +2118,14 @@
     {
       "file": "apps/web/src/features/forms/NodeFormDialog.test.tsx",
       "package": "@vitae/web",
-      "cases": 4,
+      "cases": 5,
       "skipped": 0,
       "todo": 0,
       "suites": [
         "NodeFormDialog, loading an edit",
         "NodeFormDialog, a rejected save",
-        "NodeFormDialog, the actions live in the footer"
+        "NodeFormDialog, the actions live in the footer",
+        "NodeFormDialog, editing an application"
       ],
       "subjects": [
         "../Toast.js",
@@ -2042,7 +2137,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 138
+      "lines": 173
     },
     {
       "file": "apps/web/src/features/forms/SubjectPicker.states.test.tsx",
@@ -2493,7 +2588,7 @@
     {
       "file": "apps/web/src/features/InteractionLogger.test.tsx",
       "package": "@vitae/web",
-      "cases": 5,
+      "cases": 6,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -2508,12 +2603,12 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 119
+      "lines": 142
     },
     {
       "file": "apps/web/src/features/LetterCompilePanel.test.tsx",
       "package": "@vitae/web",
-      "cases": 8,
+      "cases": 9,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -2524,14 +2619,15 @@
       ],
       "requirements": [
         "FR-RES-013",
-        "FR-RES-021"
+        "FR-RES-021",
+        "NFR-OPS-002"
       ],
       "run_by": [
         "test:web",
         "test"
       ],
       "run_in_ci": true,
-      "lines": 157
+      "lines": 175
     },
     {
       "file": "apps/web/src/features/LogIntroduction.test.tsx",
@@ -3021,6 +3117,28 @@
       "lines": 35
     },
     {
+      "file": "apps/web/src/lib/last-viewed.test.ts",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "last viewed record (FR-CAP-008)"
+      ],
+      "subjects": [
+        "./last-viewed.js"
+      ],
+      "requirements": [
+        "FR-CAP-008"
+      ],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 20
+    },
+    {
       "file": "apps/web/src/lib/list-params.test.ts",
       "package": "@vitae/web",
       "cases": 28,
@@ -3343,7 +3461,7 @@
     {
       "file": "apps/web/src/routes/career/ApplicationStatusControl.test.tsx",
       "package": "@vitae/web",
-      "cases": 9,
+      "cases": 10,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -3353,14 +3471,15 @@
         "./ApplicationStatusControl.js"
       ],
       "requirements": [
-        "FR-CAR-003"
+        "FR-CAR-003",
+        "NFR-OPS-002"
       ],
       "run_by": [
         "test:web",
         "test"
       ],
       "run_in_ci": true,
-      "lines": 120
+      "lines": 138
     },
     {
       "file": "apps/web/src/routes/career/CareerOverview.test.tsx",
@@ -5239,6 +5358,7 @@
         "./helpers/auth"
       ],
       "requirements": [
+        "FR-COMM-001",
         "FR-COMM-002"
       ],
       "run_by": [
@@ -5343,7 +5463,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 156
+      "lines": 157
     },
     {
       "file": "e2e/tests/duplicates.spec.ts",
@@ -5525,7 +5645,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 90
+      "lines": 95
     },
     {
       "file": "e2e/tests/helpers/auth.ts",
@@ -5631,7 +5751,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 297
+      "lines": 303
     },
     {
       "file": "e2e/tests/journeys.spec.ts",
@@ -5696,21 +5816,24 @@
     {
       "file": "e2e/tests/letters.spec.ts",
       "package": "@vitae/e2e",
-      "cases": 5,
+      "cases": 7,
       "skipped": 0,
       "todo": 0,
       "suites": [],
       "subjects": [
         "./helpers/a11y",
+        "./helpers/api.js",
         "./helpers/auth"
       ],
-      "requirements": [],
+      "requirements": [
+        "FR-RES-021"
+      ],
       "run_by": [
         "test:e2e",
         "test"
       ],
       "run_in_ci": true,
-      "lines": 108
+      "lines": 159
     },
     {
       "file": "e2e/tests/manifesto.spec.ts",
@@ -5769,7 +5892,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 177
+      "lines": 186
     },
     {
       "file": "e2e/tests/outputs.spec.ts",
@@ -5822,13 +5945,15 @@
         "./helpers/auth",
         "./helpers/fixtures"
       ],
-      "requirements": [],
+      "requirements": [
+        "FR-COMM-001"
+      ],
       "run_by": [
         "test:e2e",
         "test"
       ],
       "run_in_ci": true,
-      "lines": 191
+      "lines": 192
     },
     {
       "file": "e2e/tests/record.spec.ts",
@@ -6298,19 +6423,22 @@
     {
       "file": "packages/core/src/algorithms/correspondence.test.ts",
       "package": "@vitae/core",
-      "cases": 11,
+      "cases": 12,
       "skipped": 0,
       "todo": 0,
       "suites": [
         "rankReactivation",
         "brokerTally",
-        "correspondenceProfile",
+        "correspondenceProfile (FR-COMM-001)",
         "introductionTally"
       ],
       "subjects": [
         "./correspondence.js"
       ],
-      "requirements": [],
+      "requirements": [
+        "FR-025",
+        "FR-COMM-001"
+      ],
       "run_by": [
         "test:core",
         "test:unit",
@@ -6319,7 +6447,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 191
+      "lines": 208
     },
     {
       "file": "packages/core/src/algorithms/dedup.test.ts",
@@ -6830,13 +6958,14 @@
     {
       "file": "packages/core/src/forms/descriptors.test.ts",
       "package": "@vitae/core",
-      "cases": 14,
+      "cases": 15,
       "skipped": 0,
       "todo": 0,
       "suites": [
         "form descriptors stay honest against the Zod schemas"
       ],
       "subjects": [
+        "../schema/application.js",
         "../schema/edge-props.js",
         "../schema/node-props.js",
         "../types.js",
@@ -6855,7 +6984,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 240
+      "lines": 264
     },
     {
       "file": "packages/core/src/forms/subjects.test.ts",
@@ -6961,7 +7090,7 @@
     {
       "file": "packages/core/src/importers/identity.test.ts",
       "package": "@vitae/core",
-      "cases": 20,
+      "cases": 22,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -6970,7 +7099,8 @@
         "vcardUidKey",
         "icsEventKey",
         "linkedinProfileKey",
-        "bookmarkUrlKey"
+        "bookmarkUrlKey",
+        "githubRepoKey"
       ],
       "subjects": [
         "../schema/envelope.js",
@@ -6985,7 +7115,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 130
+      "lines": 145
     },
     {
       "file": "packages/core/src/importers/linkedin.test.ts",
@@ -7088,7 +7218,7 @@
     {
       "file": "packages/core/src/schema/application-status.test.ts",
       "package": "@vitae/core",
-      "cases": 12,
+      "cases": 13,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -7108,7 +7238,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 124
+      "lines": 143
     },
     {
       "file": "packages/core/src/schema/application.test.ts",
@@ -7640,22 +7770,22 @@
     }
   ],
   "summary": {
-    "files": 355,
-    "cases": 2442,
+    "files": 360,
+    "cases": 2476,
     "skipped": 0,
     "todo": 0,
     "by_package": {
-      "@vitae/api": 326,
-      "@vitae/web": 1210,
-      "@vitae/e2e": 301,
-      "@vitae/core": 372,
+      "@vitae/api": 345,
+      "@vitae/web": 1218,
+      "@vitae/e2e": 303,
+      "@vitae/core": 377,
       "@vitae/testkit": 7,
       "@vitae/ui": 226
     },
     "by_script": {
-      "test": 355,
-      "test:web": 174,
-      "test:api": 61,
+      "test": 360,
+      "test:web": 175,
+      "test:api": 65,
       "test:e2e": 61,
       "test:unit": 50,
       "test:coverage": 50,
@@ -7707,7 +7837,7 @@
       "e2e/tests/helpers/toast.ts"
     ],
     "with_skips": [],
-    "requirements_proven": 35,
+    "requirements_proven": 38,
     "requirements_unproven": [
       "FR-004",
       "FR-005",
@@ -7730,11 +7860,9 @@
       "FR-CAP-001",
       "FR-CAP-004",
       "FR-CAP-005",
-      "FR-CAP-008",
       "FR-CAR-001",
       "FR-CAR-002",
       "FR-CAR-004",
-      "FR-COMM-001",
       "FR-CON-002",
       "FR-CON-003",
       "FR-CON-004",
@@ -7795,7 +7923,6 @@
       "NFR-MNT-002",
       "NFR-MNT-003",
       "NFR-OPS-001",
-      "NFR-OPS-002",
       "NFR-PERF-001",
       "NFR-PERF-002",
       "NFR-PRIV-001",
