@@ -8,7 +8,7 @@ import type {
   PathItemObject,
   PathsObject,
 } from 'openapi3-ts/oas31';
-import { SOURCE_TYPES } from '@vitae/core';
+import { APPLICATION_STATUSES, SOURCE_TYPES } from '@vitae/core';
 import { V1_MOUNT_PREFIXES } from './mounts.js';
 
 const errorRef = { $ref: '#/components/schemas/Error' };
@@ -403,19 +403,7 @@ function detailedPaths(): PathsObject {
           {
             name: 'status',
             in: 'query',
-            schema: {
-              type: 'string',
-              enum: [
-                'draft',
-                'applied',
-                'screening',
-                'interview',
-                'offer',
-                'rejected',
-                'withdrawn',
-                'accepted',
-              ],
-            },
+            schema: { type: 'string', enum: [...APPLICATION_STATUSES] },
           },
           { name: 'q', in: 'query', schema: { type: 'string' } },
         ],
@@ -726,19 +714,7 @@ export function buildOpenApiDocument(): OpenAPIObject {
             duplicate: { type: 'boolean' },
           },
         },
-        ApplicationStatus: {
-          type: 'string',
-          enum: [
-            'draft',
-            'applied',
-            'screening',
-            'interview',
-            'offer',
-            'rejected',
-            'withdrawn',
-            'accepted',
-          ],
-        },
+        ApplicationStatus: { type: 'string', enum: [...APPLICATION_STATUSES] },
         ApplicationSummary: {
           type: 'object',
           required: [

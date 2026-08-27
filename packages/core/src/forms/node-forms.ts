@@ -6,6 +6,7 @@
  * Edge directions follow the SRS §4.4 catalog (e.g. ROLE_AT: role → org,
  * HELD: person → role, WITH: interaction|trip → person).
  */
+import { APPLICATION_STATUSES } from '../schema/application.js';
 import { NODE_TYPES, type NodeType } from '../types.js';
 import type { EdgeSubEditor, FieldDescriptor, SelectOption, TypeFormDescriptor } from './types.js';
 
@@ -736,16 +737,7 @@ export const NODE_FORM_DESCRIPTORS: Record<NodeType, TypeFormDescriptor> = {
         key: 'status',
         label: 'Status',
         widget: 'select',
-        options: sel(
-          'draft',
-          'applied',
-          'screening',
-          'interview',
-          'offer',
-          'rejected',
-          'withdrawn',
-          'accepted',
-        ),
+        options: sel(...APPLICATION_STATUSES),
         required: true,
       },
       { key: 'applied_on', label: 'Applied', widget: 'date', mono: true },

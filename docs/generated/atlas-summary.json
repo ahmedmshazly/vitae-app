@@ -2,13 +2,13 @@
   "by_package": {
     "@vitae/api": {
       "files": 109,
-      "lines": 20209,
+      "lines": 20185,
       "exports": 375,
       "undocumented": 280
     },
     "@vitae/web": {
       "files": 176,
-      "lines": 47517,
+      "lines": 47525,
       "exports": 751,
       "undocumented": 510
     },
@@ -20,8 +20,8 @@
     },
     "@vitae/core": {
       "files": 47,
-      "lines": 8584,
-      "exports": 446,
+      "lines": 8632,
+      "exports": 451,
       "undocumented": 311
     },
     "@vitae/testkit": {
@@ -46,7 +46,7 @@
   "by_kind": {
     "module": {
       "files": 64,
-      "lines": 9431,
+      "lines": 9423,
       "exports": 359,
       "undocumented": 204
     },
@@ -76,13 +76,13 @@
     },
     "contract": {
       "files": 3,
-      "lines": 906,
+      "lines": 882,
       "exports": 3,
       "undocumented": 2
     },
     "route": {
       "files": 47,
-      "lines": 8460,
+      "lines": 8468,
       "exports": 226,
       "undocumented": 178
     },
@@ -118,8 +118,8 @@
     },
     "schema": {
       "files": 9,
-      "lines": 1749,
-      "exports": 180,
+      "lines": 1805,
+      "exports": 185,
       "undocumented": 146
     },
     "algorithm": {
@@ -135,6 +135,10 @@
       "*",
       "ACMatch",
       "AFFILIATION",
+      "APPLICATION_OUTCOMES",
+      "APPLICATION_PIPELINE",
+      "APPLICATION_STATUSES",
+      "APPLICATION_STATUS_FLOW",
       "AhoCorasick",
       "ApplicationAttention",
       "ApplicationDetailResponse",
@@ -356,6 +360,7 @@
       "bundleNodeSchema",
       "bundleRef",
       "bundleSourceSchema",
+      "canTransition",
       "canonicalCountryCode",
       "canonicalCountryName",
       "canonicalOrganizationName",
@@ -692,11 +697,11 @@
   },
   "summary": {
     "files": 355,
-    "test_files": 331,
-    "lines": 80948,
-    "exports": 1746,
+    "test_files": 332,
+    "lines": 80980,
+    "exports": 1751,
     "undocumented_exports": 1230,
-    "edges": 1590,
+    "edges": 1593,
     "untested": 140,
     "no_consumer": [],
     "consumed_only_by_tests": [

@@ -6597,6 +6597,30 @@
       "lines": 43
     },
     {
+      "file": "packages/core/src/schema/application-status.test.ts",
+      "package": "@vitae/core",
+      "cases": 9,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "the application status vocabulary",
+        "the application status machine"
+      ],
+      "subjects": [
+        "./application.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 96
+    },
+    {
       "file": "packages/core/src/schema/application.test.ts",
       "package": "@vitae/core",
       "cases": 3,
@@ -7072,27 +7096,27 @@
     }
   ],
   "summary": {
-    "files": 331,
-    "cases": 2153,
+    "files": 332,
+    "cases": 2162,
     "skipped": 0,
     "todo": 0,
     "by_package": {
       "@vitae/api": 225,
       "@vitae/web": 1120,
       "@vitae/e2e": 291,
-      "@vitae/core": 284,
+      "@vitae/core": 293,
       "@vitae/testkit": 7,
       "@vitae/ui": 226
     },
     "by_script": {
-      "test": 331,
+      "test": 332,
       "test:web": 163,
       "test:e2e": 59,
       "test:api": 55,
-      "test:unit": 45,
-      "test:coverage": 45,
-      "test:core": 43,
-      "test:mutation": 43,
+      "test:unit": 46,
+      "test:coverage": 46,
+      "test:core": 44,
+      "test:mutation": 44,
       "test:property": 5,
       "test:security": 3,
       "test:a11y": 3,

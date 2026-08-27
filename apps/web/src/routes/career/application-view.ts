@@ -1,7 +1,15 @@
-import type { ApplicationStatus, ApplicationSummary } from '@vitae/core';
+import {
+  APPLICATION_OUTCOMES,
+  APPLICATION_PIPELINE,
+  type ApplicationStatus,
+  type ApplicationSummary,
+} from '@vitae/core';
 
-export const PIPELINE_STAGES = ['draft', 'applied', 'screening', 'interview', 'offer'] as const;
-export const OUTCOME_STAGES = ['accepted', 'rejected', 'withdrawn'] as const;
+// The workspace's column order used to be its own copy of the pipeline, which
+// is how the browser ended up owning an ordering the server had never heard
+// of. Both halves now come from the one list in core.
+export const PIPELINE_STAGES = APPLICATION_PIPELINE;
+export const OUTCOME_STAGES = APPLICATION_OUTCOMES;
 
 export const STATUS_LABEL: Record<ApplicationStatus, string> = {
   draft: 'Draft',

@@ -9,7 +9,15 @@
 import { z } from 'zod';
 import { isoDate, isoDateTime, sourceSchema } from './envelope.js';
 
-export const applicationStatusSchema = z.enum([
+/**
+ * Every status an application record can hold, in the order the wire and the
+ * form select carry them. This list is the only place they are written down:
+ * `applicationProps` validates against it, the application form renders it,
+ * the OpenAPI document publishes it, and the Career workspace orders by it.
+ * It was previously spelled out in five files, which is five chances for a
+ * ninth status to reach some surfaces and miss others.
+ */
+export const APPLICATION_STATUSES = [
   'draft',
   'applied',
   'screening',
@@ -18,8 +26,64 @@ export const applicationStatusSchema = z.enum([
   'rejected',
   'withdrawn',
   'accepted',
-]);
-export type ApplicationStatus = z.infer<typeof applicationStatusSchema>;
+] as const;
+
+export const applicationStatusSchema = z.enum(APPLICATION_STATUSES);
+export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
+
+/** The stages an application is still open in, in the order it walks them. */
+export const APPLICATION_PIPELINE = [
+  'draft',
+  'applied',
+  'screening',
+  'interview',
+  'offer',
+] as const satisfies readonly ApplicationStatus[];
+
+/** The three ways the record closes. Nothing leaves them. */
+export const APPLICATION_OUTCOMES = [
+  'accepted',
+  'rejected',
+  'withdrawn',
+] as const satisfies readonly ApplicationStatus[];
+
+/**
+ * Where each status can go next.
+ *
+ * The rule is forward-permissive: from any open stage you may move to any
+ * later open stage, or close on any of the three outcomes. Not every role has
+ * a recruiter screen, so `applied → interview` has to be recordable — a
+ * machine that refused it would be refusing a fact that happened, which is the
+ * one thing this product will not do. What it does refuse is the pair of moves
+ * that can only be a mistake: walking an application backwards down the
+ * pipeline, and reopening a record that already has an outcome.
+ *
+ * This is the shape of a recorded transition. Correcting a status that was
+ * entered wrongly in the first place is a different act, and belongs to
+ * whichever writer offers it — the map says what follows what, not what an
+ * operator is permitted to fix.
+ */
+export const APPLICATION_STATUS_FLOW: Readonly<
+  Record<ApplicationStatus, readonly ApplicationStatus[]>
+> = Object.freeze(
+  Object.fromEntries(
+    APPLICATION_STATUSES.map((status) => {
+      const stage = (APPLICATION_PIPELINE as readonly ApplicationStatus[]).indexOf(status);
+      const onward =
+        stage < 0 ? [] : [...APPLICATION_PIPELINE.slice(stage + 1), ...APPLICATION_OUTCOMES];
+      return [status, Object.freeze(onward)];
+    }),
+  ) as Record<ApplicationStatus, readonly ApplicationStatus[]>,
+);
+
+/**
+ * Whether `to` is a move `from` can record. Staying put is always allowed:
+ * editing an application's deadline resubmits the whole record, status
+ * included, and that is not a transition.
+ */
+export function canTransition(from: ApplicationStatus, to: ApplicationStatus): boolean {
+  return from === to || APPLICATION_STATUS_FLOW[from].includes(to);
+}
 
 export const applicationEntityRefSchema = z.object({
   id: z.string(),

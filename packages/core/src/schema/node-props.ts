@@ -6,6 +6,7 @@
  */
 import { z } from 'zod';
 import { INTERACTION_KINDS, type NodeType } from '../types.js';
+import { applicationStatusSchema } from './application.js';
 import { isoDate, isoDateTime } from './envelope.js';
 
 const urlish = z.string().url().or(z.literal('')).optional();
@@ -192,16 +193,7 @@ export const jobPostingProps = z
 export const applicationProps = z
   .object({
     role_title: z.string(),
-    status: z.enum([
-      'draft',
-      'applied',
-      'screening',
-      'interview',
-      'offer',
-      'rejected',
-      'withdrawn',
-      'accepted',
-    ]),
+    status: applicationStatusSchema,
     applied_on: isoDate.optional(),
     deadline: isoDate.optional(),
     next_step: z.string().optional(),

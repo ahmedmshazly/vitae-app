@@ -4,7 +4,7 @@
   "title": "A job application, from draft to outcome",
   "summary": "The eight statuses an application record can hold, the pipeline the Career workspace presents, and the three that close it. The enum is enforced; the ordering is not.",
   "kind": "state",
-  "note": "Read the arrows as the route the interface offers, not as a rule the server keeps. An application is an ordinary graph node: its status is a required enum on `applicationProps` (packages/core/src/schema/node-props.ts:192), and the only writer is the generic node patch (apps/api/src/routes/v1/nodes.ts:223), which validates the value against the enum and nothing else. There is no transition table, no guard, and no server-side rejection of a jump from `draft` straight to `accepted`. `GET /applications` is a read-only projection over the graph (apps/api/src/routes/v1/applications.ts:272) and never writes a status. Two facts follow. First, the ordering shown here lives entirely in the browser, as `PIPELINE_STAGES` and `OUTCOME_STAGES` (apps/web/src/routes/career/application-view.ts:3-4). Second, a legacy record with no readable status is read as `draft` rather than failing the workspace (apps/api/src/routes/v1/applications.ts:67). Note also that a job posting carries its own separate status vocabulary — watching, interested, applied, closed, passed (packages/core/src/schema/node-props.ts:185) — which this machine does not govern; and that `CAP-CAREER` is the capability these records belong to, for which docs/registry/requirements.json records no requirement at all.",
+  "note": "Read the arrows as the route the interface offers, and the map in core as the wider set of moves that count as recording rather than mistaking. An application is an ordinary graph node: its status is a required enum on `applicationProps` (packages/core/src/schema/node-props.ts:193), and the only writer is the generic node patch (apps/api/src/routes/v1/nodes.ts:223), which validates the value against the enum and nothing else. A transition table now exists — `APPLICATION_STATUS_FLOW` and `canTransition` (packages/core/src/schema/application.ts:66) — but nothing on the write path consults it yet, so a jump from `draft` straight to `accepted` is still accepted by the server; the guard arrives with the first-class application write endpoints. `GET /applications` is a read-only projection over the graph (apps/api/src/routes/v1/applications.ts:272) and never writes a status. Three facts follow. First, the eight statuses and the pipeline ordering are declared once, in core (packages/core/src/schema/application.ts:20), and the props schema, the form select, the OpenAPI document and the workspace's columns all read that one list — the ordering shown here no longer lives in the browser. Second, the table is deliberately forward-permissive: any open stage may move to any later open stage, because not every role has a recruiter screen and refusing to record `applied → interview` would be refusing something that happened. What it refuses is walking backwards and reopening a closed record. Third, a legacy record with no readable status is read as `draft` rather than failing the workspace (apps/api/src/routes/v1/applications.ts:67). Note also that a job posting carries its own separate status vocabulary — watching, interested, applied, closed, passed (packages/core/src/schema/node-props.ts:185) — which this machine does not govern; and that `CAP-CAREER` is the capability these records belong to, for which docs/registry/requirements.json records no requirement at all.",
   "sources": [
     "packages/core/src/schema/application.ts",
     "packages/core/src/schema/node-props.ts",
@@ -69,19 +69,19 @@
       "to": "applied",
       "label": "Submit the application",
       "note": "Set on the record through the application form's status select; `applied_on` and `next_step_date` are filled in the same dialog.",
-      "source": "packages/core/src/forms/node-forms.ts:736"
+      "source": "packages/core/src/forms/node-forms.ts:737"
     },
     {
       "from": "applied",
       "to": "screening",
       "label": "They replied and a screen is scheduled",
-      "source": "packages/core/src/forms/node-forms.ts:736"
+      "source": "packages/core/src/forms/node-forms.ts:737"
     },
     {
       "from": "screening",
       "to": "interview",
       "label": "Passed the screen; interview rounds begin",
-      "source": "packages/core/src/forms/node-forms.ts:736"
+      "source": "packages/core/src/forms/node-forms.ts:737"
     },
     {
       "from": "interview",
@@ -94,14 +94,14 @@
       "from": "interview",
       "to": "offer",
       "label": "An offer arrives",
-      "source": "packages/core/src/forms/node-forms.ts:736"
+      "source": "packages/core/src/forms/node-forms.ts:737"
     },
     {
       "from": "offer",
       "to": "accepted",
       "label": "Accept the offer",
       "note": "The only transition into `accepted` the interface's own stage ordering suggests.",
-      "source": "apps/web/src/routes/career/application-view.ts:4"
+      "source": "apps/web/src/routes/career/application-view.ts:12"
     },
     {
       "from": "applied",
