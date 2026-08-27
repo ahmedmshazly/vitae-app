@@ -2533,7 +2533,7 @@
           "file": "apps/api/src/db/repository.ts",
           "method": "insertInto",
           "access": "query-builder",
-          "line": 672,
+          "line": 709,
           "test": false
         },
         {
@@ -3547,7 +3547,7 @@
           "file": "apps/api/src/db/repository.ts",
           "method": "selectFrom",
           "access": "query-builder",
-          "line": 643,
+          "line": 675,
           "test": false
         },
         {

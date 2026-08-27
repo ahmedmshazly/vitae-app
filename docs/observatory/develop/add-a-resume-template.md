@@ -1,7 +1,7 @@
 ---
 id: DEV-TEMPLATE
-title: Adding a résumé template
-summary: The three template families that ship, the token and line-model contracts they obey, the offline build path that warms them, and what a fourth would need.
+title: Adding a template
+summary: The three résumé families and the one letter template that ship, the token, line-model and calibration contracts they obey, the offline build path that warms them, and what another would need.
 audience: [developer]
 domain: develop
 type: task
@@ -15,6 +15,12 @@ sources:
   - templates/onyx/main.tex
   - templates/onyx/line-model.json
   - services/buildsvc/src/calibrate.ts
+  - templates/argon/calibration.json
+  - templates/cobalt/calibration.json
+  - templates/onyx/calibration.json
+  - templates/letter-classic/main.tex
+  - templates/letter-classic/line-model.json
+  - templates/letter-classic/calibration.json
   - services/buildsvc/src/server.ts
   - services/buildsvc/Dockerfile
   - apps/api/src/services/resume.ts
@@ -27,21 +33,24 @@ sources:
   - apps/web/src/routes/Settings.tsx
   - apps/web/src/routes/Outputs.tsx
   - .github/workflows/ci.yml
-covers: [template:templates/argon, template:templates/cobalt, template:templates/onyx]
+covers: [template:templates/argon, template:templates/cobalt, template:templates/onyx, template:templates/letter-classic]
 related: [DEV, DEV-WHERE, DEV-TESTING, DEV-GATES]
 ---
 
-# Adding a résumé template
+# Adding a template
 
-## The three families
+## The three résumé families
 
-A template family is a directory under `templates/` holding exactly two files:
-`main.tex`, a self-contained LaTeX document with guillemet-delimited holes in
-it, and `line-model.json`, the gallery metadata plus the four numbers the
-selection algorithm uses to decide what fits on a page.
+A template is a directory under `templates/` holding three files: `main.tex`, a
+self-contained LaTeX document with guillemet-delimited holes in it;
+`line-model.json`, the gallery metadata plus the four numbers the selection
+algorithm uses to decide what fits on a page; and `calibration.json`, the
+fixture and the expectations the image build checks it against.
 
-Three ship. They are not three skins of one layout; they differ in page size,
-type, macro vocabulary and how much text they hold.
+Three résumé families ship. They are not three skins of one layout; they differ
+in page size, type, macro vocabulary and how much text they hold. A fourth
+directory, `letter-classic`, is a cover letter rather than a résumé, and the
+section below on calibration is where that difference is actually expressed.
 
 ### Cobalt
 
@@ -150,6 +159,32 @@ narrows. If the measured capacity differs from the configured one by more than
 **three lines**, the image build fails with `line model drift, configured N
 lines/page, rendered capacity M (tolerance ±3)`.
 
+## What a template declares about its own calibration
+
+The sample content and the expectations used to live in `calibrate.ts`, keyed
+on the template's name: a `key === 'cobalt'` branch chose between two hardcoded
+token maps, and every directory had to come out at exactly one page with a
+line model to match. That is a fine rule for three résumé layouts and an
+impassable one for anything else, and it is the reason cover letters could be
+stored for months but never compiled — the first letter template would have
+failed the **image build**, long before anyone could try to use it.
+
+Each directory now carries its own `calibration.json`:
+
+| Key | What it says |
+| --- | --- |
+| `kind` | `resume`, `letter` or `dossier`. |
+| `expected_pages` | An exact count, or `{"min":1,"max":2}` for a document whose length is genuinely variable. |
+| `line_model.check` | Whether the capacity search below applies at all. False for a letter: nothing selects content to fit a letter onto a page. |
+| `line_model.list_environment` | `itemize`, or `pts` for cobalt's own macro. The name-based branch that used to encode this. |
+| `line_model.body_token`, `blank_tokens`, `section_title`, `tolerance` | The rest of the capacity fixture, all defaulted. |
+| `tokens` | The sample value for every `«TOKEN»` this template can emit. |
+
+A directory with no `calibration.json` **fails the build**, naming the file to
+add. It is never skipped, because a silently uncalibrated template would reach
+a runtime container that has no network, and the first person to discover the
+missing package would be a user whose document did not compile.
+
 ## The build path
 
 Templates are not read from disk at request time by the compiler. They are
@@ -159,21 +194,37 @@ baked into its image.
 the calibration script twice:
 
 1. `node dist/calibrate.js` with the network available. For every directory
-   under `templates/`, it splices rich sample content into the template,
-   compiles it with Tectonic, and fails if the result is not exactly one page.
-   Then it calibrates the line model as above. This pass populates the Tectonic
-   package cache with the exact preamble, fonts, macros and glyphs that
-   template can emit.
+   under `templates/`, it splices that directory's own sample tokens into the
+   template, compiles it with Tectonic, and fails if the page count falls
+   outside its declared `expected_pages`. Where the line model applies it
+   calibrates it as above. This pass populates the Tectonic package cache with
+   the exact preamble, fonts, macros and glyphs that template can emit.
 2. `RUN --network=none node dist/calibrate.js --only-cached`. The same work
    with no network and no cache misses permitted. If anything a template needs
    was not fetched in the first pass, the image build fails here rather than
    the compile failing on somebody's résumé six months later.
 
 It writes `warmed-manifest.json` — the honest list of `key@version` pairs the
-image actually warmed, plus the configured and measured line figures — and the
+image actually warmed, plus the configured and measured line figures and, per
+template, what page count was expected against what was measured — and the
 service serves that from `/healthz`. The version is scraped out of the first
 `vN.N.N` in the template's own `main.tex`, which is why the header comment
 carries one.
+
+A real run of the current four, from the image build:
+
+```
+cobalt: line model 58, rendered capacity 58 (±3)
+onyx:   line model 49, rendered capacity 49 (±3)
+letter-classic: 1 page(s)
+Calibration OK: argon@1.0.0, cobalt@1.0.0, letter-classic@1.0.0, onyx@1.0.0, fully offline.
+```
+
+The exact capacity match on both line-modelled templates is worth noting: the
+three résumé fixtures are byte-identical to the ones the hardcoded script
+built, so the binary search sees the same documents and lands on the same
+numbers. Moving the fixtures into JSON was not allowed to change what they
+measure.
 
 The templates screen reads that manifest through the API and compares it
 against the template catalog, reporting "3 of 4 calibrated" rather than an

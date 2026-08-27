@@ -728,7 +728,7 @@
     {
       "file": "apps/api/src/routes/v1/imports.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 7,
+      "cases": 9,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -747,7 +747,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 276
+      "lines": 303
     },
     {
       "file": "apps/api/src/routes/v1/interactions.integration.test.ts",
@@ -835,7 +835,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 165
+      "lines": 182
     },
     {
       "file": "apps/api/src/routes/v1/nodes.integration.test.ts",
@@ -7618,11 +7618,11 @@
   ],
   "summary": {
     "files": 354,
-    "cases": 2433,
+    "cases": 2435,
     "skipped": 0,
     "todo": 0,
     "by_package": {
-      "@vitae/api": 323,
+      "@vitae/api": 325,
       "@vitae/web": 1209,
       "@vitae/e2e": 296,
       "@vitae/core": 372,

@@ -727,7 +727,7 @@
         "e2e/tests/application-status.spec.ts:6"
       ],
       "documents": [
-        "docs/ROADMAP.md:49",
+        "docs/ROADMAP.md:59",
         "docs/observatory/product/blueprint/career-and-resume.md:33"
       ]
     },
@@ -1015,7 +1015,7 @@
       ],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:47",
+        "docs/ROADMAP.md:49",
         "docs/observatory/product/blueprint/career-and-resume.md:111",
         "docs/observatory/product/blueprint/explore.md:32",
         "docs/observatory/product/blueprint/index.md:50",
@@ -1037,7 +1037,7 @@
         "packages/core/src/schema/dossier.test.ts:248"
       ],
       "documents": [
-        "docs/ROADMAP.md:47",
+        "docs/ROADMAP.md:49",
         "docs/observatory/product/blueprint/career-and-resume.md:101",
         "docs/observatory/product/blueprint/career-and-resume.md:111",
         "docs/observatory/product/blueprint/index.md:50",
@@ -1671,7 +1671,7 @@
         "packages/core/src/schema/resume.test.ts:2"
       ],
       "documents": [
-        "docs/ROADMAP.md:50",
+        "docs/ROADMAP.md:70",
         "docs/observatory/product/blueprint/career-and-resume.md:94",
         "docs/observatory/product/stories.md:135",
         "docs/observatory/use/write-a-resume.md:30"
@@ -1702,7 +1702,7 @@
         "packages/core/src/schema/resume.test.ts:2"
       ],
       "documents": [
-        "docs/ROADMAP.md:50",
+        "docs/ROADMAP.md:70",
         "docs/observatory/product/blueprint/career-and-resume.md:94",
         "docs/observatory/product/stories.md:135"
       ]
@@ -1868,8 +1868,8 @@
         "apps/api/src/routes/v1/imports.integration.test.ts:3"
       ],
       "documents": [
-        "docs/ROADMAP.md:48",
-        "docs/ROADMAP.md:68",
+        "docs/ROADMAP.md:50",
+        "docs/ROADMAP.md:94",
         "docs/observatory/product/blueprint/data-import-export.md:29",
         "docs/observatory/product/stories.md:105"
       ]
@@ -1896,8 +1896,8 @@
         "apps/api/src/routes/v1/imports.integration.test.ts:3"
       ],
       "documents": [
-        "docs/ROADMAP.md:48",
-        "docs/ROADMAP.md:68",
+        "docs/ROADMAP.md:50",
+        "docs/ROADMAP.md:94",
         "docs/observatory/product/blueprint/data-import-export.md:32",
         "docs/observatory/product/blueprint/data-import-export.md:52",
         "docs/observatory/product/stories.md:107"
@@ -2127,7 +2127,7 @@
       "sources": [],
       "tests": [],
       "documents": [
-        "docs/ROADMAP.md:67",
+        "docs/ROADMAP.md:93",
         "docs/observatory/product/blueprint/public-and-marketing.md:63",
         "docs/specs/srs.md:96"
       ]

@@ -41,15 +41,41 @@ filter grammars. See [`ARCHITECTURE.md`](ARCHITECTURE.md) §5.
 
 Registered under ADR 0007 so that each is a citable requirement before it is a
 line of code. Statuses live in the register; this table is the reader's map.
+Rows leave this table when they ship, and what they cost to ship is recorded
+beside them below rather than quietly deleted.
 
 | Area | What is intended | SRS |
 | ---- | ----------------- | --- |
 | Evidence dossiers | Single-subject evidence packets with a provenance appendix; audience templates for a promotion review, a petition exhibit list, a clearance history | FR-DOS-001, FR-DOS-002 |
 | Longitudinal imports | Field-level update proposals on identity-key matches; re-import that counts created/updated/unchanged/skipped | FR-SYNC-001, FR-SYNC-002 |
-| Career writes | First-class application endpoints validating the status machine | FR-CAR-003 |
-| Letters | LaTeX/PDF compile parity with résumés (authoring UI already ships) | FR-RES-021, FR-RES-020 |
 | Locked-workspace honesty | Write controls disabled at the point of use on a read-only workspace, not only refused by the server | NFR-OPS-002 |
 | Recovery objectives | Stated RPO/RTO with rehearsed drills; `scripts/backup-to-s3.sh` ships and is wired to `pnpm backup:s3`, the cadence and numbers await operational confirmation | NFR-OPS-001, FR-EXP-012, FR-EXP-013 |
+
+### Shipped out of this table
+
+What each one actually cost is worth keeping, because in both cases the work
+was not where the row said it would be.
+
+**Career writes** (FR-CAR-003) shipped 2026-08-27. The endpoints were the small
+half. The real question was what a transition guard should refuse: a
+step-by-step machine would have rejected `applied` straight to `interview`,
+which happens whenever a role has no recruiter screen, so the rule is
+forward-permissive and refuses only walking backwards and reopening a closed
+record. The second question was the trap the guard sets. An operator who
+mis-clicks `rejected` would have every forward move refused for a record that
+was never rejected, so correcting a status is a separate act with its own door
+and its own provenance, and the history can still tell a move from a fixed
+mistake.
+
+**Letters** (FR-RES-021, closing FR-RES-020) shipped 2026-08-27, and the
+blocker was not in the letters code at all. `services/buildsvc/src/calibrate.ts`
+ran at Docker **image build** over every directory under `templates/`, spliced
+in a token map chosen by template name, and hard-failed anything that was not a
+one-page résumé with a matching line model. The first letter template would
+have failed the image build before anyone could use it. Calibration is per
+template now, declared in each directory's `calibration.json`, and a directory
+without one fails loudly rather than being skipped, because a silently
+uncalibrated template reaches a runtime container that has no network.
 
 ## Deliberately kept as substrate
 

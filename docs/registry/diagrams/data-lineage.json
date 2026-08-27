@@ -4,7 +4,14 @@
   "title": "Where a person's data enters, rests, and leaves",
   "summary": "Four ways in, five places it rests, four things derived from it, three ways it comes back out to the person, and five services that see a piece of it.",
   "kind": "topology",
-  "requirements": ["FR-004", "FR-012", "FR-021", "FR-EXP-010", "FR-SET-007", "INT-5"],
+  "requirements": [
+    "FR-004",
+    "FR-012",
+    "FR-021",
+    "FR-EXP-010",
+    "FR-SET-007",
+    "INT-5"
+  ],
   "note": "The claim this diagram is really making is that the list of exits is short and each one is nameable. Only two kinds of thing leave: a bundle the person asked for, and the minimum a third party needs to do its job. Three details worth pulling out. Records marked sensitive are excluded from an export unless the person opts in, and the exclusion is transitive — edges touching a sensitive record, and the revisions and atoms that describe it, go too, because a partial exclusion would leave the shape of what was hidden. The one outbound payload that is text a person wrote is the place query sent to an unauthenticated public geocoder. And the control-plane tables are deliberately outside the graph repository — identities, memberships, lifecycle and provider events are operational records, not exportable career data, which is exactly what keeps them out of the export bundle. Nothing here models an analytics pipeline, a telemetry sink, a message queue or a model provider, because the repository contains none: there is no LLM call anywhere in the API, and the \"Ask\" surface is a deterministic ranking over the local graph.",
   "sources": [
     "apps/api/src/routes/v1/capture.ts",
@@ -172,7 +179,7 @@
       "id": "compiled_document",
       "label": "Compiled PDF, or the LaTeX source",
       "zone": "handback",
-      "note": "A compiled résumé, returned to the browser as a PDF. When the build service is unreachable the response says so and hands back the .tex instead, so the flow degrades rather than fails. Cover letters are not in this path: their LaTeX and PDF compilation is explicitly deferred until letter templates exist, so a letter leaves as text only.",
+      "note": "A compiled résumé, returned to the browser as a PDF. When the build service is unreachable the response says so and hands back the .tex instead, so the flow degrades rather than fails. Cover letters are in this path now. They go through the same signed call to the same sandboxed compiler, against templates/letter-classic, and degrade the same way: unreachable means the response says so and hands back the .tex, and the letter stays a draft rather than being recorded as finalized against a PDF that does not exist.",
       "source": "apps/api/src/routes/v1/resumes.ts:236"
     },
     {
