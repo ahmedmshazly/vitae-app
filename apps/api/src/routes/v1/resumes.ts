@@ -420,6 +420,13 @@ resumesRouter.post(
         artifacts = [];
       }
     }
+    // An attachments row asserts a blob was stored and can be fetched back, so
+    // a record with no storage key must not become one. The rebuild path below
+    // already refuses this through a NODE_ENV check; keying on the missing key
+    // instead says why rather than where, and also covers a storage adapter
+    // that answers without one. Without it the export guard refuses to back the
+    // whole workspace up rather than hand out a bundle it cannot honour.
+    artifacts = artifacts.filter((artifact) => artifact.storage_key);
     const artifactByKind = new Map(
       artifacts.map((artifact) => [String(artifact.artifact_kind), artifact]),
     );

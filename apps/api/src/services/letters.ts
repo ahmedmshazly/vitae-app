@@ -21,7 +21,6 @@ import {
 } from '@vitae/core';
 import { repository } from '../db/repository.js';
 import { newId, nowIso } from '../db/util.js';
-import { env } from '../env.js';
 import { HttpError } from '../middleware/error.js';
 import * as buildsvc from './buildsvc-client.js';
 import { getTarget, loadTemplate } from './resume.js';
@@ -371,10 +370,13 @@ async function letterArtifactRecord(params: {
   const mime = params.kind === 'pdf' ? 'application/pdf' : 'application/x-tex';
   const filename = `letter-${params.letterId}.${params.kind}`;
   const sha256 = createHash('sha256').update(params.bytes).digest('hex');
-  const stored =
-    env.NODE_ENV === 'test'
-      ? null
-      : await storage.upload({ data: params.bytes, filename, mime, sha256 });
+  // No NODE_ENV branch. Unit tests stub the adapter, so skipping the call here
+  // only made the stub dead and produced a record claiming a stored file with
+  // no key to fetch it by, which is a state production cannot reach. Integration
+  // tests run the real adapter unconfigured, so it throws and the caller's
+  // existing storage-outage branch catches it: the letter compiled, and its
+  // artifacts were not kept. That is the truth in both cases.
+  const stored = await storage.upload({ data: params.bytes, filename, mime, sha256 });
   return {
     id: newId(),
     subject_id: params.letterId,
@@ -419,6 +421,13 @@ export async function finalizeLetter(id: string, actor?: string): Promise<Letter
     // the page count are still true, and the artifacts can be rebuilt later.
     artifacts = [];
   }
+  // An attachments row asserts that a blob was stored and can be fetched back.
+  // The upload is skipped under NODE_ENV=test, which left rows claiming files
+  // nobody could fetch, and the export guard then refused to back the whole
+  // workspace up rather than hand out a bundle it could not honour. A record
+  // with no storage key is the same situation as the outage above: the letter
+  // compiled and its artifacts were not kept.
+  artifacts = artifacts.filter((artifact) => artifact.storage_key);
   const byKind = new Map(artifacts.map((artifact) => [artifact.artifact_kind, artifact]));
 
   const letter = await repository.transaction(async (tx) => {
