@@ -47,4 +47,15 @@ describe('parseIcs', () => {
     expect(events[0]!.summary).toBe('Untitled event');
     expect(events[0]!.confidence).toBeLessThan(1);
   });
+
+  it('keys an event on its UID so re-exporting the calendar converges', () => {
+    const [conference, standup] = parseIcs(CAL);
+    expect(conference!.identityKeys).toEqual(['ics:event:abc-123']);
+    expect(standup!.identityKeys).toEqual(['ics:event:def-456']);
+  });
+
+  it('gives a UID-less event no key, since title and date repeat every week', () => {
+    const events = parseIcs('BEGIN:VEVENT\nSUMMARY:Standup\nDTSTART:20260101\nEND:VEVENT');
+    expect(events[0]!.identityKeys).toEqual([]);
+  });
 });

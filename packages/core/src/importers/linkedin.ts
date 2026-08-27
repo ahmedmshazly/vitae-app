@@ -5,6 +5,7 @@
  * parseCsvRecords normalization) with several candidate names per field.
  */
 import { parseCsvRecords, pickField } from './csv.js';
+import { contactEmailKey, linkedinProfileKey } from './identity.js';
 
 export interface LinkedInPosition {
   company: string;
@@ -32,6 +33,18 @@ export interface LinkedInConnection {
   position: string | null;
   connectedOn: string | null;
   url: string | null;
+  /**
+   * What the export states about who this connection is, for re-import
+   * convergence (FR-SYNC-002). The profile slug comes first, in the same
+   * `linkedin:person:<slug>` shape a scraped bundle carries, so the CSV and a
+   * bundle for one profile land on one record; the email follows when LinkedIn
+   * included it, which is what lets a connection already in the address book
+   * resolve to the person rather than a second copy.
+   *
+   * Positions, education and skills get no keys at all: those files carry no
+   * identifier, and company plus title is a description, not an identity.
+   */
+  identityKeys: string[];
 }
 
 /** "Jan 2023" | "2023" | "2023-01" → YYYY-MM-DD (missing parts default low). */
@@ -90,15 +103,20 @@ export function parseLinkedInConnections(csv: string): LinkedInConnection[] {
     .map((r) => {
       const firstName = pickField(r, 'first_name');
       const lastName = pickField(r, 'last_name');
+      const email = pickField(r, 'email_address', 'email').toLowerCase() || null;
+      const url = pickField(r, 'url', 'profile_url') || null;
       return {
         firstName,
         lastName,
         fullName: [firstName, lastName].filter(Boolean).join(' '),
-        email: pickField(r, 'email_address', 'email').toLowerCase() || null,
+        email,
         company: pickField(r, 'company') || null,
         position: pickField(r, 'position') || null,
         connectedOn: parseLinkedInDate(pickField(r, 'connected_on')),
-        url: pickField(r, 'url', 'profile_url') || null,
+        url,
+        identityKeys: [linkedinProfileKey(url), contactEmailKey(email)].filter(
+          (k): k is string => k !== null,
+        ),
       };
     })
     .filter((c) => c.fullName);

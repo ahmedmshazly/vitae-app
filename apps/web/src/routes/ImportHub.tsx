@@ -21,6 +21,7 @@ import {
 } from '@vitae/ui';
 import { api } from '../lib/api.js';
 import { useToast } from '../features/Toast.js';
+import { ImportProposalDiff, type RowProposal } from '../features/ImportProposalDiff.js';
 
 interface StagedRow {
   id: string;
@@ -37,6 +38,12 @@ interface StagedRow {
     verdict: string;
     evidence: string[];
   } | null;
+  /**
+   * Set when the row matched a stored record by identity key. An empty `fields`
+   * is the converged case: the file says what is already there, so there is
+   * nothing to review and nothing will be written (FR-SYNC-002).
+   */
+  proposal?: RowProposal | null;
   decision: 'accept' | 'skip';
   status: string;
 }
@@ -47,11 +54,19 @@ export interface Batch {
   filename: string | null;
   status: 'staged' | 'committed' | 'discarded' | 'rolled_back';
   created_at: string;
+  /**
+   * The four-way report (FR-SYNC-002). Everything past `dupCandidates` is
+   * optional because batches committed before those buckets existed are still
+   * in history and must keep rendering as what they were.
+   */
   stats: {
     rows: number;
     accepted: number;
     dupCandidates: number;
     created?: number;
+    updated?: number;
+    unchanged?: number;
+    skipped?: number;
     failed?: number;
   };
 }
@@ -146,6 +161,31 @@ export function sourceStatus(
   };
 }
 
+/**
+ * The commit button's label and whether it can be pressed.
+ *
+ * Two kinds of row can be settled and they read differently. Accepted rows are
+ * work the reviewer signed off, and the button counts them. Rows the file has
+ * nothing new to say about ask for no sign-off at all, so a re-import where
+ * everything already matches would otherwise sit behind a button waiting for an
+ * acceptance nobody can give, and the batch could never record that it found
+ * nothing to change (FR-SYNC-002).
+ */
+export function commitAction(
+  accepted: number,
+  alreadyMatched: number,
+  pending: boolean,
+): { label: string; disabled: boolean } {
+  if (pending) return { label: 'Committing…', disabled: true };
+  if (accepted === 0 && alreadyMatched > 0) {
+    return { label: `Record ${alreadyMatched} already matched`, disabled: false };
+  }
+  return {
+    label: `Commit ${accepted} row${accepted === 1 ? '' : 's'}`,
+    disabled: accepted === 0,
+  };
+}
+
 /** Bulk seeding with staging, review, commit, and per-batch rollback. */
 export function ImportHub() {
   const [active, setActive] = useState<string | null>(null);
@@ -217,13 +257,25 @@ export function ImportHub() {
 
   const githubSync = useMutation({
     mutationFn: () =>
-      api.post<{ status: string; created: number; updated: number }>('/imports/github/sync'),
+      api.post<{
+        status: string;
+        created: number;
+        updated: number;
+        unchanged?: number;
+        skipped?: number;
+      }>('/imports/github/sync'),
     onSuccess: (r) => {
       void qc.invalidateQueries();
       flash(
         r.status === 'not_modified'
           ? 'GitHub already up to date'
-          : `GitHub: ${r.created} new, ${r.updated} updated`,
+          : [
+              `GitHub: ${r.created} new, ${r.updated} updated`,
+              r.unchanged ? `${r.unchanged} unchanged` : '',
+              r.skipped ? `${r.skipped} forks skipped` : '',
+            ]
+              .filter(Boolean)
+              .join(', '),
       );
     },
   });
@@ -294,21 +346,41 @@ export function ImportHub() {
       rowId,
       decision,
       payload,
+      fields,
     }: {
       rowId: string;
       decision?: 'accept' | 'skip';
       payload?: Record<string, unknown>;
-    }) => api.patch(`/imports/${active}/rows/${rowId}`, { decision, payload }),
+      /** Which fields of an update proposal the reviewer keeps (FR-SYNC-001). */
+      fields?: string[];
+    }) => api.patch(`/imports/${active}/rows/${rowId}`, { decision, payload, fields }),
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['import', active] }),
   });
 
   const commit = useMutation({
-    mutationFn: () => api.post<{ created: number; failed?: number }>(`/imports/${active}/commit`),
+    mutationFn: () =>
+      api.post<{
+        created: number;
+        updated?: number;
+        unchanged?: number;
+        skipped?: number;
+        failed?: number;
+      }>(`/imports/${active}/commit`),
     onSuccess: (r) => {
       const batchId = active;
       void qc.invalidateQueries();
+      // Every bucket that happened is named, and only those: a run that created
+      // four and changed nothing should not read "0 updated, 0 unchanged".
       flash(
-        `Committed ${r.created} records${r.failed ? ` · ${r.failed} rows failed and stayed staged` : ''}`,
+        [
+          `Committed ${r.created} records`,
+          r.updated ? `${r.updated} updated` : '',
+          r.unchanged ? `${r.unchanged} already matched` : '',
+          r.skipped ? `${r.skipped} skipped` : '',
+          r.failed ? `${r.failed} rows failed and stayed staged` : '',
+        ]
+          .filter(Boolean)
+          .join(' · '),
         {
           undo: async () => {
             await api.post(`/imports/${batchId}/rollback`);
@@ -331,11 +403,31 @@ export function ImportHub() {
   });
 
   const rollback = useMutation({
-    mutationFn: (id: string) => api.post<{ removed: number }>(`/imports/${id}/rollback`),
+    mutationFn: (id: string) =>
+      api.post<{
+        removed: number;
+        restored?: number;
+        refused?: Array<{ node_id: string; title: string; reason: string }>;
+      }>(`/imports/${id}/rollback`),
     onSuccess: (r) => {
       void qc.invalidateQueries();
       if (active) setActive(null);
-      flash(`Rolled back: ${r.removed} records removed`);
+      // A refusal is the interesting half of a partial rollback, so it is named
+      // with the record it protected rather than folded into a count.
+      const refused = r.refused ?? [];
+      flash(
+        [
+          `Rolled back: ${r.removed} records removed`,
+          r.restored ? `${r.restored} restored` : '',
+          refused.length === 1
+            ? `${refused[0]!.title} kept: ${refused[0]!.reason}`
+            : refused.length > 1
+              ? `${refused.length} records kept because they were edited since`
+              : '',
+        ]
+          .filter(Boolean)
+          .join(' · '),
+      );
     },
   });
 
@@ -355,6 +447,13 @@ export function ImportHub() {
   const stagedCount = history.filter((b) => b.status === 'staged').length;
   const rows = batch.data?.rows ?? [];
   const accepted = rows.filter((r) => r.decision === 'accept');
+  // Rows the file has nothing new to say about. They ask for no decision, but
+  // they are still an outcome the batch has to record, so a re-import where
+  // everything already matches has to be committable rather than stuck behind a
+  // button that waits for an acceptance nobody can give.
+  const alreadyMatched = rows.filter(
+    (r) => r.proposal && r.proposal.fields.length === 0 && r.status !== 'committed',
+  ).length;
   const isStaged = batch.data?.batch.status === 'staged';
   const busy = Boolean(reading) || stage.isPending || githubSync.isPending;
   const preparingSource = pasteOpen || Boolean(mapperCsv);
@@ -703,6 +802,25 @@ export function ImportHub() {
                         <div className="row__main">
                           <div className="row__title">{r.title}</div>
                           {r.subtitle && <div className="row__sub">{r.subtitle}</div>}
+                          {/* The diff lives inside the row's own column so the
+                              row grows downward instead of the change being
+                              squeezed in beside the controls. */}
+                          {r.proposal && r.proposal.fields.length > 0 && (
+                            <ImportProposalDiff
+                              proposal={r.proposal}
+                              disabled={rowDecision.isPending}
+                              onToggleField={
+                                isStaged
+                                  ? (fields) => rowDecision.mutate({ rowId: r.id, decision: r.decision, fields })
+                                  : undefined
+                              }
+                            />
+                          )}
+                          {r.proposal && r.proposal.fields.length === 0 && (
+                            <div className="row__sub">
+                              Already matches {r.proposal.target_title}. Nothing to change.
+                            </div>
+                          )}
                         </div>
                         {r.entity === 'atom' && isStaged && (
                           <Select
@@ -725,7 +843,17 @@ export function ImportHub() {
                         <Mono className="u-faint data-import-row__confidence">
                           conf {r.confidence.toFixed(2)}
                         </Mono>
-                        {r.dup ? (
+                        {/* An identity match is not a duplicate to wave through,
+                            it is the same record seen again, so it says what it
+                            is. Only a scored match still reads as a dup. */}
+                        {r.proposal ? (
+                          <Chip
+                            tone={r.proposal.fields.length === 0 ? 'default' : 'warning'}
+                            title={`${r.proposal.target_title} · matched on ${r.proposal.identity_key}`}
+                          >
+                            {r.proposal.fields.length === 0 ? 'unchanged' : 'update'}
+                          </Chip>
+                        ) : r.dup ? (
                           <Chip
                             tone={r.dup.verdict === 'probable' ? 'danger' : 'warning'}
                             title={`≈ ${r.dup.nodeTitle} · ${r.dup.evidence.join(', ')} · weight ${r.dup.weight}`}
@@ -786,9 +914,15 @@ export function ImportHub() {
                   </div>
                 ) : null}
                 <div className="imp__stagfoot">
+                  {/* A row matched by identity key is not a candidate for
+                      anything, it is that record; counting it as one would
+                      overstate how much of this batch is still in doubt. */}
                   <Mono className="data-import-tally">
-                    {rows.filter((r) => !r.dup).length} new · {rows.filter((r) => r.dup).length}{' '}
-                    candidates · {rows.filter((r) => r.status === 'committed').length} committed
+                    {rows.filter((r) => !r.dup && !r.proposal).length} new ·{' '}
+                    {rows.filter((r) => r.proposal && r.proposal.fields.length > 0).length} to
+                    update · {rows.filter((r) => r.proposal && r.proposal.fields.length === 0).length}{' '}
+                    already matched · {rows.filter((r) => r.dup && !r.proposal).length} candidates ·{' '}
+                    {rows.filter((r) => r.status === 'committed').length} committed
                   </Mono>
                   <div className="hstack">
                     {isStaged ? (
@@ -799,11 +933,11 @@ export function ImportHub() {
                         <Button
                           variant="primary"
                           onClick={() => commit.mutate()}
-                          disabled={commit.isPending || accepted.length === 0}
+                          disabled={
+                            commitAction(accepted.length, alreadyMatched, commit.isPending).disabled
+                          }
                         >
-                          {commit.isPending
-                            ? 'Committing…'
-                            : `Commit ${accepted.length} row${accepted.length === 1 ? '' : 's'}`}
+                          {commitAction(accepted.length, alreadyMatched, commit.isPending).label}
                         </Button>
                       </>
                     ) : batch.data.batch.status === 'committed' ? (
@@ -877,6 +1011,9 @@ export function ImportHub() {
                       <div className="row__sub">
                         {b.stats.rows} rows · {b.stats.dupCandidates} dup candidates
                         {b.stats.created != null ? ` · ${b.stats.created} created` : ''}
+                        {b.stats.updated ? ` · ${b.stats.updated} updated` : ''}
+                        {b.stats.unchanged ? ` · ${b.stats.unchanged} already matched` : ''}
+                        {b.stats.skipped ? ` · ${b.stats.skipped} skipped` : ''}
                         {b.stats.failed ? ` · ${b.stats.failed} need attention` : ''}
                       </div>
                     </div>

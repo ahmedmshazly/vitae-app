@@ -4,6 +4,7 @@
  * as its raw string, no expansion in v1 (SRS risk note); recurring events
  * import as a single node carrying the rule.
  */
+import { icsEventKey } from './identity.js';
 
 export interface IcsEvent {
   uid: string | null;
@@ -16,6 +17,13 @@ export interface IcsEvent {
   rrule: string | null;
   attendees: string[];
   confidence: number;
+  /**
+   * The event identity for re-import convergence (FR-SYNC-002), from UID, which
+   * RFC 5545 defines as globally unique for exactly this reason. Empty for a
+   * VEVENT with no UID: title and date look identifying but a weekly standup
+   * exported twice would collapse the wrong pair.
+   */
+  identityKeys: string[];
 }
 
 function unfold(text: string): string[] {
@@ -59,6 +67,7 @@ export function parseIcs(text: string): IcsEvent[] {
         rrule: null,
         attendees: [],
         confidence: 1,
+        identityKeys: [],
       };
       continue;
     }
@@ -69,6 +78,8 @@ export function parseIcs(text: string): IcsEvent[] {
           cur.confidence = 0.5;
         }
         if (!cur.start) cur.confidence = Math.min(cur.confidence, 0.6);
+        const key = icsEventKey(cur.uid);
+        if (key) cur.identityKeys = [key];
         events.push(cur);
       }
       cur = null;

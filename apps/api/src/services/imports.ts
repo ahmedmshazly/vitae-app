@@ -2,19 +2,33 @@
  * Import pipeline (SRS FR-IMP): everything stages, nothing commits without
  * review, everything rolls back by batch.
  *
- *   stage:    parse the uploaded text with the @vitae/core importers, run each
- *             row through dedup against existing records, persist batch + rows.
- *   commit:   create nodes/edges/atoms for accepted rows in one pass, every
- *             record tagged source:'import_*' and source_ref:<batchId>.
- *   rollback: soft-delete everything carrying the batch's source_ref, and purge
- *             the raw upload (FR-006: rollback and discard are deletions).
+ *   stage:    parse the uploaded text with the @vitae/core importers, resolve
+ *             each row against existing records by identity key and then by
+ *             dedup score, persist batch + rows.
+ *   commit:   create nodes/edges/atoms for accepted rows in one pass, apply
+ *             accepted update proposals, every created record tagged
+ *             source:'import_*' and source_ref:<batchId>.
+ *   rollback: soft-delete everything carrying the batch's source_ref, put back
+ *             the fields the batch updated, and purge the raw upload (FR-006:
+ *             rollback and discard are deletions).
  *   github:   direct sync (no staging): repos → repository nodes, languages →
  *             USES_SKILL edges; ETag-incremental.
+ *
+ * ## Re-import is longitudinal (FR-SYNC-001, FR-SYNC-002)
+ *
+ * A row that resolves to an existing record by identity key is not a duplicate
+ * to be skipped, it is the same record seen again. It converges silently when
+ * the file says what is already stored, and becomes an update *proposal* when
+ * it does not: a per-field diff that writes nothing until the reviewer accepts
+ * it. Rolling the batch back puts the replaced values back, per node, refusing
+ * any node somebody has edited since rather than clobbering their work.
  */
 import { createHash } from 'node:crypto';
 import {
+  changedFields,
   comparePersons,
   compareEntities,
+  contactEmailKey,
   externalNodeId,
   parseGraphBundle,
   parseIcs,
@@ -25,12 +39,17 @@ import {
   parseLinkedInSkills,
   parseNetscapeBookmarks,
   parseVcards,
+  patchForFields,
   pickField,
+  readField,
   scorePair,
+  statedFieldsOnly,
   normalizeForMatch,
   trigramSimilarity,
+  SYNC_BOOKKEEPING_FIELDS,
   type BundleEdge,
   type BundleNode,
+  type FieldChange,
   type NodeRecord,
   type PairScore,
 } from '@vitae/core';
@@ -66,6 +85,30 @@ export interface DupInfo {
   evidence: string[];
 }
 
+/**
+ * What a staged row would change about the record it resolved to
+ * (FR-SYNC-001). Lives beside `decision` and `dup` on the row rather than
+ * inside either of them: `decision` and `status` are part of the export/restore
+ * contract, and overloading them with update semantics would change the meaning
+ * of every backup already taken.
+ */
+export interface UpdateProposal {
+  /** The key that resolved this row to the record, named so the review can say why. */
+  identity_key: string;
+  target_node_id: string;
+  target_title: string;
+  /**
+   * The record's revision when this row was staged. Applying checks it, so an
+   * edit made between review and commit refuses rather than silently landing a
+   * diff the reviewer never saw.
+   */
+  target_rev: number;
+  /** Empty means the record already says what the file says: converged, not pending. */
+  fields: FieldChange[];
+  /** Field keys the reviewer accepts. Defaults to all of them; emptying it rejects the proposal. */
+  accepted: string[];
+}
+
 export interface StagedRow {
   id: string;
   index: number;
@@ -75,13 +118,38 @@ export interface StagedRow {
   payload: Record<string, unknown>;
   confidence: number;
   dup: DupInfo | null;
+  /** Set when the row resolved to an existing record by identity key. */
+  proposal?: UpdateProposal | null;
+  /**
+   * What the source states about this row's identity. Persisted rather than
+   * re-derived at commit, so a row already staged keeps the identity it was
+   * reviewed under even if the parser's rules change under it. Absent on rows
+   * staged before identity keys existed.
+   */
+  identity_keys?: string[];
   /** Bundle-local handle; edges are resolved against it at commit. */
   ref?: string | null;
   /** Destination node type for `graph_node` rows. */
   node_type?: string | null;
-  /** accept → will be created on commit; skip → ignored. */
+  /** accept → will be created or updated on commit; skip → ignored. */
   decision: 'accept' | 'skip';
   status: 'staged' | 'committed';
+}
+
+/**
+ * The four-way batch report (FR-SYNC-002). `created` predates the others and
+ * keeps counting exactly what it always counted, records the batch brought into
+ * existence, so history written before updates existed still reads correctly.
+ */
+export interface ImportStats {
+  rows: number;
+  accepted: number;
+  dupCandidates: number;
+  created?: number;
+  updated?: number;
+  unchanged?: number;
+  skipped?: number;
+  failed?: number;
 }
 
 export interface ImportBatch {
@@ -93,7 +161,28 @@ export interface ImportBatch {
   created_at: string;
   committed_at: string | null;
   rolled_back_at: string | null;
-  stats: { rows: number; accepted: number; dupCandidates: number; created?: number };
+  stats: ImportStats;
+}
+
+/**
+ * One node an accepted proposal changed, kept on the batch so rollback can put
+ * the old values back. Only the fields the import actually wrote are recorded:
+ * undoing an import must not revert edits it never made.
+ */
+interface AppliedUpdate {
+  node_id: string;
+  /** Kept so a refusal can name the record even after it has been deleted. */
+  title: string;
+  rev_before: number;
+  rev_after: number;
+  before: Array<{ key: string; value: unknown }>;
+}
+
+/** A node the rollback deliberately left alone, and why. */
+export interface RollbackRefusal {
+  node_id: string;
+  title: string;
+  reason: string;
 }
 
 const SOURCE_BY_KIND: Record<ImportKind, string> = {
@@ -113,6 +202,12 @@ interface ParsedRow {
   subtitle: string | null;
   payload: Record<string, unknown>;
   confidence: number;
+  /**
+   * What the source states about this row's identity, first one primary. Empty
+   * for rows whose file identifies them by nothing durable (a LinkedIn position,
+   * a résumé line), and those stay creates rather than being keyed on a name.
+   */
+  identityKeys: string[];
   ref?: string | null;
   nodeType?: string | null;
 }
@@ -177,6 +272,9 @@ function parseApertureBundle(content: string): { rows: ParsedRow[]; detail: stri
       subtitle: node.subtitle ?? null,
       payload: node as unknown as Record<string, unknown>,
       confidence: node.confidence,
+      // A bundle states its identities outright, so they take the same route
+      // through staging as the ones the file parsers synthesize.
+      identityKeys: node.identity_keys,
       ref: node.ref,
       nodeType: node.type,
     })),
@@ -206,9 +304,14 @@ function parseNonBundleContent(
               connectedOn: c.connectedOn ?? undefined,
             },
             confidence: 0.9,
+            identityKeys: c.identityKeys,
           })),
         };
       }
+      // Positions, education and skills carry no identifier at all: LinkedIn
+      // exports them as descriptions, and company plus title is not an identity.
+      // They stay creates, and the dedup rules below still catch the obvious
+      // repeats.
       if (file === 'positions') {
         return {
           detail: 'positions',
@@ -218,6 +321,7 @@ function parseNonBundleContent(
             subtitle: p.company || null,
             payload: { company: p.company, description: p.description, city: p.location, start: p.start, end: p.end },
             confidence: 0.9,
+            identityKeys: [],
           })),
         };
       }
@@ -230,6 +334,7 @@ function parseNonBundleContent(
             subtitle: e.degree,
             payload: { degree: e.degree, notes: e.notes, start: e.start, end: e.end },
             confidence: 0.9,
+            identityKeys: [],
           })),
         };
       }
@@ -242,6 +347,7 @@ function parseNonBundleContent(
             subtitle: null,
             payload: {},
             confidence: 0.95,
+            identityKeys: [],
           })),
         };
       }
@@ -266,6 +372,7 @@ function parseNonBundleContent(
               birthday: c.bday ?? undefined,
             },
             confidence: c.confidence,
+            identityKeys: c.identityKeys,
           })),
         };
       }
@@ -292,6 +399,10 @@ function parseNonBundleContent(
                 company: company || undefined,
               },
               confidence: name ? 0.85 : 0.3,
+              // `csv.ts` is a generic RFC 4180 reader with no idea which column
+              // holds a person, so the contacts mapping is what knows the email
+              // is an identity. A row with none has no key and stays a create.
+              identityKeys: [contactEmailKey(email)].filter((k): k is string => k !== null),
             };
           })
           .filter((r) => r.title),
@@ -315,6 +426,7 @@ function parseNonBundleContent(
             uid: e.uid ?? undefined,
           },
           confidence: e.confidence,
+          identityKeys: e.identityKeys,
         })),
       };
 
@@ -327,6 +439,7 @@ function parseNonBundleContent(
           subtitle: safeDomain(b.url) ?? null,
           payload: { url: b.url, tags: [...b.folders, ...b.tags], addedAt: b.addedAt ?? undefined },
           confidence: 1,
+          identityKeys: b.identityKeys,
         })),
       };
 
@@ -344,6 +457,9 @@ function parseNonBundleContent(
           subtitle: null,
           payload: { text, kind: 'achievement' },
           confidence: 0.7,
+          // A pasted line identifies nothing; the same sentence can honestly
+          // describe two different pieces of work.
+          identityKeys: [],
         })),
       };
     }
@@ -487,6 +603,178 @@ const ENTITY_NODE_TYPE: Record<Exclude<RowEntity, 'atom' | 'graph_node'>, string
   link: 'link',
 };
 
+// ── The node a row would write ───────────────────────────────────────────────
+
+/** The node fields an import row decides, before batch provenance is attached. */
+export interface NodeDraft {
+  type: string;
+  title: string;
+  subtitle?: string;
+  props: Record<string, unknown>;
+  identity_keys: string[];
+  notes_md: string;
+  start_date?: string;
+  end_date?: string;
+  date_precision?: 'day' | 'month' | 'year';
+}
+
+/**
+ * Fields excluded from every proposal diff.
+ *
+ * Sync bookkeeping moves whatever the source said, and comparing it makes every
+ * synced record look changed forever. `identity_keys` is excluded for a
+ * different reason: it is how the row found the record, not something the row
+ * has an opinion about, and a file that happens to state one more key than the
+ * stored record carries would otherwise turn every converged row into an update
+ * proposal about its own plumbing.
+ */
+const PROPOSAL_IGNORED_FIELDS = [...SYNC_BOOKKEEPING_FIELDS, 'identity_keys'];
+
+/**
+ * The node a row would write, as one function, because staging has to show the
+ * reviewer the diff that commit will actually apply.
+ *
+ * Splitting these apart is the trap: the diff would drift from the write, and
+ * the review screen would promise a change the commit does not make. Returns
+ * null for rows that write no node at all (résumé atoms).
+ *
+ * Exported for its own test: it decides what every import writes, and pinning
+ * that needs no database.
+ */
+export function nodeDraftFor(row: {
+  entity: RowEntity;
+  title: string;
+  subtitle: string | null;
+  payload: Record<string, unknown>;
+  identityKeys?: string[];
+}): NodeDraft | null {
+  const p = row.payload;
+  const keys = row.identityKeys ?? [];
+  switch (row.entity) {
+    case 'graph_node': {
+      const bn = row.payload as unknown as BundleNode;
+      return {
+        type: bn.type,
+        title: bn.title,
+        subtitle: bn.subtitle ?? undefined,
+        props: bn.props,
+        identity_keys: bn.identity_keys,
+        notes_md: bn.notes_md ?? '',
+        start_date: bn.start_date,
+        end_date: bn.end_date,
+        date_precision: bn.date_precision,
+      };
+    }
+    case 'person':
+      return {
+        type: 'person',
+        title: row.title,
+        subtitle: row.subtitle ?? undefined,
+        props: {
+          emails: sanitizeEmails(p.emails),
+          phones: (p.phones as string[]) ?? [],
+          headline: p.headline,
+          city: p.city,
+          socials: sanitizeLinkedInUrl(p.linkedin) ? { linkedin: sanitizeLinkedInUrl(p.linkedin) } : {},
+        },
+        identity_keys: keys,
+        notes_md: (p.note as string) ?? '',
+      };
+    case 'role':
+      return {
+        type: 'role',
+        title: row.title,
+        subtitle: (p.company as string) || undefined,
+        props: { employment_type: 'full_time', city: p.city || undefined },
+        identity_keys: keys,
+        notes_md: (p.description as string) ?? '',
+        start_date: (p.start as string) || undefined,
+        end_date: (p.end as string) || undefined,
+      };
+    case 'education':
+      return {
+        type: 'education',
+        title: row.title,
+        subtitle: (p.degree as string) || undefined,
+        props: { degree: p.degree || undefined },
+        identity_keys: keys,
+        notes_md: (p.notes as string) ?? '',
+        start_date: (p.start as string) || undefined,
+        end_date: (p.end as string) || undefined,
+      };
+    case 'skill':
+      return { type: 'skill', title: row.title, props: {}, identity_keys: keys, notes_md: '' };
+    case 'event': {
+      const rrule = p.rrule ? `\n\nRRULE: ${p.rrule as string}` : '';
+      return {
+        type: 'event',
+        title: row.title,
+        props: { kind: 'appointment', venue: p.venue || undefined },
+        identity_keys: keys,
+        notes_md: `${(p.description as string) ?? ''}${rrule}`.trim(),
+        start_date: (p.start as string) || undefined,
+        end_date: (p.end as string) || undefined,
+      };
+    }
+    case 'link':
+      return {
+        type: 'link',
+        title: row.title,
+        props: { url: p.url, domain: safeDomain(p.url as string) },
+        identity_keys: keys,
+        notes_md: '',
+      };
+    case 'atom':
+      return null;
+  }
+}
+
+/**
+ * The live record an identity key names, if any.
+ *
+ * Keys are tried in order, so the primary wins and a secondary (an email on a
+ * card that also carries a UID) only decides when the primary finds nothing.
+ * A hit of the wrong node type is not this row's record and is passed over: a
+ * key is a fact about *which* record, and a person is never an event.
+ */
+export function resolveIdentity(
+  identityKeys: readonly string[],
+  draft: NodeDraft | null,
+  byIdentityKey: Map<string, NodeRecord>,
+): { key: string; node: NodeRecord } | null {
+  if (!draft) return null;
+  for (const key of identityKeys) {
+    const hit = byIdentityKey.get(key);
+    if (hit && hit.type === draft.type) return { key, node: hit };
+  }
+  return null;
+}
+
+/**
+ * The proposal a resolved row makes: every field the file would change on the
+ * record it found, with both sides. An empty `fields` is the converged case and
+ * is what the batch report counts as unchanged.
+ */
+export function buildProposal(
+  draft: NodeDraft,
+  identity: { key: string; node: NodeRecord },
+): UpdateProposal {
+  const { identity_keys: _keys, type: _type, ...comparable } = draft;
+  const fields = changedFields(
+    identity.node as unknown as Record<string, unknown>,
+    statedFieldsOnly(comparable as unknown as Record<string, unknown>),
+    { ignore: PROPOSAL_IGNORED_FIELDS },
+  );
+  return {
+    identity_key: identity.key,
+    target_node_id: identity.node.id,
+    target_title: identity.node.title,
+    target_rev: identity.node.rev,
+    fields,
+    accepted: fields.map((f) => f.key),
+  };
+}
+
 // ── Staging ───────────────────────────────────────────────────────────────────
 
 // Bound chunks so one malformed import cannot turn a staging write into an
@@ -494,35 +782,38 @@ const ENTITY_NODE_TYPE: Record<Exclude<RowEntity, 'atom' | 'graph_node'>, string
 const RAW_CHUNK_CODE_UNITS = 200_000;
 
 /**
- * Duplicate check for a bundle node.
+ * Fuzzy duplicate check for a bundle node whose identity keys matched nothing.
  *
- * An exact external-identity match beats every fuzzy signal: `linkedin:person:x`
- * naming an existing record is a fact, not a score, so it short-circuits the
- * Fellegi-Sunter comparison entirely (which is also much cheaper across a large
- * bundle). Only keyless nodes fall through to name-based matching.
+ * An exact external-identity match beats every fuzzy signal, so it is resolved
+ * ahead of this for every row (see `resolveIdentity`): `linkedin:person:x`
+ * naming an existing record is a fact, not a score, and short-circuiting the
+ * Fellegi-Sunter comparison is also much cheaper across a large bundle. Only
+ * keyless nodes reach here and fall through to name-based matching.
  */
 function checkGraphNodeDup(
   row: ParsedRow,
-  byIdentityKey: Map<string, NodeRecord>,
   byType: Map<string, NodeRecord[]>,
   personOrgs: Map<string, string[]>,
 ): DupInfo | null {
   const node = row.payload as unknown as BundleNode;
-  for (const key of node.identity_keys) {
-    const hit = byIdentityKey.get(key);
-    if (hit) {
-      return {
-        nodeId: hit.id,
-        nodeTitle: hit.title,
-        weight: 1,
-        verdict: 'probable',
-        evidence: [`same external identity (${key})`],
-      };
-    }
-  }
   const candidates = byType.get(node.type) ?? [];
   if (node.type === 'person') return checkPersonDup(row, candidates, personOrgs);
   return checkSimpleDup(row, candidates, node.type);
+}
+
+/**
+ * An identity match, in the shape the review screen already understands. The
+ * weight is 1 rather than a score because there is nothing to score: the key
+ * either names that record or it does not.
+ */
+function identityDup(identity: { key: string; node: NodeRecord }): DupInfo {
+  return {
+    nodeId: identity.node.id,
+    nodeTitle: identity.node.title,
+    weight: 1,
+    verdict: 'probable',
+    evidence: [`same external identity (${identity.key})`],
+  };
 }
 
 function rawChunks(content: string): string[] {
@@ -562,13 +853,25 @@ export async function stageImport(
   const personOrgs = orgNamesByPerson(graph);
   const byIdentityKey = new Map<string, NodeRecord>();
   for (const n of graph.nodes.values()) {
-    for (const key of n.identity_keys ?? []) if (!byIdentityKey.has(key)) byIdentityKey.set(key, n);
+    // A merged record's keys belong to the record that survived it, the same
+    // resolution `repository.findByIdentityKey` makes, so a re-import updates
+    // what was kept rather than resurrecting what was merged away.
+    const target = n.merged_into ? graph.nodes.get(n.merged_into) : n;
+    if (!target) continue;
+    for (const key of n.identity_keys ?? []) if (!byIdentityKey.has(key)) byIdentityKey.set(key, target);
   }
 
   const rows: StagedRow[] = parsed.map((r, index) => {
-    const dup =
-      r.entity === 'graph_node'
-        ? checkGraphNodeDup(r, byIdentityKey, byType, personOrgs)
+    // Identity first, for every source and not just for bundles: a key that
+    // names an existing record settles the question, and only rows it cannot
+    // answer for are worth scoring.
+    const draft = nodeDraftFor(r);
+    const identity = resolveIdentity(r.identityKeys, draft, byIdentityKey);
+    const proposal = identity && draft ? buildProposal(draft, identity) : null;
+    const dup = identity
+      ? identityDup(identity)
+      : r.entity === 'graph_node'
+        ? checkGraphNodeDup(r, byType, personOrgs)
         : r.entity === 'person'
           ? checkPersonDup(r, byType.get('person') ?? [], personOrgs)
           : r.entity === 'atom'
@@ -583,9 +886,13 @@ export async function stageImport(
       payload: r.payload,
       confidence: r.confidence,
       dup,
+      proposal,
+      identity_keys: r.identityKeys,
       ref: r.ref ?? null,
       node_type: r.nodeType ?? null,
-      // Probable duplicates default to skip; everything else to accept.
+      // Probable duplicates default to skip, and so does an update proposal:
+      // FR-SYNC-001 is that nothing updates without acceptance, and a default
+      // of accept would make a re-import overwrite records on its own.
       decision: dup?.verdict === 'probable' ? 'skip' : 'accept',
       status: 'staged',
     };
@@ -638,15 +945,21 @@ export async function stageImport(
   return { batch, rows };
 }
 
+/** Fields the batch document carries for the commit and rollback passes only. */
+interface BatchInternals {
+  raw_content?: string;
+  bundle_edges?: BundleEdge[];
+  applied_updates?: AppliedUpdate[];
+}
+
 export async function getBatch(id: string): Promise<{ batch: ImportBatch; rows: StagedRow[] } | null> {
-  const doc = await repository.docGet<ImportBatch & { raw_content?: string; bundle_edges?: BundleEdge[] }>(
-    'imports',
-    id,
-  );
+  const doc = await repository.docGet<ImportBatch & BatchInternals>('imports', id);
   if (!doc) return null;
-  // `bundle_edges` is stripped alongside `raw_content`: both are commit-time
-  // inputs, and a large bundle's edge list has no business in a review payload.
-  const { raw_content: _raw, bundle_edges: _edges, ...batch } = doc;
+  // `bundle_edges` and `applied_updates` are stripped alongside `raw_content`:
+  // all three are commit-time or rollback-time inputs, and neither a large
+  // bundle's edge list nor a set of replaced field values belongs in a review
+  // payload.
+  const { raw_content: _raw, bundle_edges: _edges, applied_updates: _updates, ...batch } = doc;
   const rowDocs = await repository.docQuery<StagedRow>('import_rows', { import_id: id });
   const rows = rowDocs.sort((a, b) => a.index - b.index);
   return { batch: batch as ImportBatch, rows };
@@ -657,14 +970,33 @@ async function loadBundleEdges(id: string): Promise<BundleEdge[]> {
   return doc?.bundle_edges ?? [];
 }
 
+async function loadAppliedUpdates(id: string): Promise<AppliedUpdate[]> {
+  const doc = await repository.docGet<{ applied_updates?: AppliedUpdate[] }>('imports', id);
+  return doc?.applied_updates ?? [];
+}
+
 export async function listBatches(): Promise<ImportBatch[]> {
-  const docs = await repository.docList<ImportBatch & { raw_content?: string }>('imports');
+  const docs = await repository.docList<ImportBatch & BatchInternals>('imports');
   return docs
-    .map(({ raw_content: _raw, ...batch }) => batch as ImportBatch)
+    .map(({ raw_content: _raw, bundle_edges: _edges, applied_updates: _updates, ...batch }) => batch as ImportBatch)
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
 }
 
-export async function setRowDecision(batchId: string, rowId: string, decision: 'accept' | 'skip', payloadPatch?: Record<string, unknown>): Promise<void> {
+/**
+ * Record the reviewer's decision on one row.
+ *
+ * `fields` is the per-field half of FR-SYNC-001: the reviewer keeps or drops
+ * individual changes inside a proposal. Unknown keys are dropped rather than
+ * stored, so an accepted list can only ever name changes the diff actually
+ * offered, and an empty list rejects the proposal outright.
+ */
+export async function setRowDecision(
+  batchId: string,
+  rowId: string,
+  decision: 'accept' | 'skip',
+  payloadPatch?: Record<string, unknown>,
+  acceptedFields?: string[],
+): Promise<void> {
   await repository.transaction(async (tx) => {
     const row = await repository.docGet<StagedRow>('import_rows', rowId, tx);
     if (!row) throw new Error('import row not found');
@@ -672,6 +1004,10 @@ export async function setRowDecision(batchId: string, rowId: string, decision: '
     const update: Record<string, unknown> = { decision };
     if (payloadPatch) {
       update.payload = { ...(row.payload ?? {}), ...payloadPatch };
+    }
+    if (acceptedFields && row.proposal) {
+      const offered = new Set(row.proposal.fields.map((f) => f.key));
+      update.proposal = { ...row.proposal, accepted: acceptedFields.filter((key) => offered.has(key)) };
     }
     await repository.docMerge('import_rows', rowId, update, tx);
   });
@@ -699,12 +1035,21 @@ async function findOrCreateOrg(title: string, source: string, sourceRef: string,
 }
 
 /**
- * The document id a bundle row will land on, a pure function of the row, so it
- * is knowable without having processed the row. That is what lets a re-commit
- * of a partially failed batch still resolve edges into rows committed earlier.
+ * The document id a row will land on, a pure function of the row, so it is
+ * knowable without having processed the row. That is what lets a re-commit of a
+ * partially failed batch still resolve edges into rows committed earlier.
+ *
+ * A row that resolved to an existing record lands on *that* record. Otherwise
+ * an external identity derives the id, so re-importing the same record twice
+ * converges on one document instead of forking, and only a row the source
+ * identifies by nothing falls back to an id made from the batch and the row.
  */
-function graphNodeId(batchId: string, row: StagedRow): string {
-  const primary = (row.payload as unknown as BundleNode).identity_keys?.[0];
+function resolvedNodeId(batchId: string, row: StagedRow): string {
+  if (row.proposal) return row.proposal.target_node_id;
+  // Rows staged before identity keys were persisted on the row still carry a
+  // bundle's keys inside their payload, so old batches keep committing.
+  const keys = row.identity_keys ?? (row.payload as unknown as BundleNode).identity_keys;
+  const primary = keys?.[0];
   return primary
     ? externalNodeId(primary, (v) => createHash('sha256').update(v).digest('hex'))
     : importResultId(batchId, row.id, 'node');
@@ -742,7 +1087,7 @@ async function commitBundleEdges(
   for (const row of rows) {
     if (row.entity !== 'graph_node' || !row.ref) continue;
     if (failedRowIds.has(row.id)) continue;
-    if (row.decision === 'accept') refToId.set(row.ref, graphNodeId(id, row));
+    if (row.decision === 'accept') refToId.set(row.ref, resolvedNodeId(id, row));
     else if (row.dup) refToId.set(row.ref, row.dup.nodeId);
   }
 
@@ -784,7 +1129,56 @@ async function commitBundleEdges(
   return created;
 }
 
-export async function commitImport(id: string): Promise<{ created: number; failed: number }> {
+/**
+ * Apply the fields a reviewer accepted on one proposal (FR-SYNC-001).
+ *
+ * Read and write share a transaction and the revision guard is checked inside
+ * it, so a record edited between review and commit refuses instead of quietly
+ * taking a diff nobody looked at. The refusal is a row error, which keeps the
+ * row staged and retryable rather than failing the batch.
+ *
+ * The updated record deliberately keeps its own `source_ref`. Rollback deletes
+ * what carries the batch's ref, and stamping a record this import merely edited
+ * would make undoing the import delete a record that existed before it.
+ */
+async function applyProposal(proposal: UpdateProposal, source: string): Promise<AppliedUpdate> {
+  const accepted = proposal.fields.filter((f) => proposal.accepted.includes(f.key));
+  return repository.transaction(async (tx) => {
+    const before = await repository.getNode(proposal.target_node_id, {}, tx);
+    if (!before) {
+      throw new Error(
+        `"${proposal.target_title}" no longer exists, so there is nothing to update; import the file again to compare against what is there now`,
+      );
+    }
+    if (before.rev !== proposal.target_rev) {
+      throw new Error(
+        `"${before.title}" changed after this batch was staged (now revision ${before.rev}, reviewed at revision ${proposal.target_rev}); import the file again to review a current comparison`,
+      );
+    }
+    const record = before as unknown as Record<string, unknown>;
+    const previous = accepted.map((f) => ({ key: f.key, value: readField(record, f.key) }));
+    const patch = patchForFields(record, accepted.map((f) => ({ key: f.key, value: f.to })));
+    const after = await repository.stageNodeUpdate(tx, before, patch, { actor: 'import', source, op: 'update' });
+    return {
+      node_id: after.id,
+      title: after.title,
+      rev_before: before.rev,
+      rev_after: after.rev,
+      before: previous,
+    };
+  });
+}
+
+/** The four-way outcome of a commit pass (FR-SYNC-002). */
+export interface ImportCommitResult {
+  created: number;
+  updated: number;
+  unchanged: number;
+  skipped: number;
+  failed: number;
+}
+
+export async function commitImport(id: string): Promise<ImportCommitResult> {
   const found = await getBatch(id);
   if (!found || found.batch.status !== 'staged') throw new Error('batch is not staged');
   const { batch, rows } = found;
@@ -792,6 +1186,17 @@ export async function commitImport(id: string): Promise<{ created: number; faile
   const self = await getSelf();
   const orgCache = new Map<string, string>();
   let created = 0;
+  let updated = 0;
+  let unchanged = 0;
+  let skipped = 0;
+  const appliedUpdates: AppliedUpdate[] = [];
+  /**
+   * Documents this pass has already written. A file listing one person twice
+   * gives both rows the same identity, and therefore the same document id, so
+   * without this the second row would count as a second creation of a record
+   * that already converged on the first.
+   */
+  const writtenNodeIds = new Set<string>();
 
   // One malformed row must never abort the batch (SRS: staging rows fail
   // individually, the commit itself always completes). Failed rows stay
@@ -802,11 +1207,39 @@ export async function commitImport(id: string): Promise<{ created: number; faile
     failedRowIds.add(rowId);
     rowErrors.set(rowId, reason);
   };
+  /** Rows this pass acted on, which are the ones it may mark committed. */
+  const attempted = new Set<string>();
 
   for (const row of rows) {
-    if (row.decision !== 'accept' || row.status === 'committed') continue;
+    if (row.status === 'committed') continue;
+
+    // A row whose identity key resolved to a record that already says what the
+    // file says is converged, not pending. FR-SYNC-002 counts it as unchanged
+    // and asks nothing of the reviewer, so it settles whatever its decision is.
+    if (row.proposal && row.proposal.fields.length === 0) {
+      unchanged++;
+      attempted.add(row.id);
+      continue;
+    }
+    if (row.decision !== 'accept') {
+      skipped++;
+      continue;
+    }
+    // Accepting the row while rejecting every field in its diff is a rejection
+    // of the proposal, and FR-SYNC-001 is that it leaves the record untouched.
+    if (row.proposal && row.proposal.accepted.length === 0) {
+      skipped++;
+      continue;
+    }
+    attempted.add(row.id);
     try {
         const p = row.payload as Record<string, unknown>;
+
+        if (row.proposal) {
+          appliedUpdates.push(await applyProposal(row.proposal, source));
+          updated++;
+          continue;
+        }
 
         if (row.entity === 'atom') {
           // Résumé line → atom + default variant, owner chosen in the wizard.
@@ -864,200 +1297,116 @@ export async function commitImport(id: string): Promise<{ created: number; faile
           continue;
         }
 
-        let nodeId: string | null = null;
+        const draft = nodeDraftFor({
+          entity: row.entity,
+          title: row.title,
+          subtitle: row.subtitle,
+          payload: p,
+          identityKeys: row.identity_keys ?? (p.identity_keys as string[] | undefined) ?? [],
+        });
+        if (!draft) {
+          fail(row.id, `row entity ${row.entity} writes no record`);
+          continue;
+        }
+
+        // A stable external identity gives a stable document id, so re-importing
+        // the same record converges rather than duplicating: createNode returns
+        // the existing doc for a known id.
+        const nodeDocId = resolvedNodeId(id, row);
+        if (writtenNodeIds.has(nodeDocId)) {
+          unchanged++;
+          continue;
+        }
+        const node = await repository.createNode(
+          { ...draft, source, source_ref: id, confidence: row.confidence },
+          { actor: 'import' },
+          { id: nodeDocId },
+        );
+        // A deterministic id also resolves to a *rolled-back* record, and
+        // create-returns-existing would hand back the tombstone, so re-importing
+        // something you had rolled back would silently produce nothing. Rolling
+        // back and importing again is an undo, not a ban.
+        //
+        // Restoring re-stamps provenance onto this batch, because the record is
+        // live again on account of this import and rollback only sweeps what
+        // carries the batch's ref. Without that, importing after a rollback gave
+        // you a record no batch could take away again. A record that comes back
+        // still live is not re-stamped: it existed before this import, and
+        // hijacking it would make undoing this import delete somebody's data.
+        const nodeId = node.deleted_at
+          ? (
+              await repository.updateNode(
+                node.id,
+                { deleted_at: null, source, source_ref: id },
+                { actor: 'import', op: 'restore' },
+              )
+            ).id
+          : node.id;
+        writtenNodeIds.add(nodeDocId);
+
+        // Relationships the destination implies. A bundle brings its own edges
+        // and gets none of these: its records belong to the person they describe,
+        // never to the owner of this graph.
         switch (row.entity) {
-          case 'graph_node': {
-            const bn = row.payload as unknown as BundleNode;
-            const primaryKey = bn.identity_keys[0];
-            // A stable external identity gives a stable document id, so
-            // re-importing the same record updates nothing rather than
-            // duplicating: createNode returns the existing doc for a known id.
-            const deterministicId = primaryKey
-              ? externalNodeId(primaryKey, (v) => createHash('sha256').update(v).digest('hex'))
-              : importResultId(id, row.id, 'node');
-            const node = await repository.createNode(
-              {
-                type: bn.type,
-                title: bn.title,
-                subtitle: bn.subtitle ?? undefined,
-                props: bn.props,
-                identity_keys: bn.identity_keys,
-                notes_md: bn.notes_md ?? '',
-                start_date: bn.start_date,
-                end_date: bn.end_date,
-                date_precision: bn.date_precision,
-                source,
-                source_ref: id,
-                confidence: row.confidence,
-              },
-              { actor: 'import' },
-              { id: deterministicId },
-            );
-            // A deterministic id also resolves to a *rolled-back* record, and
-            // create-returns-existing would hand back the tombstone, so
-            // re-importing a batch you had rolled back would silently produce
-            // nothing. Rolling back then re-importing is an undo, not a ban.
-            nodeId = node.deleted_at
-              ? (await repository.restoreNode(node.id, { actor: 'import' })).id
-              : node.id;
-            break;
-          }
-          case 'person': {
-            const node = await repository.createNode(
-              {
-                type: 'person',
-                title: row.title,
-                subtitle: row.subtitle ?? undefined,
-                props: {
-                  emails: sanitizeEmails(p.emails),
-                  phones: (p.phones as string[]) ?? [],
-                  headline: p.headline,
-                  city: p.city,
-                  socials: sanitizeLinkedInUrl(p.linkedin) ? { linkedin: sanitizeLinkedInUrl(p.linkedin) } : {},
-                },
-                notes_md: (p.note as string) ?? '',
-                source,
-                source_ref: id,
-                confidence: row.confidence,
-              },
-              { actor: 'import' },
-              { id: importResultId(id, row.id, 'node') },
-            );
-            nodeId = node.id;
+          case 'person':
             if (self) {
               await repository.createEdge(
-                { type: 'KNOWS', src: self.id, dst: node.id, props: {}, source, source_ref: id },
+                { type: 'KNOWS', src: self.id, dst: nodeId, props: {}, source, source_ref: id },
                 { actor: 'import' },
                 { id: importResultId(id, row.id, 'knows') },
               );
             }
             break;
-          }
-          case 'role': {
-            const node = await repository.createNode(
-              {
-                type: 'role',
-                title: row.title,
-                subtitle: (p.company as string) || undefined,
-                props: { employment_type: 'full_time', city: p.city || undefined },
-                notes_md: (p.description as string) ?? '',
-                start_date: (p.start as string) || undefined,
-                end_date: (p.end as string) || undefined,
-                source,
-                source_ref: id,
-                confidence: row.confidence,
-              },
-              { actor: 'import' },
-              { id: importResultId(id, row.id, 'node') },
-            );
-            nodeId = node.id;
+          case 'role':
             if (p.company) {
               const orgId = await findOrCreateOrg(p.company as string, source, id, orgCache);
               await repository.createEdge(
-                { type: 'ROLE_AT', src: node.id, dst: orgId, source, source_ref: id },
+                { type: 'ROLE_AT', src: nodeId, dst: orgId, source, source_ref: id },
                 { actor: 'import' },
                 { id: importResultId(id, row.id, 'role-at') },
               );
             }
             if (self) {
               await repository.createEdge(
-                { type: 'HELD', src: self.id, dst: node.id, source, source_ref: id },
+                { type: 'HELD', src: self.id, dst: nodeId, source, source_ref: id },
                 { actor: 'import' },
                 { id: importResultId(id, row.id, 'held') },
               );
             }
             break;
-          }
-          case 'education': {
-            const node = await repository.createNode(
-              {
-                type: 'education',
-                title: row.title,
-                subtitle: (p.degree as string) || undefined,
-                props: { degree: p.degree || undefined },
-                notes_md: (p.notes as string) ?? '',
-                start_date: (p.start as string) || undefined,
-                end_date: (p.end as string) || undefined,
-                source,
-                source_ref: id,
-                confidence: row.confidence,
-              },
-              { actor: 'import' },
-              { id: importResultId(id, row.id, 'node') },
-            );
-            nodeId = node.id;
+          case 'education':
             if (self) {
               await repository.createEdge(
-                { type: 'ATTENDED', src: self.id, dst: node.id, source, source_ref: id },
+                { type: 'ATTENDED', src: self.id, dst: nodeId, source, source_ref: id },
                 { actor: 'import' },
                 { id: importResultId(id, row.id, 'attended') },
               );
             }
             break;
-          }
-          case 'skill': {
-            const node = await repository.createNode(
-              { type: 'skill', title: row.title, props: {}, source, source_ref: id, confidence: row.confidence },
-              { actor: 'import' },
-              { id: importResultId(id, row.id, 'node') },
-            );
-            nodeId = node.id;
+          case 'skill':
             if (self) {
               await repository.createEdge(
-                { type: 'USES_SKILL', src: self.id, dst: node.id, source, source_ref: id },
+                { type: 'USES_SKILL', src: self.id, dst: nodeId, source, source_ref: id },
                 { actor: 'import' },
                 { id: importResultId(id, row.id, 'uses-skill') },
               );
             }
             break;
-          }
-          case 'event': {
-            const rrule = p.rrule ? `\n\nRRULE: ${p.rrule as string}` : '';
-            const node = await repository.createNode(
-              {
-                type: 'event',
-                title: row.title,
-                props: { kind: 'appointment', venue: p.venue || undefined },
-                notes_md: `${(p.description as string) ?? ''}${rrule}`.trim(),
-                start_date: (p.start as string) || undefined,
-                end_date: (p.end as string) || undefined,
-                source,
-                source_ref: id,
-                confidence: row.confidence,
-              },
-              { actor: 'import' },
-              { id: importResultId(id, row.id, 'node') },
-            );
-            nodeId = node.id;
-            break;
-          }
-          case 'link': {
-            const node = await repository.createNode(
-              {
-                type: 'link',
-                title: row.title,
-                props: { url: p.url, domain: safeDomain(p.url as string) },
-                source,
-                source_ref: id,
-                confidence: row.confidence,
-              },
-              { actor: 'import' },
-              { id: importResultId(id, row.id, 'node') },
-            );
-            nodeId = node.id;
+          case 'link':
             for (const tagName of ((p.tags as string[]) ?? []).slice(0, 10)) {
               const tagId = await upsertTag(tagName);
               await repository.docPut('taggings', importResultId(id, row.id, `tag:${tagName}`), {
                 tag_id: tagId,
                 subject_kind: 'node',
-                subject_id: node.id,
+                subject_id: nodeId,
                 created_at: nowIso(),
               });
             }
             break;
-          }
+          default:
+            break;
         }
-        if (nodeId) created++;
+        created++;
     } catch (err) {
       fail(row.id, (err as Error).message || 'row failed');
     }
@@ -1066,10 +1415,11 @@ export async function commitImport(id: string): Promise<{ created: number; faile
   const edgesCreated = await commitBundleEdges(id, rows, source, failedRowIds);
   created += edgesCreated;
 
-  // Mark rows committed (only the ones that actually produced data) + batch
-  // status. Failed rows keep their reason so the UI can explain the retry.
+  // Mark rows committed (only the ones this pass acted on) + batch status.
+  // Failed rows keep their reason so the UI can explain the retry, and a row
+  // left pending is not touched at all so the reviewer can still change it.
   for (const row of rows) {
-    if (row.decision !== 'accept' || row.status === 'committed') continue;
+    if (row.status === 'committed' || !attempted.has(row.id)) continue;
     await repository.docMerge(
       'import_rows',
       row.id,
@@ -1087,13 +1437,29 @@ export async function commitImport(id: string): Promise<{ created: number; faile
     status: clean ? 'committed' : 'staged',
     committed_at: nowIso(),
     // JSONB merges shallowly, so rebuild the nested object from the batch data.
-    stats: { ...batch.stats, created: (batch.stats.created ?? 0) + created, failed: failedRowIds.size },
+    // created, updated and unchanged accumulate because the rows behind them are
+    // marked committed and cannot be counted twice; skipped is replaced, because
+    // a row left pending is still pending on the next pass and adding would
+    // count the same undone work again.
+    stats: {
+      ...batch.stats,
+      created: (batch.stats.created ?? 0) + created,
+      updated: (batch.stats.updated ?? 0) + updated,
+      unchanged: (batch.stats.unchanged ?? 0) + unchanged,
+      skipped,
+      failed: failedRowIds.size,
+    },
+    ...(appliedUpdates.length > 0
+      ? { applied_updates: [...(await loadAppliedUpdates(id)), ...appliedUpdates] }
+      : {}),
   });
   if (clean) await purgeRawImport(id);
-  // New records change the identity graph. Without busting the scan cache the
-  // Identity audit kept serving a pre-import queue until the five-minute TTL.
-  if (created > 0) await invalidateDuplicateScan();
-  return { created, failed: failedRowIds.size };
+  // New and changed records both move the identity graph. Without busting the
+  // scan cache the Identity audit kept serving a pre-import queue until the
+  // five-minute TTL, and an accepted update changes exactly the fields the
+  // scanner matches on.
+  if (created > 0 || updated > 0) await invalidateDuplicateScan();
+  return { created, updated, unchanged, skipped, failed: failedRowIds.size };
 }
 
 /**
@@ -1107,14 +1473,27 @@ export async function discardImport(id: string): Promise<void> {
 }
 
 /**
- * Soft-delete every node/edge/atom the batch created, and purge the raw upload.
+ * Undo a batch: soft-delete every node/edge/atom it created, put back every
+ * field it changed, and purge the raw upload.
  *
  * FR-006: rolling back an import is a deletion intent. Keeping the original
  * address book / calendar / résumé text on the batch "for re-parse" meant the
  * most sensitive artifact in the system survived the user's own undo, forever.
  * Re-importing is a re-upload.
+ *
+ * The update half is per node and guarded, unlike `undoMerge`, which is all or
+ * nothing. A merge is one act on one cluster; a batch of updates is many
+ * independent acts, and one record somebody has edited since is no reason to
+ * abandon the other ninety-nine. A record whose revision has moved past what
+ * the import left is reported as refused, with what moved, and keeps the edit.
+ *
+ * Records the batch *created* are deleted whatever their revision. They exist
+ * only because of the batch, deletion here is soft and reversible from Trash,
+ * and FR-006 makes rolling back a deletion promise rather than a negotiation.
  */
-export async function rollbackImport(id: string): Promise<{ removed: number }> {
+export async function rollbackImport(
+  id: string,
+): Promise<{ removed: number; restored: number; refused: RollbackRefusal[] }> {
   const [nodes, edges] = await Promise.all([repository.allLiveNodes(), repository.allLiveEdges()]);
   let removed = 0;
   for (const e of edges) {
@@ -1150,13 +1529,35 @@ export async function rollbackImport(id: string): Promise<{ removed: number }> {
     });
     removed++;
   }
+  // Then the records the batch only edited. Each is its own transaction, so a
+  // refusal stops that node and nothing else.
+  const refused: RollbackRefusal[] = [];
+  let restored = 0;
+  for (const update of await loadAppliedUpdates(id)) {
+    const outcome: { title: string; reason: string | null } = await repository.transaction(async (tx) => {
+      const node = await repository.getNode(update.node_id, {}, tx);
+      if (!node) return { title: update.title, reason: 'it no longer exists' };
+      if (node.rev !== update.rev_after) {
+        return {
+          title: node.title,
+          reason: `it was edited after the import (now revision ${node.rev}, the import left it at revision ${update.rev_after})`,
+        };
+      }
+      const patch = patchForFields(node as unknown as Record<string, unknown>, update.before);
+      await repository.stageNodeUpdate(tx, node, patch, { actor: 'import-rollback', op: 'update' });
+      return { title: node.title, reason: null };
+    });
+    if (outcome.reason === null) restored++;
+    else refused.push({ node_id: update.node_id, title: outcome.title, reason: outcome.reason });
+  }
+
   await repository.docMerge('imports', id, {
     status: 'rolled_back',
     rolled_back_at: nowIso(),
   });
   await purgeRawImport(id);
-  if (removed > 0) await invalidateDuplicateScan();
-  return { removed };
+  if (removed > 0 || restored > 0) await invalidateDuplicateScan();
+  return { removed, restored, refused };
 }
 
 // ── GitHub sync ───────────────────────────────────────────────────────────────
@@ -1175,11 +1576,21 @@ interface GithubRepo {
   fork: boolean;
 }
 
-export async function githubSync(): Promise<{ status: 'synced' | 'not_modified' | 'unauthorized' | 'not_configured'; created: number; updated: number }> {
+export interface GithubSyncResult {
+  status: 'synced' | 'not_modified' | 'unauthorized' | 'not_configured';
+  created: number;
+  updated: number;
+  unchanged: number;
+  skipped: number;
+}
+
+const NOTHING_SYNCED = { created: 0, updated: 0, unchanged: 0, skipped: 0 };
+
+export async function githubSync(): Promise<GithubSyncResult> {
   const settings = await getSettings();
   // FR-004: the credential comes from the secret store, never from Postgres.
   const pat = githubToken();
-  if (!pat) return { status: 'not_configured', created: 0, updated: 0 };
+  if (!pat) return { status: 'not_configured', ...NOTHING_SYNCED };
 
   const headers: Record<string, string> = {
     authorization: `Bearer ${pat}`,
@@ -1195,9 +1606,9 @@ export async function githubSync(): Promise<{ status: 'synced' | 'not_modified' 
   });
   if (res.status === 304) {
     await patchSettings({ github: { ...settings.github, lastSyncAt: nowIso() } });
-    return { status: 'not_modified', created: 0, updated: 0 };
+    return { status: 'not_modified', ...NOTHING_SYNCED };
   }
-  if (res.status === 401 || res.status === 403) return { status: 'unauthorized', created: 0, updated: 0 };
+  if (res.status === 401 || res.status === 403) return { status: 'unauthorized', ...NOTHING_SYNCED };
   if (!res.ok) throw new Error(`GitHub responded ${res.status}`);
 
   const repos = (await res.json()) as GithubRepo[];
@@ -1211,8 +1622,15 @@ export async function githubSync(): Promise<{ status: 'synced' | 'not_modified' 
 
   let created = 0;
   let updated = 0;
+  let unchanged = 0;
+  let skipped = 0;
   for (const r of repos) {
-    if (r.fork) continue;
+    // Forks are somebody else's work with your name on the clone, so they are
+    // not imported. That is a real bucket of the report, not a silent omission.
+    if (r.fork) {
+      skipped++;
+      continue;
+    }
     const props = {
       host: 'github',
       full_name: r.full_name,
@@ -1229,9 +1647,21 @@ export async function githubSync(): Promise<{ status: 'synced' | 'not_modified' 
     const prev = byFullName.get(r.full_name);
     let repoNodeId: string;
     if (prev) {
-      await repository.updateNode(prev.id, { props: { ...(prev.props as Record<string, unknown>), ...props } }, { actor: 'github-sync' });
+      const before = prev.props as Record<string, unknown>;
+      const merged = { ...before, ...props };
+      // `last_synced_at` moves on every run whatever GitHub said, so comparing
+      // it makes every repository look changed and the unchanged bucket read
+      // zero forever. Excluding it also means the stamp is only written when
+      // something else was, which is what makes it honest: it records when this
+      // repository last took data from GitHub, not when a sync last ran.
+      const changes = changedFields({ props: before }, { props: merged }, { ignore: SYNC_BOOKKEEPING_FIELDS });
       repoNodeId = prev.id;
-      updated++;
+      if (changes.length === 0) {
+        unchanged++;
+      } else {
+        await repository.updateNode(prev.id, { props: merged }, { actor: 'github-sync' });
+        updated++;
+      }
     } else {
       const node = await repository.createNode(
         { type: 'repository', title: r.name, subtitle: r.description ?? undefined, props, source: 'import_github', source_ref: 'github_sync' },
@@ -1263,7 +1693,7 @@ export async function githubSync(): Promise<{ status: 'synced' | 'not_modified' 
   }
 
   await patchSettings({ github: { lastSyncAt: nowIso(), etag } });
-  return { status: 'synced', created, updated };
+  return { status: 'synced', created, updated, unchanged, skipped };
 }
 
 // ── Small helpers ─────────────────────────────────────────────────────────────

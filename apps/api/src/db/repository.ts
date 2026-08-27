@@ -651,6 +651,43 @@ export class Repository {
     return rows.map((r) => r.data as Record<string, unknown>);
   }
 
+  /**
+   * The revision trails of many subjects at once, keyed by subject id.
+   *
+   * The batched form exists because provenance is asked for a whole exhibit
+   * list rather than one record: a dossier appendix resolves the trail behind
+   * every citation it prints, and forty citations through `revisionsFor` is
+   * forty round trips to compile one document.
+   *
+   * Every id asked for is present in the result, holding an empty array when
+   * nothing was retained for it. That is the difference between "this record
+   * has no revisions" and "nobody asked about this record", and a caller
+   * reading a missing key as the former would print an empty trail for a
+   * subject it simply forgot to include.
+   */
+  async revisionsForMany(
+    subjectIds: readonly string[],
+  ): Promise<Map<string, Array<Record<string, unknown>>>> {
+    const trails = new Map<string, Array<Record<string, unknown>>>();
+    for (const id of subjectIds) trails.set(id, []);
+    // `IN ()` is a syntax error in Postgres, so an empty ask never becomes a query.
+    if (trails.size === 0) return trails;
+    const rows = await db
+      .selectFrom('revisions')
+      .select(['subject_id', 'data'])
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
+      .where('subject_id', 'in', [...trails.keys()])
+      .orderBy('rev', 'asc')
+      .execute();
+    for (const row of rows) {
+      // `subject_id` is a generated column and so nullable to the type layer,
+      // though the WHERE above already excludes null.
+      if (row.subject_id) trails.get(row.subject_id)?.push(row.data as Record<string, unknown>);
+    }
+    return trails;
+  }
+
   // ── Transactions and invalidation ──────────────────────────────────────────
 
   async transaction<T>(fn: (tx: Tx) => Promise<T>): Promise<T> {

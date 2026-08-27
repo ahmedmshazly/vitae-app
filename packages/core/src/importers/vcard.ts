@@ -6,6 +6,7 @@
  * vCard 2.1 quoted-printable is out of scope (SRS risk note), such lines land
  * in `unrecognized`.
  */
+import { contactEmailKey, vcardUidKey } from './identity.js';
 
 export interface VCardContact {
   fullName: string;
@@ -21,6 +22,15 @@ export interface VCardContact {
   unrecognized: string[];
   /** 1 for a clean card; lower when we had to guess. */
   confidence: number;
+  /**
+   * What this card states about who it is, for re-import convergence
+   * (FR-SYNC-002). The UID comes first because it is the address book's own
+   * identifier for the record and survives a rename; the primary email follows,
+   * so a card re-exported from a *different* app under a new UID still resolves
+   * to the person already stored. Empty when the card states neither, and such
+   * a card stays a create rather than being keyed on its display name.
+   */
+  identityKeys: string[];
 }
 
 /** Unfold continuation lines (leading space/tab) and split. */
@@ -59,6 +69,7 @@ export function parseVcards(text: string): VCardContact[] {
   const contacts: VCardContact[] = [];
   let cur: VCardContact | null = null;
   let fromN: string | null = null;
+  let uid: string | null = null;
 
   for (const line of lines) {
     const prop = parseLine(line);
@@ -79,8 +90,10 @@ export function parseVcards(text: string): VCardContact[] {
         bday: null,
         unrecognized: [],
         confidence: 1,
+        identityKeys: [],
       };
       fromN = null;
+      uid = null;
       continue;
     }
     if (prop.name === 'END' && prop.value.toUpperCase() === 'VCARD') {
@@ -93,6 +106,13 @@ export function parseVcards(text: string): VCardContact[] {
           cur.fullName = cur.emails[0]!.split('@')[0]!;
           cur.confidence = 0.5;
         }
+        // Only the first address becomes a key. Later ones are routinely shared
+        // (a team alias, a household), and an identity key decides rather than
+        // scores, so keying on all of them would silently fuse two people the
+        // duplicate scanner would at most have flagged for review.
+        cur.identityKeys = [vcardUidKey(uid), contactEmailKey(cur.emails[0])].filter(
+          (k): k is string => k !== null,
+        );
         if (cur.fullName) contacts.push(cur);
       }
       cur = null;
@@ -145,10 +165,15 @@ export function parseVcards(text: string): VCardContact[] {
       case 'BDAY':
         cur.bday = value || null;
         break;
+      case 'UID':
+        // Kept rather than discarded: it is the one field on the card that
+        // identifies the record across exports, which is what makes a second
+        // import of the same address book converge instead of duplicating it.
+        uid = value || null;
+        break;
       case 'VERSION':
       case 'PRODID':
       case 'REV':
-      case 'UID':
       case 'PHOTO':
         break; // understood, not needed
       default:

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { sourceStatus, type Batch } from './ImportHub.js';
+import { commitAction, sourceStatus, type Batch } from './ImportHub.js';
 
 function batch(over: Partial<Batch> & Pick<Batch, 'kind' | 'status'>): Batch {
   return {
@@ -51,5 +51,29 @@ describe('sourceStatus', () => {
       label: 'ready',
       tone: 'muted',
     });
+  });
+});
+
+describe('commitAction', () => {
+  it('counts the rows the reviewer accepted', () => {
+    expect(commitAction(1, 0, false)).toEqual({ label: 'Commit 1 row', disabled: false });
+    expect(commitAction(4, 0, false)).toEqual({ label: 'Commit 4 rows', disabled: false });
+  });
+
+  it('lets a re-import that found nothing to change still be recorded', () => {
+    // Otherwise the button waits for an acceptance nobody can give, and the
+    // batch never gets to report that every row already matched.
+    expect(commitAction(0, 3, false)).toEqual({
+      label: 'Record 3 already matched',
+      disabled: false,
+    });
+  });
+
+  it('has nothing to do when every row is skipped', () => {
+    expect(commitAction(0, 0, false)).toEqual({ label: 'Commit 0 rows', disabled: true });
+  });
+
+  it('locks while the commit is in flight', () => {
+    expect(commitAction(2, 0, true)).toEqual({ label: 'Committing…', disabled: true });
   });
 });

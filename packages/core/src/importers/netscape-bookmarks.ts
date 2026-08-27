@@ -5,6 +5,7 @@
  * saved date. Regex-driven, the format is line-oriented and never valid HTML,
  * so a DOM parser buys nothing.
  */
+import { bookmarkUrlKey } from './identity.js';
 
 export interface Bookmark {
   url: string;
@@ -14,6 +15,13 @@ export interface Bookmark {
   /** TAGS attribute if the browser exported one. */
   tags: string[];
   addedAt: string | null; // YYYY-MM-DD
+  /**
+   * The link identity for re-import convergence (FR-SYNC-002): the URL is what
+   * the export states about the page, and it outlives the title a browser lets
+   * you edit. Empty when the URL is too long to key, and those still meet the
+   * importer's exact-URL duplicate rule on the way in.
+   */
+  identityKeys: string[];
 }
 
 function decodeEntities(s: string): string {
@@ -53,12 +61,15 @@ export function parseNetscapeBookmarks(html: string): Bookmark[] {
       if (!url || !/^https?:/i.test(url)) continue;
       const added = attr(`<A ${attrs}>`, 'ADD_DATE');
       const tagsAttr = attr(`<A ${attrs}>`, 'TAGS');
+      const href = decodeEntities(url);
+      const key = bookmarkUrlKey(href);
       bookmarks.push({
-        url: decodeEntities(url),
+        url: href,
         title: decodeEntities(m[3]!.trim()) || url,
         folders: [...stack],
         tags: tagsAttr ? tagsAttr.split(',').map((t) => t.trim()).filter(Boolean) : [],
         addedAt: added && /^\d+$/.test(added) ? new Date(Number(added) * 1000).toISOString().slice(0, 10) : null,
+        identityKeys: key ? [key] : [],
       });
     }
   }

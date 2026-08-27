@@ -52,6 +52,31 @@ describe('parseVcards', () => {
     expect(parseVcards(many)).toHaveLength(2);
   });
 
+  it('keys a card on its UID first and its primary email second', () => {
+    const withUid = CARD_40.replace('VERSION:4.0', 'VERSION:4.0\nUID:urn:uuid:9f1c-abc');
+    const [c] = parseVcards(withUid);
+    expect(c!.identityKeys).toEqual([
+      'vcard:person:urn:uuid:9f1c-abc',
+      'contact:email:sarah.chen@nile-robotics.com',
+    ]);
+  });
+
+  it('falls back to the email when the card states no UID', () => {
+    const [c] = parseVcards(CARD_30_FOLDED);
+    expect(c!.identityKeys).toEqual(['contact:email:omar@example.com']);
+  });
+
+  it('keys only the first address, so a shared alias cannot fuse two people', () => {
+    const shared = CARD_40.replace('URL:https://sarah.dev', 'EMAIL:team@nile-robotics.com');
+    const [c] = parseVcards(shared);
+    expect(c!.identityKeys).not.toContain('contact:email:team@nile-robotics.com');
+  });
+
+  it('gives a card with neither UID nor email no key at all', () => {
+    const [c] = parseVcards('BEGIN:VCARD\nVERSION:4.0\nFN:No Contact Details\nEND:VCARD');
+    expect(c!.identityKeys).toEqual([]);
+  });
+
   it('keeps quoted-printable lines as unrecognized instead of garbling', () => {
     const v21 = `BEGIN:VCARD\nVERSION:2.1\nFN;ENCODING=QUOTED-PRINTABLE:=41=68=6D=65=64\nEMAIL:a@b.c\nEND:VCARD`;
     const [c] = parseVcards(v21);

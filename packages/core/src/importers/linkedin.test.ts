@@ -50,4 +50,22 @@ describe('parseLinkedInConnections', () => {
       position: 'Staff SWE',
     });
   });
+
+  it('keys a connection on the profile slug, then on the email', () => {
+    const csv = `First Name,Last Name,URL,Email Address\nSarah,Chen,https://linkedin.com/in/sc,Sarah.Chen@nile.com`;
+    expect(parseLinkedInConnections(csv)[0]!.identityKeys).toEqual([
+      'linkedin:person:sc',
+      'contact:email:sarah.chen@nile.com',
+    ]);
+  });
+
+  it('keys a connection LinkedIn withheld the email for on the slug alone', () => {
+    const csv = `First Name,Last Name,URL,Email Address\nSarah,Chen,https://linkedin.com/in/sc,`;
+    expect(parseLinkedInConnections(csv)[0]!.identityKeys).toEqual(['linkedin:person:sc']);
+  });
+
+  it('gives a connection with no URL and no email no key', () => {
+    const csv = `First Name,Last Name,URL,Email Address\nSarah,Chen,,`;
+    expect(parseLinkedInConnections(csv)[0]!.identityKeys).toEqual([]);
+  });
 });

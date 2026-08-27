@@ -78,13 +78,30 @@ importsRouter.get(
   }),
 );
 
-/** Flip a staged row between accept/skip; optionally patch its payload. */
+/**
+ * Flip a staged row between accept/skip; optionally patch its payload, or name
+ * which fields of an update proposal the reviewer accepts (FR-SYNC-001). An
+ * empty `fields` array is meaningful: it rejects every change in the proposal
+ * and leaves the record untouched, so it is not treated as "unspecified".
+ */
+const rowDecisionSchema = z.object({
+  decision: z.enum(['accept', 'skip']).optional(),
+  payload: z.record(z.string(), z.unknown()).optional(),
+  fields: z.array(z.string().max(200)).max(200).optional(),
+});
+
 importsRouter.patch(
   '/:id/rows/:rowId',
   asyncHandler(async (req, res) => {
-    const decision = req.body?.decision as 'accept' | 'skip' | undefined;
-    if (decision && decision !== 'accept' && decision !== 'skip') throw new HttpError(422, 'VALIDATION', 'decision must be accept or skip');
-    await setRowDecision(req.params.id, req.params.rowId, decision ?? 'accept', req.body?.payload as Record<string, unknown> | undefined);
+    const parsed = rowDecisionSchema.safeParse(req.body ?? {});
+    if (!parsed.success) throw new HttpError(422, 'VALIDATION', 'decision must be accept or skip', parsed.error.issues);
+    await setRowDecision(
+      req.params.id,
+      req.params.rowId,
+      parsed.data.decision ?? 'accept',
+      parsed.data.payload,
+      parsed.data.fields,
+    );
     res.json({ ok: true });
   }),
 );

@@ -26,6 +26,7 @@ describe('parseNetscapeBookmarks', () => {
       folders: ['Reading', 'ML'],
       tags: ['transformers', 'nlp'],
       addedAt: '2024-01-01',
+      identityKeys: ['bookmark:link:https://arxiv.org/abs/1706.03762'],
     });
     expect(ab!.title).toBe('A & B');
     expect(ab!.url).toBe('https://example.com/a?x=1&y=2');
@@ -35,5 +36,12 @@ describe('parseNetscapeBookmarks', () => {
 
   it('skips non-http(s) schemes', () => {
     expect(parseNetscapeBookmarks(FILE)).toHaveLength(3);
+  });
+
+  it('keys a link on its URL so a second export of it converges', () => {
+    const [, ab, root] = parseNetscapeBookmarks(FILE);
+    expect(ab!.identityKeys).toEqual(['bookmark:link:https://example.com/a?x=1&y=2']);
+    // The bare trailing slash is not part of which page this is.
+    expect(root!.identityKeys).toEqual(['bookmark:link:https://root.example.com']);
   });
 });
