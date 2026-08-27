@@ -106,6 +106,23 @@ describe('letters routes', () => {
     expect(res.body.tex).toContain('Dear Marie Uwase,');
     expect(res.body.tex).not.toMatch(/«[^»]*»/);
 
+    // Two outcomes are acceptable here and a third is not. Either the build
+    // service answered, in which case a real PDF of one or two pages came back,
+    // or it was unreachable, in which case `offline` says so. Asserting only
+    // the response shape, as this case first did, would also pass for a
+    // compiler that was up and failing, which is the one result worth catching.
+    if (res.body.offline) {
+      expect(res.body.ok, 'an offline compile is not a successful one').toBe(false);
+      expect(res.body.pdfBase64).toBeNull();
+    } else {
+      expect(res.body.ok, `compile failed: ${res.body.logTail ?? ''}`).toBe(true);
+      expect(typeof res.body.pdfBase64).toBe('string');
+      // A PDF, not an error page rendered as one.
+      expect(Buffer.from(res.body.pdfBase64, 'base64').subarray(0, 5).toString()).toBe('%PDF-');
+      expect(res.body.pages).toBeGreaterThanOrEqual(1);
+      expect(res.body.pages).toBeLessThanOrEqual(2);
+    }
+
     // Preview stores nothing.
     const after = await request(app)
       .get(`/api/v1/letters/${letter.body.letter.id}`)
