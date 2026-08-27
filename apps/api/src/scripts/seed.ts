@@ -56,8 +56,8 @@ async function main() {
     (await repository.createNode({ type: 'organization', title, props: { domain, kind, website: `https://${domain}` }, source: 'manual' })).id;
   const nile = await org('Nile Robotics', 'nile-robotics.com', 'company');
   const _devfest = await org('DevFest Cairo', 'devfest.cairo', 'community');
-  const _pycairo = await org('PyCairo', 'pycairo.org', 'community');
-  const _univ = await org('Cairo University', 'cu.edu.eg', 'university');
+  const pycairo = await org('PyCairo', 'pycairo.org', 'community');
+  const univ = await org('Cairo University', 'cu.edu.eg', 'university');
 
   // ── People (network) ───────────────────────────────────────────────────────
   const person = async (title: string, props: Record<string, unknown>) =>
@@ -360,6 +360,378 @@ async function main() {
     type: 'account',
     title: 'Cloudflare',
     props: { kind: 'subscription', service: 'Cloudflare Pro', url: 'https://dash.cloudflare.com', cost: { amount: 20, currency: 'USD', period: 'monthly' }, renewal_on: '2026-08-01', account_status: 'active' },
+    source: 'manual',
+  });
+
+  // ── A correspondence world ─────────────────────────────────────────────────
+  //
+  // Everything above this line is the smallest graph that makes each screen
+  // render. That was enough while the screens only had to draw; it stopped
+  // being enough once they started computing. Five undirected interactions
+  // cannot demonstrate a reciprocity ratio, a reply latency, an imbalance, or
+  // a tie that was once strong and went quiet, because none of those figures
+  // exist in five records.
+  //
+  // So the seven people below are not more of the same. Each one is a
+  // different shape of correspondence, chosen against what the algorithms
+  // actually key on: the Hawkes kernel decays with a 90-day constant, a tie
+  // counts as once-strong at a peak of 0.55, an imbalance is only ranked once
+  // four directional events exist, and a direction change more than 60 days
+  // apart is a new thread rather than a reply. Data that ignores those numbers
+  // fills a screen without demonstrating anything on it.
+  //
+  // Every exchange is stated, never inferred. Where a real operator would not
+  // have recorded who reached out - an annual meeting, a corridor encounter -
+  // the direction is left unset, and the coverage line owns up to it. That is
+  // the honest shape of a real log, and a seed where every single interaction
+  // carries a direction would quietly imply the product asks for one.
+
+  /** [days ago, kind, who opened it (null when unrecorded), what it was]. */
+  type Beat = [number, string, 'me' | 'them' | null, string];
+
+  const exchange = async (personId: string, topics: string[], beats: Beat[]) => {
+    // Oldest first, so the log reads the way the correspondence happened.
+    for (const [agoDays, kind, who, title] of [...beats].sort((a, b) => b[0] - a[0])) {
+      const node = await repository.createNode({
+        type: 'interaction',
+        title,
+        props: {
+          kind,
+          occurred_at: daysAgo(agoDays),
+          talking_points: topics,
+          ...(who ? { initiated_by: who } : {}),
+        },
+        source: 'manual',
+      });
+      await repository.createEdge({ type: 'WITH', src: node.id, dst: personId, source: 'manual' });
+    }
+  };
+
+  const meridian = await org('Meridian Labs', 'meridian-labs.example', 'company');
+
+  /**
+   * Where someone works, as a role node joined to an organization, which is
+   * the shape the warm-path search reads. A person with a headline naming an
+   * employer and no ROLE_AT edge looks affiliated to a human reader and
+   * unaffiliated to every query, which is the gap this closes.
+   */
+  const worksAt = async (personId: string, roleTitle: string, orgId: string, startDate: string) => {
+    const role = await repository.createNode({
+      type: 'role',
+      title: roleTitle,
+      props: { employment_type: 'full_time' },
+      start_date: startDate,
+      status: 'active',
+      source: 'manual',
+    });
+    await repository.createEdge({ type: 'HELD', src: personId, dst: role.id, source: 'manual' });
+    await repository.createEdge({ type: 'ROLE_AT', src: role.id, dst: orgId, source: 'manual' });
+  };
+
+  // Mariam: the peer. Two people at the same level who genuinely trade, which
+  // is what a reciprocity ratio near even and a two-day median reply look like.
+  const mariam = await person('Mariam Sabry', {
+    headline: 'Principal engineer, autonomy platform',
+    city: 'Amsterdam',
+    emails: ['mariam@zeta-autonomy.example'],
+    socials: { linkedin: 'https://linkedin.com/in/mariam-sabry' },
+  });
+  await knows(mariam, {
+    closeness: 4,
+    cadence_target_days: 45,
+    met_via: 'CoRL 2024 workshop',
+    topics: ['sim-to-real', 'evaluation harnesses', 'perception'],
+  });
+  await exchange(mariam, ['sim-to-real', 'evaluation'], [
+    [612, 'email', 'me', 'Asked how Zeta evaluates sim-to-real gap'],
+    [610, 'email', 'them', 'She sent their eval harness write-up'],
+    [575, 'video', 'them', 'Walked me through their scenario generator'],
+    [540, 'email', 'me', 'Sent my notes on scenario coverage'],
+    [537, 'email', 'them', 'Pushed back on my coverage metric'],
+    [498, 'call', 'me', 'Argued out the coverage metric properly'],
+    [451, 'email', 'them', 'Draft of her workshop abstract'],
+    [449, 'email', 'me', 'Comments on the abstract'],
+    [402, 'video', 'them', 'Reviewed my PerceptionBench design'],
+    [365, 'email', 'me', 'Shared the benchmark results'],
+    [362, 'email', 'them', 'Asked for the raw traces'],
+    [318, 'email', 'me', 'Sent the traces and the caveats'],
+    [287, 'coffee', null, 'Ran into each other at the Amsterdam meetup'],
+    [264, 'email', 'them', 'Suggested we write the eval piece together'],
+    [261, 'email', 'me', 'Agreed, and sketched an outline'],
+    [230, 'video', 'me', 'Outline review'],
+    [227, 'email', 'them', 'Her section draft'],
+    [223, 'email', 'me', 'My section draft'],
+    [186, 'call', 'them', 'Talked through the reviewer comments'],
+    [151, 'email', 'me', 'Camera-ready sent'],
+    [149, 'email', 'them', 'Congratulations, and a hiring question'],
+    [146, 'email', 'me', 'Answered the hiring question'],
+    [112, 'video', 'them', 'Asked whether I would consider Zeta'],
+    [109, 'email', 'me', 'Said I was starting to look'],
+    [77, 'email', 'them', 'Sent the Staff Perception role'],
+    [75, 'email', 'me', 'Thanked her and applied'],
+    [44, 'call', 'them', 'Prep call before the Zeta screen'],
+    [41, 'email', 'me', 'Debrief after the screen'],
+    [19, 'email', 'them', 'Checked how the loop was going'],
+    [17, 'email', 'me', 'Updated her on the timeline'],
+  ]);
+
+  // Youssef: the recruiter. He writes far more than he is written to, and the
+  // last few messages have no answer at all. This is what the unanswered
+  // inbound count and the inbound half of the imbalance register are for.
+  const youssef = await person('Youssef Darwish', {
+    headline: 'Talent partner, engineering',
+    city: 'Cairo',
+    emails: ['youssef@helio.example'],
+  });
+  await knows(youssef, {
+    closeness: 2,
+    cadence_target_days: 90,
+    met_via: 'cold outreach',
+    topics: ['hiring', 'roles'],
+  });
+  await exchange(youssef, ['hiring'], [
+    [340, 'email', 'them', 'Cold note about a platform role'],
+    [333, 'email', 'me', 'Said not now, but keep in touch'],
+    [268, 'email', 'them', 'Another role, more senior'],
+    [265, 'email', 'me', 'Asked what the team actually owns'],
+    [263, 'email', 'them', 'Sent the team charter'],
+    [196, 'email', 'them', 'Checking in'],
+    [188, 'email', 'me', 'Brief reply, still not looking'],
+    [131, 'email', 'them', 'ML Platform Lead is open'],
+    [128, 'call', 'me', 'Called him back about it'],
+    [126, 'email', 'them', 'Sent the full brief'],
+    [122, 'email', 'me', 'Applied'],
+    [88, 'email', 'them', 'Screen scheduled'],
+    [54, 'email', 'them', 'Nudge about availability'],
+    [33, 'email', 'them', 'Second nudge'],
+    [21, 'email', 'them', 'Asked whether I am still interested'],
+    [9, 'email', 'them', 'Third nudge, offering to call'],
+  ]);
+
+  // Hoda: the mentor. Everything outbound and nothing back in writing, which
+  // is the extreme of the imbalance register - and the two annual meetings
+  // carry no recorded direction, so the coverage line has something true to
+  // own up to rather than a seed where every record happens to be complete.
+  const hoda = await person('Hoda El-Masry', {
+    headline: 'Professor of computer science',
+    city: 'Cairo',
+    emails: ['h.elmasry@cu.edu.eg'],
+  });
+  await knows(hoda, {
+    closeness: 3,
+    cadence_target_days: 180,
+    met_via: 'undergraduate thesis supervisor',
+    topics: ['research', 'mentoring', 'graduate study'],
+    favors: [{ direction: 'owed_by_me', what: 'wrote my graduate reference', settled: true }],
+  });
+  await exchange(hoda, ['mentoring', 'research'], [
+    [700, 'email', 'me', 'Sent her the PerceptionBench paper'],
+    [640, 'meeting', null, 'Annual visit to the department'],
+    [520, 'email', 'me', 'Update on the Nile work'],
+    [430, 'email', 'me', 'Asked about the graduate reference'],
+    [365, 'email', 'me', 'Thanked her for the reference'],
+    [280, 'meeting', null, 'Annual visit to the department'],
+    [190, 'email', 'me', 'Sent the CoRL acceptance'],
+    [96, 'email', 'me', 'Asked whether she knows anyone in robotics hiring'],
+    [30, 'email', 'me', 'Update on the search'],
+  ]);
+
+  // Nour: dormant, and once the strongest tie in the graph. Six months of
+  // weekly project contact takes the Hawkes intensity well past the 0.55 peak
+  // that qualifies a tie as once-strong; fourteen months of silence is far
+  // past eight times the median gap, which is what makes it dormant. Both
+  // halves are needed - a tie that was never strong is not a loss, and a tie
+  // that never went quiet is not a reconnect.
+  const nour = await person('Nour Abdelrahman', {
+    headline: 'Robotics perception lead',
+    city: 'Munich',
+    emails: ['nour@meridian-labs.example'],
+    socials: { linkedin: 'https://linkedin.com/in/nour-abdelrahman' },
+  });
+  await knows(nour, {
+    closeness: 4,
+    cadence_target_days: 60,
+    met_via: 'the joint perception evaluation project',
+    topics: ['perception', 'sensor fusion', 'robotics'],
+    favors: [{ direction: 'owed_to_me', what: 'covered my on-call for a week', settled: false }],
+  });
+  const nourThreads = [
+    'Weekly sync: calibration drift',
+    'Weekly sync: sensor fusion latency',
+    'Weekly sync: dataset splits',
+    'Weekly sync: labelling backlog',
+    'Weekly sync: evaluation harness',
+    'Weekly sync: the deadline',
+  ];
+  const nourBeats: Beat[] = [];
+  // 660 days ago to 480, weekly, alternating who called it.
+  for (let i = 0, ago = 660; ago >= 480; i += 1, ago -= 7) {
+    nourBeats.push([ago, i % 3 === 0 ? 'video' : 'call', i % 2 === 0 ? 'me' : 'them', `${nourThreads[i % nourThreads.length]} (week ${i + 1})`]);
+  }
+  nourBeats.push(
+    [474, 'email', 'them', 'Final results and the write-up'],
+    [470, 'email', 'me', 'Signed off on the write-up'],
+    [455, 'coffee', null, 'Last coffee before she moved to Munich'],
+  );
+  await exchange(nour, ['perception', 'sensor fusion'], nourBeats);
+
+  // Basma: the broker. Two of the introductions in this graph came through
+  // her, which is what gives the recorded-introductions register something to
+  // count that is not a free-text met_via string.
+  const basma = await person('Basma Zaki', {
+    headline: 'Engineering director',
+    city: 'Cairo',
+    emails: ['basma@cairo-ai.example'],
+  });
+  await knows(basma, {
+    closeness: 4,
+    cadence_target_days: 90,
+    met_via: 'my manager at Cairo AI Lab',
+    topics: ['leadership', 'hiring', 'robotics'],
+    favors: [{ direction: 'owed_by_me', what: 'two introductions', settled: false }],
+  });
+  await exchange(basma, ['leadership', 'hiring'], [
+    [900, 'meeting', null, 'Last one-to-one before I left the lab'],
+    [700, 'coffee', 'them', 'She asked how the Nile move was going'],
+    [610, 'email', 'me', 'Sent her the PerceptionBench link'],
+    [607, 'email', 'them', 'Offered to introduce me to Mariam'],
+    [520, 'call', 'me', 'Asked her advice on staff scope'],
+    [430, 'coffee', 'them', 'Caught up in Zamalek'],
+    [300, 'email', 'me', 'Told her I was starting to look'],
+    [297, 'email', 'them', 'Offered to introduce me to Rania'],
+    [210, 'call', 'them', 'Talked through what staff means at Helio'],
+    [120, 'coffee', null, 'Coffee, no agenda'],
+    [64, 'email', 'me', 'Asked her to look at my packet'],
+    [61, 'email', 'them', 'Comments on the packet'],
+    [26, 'call', 'me', 'Walked through the Zeta loop with her'],
+  ]);
+
+  // Amr: the community tie, which exists in bursts around the conference and
+  // is quiet the rest of the year. The register rule plots interactions by
+  // date rather than evenly, and a seasonal correspondence is what makes the
+  // difference between those two visible.
+  const amr = await person('Amr Selim', {
+    headline: 'Data platform engineer, PyCairo organiser',
+    city: 'Cairo',
+    emails: ['amr@pycairo.org'],
+  });
+  await knows(amr, {
+    closeness: 3,
+    cadence_target_days: 120,
+    met_via: 'PyCairo',
+    topics: ['community', 'data platforms', 'speaking'],
+  });
+  await exchange(amr, ['community', 'speaking'], [
+    [718, 'email', 'them', 'Call for speakers'],
+    [714, 'email', 'me', 'Submitted a talk'],
+    [700, 'email', 'them', 'Accepted, here is the slot'],
+    [690, 'message', 'me', 'Logistics questions'],
+    [688, 'message', 'them', 'Answers'],
+    [683, 'encounter', null, 'The conference itself'],
+    [680, 'message', 'them', 'Thanks and the recording link'],
+    [560, 'message', 'me', 'Shared a post about deterministic tooling'],
+    [420, 'message', 'them', 'Asked if I would review a submission'],
+    [418, 'message', 'me', 'Said yes'],
+    [400, 'email', 'me', 'Review sent'],
+    [353, 'email', 'them', 'Call for speakers, second year'],
+    [349, 'email', 'me', 'Submitted again'],
+    [335, 'email', 'them', 'Accepted'],
+    [322, 'message', 'me', 'Asked about the audience'],
+    [320, 'message', 'them', 'Roughly 150, mostly practitioners'],
+    [318, 'encounter', null, 'The conference itself'],
+    [315, 'message', 'them', 'Recording link'],
+    [140, 'message', 'them', 'Shared a job posting he thought I would like'],
+    [138, 'message', 'me', 'Thanked him'],
+  ]);
+
+  // Rania: the newest tie, and the one that is climbing. Introduced three
+  // months ago and accelerating from monthly to weekly, which is the opposite
+  // shape to Nour and the reason both are here.
+  const rania = await person('Rania Fouad', {
+    headline: 'Product manager, clinical platforms',
+    city: 'Dubai',
+    emails: ['rania@helio.example'],
+  });
+  await knows(rania, {
+    closeness: 3,
+    cadence_target_days: 30,
+    met_via: 'introduced by Basma Zaki',
+    topics: ['product', 'health data', 'hiring'],
+  });
+  await exchange(rania, ['product', 'hiring'], [
+    [92, 'email', 'them', 'Basma introduced us'],
+    [90, 'email', 'me', 'Replied and suggested a call'],
+    [86, 'video', 'me', 'First call, what Helio is building'],
+    [62, 'email', 'them', 'Sent the platform roadmap'],
+    [59, 'email', 'me', 'Questions about the data model'],
+    [57, 'email', 'them', 'Answers, and an offer to introduce me internally'],
+    [38, 'video', 'them', 'Walked me through the org'],
+    [35, 'email', 'me', 'Thanked her, asked about the lead role'],
+    [24, 'call', 'them', 'The lead role in detail'],
+    [16, 'email', 'me', 'Sent my application'],
+    [11, 'email', 'them', 'Confirmed it landed with the hiring manager'],
+    [4, 'message', 'me', 'Asked what to expect from the panel'],
+    [2, 'message', 'them', 'Told me who is on it'],
+  ]);
+
+  // Direction on two of the ties that were already here, so the correspondence
+  // panel has something to say on the profiles the tour actually opens.
+  await exchange(sarah, ['reinforcement learning', 'hiring'], [
+    [300, 'email', 'me', 'Asked whether Nile was hiring'],
+    [297, 'email', 'them', 'Said yes, and asked for my CV'],
+    [295, 'email', 'me', 'Sent the CV'],
+    [240, 'video', 'them', 'Told me about the perception opening'],
+    [180, 'email', 'me', 'Asked how the reorg landed'],
+    [176, 'email', 'them', 'Explained the reorg'],
+    [120, 'coffee', null, 'Coffee in Berlin'],
+    [96, 'email', 'them', 'Sent the RL reading list'],
+    [93, 'email', 'me', 'Thanked her, asked about her VP'],
+    [60, 'call', 'me', 'Asked for the introduction'],
+    [58, 'email', 'them', 'Said she would make it'],
+  ]);
+  await exchange(omar, ['frontend', 'design systems'], [
+    [210, 'message', 'them', 'Asked me to look at a rendering bug'],
+    [208, 'message', 'me', 'Found it, sent a patch'],
+    [150, 'message', 'me', 'Asked about token naming'],
+    [149, 'message', 'them', 'Long answer about naming'],
+    [88, 'coffee', null, 'Coffee, mostly complaining about tooling'],
+    [52, 'message', 'them', 'Shared his design system talk'],
+    [50, 'message', 'me', 'Notes on the talk'],
+    [12, 'message', 'them', 'Asked whether I was still job hunting'],
+  ]);
+
+  // ── Recorded introductions ─────────────────────────────────────────────────
+  //
+  // An introduction is a first-class fact here, not a sentence in a met_via
+  // field: who was connected to whom, by whom, when, and in what context. The
+  // rollup counts these apart from free-text credits precisely because the two
+  // are different kinds of evidence, and the warm-path search reads them.
+  const introduced = async (dst: string, via: string, occurredOn: string, context: string) =>
+    repository.createEdge({
+      type: 'INTRODUCED',
+      src: self.id,
+      dst,
+      props: { via, occurred_on: occurredOn, context },
+      source: 'manual',
+    });
+  await introduced(mariam, basma, daysAgo(605).slice(0, 10), 'Basma put us in touch after the workshop');
+  await introduced(rania, basma, daysAgo(92).slice(0, 10), 'Basma introduced us when I started looking');
+  await introduced(karim, sarah, daysAgo(56).slice(0, 10), 'Sarah introduced me to her engineering manager');
+
+  // Where these seven actually work. Without it the graph holds seven people
+  // whose headlines name employers and whose records claim no affiliation at
+  // all, which reads as a network to a person and as nothing to a query.
+  await worksAt(mariam, 'Principal Engineer', zeta, '2021-04-01');
+  await worksAt(youssef, 'Talent Partner', helio, '2023-02-01');
+  await worksAt(rania, 'Product Manager', helio, '2022-09-01');
+  await worksAt(nour, 'Perception Lead', meridian, '2025-02-01');
+  await worksAt(basma, 'Engineering Director', cairoAi, '2018-01-01');
+  await worksAt(hoda, 'Professor', univ, '2009-09-01');
+  await repository.createEdge({
+    type: 'MEMBER_OF',
+    src: amr,
+    dst: pycairo,
+    props: { role: 'organiser' },
     source: 'manual',
   });
 
