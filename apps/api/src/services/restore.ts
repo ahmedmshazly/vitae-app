@@ -140,6 +140,16 @@ export async function restoreBundle(
       requireRef('letters.jsonl', row, 'resume_id', resumeIds);
     }
   }
+  if (rows['dossiers.jsonl']) {
+    // Only the subject is checked. The records a claim cites are checked when
+    // the dossier is compiled, not when it is restored: a citation whose record
+    // is gone is a fact the provenance appendix is built to report, and
+    // refusing the whole restore over one would turn a readable dossier into a
+    // failed disaster drill.
+    for (const row of rows['dossiers.jsonl']) {
+      requireRef('dossiers.jsonl', row, 'subject_node', nodeIds);
+    }
+  }
   for (const file of ['import_rows.jsonl', 'import_raw_chunks.jsonl']) {
     for (const row of rows[file]!) requireRef(file, row, '_parent_id', importIds);
   }

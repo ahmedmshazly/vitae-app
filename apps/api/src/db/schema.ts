@@ -161,6 +161,12 @@ interface LetterTable extends DocTable {
   updated_at: GeneratedAlways<string | null>;
   deleted_at: GeneratedAlways<string | null>;
 }
+interface DossierTable extends DocTable {
+  subject_node: GeneratedAlways<string | null>;
+  audience: GeneratedAlways<string | null>;
+  updated_at: GeneratedAlways<string | null>;
+  deleted_at: GeneratedAlways<string | null>;
+}
 interface ReminderTable extends DocTable {
   status: GeneratedAlways<string | null>;
   due_on: GeneratedAlways<string | null>;
@@ -215,6 +221,7 @@ export interface Database {
   targets: TargetTable;
   resumes: ResumeTable;
   letters: LetterTable;
+  dossiers: DossierTable;
   templates: DocTable;
   reminders: ReminderTable;
   tags: TagTable;
@@ -243,6 +250,7 @@ export const TABLES = [
   'targets',
   'resumes',
   'letters',
+  'dossiers',
   'templates',
   'reminders',
   'tags',

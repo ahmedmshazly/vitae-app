@@ -149,6 +149,17 @@
       ],
       "note": "The compatibility trigger is what lets the schema suite insert space-only rows with no workspace id."
     },
+    "apps/api/src/db/migrations/011-dossiers.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/__tests__/api.integration.test.ts"
+      ],
+      "note": "The complete-backup round trip truncates and restores every bundle collection, dossiers among them, so the table and its tenancy wiring are exercised there."
+    },
     "apps/api/src/db/pg.ts": {
       "risk": "medium",
       "layers": [

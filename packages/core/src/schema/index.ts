@@ -4,4 +4,5 @@ export * from './node-props.js';
 export * from './edge-props.js';
 export * from './application.js';
 export * from './resume.js';
+export * from './dossier.js';
 export * from './validate.js';

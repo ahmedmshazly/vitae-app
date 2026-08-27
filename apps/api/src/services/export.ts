@@ -59,6 +59,8 @@ export const BUNDLE_COLLECTIONS: ReadonlyArray<{ file: string; table: TableName;
   { file: 'resumes.jsonl', table: 'resumes' },
   // Optional: added in migration 006 (FR-RES-020). Older backups omit this file.
   { file: 'letters.jsonl', table: 'letters', optional: true },
+  // Optional: added in migration 011 (FR-DOS-001). Older backups omit this file.
+  { file: 'dossiers.jsonl', table: 'dossiers', optional: true },
   { file: 'templates.jsonl', table: 'templates' },
   { file: 'reminders.jsonl', table: 'reminders' },
   { file: 'tags.jsonl', table: 'tags' },
@@ -265,6 +267,13 @@ export async function* exportEntries(
   yield includeSensitive
     ? jsonlFile('letters.jsonl', 'letters', () => true)
     : emptyFile('letters.jsonl');
+  // A dossier is a selection of evidence about one person, assembled for a
+  // named reader. It carries no node sensitivity label of its own and it can
+  // cite records that do, so it goes the way targets and letters go: only into
+  // an explicit complete backup.
+  yield includeSensitive
+    ? jsonlFile('dossiers.jsonl', 'dossiers', () => true)
+    : emptyFile('dossiers.jsonl');
   yield jsonlFile('templates.jsonl', 'templates', () => true);
   yield jsonlFile('reminders.jsonl', 'reminders', refersToSensitive(['subject_id']));
   yield jsonlFile('tags.jsonl', 'tags', async (tagId) => {
