@@ -1,5 +1,5 @@
 {
-  "$note": "Numbers scripts/check-e2e-ratchets.mjs holds the end-to-end suite to. Measured 2026-08-25.",
+  "$note": "Numbers scripts/check-e2e-ratchets.mjs holds the end-to-end suite to. Measured 2026-08-27.",
   "notes": [
     "Floors may only be raised, and only when the suite has genuinely grown. Lowering one gives coverage back.",
     "Ceilings may only be lowered. Each is a compromise the suite has agreed to carry, not a target.",
@@ -9,9 +9,9 @@
     "Both suites count: e2e/tests runs against a self-hosted stack, e2e/cloud against the same stack with VITAE_CLOUD_ENABLED=true. They run as separate Playwright invocations because the flag breaks the first suite by design, but one set of rules governs both."
   ],
   "floors": {
-    "spec_files": 50,
-    "test_blocks": 283,
-    "expect_lines": 978
+    "spec_files": 52,
+    "test_blocks": 293,
+    "expect_lines": 1018
   },
   "ceilings": {
     "sleeps": 3,

@@ -2,8 +2,8 @@
   "generated_by": "scripts/docs/gen-traceability.mjs",
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
-    "files_scanned": 937,
-    "files_citing": 230,
+    "files_scanned": 938,
+    "files_citing": 231,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,7 +20,7 @@
   },
   "totals": {
     "registered": 131,
-    "citations": 894,
+    "citations": 897,
     "implemented_and_tested": 32,
     "implemented_untested": 60,
     "tested_only": 3,
@@ -1021,7 +1021,8 @@
         "packages/core/src/schema/dossier.ts:2"
       ],
       "tests": [
-        "apps/api/src/routes/v1/dossiers.integration.test.ts:2"
+        "apps/api/src/routes/v1/dossiers.integration.test.ts:2",
+        "e2e/tests/dossier.spec.ts:7"
       ],
       "documents": [
         "docs/ROADMAP.md:68",
@@ -1048,6 +1049,8 @@
       ],
       "tests": [
         "apps/api/src/routes/v1/dossiers.integration.test.ts:2",
+        "e2e/tests/dossier.spec.ts:7",
+        "e2e/tests/dossier.spec.ts:133",
         "packages/core/src/schema/dossier.test.ts:4",
         "packages/core/src/schema/dossier.test.ts:248"
       ],
@@ -3606,6 +3609,10 @@
     ],
     "e2e/tests/correspondence.spec.ts": [
       "FR-COMM-002"
+    ],
+    "e2e/tests/dossier.spec.ts": [
+      "FR-DOS-001",
+      "FR-DOS-002"
     ],
     "e2e/tests/ledger.spec.ts": [
       "FR-PROV-002",
