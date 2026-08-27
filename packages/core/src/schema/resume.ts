@@ -240,12 +240,31 @@ export type LetterBlock = z.infer<typeof letterBlockSchema>;
 export const letterStatusSchema = z.enum(['draft', 'final', 'sent']);
 export type LetterStatus = z.infer<typeof letterStatusSchema>;
 
+/**
+ * Who the letter is addressed to (FR-RES-021). Every field is optional because
+ * a job target records the company and the role but never the person who reads
+ * the application. When nothing here is filled in, the renderer addresses the
+ * organisation from the target rather than inventing a name for the envelope.
+ */
+export const letterRecipientSchema = z.object({
+  name: z.string().trim().min(1).optional(),
+  title: z.string().trim().min(1).optional(),
+  org: z.string().trim().min(1).optional(),
+  address: z.array(z.string().trim().min(1)).max(6).default([]),
+});
+export type LetterRecipient = z.infer<typeof letterRecipientSchema>;
+
 /** Writable cover-letter aggregate, generation UI at `/resume/letters` (FR-RES-020). */
 export const letterCreateSchema = z.object({
   target_id: z.string().min(1),
   resume_id: z.string().min(1).optional(),
   blocks: z.array(letterBlockSchema).min(1).max(24),
   status: letterStatusSchema.default('draft'),
+  recipient: letterRecipientSchema.optional(),
+  /** Overrides the derived "Dear …" line; the renderer supplies a default. */
+  salutation: z.string().trim().min(1).max(120).optional(),
+  /** Overrides "Sincerely,". */
+  closing: z.string().trim().min(1).max(120).optional(),
   expected_rev: z.number().int().positive().optional(),
 });
 export type LetterCreateInput = z.infer<typeof letterCreateSchema>;
@@ -254,8 +273,17 @@ export const letterSchema = letterCreateSchema
   .omit({ expected_rev: true })
   .extend({
     id: z.string(),
+    /** Set when the letter is finalized, so a stored PDF names the layout that made it. */
+    template_key: z.string().nullable().default(null),
+    template_version: z.string().nullable().default(null),
     tex_key: z.string().nullable().default(null),
     pdf_key: z.string().nullable().default(null),
+    /** Null until a compile measured it, and null again when poppler could not. */
+    pages: z.number().int().nullable().default(null),
+    artifact_ids: z.object({ pdf: z.string().optional(), tex: z.string().optional() }).default({}),
+    artifact_hashes: z.object({ pdf: z.string().optional(), tex: z.string().optional() }).default({}),
+    /** Pins the compile clock so re-finalizing the same letter is byte-identical. */
+    source_date_epoch: z.number().int().nullable().default(null),
     rev: z.number().int().positive().default(1),
     deleted_at: isoDateTime.nullable().default(null),
     created_at: isoDateTime,

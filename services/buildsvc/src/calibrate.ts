@@ -11,6 +11,15 @@
  *   2. `node dist/calibrate.js --only-cached` under `RUN --network=none`.
  *      proves the cache is complete; the image build fails if it is not.
  * Writes warmed-manifest.json next to the cache for /healthz.
+ *
+ * Every template declares its own fixture in templates/<key>/calibration.json:
+ * its kind, the sample content for its own «TOKEN» vocabulary, how many pages
+ * that content is expected to fill, and whether the line model applies to it.
+ * Until that file existed this script chose between two hardcoded token maps by
+ * directory name (`cobalt` or not) and demanded exactly one page, so the first
+ * non-résumé template added to templates/ failed the image build before it
+ * could ever be used. Nothing here may infer a template's vocabulary from its
+ * name again.
  */
 import { execFile } from 'node:child_process';
 import { mkdtemp, readdir, readFile, writeFile } from 'node:fs/promises';
@@ -24,82 +33,110 @@ const TEMPLATES_DIR = process.env.TEMPLATES_DIR ?? join(process.cwd(), 'template
 const MANIFEST_PATH = process.env.WARMED_MANIFEST_PATH ?? join(process.cwd(), 'warmed-manifest.json');
 const ONLY_CACHED = process.argv.includes('--only-cached');
 
-// ── Sample content ────────────────────────────────────────────────────────────
-// Everything the renderers can emit must appear here at least once: regular /
-// bold / italic in serif AND sans at every size used (\Huge, \LARGE, \large,
-// \small, body), \href, and every glyph macro latex-escape.ts can produce
-// (\textbullet, \textbar, \textendash, \textemdash, \textperiodcentered).
+const KINDS = ['resume', 'letter', 'dossier'] as const;
+type TemplateKind = (typeof KINDS)[number];
 
-const NAME = 'Jordan Kim';
-const HEADLINE = String.raw`Machine Learning Engineer \textendash{} Data Systems`;
-const CONTACT_LINE = String.raw`Kigali, Rwanda \textbullet{} \href{https://github.com/example}{github.com/example} \textbullet{} \href{mailto:a@example.com}{a@example.com} \textbullet{} +250\,780\,000\,000`;
-const SUMMARY_TEXT = String.raw`Engineer \textemdash{} builds {\bfseries reliable} systems \textperiodcentered{} ships {\itshape measurable} results\textbar{}fast. {\bfseries\itshape Bold italic serif} and {\sffamily sans regular, {\bfseries sans bold}, {\itshape sans italic}} all warm here. Ligatures: efficient offices affix fluffy waffles.`;
+/** An exact page count, or an inclusive range for documents that legitimately run long. */
+type PageExpectation = number | { min: number; max: number };
 
-// Cobalt macro vocabulary (\cventry / \skillrow / pts / \dotsep).
-const COBALT_TOKENS: Record<string, string> = {
-  ACCENT_HEX: '2563EB',
-  NAME,
-  HEADLINE,
-  TAGLINE_BLOCK: String.raw`{\small Kigali \dotsep{} Cairo \dotsep{} Pittsburgh}\\[5pt]
-  `,
-  CONTACT_LINE: String.raw`Kigali, Rwanda \dotsep{} \href{https://github.com/example}{github.com/example} \dotsep{} \href{https://linkedin.com/in/example}{linkedin.com/in/example} \dotsep{} +250\,780\,000\,000`,
-  SUMMARY_BLOCK: `\\section{Summary}\n${SUMMARY_TEXT}\n`,
-  SECTIONS: String.raw`\section{Technical Skills}
-\skillrow{Programming}{Python, TypeScript, SQL, C++ \textendash{} production use}
-\skillrow{Platforms}{Kubernetes \textperiodcentered{} AWS \textperiodcentered{} GCP}
-\section{Experience}
-\cventry{Senior ML Engineer}{Nile Robotics\,\textbar\,Kigali}{Jan 2022 -- Present}
-\begin{pts}
-  \item Cut inference latency 38\% across 12 services \textemdash{} p99 under 80\,ms.
-  \item Built a {\bfseries reinforcement-learning} pipeline processing {\itshape 4\,TB/day}.
-\end{pts}
-\vspace{2pt}
-\cventry{Data Engineering Intern}{NiaDelta}{Jun 2020 -- Aug 2020}
-\begin{pts}
-  \item Automated ingestion for 30+ sources; see \href{https://example.com/report}{the write-up}.
-\end{pts}
-\section{Education}
-\cventry{MSc Computer Science (CGPA 3.9 / 4.0)}{Carnegie Mellon University\,\textbar\,Pittsburgh}{2024 -- 2026}
-\begin{pts}
-  \item Relevant coursework: Distributed Systems, Convex Optimization.
-\end{pts}
-\section{Awards}
-\noindent{\small Best Poster \textemdash{} IEEE AFRICON \textemdash{} 2023}\par\vspace{1.5pt}
-\noindent{\small Dean's List \textemdash{} 2022}\par\vspace{1.5pt}`,
-};
+interface LineModelCheck {
+  /** False for kinds whose length is content-driven, a letter has no line budget to drift from. */
+  check: boolean;
+  tolerance?: number;
+  /** Token the capacity fixture fills with a list of measured lines. */
+  body_token?: string;
+  /** Tokens blanked while measuring, so only the list under test occupies the page. */
+  blank_tokens?: string[];
+  section_title?: string;
+  /** `itemize` for the plain templates, `pts` for cobalt's tight list. */
+  list_environment?: string;
+}
 
-// Generic macro vocabulary (onyx / argon: plain \section + itemize).
-const GENERIC_TOKENS: Record<string, string> = {
-  ACCENT_HEX: '2563EB',
-  NAME,
-  HEADLINE,
-  TAGLINE_BLOCK: '',
-  CONTACT_LINE,
-  SUMMARY_BLOCK: `${SUMMARY_TEXT}\\par\\vspace{4pt}`,
-  SECTIONS: String.raw`\section{Skills}
-{\bfseries Programming:} Python, TypeScript, SQL \textendash{} production use\\
-{\bfseries Platforms:} Kubernetes \textperiodcentered{} AWS\\
-\section{Experience}
-{\bfseries Senior ML Engineer}, Nile Robotics \hfill Jan 2022 -- Present\\
-\begin{itemize}
-  \item Cut inference latency 38\% \textemdash{} p99 under 80\,ms; see \href{https://example.com}{notes}.
-  \item Built a {\bfseries reinforcement-learning} pipeline processing {\itshape 4\,TB/day}.
-\end{itemize}
-\section{Education}
-{\bfseries MSc Computer Science}, Carnegie Mellon University \hfill 2024 -- 2026\\
-\begin{itemize}
-  \item Relevant coursework: Distributed Systems, Convex Optimization.
-\end{itemize}
-\section{Awards}
-\begin{itemize}
-  \item Best Poster \textemdash{} IEEE AFRICON \textemdash{} 2023
-\end{itemize}`,
-};
+interface Calibration {
+  kind: TemplateKind;
+  expected_pages: PageExpectation;
+  line_model: LineModelCheck;
+  tokens: Record<string, string>;
+}
 
-function splice(templateKey: string, source: string): string {
-  const tokens = templateKey === 'cobalt' ? COBALT_TOKENS : GENERIC_TOKENS;
+function calibrationPath(templateKey: string): string {
+  return join(TEMPLATES_DIR, templateKey, 'calibration.json');
+}
+
+/**
+ * Read and validate one template's fixture. A missing or malformed file is
+ * fatal by design: skipping it would ship an uncalibrated template into a
+ * runtime container with no network, where the first real compile fails with a
+ * package fetch nobody can service.
+ */
+async function loadCalibration(templateKey: string): Promise<Calibration> {
+  const path = calibrationPath(templateKey);
+  let raw: string;
+  try {
+    raw = await readFile(path, 'utf8');
+  } catch {
+    throw new Error(
+      `template ${templateKey}: no calibration.json. Add ${path} declaring {kind, expected_pages, line_model, tokens} for this template's own «TOKEN» vocabulary.`,
+    );
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    throw new Error(`template ${templateKey}: ${path} is not valid JSON (${String(err)})`);
+  }
+  const config = parsed as Partial<Calibration>;
+  if (!KINDS.includes(config.kind as TemplateKind)) {
+    throw new Error(`template ${templateKey}: calibration.json kind must be one of ${KINDS.join(', ')}`);
+  }
+  if (!config.tokens || typeof config.tokens !== 'object') {
+    throw new Error(`template ${templateKey}: calibration.json needs a tokens object`);
+  }
+  for (const [name, value] of Object.entries(config.tokens)) {
+    if (typeof value !== 'string') {
+      throw new Error(`template ${templateKey}: calibration.json token «${name}» must be a string`);
+    }
+  }
+  const expected = config.expected_pages;
+  if (typeof expected === 'number') {
+    if (!Number.isInteger(expected) || expected < 1) {
+      throw new Error(`template ${templateKey}: expected_pages must be a positive integer`);
+    }
+  } else if (expected && typeof expected === 'object') {
+    const { min, max } = expected;
+    if (!Number.isInteger(min) || !Number.isInteger(max) || min < 1 || max < min) {
+      throw new Error(`template ${templateKey}: expected_pages range must be {min,max} with 1 <= min <= max`);
+    }
+  } else {
+    throw new Error(`template ${templateKey}: calibration.json needs expected_pages (a count or {min,max})`);
+  }
+  const lineModel = config.line_model;
+  if (!lineModel || typeof lineModel.check !== 'boolean') {
+    throw new Error(`template ${templateKey}: calibration.json needs line_model.check (true or false)`);
+  }
+  return {
+    kind: config.kind as TemplateKind,
+    expected_pages: expected,
+    line_model: lineModel,
+    tokens: config.tokens as Record<string, string>,
+  };
+}
+
+function pageExpectationSatisfied(expected: PageExpectation, pages: number): boolean {
+  return typeof expected === 'number' ? pages === expected : pages >= expected.min && pages <= expected.max;
+}
+
+function describePageExpectation(expected: PageExpectation): string {
+  return typeof expected === 'number' ? String(expected) : `${expected.min}-${expected.max}`;
+}
+
+function splice(templateKey: string, source: string, tokens: Record<string, string>): string {
   const out = source.replace(/«([A-Z_]+)»/g, (_, name: string) => {
-    if (!(name in tokens)) throw new Error(`template ${templateKey}: no sample content for token «${name}»`);
+    if (!(name in tokens)) {
+      throw new Error(
+        `template ${templateKey}: no sample content for token «${name}». Add it to ${calibrationPath(templateKey)}.`,
+      );
+    }
     return tokens[name]!;
   });
   const leftover = out.match(/«[^»]*»/);
@@ -107,7 +144,12 @@ function splice(templateKey: string, source: string): string {
   return out;
 }
 
-async function compileFixture(templateKey: string, tex: string): Promise<number> {
+/**
+ * Compile a fixture and count its pages. Returns null when pdfinfo produced no
+ * page count at all: a zero would travel into the manifest as if the document
+ * were empty, and "unknown" and "empty" are different facts.
+ */
+async function compileFixture(templateKey: string, tex: string): Promise<number | null> {
   const workdir = await mkdtemp(join(tmpdir(), 'vitae-cal-'));
   await writeFile(join(workdir, 'main.tex'), tex);
   const args = ['-X', 'compile', 'main.tex', '--untrusted', '--outdir', workdir];
@@ -115,37 +157,61 @@ async function compileFixture(templateKey: string, tex: string): Promise<number>
   await run('tectonic', args, { cwd: workdir });
   const { stdout } = await run('pdfinfo', [join(workdir, 'main.pdf')]);
   const m = stdout.match(/Pages:\s+(\d+)/);
-  const pages = m ? Number(m[1]) : 0;
-  console.log(`  ${templateKey}: ${pages} page(s)${ONLY_CACHED ? ' [offline]' : ''}`);
+  const pages = m ? Number(m[1]) : null;
+  console.log(`  ${templateKey}: ${pages ?? 'unknown'} page(s)${ONLY_CACHED ? ' [offline]' : ''}`);
   return pages;
 }
 
-function capacityFixture(templateKey: string, source: string, bullets: number): string {
-  const list = Array.from({ length: bullets }, (_, index) => `  \\item Calibration line ${index + 1}.`).join('\n');
-  const sections = templateKey === 'cobalt'
-    ? `\\section{Calibration}\n\\begin{pts}\n${list}\n\\end{pts}`
-    : `\\section{Calibration}\n\\begin{itemize}\n${list}\n\\end{itemize}`;
-  // splice() uses the rich fixture map for remaining header tokens.
-  return splice(templateKey, source.replace(/«SECTIONS»/g, sections).replace(/«SUMMARY_BLOCK»/g, ''));
+/** Same as compileFixture, but for the callers whose next step cannot proceed on "unknown". */
+async function compileFixturePages(templateKey: string, tex: string): Promise<number> {
+  const pages = await compileFixture(templateKey, tex);
+  if (pages === null) {
+    throw new Error(`${templateKey}: pdfinfo reported no page count for the calibration fixture`);
+  }
+  return pages;
 }
 
-async function verifyLineModel(templateKey: string, source: string): Promise<{ configured: number; measured: number }> {
-  const config = JSON.parse(await readFile(join(TEMPLATES_DIR, templateKey, 'line-model.json'), 'utf8')) as {
+function capacityFixture(
+  templateKey: string,
+  source: string,
+  config: Calibration,
+  bullets: number,
+): string {
+  const list = Array.from({ length: bullets }, (_, index) => `  \\item Calibration line ${index + 1}.`).join('\n');
+  const listEnvironment = config.line_model.list_environment ?? 'itemize';
+  const title = config.line_model.section_title ?? 'Calibration';
+  const bodyToken = config.line_model.body_token ?? 'SECTIONS';
+  const sections = `\\section{${title}}\n\\begin{${listEnvironment}}\n${list}\n\\end{${listEnvironment}}`;
+  let filled = source.replaceAll(`«${bodyToken}»`, sections);
+  for (const token of config.line_model.blank_tokens ?? []) {
+    filled = filled.replaceAll(`«${token}»`, '');
+  }
+  // splice() uses the rich fixture map for remaining header tokens.
+  return splice(templateKey, filled, config.tokens);
+}
+
+async function verifyLineModel(
+  templateKey: string,
+  source: string,
+  config: Calibration,
+): Promise<{ configured: number; measured: number }> {
+  const lineModelPath = join(TEMPLATES_DIR, templateKey, 'line-model.json');
+  const parsed = JSON.parse(await readFile(lineModelPath, 'utf8')) as {
     line_model?: { lines_per_page?: number };
   };
-  const configured = Number(config.line_model?.lines_per_page ?? 0);
+  const configured = Number(parsed.line_model?.lines_per_page ?? 0);
   if (!Number.isFinite(configured) || configured <= 0) throw new Error(`${templateKey}: invalid lines_per_page`);
   let low = 1;
   let high = Math.ceil(configured * 2);
   while (low < high) {
     const mid = Math.ceil((low + high) / 2);
-    const pages = await compileFixture(templateKey, capacityFixture(templateKey, source, mid));
+    const pages = await compileFixturePages(templateKey, capacityFixture(templateKey, source, config, mid));
     if (pages <= 1) low = mid;
     else high = mid - 1;
   }
   // Strict gate: knapsack budgets trust lines_per_page. Allow only ±3 lines of
   // measurement noise (binary search / fixture variance) before failing the image.
-  const tolerance = 3;
+  const tolerance = config.line_model.tolerance ?? 3;
   if (Math.abs(low - configured) > tolerance) {
     throw new Error(
       `${templateKey}: line model drift, configured ${configured} lines/page, rendered capacity ${low} (tolerance ±${tolerance})`,
@@ -164,22 +230,49 @@ if (keys.length === 0) {
 
 const warmed: string[] = [];
 const lineCalibration: Record<string, { configured: number; measured: number }> = {};
+const pageCalibration: Record<string, { kind: TemplateKind; expected: string; measured: number }> = {};
 for (const key of keys) {
-  const source = await readFile(join(TEMPLATES_DIR, key, 'main.tex'), 'utf8');
-  const version = source.match(/v(\d+\.\d+\.\d+)/)?.[1] ?? '0.0.0';
-  const pages = await compileFixture(key, splice(key, source));
-  if (pages !== 1) {
-    console.error(`Calibration FAILED: ${key} fixture compiled to ${pages} pages (expected 1).`);
+  let config: Calibration;
+  try {
+    config = await loadCalibration(key);
+  } catch (err) {
+    console.error(`Calibration FAILED: ${err instanceof Error ? err.message : String(err)}`);
     process.exit(1);
   }
-  lineCalibration[key] = await verifyLineModel(key, source);
+  const source = await readFile(join(TEMPLATES_DIR, key, 'main.tex'), 'utf8');
+  const version = source.match(/v(\d+\.\d+\.\d+)/)?.[1] ?? '0.0.0';
+  const pages = await compileFixture(key, splice(key, source, config.tokens));
+  if (pages === null) {
+    console.error(`Calibration FAILED: ${key} fixture compiled but pdfinfo reported no page count.`);
+    process.exit(1);
+  }
+  if (!pageExpectationSatisfied(config.expected_pages, pages)) {
+    console.error(
+      `Calibration FAILED: ${key} fixture compiled to ${pages} pages (expected ${describePageExpectation(config.expected_pages)}).`,
+    );
+    process.exit(1);
+  }
+  if (config.line_model.check) {
+    lineCalibration[key] = await verifyLineModel(key, source, config);
+  }
+  pageCalibration[key] = {
+    kind: config.kind,
+    expected: describePageExpectation(config.expected_pages),
+    measured: pages,
+  };
   warmed.push(`${key}@${version}`);
 }
 
 await writeFile(MANIFEST_PATH, JSON.stringify({
   templates_warmed: warmed,
   line_calibration: lineCalibration,
+  page_calibration: pageCalibration,
   generated_at: new Date().toISOString(),
 }, null, 2));
-console.log(`Calibration OK: ${warmed.join(', ')}, one page each${ONLY_CACHED ? ', fully offline' : ''}.`);
+// "one page each" is only true while every template says so, and it stops being
+// true the moment a letter or dossier template ships.
+const everyTemplateIsOnePage = keys.every((key) => pageCalibration[key]!.expected === '1');
+console.log(
+  `Calibration OK: ${warmed.join(', ')}${everyTemplateIsOnePage ? ', one page each' : ''}${ONLY_CACHED ? ', fully offline' : ''}.`,
+);
 console.log(`Manifest written to ${MANIFEST_PATH}`);

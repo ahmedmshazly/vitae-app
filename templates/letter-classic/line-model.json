@@ -1,0 +1,18 @@
+{
+  "key": "letter-classic",
+  "version": "1.0.0",
+  "name": "Letter Classic",
+  "doc_kind": "letter",
+  "engine": "tectonic",
+  "ats_strict": false,
+  "description": "Block-format business letter: sender, date, recipient, salutation, body, closing, signature.",
+  "traits": ["business-letter", "block-format", "plain"],
+  "page_size": "Letter",
+  "accent_options": ["#2563eb", "#0f766e", "#7c3aed", "#b45309", "#be123c", "#111827"],
+  "line_model": {
+    "chars_per_line": 88,
+    "lines_per_page": 42,
+    "entry_overhead": 0,
+    "section_overhead": 0
+  }
+}

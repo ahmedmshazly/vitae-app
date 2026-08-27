@@ -1,5 +1,11 @@
 /**
- * Cover letters against a target (FR-RES-020).
+ * Cover letters against a target (FR-RES-020) and their compile pair
+ * (FR-RES-021).
+ *
+ * The compile assertions are shaped like the résumé slice next door: they check
+ * the honest response shape and tolerate a build service that is not running,
+ * because the point of FR-RES-013 is that an absent compiler degrades rather
+ * than fails.
  */
 import { afterAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
@@ -58,5 +64,101 @@ describe('letters routes', () => {
       .set(authHeader(token))
       .send({ target_id: 'missing-target', blocks: [{ kind: 'hook', text: 'nope' }] })
       .expect(422);
+  });
+
+  it('compiles a letter to the same artifact pair shape a résumé compiles to', async () => {
+    const { app, token } = await getAuthedApp();
+    const target = await request(app)
+      .post('/api/v1/targets')
+      .set(authHeader(token))
+      .send({ role_title: 'Letter Compile Shape', jd_raw: 'Requirements\n- Writing' })
+      .expect(201);
+    const letter = await request(app)
+      .post('/api/v1/letters')
+      .set(authHeader(token))
+      .send({
+        target_id: target.body.target.id,
+        recipient: { name: 'Marie Uwase', title: 'Head of Engineering' },
+        blocks: [
+          { kind: 'hook', text: 'I am writing about the role.' },
+          { kind: 'body', text: 'I have shipped **measurable** systems.' },
+          { kind: 'closer', text: 'Looking forward to speaking.' },
+        ],
+      })
+      .expect(201);
+
+    const res = await request(app)
+      .post(`/api/v1/letters/${letter.body.letter.id}/compile`)
+      .set(authHeader(token))
+      .expect(200);
+
+    expect(res.body).toHaveProperty('ok');
+    expect(res.body).toHaveProperty('pages');
+    expect(res.body).toHaveProperty('offline');
+    expect(res.body).toHaveProperty('error');
+    expect(res.body).toHaveProperty('logTail');
+    expect(res.body.template).toBe('letter-classic@1.0.0');
+    expect(typeof res.body.tex).toBe('string');
+    expect(res.body.tex).toContain('\\documentclass');
+    // The escape layer is the same one the résumé renderer uses, so the
+    // markdown became a macro and the greeting names the recorded recipient.
+    expect(res.body.tex).toContain('\\textbf{measurable}');
+    expect(res.body.tex).toContain('Dear Marie Uwase,');
+    expect(res.body.tex).not.toMatch(/«[^»]*»/);
+
+    // Preview stores nothing.
+    const after = await request(app)
+      .get(`/api/v1/letters/${letter.body.letter.id}`)
+      .set(authHeader(token))
+      .expect(200);
+    expect(after.body.letter.status).toBe('draft');
+    expect(after.body.letter.pages).toBeNull();
+  });
+
+  it('degrades to the source when the compiler is unreachable, and keeps the draft a draft', async () => {
+    const { app, token } = await getAuthedApp();
+    const target = await request(app)
+      .post('/api/v1/targets')
+      .set(authHeader(token))
+      .send({ role_title: 'Letter Finalize Shape', jd_raw: 'Requirements\n- Writing' })
+      .expect(201);
+    const letter = await request(app)
+      .post('/api/v1/letters')
+      .set(authHeader(token))
+      .send({
+        target_id: target.body.target.id,
+        blocks: [{ kind: 'hook', text: 'I am writing about the role.' }],
+      })
+      .expect(201);
+    const id = letter.body.letter.id as string;
+
+    const res = await request(app)
+      .post(`/api/v1/letters/${id}/finalize`)
+      .set(authHeader(token))
+      .expect(200);
+    expect(typeof res.body.tex).toBe('string');
+
+    const after = await request(app).get(`/api/v1/letters/${id}`).set(authHeader(token)).expect(200);
+    if (res.body.offline || !res.body.ok) {
+      // Nothing compiled, so nothing may claim to have been finalized.
+      expect(after.body.letter.status).toBe('draft');
+      expect(after.body.letter.pdf_key).toBeNull();
+      await request(app)
+        .get(`/api/v1/letters/${id}/artifacts/pdf`)
+        .set(authHeader(token))
+        .expect(409);
+    } else {
+      expect(after.body.letter.status).toBe('final');
+      expect(after.body.letter.template_key).toBe('letter-classic');
+      expect(after.body.letter.artifact_hashes.pdf).toEqual(expect.any(String));
+    }
+  });
+
+  it('refuses to compile a letter that is not there', async () => {
+    const { app, token } = await getAuthedApp();
+    await request(app)
+      .post('/api/v1/letters/missing-letter/compile')
+      .set(authHeader(token))
+      .expect(404);
   });
 });

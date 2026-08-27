@@ -94,6 +94,10 @@ services:
       dockerfile: services/buildsvc/Dockerfile
     image: vitae/buildsvc:prod
     restart: unless-stopped
+    # Docker sends SIGTERM then kills after 10s by default, which would end a
+    # compile mid-run and make the service's 90s drain (services/buildsvc/src/server.ts:290)
+    # a promise it is never given the time to keep.
+    stop_grace_period: 100s
     environment:
       - PORT=8787
       - BUILDSVC_HOST=0.0.0.0

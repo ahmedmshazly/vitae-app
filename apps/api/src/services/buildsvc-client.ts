@@ -23,7 +23,13 @@ export interface CompileResult {
   ok: boolean;
   offline?: boolean;
   pdfBase64?: string;
-  pages?: number;
+  /**
+   * Null when the build service compiled the document but could not count its
+   * pages. It used to answer 1 in that case, and 1 is the number every page
+   * gate reads as a pass, so callers must be able to tell a measurement from a
+   * missing one.
+   */
+  pages?: number | null;
   durationMs?: number;
   logTail?: string;
   text?: string;
@@ -32,6 +38,18 @@ export interface CompileResult {
 
 function sign(timestamp: string, body: string): string {
   return createHmac('sha256', env.BUILDSVC_HMAC_SECRET).update(`${timestamp}.${body}`).digest('hex');
+}
+
+/**
+ * How long to wait beyond the compile budget itself. The build service still
+ * has to count the pages, extract the text and ship a base64 PDF back after
+ * Tectonic returns, and on a multipage document all three take real time. A
+ * flat five seconds was sized for a one-page résumé and would abort a long
+ * compile that had already succeeded; a quarter of the budget leaves the
+ * 20-second default exactly where it was and grows with the rest.
+ */
+function abortAfter(timeoutMs: number): number {
+  return timeoutMs + Math.max(5000, Math.round(timeoutMs * 0.25));
 }
 
 export async function compile(req: CompileRequest): Promise<CompileResult> {
@@ -55,7 +73,7 @@ export async function compile(req: CompileRequest): Promise<CompileResult> {
         'x-signature': sign(ts, body),
       },
       body,
-      signal: AbortSignal.timeout((req.timeoutMs ?? 20000) + 5000),
+      signal: AbortSignal.timeout(abortAfter(req.timeoutMs ?? 20000)),
     });
 
     const json = (await res.json()) as Record<string, unknown>;
@@ -73,7 +91,7 @@ export async function compile(req: CompileRequest): Promise<CompileResult> {
     return {
       ok: true,
       pdfBase64: json.pdf as string,
-      pages: json.pages as number,
+      pages: (json.pages as number | null | undefined) ?? null,
       durationMs: json.duration_ms as number,
       logTail: json.log_tail as string | undefined,
       text: json.text as string | undefined,

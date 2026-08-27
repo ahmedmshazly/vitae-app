@@ -20,6 +20,7 @@ import {
   SkeletonRows,
 } from '@vitae/ui';
 import { api } from '../lib/api.js';
+import { LetterCompilePanel } from '../features/LetterCompilePanel.js';
 import { useToast } from '../features/Toast.js';
 
 type LetterStatus = 'draft' | 'final' | 'sent';
@@ -31,12 +32,22 @@ interface LetterBlock {
   text?: string;
 }
 
+interface LetterRecipient {
+  name?: string;
+  title?: string;
+  org?: string;
+}
+
 interface Letter {
   id: string;
   target_id: string;
   resume_id?: string;
   blocks: LetterBlock[];
   status: LetterStatus;
+  recipient?: LetterRecipient | null;
+  /** Null until a compile measured it, and null again when it could not. */
+  pages?: number | null;
+  artifact_ids?: { pdf?: string; tex?: string } | null;
   rev: number;
   deleted_at?: string | null;
   created_at: string;
@@ -69,6 +80,8 @@ const EMPTY_BLOCKS: LetterBlock[] = [
   { kind: 'closer', text: '' },
 ];
 
+const EMPTY_RECIPIENT: Required<LetterRecipient> = { name: '', title: '', org: '' };
+
 function atomLabel(atom: AtomRow): string {
   const text = atom.variants.find((v) => v.is_default)?.text ?? atom.variants[0]?.text ?? atom.id;
   const short = text.length > 72 ? `${text.slice(0, 72)}…` : text;
@@ -100,8 +113,15 @@ export function Letters() {
     resume_id: string;
     status: LetterStatus;
     blocks: LetterBlock[];
+    recipient: Required<LetterRecipient>;
     expected_rev?: number;
-  }>({ target_id: '', resume_id: '', status: 'draft', blocks: EMPTY_BLOCKS });
+  }>({
+    target_id: '',
+    resume_id: '',
+    status: 'draft',
+    blocks: EMPTY_BLOCKS,
+    recipient: EMPTY_RECIPIENT,
+  });
   const [archive, setArchive] = useState<Letter | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -172,6 +192,7 @@ export function Letters() {
       resume_id: '',
       status: 'draft',
       blocks: EMPTY_BLOCKS.map((b) => ({ ...b })),
+      recipient: { ...EMPTY_RECIPIENT },
     });
     setCreateOpen(true);
   }
@@ -187,6 +208,7 @@ export function Letters() {
       blocks: letter.blocks.length
         ? letter.blocks.map((b) => ({ ...b }))
         : EMPTY_BLOCKS.map((b) => ({ ...b })),
+      recipient: { ...EMPTY_RECIPIENT, ...(letter.recipient ?? {}) },
       expected_rev: letter.rev,
     });
   }
@@ -226,11 +248,20 @@ export function Letters() {
         .filter((block) => block.text || block.atom_id);
       if (!draft.target_id) throw new Error('Pick a target.');
       if (blocks.length === 0) throw new Error('Add at least one block with text or an atom.');
+      // Only the fields that were actually filled in travel: an empty string
+      // would be stored as a recipient nobody wrote down, and the letter would
+      // then address a blank line instead of the company on the target.
+      const recipient = Object.fromEntries(
+        Object.entries(draft.recipient)
+          .map(([key, value]) => [key, value.trim()])
+          .filter(([, value]) => value.length > 0),
+      );
       const body = {
         target_id: draft.target_id,
         resume_id: draft.resume_id || undefined,
         status: draft.status,
         blocks,
+        ...(Object.keys(recipient).length > 0 ? { recipient } : {}),
         ...(draft.expected_rev ? { expected_rev: draft.expected_rev } : {}),
       };
       if (editing) {
@@ -506,6 +537,15 @@ export function Letters() {
                 <p>{block.text || <span className="text-muted">Atom-only block</span>}</p>
               </div>
             ))}
+            {!selected.deleted_at && (
+              <LetterCompilePanel
+                key={selected.id}
+                letterId={selected.id}
+                letterStatus={selected.status}
+                hasStoredArtifacts={Boolean(selected.artifact_ids?.pdf)}
+                onFinalized={() => void qc.invalidateQueries({ queryKey: ['letters'] })}
+              />
+            )}
           </div>
         )}
       </Sheet>
@@ -582,6 +622,49 @@ export function Letters() {
                 { value: 'final', label: 'Final' },
                 { value: 'sent', label: 'Sent' },
               ]}
+            />
+          </Field>
+
+          {/* Optional, and it stays optional. A job target records the company
+              and the role but never the person who reads the application, so
+              with nothing here the letter addresses the organisation rather
+              than inventing a name for the envelope. */}
+          <div className="border-b border-hairline pb-2">
+            <h3 className="m-0 text-sm font-semibold text-ink-strong">Recipient</h3>
+          </div>
+          <Field
+            label="Name"
+            htmlFor={`${ids}-recipient-name`}
+            help="Leave blank to greet the hiring team."
+          >
+            <Input
+              id={`${ids}-recipient-name`}
+              value={draft.recipient.name}
+              onChange={(e) =>
+                setDraft((d) => ({ ...d, recipient: { ...d.recipient, name: e.target.value } }))
+              }
+            />
+          </Field>
+          <Field label="Their title" htmlFor={`${ids}-recipient-title`}>
+            <Input
+              id={`${ids}-recipient-title`}
+              value={draft.recipient.title}
+              onChange={(e) =>
+                setDraft((d) => ({ ...d, recipient: { ...d.recipient, title: e.target.value } }))
+              }
+            />
+          </Field>
+          <Field
+            label="Organisation"
+            htmlFor={`${ids}-recipient-org`}
+            help="Leave blank to use the company on the job target."
+          >
+            <Input
+              id={`${ids}-recipient-org`}
+              value={draft.recipient.org}
+              onChange={(e) =>
+                setDraft((d) => ({ ...d, recipient: { ...d.recipient, org: e.target.value } }))
+              }
             />
           </Field>
 

@@ -134,3 +134,74 @@ const RENDERERS: Record<string, TemplateRenderer> = { cobalt, onyx: generic, arg
 export function rendererFor(templateKey: string): TemplateRenderer {
   return RENDERERS[templateKey] ?? generic;
 }
+
+// ── Cover letters (letter-classic), a business letter rather than a résumé ───
+// FR-RES-021: a letter compiles through the same sandboxed compiler as a
+// résumé, so it goes through the same escape layer too. Nothing below invents a
+// second escaper; escapeInline / renderInlineMarkdown / contactBit are the ones
+// the résumé renderers above already use, and a second escaper would be a
+// second set of injection bugs to find.
+
+export interface LetterRenderModel {
+  senderName: string;
+  senderContacts: ContactItem[];
+  /** Already formatted by the caller, so nothing here depends on a host locale. */
+  dateLine: string;
+  // Structural rather than the core LetterRecipient: letters stored before the
+  // recipient existed carry no address array, and this renderer has to render
+  // those rows rather than reject them.
+  recipient: { name?: string; title?: string; org?: string; address?: string[] };
+  /** The "Re:" line. A letter states which role it is about; a résumé does not. */
+  subject?: string;
+  salutation: string;
+  /** One entry per paragraph, in reading order, still holding raw author text. */
+  paragraphs: string[];
+  closing: string;
+  accent: string;
+}
+
+/**
+ * Split an author's block into paragraphs.
+ *
+ * This has to happen before escaping, not after: escapeLatex strips C0 control
+ * characters, and a newline is one of them, so a paragraph handed to
+ * renderInlineMarkdown with its line breaks intact comes back with the lines
+ * welded together ("first linesecond line"). Blank lines become paragraph
+ * breaks and every other run of whitespace becomes a single space, which is
+ * what TeX would have done with them anyway.
+ */
+export function letterParagraphs(text: string): string[] {
+  return text
+    .split(/\n[^\S\n]*\n/)
+    .map((paragraph) => paragraph.replace(/\s+/g, ' ').trim())
+    .filter((paragraph) => paragraph.length > 0);
+}
+
+export function letterTokens(model: LetterRenderModel): Record<string, string> {
+  const recipientLines = [
+    model.recipient.name,
+    model.recipient.title,
+    model.recipient.org,
+    ...(model.recipient.address ?? []),
+    model.subject ? `Re: ${model.subject}` : undefined,
+  ]
+    .filter((line): line is string => Boolean(line && line.trim()))
+    .map(escapeInline);
+
+  return {
+    ACCENT_HEX: model.accent.replace('#', '').toUpperCase(),
+    SENDER_NAME: escapeInline(model.senderName),
+    SENDER_CONTACT_BLOCK: model.senderContacts
+      .filter((contact) => !contact.disabled)
+      .map(contactBit)
+      .join(' \\textbullet{} '),
+    DATE_LINE: escapeInline(model.dateLine),
+    // A trailing \\ would end the paragraph with nothing after it, which TeX
+    // refuses outright, so the breaks go between the lines and nowhere else.
+    RECIPIENT_BLOCK: recipientLines.join('\\\\\n'),
+    SALUTATION: escapeInline(model.salutation),
+    BODY_BLOCKS: model.paragraphs.map(renderInlineMarkdown).join('\n\n'),
+    CLOSING_LINE: escapeInline(model.closing),
+    SIGNATURE_NAME: escapeInline(model.senderName),
+  };
+}

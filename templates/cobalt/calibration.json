@@ -1,0 +1,23 @@
+{
+  "kind": "resume",
+  "expected_pages": 1,
+  "line_model": {
+    "check": true,
+    "tolerance": 3,
+    "body_token": "SECTIONS",
+    "blank_tokens": [
+      "SUMMARY_BLOCK"
+    ],
+    "section_title": "Calibration",
+    "list_environment": "pts"
+  },
+  "tokens": {
+    "ACCENT_HEX": "2563EB",
+    "NAME": "Jordan Kim",
+    "HEADLINE": "Machine Learning Engineer \\textendash{} Data Systems",
+    "TAGLINE_BLOCK": "{\\small Kigali \\dotsep{} Cairo \\dotsep{} Pittsburgh}\\\\[5pt]\n  ",
+    "CONTACT_LINE": "Kigali, Rwanda \\dotsep{} \\href{https://github.com/example}{github.com/example} \\dotsep{} \\href{https://linkedin.com/in/example}{linkedin.com/in/example} \\dotsep{} +250\\,780\\,000\\,000",
+    "SUMMARY_BLOCK": "\\section{Summary}\nEngineer \\textemdash{} builds {\\bfseries reliable} systems \\textperiodcentered{} ships {\\itshape measurable} results\\textbar{}fast. {\\bfseries\\itshape Bold italic serif} and {\\sffamily sans regular, {\\bfseries sans bold}, {\\itshape sans italic}} all warm here. Ligatures: efficient offices affix fluffy waffles.\n",
+    "SECTIONS": "\\section{Technical Skills}\n\\skillrow{Programming}{Python, TypeScript, SQL, C++ \\textendash{} production use}\n\\skillrow{Platforms}{Kubernetes \\textperiodcentered{} AWS \\textperiodcentered{} GCP}\n\\section{Experience}\n\\cventry{Senior ML Engineer}{Nile Robotics\\,\\textbar\\,Kigali}{Jan 2022 -- Present}\n\\begin{pts}\n  \\item Cut inference latency 38\\% across 12 services \\textemdash{} p99 under 80\\,ms.\n  \\item Built a {\\bfseries reinforcement-learning} pipeline processing {\\itshape 4\\,TB/day}.\n\\end{pts}\n\\vspace{2pt}\n\\cventry{Data Engineering Intern}{NiaDelta}{Jun 2020 -- Aug 2020}\n\\begin{pts}\n  \\item Automated ingestion for 30+ sources; see \\href{https://example.com/report}{the write-up}.\n\\end{pts}\n\\section{Education}\n\\cventry{MSc Computer Science (CGPA 3.9 / 4.0)}{Carnegie Mellon University\\,\\textbar\\,Pittsburgh}{2024 -- 2026}\n\\begin{pts}\n  \\item Relevant coursework: Distributed Systems, Convex Optimization.\n\\end{pts}\n\\section{Awards}\n\\noindent{\\small Best Poster \\textemdash{} IEEE AFRICON \\textemdash{} 2023}\\par\\vspace{1.5pt}\n\\noindent{\\small Dean's List \\textemdash{} 2022}\\par\\vspace{1.5pt}"
+  }
+}

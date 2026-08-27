@@ -1,0 +1,48 @@
+% Letter Classic v1.0.0: block-format business letter (sender, date, recipient,
+% salutation, body, closing, signature). Values are guillemet-delimited tokens
+% filled by the TypeScript renderer (SRS D10) AFTER escaping every value
+% (SRS 8.4), through the same escape layer the résumé templates use.
+%
+% Every package here is already loaded by cobalt/onyx/argon, so this template
+% adds nothing to what the image build has to fetch: the runtime container has
+% no network, and an unwarmed package is a compile failure in production.
+%
+% Unlike a résumé this document has no one-page gate. A cover letter that runs
+% onto a second page is long, not broken, so calibration.json declares a page
+% range and switches the line-model check off rather than pretending a letter
+% has a line budget to drift from.
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{charter}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\definecolor{accent}{HTML}{«ACCENT_HEX»}
+\definecolor{textmuted}{HTML}{565656}
+\hypersetup{colorlinks=true,urlcolor=accent,linkcolor=accent}
+\setlength\parindent{0pt}
+\setlength\parskip{0.8\baselineskip}
+\raggedright
+% Page one carries no number; a second page does. That asymmetry is how a
+% reader holding a printout knows whether a page is missing.
+\pagestyle{plain}
+\begin{document}
+\thispagestyle{empty}
+
+{\bfseries\large\color{accent} «SENDER_NAME»}\\
+{\small\color{textmuted} «SENDER_CONTACT_BLOCK»}
+
+«DATE_LINE»
+
+«RECIPIENT_BLOCK»
+
+«SALUTATION»
+
+«BODY_BLOCKS»
+
+«CLOSING_LINE»\\[2\baselineskip]
+«SIGNATURE_NAME»
+
+\end{document}

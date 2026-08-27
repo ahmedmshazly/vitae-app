@@ -1,0 +1,23 @@
+{
+  "kind": "resume",
+  "expected_pages": 1,
+  "line_model": {
+    "check": true,
+    "tolerance": 3,
+    "body_token": "SECTIONS",
+    "blank_tokens": [
+      "SUMMARY_BLOCK"
+    ],
+    "section_title": "Calibration",
+    "list_environment": "itemize"
+  },
+  "tokens": {
+    "ACCENT_HEX": "2563EB",
+    "NAME": "Jordan Kim",
+    "HEADLINE": "Machine Learning Engineer \\textendash{} Data Systems",
+    "TAGLINE_BLOCK": "",
+    "CONTACT_LINE": "Kigali, Rwanda \\textbullet{} \\href{https://github.com/example}{github.com/example} \\textbullet{} \\href{mailto:a@example.com}{a@example.com} \\textbullet{} +250\\,780\\,000\\,000",
+    "SUMMARY_BLOCK": "Engineer \\textemdash{} builds {\\bfseries reliable} systems \\textperiodcentered{} ships {\\itshape measurable} results\\textbar{}fast. {\\bfseries\\itshape Bold italic serif} and {\\sffamily sans regular, {\\bfseries sans bold}, {\\itshape sans italic}} all warm here. Ligatures: efficient offices affix fluffy waffles.\\par\\vspace{4pt}",
+    "SECTIONS": "\\section{Skills}\n{\\bfseries Programming:} Python, TypeScript, SQL \\textendash{} production use\\\\\n{\\bfseries Platforms:} Kubernetes \\textperiodcentered{} AWS\\\\\n\\section{Experience}\n{\\bfseries Senior ML Engineer}, Nile Robotics \\hfill Jan 2022 -- Present\\\\\n\\begin{itemize}\n  \\item Cut inference latency 38\\% \\textemdash{} p99 under 80\\,ms; see \\href{https://example.com}{notes}.\n  \\item Built a {\\bfseries reinforcement-learning} pipeline processing {\\itshape 4\\,TB/day}.\n\\end{itemize}\n\\section{Education}\n{\\bfseries MSc Computer Science}, Carnegie Mellon University \\hfill 2024 -- 2026\\\\\n\\begin{itemize}\n  \\item Relevant coursework: Distributed Systems, Convex Optimization.\n\\end{itemize}\n\\section{Awards}\n\\begin{itemize}\n  \\item Best Poster \\textemdash{} IEEE AFRICON \\textemdash{} 2023\n\\end{itemize}"
+  }
+}

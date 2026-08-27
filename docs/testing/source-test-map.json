@@ -854,10 +854,12 @@
     "apps/api/src/services/letters.ts": {
       "risk": "medium",
       "layers": [
+        "unit",
         "integration"
       ],
       "status": "covered",
       "tests": [
+        "apps/api/src/services/letters.test.ts",
         "apps/api/src/routes/v1/letters.integration.test.ts"
       ]
     },
@@ -1003,13 +1005,15 @@
     "apps/api/src/services/template-renderers.ts": {
       "risk": "medium",
       "layers": [
+        "unit",
         "integration"
       ],
-      "status": "deferred",
+      "status": "covered",
       "tests": [
+        "apps/api/src/services/template-renderers.test.ts",
         "apps/api/src/__tests__/api.integration.test.ts"
       ],
-      "note": "Covered by the monolith integration suite until route-focused splits land."
+      "note": "The résumé and letter token renderers and the LaTeX escape layer are pinned directly; the rest still rides the monolith integration suite."
     },
     "apps/web/src/App.tsx": {
       "risk": "medium",
@@ -2667,8 +2671,10 @@
       "tests": [
         "packages/core/src/schema/resume-workspace.test.ts",
         "packages/core/src/schema/template-gallery.test.ts",
-        "packages/core/src/schema/template-wording.test.ts"
-      ]
+        "packages/core/src/schema/template-wording.test.ts",
+        "apps/api/src/services/letters.test.ts"
+      ],
+      "note": "The letter half of this module, recipient and salutation and closing, is exercised through the letter renderer rather than a schema suite of its own."
     },
     "packages/core/src/schema/validate.ts": {
       "risk": "medium",

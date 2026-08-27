@@ -1,0 +1,18 @@
+{
+  "kind": "letter",
+  "expected_pages": { "min": 1, "max": 2 },
+  "line_model": {
+    "check": false
+  },
+  "tokens": {
+    "ACCENT_HEX": "2563EB",
+    "SENDER_NAME": "Jordan Kim",
+    "SENDER_CONTACT_BLOCK": "Kigali, Rwanda \\textbullet{} \\href{mailto:a@example.com}{a@example.com} \\textbullet{} \\href{https://github.com/example}{github.com/example} \\textbullet{} +250\\,780\\,000\\,000",
+    "DATE_LINE": "26 August 2026",
+    "RECIPIENT_BLOCK": "Hiring Team\\\\\nNile Robotics\\\\\nRe: Senior Machine Learning Engineer \\textendash{} Data Systems",
+    "SALUTATION": "Dear Hiring Team,",
+    "BODY_BLOCKS": "I am writing about the Senior Machine Learning Engineer role. For four years I have built inference systems that stay up \\textemdash{} the kind of work your posting describes \\textperiodcentered{} at the scale it describes it.\n\nAt Nile Robotics I cut inference latency 38\\% across twelve services and held p99 under 80\\,ms. The pipeline behind that number processes \\textit{4\\,TB a day}, and the \\textbf{reinforcement-learning} component that schedules it is the piece I would bring here first. The write-up is at \\href{https://example.com/report}{example.com/report}.\n\nTwo details from the posting stood out. The first is ownership of the serving path end to end \\textendash{} something I have done rather than supervised. The second is the emphasis on measurement: every claim above is a figure I can decompose on request, and I would rather show the derivation than the headline.\n\nBefore that I automated ingestion for thirty-odd sources as a data engineering intern at NiaDelta, which is where I learned how much of reliability is really about the boring parts \\textbar{} naming, retries, and the willingness to delete a clever thing. Ligatures: efficient offices affix fluffy waffles.\n\nOne project shipped under a budget of \\$40\\,000 with a 95\\% uptime target; the config lived in \\{scheduler\\}, the metric was named p99\\_latency, and the on-call rota was \\#serving. Approximate cost per request fell by a factor of \\textasciitilde{}3, error rate by 2\\textasciicircum{}-4, and the escape hatch was a literal \\textbackslash{} in the template that used to break the build. R\\&D signed off in June.\n\nI would welcome a conversation about where the team needs the most help, and I am happy to walk through any of the above in detail.",
+    "CLOSING_LINE": "Sincerely,",
+    "SIGNATURE_NAME": "Jordan Kim"
+  }
+}

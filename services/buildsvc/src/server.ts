@@ -107,13 +107,19 @@ function verifySignature(req: Request): boolean {
   }
 }
 
-async function pdfPages(pdfPath: string): Promise<number> {
+/**
+ * Page count, or null when poppler could not tell us. It used to answer 1 on
+ * both failure paths, which is the one answer callers act on: the résumé
+ * one-page gate read that invented 1 as a passing measurement and finalized a
+ * document nobody had measured. An honest null makes the gate refuse instead.
+ */
+async function pdfPages(pdfPath: string): Promise<number | null> {
   try {
     const { stdout } = await run('pdfinfo', [pdfPath]);
     const m = stdout.match(/Pages:\s+(\d+)/);
-    return m ? Number(m[1]) : 1;
+    return m ? Number(m[1]) : null;
   } catch {
-    return 1;
+    return null;
   }
 }
 
@@ -128,9 +134,16 @@ async function pdfText(pdfPath: string): Promise<string> {
 
 // Written during the Docker build by calibrate.ts, the honest list of what
 // this image actually warmed (and proved compilable offline).
+interface PageCalibration {
+  kind: string;
+  expected: string;
+  measured: number;
+}
 interface WarmedManifest {
   templates_warmed: string[];
   line_calibration?: Record<string, { configured: number; measured: number }>;
+  /** Absent for templates whose length is content-driven rather than line-budgeted. */
+  page_calibration?: Record<string, PageCalibration>;
   generated_at?: string;
 }
 const warmedManifest: WarmedManifest = (() => {
@@ -140,11 +153,13 @@ const warmedManifest: WarmedManifest = (() => {
     ) as {
       templates_warmed?: string[];
       line_calibration?: Record<string, { configured: number; measured: number }>;
+      page_calibration?: Record<string, PageCalibration>;
       generated_at?: string;
     };
     return {
       templates_warmed: manifest.templates_warmed ?? [],
       line_calibration: manifest.line_calibration,
+      page_calibration: manifest.page_calibration,
       generated_at: manifest.generated_at,
     };
   } catch {
@@ -167,6 +182,7 @@ app.get('/healthz', async (_req, res) => {
     tectonic: tectonicVersion,
     templates_warmed: warmedTemplates,
     line_calibration: warmedManifest.line_calibration ?? {},
+    page_calibration: warmedManifest.page_calibration ?? {},
     calibrated_at: warmedManifest.generated_at ?? null,
     active_requests: activeRequests,
   });
@@ -262,11 +278,16 @@ function shutdown(signal: string): void {
   if (shuttingDown) return;
   shuttingDown = true;
   console.log(`[buildsvc] ${signal}, draining ${activeRequests} request(s)`);
+  // Long enough to outlast the slowest compile a caller may still be waiting
+  // on. 65s was sized for a one-page résumé (a 20s Tectonic budget); a
+  // multipage document is dispatched with timeout_ms 60000, and text
+  // extraction and the base64 response come after that, so the old drain
+  // killed in-flight multipage builds on every deploy.
   const force = setTimeout(() => {
     console.error('[buildsvc] drain timed out');
     server.closeAllConnections();
     process.exit(1);
-  }, 65_000);
+  }, 90_000);
   force.unref();
   server.close((error) => {
     clearTimeout(force);

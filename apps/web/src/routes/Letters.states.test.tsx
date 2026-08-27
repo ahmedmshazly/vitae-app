@@ -99,4 +99,60 @@ describe('Letters states', () => {
     expect(screen.getByText('Some choices could not be loaded')).toBeInTheDocument();
     expect(screen.getByText(/atoms/)).toBeInTheDocument();
   });
+
+  it('offers the compile pair from the detail sheet (FR-RES-021)', async () => {
+    renderWithApp(<Letters />, { route: '/letters' });
+    await userEvent.click(await screen.findByRole('button', { name: /Details of the letter/ }));
+
+    const panel = await screen.findByRole('region', { name: 'Compile this letter' });
+    expect(within(panel).getByRole('button', { name: 'Compile preview' })).toBeInTheDocument();
+    expect(within(panel).getByRole('button', { name: 'Finalize letter' })).toBeInTheDocument();
+  });
+
+  it('says the compiler is unreachable rather than showing a blank preview', async () => {
+    mockApi.post.mockResolvedValue({
+      ok: false,
+      pages: null,
+      offline: true,
+      error: { code: 'BUILDSVC_OFFLINE', message: 'unreachable' },
+      logTail: null,
+      pdfBase64: null,
+      tex: '\\documentclass{article}',
+      template: 'letter-classic@1.0.0',
+    });
+    renderWithApp(<Letters />, { route: '/letters' });
+    await userEvent.click(await screen.findByRole('button', { name: /Details of the letter/ }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Compile preview' }));
+
+    expect(await screen.findByText('Build service offline')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Download .tex' })).toBeInTheDocument();
+  });
+
+  it('sends only the recipient fields that were filled in', async () => {
+    mockApi.patch.mockResolvedValue({ letter: { ...LETTER, rev: 2 } });
+    renderWithApp(<Letters />, { route: '/letters' });
+    await userEvent.click(
+      await screen.findByRole('button', { name: /Edit the letter to Northwind/ }),
+    );
+
+    await userEvent.type(await screen.findByLabelText('Name'), 'Marie Uwase');
+    await userEvent.click(screen.getByRole('button', { name: 'Save letter' }));
+
+    const body = mockApi.patch.mock.calls[0]![1] as { recipient?: Record<string, string> };
+    // An empty string would be stored as a recipient nobody wrote down, and
+    // the letter would then address a blank line.
+    expect(body.recipient).toEqual({ name: 'Marie Uwase' });
+  });
+
+  it('omits the recipient entirely when none was recorded', async () => {
+    mockApi.patch.mockResolvedValue({ letter: { ...LETTER, rev: 2 } });
+    renderWithApp(<Letters />, { route: '/letters' });
+    await userEvent.click(
+      await screen.findByRole('button', { name: /Edit the letter to Northwind/ }),
+    );
+    await userEvent.click(await screen.findByRole('button', { name: 'Save letter' }));
+
+    const body = mockApi.patch.mock.calls[0]![1] as { recipient?: Record<string, string> };
+    expect(body.recipient).toBeUndefined();
+  });
 });
