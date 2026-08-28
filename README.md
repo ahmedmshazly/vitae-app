@@ -106,4 +106,4 @@ Report vulnerabilities through the process in [SECURITY.md](SECURITY.md).
 ## License
 
 Vitae is licensed under the [Apache License 2.0](LICENSE). See [NOTICE](NOTICE)
-for attribution.
+for attribution and [AUTHORS](AUTHORS) for who wrote it.

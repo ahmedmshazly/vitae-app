@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "description": "Vitae: a self-hosted life and career system with a deterministic LaTeX resume engine.",
+  "author": "Ahmed Elshazly (https://github.com/ahmedmshazly)",
+  "license": "Apache-2.0",
   "packageManager": "pnpm@9.15.0",
   "engines": {
     "node": ">=22.23.0 <23",
