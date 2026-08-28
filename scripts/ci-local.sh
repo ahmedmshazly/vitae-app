@@ -181,6 +181,23 @@ ensure_e2e_database() {
 
 # API tests use an isolated vitae_test database. Auth remains on Firebase, so
 # the Auth emulator is retained only for the local developer-token contract.
+#
+# This step owns no build service, and the workflow's api-integration job does
+# not run one either, so the compile cases here are meant to take their offline
+# branch. BUILDSVC_URL has to be pinned for that to be true. It was the one
+# dependency left to the environment: packages/config defaults it to
+# localhost:8787, the repository .env sets the same, and a developer with
+# `docker compose up -d buildsvc` running therefore had the API suite signing
+# CI-secret requests against a container holding the development secret. That
+# answers 401 BAD_SIGNATURE with no log_tail, which is reachable-but-failing —
+# neither of the two outcomes the letter compile case accepts. The step passed
+# or failed depending on whether an unrelated container happened to be up.
+#
+# 9 is the discard port: privileged, so nothing a developer runs can bind it,
+# which makes the refusal deterministic. Pointing at 8797 instead would only
+# trade one ambient dependency for another, since a stale container from an
+# interrupted run listens there. A real compile is proven in e2e, where the
+# gate starts the build service itself and shares its secret with the API.
 api_integration() {
   ensure_emulators || return 1
   ensure_postgres || return 1
@@ -194,6 +211,7 @@ api_integration() {
   SESSION_SECRET=ci-session-secret-not-a-real-one \
   AUTH_ENABLE_DEV_LOGIN=true \
   BUILDSVC_HMAC_SECRET=ci-buildsvc-secret \
+  BUILDSVC_URL=http://127.0.0.1:9 \
     pnpm --filter @vitae/api test
 }
 
