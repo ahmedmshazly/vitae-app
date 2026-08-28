@@ -84,15 +84,15 @@ the primary check is dead.
 
 ### DOC-D-002 - the gap is where the newest code lives
 
-`scripts/check-test-coverage-map.mjs` is unchanged since `20f2b86 Release Vitae
+`scripts/check-test-coverage-map.mjs` is unchanged since `4355062 Release Vitae
 1.0.0`. Sixteen of the eighteen unguarded modules were added in the three
 feature commits after it.
 
 | Commit | Unguarded modules introduced |
 | --- | --- |
-| `1e2c502 feat(cloud)` | `apps/api/src/cloud/paddle.ts`, `apps/api/src/middleware/workspace.ts`, `apps/api/src/routes/v1/billing.ts`, `apps/api/src/routes/webhooks/paddle.ts`, `apps/api/src/services/control-plane.ts`, `apps/api/src/db/migrations/007`-`010`, `apps/web/src/lib/paddle.ts` |
-| `ffd9819 feat(marketing)` | `CareerEvidence.tsx`, `CloudAction.tsx`, `HowItWorks.tsx`, `SecurityOwnership.tsx`, `WarmPaths.tsx` under `apps/web/src/routes/marketing/` |
-| `cfccb40 feat` | `apps/api/src/routes/v1/applications.ts`, `apps/web/src/routes/career/application-view.ts`, `apps/web/src/routes/career/ApplicationActions.tsx` |
+| `a6cf2b0 feat(cloud)` | `apps/api/src/cloud/paddle.ts`, `apps/api/src/middleware/workspace.ts`, `apps/api/src/routes/v1/billing.ts`, `apps/api/src/routes/webhooks/paddle.ts`, `apps/api/src/services/control-plane.ts`, `apps/api/src/db/migrations/007`-`010`, `apps/web/src/lib/paddle.ts` |
+| `b1413d1 feat(marketing)` | `CareerEvidence.tsx`, `CloudAction.tsx`, `HowItWorks.tsx`, `SecurityOwnership.tsx`, `WarmPaths.tsx` under `apps/web/src/routes/marketing/` |
+| `63747d2 feat` | `apps/api/src/routes/v1/applications.ts`, `apps/web/src/routes/career/application-view.ts`, `apps/web/src/routes/career/ApplicationActions.tsx` |
 
 The Cloud billing and tenant-isolation plane is the most security-sensitive code
 in the repository. It is unguarded by the coverage gate and absent from the
@@ -122,7 +122,7 @@ apps/api/src/services/control-plane.ts:100:7
 `refreshAccess()` declares `graceEndsAt` with `let` beside `deletionScheduledAt`,
 which genuinely is reassigned through `??=`. Only the first is constant.
 
-The file is from `1e2c502 feat(cloud)`, the same commit as most of `DOC-D-002`.
+The file is from `a6cf2b0 feat(cloud)`, the same commit as most of `DOC-D-002`.
 The Cloud plane therefore entered the repository past a coverage gate that could
 not fail and a lint gate that was already failing, so neither reported it.
 
@@ -522,7 +522,7 @@ Reproduce:
 
 ```bash
 ls apps/web/src/routes/reference/EntityCatalogOverview*   # module and suite, one directory
-git show 48c534c:docs/testing/source-test-map.json |
+git show 464cb3b:docs/testing/source-test-map.json |
   node -e 'const m = JSON.parse(require("node:fs").readFileSync(0, "utf8"));
     console.log(JSON.stringify(m.modules["apps/web/src/routes/reference/EntityCatalogOverview.tsx"]))'
 # {"risk":"medium","layers":["component","e2e"],"status":"deferred","tests":[],
@@ -617,7 +617,7 @@ will implement patterns that cannot pass CI.
 `/manifesto`, with line 151 reading **"Permitted on those three routes and
 nowhere else"**.
 
-`ffd9819 feat(marketing)` added `/how-it-works`, `/pricing`, `/product`,
+`b1413d1 feat(marketing)` added `/how-it-works`, `/pricing`, `/product`,
 `/product/career-evidence`, `/product/warm-paths`, and `/security-and-ownership`.
 By the document's own rule these pages are non-compliant.
 
@@ -720,6 +720,6 @@ cannot contain that commit's hash. Resolve a subject with
 | `DOC-D-041` | `fix(build): make a local pnpm build a production build` | `NODE_ENV` removed from `.env.example`, which is the only file in the repository that put it on a developer's machine; the comment left in its place explains why it must not come back. Because an existing `.env` is user-owned and was not edited, `scripts/check-web-budgets.mjs` now refuses a bundle carrying the development JSX runtime or the build machine's absolute paths, before it forms any opinion about size - so the residue announces itself instead of being measured. Seen to fail: `49 of 55 chunks carry the development JSX runtime`, exit 1. `scripts/check-web-budgets.selftest.mjs` runs seven cases ahead of every invocation. |
 | `DOC-D-032` | `docs(traceability): define every requirement the code cites` | Found while editing, not during the audit, so it has no open row above: the stack table in `docs/specs/srs.md` named the web application as *"React 18 and Vite"*, while `apps/web/package.json:29` pins `react: ^19.2.8`. Corrected in the same edit. This is the same fact as `DOC-D-020`, which remains open in its second location, `apps/web/package.json:6`. |
 | `DOC-D-043` | `fix(testing): let the coverage map see the tests beside it` | `colocatedTest()` is replaced by `siblingTests()`, which lists the directory instead of guessing filenames. Plain `<name>.test.ts`, `.test.tsx` and `.spec.ts` count on their name, because a few of them prove a component through the content module it renders; facet-named files count only when they import the module, so `Foo.helpers.test.ts` can never be read as proof of `Foo.ts`. That costs recall deliberately: fifty-two of the eighty-four facet suites import their module and count, and the other thirty-two still require a map entry. A second rule closes the half nothing was reading - an entry with an empty `tests` array now fails when a sibling suite exists, which is what caught these sixteen. All sixteen entries now name their real suites and `$schema_note` states both rules. Seen to fail: the two new cases in `scripts/check-test-coverage-map.selftest.mjs` were run against `HEAD`'s checker and reported `expected exit 0, got 1` and `expected exit 1, got 0`. An entry that names some of its siblings but not all of them is incomplete rather than false, and is left alone. |
-| `DOC-D-006` | `docs(product): author the definition forward around four personas` | Closed in two halves. The architecture guide's ten `§` references were replaced with registered identifiers one commit earlier (`docs(product): point surfaces and citations at what ships`); this commit rewrote `docs/ROADMAP.md`, so its `§4.x`, `M0`, and prefix-less citations are gone too - every SRS cell now carries canonical registered identifiers. The registered-but-uncited hazard a roadmap rewrite used to pose was pre-empted by the anchor section added in `docs(specs): anchor the fragile identifiers, and open ADR 0007`, which cites the twenty-one grouped-citation dependents individually. |
+| `DOC-D-006` | `docs(product): author the definition forward around four personas` | Closed in two halves. The architecture guide's ten `§` references were replaced with registered identifiers one commit earlier (`docs(product): point surfaces and citations at what ships`); this commit rewrote `docs/ROADMAP.md`, so its `§4.x`, `M0`, and prefix-less citations are gone too - every SRS cell now carries canonical registered identifiers. The registered-but-uncited hazard a roadmap rewrite used to pose was pre-empted by the anchor section added in `docs(specs): anchor the fragile identifiers, open ADR 0007`, which cites the twenty-one grouped-citation dependents individually. |
 | `DOC-D-031` | `docs(product): author the definition forward around four personas` | The roadmap no longer plans a nightly `pg_dump` to R2 that nothing produces. Its recovery row states what ships - `scripts/backup-to-s3.sh`, wired to `pnpm backup:s3`, uploading a full export bundle to S3 - and what awaits operational confirmation (cadence and objectives), citing `NFR-OPS-001`, `FR-EXP-012`, and `FR-EXP-013`. The two-way R2-versus-S3 divergence is gone because only one system is described anywhere. |
-| `DOC-D-029` | `docs(product): give every journey a statement, and its stories` | `J2`, `J3`, `J5`, `J6` and `J7` carry authored statements under ADR 0007, with two honest statuses distinguishing them: `partial` for journeys whose steps ship but whose identifier no spec names (J2, J3, J6 - covered unnamed by `exploration.spec.ts`, `import.spec.ts`, `duplicates.spec.ts`, `export.spec.ts`), and a new `planned` status for journeys riding on registered intent (J5 dossiers, J7 correspondence). The journeys page and `docs/registry/journeys.json` no longer describe empty rows, and `docs/observatory/product/stories.md` gives all eight journeys acceptance criteria that cite the requirement register. |
+| `DOC-D-029` | `docs(product): give every journey a statement and its stories` | `J2`, `J3`, `J5`, `J6` and `J7` carry authored statements under ADR 0007, with two honest statuses distinguishing them: `partial` for journeys whose steps ship but whose identifier no spec names (J2, J3, J6 - covered unnamed by `exploration.spec.ts`, `import.spec.ts`, `duplicates.spec.ts`, `export.spec.ts`), and a new `planned` status for journeys riding on registered intent (J5 dossiers, J7 correspondence). The journeys page and `docs/registry/journeys.json` no longer describe empty rows, and `docs/observatory/product/stories.md` gives all eight journeys acceptance criteria that cite the requirement register. |

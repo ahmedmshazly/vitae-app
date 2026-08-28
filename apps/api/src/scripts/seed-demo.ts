@@ -26,7 +26,7 @@
  * Bulk data breaks them in one specific way: a Playwright locator that resolves
  * to one element today resolves to two once a new record happens to share its
  * wording, and the spec fails on strict mode rather than on the product. That
- * has happened before (commit 0a1c577). The rules below are what keep it from
+ * has happened before (commit 3642c0d). The rules below are what keep it from
  * happening again, and each is written next to the assertion it protects.
  *
  *   · Certain wordings are matched with no `.first()`, each on one screen: an
@@ -47,7 +47,7 @@
  *     assertion names that exact chain, and any new tie into either person can
  *     outrank it. New peer ties go anywhere else in the graph.
  *   · Résumé and letter artifacts are never fabricated. An attachments row
- *     asserts a blob that can actually be fetched (commit 3fe5ea6), so this
+ *     asserts a blob that can actually be fetched (commit d9f949b), so this
  *     seed writes none and leaves the compile buttons to make real ones.
  *
  * Dates stay relative to now through `daysAgo`/`dateAgo`, or are fixed calendar

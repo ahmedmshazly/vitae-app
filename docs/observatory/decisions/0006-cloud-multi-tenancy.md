@@ -41,10 +41,10 @@ related: [ADR, ADR-CATALOG]
 
 - **Status:** reconstructed from evidence. No record was written, and this page
   is not a substitute for one.
-- **Decided:** 2026-08-23, in `1e2c502 feat(cloud): add tenant-safe workspace
+- **Decided:** 2026-08-23, in `a6cf2b0 feat(cloud): add tenant-safe workspace
   and billing foundation`.
 - **Reconstructed:** 2026-08-24, against the working tree at
-  `ec33e2a fix(testing): let the coverage map see the tests beside it`.
+  `a55a677 fix(testing): let the coverage map see the tests beside it`.
 - **Extends:** ADR 0005 (Postgres instead of Firestore). Supersedes nothing.
 
 ## What this page is, and what it cannot be

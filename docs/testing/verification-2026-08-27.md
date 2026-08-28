@@ -1,6 +1,6 @@
 # Full verification sweep, 2026-08-27
 
-Every suite the repository owns, run end to end against `main` at `781f041`,
+Every suite the repository owns, run end to end against `main` at `6e1e2c0`,
 with the defects it found and what changed. The sweep was commissioned as a
 re-verification: the previous session's testing was done in another tool and
 left no commits, no notes and no artifacts, so there was nothing to trust and
@@ -53,7 +53,7 @@ never calls. What production runs is byte-identical before and after.
 **Seen to fail.** `pnpm docs:check` →
 `docs/generated/traceability.json: is stale. Run 'pnpm docs:gen' and commit the result.`
 
-Commit `781f041` added seven files. Two of them are read by the citation
+Commit `6e1e2c0` added seven files. Two of them are read by the citation
 scanner - `apps/api/src/services/storage/memory.ts`, which cites `FR-001`, and
 `apps/web/src/lib/last-viewed.ts`. The commit regenerated `docs/generated/*`,
 but did so *before* those files were staged, and the generator reads the
@@ -177,8 +177,8 @@ decision is deliberate rather than unnoticed.
 **Reasoned, not seen.** It has not fired, and the suite is green with it in
 place. It is recorded because it was found while reviewing what a much larger
 demo graph would do to the existing locators, and because the same class of
-defect has fired here before - commit `0a1c577`, "the panel's evidence lists
-made note text ambiguous".
+defect has fired here before - commit `3642c0d`, "note text went ambiguous
+once the panel cited it".
 
 `e2e/tests/document-editor.spec.ts` asserted `paper.getByText('Education')`.
 Playwright's `getByText(string)` defaults to `exact: false`, which is a
@@ -425,7 +425,7 @@ It is recorded here because of what expanding it exposed rather than what it
 added. Nine specs sign into that space, and bulk data breaks a browser suite in
 one specific way: a locator that resolves to one element today resolves to two
 tomorrow, because a new record happened to share its wording, and the spec then
-fails on strict mode rather than on the product. Commit `0a1c577` is that
+fails on strict mode rather than on the product. Commit `3642c0d` is that
 failure, already in this repository's history.
 
 Those couplings were undocumented. A spec asserted `getByText('Workflow')` with

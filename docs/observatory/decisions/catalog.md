@@ -53,7 +53,7 @@ that survives the pull request rather than a formality alongside it.
 | 0007 | The product definition is authored forward | 2026-08-26 | accepted | Author personas, journeys, stories, and a full non-functional set into the register under the existing gates; mark every authored statement as a decision rather than a recovery; keep every legacy identifier cited through a durable anchor in the requirements document. |
 
 The dates are the ones each record gives itself. ADR 0006 has no self-declared
-date; 2026-08-23 is the author date of `1e2c502 feat(cloud): add tenant-safe
+date; 2026-08-23 is the author date of `a6cf2b0 feat(cloud): add tenant-safe
 workspace and billing foundation`, the commit that introduced every file the
 reconstruction reads.
 
