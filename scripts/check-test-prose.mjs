@@ -64,7 +64,7 @@ const SOFT_LIMIT = 3;
 const DASH = /[–—]/;
 const CURLY = /[‘’“”]/;
 const ELLIPSIS = /…/; // prose-gate: a detector has to spell out what it detects
-const NBSP = /[   ]/;
+const NBSP = /[\u00a0\u202f\u2007]/; // prose-gate: escaped so it is greppable and lintable
 
 // Shapes where one of these characters is doing a job no hyphen can do. Blanked
 // out before the character checks run, so they need no entry in the allowlist.
