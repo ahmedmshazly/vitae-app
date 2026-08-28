@@ -146,7 +146,7 @@ test('a failed season digest reports itself instead of looking un-brushed', asyn
 
   // `isError` was never read, so a failed digest fell back to the default
   // header and looked exactly like never having brushed at all.
-  await expect(page.getByRole('alert')).toContainText('Couldn’t summarise that range', { timeout: 10_000 });
+  await expect(page.getByRole('alert')).toContainText("Couldn't summarise that range", { timeout: 10_000 });
 });
 
 test('nothing on the chronograph is set below the type scale', async ({ page }) => {

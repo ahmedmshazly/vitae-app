@@ -124,7 +124,7 @@ export function ApplicationStatusControl({
                 disabled={!correctTo || change.isPending}
                 onClick={() => correctTo && change.mutate({ status: correctTo, correction: true })}
               >
-                {change.isPending ? 'Saving…' : 'Record correction'}
+                {change.isPending ? 'Saving...' : 'Record correction'}
               </Button>
             </>
           }

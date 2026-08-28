@@ -18,7 +18,7 @@ describe('People directory states', () => {
     mockApi.get.mockReturnValue(new Promise(() => {}));
     renderWithApp(<People />, { route: '/people' });
     expect(screen.getByRole('status', { name: 'Loading' })).toBeInTheDocument();
-    expect(screen.getByText('Loading…')).toBeInTheDocument();
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
   it('shows an error with retry that reloads the directory', async () => {
@@ -27,7 +27,7 @@ describe('People directory states', () => {
     renderWithApp(<People />, { route: '/people' });
 
     const alert = await screen.findByRole('alert');
-    expect(within(alert).getByText('Couldn’t load your people')).toBeInTheDocument();
+    expect(within(alert).getByText("Couldn't load your people")).toBeInTheDocument();
     expect(within(alert).getByText('upstream 502')).toBeInTheDocument();
 
     mockApi.get.mockResolvedValueOnce({ people: [] });

@@ -66,7 +66,7 @@ interface Props {
  * Finalize (one-page + coverage gate) with a link to Outputs.
  *
  * The key is the fix for a silent, load-bearing bug. Tailor renders this as
- * `{target && <PreviewPane …/>}`, so picking a different job target in the
+ * `{target && <PreviewPane .../>}`, so picking a different job target in the
  * rail re-rendered the same instance: the compile result, the PDF, the
  * coverage gate and the finalize receipt for target A stayed on screen,
  * presented as target B's. A user read a green gate for a résumé that was
@@ -125,7 +125,7 @@ function TargetPreview({ targetId, draft, onDraft }: Props) {
       {tplQuery.isError ? (
         <ErrorState
           className="mb-3"
-          title="Couldn’t load the templates"
+          title="Couldn't load the templates"
           detail={(tplQuery.error as Error | null)?.message}
           onRetry={() => void tplQuery.refetch()}
           retrying={tplQuery.isFetching}
@@ -230,7 +230,7 @@ function TargetPreview({ targetId, draft, onDraft }: Props) {
           disabled={compile.isPending}
           onClick={() => compile.mutate()}
         >
-          {compile.isPending ? 'Compiling…' : 'Compile PDF'}
+          {compile.isPending ? 'Compiling...' : 'Compile PDF'}
         </Button>
         <Button
           variant="ghost"
@@ -240,7 +240,7 @@ function TargetPreview({ targetId, draft, onDraft }: Props) {
             r?.ok ? 'Persist this résumé (one-page + coverage gate)' : 'Compile successfully first'
           }
         >
-          {finalize.isPending ? 'Finalizing…' : 'Finalize'}
+          {finalize.isPending ? 'Finalizing...' : 'Finalize'}
         </Button>
       </div>
 
@@ -248,7 +248,7 @@ function TargetPreview({ targetId, draft, onDraft }: Props) {
         <StatusTrace
           className="mb-3"
           tone="danger"
-          label="Couldn’t finalize this résumé"
+          label="Couldn't finalize this résumé"
           detail={(finalize.error as Error | null)?.message ?? 'Nothing was saved. Try again.'}
         />
       )}
@@ -322,7 +322,7 @@ function TargetPreview({ targetId, draft, onDraft }: Props) {
         </>
       ) : compile.isError ? (
         <ErrorState
-          title="Couldn’t reach the build service"
+          title="Couldn't reach the build service"
           detail={(compile.error as Error | null)?.message}
           onRetry={() => compile.mutate()}
           retryLabel="Compile again"

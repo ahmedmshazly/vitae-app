@@ -197,7 +197,7 @@ export function PlaceResolvePanel({
                 ref={inputRef}
                 className="atlas__resolveinput"
                 value={q}
-                placeholder="Search places…"
+                placeholder="Search places..."
                 aria-label="Search places"
                 onChange={(e) => setQ(e.target.value)}
               />
@@ -282,7 +282,7 @@ export function PlaceResolvePanel({
           {merges.isError && (
             <Banner
               tone="danger"
-              title="Couldn’t check for existing places"
+              title="Couldn't check for existing places"
               action={
                 <Button size="sm" onClick={() => void merges.refetch()}>
                   Retry check
@@ -295,7 +295,7 @@ export function PlaceResolvePanel({
 
           {suggestions.length > 0 && (
             <div className="atlas__resolvemerge">
-              <div className="atlas__listhead">Also merge with…</div>
+              <div className="atlas__listhead">Also merge with...</div>
               <ul className="atlas__resolvelist atlas__resolvelist--compact">
                 {suggestions.map((s) => {
                   const on = mergeId === s.placeId;
@@ -331,7 +331,7 @@ export function PlaceResolvePanel({
 
           {/* A failed POST was 11px of red text with no role, so the press
               was announced as nothing at all and people pressed again. */}
-          {error && <ErrorState title="Couldn’t place this label" detail={error} />}
+          {error && <ErrorState title="Couldn't place this label" detail={error} />}
         </div>
       </div>
 
@@ -345,7 +345,7 @@ export function PlaceResolvePanel({
           disabled={!selected || saving}
           onClick={() => void confirm()}
         >
-          {saving ? 'Saving…' : 'Confirm'}
+          {saving ? 'Saving...' : 'Confirm'}
         </Button>
       </div>
     </div>

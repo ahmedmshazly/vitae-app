@@ -99,7 +99,7 @@ export function ExportPage() {
       const blob = await api.downloadGet(`/export/views/${v.id}.csv`);
       saveBlob(blob, `${v.name.replace(/[^\w.-]+/g, '-')}.csv`);
       setCompletedExport('csv');
-      flash(`Exported “${v.name}” as CSV`);
+      flash(`Exported '${v.name}' as CSV`);
     } catch (err) {
       const message = (err as Error).message || 'CSV export failed';
       setExportError(message);
@@ -276,7 +276,7 @@ export function ExportPage() {
               }
             >
               {building
-                ? 'Building…'
+                ? 'Building...'
                 : includeSensitive
                   ? 'Export full backup'
                   : 'Export everything'}
@@ -288,7 +288,7 @@ export function ExportPage() {
           <Section title="Backup status">
             {status.isError ? (
               <ErrorState
-                title="Couldn’t load backup status"
+                title="Couldn't load backup status"
                 detail={(status.error as Error | null)?.message}
                 onRetry={() => void status.refetch()}
               />
@@ -333,7 +333,7 @@ export function ExportPage() {
           >
             {views.isError ? (
               <ErrorState
-                title="Couldn’t load saved views"
+                title="Couldn't load saved views"
                 detail={(views.error as Error | null)?.message}
                 onRetry={() => void views.refetch()}
               />
@@ -370,7 +370,7 @@ export function ExportPage() {
                       onClick={() => void exportView(v)}
                       aria-label={`Export ${v.name} as CSV`}
                     >
-                      {exportingViewId === v.id ? 'Building…' : 'CSV'}
+                      {exportingViewId === v.id ? 'Building...' : 'CSV'}
                     </Button>
                   </div>
                 ))}

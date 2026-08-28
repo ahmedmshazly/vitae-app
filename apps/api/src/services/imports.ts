@@ -454,7 +454,7 @@ function parseNonBundleContent(
         detail: null,
         rows: lines.map((text) => ({
           entity: 'atom' as const,
-          title: text.length > 90 ? `${text.slice(0, 89)}…` : text,
+          title: text.length > 90 ? `${text.slice(0, 89)}...` : text,
           subtitle: null,
           payload: { text, kind: 'achievement' },
           confidence: 0.7,

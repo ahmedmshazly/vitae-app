@@ -74,6 +74,6 @@ describe('commitAction', () => {
   });
 
   it('locks while the commit is in flight', () => {
-    expect(commitAction(2, 0, true)).toEqual({ label: 'Committing…', disabled: true });
+    expect(commitAction(2, 0, true)).toEqual({ label: 'Committing...', disabled: true });
   });
 });

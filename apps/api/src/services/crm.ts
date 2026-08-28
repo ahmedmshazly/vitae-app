@@ -217,7 +217,7 @@ export interface PersonListItem {
   daysSinceLast: number | null;
   lastInteraction: { kind: string; title: string; occurredAt: string } | null;
   source: string;
-  /** How many records in the graph are this person's own (roles, degrees, …). */
+  /** How many records in the graph are this person's own (roles, degrees, ...). */
   recordCount: number;
   /** The reserved owner for records nobody has claimed. */
   isPlaceholder: boolean;

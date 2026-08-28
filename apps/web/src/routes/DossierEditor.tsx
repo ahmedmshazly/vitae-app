@@ -221,7 +221,7 @@ export function DossierEditor() {
         <PageHeader title="Dossier" />
         <RegisterRule />
         <ErrorState
-          title={notFound ? 'This dossier no longer exists' : 'Couldn’t compile this dossier'}
+          title={notFound ? 'This dossier no longer exists' : "Couldn't compile this dossier"}
           detail={
             notFound
               ? 'It was deleted, or the address is wrong. Your other dossiers are still listed.'
@@ -268,7 +268,7 @@ export function DossierEditor() {
         help={
           <InfoPopover title="How this compiles">
             <p>
-              Sections come out in the order this audience’s grammar declares, and every citation
+              Sections come out in the order this audience's grammar declares, and every citation
               is resolved against the live graph each time the document is asked for, so nothing
               here is a copy that can go stale. The appendix prints each cited record once, in the
               order it was first cited, with its source, its confidence and its revision trail.
@@ -277,7 +277,7 @@ export function DossierEditor() {
         }
         actions={
           <Button variant="danger" onClick={() => setConfirmDelete(true)} disabled={remove.isPending}>
-            {remove.isPending ? 'Deleting…' : 'Delete'}
+            {remove.isPending ? 'Deleting...' : 'Delete'}
           </Button>
         }
       />
@@ -350,7 +350,7 @@ export function DossierEditor() {
           // on, by design. The compiled view below still renders, because it
           // carries its own headings from the server.
           <ErrorState
-            title="Couldn’t load this audience’s sections"
+            title="Couldn't load this audience's sections"
             detail={
               (audiences.error as Error | null)?.message ??
               'Without them there is no way to say what each section will admit.'
@@ -461,7 +461,7 @@ export function DossierEditor() {
           <EmptyState
             glyph="document"
             title="Nothing to compile yet"
-            hint="A section with entries in it appears here, in the order this audience’s grammar declares."
+            hint="A section with entries in it appears here, in the order this audience's grammar declares."
           />
         ) : (
           compiled.sections.map((section) => (

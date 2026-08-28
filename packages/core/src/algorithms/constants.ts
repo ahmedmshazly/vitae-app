@@ -1,6 +1,6 @@
 /**
  * All tunable constants for the intelligence layer, in one editable place
- * (SRS FR-SET-004: "constants editor … validated ranges, versioned, live
+ * (SRS FR-SET-004: "constants editor ... validated ranges, versioned, live
  * preview"). Every algorithm imports its constants from here so a settings
  * override is a single object spread, and the defaults are the documented
  * values from SRS §10.7. Nothing here is learned; everything is a curated,

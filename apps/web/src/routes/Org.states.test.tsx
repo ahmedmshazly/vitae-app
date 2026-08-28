@@ -70,7 +70,7 @@ describe('Org states', () => {
     renderOrg();
 
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Couldn’t load this organization');
+    expect(alert).toHaveTextContent("Couldn't load this organization");
     expect(alert).toHaveTextContent('org service unavailable');
     expect(screen.queryByText('No inroads yet')).not.toBeInTheDocument();
     expect(screen.queryByText('No linked roles')).not.toBeInTheDocument();

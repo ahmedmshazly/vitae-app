@@ -216,7 +216,7 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       # FR-007: the Dockerfile needs the REPO ROOT as context (it bakes in
-      # templates/), so `docker build … services/buildsvc` could never work.
+      # templates/), so `docker build ... services/buildsvc` could never work.
       - name: Build the Tectonic build service image
         run: docker build -f services/buildsvc/Dockerfile -t vitae/buildsvc:ci .
       - name: Scan build service image for critical vulnerabilities

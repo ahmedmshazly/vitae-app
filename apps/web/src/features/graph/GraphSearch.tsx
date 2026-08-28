@@ -84,7 +84,7 @@ export function GraphSearch({ open, nodes, onClose, onPick }: GraphSearchProps) 
         ref={inputRef}
         className="lifemap__searchinput"
         value={q}
-        placeholder="Find in map…"
+        placeholder="Find in map..."
         role="combobox"
         aria-expanded={hits.length > 0}
         aria-controls={LISTBOX_ID}

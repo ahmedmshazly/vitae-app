@@ -69,7 +69,7 @@ export function Browse() {
   if (!valid) {
     return (
       <div className="page">
-        <PageHeader title="Unknown type" subtitle={`“${type}” is not a Vitae record type.`} />
+        <PageHeader title="Unknown type" subtitle={`'${type}' is not a Vitae record type.`} />
         <RegisterRule />
         <EmptyState
           glyph="filter"
@@ -87,7 +87,7 @@ export function Browse() {
       <PageHeader
         title={label}
         subtitle={
-          // Undefined rather than the word "Loading…": a subtitle that counts
+          // Undefined rather than the word "Loading...": a subtitle that counts
           // records has nothing honest to say before the records arrive, and
           // the skeleton below is already saying the same thing.
           listQuery.isPending ? undefined : (
@@ -130,7 +130,7 @@ export function Browse() {
           query={listQuery}
           skeletonRows={8}
           loadingLabel={`Loading ${label} records`}
-          errorTitle={`Couldn’t load ${label} records`}
+          errorTitle={`Couldn't load ${label} records`}
           empty={
             <EmptyState
               glyph="document"

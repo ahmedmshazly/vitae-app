@@ -73,7 +73,7 @@ describe('AtlasDossier states', () => {
     expect(open.getAttribute('href')).toMatch(/^\//);
   });
 
-  it('announces a route’s companions as a set', () => {
+  it("announces a route's companions as a set", () => {
     dossier({ trip });
     const companions = screen.getByRole('list', { name: 'Companions' });
     expect(within(companions).getAllByRole('listitem')).toHaveLength(1);

@@ -57,7 +57,7 @@ test('a failed load says so instead of inviting you to start over', async ({ pag
   // `isError` was unread, so a failure rendered the empty panel and offered to
   // tailor résumés you may already have.
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load your outputs');
+  await expect(alert).toContainText("Couldn't load your outputs");
   await expect(alert).toContainText('the output store is unreachable');
   await expect(page.getByText('No outputs yet')).toHaveCount(0);
 });
@@ -118,7 +118,7 @@ test('a failed detail lookup does not spin for ever', async ({ page }) => {
 
   // `!detail` held forever on failure, so the sheet span a spinner with
   // nothing to read, the same shape the Life map had.
-  await expect(page.getByRole('alert')).toContainText('Couldn’t load this output', { timeout: 10_000 });
+  await expect(page.getByRole('alert')).toContainText("Couldn't load this output", { timeout: 10_000 });
   await expect(page.locator('.vt-spinner')).toHaveCount(0);
 });
 

@@ -100,7 +100,7 @@ describe('DocumentPane', () => {
     renderPane();
 
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Couldn’t assemble the document');
+    expect(alert).toHaveTextContent("Couldn't assemble the document");
     expect(alert).toHaveTextContent('model service down');
 
     mockApi.post.mockResolvedValue(model());

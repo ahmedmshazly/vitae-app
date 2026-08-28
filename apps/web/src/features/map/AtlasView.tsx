@@ -367,7 +367,7 @@ export function AtlasView() {
         </header>
         <div className="explore-instrument-state__body">
           <ErrorState
-            title="Couldn’t assemble the Atlas"
+            title="Couldn't assemble the Atlas"
             detail={(error as Error | null)?.message}
             onRetry={() => void refetch()}
           />
@@ -591,7 +591,7 @@ export function AtlasView() {
                 className="lifemap__searchinput"
                 autoFocus
                 value={findQ}
-                placeholder="Find place…"
+                placeholder="Find place..."
                 aria-label="Find place"
                 onChange={(e) => setFindQ(e.target.value)}
                 onKeyDown={(e) => {
@@ -621,7 +621,7 @@ export function AtlasView() {
                   </li>
                 ))}
                 {findQ.trim() && findHits.length === 0 && (
-                  <li className="lifemap__searchempty">No places match “{findQ.trim()}”</li>
+                  <li className="lifemap__searchempty">No places match '{findQ.trim()}'</li>
                 )}
               </ul>
             </div>
@@ -702,13 +702,13 @@ export function AtlasView() {
               if (!selectedCity) return;
               const url = `${window.location.origin}/explore/atlas?city=${encodeURIComponent(selectedCity)}`;
               if (!navigator.clipboard) {
-                flash('Couldn’t reach the clipboard.', { variant: 'error' });
+                flash("Couldn't reach the clipboard.", { variant: 'error' });
                 return;
               }
               void navigator.clipboard
                 .writeText(url)
                 .then(() => flash(`Copied a link to ${selectedCity}`))
-                .catch(() => flash('Couldn’t reach the clipboard.', { variant: 'error' }));
+                .catch(() => flash("Couldn't reach the clipboard.", { variant: 'error' }));
             }}
             onCompare={
               selectedEntry && !selectedTrip ? () => startCompare(selectedEntry.city) : undefined

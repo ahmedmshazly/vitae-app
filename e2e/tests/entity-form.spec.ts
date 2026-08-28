@@ -88,7 +88,7 @@ test('a rejected save explains itself and keeps everything typed', async ({ page
   // There was no catch at all: the rejection escaped as an unhandled error,
   // the dialog sat there looking idle, and nothing said why.
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t save.');
+  await expect(alert).toContainText("Couldn't save.");
   await expect(alert).toContainText('The graph is read-only right now.');
   await expect(page.getByLabel('Full name')).toHaveValue(name);
   await expect(page.getByLabel('One-liner')).toHaveValue('should survive the failure');

@@ -48,7 +48,7 @@ interface SearchResp {
   results: Hit[];
 }
 
-/** Kinds a result can be narrowed to (reference: people / links / documents / …). */
+/** Kinds a result can be narrowed to (reference: people / links / documents / ...). */
 const GROUPS: Array<{ key: string; label: string; types: string[] }> = [
   { key: 'people', label: 'People', types: ['person'] },
   { key: 'organizations', label: 'Organizations', types: ['organization'] },
@@ -115,8 +115,8 @@ export function SearchResults() {
     return () => clearTimeout(t);
   }, [draft, setParams]);
 
-  // …and the URL is the source of truth on the way back in: a link into
-  // /search?q=… or the back button has to land in the input too.
+  // ...and the URL is the source of truth on the way back in: a link into
+  // /search?q=... or the back button has to land in the input too.
   useEffect(() => {
     if (q === pushed.current) return;
     pushed.current = q;
@@ -191,7 +191,7 @@ export function SearchResults() {
           <InfoPopover title="How these results are ordered">
             <p>
               Free text is scored against titles, notes and documents; the strongest match leads. The bar on each row is
-              that row&rsquo;s score as a share of the top one, so a row at 1.00 is the best match and a set of rows all
+              that row's score as a share of the top one, so a row at 1.00 is the best match and a set of rows all
               near 1.00 is a tie you will have to break yourself.
             </p>
             <p>
@@ -234,14 +234,14 @@ export function SearchResults() {
             mono
             className="search-bar__input"
             autoFocus
-            placeholder="Search titles, notes, documents…"
+            placeholder="Search titles, notes, documents..."
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
           />
         </span>
         {q && (
           <Mono className="search-bar__timing text-xs text-muted">
-            {searching ? 'searching…' : search.data ? `${search.data.ms} ms` : ''}
+            {searching ? 'searching...' : search.data ? `${search.data.ms} ms` : ''}
           </Mono>
         )}
       </form>
@@ -323,7 +323,7 @@ export function SearchResults() {
         >
           {search.isError ? (
             <ErrorState
-              title="Couldn’t run that search"
+              title="Couldn't run that search"
               detail={(search.error as Error | null)?.message}
               onRetry={() => void search.refetch()}
             />

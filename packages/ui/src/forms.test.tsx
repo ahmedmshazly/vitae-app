@@ -87,7 +87,7 @@ describe('Select: the clear sentinel', () => {
     render(<ControlledSelect clearable initial="a" />);
     await user.click(screen.getByRole('combobox'));
     await user.click(await screen.findByText('Clear'));
-    expect(screen.getByRole('combobox')).toHaveTextContent('Select…');
+    expect(screen.getByRole('combobox')).toHaveTextContent('Select...');
   });
 });
 

@@ -77,7 +77,7 @@ test('a failed overview says so instead of reporting an empty workspace', async 
   // 0, set "Base résumé", and told you to finalize your first résumé: the
   // screen inventing an empty workspace and asking you to rebuild it.
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t read your résumé workspace');
+  await expect(alert).toContainText("Couldn't read your résumé workspace");
   await expect(alert).toContainText('the résumé store is unreachable');
   await expect(page.getByText('No outputs yet')).toHaveCount(0);
   await expect(page.getByText('Finalize a résumé to set the first base')).toHaveCount(0);

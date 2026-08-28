@@ -11,7 +11,7 @@
  * Two of the published numbers were wrong, which is what a gate is for:
  *
  *   - the sleep count greps only for `waitForTimeout` and missed two 5-second
- *     `new Promise((r) => setTimeout(r, …))` waits, so it read 1 where there
+ *     `new Promise((r) => setTimeout(r, ...))` waits, so it read 1 where there
  *     were 3. This counts both forms.
  *   - "specs with no accessibility scan" counted *files*, not screens. Every
  *     route those files reach is already scanned by the spec that owns that

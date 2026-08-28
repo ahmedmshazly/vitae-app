@@ -278,7 +278,7 @@ async function blockParagraphs(blocks: LetterBlock[]): Promise<string[]> {
 async function buildLetterRenderModel(letter: LetterRow): Promise<LetterRenderModel> {
   const target = await getTarget(String(letter.target_id));
   if (!target || target.deleted_at) {
-    throw new HttpError(422, 'VALIDATION', 'This letter’s job target is missing, so there is nothing to address it to.');
+    throw new HttpError(422, 'VALIDATION', "This letter's job target is missing, so there is nothing to address it to.");
   }
   const [profile, settings] = await Promise.all([
     buildFullModel([], { headline: '' }),

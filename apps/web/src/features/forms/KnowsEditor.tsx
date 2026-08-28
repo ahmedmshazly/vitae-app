@@ -91,7 +91,7 @@ export function KnowsEditor({
   return (
     <div className="knows-editor">
       <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
-        <Field label="Relation" help="Friend, colleague, family, mentor, …">
+        <Field label="Relation" help="Friend, colleague, family, mentor, ...">
           <Select
             label={`Relation: ${relation ? (personRelationLabel(relation) ?? relation) : 'not chosen'}`}
             value={relation}
@@ -100,7 +100,7 @@ export function KnowsEditor({
               value: r,
               label: personRelationLabel(r) ?? r,
             }))}
-            placeholder="Choose relation…"
+            placeholder="Choose relation..."
             clearable
           />
         </Field>
@@ -144,8 +144,8 @@ export function KnowsEditor({
           <Input id="ke-meton" mono type="date" value={metOn} onChange={(e) => setMetOn(e.target.value)} />
         </Field>
       </div>
-      <Field label="Topics" htmlFor="ke-topics" help="What you talk about - feeds “Who should I call”.">
-        <TagInput id="ke-topics" value={topics} onChange={setTopics} placeholder="RL · robotics hiring…" />
+      <Field label="Topics" htmlFor="ke-topics" help="What you talk about - feeds 'Who should I call'.">
+        <TagInput id="ke-topics" value={topics} onChange={setTopics} placeholder="RL · robotics hiring..." />
       </Field>
       {/* No local onError: the query client's MutationCache already announces
           every failure once. What was missing is the message in place. A
@@ -180,7 +180,7 @@ export function KnowsEditor({
             disabled={save.isPending}
             onClick={() => save.mutate()}
           >
-            {save.isPending ? 'Saving…' : 'Save relationship'}
+            {save.isPending ? 'Saving...' : 'Save relationship'}
           </Button>
         </Inline>
       </Spread>

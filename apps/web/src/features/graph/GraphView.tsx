@@ -433,7 +433,7 @@ export function GraphView() {
           // without ever saying that anything had gone wrong.
           <div className="grid h-full place-items-center p-8">
             <ErrorState
-              title="Couldn’t draw the map"
+              title="Couldn't draw the map"
               detail={(error as Error | null)?.message}
               onRetry={() => void refetch()}
             />
@@ -527,7 +527,7 @@ export function GraphView() {
               void navigator.clipboard
                 ?.writeText(url)
                 .then(() => flash(`Copied a link to ${selected.title}`))
-                .catch(() => flash('Couldn’t reach the clipboard.', { variant: 'error' }));
+                .catch(() => flash("Couldn't reach the clipboard.", { variant: 'error' }));
             }}
           />
         )}

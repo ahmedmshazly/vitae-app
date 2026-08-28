@@ -93,7 +93,7 @@ describe('POST/GET/DELETE /api/v1/edges', () => {
     expect(second.status).toBe(201);
     expect(second.body.edge.id).toBe(first.body.edge.id);
     expect(second.body.edge.props.topics).toEqual(['Business']);
-    // …and what the caller did not mention survives.
+    // ...and what the caller did not mention survives.
     expect(second.body.edge.props.closeness).toBe(4);
     expect(second.body.edge.props.favors).toHaveLength(1);
   });

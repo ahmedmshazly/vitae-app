@@ -160,7 +160,7 @@ test('a failed load names the record, and a failed history does not take the pag
   // History is a separate query: it must degrade on its own.
   await page.route(REVISIONS, (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
   await page.goto(url);
-  await expect(page.getByRole('alert')).toContainText('Couldn’t load the history.');
+  await expect(page.getByRole('alert')).toContainText("Couldn't load the history.");
   await expect(page.getByRole('region', { name: /^Properties/ })).toBeVisible();
   // Nothing true to encode without revisions, so the rule carries no ticks.
   await expect(page.locator('.vt-register__tick')).toHaveCount(0);
@@ -176,7 +176,7 @@ test('a failed load names the record, and a failed history does not take the pag
   );
   await page.goto(url);
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load this record');
+  await expect(alert).toContainText("Couldn't load this record");
   await expect(alert).toContainText('the graph is unreachable');
 });
 

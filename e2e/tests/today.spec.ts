@@ -142,7 +142,7 @@ test('error state names the failure, shows the detail, and retries', async ({ pa
   await page.reload();
 
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load today');
+  await expect(alert).toContainText("Couldn't load today");
   await expect(alert).toContainText('upstream is down');
   // Nothing true to encode while the load failed, so the rule carries no ticks.
   await expect(page.locator('.vt-register__tick')).toHaveCount(0);

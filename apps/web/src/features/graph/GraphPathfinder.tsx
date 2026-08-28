@@ -69,7 +69,7 @@ export function GraphPathfinder({
           <EntityPicker
             types={destinationTypes as NodeType[]}
             onPick={onPickTo}
-            placeholder="Search a destination record…"
+            placeholder="Search a destination record..."
           />
         )}
       </div>

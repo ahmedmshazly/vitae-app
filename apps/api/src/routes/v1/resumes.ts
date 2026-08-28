@@ -1010,7 +1010,7 @@ resumesRouter.post(
         throw new HttpError(
           409,
           'NOT_FINAL',
-          'Only a finalized résumé can be sent, this one is still a draft. Re-run Finalize: it must fit one page and cover ≥95% of the job description’s keywords.',
+          "Only a finalized résumé can be sent, this one is still a draft. Re-run Finalize: it must fit one page and cover ≥95% of the job description's keywords.",
         );
       }
       const target = await repository.docGet<Record<string, unknown>>(

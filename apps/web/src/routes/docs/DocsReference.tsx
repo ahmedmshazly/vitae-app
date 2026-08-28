@@ -132,7 +132,7 @@ export function DocsCatalog({ spec }: { spec: CatalogSpec }) {
         className="docs-catalog"
         loading={<CatalogSkeleton />}
         loadingLabel={`Loading the ${spec.title.toLowerCase()} catalog`}
-        errorTitle={`Couldn’t load the ${spec.title.toLowerCase()} catalog`}
+        errorTitle={`Couldn't load the ${spec.title.toLowerCase()} catalog`}
         compact
       >
         {(all) => (

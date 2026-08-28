@@ -36,7 +36,7 @@ test('a failed load says so instead of spinning for ever', async ({ page }) => {
   // `isError` was never destructured, so `data` stayed undefined, `!view` held,
   // and the spinner ran until you gave up.
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t draw the map');
+  await expect(alert).toContainText("Couldn't draw the map");
   await expect(alert).toContainText('the graph service is down');
   await expect(page.locator('.vt-spinner')).toHaveCount(0);
 });
@@ -71,7 +71,7 @@ test('the canvas ground is flat, no wash, no texture, no tint', async ({ page })
   // three separate standing bans, all in one rule.
   expect(ground.image).toBe('none');
 
-  // …and the ground is one of the page's own greys, not a blue-black of its
+  // ...and the ground is one of the page's own greys, not a blue-black of its
   // own invention. The instrument sits on the sunken surface, one step below
   // the page, which is a token like any other.
   const rgb = (hex: string) =>
@@ -141,7 +141,7 @@ test('a failed path lookup reports itself instead of rendering nothing', async (
 
   // PathStory returned null when the query failed, so asking for a path looked
   // exactly like never having asked.
-  await expect(page.getByRole('alert')).toContainText('Couldn’t work out a path', { timeout: 10_000 });
+  await expect(page.getByRole('alert')).toContainText("Couldn't work out a path", { timeout: 10_000 });
 });
 
 test('the life map has no automated a11y violations', async ({ page }) => {

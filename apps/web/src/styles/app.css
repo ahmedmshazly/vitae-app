@@ -227,7 +227,7 @@
   white-space: nowrap;
 }
 /* When the bar is tight the trail gives way before the page you are on does:
-   "Network / Peo… / Profile" still locates you, "Netw… / Pro…" does not. */
+   "Network / Peo... / Profile" still locates you, "Netw... / Pro..." does not. */
 .topbar__crumb > span:not(.cur) {
   flex: 0 200 auto;
 }

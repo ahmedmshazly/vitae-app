@@ -107,7 +107,7 @@ describe('AddConnection reports a refused link where it happened', () => {
     await fillIn(user);
     await user.click(screen.getByRole('button', { name: 'Create link' }));
 
-    expect(await screen.findByRole('button', { name: 'Linking…' })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: 'Linking...' })).toBeDisabled();
 
     gate.resolve({ edge: { id: 'e-new' } });
     expect(await screen.findByText('Linked Staff Engineer')).toBeInTheDocument();

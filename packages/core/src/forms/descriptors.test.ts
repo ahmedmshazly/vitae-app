@@ -33,7 +33,7 @@ describe('form descriptors stay honest against the Zod schemas', () => {
     }
   });
 
-  it('every node descriptor field exists in that type’s props schema', () => {
+  it("every node descriptor field exists in that type's props schema", () => {
     for (const type of NODE_TYPES) {
       const keys = shapeKeys(NODE_PROPS_SCHEMAS[type]);
       if (!keys) continue;
@@ -43,7 +43,7 @@ describe('form descriptors stay honest against the Zod schemas', () => {
     }
   });
 
-  it('every edge descriptor field exists in that edge’s props schema', () => {
+  it("every edge descriptor field exists in that edge's props schema", () => {
     for (const type of EDGE_TYPES) {
       const keys = shapeKeys(EDGE_PROPS_SCHEMAS[type]);
       if (!keys) continue;
@@ -53,7 +53,7 @@ describe('form descriptors stay honest against the Zod schemas', () => {
     }
   });
 
-  it('every field’s section id is declared in the descriptor’s sections', () => {
+  it("every field's section id is declared in the descriptor's sections", () => {
     for (const type of NODE_TYPES) {
       const d = NODE_FORM_DESCRIPTORS[type];
       const sectionIds = new Set(d.sections.map((s) => s.id));

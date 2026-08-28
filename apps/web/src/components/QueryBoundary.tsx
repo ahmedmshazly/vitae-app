@@ -198,8 +198,8 @@ export function QueryBoundary<const S extends QuerySource>({
   loading,
   skeletonRows = 6,
   loadingLabel = 'Loading',
-  errorTitle = 'Couldn’t load this',
-  staleErrorTitle = 'Couldn’t refresh this data',
+  errorTitle = "Couldn't load this",
+  staleErrorTitle = "Couldn't refresh this data",
   retryLabel = 'Retry',
   refreshingLabel = 'Refreshing data',
   showRefreshing = true,
@@ -244,7 +244,7 @@ export function QueryBoundary<const S extends QuerySource>({
     if (!targets.some((q) => q.refetch)) return undefined;
     return (
       <Button size="sm" disabled={retrying} onClick={() => void retry(targets)}>
-        {retrying ? 'Retrying…' : retryLabel}
+        {retrying ? 'Retrying...' : retryLabel}
       </Button>
     );
   }
@@ -275,7 +275,7 @@ export function QueryBoundary<const S extends QuerySource>({
         {withDegraded && degraded.length > 0 && (
           <Banner
             tone="danger"
-            title={`Couldn’t load ${phrase(degraded.map((s) => s.label))}`}
+            title={`Couldn't load ${phrase(degraded.map((s) => s.label))}`}
             action={retryAction(degraded.map((s) => s.query))}
           >
             Everything else on this screen is current.

@@ -66,7 +66,7 @@ export function EntityObservatoryCommandPalette({
           <input
             ref={inputRef}
             value={query}
-            placeholder="Navigate, reveal, focus, export…"
+            placeholder="Navigate, reveal, focus, export..."
             aria-label="Find a command"
             onChange={(event) => setQuery(event.target.value)}
           />

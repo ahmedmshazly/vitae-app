@@ -61,7 +61,7 @@ describe('Letters states', () => {
     serve({ '/letters': new Error('gateway down') });
     renderWithApp(<Letters />, { route: '/letters' });
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Couldn’t load your cover letters',
+      "Couldn't load your cover letters",
     );
     expect(screen.queryByText(/No cover letters yet/)).not.toBeInTheDocument();
   });

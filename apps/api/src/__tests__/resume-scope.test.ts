@@ -103,7 +103,7 @@ function idsIn(model: Awaited<ReturnType<typeof buildFullModel>>): string[] {
   ]);
 }
 
-describe('the résumé contains only the owner’s records', () => {
+describe("the résumé contains only the owner's records", () => {
   it('excludes every record owned by someone else', async () => {
     const model = await buildFullModel([{ atomId: 'a1', ownerId: 'role-mine', text: 'Did a thing.' }], opts);
     const ids = idsIn(model);
@@ -120,7 +120,7 @@ describe('the résumé contains only the owner’s records', () => {
     }
   });
 
-  it('keeps the owner’s own records in every section', async () => {
+  it("keeps the owner's own records in every section", async () => {
     const model = await buildFullModel([{ atomId: 'a1', ownerId: 'role-mine', text: 'Did a thing.' }], opts);
     const ids = idsIn(model);
     for (const mine of ['role-mine', 'edu-mine', 'award-mine', 'pub-mine', 'proj-mine', 'skill-mine']) {

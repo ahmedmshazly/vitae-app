@@ -136,7 +136,7 @@ describe('githubRepoKey', () => {
     expect(isStorable(githubRepoKey(123456)!)).toBe(true);
   });
 
-  it('yields nothing for a value that is not GitHub’s id', () => {
+  it("yields nothing for a value that is not GitHub's id", () => {
     expect(githubRepoKey('owner/name')).toBeNull();
     expect(githubRepoKey('')).toBeNull();
     expect(githubRepoKey(null)).toBeNull();

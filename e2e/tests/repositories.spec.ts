@@ -90,9 +90,9 @@ test('a Settings failure does not pretend the repository list failed', async ({ 
   await page.goto('/repositories');
 
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load GitHub settings');
+  await expect(alert).toContainText("Couldn't load GitHub settings");
   await expect(alert).toContainText('settings store unreachable');
-  await expect(page.getByText('Couldn’t load repositories')).toHaveCount(0);
+  await expect(page.getByText("Couldn't load repositories")).toHaveCount(0);
 });
 
 test('a failed repository list says so instead of claiming you have none', async ({ page }) => {
@@ -109,7 +109,7 @@ test('a failed repository list says so instead of claiming you have none', async
   await page.goto('/repositories');
 
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load repositories');
+  await expect(alert).toContainText("Couldn't load repositories");
   await expect(alert).toContainText('repository index unreachable');
   await expect(page.getByText('No repositories yet')).toHaveCount(0);
 });

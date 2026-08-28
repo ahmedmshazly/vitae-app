@@ -134,7 +134,7 @@ export function ErrorState({
         <span className="vt-error__actions">
           {onRetry && (
             <button type="button" className="vt-btn vt-btn--sm" onClick={onRetry} disabled={retrying}>
-              {retrying ? 'Retrying…' : retryLabel}
+              {retrying ? 'Retrying...' : retryLabel}
             </button>
           )}
           {action}

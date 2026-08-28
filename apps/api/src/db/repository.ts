@@ -728,7 +728,7 @@ export class Repository {
   // ── Generic document access ────────────────────────────────────────────────
   //
   // The collections that are genuinely key-value (tags, saved views, habit
-  // checks, dedup state, …). These exist so services stop reaching around the
+  // checks, dedup state, ...). These exist so services stop reaching around the
   // repository for them; the graph itself deliberately does not go through here.
 
   async docGet<T = Record<string, unknown>>(table: TableName, id: string, conn: Db = db): Promise<T | null> {
@@ -773,7 +773,7 @@ export class Repository {
     conn: Db = db,
   ): Promise<void> {
     const clean = JSON.stringify(stripUndefined(patch));
-    // Update-then-insert, not INSERT … ON CONFLICT. Postgres validates the
+    // Update-then-insert, not INSERT ... ON CONFLICT. Postgres validates the
     // proposed row's NOT NULL constraints *before* it resolves the conflict, so
     // an upsert against a child table (`import_rows`, `meta_runs`) fails on its
     // missing parent-id column even when the row is already there and only the

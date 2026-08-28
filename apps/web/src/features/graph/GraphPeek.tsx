@@ -231,7 +231,7 @@ export function PathStory({ path, loading, emptyHint, failed, onRetry }: PathSto
   } else if (failed) {
     body = (
       <ErrorState
-        title="Couldn’t work out a path"
+        title="Couldn't work out a path"
         detail="The lookup failed. The map itself is unaffected."
         onRetry={retry}
       />

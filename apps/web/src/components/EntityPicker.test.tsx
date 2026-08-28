@@ -22,10 +22,10 @@ describe('EntityPicker', () => {
     });
 
     renderWithApp(
-      <EntityPicker types={['person']} onPick={onPick} placeholder="Search people…" />,
+      <EntityPicker types={['person']} onPick={onPick} placeholder="Search people..." />,
     );
 
-    const input = screen.getByRole('combobox', { name: 'Search people…' });
+    const input = screen.getByRole('combobox', { name: 'Search people...' });
     await user.type(input, 'Ada');
 
     await waitFor(() => {

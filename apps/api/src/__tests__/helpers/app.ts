@@ -12,7 +12,7 @@ let cached: { app: Express; token: string } | null = null;
  * `POST /auth/dev-login` echoes the token in the JSON body **only** under
  * emulators; otherwise it sends it as the httpOnly `vitae_session` cookie and
  * the body carries just the user (routes/v1/auth.ts: "The token is the
- * session; it goes out as an httpOnly cookie… The exception is an emulator
+ * session; it goes out as an httpOnly cookie... The exception is an emulator
  * run, where supertest has no cookie jar"). Supertest keeps no cookie jar, so
  * the cookie is read off the header here.
  *

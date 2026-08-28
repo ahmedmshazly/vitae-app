@@ -189,7 +189,7 @@ ensure_e2e_database() {
 # localhost:8787, the repository .env sets the same, and a developer with
 # `docker compose up -d buildsvc` running therefore had the API suite signing
 # CI-secret requests against a container holding the development secret. That
-# answers 401 BAD_SIGNATURE with no log_tail, which is reachable-but-failing —
+# answers 401 BAD_SIGNATURE with no log_tail, which is reachable-but-failing -
 # neither of the two outcomes the letter compile case accepts. The step passed
 # or failed depending on whether an unrelated container happened to be up.
 #

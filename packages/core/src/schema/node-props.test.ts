@@ -11,7 +11,7 @@ const LONG_TAIL_VALID: Array<[string, Record<string, unknown>]> = [
   ['location', { kind: 'city', lat: 30.0444, lng: 31.2357, country_code: 'EG' }],
   ['trip', { purpose: 'conference', destination: 'Vancouver', transport: ['plane'], budget: { amount: 2000, currency: 'USD' } }],
   ['media_item', { media_kind: 'book', creator: 'C. Alexander', consumption_status: 'in_progress', rating: 5 }],
-  ['highlight', { excerpt: 'A pattern language…', loc_ref: 'p. 141', thought: 'applies to schema design' }],
+  ['highlight', { excerpt: 'A pattern language...', loc_ref: 'p. 141', thought: 'applies to schema design' }],
   ['asset', { category: 'electronics', vendor: 'Lenovo', price: { amount: 1400, currency: 'USD' }, asset_status: 'owned' }],
   ['health_log', { metric: 'sleep_h', value: 7.5, unit: 'h', logged_at: '2026-07-01T08:00:00Z' }],
   ['account', { kind: 'subscription', service: 'Cloudflare', cost: { amount: 5, currency: 'USD', period: 'monthly' }, account_status: 'active' }],

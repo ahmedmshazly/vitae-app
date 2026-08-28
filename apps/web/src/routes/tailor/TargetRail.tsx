@@ -162,7 +162,7 @@ export function TargetRail({
           <Textarea
             aria-label="Job description"
             rows={8}
-            placeholder="Paste the job description here…"
+            placeholder="Paste the job description here..."
             value={jd}
             onChange={(e) => setJd(e.target.value)}
           />
@@ -171,11 +171,11 @@ export function TargetRail({
             disabled={!jd.trim() || create.isPending}
             onClick={() => create.mutate()}
           >
-            {create.isPending ? 'Parsing…' : 'Parse keywords'}
+            {create.isPending ? 'Parsing...' : 'Parse keywords'}
           </Button>
           {create.isError && (
             <p role="alert" className="m-0 text-xs text-danger">
-              Couldn’t parse that description. {(create.error as Error | null)?.message}
+              Couldn't parse that description. {(create.error as Error | null)?.message}
             </p>
           )}
         </div>
@@ -183,7 +183,7 @@ export function TargetRail({
 
       {targetsQuery.isError ? (
         <ErrorState
-          title="Couldn’t load your job targets"
+          title="Couldn't load your job targets"
           detail={(targetsQuery.error as Error | null)?.message}
           onRetry={() => void targetsQuery.refetch()}
           retrying={targetsQuery.isFetching}
@@ -252,7 +252,7 @@ export function TargetRail({
           {updateTarget.isError && (
             <StatusTrace
               tone="danger"
-              label="Couldn’t update this target"
+              label="Couldn't update this target"
               detail={(updateTarget.error as Error | null)?.message ?? 'Try again'}
             />
           )}
@@ -304,7 +304,7 @@ export function TargetRail({
                     })
                   }
                 >
-                  {updateTarget.isPending ? 'Saving…' : 'Save details'}
+                  {updateTarget.isPending ? 'Saving...' : 'Save details'}
                 </Button>
               </div>
             ) : (
@@ -426,7 +426,7 @@ export function TargetRail({
                 {saveKeywords.isError && (
                   <StatusTrace
                     tone="danger"
-                    label="Couldn’t save these keywords"
+                    label="Couldn't save these keywords"
                     detail={`Weights run 0 to 10, and a target holds at most ${KEYWORD_LIMIT} terms.`}
                   />
                 )}
@@ -438,7 +438,7 @@ export function TargetRail({
                   }
                   onClick={() => saveKeywords.mutate()}
                 >
-                  {saveKeywords.isPending ? 'Saving…' : 'Save keywords'}
+                  {saveKeywords.isPending ? 'Saving...' : 'Save keywords'}
                 </Button>
               </div>
             ) : active.parsed.keywords.length === 0 ? (

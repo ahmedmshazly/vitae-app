@@ -104,7 +104,7 @@ export function GraphToolbar({
           announce={!loadFailed}
           label={
             loadFailed
-              ? 'Couldn’t draw the map'
+              ? "Couldn't draw the map"
               : busy
                 ? 'Connecting records'
                 : truncated

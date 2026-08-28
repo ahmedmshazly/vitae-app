@@ -190,7 +190,7 @@ test('the reminders drawer reports a failed load and offers a retry', async ({ p
   await page.route(REMINDERS, (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
   await signIn(page);
   await page.getByRole('button', { name: /reminders/i }).click();
-  await expect(page.getByRole('alert')).toContainText('Couldn’t load reminders');
+  await expect(page.getByRole('alert')).toContainText("Couldn't load reminders");
 
   await page.unroute(REMINDERS);
   await page.getByRole('button', { name: 'Retry' }).click();

@@ -312,7 +312,7 @@ export function EntityForm({
 
       <fieldset className="entity-form__section">
         <legend className="entity-form__legend">Notes</legend>
-        <Textarea placeholder="Markdown notes…" {...register('notes_md')} />
+        <Textarea placeholder="Markdown notes..." {...register('notes_md')} />
       </fieldset>
 
       {!formId && (
@@ -323,7 +323,7 @@ export function EntityForm({
             </Button>
           )}
           <Button type="submit" variant="primary" disabled={busy}>
-            {busy ? 'Saving…' : submitLabel}
+            {busy ? 'Saving...' : submitLabel}
           </Button>
         </div>
       )}

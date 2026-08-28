@@ -39,7 +39,7 @@ export function isSubjectBearing(type: string): boolean {
  * null when this edge is not a subject edge for the record's type.
  *
  * `direction: 'in'` means the edge runs person → record (HELD, EARNED,
- * ATTENDED …), so the record is `dst`. 'out' runs record → person.
+ * ATTENDED ...), so the record is `dst`. 'out' runs record → person.
  * Callers pass a type lookup because an edge only carries ids.
  */
 export function subjectAssignment(

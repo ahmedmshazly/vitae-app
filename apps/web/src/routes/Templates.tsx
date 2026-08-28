@@ -205,7 +205,7 @@ export function Templates() {
 
       {loadFailed ? (
         <ErrorState
-          title="Couldn’t load résumé templates"
+          title="Couldn't load résumé templates"
           detail={(templatesQuery.error as Error | null)?.message}
           onRetry={() => void templatesQuery.refetch()}
         />
@@ -215,7 +215,7 @@ export function Templates() {
         <EmptyState
           glyph="resume"
           title="No résumé templates are available"
-          hint="The template catalogue returned no layouts. Retry the request; if it persists, check the API’s template files."
+          hint="The template catalogue returned no layouts. Retry the request; if it persists, check the API's template files."
           action={
             <Button size="sm" onClick={() => void templatesQuery.refetch()}>
               Retry
@@ -227,7 +227,7 @@ export function Templates() {
           {refreshFailed && (
             <Banner
               tone="danger"
-              title="Couldn’t refresh the template catalogue"
+              title="Couldn't refresh the template catalogue"
               action={
                 <Button size="sm" onClick={() => void templatesQuery.refetch()}>
                   Retry
@@ -275,7 +275,7 @@ export function Templates() {
                 label={`Setting ${
                   templates.find((template) => template.key === setDefault.variables)?.name ??
                   'the layout'
-                } as the default…`}
+                } as the default...`}
               />
             )}
             {/* The Section states a count, so the markup under it has to be the
@@ -362,7 +362,7 @@ export function Templates() {
                           // to a voice control matches this button (WCAG 2.5.3);
                           // the old name shared no words with its own label. The
                           // pending state is folded in because an aria-label
-                          // overrides content, so "Making default…" reached
+                          // overrides content, so "Making default..." reached
                           // assistive tech as "Make Cobalt the default".
                           aria-label={
                             active
@@ -375,7 +375,7 @@ export function Templates() {
                           {active
                             ? 'Current default'
                             : setting
-                              ? 'Making default…'
+                              ? 'Making default...'
                               : 'Make default'}
                         </Button>
                       </div>

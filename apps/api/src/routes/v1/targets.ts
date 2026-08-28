@@ -73,7 +73,7 @@ targetsRouter.get(
   }),
 );
 
-/** Save the Tailor workspace draft (mode, selection, section config…). */
+/** Save the Tailor workspace draft (mode, selection, section config...). */
 targetsRouter.patch(
   '/:id/draft',
   asyncHandler(async (req, res) => {

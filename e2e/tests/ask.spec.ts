@@ -66,7 +66,7 @@ test('an ask that nothing matched says so, however well you know the leader', as
   await expect(banner).toContainText('No contact matched the intent');
   await expect(ranked(page).locator('article').first()).toBeVisible();
 
-  // …and it goes away the moment a factor actually answers the ask.
+  // ...and it goes away the moment a factor actually answers the ask.
   await askFor(page, 'need=referral&topics=reinforcement+learning&run=1');
   await expect(ranked(page).locator('article').first()).toBeVisible();
   await expect(page.getByText('No contact matched the intent')).toHaveCount(0);
@@ -125,7 +125,7 @@ test('a failed rank says so instead of reporting that nobody fits', async ({ pag
   await askFor(page, 'need=referral&topics=reinforcement+learning&run=1');
 
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t rank anyone');
+  await expect(alert).toContainText("Couldn't rank anyone");
   await expect(alert).toContainText('the ranker is unavailable');
   await expect(page.getByText('No one to call')).toHaveCount(0);
 });
@@ -181,7 +181,7 @@ test('a failed draft says so instead of leaving an empty box above a live Send',
 
   // generate() was a try/finally with no catch: the rejection went nowhere.
   const dialog = page.getByRole('dialog');
-  await expect(dialog.getByRole('alert')).toContainText('Couldn’t draft that message');
+  await expect(dialog.getByRole('alert')).toContainText("Couldn't draft that message");
   await expect(dialog.getByRole('button', { name: 'Send & log' })).toBeDisabled();
 });
 

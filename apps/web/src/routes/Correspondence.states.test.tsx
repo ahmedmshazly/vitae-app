@@ -30,7 +30,7 @@ describe('Correspondence states', () => {
   it('reports a failed load instead of an empty rollup', async () => {
     mockApi.get.mockRejectedValue(new Error('rollup unavailable'));
     renderWithApp(<Correspondence />);
-    expect(await screen.findByText('Couldn’t load correspondence')).toBeInTheDocument();
+    expect(await screen.findByText("Couldn't load correspondence")).toBeInTheDocument();
     expect(screen.queryByText('No dormant ties')).not.toBeInTheDocument();
   });
 

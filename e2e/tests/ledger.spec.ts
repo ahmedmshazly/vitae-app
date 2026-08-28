@@ -47,7 +47,7 @@ test('a failed ledger load names itself instead of posing as empty', async ({ pa
   await signIn(page);
   await page.route('**/api/v1/ledger**', (route) => route.abort());
   await page.goto('/today/ledger');
-  await expect(page.getByText('Couldn’t load the ledger')).toBeVisible();
+  await expect(page.getByText("Couldn't load the ledger")).toBeVisible();
   await expect(page.getByRole('button', { name: 'Retry' })).toBeVisible();
   await expect(page.getByText('No changes yet')).toHaveCount(0);
 });

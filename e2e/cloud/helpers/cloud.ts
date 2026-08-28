@@ -45,7 +45,7 @@ export async function signInToCloud(page: Page): Promise<void> {
   });
 }
 
-/** Paddle's `ts=…;h1=…`, over `${timestamp}:` followed by the untouched body. */
+/** Paddle's `ts=...;h1=...`, over `${timestamp}:` followed by the untouched body. */
 function signature(body: Buffer, timestamp: number): string {
   const digest = createHmac('sha256', WEBHOOK_SECRET)
     .update(`${timestamp}:`)

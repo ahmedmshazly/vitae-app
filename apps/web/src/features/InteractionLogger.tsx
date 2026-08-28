@@ -118,7 +118,7 @@ export function InteractionLogger({
             Cancel
           </Button>
           <Button variant="primary" disabled={!canSave} onClick={() => log.mutate()}>
-            {log.isPending ? 'Saving…' : 'Save'}
+            {log.isPending ? 'Saving...' : 'Save'}
           </Button>
         </>
       }

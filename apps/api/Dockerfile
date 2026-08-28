@@ -8,7 +8,7 @@
 #   docker build -f apps/api/Dockerfile -t vitae/api .
 #
 # Runtime env: see docs/DEPLOYMENT.md §2 (WEB_ORIGIN, OWNER_EMAIL,
-# GOOGLE_APPLICATION_CREDENTIALS, SESSION_SECRET, CLOUDINARY_URL, …).
+# GOOGLE_APPLICATION_CREDENTIALS, SESSION_SECRET, CLOUDINARY_URL, ...).
 
 FROM node:22-alpine@sha256:16e22a550f3863206a3f701448c45f7912c6896a62de43add43bb9c86130c3e2 AS deps
 RUN corepack enable

@@ -69,7 +69,7 @@ export interface ComboboxItem {
   disabled?: boolean;
   /**
    * The word beside the disabled glyph, so the state is never tone alone
-   * (IDENTITY 6). Say why when you know: "Creating…", "Already linked".
+   * (IDENTITY 6). Say why when you know: "Creating...", "Already linked".
    */
   disabledReason?: string;
 }
@@ -130,7 +130,7 @@ export function Combobox({
   loading,
   error,
   emptyMessage = 'No matches.',
-  loadingMessage = 'Searching…',
+  loadingMessage = 'Searching...',
   placeholder,
   id,
   disabled,

@@ -32,7 +32,7 @@ function Harness() {
       <ListToolbar
         list={list}
         label="Filter atoms"
-        placeholder="Search bullet text or owner…"
+        placeholder="Search bullet text or owner..."
         noun="atom"
         count={list.isDefault ? TOTAL : NARROWED}
         total={TOTAL}

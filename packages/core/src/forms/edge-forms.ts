@@ -20,7 +20,7 @@ const knowsFields: FieldDescriptor[] = [
     label: 'Relation',
     widget: 'select',
     options: sel(...PERSON_RELATIONS),
-    help: 'Friend, colleague, family, mentor, …',
+    help: 'Friend, colleague, family, mentor, ...',
   },
   { key: 'closeness', label: 'Closeness', widget: 'rating', min: 1, max: 5 },
   {
@@ -52,7 +52,7 @@ export const EDGE_FORM_DESCRIPTORS: Record<EdgeType, EdgeFormDescriptor> = {
   KNOWS: {
     type: 'KNOWS',
     label: 'Knows',
-    description: 'Person ↔ person, typed relationship (friend, colleague, family, …).',
+    description: 'Person ↔ person, typed relationship (friend, colleague, family, ...).',
     srcTypes: ['person'],
     dstTypes: ['person'],
     fields: knowsFields,
@@ -122,7 +122,7 @@ export const EDGE_FORM_DESCRIPTORS: Record<EdgeType, EdgeFormDescriptor> = {
   WITH: {
     type: 'WITH',
     label: 'With',
-    description: 'Anything (interaction, trip, interview, event…) → person present.',
+    description: 'Anything (interaction, trip, interview, event...) → person present.',
     srcTypes: '*',
     dstTypes: ['person'],
     fields: [],
@@ -329,7 +329,7 @@ export const EDGE_FORM_DESCRIPTORS: Record<EdgeType, EdgeFormDescriptor> = {
   ORG_RELATED: {
     type: 'ORG_RELATED',
     label: 'Related org',
-    description: 'Organization → organization (parent, partner, competitor, …).',
+    description: 'Organization → organization (parent, partner, competitor, ...).',
     srcTypes: ['organization'],
     dstTypes: ['organization'],
     fields: [
@@ -359,7 +359,7 @@ export const EDGE_FORM_DESCRIPTORS: Record<EdgeType, EdgeFormDescriptor> = {
         help: 'Person id when recorded from a profile; kept as written otherwise.',
       },
       { key: 'occurred_on', label: 'On', widget: 'date', mono: true },
-      { key: 'context', label: 'Context', widget: 'text', placeholder: 'conference hallway, a thread, …' },
+      { key: 'context', label: 'Context', widget: 'text', placeholder: 'conference hallway, a thread, ...' },
     ],
   },
 };

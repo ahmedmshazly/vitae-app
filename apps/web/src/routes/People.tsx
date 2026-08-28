@@ -121,7 +121,7 @@ export function People() {
               {' · sorted by tie strength'}
             </>
           ) : (
-            'Loading…'
+            'Loading...'
           )
         }
         actions={
@@ -158,7 +158,7 @@ export function People() {
         query={peopleQuery}
         loadingLabel="Loading"
         skeletonRows={8}
-        errorTitle="Couldn’t load your people"
+        errorTitle="Couldn't load your people"
         filtered={filtered}
         isEmpty={() => people.length === 0}
         isSourceEmpty={(resolved) => resolved.people.length === 0}
@@ -167,7 +167,7 @@ export function People() {
             <EmptyState
               glyph="person"
               title="No one here yet"
-              hint="Add people you know - Vitae tracks how you’re connected and nudges you to reconnect. Capture fast with ⌘K (“p Lina Farouk @@DevFest #ml”) or use the button."
+              hint="Add people you know - Vitae tracks how you're connected and nudges you to reconnect. Capture fast with ⌘K ('p Lina Farouk @@DevFest #ml') or use the button."
               action={<NewNodeButton type="person" label="Add your first person" />}
             />
           </Section>

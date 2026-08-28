@@ -9,7 +9,7 @@
  *
  * Two backends, resolved in order:
  *   1. environment, a value injected by the deployment's secret manager
- *      (Cloud Run + Secret Manager, Fly secrets, …). Read-only at runtime:
+ *      (Cloud Run + Secret Manager, Fly secrets, ...). Read-only at runtime:
  *      rotation happens in the secret manager, not through the API.
  *   2. file: `VITAE_SECRETS_DIR` (default `.secrets/` at the repo root, which
  *      is git-ignored and chmod 0600). This is the local/self-hosted path and

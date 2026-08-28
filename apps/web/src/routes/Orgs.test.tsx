@@ -26,7 +26,7 @@ describe('Organizations directory states', () => {
     renderWithApp(<Orgs />, { route: '/orgs' });
 
     const alert = await screen.findByRole('alert');
-    expect(within(alert).getByText('Couldn’t load your organizations')).toBeInTheDocument();
+    expect(within(alert).getByText("Couldn't load your organizations")).toBeInTheDocument();
 
     mockApi.get.mockResolvedValueOnce({ orgs: [] });
     await user.click(within(alert).getByRole('button', { name: 'Retry' }));

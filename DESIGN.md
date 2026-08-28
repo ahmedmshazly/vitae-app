@@ -62,7 +62,7 @@ Stable data roles are person `#1f9c86`, work `#b08a18`, place `#6e8fd0`, event `
 `#a87bc0`, practice `#7e9b3a`, media `#d4649b`, and other `#c56a2a`. Workspace-home action tones
 reuse those roles: relationship → person, career → work, time → event, place → place, and data →
 media. Generic visualizations use the same eight slots in fixed order. A ninth series becomes
-“Other” or gains a second encoding; do not generate or cycle hues.
+"Other" or gains a second encoding; do not generate or cycle hues.
 
 Geometry is tight and cut-edged: radii are `2 / 3 / 5px`, with a full radius reserved for true
 dots, rings, meters, and compact badges. Spacing comes from the seven-step `4 / 8 / 12 / 16 / 24 /
@@ -119,15 +119,15 @@ that convention. Use `entityHref` for record links. Keep graph and map dependenc
 
 Public `/`, `/tour`, `/manifesto`, `/guides`, `/resources`, legal/status pages, and
 `/reference/entities` routes do not wait on auth or the API. `/welcome` is a legacy redirect to
-`/`. The marketing shell is editorial and uses real product captures labelled “Real interface
-· fictional demo data”; do not fabricate screenshots, endorsements, commercial claims, legal terms,
+`/`. The marketing shell is editorial and uses real product captures labelled "Real interface
+· fictional demo data"; do not fabricate screenshots, endorsements, commercial claims, legal terms,
 or operating-status claims. Hosted Cloud CTAs remain pre-launch until their release gate is enabled.
 
 `/reference/entities` is deliberately standalone and stays that way. The entity catalog and its
 observatory are generated from the same type constants the API validates against: they describe the
-schema, not a person’s records, and they read no user data. Giving them a workspace hub would claim
+schema, not a person's records, and they read no user data. Giving them a workspace hub would claim
 they operate on your graph, which they do not, and would put a documentation surface behind an
-account it does not need. They are reached from Help, the app’s other standalone reference surface,
+account it does not need. They are reached from Help, the app's other standalone reference surface,
 and from a direct link. Because the route mounts outside `Shell` it carries no breadcrumb, no
 workspace strip and no rail, so it must supply its own heading and its own way back into the app.
 
@@ -153,19 +153,19 @@ Common screen grammar:
   narrower context register.
 - A list is a semantic `ul`/`ol` of ruled rows. Rows carry a leading glyph or index, title and
   subtitle, optional chips/provenance, then right-aligned dates, counts, state, or actions. Numeric
-  metadata is monospace and tabular. Put row actions beside the row’s main link, never inside it.
+  metadata is monospace and tabular. Put row actions beside the row's main link, never inside it.
 - Selection needs semantic state plus a marker/check or label; hover only changes tone. Do not make
   a `Link` itself a `listitem`, nest controls inside links, or hide essential actions from keyboard
   focus.
 - Relationship rankings are a single expandable ledger. Scores sit beside factor chips and their
   source evidence; they are not oracles and not a stack of disconnected result cards.
 - Explore screens are instruments: explicit control bands above a flat graph/timeline/map canvas,
-  with a readable list, trail, or dossier tied to the same selection. Chronograph’s list is the
+  with a readable list, trail, or dossier tied to the same selection. Chronograph's list is the
   keyboard-readable twin of the canvas. Atlas puts a provenance trace before the place/route
   dossier.
 - Data screens share a numbered chain-of-custody trace. Imports, identity review, repositories,
   exports, and trash use source registers, evidence queues, definition ledgers, and recovery rows.
-  “Done”, “current”, and “upcoming” remain textual/structural as well as coloured.
+  "Done", "current", and "upcoming" remain textual/structural as well as coloured.
 - Cards are allowed for a singular bounded module, a stage item, or a document/record preview. A
   static card does not react on hover. Use `vt-card--interactive` only when an actual control inside
   warrants the response.
@@ -188,7 +188,7 @@ Feedback is both textual and animated, but animation never substitutes for the t
 - Toasts are the one transient channel. They queue (maximum four), pause on hover and focus, support
   swipe dismissal, are reachable with `F8` and normal tab order, and keep Undo attached to its own
   operation. Neutral/success messages last about five seconds, errors eight, and actionable toasts
-  up to twelve. Success and error add both a glyph and the words “Done” / “Error”.
+  up to twelve. Success and error add both a glyph and the words "Done" / "Error".
 - Mutation failures that lack a local handler reach the global error toast. Destructive actions use
   a confirmation where consequences are material and an Undo toast where reversal is available.
 
@@ -209,7 +209,7 @@ by `25ms` and cap at five positions (`125ms` total); later rows arrive with the 
 surfaces never scale, overshoot, or bounce. A small active press response is acceptable because it
 reports direct manipulation. Hover is not a state change and must not move the layout.
 
-Ask “what state change does this report?” before adding motion. Loading indicators may loop only
+Ask "what state change does this report?" before adding motion. Loading indicators may loop only
 while work is genuinely active. Under `prefers-reduced-motion: reduce`, duration tokens become zero,
 CSS animations/transitions are disabled, and React motion variants resolve immediately without
 travel.
@@ -245,7 +245,7 @@ The product contract is WCAG 2.2 AA. New work must preserve the mechanisms alrea
   icon-only controls; `aria-current`, `aria-selected`, `aria-expanded`, and `aria-busy` where the
   visible state requires them;
 - complete keyboard operation, visible `--ae-focus-ring`, a forced-colours outline fallback, focus
-  restoration/management in shared overlays, route focus, the skip link, and the tour’s arrow/Home/
+  restoration/management in shared overlays, route focus, the skip link, and the tour's arrow/Home/
   End tab behavior;
 - text contrast at or above the token floor, and control boundaries using `--ae-border-control`
   when no other affordance defines them;
@@ -264,7 +264,7 @@ rebuilding focus trapping, escape behavior, announcement timing, or swipe handli
 1. Reuse tokens and `@vitae/ui` primitives before adding app CSS. App-specific CSS should describe
    screen composition, not fork Button, Row, Card, feedback, or overlay behavior.
 2. Keep new chrome achromatic. Introduce colour only as an existing semantic/data role, with a
-   redundant non-colour signal. Do not add a one-off “accent colour.”
+   redundant non-colour signal. Do not add a one-off "accent colour."
 3. Keep surfaces flat: no decorative gradients, glow, halo, glass, blur, ambient wash, shimmer,
    background texture, or card shadow. Keep radii and spacing on the token scales.
 4. Do not use an equal-card dashboard as a page skeleton. Prefer one lead, a ruled register, a

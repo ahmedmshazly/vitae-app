@@ -61,7 +61,7 @@ async function readContent<T>(path: string, what: string): Promise<T> {
       }
       throw new Error(`${what} is not available (${error.status}).`);
     }
-    throw new Error(`Couldn’t reach ${what}. Check your connection and try again.`);
+    throw new Error(`Couldn't reach ${what}. Check your connection and try again.`);
   }
 }
 
@@ -78,7 +78,7 @@ export function manifestQueryOptions() {
 export function pageQueryOptions(page: DocsPageSummary) {
   return {
     queryKey: ['docs', 'page', page.id] as const,
-    queryFn: () => readContent<DocsPageContent>(page.content, `“${page.title}”`),
+    queryFn: () => readContent<DocsPageContent>(page.content, `'${page.title}'`),
     ...FOREVER,
   };
 }

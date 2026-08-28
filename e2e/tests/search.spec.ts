@@ -58,7 +58,7 @@ test.describe('search', () => {
     await expect(rows.nth(1)).toContainText(fixture.twinTitle);
     await expect(matches(page)).toContainText('First of the two · Berlin');
     await expect(matches(page)).toContainText('Second of the two · Lisbon');
-    // …and each says where it came from, which is what separates a person you
+    // ...and each says where it came from, which is what separates a person you
     // typed from one a vCard brought in.
     await expect(matches(page).locator('.vt-prov')).toHaveCount(2);
 
@@ -113,7 +113,7 @@ test.describe('search', () => {
     await page.getByLabel(QUERY).fill(fixture.token);
 
     const alert = page.getByRole('alert');
-    await expect(alert).toContainText('Couldn’t run that search');
+    await expect(alert).toContainText("Couldn't run that search");
     await expect(alert).toContainText('the index is rebuilding');
     await expect(page.getByText('No matches', { exact: true })).toHaveCount(0);
   });

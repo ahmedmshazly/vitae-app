@@ -97,7 +97,7 @@ export function Org() {
         <PageHeader title="Organization" />
         <RegisterRule />
         <ErrorState
-          title="Couldn’t load this organization"
+          title="Couldn't load this organization"
           detail={(error as Error | null)?.message}
           onRetry={() => void refetch()}
           retrying={isFetching}
@@ -112,7 +112,7 @@ export function Org() {
     return (
       <div className="page page--network page--organization-dossier">
         <div className="network-dossier network-dossier--organization">
-          <PageHeader title="Organization" subtitle="Loading…" />
+          <PageHeader title="Organization" subtitle="Loading..." />
           <div className="network-dossier__facts">
             {['people', 'affinity', 'roles', 'location'].map((cell) => (
               <div key={cell} className="grid gap-2">
@@ -214,7 +214,7 @@ export function Org() {
           title="This organization could not be refreshed"
           action={
             <Button size="sm" disabled={isFetching} onClick={() => void refetch()}>
-              {isFetching ? 'Retrying…' : 'Retry record'}
+              {isFetching ? 'Retrying...' : 'Retry record'}
             </Button>
           }
         >
@@ -226,9 +226,9 @@ export function Org() {
       <ConfirmDialog
         open={confirmDelete}
         onOpenChange={setConfirmDelete}
-        title={`Move “${org.title}” to trash?`}
+        title={`Move '${org.title}' to trash?`}
         body="It stays recoverable from Trash for 30 days; connections are preserved."
-        confirmLabel={remove.isPending ? 'Moving…' : 'Move to trash'}
+        confirmLabel={remove.isPending ? 'Moving...' : 'Move to trash'}
         destructive
         busy={remove.isPending}
         onConfirm={() => remove.mutate()}

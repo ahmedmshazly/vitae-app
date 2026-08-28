@@ -319,7 +319,7 @@ export function Help() {
       <div className="workspace-home__eyebrow">Product reference</div>
       <PageHeader
         title="Help & shortcuts"
-        subtitle="The shortest path into Vitae’s working model."
+        subtitle="The shortest path into Vitae's working model."
       />
       <RegisterRule />
 
@@ -331,7 +331,7 @@ export function Help() {
             the next useful view. Vitae never needs a perfect profile before it becomes useful.
           </p>
           <Link to="/today/planner">
-            Open today’s planner <span aria-hidden>↗</span>
+            Open today's planner <span aria-hidden>↗</span>
           </Link>
         </section>
 

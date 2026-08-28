@@ -184,7 +184,7 @@ export function EdgeSubEditorRow({
         <EntityPicker
           types={sub.targetTypes}
           excludeIds={mine.map((d) => d.target.id)}
-          placeholder={`Link ${sub.label.toLowerCase()}…`}
+          placeholder={`Link ${sub.label.toLowerCase()}...`}
           onPick={(target) =>
             onChange([...drafts, { key: newDraftKey(), sub, target, props: {} }])
           }

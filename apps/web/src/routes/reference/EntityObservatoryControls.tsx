@@ -165,7 +165,7 @@ export function EntityObservatoryControls({
               id={`${ids}-search`}
               type="search"
               value={search}
-              placeholder="Entity, relation, or field…"
+              placeholder="Entity, relation, or field..."
               autoComplete="off"
               aria-describedby={`${ids}-search-count`}
               onChange={(event) => onSearch(event.target.value)}
@@ -451,7 +451,7 @@ export function EntityObservatoryControls({
             Relation or field filter
             <input
               value={state.filters.fieldQuery}
-              placeholder="confidence, dates, KNOWS…"
+              placeholder="confidence, dates, KNOWS..."
               onChange={(event) =>
                 onStateChange(
                   replaceState(state, (draft) => {

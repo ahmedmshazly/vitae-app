@@ -31,7 +31,7 @@ describe('Ledger states', () => {
   it('reports a failed load instead of showing an empty feed', async () => {
     mockApi.get.mockRejectedValue(new Error('ledger unavailable'));
     renderWithApp(<Ledger />);
-    expect(await screen.findByText('Couldn’t load the ledger')).toBeInTheDocument();
+    expect(await screen.findByText("Couldn't load the ledger")).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
     expect(screen.queryByText('No changes yet')).not.toBeInTheDocument();
   });

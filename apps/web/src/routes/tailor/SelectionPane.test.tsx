@@ -85,7 +85,7 @@ describe('SelectionPane', () => {
   it('traces progress while the selection is being packed', () => {
     renderPane({ tailorPending: true });
     expect(screen.getByText('Scoring and packing')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Selecting…' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Selecting...' })).toBeDisabled();
   });
 
   it('names the bullet each pin and exclude action belongs to', async () => {

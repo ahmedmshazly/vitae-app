@@ -143,7 +143,7 @@ export const certificationProps = z.object({
 
 export const courseProps = z
   .object({
-    provider: z.string().optional(), // Coursera, Udacity, MIT OCW…
+    provider: z.string().optional(), // Coursera, Udacity, MIT OCW...
     platform: z.string().optional(),
     format: z.enum(['self_paced', 'cohort', 'in_person', 'bootcamp']).optional(),
     hours: z.number().nonnegative().optional(),
@@ -187,7 +187,7 @@ export const jobPostingProps = z
     posting_status: z
       .enum(['watching', 'interested', 'applied', 'closed', 'passed'])
       .optional(),
-    source: z.string().optional(), // LinkedIn, referral, careers page…
+    source: z.string().optional(), // LinkedIn, referral, careers page...
   })
   .passthrough();
 
@@ -465,7 +465,7 @@ export const highlightProps = z
     excerpt: z.string().max(500).optional(),
     loc_ref: z.string().optional(), // "p. 141", "32:10", location within the source.
     thought: z.string().optional(),
-    // The source (media_item, link, …) is linked via an ABOUT edge.
+    // The source (media_item, link, ...) is linked via an ABOUT edge.
   })
   .passthrough();
 
@@ -503,7 +503,7 @@ export const accountProps = z
     service: z.string().optional(),
     username: z.string().optional(),
     url: urlish,
-    // Masked identifier only ("…4242"), never store credentials (SRS AR-1).
+    // Masked identifier only ("...4242"), never store credentials (SRS AR-1).
     identifier_masked: z.string().optional(),
     cost: z
       .object({

@@ -436,7 +436,7 @@ export function fieldSummary(field: CatalogField): string {
   if (field.enumRef) parts.push(field.enumRef);
   if (field.enumValues.length > 0) parts.push(field.enumValues.join(' | '));
   if (field.min != null || field.max != null) {
-    parts.push(`${field.min ?? '−∞'}…${field.max ?? '∞'}`);
+    parts.push(`${field.min ?? '−∞'}...${field.max ?? '∞'}`);
   }
   if (field.length != null) parts.push(`length ${field.length}`);
   if (field.defaultValue !== undefined) parts.push(`default ${JSON.stringify(field.defaultValue)}`);

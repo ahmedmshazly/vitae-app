@@ -177,7 +177,7 @@ export function Collections() {
         <input
           id="library-query"
           className="coll__input"
-          placeholder={q ? 'Add another clause…' : 'Try type:person, tag:ml, or city:Berlin'}
+          placeholder={q ? 'Add another clause...' : 'Try type:person, tag:ml, or city:Berlin'}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
         />
@@ -244,7 +244,7 @@ export function Collections() {
             query={results}
             skeletonRows={5}
             loadingLabel="Reading the library"
-            errorTitle="Couldn’t run that query"
+            errorTitle="Couldn't run that query"
             showRefreshing={false}
             filtered
             emptyFiltered={
@@ -283,7 +283,7 @@ export function Collections() {
           {counts.isError && (
             <Banner
               tone="danger"
-              title="Couldn’t count your records"
+              title="Couldn't count your records"
               action={
                 <Button size="sm" onClick={() => void counts.refetch()}>
                   Retry
@@ -343,7 +343,7 @@ export function Collections() {
               query={views}
               skeletonRows={3}
               loadingLabel="Reading your saved views"
-              errorTitle="Couldn’t load saved views"
+              errorTitle="Couldn't load saved views"
               empty={
                 <EmptyState
                   glyph="filter"
@@ -370,7 +370,7 @@ export function Collections() {
                       variant="danger"
                       glyph="trash"
                       // The name carries the state as well as the row. A fixed
-                      // label would have masked the visible "Deleting…" from
+                      // label would have masked the visible "Deleting..." from
                       // the one reader who cannot see it.
                       aria-label={
                         deletingViewId === v.id ? `Deleting view ${v.name}` : `Delete view ${v.name}`
@@ -378,7 +378,7 @@ export function Collections() {
                       disabled={deletingViewId === v.id}
                       onClick={() => setConfirmDeleteView(v)}
                     >
-                      {deletingViewId === v.id ? 'Deleting…' : 'Delete'}
+                      {deletingViewId === v.id ? 'Deleting...' : 'Delete'}
                     </Button>
                   </div>
                 ))
@@ -394,7 +394,7 @@ export function Collections() {
           // signal off the screen with it.
           if (!open && !deleteViewM.isPending) setConfirmDeleteView(null);
         }}
-        title={`Delete the view “${confirmDeleteView?.name ?? ''}”?`}
+        title={`Delete the view '${confirmDeleteView?.name ?? ''}'?`}
         body={
           <>
             The records it finds are untouched, only the saved query goes.
@@ -422,7 +422,7 @@ export function Collections() {
               disabled={!viewName.trim() || saveViewM.isPending}
               onClick={saveView}
             >
-              {saveViewM.isPending ? 'Saving…' : 'Save'}
+              {saveViewM.isPending ? 'Saving...' : 'Save'}
             </Button>
           </>
         }

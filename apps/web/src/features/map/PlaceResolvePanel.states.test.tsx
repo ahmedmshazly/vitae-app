@@ -78,7 +78,7 @@ describe('PlaceResolvePanel states', () => {
   it('warns when the duplicate check failed instead of implying there are none', async () => {
     serve({ '/places/suggest-merges': new ApiError(500, 'internal', 'merge index down') });
     renderWithApp(panel());
-    expect(await screen.findByText(/Couldn’t check for existing places/)).toBeInTheDocument();
+    expect(await screen.findByText(/Couldn't check for existing places/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Retry check' })).toBeInTheDocument();
   });
 
@@ -105,7 +105,7 @@ describe('PlaceResolvePanel states', () => {
 
     const confirm = screen.getByRole('button', { name: 'Confirm' });
     await user.click(confirm);
-    expect(await screen.findByRole('button', { name: 'Saving…' })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: 'Saving...' })).toBeDisabled();
 
     reject(new ApiError(500, 'internal', 'place service refused'));
     await waitFor(() =>

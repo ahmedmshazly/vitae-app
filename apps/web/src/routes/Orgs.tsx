@@ -63,7 +63,7 @@ export function Orgs() {
                 {orgs.length === 1 ? 'organization' : 'organizations'} · sorted by affinity
               </>
             ) : (
-              'Loading…'
+              'Loading...'
             )}
           </>
         }
@@ -96,14 +96,14 @@ export function Orgs() {
         query={orgsQuery}
         loadingLabel="Loading"
         skeletonRows={8}
-        errorTitle="Couldn’t load your organizations"
+        errorTitle="Couldn't load your organizations"
         isEmpty={(resolved) => resolved.orgs.length === 0}
         empty={
           <Section title="All organizations" meta={0}>
             <EmptyState
               glyph="org"
               title="No organizations yet"
-              hint="Companies, universities, and communities you're tied to. They anchor roles, applications, and warm intros. Capture with ⌘K (“o Nile Robotics #robotics”) or use the button."
+              hint="Companies, universities, and communities you're tied to. They anchor roles, applications, and warm intros. Capture with ⌘K ('o Nile Robotics #robotics') or use the button."
               // Distinct from the header's "New organization" - both are on
               // screen at once when the list is empty.
               action={<NewNodeButton type="organization" label="Add your first organization" />}

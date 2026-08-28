@@ -43,7 +43,7 @@ export function ApplicationDossier() {
         <PageHeader title="Application" />
         <RegisterRule />
         <ErrorState
-          title="Couldn’t load this application"
+          title="Couldn't load this application"
           detail={(dossierQuery.error as Error | null)?.message}
           onRetry={() => void dossierQuery.refetch()}
         />
@@ -55,7 +55,7 @@ export function ApplicationDossier() {
     return (
       <div className="page">
         <BackToCareer />
-        <PageHeader title="Application" subtitle="Loading the dossier…" />
+        <PageHeader title="Application" subtitle="Loading the dossier..." />
         <RegisterRule />
         <SkeletonRows rows={7} />
       </div>

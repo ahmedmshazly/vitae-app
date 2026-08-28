@@ -80,7 +80,7 @@ describe('organization dossier screen', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Delete' }));
     await user.click(screen.getByRole('button', { name: 'Move to trash' }));
-    expect(screen.getByRole('button', { name: 'Moving…' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Moving...' })).toBeDisabled();
 
     finish();
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());

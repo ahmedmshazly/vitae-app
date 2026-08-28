@@ -75,7 +75,7 @@ test('a failed history load says so instead of claiming you have imported nothin
   await page.goto('/import');
 
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load import history');
+  await expect(alert).toContainText("Couldn't load import history");
   await expect(alert).toContainText('the import store is unreachable');
   await expect(page.getByText('No imports yet')).toHaveCount(0);
   // Sources stay usable, the catalogue of importers is not the history query.
@@ -120,7 +120,7 @@ test('opening a batch that fails to load reports the failure', async ({ page }) 
 
   await page.getByRole('button', { name: /Open contacts import from 2026-08-01/ }).click();
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load this import batch');
+  await expect(alert).toContainText("Couldn't load this import batch");
   await expect(alert).toContainText('batch rows are unreachable');
 });
 

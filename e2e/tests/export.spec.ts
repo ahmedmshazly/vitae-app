@@ -50,7 +50,7 @@ test('a failed backup status says so instead of spinning forever into nothing', 
   await page.goto('/export');
 
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load backup status');
+  await expect(alert).toContainText("Couldn't load backup status");
   await expect(alert).toContainText('export ledger unreachable');
 });
 
@@ -68,7 +68,7 @@ test('a failed saved-views load reports itself', async ({ page }) => {
   await page.goto('/export');
 
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load saved views');
+  await expect(alert).toContainText("Couldn't load saved views");
   await expect(alert).toContainText('views store unreachable');
 });
 

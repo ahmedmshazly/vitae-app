@@ -145,7 +145,7 @@ export function DocsSearch({ manifest }: { manifest: DocsManifest }) {
         className="docs-search"
         loading={<SearchSkeleton />}
         loadingLabel="Loading the search index"
-        errorTitle="Couldn’t load the search index"
+        errorTitle="Couldn't load the search index"
         compact
       >
         {(built) => (
@@ -218,7 +218,7 @@ function Results({
       <>
         <EmptyState
           glyph="search"
-          title={`Nothing matches “${query}”.`}
+          title={`Nothing matches '${query}'.`}
           hint={
             narrowed
               ? 'The words may be right and the filters wrong. Clearing them widens the search.'
@@ -326,7 +326,7 @@ function facetLabel(manifest: DocsManifest, name: FacetName, value: string): str
 function MissingWords({ missing }: { missing: readonly string[] }) {
   return (
     <p className="docs-search__missing">
-      No page contains {missing.map((word) => `“${word}”`).join(', ')}.
+      No page contains {missing.map((word) => `'${word}'`).join(', ')}.
     </p>
   );
 }

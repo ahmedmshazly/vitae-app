@@ -73,7 +73,7 @@ test('a failed target list says so rather than showing an empty workspace', asyn
   // `isError` was never destructured from either query, so a failed load left
   // empty panes reading "you have nothing" rather than "this did not load".
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load your job targets');
+  await expect(alert).toContainText("Couldn't load your job targets");
   await expect(alert).toContainText('target store unreachable');
 });
 
@@ -88,7 +88,7 @@ test('a failed atom list is reported too, not just the targets', async ({ page }
   );
   await goTailor(page);
 
-  await expect(page.getByRole('alert')).toContainText('Couldn’t load your atoms');
+  await expect(page.getByRole('alert')).toContainText("Couldn't load your atoms");
 });
 
 test('the score breakdown still proves its own arithmetic', async ({ page }) => {
@@ -134,7 +134,7 @@ test('a failed re-score says so, and does not claim your work is unsaved', async
   // Was `.catch(() => {})`: the previous target's numbers stayed on screen,
   // attached to this target's atoms.
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t score your atoms', { timeout: 10_000 });
+  await expect(alert).toContainText("Couldn't score your atoms", { timeout: 10_000 });
 
   // Scoring and saving fail for different reasons, a scoring failure must not
   // tell you your draft is not being saved.

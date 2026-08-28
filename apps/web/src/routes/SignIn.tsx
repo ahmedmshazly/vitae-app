@@ -15,7 +15,7 @@ import { Button, Glyph, LogoStacked, RegisterRule, Skeleton } from '@vitae/ui';
 import { useAuth } from '../lib/auth.js';
 
 /** Which way in is mid-flight. A single shared flag made the developer button
- * read "Signing in…" while it was Google that was busy, and left it disabled
+ * read "Signing in..." while it was Google that was busy, and left it disabled
  * with no way back if the Google popup never resolved. */
 type Pending = 'google' | 'dev' | null;
 
@@ -69,7 +69,7 @@ export function SignIn() {
                 onClick={() => void run('google', signInGoogle)}
               >
                 <Glyph name="person" size={16} />
-                {pending === 'google' ? 'Signing in…' : 'Continue with Google'}
+                {pending === 'google' ? 'Signing in...' : 'Continue with Google'}
               </Button>
             )}
 
@@ -81,7 +81,7 @@ export function SignIn() {
                 disabled={pending !== null}
                 onClick={() => void run('dev', signInDev)}
               >
-                {pending === 'dev' ? 'Signing in…' : 'Developer sign-in'}
+                {pending === 'dev' ? 'Signing in...' : 'Developer sign-in'}
                 {/* Inherit the button's own foreground rather than --ae-muted.
                     That token is documented at 7.6:1 against the application's
                     dark ground; on this button's near-white fill it measures
@@ -115,7 +115,7 @@ export function SignIn() {
 
           <p className="signin__access-note">
             {cloudEnabled
-              ? 'One private workspace. Your account never selects or shares another person’s records.'
+              ? "One private workspace. Your account never selects or shares another person's records."
               : 'This is a single-owner system. Verified accounts that do not match the configured owner email are denied.'}
           </p>
         </>

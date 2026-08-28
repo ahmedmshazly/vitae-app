@@ -46,7 +46,7 @@ test('a failed path lookup says the lookup failed, not that your graph is empty'
   // `paths.isError` was never checked, so a failed fetch fell through to the
   // empty branch and told the user to go capture people who already exist.
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t work out how to reach');
+  await expect(alert).toContainText("Couldn't work out how to reach");
   await expect(alert).toContainText('the path finder is down');
   await expect(page.getByText('No warm path')).toHaveCount(0);
 });
@@ -63,7 +63,7 @@ test('a failed target list says so instead of showing no organizations', async (
   await goIntros(page);
 
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load your organizations');
+  await expect(alert).toContainText("Couldn't load your organizations");
   await expect(page.getByText('No organizations yet')).toHaveCount(0);
 });
 
@@ -78,7 +78,7 @@ test('an empty graph invites a first organization', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Open organizations' })).toBeVisible();
 });
 
-test('each hop is weighted by its own tie, not by the path’s label', async ({ page }) => {
+test("each hop is weighted by its own tie, not by the path's label", async ({ page }) => {
   await signIn(page);
   const pathsResponse = page.waitForResponse(
     (response) => response.url().includes('/api/v1/intros/paths?') && response.status() === 200,
@@ -86,7 +86,7 @@ test('each hop is weighted by its own tie, not by the path’s label', async ({ 
   await goIntros(page);
   const { paths } = (await (await pathsResponse).json()) as IntroPathsPayload;
 
-  // Named hops, not “the first article that says chains into”: a richer seed
+  // Named hops, not 'the first article that says chains into': a richer seed
   // can insert other multi-hop paths ahead of this one without changing the
   // Lina → Karim sentence this spec is actually about.
   const multi = reach(page)
@@ -169,7 +169,7 @@ test('the destination lives in the URL, and the rail switches it', async ({ page
   expect(new URL(page.url()).searchParams.get('org')).not.toBe(before);
   await expect(reach(page).getByRole('heading').first()).toContainText(otherName);
 
-  // …and it survives a reload rather than snapping back to the first target.
+  // ...and it survives a reload rather than snapping back to the first target.
   const url = page.url();
   await page.reload();
   expect(page.url()).toBe(url);

@@ -12,8 +12,8 @@
 #
 # The SPA is not here: Vercel builds it from main on push.
 #
-# The documentation corpus IS here. It is private — served by the API behind the
-# OWNER_EMAIL allow-list rather than published by the web host — so it has to
+# The documentation corpus IS here. It is private - served by the API behind the
+# OWNER_EMAIL allow-list rather than published by the web host - so it has to
 # reach the VM, and it cannot be built there: the compiler reads the tracked
 # file set with git and the VM's checkout is not where the corpus is authored.
 # This script compiles it locally and copies it up before restarting anything.
@@ -85,7 +85,7 @@ pnpm docs:build
 
 # Moving the code first, publishing second, is not arbitrary. The corpus lands
 # inside the deployed checkout, so copying it up before the cleanliness check
-# makes the tree dirty and the deploy refuses itself — which is exactly what
+# makes the tree dirty and the deploy refuses itself - which is exactly what
 # happened the first time this ran. Merging first also means the .gitignore
 # that excludes the published corpus is in place before it arrives.
 step "Deploying ${BRANCH} to ${HOST}:${APP_DIR}"
@@ -118,7 +118,7 @@ step "Building and restarting"
 
   # \`< /dev/null\` is load-bearing, not tidiness. This script reaches the remote
   # shell on stdin, and \`compose run\` attaches stdin to the container it
-  # starts — so without the redirect it consumes the rest of THIS SCRIPT. The
+  # starts - so without the redirect it consumes the rest of THIS SCRIPT. The
   # recreate below was swallowed on every deploy that ever ran: the migration
   # succeeded, nothing was recreated, and the readiness check then passed
   # against the container that had never gone away.

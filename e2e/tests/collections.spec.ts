@@ -61,7 +61,7 @@ test('a failed count says so instead of reporting zero of everything', async ({ 
   await goCollections(page);
 
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t count your records');
+  await expect(alert).toContainText("Couldn't count your records");
   await expect(alert).toContainText('the graph is unreachable');
 
   // The failure costs the numbers, not the way in. Every register still opens,
@@ -91,7 +91,7 @@ test('a failed query reports a failure, not "No matches"', async ({ page }) => {
   // results.isError was never checked, so a failed fetch fell through to the
   // empty branch and told the user their query matched nothing.
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t run that query');
+  await expect(alert).toContainText("Couldn't run that query");
   await expect(page.getByText('No matches')).toHaveCount(0);
 });
 
@@ -145,7 +145,7 @@ test('deleting a saved view asks first, and can be undone', async ({ page }) => 
 
   // Was a bare × that deleted on click: no confirmation, no toast, no undo.
   await views.getByRole('button', { name: `Delete view ${name}` }).click();
-  await expect(page.getByRole('dialog')).toContainText(`Delete the view “${name}”?`);
+  await expect(page.getByRole('dialog')).toContainText(`Delete the view '${name}'?`);
   await page.getByRole('button', { name: 'Delete view' }).click();
 
   await expect(page.getByRole('region', { name: /^Saved views/ })).not.toContainText(name);

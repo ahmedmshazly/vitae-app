@@ -45,7 +45,7 @@ describe('Dossiers states', () => {
     renderList();
 
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Couldn’t check whose dossiers these are');
+    expect(alert).toHaveTextContent("Couldn't check whose dossiers these are");
     expect(alert).toHaveTextContent('auth service unavailable');
     expect(screen.queryByText('No self record yet')).not.toBeInTheDocument();
     expect(screen.queryByText('No dossiers yet')).not.toBeInTheDocument();
@@ -76,7 +76,7 @@ describe('Dossiers states', () => {
     renderList();
 
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Couldn’t load your dossiers');
+    expect(alert).toHaveTextContent("Couldn't load your dossiers");
     expect(alert).toHaveTextContent('dossier service unavailable');
     expect(screen.queryByText('No dossiers yet')).not.toBeInTheDocument();
   });
@@ -101,7 +101,7 @@ describe('Dossiers states', () => {
     await screen.findByText('No dossiers yet');
     await userEvent.click(screen.getAllByRole('button', { name: 'New dossier' })[0]!);
 
-    expect(await screen.findByText('Couldn’t load the audiences')).toBeInTheDocument();
+    expect(await screen.findByText("Couldn't load the audiences")).toBeInTheDocument();
     expect(screen.getByText('grammar unavailable')).toBeInTheDocument();
   });
 });

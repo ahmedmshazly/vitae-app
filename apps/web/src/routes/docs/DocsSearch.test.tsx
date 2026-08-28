@@ -179,13 +179,13 @@ describe('searching the corpus', () => {
 
   it('names the words it could not find', async () => {
     renderSearch('/docs/search?q=migration kubernetes');
-    expect(await screen.findByText(/No page contains “kubernetes”/)).toBeInTheDocument();
+    expect(await screen.findByText(/No page contains 'kubernetes'/)).toBeInTheDocument();
   });
 
   it('says the index could not be read rather than showing no results', async () => {
     failIndex = true;
     renderSearch('/docs/search?q=migration');
-    expect(await screen.findByText('Couldn’t load the search index')).toBeInTheDocument();
+    expect(await screen.findByText("Couldn't load the search index")).toBeInTheDocument();
   });
 
   it('reads the index through the authenticated API', async () => {

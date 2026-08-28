@@ -63,7 +63,7 @@ describe('PreviewPane', () => {
     mockApi.get.mockRejectedValueOnce(new Error('no templates'));
     renderPane();
 
-    expect(await screen.findByText('Couldn’t load the templates')).toBeInTheDocument();
+    expect(await screen.findByText("Couldn't load the templates")).toBeInTheDocument();
     mockApi.get.mockResolvedValue(templates);
     await user.click(screen.getByRole('button', { name: 'Retry' }));
     expect(await screen.findByRole('button', { name: 'Cobalt' })).toBeInTheDocument();
@@ -111,7 +111,7 @@ describe('PreviewPane', () => {
     renderPane();
 
     await user.click(await screen.findByRole('button', { name: 'Compile PDF' }));
-    expect(await screen.findByText('Couldn’t reach the build service')).toBeInTheDocument();
+    expect(await screen.findByText("Couldn't reach the build service")).toBeInTheDocument();
 
     mockApi.post.mockResolvedValue(compiled());
     await user.click(screen.getByRole('button', { name: 'Compile again' }));
@@ -189,7 +189,7 @@ describe('PreviewPane', () => {
     await user.click(screen.getByRole('button', { name: 'Finalize' }));
 
     await waitFor(() => {
-      expect(screen.getByText('Couldn’t finalize this résumé')).toBeInTheDocument();
+      expect(screen.getByText("Couldn't finalize this résumé")).toBeInTheDocument();
     });
   });
 });

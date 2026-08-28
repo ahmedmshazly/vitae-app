@@ -39,7 +39,7 @@ function unescapeValue(v: string): string {
   return v.replace(/\\n/gi, '\n').replace(/\\,/g, ',').replace(/\\;/g, ';').replace(/\\\\/g, '\\');
 }
 
-/** DTSTART variants → ISO date: 20260712, 20260712T093000Z, VALUE=DATE:… */
+/** DTSTART variants → ISO date: 20260712, 20260712T093000Z, VALUE=DATE:... */
 function toIsoDate(value: string): string | null {
   const m = value.match(/^(\d{4})(\d{2})(\d{2})/);
   return m ? `${m[1]}-${m[2]}-${m[3]}` : null;

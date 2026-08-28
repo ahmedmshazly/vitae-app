@@ -114,7 +114,7 @@ describe('Toast compatibility adapter', () => {
     fireEvent.click(screen.getByText('flash-undo'));
     fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
 
-    const failure = await screen.findByText('Couldn’t undo that change');
+    const failure = await screen.findByText("Couldn't undo that change");
     expect(failure.closest('li')).toHaveAttribute('data-variant', 'error');
   });
 });

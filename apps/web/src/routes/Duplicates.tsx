@@ -158,7 +158,7 @@ export function Duplicates() {
       const error = err as ApiError;
       flash(
         error.code === 'MERGE_CONFLICT'
-          ? 'Can’t undo safely because an affected record changed after the merge.'
+          ? "Can't undo safely because an affected record changed after the merge."
           : `Undo failed: ${error.message}`,
       );
     },
@@ -210,7 +210,7 @@ export function Duplicates() {
               disabled={rescan.isPending || result.isLoading}
               onClick={() => rescan.mutate()}
             >
-              {rescan.isPending ? 'Scanning…' : 'Rescan'}
+              {rescan.isPending ? 'Scanning...' : 'Rescan'}
             </Button>
             <Link to="/data/imports" className="vt-btn vt-btn--sm">
               Back to imports
@@ -346,7 +346,7 @@ export function Duplicates() {
       <Section title="Queue" meta={result.isSuccess ? clusters.length : undefined}>
         {result.isError ? (
           <ErrorState
-            title="Couldn’t load the identity queue"
+            title="Couldn't load the identity queue"
             detail={(result.error as Error | null)?.message}
             onRetry={() => void result.refetch()}
             retrying={result.isFetching}
@@ -373,7 +373,7 @@ export function Duplicates() {
                 hint="Imports and new records are checked automatically. Rescan if you just added records elsewhere."
                 action={
                   <Button size="sm" disabled={rescan.isPending} onClick={() => rescan.mutate()}>
-                    {rescan.isPending ? 'Scanning…' : 'Rescan'}
+                    {rescan.isPending ? 'Scanning...' : 'Rescan'}
                   </Button>
                 }
               />
@@ -468,7 +468,7 @@ export function Duplicates() {
       >
         {merges.isError ? (
           <ErrorState
-            title="Couldn’t load merge history"
+            title="Couldn't load merge history"
             detail={(merges.error as Error | null)?.message}
             onRetry={() => void merges.refetch()}
           />
@@ -503,7 +503,7 @@ export function Duplicates() {
                       onClick={() => undo.mutate(merge.id)}
                       aria-label={`Undo merge of ${merge.drop_title} into ${merge.keep_title}`}
                     >
-                      {undoing ? 'Undoing…' : 'Undo'}
+                      {undoing ? 'Undoing...' : 'Undo'}
                     </Button>
                   )}
                 </li>
@@ -519,7 +519,7 @@ export function Duplicates() {
       >
         {aliases.isError ? (
           <ErrorState
-            title="Couldn’t load learned aliases"
+            title="Couldn't load learned aliases"
             detail={(aliases.error as Error | null)?.message}
             onRetry={() => void aliases.refetch()}
           />
@@ -553,7 +553,7 @@ export function Duplicates() {
                   aria-label={`Forget alias ${alias.alias}`}
                 >
                   {removeAlias.isPending && removeAlias.variables === alias.id
-                    ? 'Forgetting…'
+                    ? 'Forgetting...'
                     : 'Forget'}
                 </Button>
               </li>
@@ -785,7 +785,7 @@ function ClusterAudit({
               onClick={() => consolidate.mutate()}
             >
               {consolidate.isPending
-                ? 'Consolidating…'
+                ? 'Consolidating...'
                 : consolidated.length > 0
                   ? `Retry ${remainingDrops.length} record${remainingDrops.length === 1 ? '' : 's'}`
                   : `Merge ${includedIds.size} records`}
@@ -833,7 +833,7 @@ function ClusterAudit({
 
       {loadError ? (
         <ErrorState
-          title="Couldn’t load cluster records"
+          title="Couldn't load cluster records"
           detail={loadError.message}
           onRetry={() => void Promise.all(queries.map((query) => query.refetch()))}
           retrying={queries.some((query) => query.isFetching)}

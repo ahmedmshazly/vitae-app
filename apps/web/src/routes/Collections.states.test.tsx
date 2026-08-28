@@ -53,7 +53,7 @@ describe('Library states', () => {
     renderWithApp(<Collections />, { route: '/explore/library' });
 
     const alert = await screen.findByRole('alert');
-    expect(within(alert).getByText('Couldn’t count your records')).toBeInTheDocument();
+    expect(within(alert).getByText("Couldn't count your records")).toBeInTheDocument();
     expect(within(alert).getByText(/counts index is rebuilding/)).toBeInTheDocument();
 
     // The failure used to take the only route into each record type with it.
@@ -82,7 +82,7 @@ describe('Library states', () => {
     await user.click(within(alert).getByRole('button', { name: 'Retry' }));
 
     expect(await screen.findByRole('link', { name: 'Open person records, 12' })).toBeInTheDocument();
-    expect(screen.queryByText('Couldn’t count your records')).not.toBeInTheDocument();
+    expect(screen.queryByText("Couldn't count your records")).not.toBeInTheDocument();
   });
 
   it('says the saved views are still loading rather than counting none', async () => {
@@ -113,7 +113,7 @@ describe('Library states', () => {
     serveLibrary({ views: new Error('views service is down') });
     renderWithApp(<Collections />, { route: '/explore/library' });
 
-    expect(await screen.findByText('Couldn’t load saved views')).toBeInTheDocument();
+    expect(await screen.findByText("Couldn't load saved views")).toBeInTheDocument();
     expect(screen.getByText('saved views unavailable')).toBeInTheDocument();
     expect(screen.queryByText('No saved views yet')).not.toBeInTheDocument();
   });
@@ -122,7 +122,7 @@ describe('Library states', () => {
     serveLibrary({ nodes: new Error('the parser rejected that clause') });
     renderWithApp(<Collections />, { route: '/explore/library?q=type%3Aperson' });
 
-    expect(await screen.findByText('Couldn’t run that query')).toBeInTheDocument();
+    expect(await screen.findByText("Couldn't run that query")).toBeInTheDocument();
     expect(screen.getByText(/the parser rejected that clause/)).toBeInTheDocument();
 
     // The trace above still says it on screen, but the boundary owns the
@@ -253,7 +253,7 @@ describe('Library states', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Save this view' });
     await user.click(within(dialog).getByRole('button', { name: 'Save' }));
 
-    const busy = await within(dialog).findByRole('button', { name: 'Saving…' });
+    const busy = await within(dialog).findByRole('button', { name: 'Saving...' });
     expect(busy).toBeDisabled();
 
     release();

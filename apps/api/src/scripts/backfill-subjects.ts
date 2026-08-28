@@ -20,7 +20,7 @@
  * the graph holds a single person's records.
  *
  * Written edges carry source_ref `backfill-subject-v1` (or
- * `…-placeholder`), so undoing the whole operation is one query, see `--undo`.
+ * `...-placeholder`), so undoing the whole operation is one query, see `--undo`.
  *
  * Records that already have a subject edge are left alone, including ones owned
  * by someone else: this only fills gaps, it never reassigns.

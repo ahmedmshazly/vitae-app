@@ -2,7 +2,7 @@
  * Printing a documentation page.
  *
  * A printed page has no hover, no scrolling and no back button, so the print
- * rules are not a restyle — they change what the document *contains*. Chrome
+ * rules are not a restyle - they change what the document *contains*. Chrome
  * that only exists to navigate is removed. Evidence that only exists on screen
  * as a rail is kept, because on paper it is the only way to check a claim. And
  * every link prints its destination, since a reader holding a sheet of paper
@@ -282,7 +282,7 @@
 
   /*
    * Tone is a left rule on screen and nothing but ink weight on a monochrome
-   * printer, so the label above it — NOTE, WARNING, CAUTION — is what actually
+   * printer, so the label above it - NOTE, WARNING, CAUTION - is what actually
    * carries the meaning. These greys only keep the rules from all looking alike
    * on a colour printer.
    */

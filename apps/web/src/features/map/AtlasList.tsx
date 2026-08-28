@@ -35,7 +35,7 @@ export function AtlasList({
         <input
           className="lifemap__searchinput"
           value={filterQuery}
-          placeholder="Filter places and trips…"
+          placeholder="Filter places and trips..."
           aria-label="Filter list"
           onChange={(e) => onFilterQuery(e.target.value)}
         />

@@ -91,7 +91,7 @@ describe('NodeFormDialog, a rejected save', () => {
     // promise and the dialog sat there looking idle.
     // Scoped by text: a field error is also role="alert", so "the first
     // alert" would silently pass on a validation message instead.
-    const alert = (await screen.findByText(/Couldn’t save\./)).closest('[role="alert"]')!;
+    const alert = (await screen.findByText(/Couldn't save\./)).closest('[role="alert"]')!;
     expect(alert).toHaveTextContent('The graph is read-only right now.');
     expect(post).toHaveBeenCalledWith('/nodes', expect.objectContaining({ type: 'person' }));
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
@@ -114,7 +114,7 @@ describe('NodeFormDialog, a rejected save', () => {
     await user.type(document.querySelector('#ef-title') as HTMLElement, 'Retry me');
     const submit = screen.getByRole('button', { name: /^Create person/ });
     await user.click(submit);
-    await screen.findByText(/Couldn’t save\./);
+    await screen.findByText(/Couldn't save\./);
     await waitFor(() => expect(submit).toBeEnabled());
   });
 });

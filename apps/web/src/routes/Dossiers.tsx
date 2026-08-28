@@ -128,7 +128,7 @@ export function Dossiers() {
 
       {self.isError ? (
         <ErrorState
-          title="Couldn’t check whose dossiers these are"
+          title="Couldn't check whose dossiers these are"
           detail={(self.error as Error | null)?.message}
           onRetry={() => void self.refetch()}
         />
@@ -149,7 +149,7 @@ export function Dossiers() {
         />
       ) : dossiers.isError ? (
         <ErrorState
-          title="Couldn’t load your dossiers"
+          title="Couldn't load your dossiers"
           detail={(dossiers.error as Error | null)?.message}
           onRetry={() => void dossiers.refetch()}
         />
@@ -213,7 +213,7 @@ export function Dossiers() {
               disabled={create.isPending || !audience || !title.trim()}
               onClick={() => create.mutate()}
             >
-              {create.isPending ? 'Creating…' : 'Create dossier'}
+              {create.isPending ? 'Creating...' : 'Create dossier'}
             </Button>
           </>
         }
@@ -228,7 +228,7 @@ export function Dossiers() {
           <Field label="Title" htmlFor="dossier-new-title" required>
             <Input
               id="dossier-new-title"
-              placeholder="What this packet is for…"
+              placeholder="What this packet is for..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -240,7 +240,7 @@ export function Dossiers() {
                 them in view rather than from three names. */}
             {audiences.isError ? (
               <ErrorState
-                title="Couldn’t load the audiences"
+                title="Couldn't load the audiences"
                 detail={(audiences.error as Error | null)?.message}
                 onRetry={() => void audiences.refetch()}
               />

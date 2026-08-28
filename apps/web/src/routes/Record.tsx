@@ -146,7 +146,7 @@ export function Record() {
         <PageHeader title="Record" />
         <RegisterRule />
         <ErrorState
-          title="Couldn’t load this record"
+          title="Couldn't load this record"
           detail={(error as Error | null)?.message}
           onRetry={() => void refetch()}
         />
@@ -157,7 +157,7 @@ export function Record() {
   if (isLoading || !data) {
     return (
       <div className="page">
-        <PageHeader title="Record" subtitle="Loading…" />
+        <PageHeader title="Record" subtitle="Loading..." />
         <RegisterRule />
         <SkeletonRows rows={5} />
       </div>
@@ -184,7 +184,7 @@ export function Record() {
       flash(next ? 'Pinned' : 'Unpinned');
     } catch (err) {
       if (prev) qc.setQueryData(['node', id], prev);
-      flash(err instanceof Error ? err.message : 'Couldn’t change the pin.', { variant: 'error' });
+      flash(err instanceof Error ? err.message : "Couldn't change the pin.", { variant: 'error' });
     } finally {
       await qc.invalidateQueries({ queryKey: ['node', id] });
     }
@@ -265,7 +265,7 @@ export function Record() {
       <ConfirmDialog
         open={confirmDelete}
         onOpenChange={setConfirmDelete}
-        title={`Move “${node.title}” to trash?`}
+        title={`Move '${node.title}' to trash?`}
         body="It stays recoverable from Trash for 30 days; connections are preserved."
         confirmLabel="Move to trash"
         destructive
@@ -368,7 +368,7 @@ export function Record() {
           <Section title="History" meta={revisions.length || undefined}>
             {revs.isError ? (
               <p role="alert" className="text-sm text-danger">
-                <strong className="font-semibold">Couldn’t load the history.</strong> The record
+                <strong className="font-semibold">Couldn't load the history.</strong> The record
                 itself is fine.
               </p>
             ) : revs.isLoading ? (

@@ -9,9 +9,9 @@
  *
  * Type carries the hierarchy. Prose is Source Serif 4, the editorial face the
  * manifesto route already uses, because a documentation corpus is long-form
- * reading. Everything that is chrome — headings, navigation, badges, table
- * cells — is Instrument Sans, and everything that is a literal — a path, an
- * identifier, a command — is IBM Plex Mono. A reader can tell what a run of
+ * reading. Everything that is chrome - headings, navigation, badges, table
+ * cells - is Instrument Sans, and everything that is a literal - a path, an
+ * identifier, a command - is IBM Plex Mono. A reader can tell what a run of
  * text *is* before reading a word of it.
  *
  * No colour states anything on its own. A status badge names its status, a
@@ -163,7 +163,7 @@
  *
  * `main` carries `tabIndex={-1}` so that activating the skip link actually
  * moves focus rather than only scrolling. The global rule then wants to ring
- * it, and the global ring is a `box-shadow` — on an element thirteen thousand
+ * it, and the global ring is a `box-shadow` - on an element thirteen thousand
  * pixels tall that is two vertical lines running off both edges of the screen
  * with no top or bottom in view. It reports nothing a reader can use.
  *
@@ -1776,7 +1776,7 @@ h6.docs-heading {
 /*
  * A generated catalog is a ledger with a filter beside it. It uses the prose
  * table styles rather than a second table language, because it is the same
- * kind of object: rows of facts a reader scans. What is different is density —
+ * kind of object: rows of facts a reader scans. What is different is density -
  * these are read by looking things up, so the type is one step down and the
  * literal columns are mono.
  */

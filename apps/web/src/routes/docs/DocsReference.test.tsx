@@ -192,7 +192,7 @@ describe('one catalog', () => {
   it('reports an artifact it could not read', async () => {
     routesOk = false;
     renderDocs('/docs/reference/routes');
-    expect(await screen.findByText('Couldn’t load the routes catalog')).toBeInTheDocument();
+    expect(await screen.findByText("Couldn't load the routes catalog")).toBeInTheDocument();
   });
 
   it('reports an artifact whose shape changed, rather than an empty table', async () => {

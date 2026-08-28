@@ -548,7 +548,7 @@ function detailedPaths(): PathsObject {
       }),
     },
     '/letters/{id}/finalize': {
-      post: op('finalizeLetter', 'Compile and keep the PDF and source as this letter’s artifacts', {
+      post: op('finalizeLetter', "Compile and keep the PDF and source as this letter's artifacts", {
         tags: ['letters'],
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
         responses: {

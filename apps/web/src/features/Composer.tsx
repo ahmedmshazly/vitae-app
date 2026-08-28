@@ -148,7 +148,7 @@ export function Composer({ ctx, onClose }: { ctx: ComposerContext; onClose: () =
       .writeText(body)
       .then(() => flash('Copied draft to clipboard'))
       .catch(() =>
-        flash('Couldn’t reach the clipboard, select the text and copy it.', { variant: 'error' }),
+        flash("Couldn't reach the clipboard, select the text and copy it.", { variant: 'error' }),
       );
   }
 
@@ -186,7 +186,7 @@ export function Composer({ ctx, onClose }: { ctx: ComposerContext; onClose: () =
               disabled={drafting}
               onClick={() => generate(tone)}
             >
-              {drafting ? 'Regenerating…' : 'Regenerate'}
+              {drafting ? 'Regenerating...' : 'Regenerate'}
             </Button>
             {edited && (
               <span className="text-xs text-faint">edited, tone switch won&apos;t overwrite</span>
@@ -201,7 +201,7 @@ export function Composer({ ctx, onClose }: { ctx: ComposerContext; onClose: () =
               disabled={blocked || sendM.isPending}
               onClick={() => sendM.mutate()}
             >
-              {sendM.isPending ? 'Queuing…' : 'Send & log'}
+              {sendM.isPending ? 'Queuing...' : 'Send & log'}
             </Button>
           </Inline>
         </Spread>
@@ -216,7 +216,7 @@ export function Composer({ ctx, onClose }: { ctx: ComposerContext; onClose: () =
           title="This message was not sent"
           action={
             <Button size="sm" disabled={sendM.isPending} onClick={() => sendM.mutate()}>
-              {sendM.isPending ? 'Sending…' : 'Try again'}
+              {sendM.isPending ? 'Sending...' : 'Try again'}
             </Button>
           }
         >
@@ -236,7 +236,7 @@ export function Composer({ ctx, onClose }: { ctx: ComposerContext; onClose: () =
 
       {draftError ? (
         <ErrorState
-          title="Couldn’t draft that message"
+          title="Couldn't draft that message"
           detail={draftError}
           onRetry={() => generate(tone)}
         />

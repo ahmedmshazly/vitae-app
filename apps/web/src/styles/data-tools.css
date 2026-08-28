@@ -38,7 +38,7 @@
   margin-top: var(--ae-space-3);
 }
 
-/* Was `style={{ fontSize: 11, color: … }}`, both below the type floor by
+/* Was `style={{ fontSize: 11, color: ... }}`, both below the type floor by
    accident rather than by intent. */
 .data-import-caution {
   font-size: var(--ae-text-xs);

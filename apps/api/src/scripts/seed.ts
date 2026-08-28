@@ -21,7 +21,7 @@ async function wipe() {
 }
 
 async function main() {
-  console.log('Seeding Vitae sample graph…');
+  console.log('Seeding Vitae sample graph...');
   await wipe();
 
   // ── Skills (the JD parser dictionary) ──────────────────────────────────────
@@ -329,7 +329,7 @@ async function main() {
 
   const book = await repository.createNode({
     type: 'media_item',
-    title: 'The Staff Engineer’s Path',
+    title: "The Staff Engineer's Path",
     props: { media_kind: 'book', creator: 'Tanya Reilly', consumption_status: 'in_progress', rating: 4, started_on: '2026-05-20' },
     source: 'manual',
   });
@@ -337,7 +337,7 @@ async function main() {
   const hl = await repository.createNode({
     type: 'highlight',
     title: 'On being glue',
-    props: { excerpt: 'Being glue is being the person who notices the missing pieces…', loc_ref: 'p. 141', thought: 'Applies to how I frame platform work in atoms.' },
+    props: { excerpt: 'Being glue is being the person who notices the missing pieces...', loc_ref: 'p. 141', thought: 'Applies to how I frame platform work in atoms.' },
     source: 'manual',
   });
   await repository.createEdge({ type: 'ABOUT', src: hl.id, dst: book.id, source: 'manual' });

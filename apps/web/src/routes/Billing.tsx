@@ -202,7 +202,7 @@ export function Billing() {
 
       {billing.isError ? (
         <ErrorState
-          title="Couldn’t load billing"
+          title="Couldn't load billing"
           detail={(billing.error as Error | null)?.message}
           onRetry={() => void billing.refetch()}
           retrying={billing.isFetching}
@@ -260,14 +260,14 @@ export function Billing() {
               {billing.data.subscription || billing.data.customer.configured ? (
                 <>
                   <p className="m-0 mb-3 text-sm text-ink-soft">
-                    Update payment details, view invoices, or cancel through the billing provider’s secure portal.
+                    Update payment details, view invoices, or cancel through the billing provider's secure portal.
                   </p>
                   <Button
                     variant="primary"
                     disabled={portal.isPending}
                     onClick={() => portal.mutate()}
                   >
-                    {portal.isPending ? 'Opening billing portal…' : 'Manage billing'}
+                    {portal.isPending ? 'Opening billing portal...' : 'Manage billing'}
                   </Button>
                 </>
               ) : !paddleCheckoutReady() ? (
@@ -288,7 +288,7 @@ export function Billing() {
                     disabled={checkout.isPending}
                     onClick={() => checkout.mutate(period)}
                   >
-                    {checkout.isPending ? 'Preparing secure checkout…' : 'Continue to secure checkout'}
+                    {checkout.isPending ? 'Preparing secure checkout...' : 'Continue to secure checkout'}
                   </Button>
                   <p className="m-0 mt-3 text-xs text-faint">
                     Checkout is handled by Paddle. Vitae does not receive your card number.

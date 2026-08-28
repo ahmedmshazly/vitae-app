@@ -64,7 +64,7 @@ let shuttingDown = false;
 function shutdown(signal: string): void {
   if (shuttingDown) return;
   shuttingDown = true;
-  console.log(`[api] ${signal}, draining…`);
+  console.log(`[api] ${signal}, draining...`);
   setReady(false); // /ready starts failing so the LB stops routing here
   clearInterval(purgeTimer);
 

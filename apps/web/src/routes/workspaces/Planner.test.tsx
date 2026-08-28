@@ -29,7 +29,7 @@ describe('Planner states', () => {
     renderWithApp(<Planner />, { route: '/today/planner' });
 
     const alert = await screen.findByRole('alert');
-    expect(within(alert).getByText('Couldn’t load the planner')).toBeInTheDocument();
+    expect(within(alert).getByText("Couldn't load the planner")).toBeInTheDocument();
     expect(within(alert).getByText('planner unavailable')).toBeInTheDocument();
 
     mockApi.get.mockResolvedValueOnce(emptyPlanner);

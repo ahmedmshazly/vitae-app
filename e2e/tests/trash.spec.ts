@@ -55,7 +55,7 @@ test('a failed trash load says so instead of claiming the bin is empty', async (
   await page.goto('/trash');
 
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load trash');
+  await expect(alert).toContainText("Couldn't load trash");
   await expect(alert).toContainText('trash index unreachable');
   await expect(page.getByText('Trash is empty')).toHaveCount(0);
 });

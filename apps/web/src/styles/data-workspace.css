@@ -1,5 +1,5 @@
 /*
- * Data workspace — Living Ledger custody surfaces.
+ * Data workspace - Living Ledger custody surfaces.
  *
  * Import, identity, repositories, export, and recovery all move records
  * through accountable stages. This sheet gives those stages one shared trace
@@ -180,7 +180,7 @@
   color: var(--ae-muted);
 }
 
-/* Import — a source register, followed by an isolated review ledger. */
+/* Import - a source register, followed by an isolated review ledger. */
 .data-source-ledger.imp__cards {
   display: grid;
   grid-template-columns: 1fr;
@@ -348,7 +348,7 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
-/* Identity — one evidence queue, not a wall of interchangeable cards. */
+/* Identity - one evidence queue, not a wall of interchangeable cards. */
 .data-identity-page .dedup-summary {
   display: flex;
   min-height: 46px;
@@ -476,7 +476,7 @@
   background: var(--ae-surface-overlay);
 }
 
-/* Repositories — connection custody above a ranked record ledger. */
+/* Repositories - connection custody above a ranked record ledger. */
 .data-github-connection {
   border-top: 1px solid var(--ae-border);
   border-bottom: 1px solid var(--ae-border);
@@ -574,7 +574,7 @@
   white-space: nowrap;
 }
 
-/* Export — a dominant archive builder with status and extracts downstream. */
+/* Export - a dominant archive builder with status and extracts downstream. */
 .data-export-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.55fr) minmax(270px, 0.65fr);
@@ -741,7 +741,7 @@
   white-space: nowrap;
 }
 
-/* Trash — countdown is shown as text and a native recovery meter. */
+/* Trash - countdown is shown as text and a native recovery meter. */
 .data-trash-ledger {
   margin: 0;
   padding: 0;

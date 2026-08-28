@@ -136,7 +136,7 @@ describe('Composer states', () => {
     await screen.findByLabelText('Draft message');
 
     await user.click(screen.getByRole('button', { name: 'Regenerate' }));
-    const busy = await screen.findByRole('button', { name: 'Regenerating…' });
+    const busy = await screen.findByRole('button', { name: 'Regenerating...' });
     expect(busy).toBeDisabled();
 
     release({ body: 'Second draft.', facts: [] });
@@ -186,7 +186,7 @@ describe('Composer states', () => {
 
     // Copy used to stay live over the error panel and report a success for
     // text the user could no longer read.
-    expect(await screen.findByText('Couldn’t draft that message')).toBeInTheDocument();
+    expect(await screen.findByText("Couldn't draft that message")).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Copy' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Send & log' })).toBeDisabled();
   });

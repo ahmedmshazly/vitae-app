@@ -39,7 +39,7 @@ export interface ListToolbarFacet<S extends ListParamSchema> {
   /** Names the control for assistive tech: "Kind", "State". */
   label: string;
   /**
-   * Pills list every value including the default ("All", "Pinned", …).
+   * Pills list every value including the default ("All", "Pinned", ...).
    * A Select lists only the narrowing values: its default is the placeholder,
    * and Select's own "Clear" item is the way back to it.
    */
@@ -100,7 +100,7 @@ export function ListToolbar<S extends ListParamSchema>({
   label,
   queryName,
   queryLabel,
-  placeholder = 'Search…',
+  placeholder = 'Search...',
   facets,
   sort,
   count,

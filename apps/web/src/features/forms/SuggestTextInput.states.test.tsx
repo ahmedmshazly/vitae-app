@@ -66,7 +66,7 @@ describe('SuggestTextInput reports what it could not do', () => {
     await user.click(await screen.findByRole('option', { name: /Create organization/ }));
 
     expect(await screen.findByText('Created')).toBeInTheDocument();
-    expect(screen.getByText('organization “Acme”')).toBeInTheDocument();
+    expect(screen.getByText("organization 'Acme'")).toBeInTheDocument();
     // Still offering to create it would mint the duplicate this field exists
     // to prevent, and the focus returning to the input reopens the list.
     expect(screen.queryByRole('option', { name: /Create organization/ })).not.toBeInTheDocument();
@@ -97,7 +97,7 @@ describe('SuggestTextInput will not mint a duplicate', () => {
 
     await user.type(screen.getByRole('combobox', { name: 'Company' }), 'Acme Labs');
 
-    expect(await screen.findByRole('option', { name: /Create organization “Acme Labs”/ })).toBeInTheDocument();
+    expect(await screen.findByRole('option', { name: /Create organization 'Acme Labs'/ })).toBeInTheDocument();
   });
 });
 

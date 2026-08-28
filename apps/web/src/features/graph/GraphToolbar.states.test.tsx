@@ -74,14 +74,14 @@ describe('GraphToolbar trace', () => {
 
   it('says the map did not load rather than reporting zero of everything', () => {
     renderToolbar({ failed: true, errorMessage: 'the graph service is down' });
-    expect(screen.getByText('Couldn’t draw the map')).toBeInTheDocument();
+    expect(screen.getByText("Couldn't draw the map")).toBeInTheDocument();
     expect(screen.getByText('the graph service is down')).toBeInTheDocument();
     expect(screen.queryByText(/0 records/)).not.toBeInTheDocument();
   });
 
   it('treats a finished load with no counts as a failed one', () => {
     renderToolbar({ busy: false });
-    expect(screen.getByText('Couldn’t draw the map')).toBeInTheDocument();
+    expect(screen.getByText("Couldn't draw the map")).toBeInTheDocument();
   });
 
   it('leaves the assertive alert to the canvas so the failure is spoken once', () => {

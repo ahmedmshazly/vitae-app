@@ -3,7 +3,7 @@
  *
  * The graph holds several people's records, the owner's, plus profiles brought
  * in by imports. Ownership is expressed by the subject edge each type declares
- * (`HELD person→role`, `EARNED person→award`, …), but until now nothing read it
+ * (`HELD person→role`, `EARNED person→award`, ...), but until now nothing read it
  * at query time, so every read model treated "all nodes of this type" as "all of
  * mine". That is only true in a graph with exactly one person in it.
  *

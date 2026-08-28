@@ -210,7 +210,7 @@ async function main(): Promise<void> {
       const mark = personId === self.id ? ' (you)' : '';
       console.log(`  ${String(count).padStart(4)}  ${(p?.title ?? personId).slice(0, 48)}${mark}`);
     }
-    if (ranked.length > 10) console.log(`  … and ${ranked.length - 10} more people`);
+    if (ranked.length > 10) console.log(`  ... and ${ranked.length - 10} more people`);
   }
 
   // ── report ────────────────────────────────────────────────────────────────
@@ -227,7 +227,7 @@ async function main(): Promise<void> {
       const mark = list[0]!.severity === 'error' ? '✘' : '·';
       console.log(`\n  ${mark} ${check} (${list.length})`);
       for (const f of list.slice(0, 15)) console.log(`      ${f.detail}`);
-      if (list.length > 15) console.log(`      … and ${list.length - 15} more`);
+      if (list.length > 15) console.log(`      ... and ${list.length - 15} more`);
     }
   }
 

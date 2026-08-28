@@ -39,7 +39,7 @@ describe('TargetRail', () => {
     renderWithApp(<TargetRail activeId={null} onSelect={() => {}} />);
 
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Couldn’t load your job targets');
+    expect(alert).toHaveTextContent("Couldn't load your job targets");
     expect(alert).toHaveTextContent('gateway timeout');
 
     mockApi.get.mockResolvedValue({ targets: [target()] });
@@ -103,7 +103,7 @@ describe('TargetRail', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Archive' }));
     await waitFor(() => {
-      expect(screen.getByText('Couldn’t update this target')).toBeInTheDocument();
+      expect(screen.getByText("Couldn't update this target")).toBeInTheDocument();
     });
   });
 

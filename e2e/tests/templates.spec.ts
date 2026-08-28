@@ -107,7 +107,7 @@ test('a failed catalogue says so and Retry can recover it', async ({ page }) => 
   await page.goto('/resume/templates');
 
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load résumé templates');
+  await expect(alert).toContainText("Couldn't load résumé templates");
   await expect(alert).toContainText('template registry unavailable');
   await expect(page.getByText('No résumé templates are available')).toHaveCount(0);
 

@@ -50,7 +50,7 @@ export interface EntityPickerProps {
 
 function humanTypeList(types: NodeType[]): string {
   const labels = types.slice(0, 4).map(typeLabel);
-  if (types.length > 4) return `${labels.join(', ')}…`;
+  if (types.length > 4) return `${labels.join(', ')}...`;
   if (labels.length <= 1) return labels[0] ?? 'records';
   if (labels.length === 2) return `${labels[0]} or ${labels[1]}`;
   return `${labels.slice(0, -1).join(', ')}, or ${labels[labels.length - 1]}`;
@@ -135,7 +135,7 @@ export function EntityPicker({ types, onPick, placeholder, excludeIds = [], auto
         : effectiveTypes.slice(0, 4)
     : [];
   const optionCount = hits.length + createOptions.length;
-  const defaultPlaceholder = `Search ${humanTypeList(types)}…`;
+  const defaultPlaceholder = `Search ${humanTypeList(types)}...`;
 
   // Only a new query sends the selection home. Keying this on the option count
   // as well would re-home the row somebody had just arrowed to whenever a
@@ -297,8 +297,8 @@ export function EntityPicker({ types, onPick, placeholder, excludeIds = [], auto
                 <EntityGlyph type={type} size="sm" />
                 <span className="entity-picker__title">
                   {busy
-                    ? `Creating ${typeLabel(type)} “${value.trim()}”…`
-                    : `Create ${typeLabel(type)} “${value.trim()}”, refine later`}
+                    ? `Creating ${typeLabel(type)} '${value.trim()}'...`
+                    : `Create ${typeLabel(type)} '${value.trim()}', refine later`}
                 </span>
               </button>
             );

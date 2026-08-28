@@ -39,7 +39,7 @@ const rel = (abs) => relative(root, abs).split('\\').join('/');
 const toOpenApiPath = (p) => p.replace(/:([A-Za-z0-9_]+)/g, '{$1}');
 const joinPath = (...parts) => ('/' + parts.join('/')).replace(/\/{2,}/g, '/').replace(/(.)\/$/, '$1');
 
-/** Regex literals out of a `const NAME = [/…/, /…/]` array, as live RegExps. */
+/** Regex literals out of a `const NAME = [/.../, /.../]` array, as live RegExps. */
 function regexArray(sf, name) {
   let found = null;
   walk(sf, (node) => {

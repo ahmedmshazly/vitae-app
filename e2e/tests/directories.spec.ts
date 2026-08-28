@@ -142,7 +142,7 @@ test('a failed load names the directory and offers a retry', async ({ page }) =>
   );
   await page.goto('/orgs');
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load your organizations');
+  await expect(alert).toContainText("Couldn't load your organizations");
   await expect(alert).toContainText('the graph is unreachable');
   await expect(alert.getByRole('button', { name: 'Retry' })).toBeVisible();
 });

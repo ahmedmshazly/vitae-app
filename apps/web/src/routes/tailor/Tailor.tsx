@@ -23,7 +23,7 @@ function scoresMap(scores: AtomScore[] | undefined): Map<string, AtomScore> {
  * Tailoring workspace (SRS P15): JD → keywords → atom selection (auto knapsack
  * or fully manual with drag-and-drop) → compiled PDF → finalized output.
  * The whole configuration is a per-target draft, autosaved and restored, and
- * the active target lives in the URL (?target=…) so sessions survive reloads.
+ * the active target lives in the URL (?target=...) so sessions survive reloads.
  */
 export function Tailor() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -210,7 +210,7 @@ export function Tailor() {
               this tab.
             </span>
           ) : saveState === 'saving' ? (
-            <Mono className="text-xs text-muted">saving…</Mono>
+            <Mono className="text-xs text-muted">saving...</Mono>
           ) : saveState === 'saved' ? (
             <Mono className="text-xs text-faint">draft saved</Mono>
           ) : undefined
@@ -244,7 +244,7 @@ export function Tailor() {
           read as "you have nothing" rather than "this did not load". */}
       {scoringFailed && (
         <p role="alert" className="mb-3 text-sm text-danger">
-          <strong className="font-semibold">Couldn’t score your atoms against this target.</strong>{' '}
+          <strong className="font-semibold">Couldn't score your atoms against this target.</strong>{' '}
           Any numbers below are from the previous run.
         </p>
       )}
@@ -252,7 +252,7 @@ export function Tailor() {
       {(targetsQuery.isError || atomsQuery.isError) && (
         <p role="alert" className="mb-3 text-sm text-danger">
           <strong className="font-semibold">
-            Couldn’t load your {targetsQuery.isError ? 'job targets' : 'atoms'}.
+            Couldn't load your {targetsQuery.isError ? 'job targets' : 'atoms'}.
           </strong>{' '}
           {((targetsQuery.error ?? atomsQuery.error) as Error | null)?.message}, the workspace below
           is incomplete.

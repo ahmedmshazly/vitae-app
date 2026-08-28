@@ -64,7 +64,7 @@ test('Suggestion-backed fields offer existing values and a stub-create', async (
   await expect(page.getByRole('dialog')).toBeVisible();
 
   // Tech stack is a suggest-list (kind: tech → skill). A novel value always
-  // offers a "Create skill …, refine later" stub so linking never blocks.
+  // offers a "Create skill ..., refine later" stub so linking never blocks.
   const techInput = page.getByLabel('Tech stack');
   await techInput.click();
   await techInput.fill(`Zskill${Date.now()}`);

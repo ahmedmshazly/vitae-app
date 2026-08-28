@@ -63,7 +63,7 @@ const EXEMPT = new Map([
 const findings = [];
 const covered = [];
 
-/** Every `pnpm …` the workflow runs, one per occurrence, flags stripped. */
+/** Every `pnpm ...` the workflow runs, one per occurrence, flags stripped. */
 const invocations = [...workflow.matchAll(/\bpnpm ((?:--filter [@\w/-]+ )?[\w:@/.-]+)/g)].map((m) => m[1].trim());
 
 for (const invocation of new Set(invocations)) {
@@ -77,7 +77,7 @@ for (const invocation of new Set(invocations)) {
     }
     continue;
   }
-  // Only root scripts are checked by name. `pnpm exec …` and bare binaries are
+  // Only root scripts are checked by name. `pnpm exec ...` and bare binaries are
   // invoked differently on either side by design, and comparing them by string
   // would report drift that is not drift.
   if (!scripts.includes(invocation)) continue;

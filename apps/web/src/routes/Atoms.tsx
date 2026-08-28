@@ -208,7 +208,7 @@ function cardName(atom: Atom): string {
   const variant = atom.variants.find((item) => item.is_default) ?? atom.variants[0];
   const text = variant?.text?.trim();
   if (!text) return `${kindLabel(atom.kind)} with no default variant`;
-  return text.length > 80 ? `${text.slice(0, 80)}…` : text;
+  return text.length > 80 ? `${text.slice(0, 80)}...` : text;
 }
 
 /**
@@ -447,7 +447,7 @@ export function Atoms() {
       <div className="resume-toolbar card">
         <Input
           aria-label="Search atoms"
-          placeholder="Search bullet text or owner…"
+          placeholder="Search bullet text or owner..."
           value={list.drafts.q}
           onChange={(event) => list.set('q', event.target.value)}
           onKeyDown={(event) => {
@@ -487,8 +487,8 @@ export function Atoms() {
           used to be. */}
       <QueryBoundary
         query={atomsQuery}
-        errorTitle="Couldn’t load your atom library"
-        staleErrorTitle="Couldn’t refresh your atom library"
+        errorTitle="Couldn't load your atom library"
+        staleErrorTitle="Couldn't refresh your atom library"
         refreshingLabel="Refreshing your atom library"
         loading={<AtomGridSkeleton />}
         loadingLabel="Loading your atoms"
@@ -613,7 +613,7 @@ export function Atoms() {
                   disabled={duplicate.isPending}
                   onClick={() => duplicate.mutate(editing.id)}
                 >
-                  {duplicate.isPending ? 'Duplicating…' : 'Duplicate'}
+                  {duplicate.isPending ? 'Duplicating...' : 'Duplicate'}
                 </Button>
                 <Button variant="danger" onClick={() => setArchive(editing)}>
                   {editing.deleted_at ? 'Restore' : 'Archive'}
@@ -627,7 +627,7 @@ export function Atoms() {
               disabled={!valid || save.isPending}
               onClick={() => save.mutate()}
             >
-              {save.isPending ? 'Saving…' : 'Save atom'}
+              {save.isPending ? 'Saving...' : 'Save atom'}
             </Button>
           </>
         }
@@ -638,7 +638,7 @@ export function Atoms() {
               body text below the fold, with the Save button back to reading
               "Save atom" as if nothing had happened. */}
           {save.isError && (
-            <Banner tone="danger" title="Couldn’t save this atom">
+            <Banner tone="danger" title="Couldn't save this atom">
               {save.error.message}
             </Banner>
           )}
@@ -754,7 +754,7 @@ export function Atoms() {
                     aria-label={`${emphasisLabel(variant.emphasis)} wording, variant ${index + 1} of ${form.variants.length}`}
                     value={variant.text}
                     onChange={(event) => updateVariant(index, { text: event.target.value })}
-                    placeholder="Action + context + measurable result…"
+                    placeholder="Action + context + measurable result..."
                   />
                 </div>
               ))}
@@ -772,7 +772,7 @@ export function Atoms() {
               {catalogQuery.isError ? (
                 <Banner
                   tone="danger"
-                  title="Couldn’t load your skill catalogue"
+                  title="Couldn't load your skill catalogue"
                   action={
                     <Button size="sm" onClick={() => void catalogQuery.refetch()}>
                       Retry
@@ -808,7 +808,7 @@ export function Atoms() {
                   {skills.length > 0 && (
                     <Input
                       aria-label="Filter skills"
-                      placeholder="Filter skills…"
+                      placeholder="Filter skills..."
                       value={skillFilter}
                       onChange={(event) => setSkillFilter(event.target.value)}
                     />
@@ -847,7 +847,7 @@ export function Atoms() {
             <Field label="Metric unit" htmlFor={`${ids}-metric-unit`}>
               <Input
                 id={`${ids}-metric-unit`}
-                placeholder="%, users, hours…"
+                placeholder="%, users, hours..."
                 value={form.metricUnit}
                 onChange={(event) => setForm({ ...form, metricUnit: event.target.value })}
               />
@@ -890,7 +890,7 @@ export function Atoms() {
               <EntityPicker
                 types={EVIDENCE_NODE_TYPES}
                 excludeIds={form.evidenceNodes.map((item) => item.node_id)}
-                placeholder="Link a repository, document, or project…"
+                placeholder="Link a repository, document, or project..."
                 onPick={(entity) => {
                   if (form.evidenceNodes.some((item) => item.node_id === entity.id)) return;
                   setForm({
@@ -916,7 +916,7 @@ export function Atoms() {
             <Input
               id={`${ids}-evidence-url`}
               type="url"
-              placeholder="https://…"
+              placeholder="https://..."
               value={form.evidenceUrl}
               onChange={(event) => setForm({ ...form, evidenceUrl: event.target.value })}
             />

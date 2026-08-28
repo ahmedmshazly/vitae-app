@@ -51,7 +51,7 @@ describe('dropToken', () => {
 });
 
 describe('rowSubtitle', () => {
-  it('prefers the record’s own subtitle', () => {
+  it("prefers the record's own subtitle", () => {
     expect(rowSubtitle(hit({ subtitle: 'Staff SWE' , props: { city: 'Berlin' } }))).toBe('Staff SWE');
   });
 

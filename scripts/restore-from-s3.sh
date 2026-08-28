@@ -4,7 +4,7 @@
 # Required env:
 #   BACKUP_S3_URI   e.g. s3://vitae-backups/prod
 # Optional:
-#   BACKUP_DAY      YYYY-MM-DD (default: contents of …/exports/LATEST)
+#   BACKUP_DAY      YYYY-MM-DD (default: contents of .../exports/LATEST)
 #   DRY_RUN=1       download + verify checksum only; no database writes
 #   CONFIRM=YES     required unless DRY_RUN=1
 #   FORCE=1         pass --force to restore (non-empty target)

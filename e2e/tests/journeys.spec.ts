@@ -50,7 +50,7 @@ test('J4: paste a JD, auto-tailor, and compile a PDF', async ({ page }) => {
   // menu). It says what it makes now, and says Cancel while the form is open.
   await page.getByRole('button', { name: 'New target' }).click();
   await page.getByPlaceholder('Role title').fill('Playwright ML Engineer');
-  await page.getByPlaceholder('Paste the job description here…').fill(
+  await page.getByPlaceholder('Paste the job description here...').fill(
     'Requirements\n- Strong Python\n- Kubernetes\n- Reinforcement learning and gRPC',
   );
   await page.getByRole('button', { name: /parse keywords/i }).click();
@@ -86,7 +86,7 @@ test('J8: delete a record and restore it from Trash', async ({ page }) => {
 
   // Find it via the quick-switcher and open THIS run's record, the search
   // index refreshes asynchronously, so the top fuzzy hit can briefly be a
-  // stale Zqx… record left by an earlier run.
+  // stale Zqx... record left by an earlier run.
   await page.keyboard.press('Meta+p');
   const sw = page.getByLabel('Command or record search');
   await sw.fill(title.slice(0, 12));

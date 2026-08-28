@@ -91,7 +91,7 @@ export function LogIntroduction({
             Cancel
           </Button>
           <Button variant="primary" disabled={!canSave} onClick={() => save.mutate()}>
-            {save.isPending ? 'Saving…' : 'Save introduction'}
+            {save.isPending ? 'Saving...' : 'Save introduction'}
           </Button>
         </>
       }
@@ -138,7 +138,7 @@ export function LogIntroduction({
         <Field label="Context" htmlFor="log-intro-context" help="Optional">
           <Input
             id="log-intro-context"
-            placeholder="conference hallway, a thread, …"
+            placeholder="conference hallway, a thread, ..."
             value={context}
             onChange={(e) => setContext(e.target.value)}
           />
@@ -150,7 +150,7 @@ export function LogIntroduction({
             checked={creditFavor}
             onChange={(e) => setCreditFavor(e.target.checked)}
           />
-          Record it in the broker&rsquo;s favor ledger (owed by me)
+          Record it in the broker's favor ledger (owed by me)
         </label>
       </Stack>
     </Modal>

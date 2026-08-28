@@ -129,7 +129,7 @@ describe('Application dossier', () => {
   it('keeps a failed dossier distinct from a missing application', async () => {
     mockApi.get.mockRejectedValue(new Error('request timed out'));
     renderDossier();
-    expect(await screen.findByRole('alert')).toHaveTextContent('Couldn’t load this application');
+    expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't load this application");
     expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
   });
 });

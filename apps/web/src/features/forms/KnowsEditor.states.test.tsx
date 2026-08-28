@@ -72,7 +72,7 @@ describe('KnowsEditor says when the relationship did not change', () => {
 
     await user.click(screen.getByRole('button', { name: 'Save relationship' }));
 
-    expect(await screen.findByRole('button', { name: 'Saving…' })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: 'Saving...' })).toBeDisabled();
 
     gate.resolve({});
     await waitFor(() => expect(onDone).toHaveBeenCalledOnce());

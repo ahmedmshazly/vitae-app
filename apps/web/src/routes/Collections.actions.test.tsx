@@ -21,7 +21,7 @@ describe('Library query actions', () => {
     const user = userEvent.setup();
     renderWithApp(<Collections />, { route: '/explore/library?q=type%3Aperson' });
 
-    const query = screen.getByPlaceholderText('Add another clause…');
+    const query = screen.getByPlaceholderText('Add another clause...');
     await user.type(query, 'city:Cairo');
 
     const save = screen.getByRole('button', { name: 'Save view' });

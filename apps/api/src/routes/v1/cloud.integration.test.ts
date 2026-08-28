@@ -259,7 +259,7 @@ describe('Vitae Cloud control plane', () => {
     expect(billing.body.access.state).toBe('read_only');
   });
 
-  it('cannot read another workspace’s dossiers, letters, or applications', async () => {
+  it("cannot read another workspace's dossiers, letters, or applications", async () => {
     const { app, token: ownerToken } = await getAuthedApp();
     await request(app).post('/api/v1/auth/bootstrap').set(authHeader(ownerToken)).expect(201);
 

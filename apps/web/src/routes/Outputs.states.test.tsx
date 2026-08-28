@@ -119,7 +119,7 @@ describe('Outputs states', () => {
     render();
 
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Couldn’t load your outputs');
+    expect(alert).toHaveTextContent("Couldn't load your outputs");
     expect(alert).toHaveTextContent('the output store is unreachable');
     expect(screen.queryByText('No outputs yet')).not.toBeInTheDocument();
   });
@@ -133,7 +133,7 @@ describe('Outputs states', () => {
       await queryClient.refetchQueries({ queryKey: ['resumes'] });
     });
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Couldn’t refresh your outputs');
+    expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't refresh your outputs");
     // The rows that did load are still there, which is the whole point of
     // telling the difference between a first load and a refresh.
     const list = screen.getByRole('list', { name: 'Outputs' });
@@ -198,7 +198,7 @@ describe('Outputs states', () => {
     await userEvent.click(borealis);
 
     // The name has to move with the state: an aria-label replaces the visible
-    // "Rebuilding…", so without this nothing reached assistive tech.
+    // "Rebuilding...", so without this nothing reached assistive tech.
     const busy = await screen.findByRole('button', {
       name: 'Rebuilding the artifacts for Borealis Platform Lead, made 2026-07-14 11:05',
     });
@@ -221,8 +221,8 @@ describe('Outputs states', () => {
     const sheet = await screen.findByRole('dialog');
     await userEvent.click(await within(sheet).findByRole('button', { name: 'Duplicate' }));
 
-    expect(await within(sheet).findByRole('button', { name: 'Duplicating…' })).toBeDisabled();
-    expect(within(sheet).getByRole('status')).toHaveTextContent('Duplicating…');
+    expect(await within(sheet).findByRole('button', { name: 'Duplicating...' })).toBeDisabled();
+    expect(within(sheet).getByRole('status')).toHaveTextContent('Duplicating...');
   });
 
   it('tells a stored TeX file apart from nothing stored at all', async () => {
@@ -285,7 +285,7 @@ describe('Outputs states', () => {
 
     const sheet = await screen.findByRole('dialog');
     const alert = await within(sheet).findByRole('alert');
-    expect(alert).toHaveTextContent('Couldn’t load this output');
+    expect(alert).toHaveTextContent("Couldn't load this output");
     expect(alert).toHaveTextContent('detail unavailable');
   });
 
@@ -301,10 +301,10 @@ describe('Outputs states', () => {
     );
 
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Couldn’t open that artifact');
+    expect(alert).toHaveTextContent("Couldn't open that artifact");
     expect(alert).toHaveTextContent('artifact store is offline');
 
     await userEvent.click(within(alert).getByRole('button', { name: 'Dismiss' }));
-    expect(screen.queryByText('Couldn’t open that artifact')).not.toBeInTheDocument();
+    expect(screen.queryByText("Couldn't open that artifact")).not.toBeInTheDocument();
   });
 });

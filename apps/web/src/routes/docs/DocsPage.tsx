@@ -369,7 +369,7 @@ export function DocsPage({
         className="docs-article"
         loading={<ArticleSkeleton />}
         loadingLabel={`Loading ${summary.title}`}
-        errorTitle={`Couldn’t load “${summary.title}”`}
+        errorTitle={`Couldn't load '${summary.title}'`}
         compact
       >
         {(page) => (

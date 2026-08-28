@@ -102,7 +102,7 @@ export function RemindersDrawer({
           // was writing its own alert markup for the same job.
           <div className="p-4">
             <ErrorState
-              title="Couldn’t load reminders"
+              title="Couldn't load reminders"
               detail={(error as Error | null)?.message}
               onRetry={() => void refetch()}
               retrying={isFetching}
@@ -139,7 +139,7 @@ export function RemindersDrawer({
                     disabled={pendingId != null}
                     onClick={() => snooze.mutate(r.id)}
                   >
-                    {snooze.isPending && snooze.variables === r.id ? 'Snoozing…' : 'Snooze'}
+                    {snooze.isPending && snooze.variables === r.id ? 'Snoozing...' : 'Snooze'}
                   </Button>
                   <Button
                     size="sm"
@@ -147,7 +147,7 @@ export function RemindersDrawer({
                     disabled={pendingId != null}
                     onClick={() => done.mutate(r.id)}
                   >
-                    {done.isPending && done.variables === r.id ? 'Marking…' : 'Done'}
+                    {done.isPending && done.variables === r.id ? 'Marking...' : 'Done'}
                   </Button>
                 </li>
               );

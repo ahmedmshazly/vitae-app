@@ -124,7 +124,7 @@ describe('Repositories states', () => {
     renderRepositories();
 
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Couldn’t load repositories');
+    expect(alert).toHaveTextContent("Couldn't load repositories");
     expect(alert).toHaveTextContent('repository index unreachable');
     expect(screen.queryByText('No repositories yet')).not.toBeInTheDocument();
   });

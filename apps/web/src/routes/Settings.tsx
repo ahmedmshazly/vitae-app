@@ -210,7 +210,7 @@ export function Settings() {
 
       {settings.isError ? (
         <ErrorState
-          title="Couldn’t load settings"
+          title="Couldn't load settings"
           detail={(settings.error as Error | null)?.message}
           onRetry={() => void settings.refetch()}
           retrying={settings.isFetching}
@@ -308,7 +308,7 @@ function SystemStatusSection({
     >
       {isError ? (
         <ErrorState
-          title="Couldn’t load system status"
+          title="Couldn't load system status"
           detail={error?.message}
           onRetry={onRetry}
           retrying={refetching}
@@ -435,7 +435,7 @@ function ResumeDefaultsCard({
         </p>
       </div>
       <Button variant="primary" disabled={!dirty || saving} onClick={() => onSave(draft)}>
-        {saving && dirty ? 'Saving…' : 'Save résumé defaults'}
+        {saving && dirty ? 'Saving...' : 'Save résumé defaults'}
       </Button>
     </Section>
   );
@@ -512,7 +512,7 @@ function ProfileCard({
           />
         </Field>
         <Button type="submit" variant="primary" disabled={!dirty || saving}>
-          {saving && dirty ? 'Saving…' : 'Save profile'}
+          {saving && dirty ? 'Saving...' : 'Save profile'}
         </Button>
       </form>
     </Section>
@@ -690,7 +690,7 @@ function AliasesCard({
         disabled={!dirty || saving}
         onClick={() => onSave(rows)}
       >
-        {saving && dirty ? 'Saving…' : 'Save aliases'}
+        {saving && dirty ? 'Saving...' : 'Save aliases'}
       </Button>
     </Section>
   );
@@ -744,7 +744,7 @@ function GithubCard({
             type="password"
             autoComplete="off"
             spellCheck={false}
-            placeholder="ghp_… (repo read scope)"
+            placeholder="ghp_... (repo read scope)"
             value={token}
             onChange={(e) => setToken(e.target.value)}
           />
@@ -756,7 +756,7 @@ function GithubCard({
             variant="primary"
             disabled={!token.trim() || saveToken.isPending}
           >
-            {saveToken.isPending ? 'Saving…' : configured ? 'Replace' : 'Save'}
+            {saveToken.isPending ? 'Saving...' : configured ? 'Replace' : 'Save'}
           </Button>
           {configured && (
             <Button
@@ -766,7 +766,7 @@ function GithubCard({
               onClick={() => disconnect.mutate()}
               aria-label="Disconnect GitHub token"
             >
-              {disconnect.isPending ? 'Disconnecting…' : 'Disconnect'}
+              {disconnect.isPending ? 'Disconnecting...' : 'Disconnect'}
             </Button>
           )}
         </div>
@@ -775,7 +775,7 @@ function GithubCard({
         <StatusTrace
           className="mt-2"
           tone="warning"
-          label={saveToken.isError ? 'Couldn’t store the token' : 'Couldn’t disconnect GitHub'}
+          label={saveToken.isError ? "Couldn't store the token" : "Couldn't disconnect GitHub"}
           detail={
             ((saveToken.error ?? disconnect.error) as Error | null)?.message ?? 'Try again.'
           }

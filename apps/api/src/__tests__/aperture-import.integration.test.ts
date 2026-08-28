@@ -201,7 +201,7 @@ d('Aperture bundle import (integration)', () => {
    * one scraped profile lands here as many linked records, each belonging to the
    * person it describes, with nothing attributed to the owner of this graph.
    */
-  it('imports a real Aperture-produced bundle as someone else’s records', async () => {
+  it("imports a real Aperture-produced bundle as someone else's records", async () => {
     await purgeApertureRecords();
 
     const staged = await request(app)

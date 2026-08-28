@@ -1,7 +1,7 @@
 /**
  * Universal typed-connection composer for entity create/edit forms.
  *
- * Curated sub-editors remain useful shortcuts ("Employer", "Skills", …), but
+ * Curated sub-editors remain useful shortcuts ("Employer", "Skills", ...), but
  * they cannot anticipate every valid graph relationship. This composer uses
  * the same endpoint matrix enforced by the API and always includes RELATES_TO,
  * so every node type can link to every other node type before the node is
@@ -143,7 +143,7 @@ export function ConnectionComposer({
               value: option.key,
               label: connectionOptionSelectLabel(option),
             }))}
-            placeholder="Choose how they relate…"
+            placeholder="Choose how they relate..."
             clearable={false}
           />
         </Field>
@@ -169,7 +169,7 @@ export function ConnectionComposer({
                 key={selected.targetTypes.join(',')}
                 types={selected.targetTypes}
                 excludeIds={additional.map((draft) => draft.target.id)}
-                placeholder="Search or create a record…"
+                placeholder="Search or create a record..."
                 onPick={setTarget}
               />
             )}

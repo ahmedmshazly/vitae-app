@@ -59,7 +59,7 @@ describe('LogIntroduction', () => {
     });
   });
 
-  it('credits the broker’s favor ledger when asked, in the same gesture', async () => {
+  it("credits the broker's favor ledger when asked, in the same gesture", async () => {
     mockSelfAndSearch();
     mockApi.post.mockResolvedValue({ edge: { id: 'e1' } });
     const user = userEvent.setup();

@@ -132,7 +132,7 @@ export function Trash() {
               onClick={() => setConfirmPurge(true)}
               aria-label={`Purge ${expired} expired record${expired === 1 ? '' : 's'} now`}
             >
-              {purge.isPending ? 'Purging…' : `Purge ${expired} expired now`}
+              {purge.isPending ? 'Purging...' : `Purge ${expired} expired now`}
             </Button>
           ) : undefined
         }
@@ -260,7 +260,7 @@ export function Trash() {
             relationship data. It cannot be undone.
           </p>
         }
-        confirmLabel={purge.isPending ? 'Purging…' : 'Purge permanently'}
+        confirmLabel={purge.isPending ? 'Purging...' : 'Purge permanently'}
         destructive
         busy={purge.isPending}
         onConfirm={() => purge.mutate()}
@@ -268,7 +268,7 @@ export function Trash() {
 
       {purgePreview.isError && (
         <ErrorState
-          title="Couldn’t load the purge preview"
+          title="Couldn't load the purge preview"
           detail={(purgePreview.error as Error | null)?.message}
           onRetry={() => void purgePreview.refetch()}
         />
@@ -287,7 +287,7 @@ export function Trash() {
       >
         {trash.isError ? (
           <ErrorState
-            title="Couldn’t load trash"
+            title="Couldn't load trash"
             detail={(trash.error as Error | null)?.message}
             onRetry={() => void trash.refetch()}
           />
@@ -335,7 +335,7 @@ export function Trash() {
                     onClick={() => restore.mutate(n.id)}
                     aria-label={`Restore ${n.title}`}
                   >
-                    {restoring ? 'Restoring…' : 'Restore'}
+                    {restoring ? 'Restoring...' : 'Restore'}
                   </Button>
                 </li>
               );

@@ -41,7 +41,7 @@ interface AtomRow {
 /** The sentence a résumé would print, which is the only name an atom has. */
 function atomLabel(atom: AtomRow): string {
   const text = atom.variants.find((v) => v.is_default)?.text ?? atom.variants[0]?.text ?? atom.id;
-  const short = text.length > 72 ? `${text.slice(0, 72)}…` : text;
+  const short = text.length > 72 ? `${text.slice(0, 72)}...` : text;
   return atom.owner_title ? `${atom.owner_title}: ${short}` : short;
 }
 
@@ -119,7 +119,7 @@ export function DossierClaimForm({
           id={`${ids}-text`}
           rows={2}
           maxLength={600}
-          placeholder="What is true, stated plainly…"
+          placeholder="What is true, stated plainly..."
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
@@ -156,7 +156,7 @@ export function DossierClaimForm({
         ) : (
           <EntityPicker
             types={admittedTypes(section)}
-            placeholder="Search the records this entry rests on…"
+            placeholder="Search the records this entry rests on..."
             excludeIds={cites.filter((c) => c.kind === 'node').map((c) => c.id)}
             onPick={(entity: PickedEntity) =>
               addCitation({ kind: 'node', id: entity.id, label: entity.title })
@@ -185,7 +185,7 @@ export function DossierClaimForm({
           <Field
             label="Or cite a résumé atom"
             htmlFor={`${ids}-atom`}
-            help={atomsQuery.isLoading ? 'Loading your atoms…' : 'This section admits atoms.'}
+            help={atomsQuery.isLoading ? 'Loading your atoms...' : 'This section admits atoms.'}
           >
             <div className="flex flex-wrap items-center gap-2">
               <Select
@@ -233,7 +233,7 @@ export function DossierClaimForm({
           disabled={!canSubmit}
           onClick={() => void submit()}
         >
-          {busy ? 'Saving…' : 'Add this entry'}
+          {busy ? 'Saving...' : 'Add this entry'}
         </Button>
       </div>
     </fieldset>

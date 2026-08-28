@@ -36,7 +36,7 @@ describe('RemindersDrawer', () => {
     renderOpen();
 
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Couldn’t load reminders');
+    expect(alert).toHaveTextContent("Couldn't load reminders");
     expect(alert).toHaveTextContent('timeout');
 
     mockApi.get.mockResolvedValueOnce({ reminders: [] });

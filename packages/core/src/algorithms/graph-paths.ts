@@ -61,7 +61,7 @@ const DEFAULTS: Required<FindPathsOptions> = {
 };
 
 /**
- * Find up to `maxPaths` simple paths self → … → targetOrg, ranked by the
+ * Find up to `maxPaths` simple paths self → ... → targetOrg, ranked by the
  * product of hop strengths.
  */
 export function findIntroPaths(

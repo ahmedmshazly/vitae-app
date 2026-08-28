@@ -10,7 +10,7 @@
  * Search and inline creation are `EntityPicker`'s job; this adds the "That's
  * me" shortcut and the chosen-subject row.
  *
- * The shortcut used to be `{self && …}` over a query destructured for `data`
+ * The shortcut used to be `{self && ...}` over a query destructured for `data`
  * alone, so a slow /auth/me and a failed one both rendered as the button
  * simply not being there. Somebody filling in their own publication concluded
  * Vitae had no way to say "mine" and typed their own name into the search
@@ -85,12 +85,12 @@ export function SubjectPicker({
           {isPending && <Skeleton width={92} height={30} />}
           {self && (
             <Button type="button" onClick={() => onChange({ id: self.id, title: self.title })}>
-              That&rsquo;s me
+              That's me
             </Button>
           )}
           <EntityPicker
             types={['person']}
-            placeholder="Search people, or type a new name…"
+            placeholder="Search people, or type a new name..."
             onPick={(person: PickedEntity) => onChange({ id: person.id, title: person.title })}
           />
         </div>
@@ -105,7 +105,7 @@ export function SubjectPicker({
           <StatusTrace
             tone="danger"
             announce={false}
-            label="Couldn’t check who you are"
+            label="Couldn't check who you are"
             detail="Search for yourself by name above."
           />
           <Button type="button" size="sm" variant="ghost" onClick={() => void refetch()}>

@@ -110,7 +110,7 @@ describe('a failed unlink stays on screen', () => {
     const dialog = await openUnlink(user);
     await user.click(within(dialog).getByRole('button', { name: 'Unlink' }));
 
-    const busy = await within(dialog).findByRole('button', { name: 'Unlinking…' });
+    const busy = await within(dialog).findByRole('button', { name: 'Unlinking...' });
     expect(busy).toBeDisabled();
 
     gate.resolve({});
@@ -156,7 +156,7 @@ describe('a failed property save stays on screen', () => {
     await user.click(screen.getByRole('button', { name: /properties$/ }));
     await user.click(await screen.findByRole('button', { name: 'Save' }));
 
-    const busy = await screen.findByRole('button', { name: 'Saving…' });
+    const busy = await screen.findByRole('button', { name: 'Saving...' });
     expect(busy).toBeDisabled();
 
     gate.resolve({});

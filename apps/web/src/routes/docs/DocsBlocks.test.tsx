@@ -180,7 +180,7 @@ describe('tables', () => {
 
   // Without a row header every cell is announced bare, and a reference table
   // read one cell at a time stops saying which row it is in.
-  it('makes the first cell of each row that row’s header', () => {
+  it("makes the first cell of each row that row's header", () => {
     draw([block]);
     const rows = screen.getAllByRole('row').slice(1);
     for (const row of rows) {

@@ -1357,7 +1357,7 @@ d('Vitae API (integration)', () => {
       .send({ type: 'idea', title: marker, props: { status: 'spark' } })
       .expect(201);
 
-    // Visible in demo…
+    // Visible in demo...
     const demoList = await request(app)
       .get('/api/v1/nodes?type=idea&limit=500')
       .set('Authorization', `Bearer ${token}`)
@@ -1365,7 +1365,7 @@ d('Vitae API (integration)', () => {
       .expect(200);
     expect(demoList.body.nodes.some((n: { title: string }) => n.title === marker)).toBe(true);
 
-    // …absent from real.
+    // ...absent from real.
     const realList = await request(app)
       .get('/api/v1/nodes?type=idea&limit=500')
       .set('Authorization', `Bearer ${token}`)

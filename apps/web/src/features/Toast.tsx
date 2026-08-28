@@ -61,10 +61,10 @@ function ToastBridge({ children }: { children: ReactNode }) {
           onAction: () => {
             try {
               void Promise.resolve(undo()).catch(() => {
-                toast('Couldn’t undo that change', { variant: 'error' });
+                toast("Couldn't undo that change", { variant: 'error' });
               });
             } catch {
-              toast('Couldn’t undo that change', { variant: 'error' });
+              toast("Couldn't undo that change", { variant: 'error' });
             }
           },
         };

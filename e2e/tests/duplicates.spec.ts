@@ -85,7 +85,7 @@ test('a failed queue load says so instead of rendering nothing useful', async ({
 
   await expect(page.getByRole('heading', { name: 'Identity audit' })).toBeVisible();
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load the identity queue');
+  await expect(alert).toContainText("Couldn't load the identity queue");
   await expect(alert).toContainText('the identity scanner is unreachable');
   await expect(page.getByText('No duplicates detected')).toHaveCount(0);
 });
@@ -132,7 +132,7 @@ test('a failed merge history load reports itself', async ({ page }) => {
   await page.goto('/import/duplicates');
 
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load merge history');
+  await expect(alert).toContainText("Couldn't load merge history");
   await expect(alert).toContainText('merge log unavailable');
 });
 

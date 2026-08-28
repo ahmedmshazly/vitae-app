@@ -90,7 +90,7 @@ export function ResumeHub() {
         help={
           <InfoPopover title="How the résumé engine works">
             <p>
-              Everything is deterministic - no AI guesswork. Your bullets (“atoms”) are scored
+              Everything is deterministic - no AI guesswork. Your bullets ('atoms') are scored
               against the JD and packed to one page, then rendered to LaTeX and compiled.
             </p>
             <p>
@@ -116,7 +116,7 @@ export function ResumeHub() {
           The failure costs you the numbers, not the navigation below. */}
       {overview.isError ? (
         <ErrorState
-          title="Couldn’t read your résumé workspace"
+          title="Couldn't read your résumé workspace"
           detail={(overview.error as Error | null)?.message}
           onRetry={() => void overview.refetch()}
         />

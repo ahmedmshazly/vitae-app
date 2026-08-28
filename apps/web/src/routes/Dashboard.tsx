@@ -282,7 +282,7 @@ export function Dashboard() {
         <PageHeader title="Today" />
         <RegisterRule />
         <ErrorState
-          title="Couldn’t load today"
+          title="Couldn't load today"
           detail={(error as Error | null)?.message}
           onRetry={() => void refetch()}
         />
@@ -293,7 +293,7 @@ export function Dashboard() {
   if (isLoading || !data) {
     return (
       <div className="page">
-        <PageHeader title="Today" subtitle="Loading your agenda…" />
+        <PageHeader title="Today" subtitle="Loading your agenda..." />
         <RegisterRule />
         <SkeletonRows rows={6} />
       </div>
@@ -472,7 +472,7 @@ function Bar({ value, label, decorative }: { value: number; label: string; decor
       className="h-1.5 overflow-hidden rounded-full bg-raised"
       // Inside a link whose text already prints the percentage, the meter's
       // value is folded into the link's accessible name and read twice
-      // ("… 31% 31%"). Where it is the only statement of the value it stays a
+      // ("... 31% 31%"). Where it is the only statement of the value it stays a
       // real progressbar.
       role={decorative ? undefined : 'progressbar'}
       aria-hidden={decorative || undefined}

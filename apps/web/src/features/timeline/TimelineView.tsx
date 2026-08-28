@@ -178,7 +178,7 @@ export function TimelineView() {
         </header>
         <div className="explore-instrument-state__body">
           <ErrorState
-            title="Couldn’t assemble the chronograph"
+            title="Couldn't assemble the chronograph"
             detail={(error as Error | null)?.message}
             onRetry={() => void refetch()}
           />

@@ -29,7 +29,7 @@ test('a failed rollup names itself instead of posing as a quiet graph', async ({
   await signIn(page);
   await page.route('**/api/v1/correspondence**', (route) => route.abort());
   await page.goto('/network/correspondence');
-  await expect(page.getByText('Couldn’t load correspondence')).toBeVisible();
+  await expect(page.getByText("Couldn't load correspondence")).toBeVisible();
   await expect(page.getByRole('button', { name: 'Retry' })).toBeVisible();
   await expect(page.getByText('No dormant ties')).toHaveCount(0);
 });

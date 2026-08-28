@@ -106,7 +106,7 @@ export function Planner() {
       {query.isLoading && <SkeletonRows count={6} />}
       {query.isError && (
         <ErrorState
-          title="Couldn’t load the planner"
+          title="Couldn't load the planner"
           detail={query.error instanceof Error ? query.error.message : undefined}
           onRetry={() => void query.refetch()}
         />

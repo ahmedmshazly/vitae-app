@@ -47,7 +47,7 @@ const only = process.argv.find((a) => a.startsWith('--only='))?.slice('--only='.
 /** The scraped LinkedIn reaction bar, used verbatim as a post title. */
 const REACTION_BAR = /^(Like\s+)+Celebrate\s+Support\s+Love\s+Insightful\s+Funny\s+Comment\s+Share$/;
 
-/** Trailing recommendation block: "… June 25, 2024, Allan managed Leila directly". */
+/** Trailing recommendation block: "... June 25, 2024, Allan managed Leila directly". */
 const RECOMMENDATION_TAIL =
   /\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4},\s+.+$/;
 
@@ -157,11 +157,11 @@ function titleFromText(text: string): string {
   if (flat.length <= POST_TITLE_MAX) return flat;
   const cut = flat.slice(0, POST_TITLE_MAX);
   const lastSpace = cut.lastIndexOf(' ');
-  return `${(lastSpace > 40 ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
+  return `${(lastSpace > 40 ? cut.slice(0, lastSpace) : cut).trimEnd()}...`;
 }
 
 /**
- * Split "Allan Villegas, Ph.D. CEO @LiaPay | … June 25, 2024, Allan managed …"
+ * Split "Allan Villegas, Ph.D. CEO @LiaPay | ... June 25, 2024, Allan managed ..."
  * into the person's name and the headline that was appended to it. Returns null
  * when the split is not confident, so a title we cannot parse is left alone.
  */
@@ -421,7 +421,7 @@ async function main(): Promise<void> {
         patch.props = { ...props, headline: split.headline };
         before.props = props;
       }
-      console.log(`   ~NODE "${n.title.slice(0, 50)}…"`);
+      console.log(`   ~NODE "${n.title.slice(0, 50)}..."`);
       console.log(`          name     -> "${split.name}"`);
       if (patch.props) console.log(`          headline -> "${split.headline.slice(0, 60)}"`);
       await patchNode(n.id, `person ${n.id}`, patch, before);

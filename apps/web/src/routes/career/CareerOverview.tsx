@@ -108,7 +108,7 @@ export function CareerOverview() {
 
       {applicationsQuery.isError ? (
         <ErrorState
-          title="Couldn’t load your applications"
+          title="Couldn't load your applications"
           detail={(applicationsQuery.error as Error | null)?.message}
           onRetry={() => void applicationsQuery.refetch()}
         />
@@ -200,7 +200,7 @@ export function CareerOverview() {
             <div className="mb-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_180px_auto]">
               <Input
                 aria-label="Search applications"
-                placeholder="Search role, company, person, or next step…"
+                placeholder="Search role, company, person, or next step..."
                 value={query}
                 onChange={(event) => setFilter('q', event.target.value)}
               />

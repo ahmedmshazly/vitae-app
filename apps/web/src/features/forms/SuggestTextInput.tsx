@@ -220,7 +220,7 @@ export function SuggestTextInput({
           className="mt-2"
           tone="success"
           label="Created"
-          detail={`${created.type} “${created.title}”`}
+          detail={`${created.type} '${created.title}'`}
         />
       )}
 
@@ -261,8 +261,8 @@ export function SuggestTextInput({
             >
               <span className="entity-picker__title">
                 {creating
-                  ? `Creating ${stubType!.replace('_', ' ')} “${typed}”…`
-                  : `Create ${stubType!.replace('_', ' ')} “${typed}”, refine later`}
+                  ? `Creating ${stubType!.replace('_', ' ')} '${typed}'...`
+                  : `Create ${stubType!.replace('_', ' ')} '${typed}', refine later`}
               </span>
             </button>
           )}

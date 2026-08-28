@@ -99,7 +99,7 @@ describe('Atoms states', () => {
     serve({ '/atoms': new Error('gateway down') });
     renderWithApp(<Atoms />, { route: ROUTE });
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Couldn’t load your atom library');
+    expect(alert).toHaveTextContent("Couldn't load your atom library");
     expect(alert).toHaveTextContent('gateway down');
     expect(screen.queryByText('No atoms yet')).not.toBeInTheDocument();
   });
@@ -112,7 +112,7 @@ describe('Atoms states', () => {
     void queryClient.refetchQueries({ queryKey: ['atoms'] });
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Couldn’t refresh your atom library',
+      "Couldn't refresh your atom library",
     );
     expect(screen.getByRole('list', { name: 'Atoms' })).toBeInTheDocument();
   });
@@ -156,7 +156,7 @@ describe('Atoms states', () => {
 
     await userEvent.click(within(sheet).getByRole('button', { name: 'Duplicate' }));
 
-    const busy = await within(sheet).findByRole('button', { name: 'Duplicating…' });
+    const busy = await within(sheet).findByRole('button', { name: 'Duplicating...' });
     expect(busy).toBeDisabled();
   });
 
@@ -185,7 +185,7 @@ describe('Atoms states', () => {
     renderWithApp(<Atoms />, { route: ROUTE });
     const sheet = await openFirstAtom();
 
-    expect(await within(sheet).findByText('Couldn’t load your skill catalogue')).toBeInTheDocument();
+    expect(await within(sheet).findByText("Couldn't load your skill catalogue")).toBeInTheDocument();
     expect(within(sheet).getByRole('button', { name: 'Retry' })).toBeInTheDocument();
   });
 
@@ -196,7 +196,7 @@ describe('Atoms states', () => {
 
     await userEvent.click(within(sheet).getByRole('button', { name: 'Save atom' }));
 
-    expect(await within(sheet).findByText('Couldn’t save this atom')).toBeInTheDocument();
+    expect(await within(sheet).findByText("Couldn't save this atom")).toBeInTheDocument();
     expect(within(sheet).getByText(/this atom changed elsewhere/)).toBeInTheDocument();
   });
 });

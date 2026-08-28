@@ -40,7 +40,7 @@ test('add a typed KNOWS relationship carrying a topic', async ({ page }) => {
   await relation.click();
   await page.getByRole('option', { name: /Friend/ }).first().click();
 
-  const topics = page.getByPlaceholder(/Topics|Add…/).first();
+  const topics = page.getByPlaceholder(/Topics|Add.../).first();
   await expect(topics).toBeVisible();
   await topics.fill('Business');
   await topics.press('Enter');

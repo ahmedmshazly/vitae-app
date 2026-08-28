@@ -68,7 +68,7 @@ describe('ErrorBoundary', () => {
     expect(screen.getByRole('button', { name: 'Reload page' })).toBeInTheDocument();
   });
 
-  it('ShellErrorFallback’s "Try again" resets via the same retry callback', () => {
+  it('ShellErrorFallback\'s "Try again" resets via the same retry callback', () => {
     render(
       <ErrorBoundary fallback={(retry) => <ShellErrorFallback retry={retry} />}>
         <Bomb />

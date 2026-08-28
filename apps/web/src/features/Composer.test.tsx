@@ -36,7 +36,7 @@ describe('Composer', () => {
     mockApi.post.mockRejectedValueOnce(new Error('upstream 502'));
     renderWithApp(<Composer ctx={ctx} onClose={vi.fn()} />);
 
-    expect(await screen.findByText('Couldn’t draft that message')).toBeInTheDocument();
+    expect(await screen.findByText("Couldn't draft that message")).toBeInTheDocument();
     expect(screen.getByText('upstream 502')).toBeInTheDocument();
   });
 

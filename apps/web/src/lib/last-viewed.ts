@@ -1,5 +1,5 @@
 /**
- * The record the operator last opened (FR-CAP-008). Capture's `n …` line
+ * The record the operator last opened (FR-CAP-008). Capture's `n ...` line
  * appends to this id. Session storage keeps it for the tab without inventing a
  * graph of recents.
  */

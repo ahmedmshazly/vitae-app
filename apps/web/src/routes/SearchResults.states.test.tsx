@@ -57,7 +57,7 @@ describe('Search route states', () => {
     renderWithApp(<SearchResults />, { route: '/search?q=ada' });
 
     const alert = await screen.findByRole('alert');
-    expect(within(alert).getByText('Couldn’t run that search')).toBeInTheDocument();
+    expect(within(alert).getByText("Couldn't run that search")).toBeInTheDocument();
     expect(within(alert).getByText('search index down')).toBeInTheDocument();
 
     mockApi.get.mockResolvedValueOnce({

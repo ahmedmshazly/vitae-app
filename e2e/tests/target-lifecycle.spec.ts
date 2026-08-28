@@ -24,7 +24,7 @@ test('tailor target rail supports status, keyword edit, and archive/restore', as
   await page.getByPlaceholder('Role title').fill(role);
   await page.getByPlaceholder('Company').fill('Lifecycle Co');
   await page
-    .getByPlaceholder('Paste the job description here…')
+    .getByPlaceholder('Paste the job description here...')
     .fill('Requirements\n- Python\n- Kubernetes\n- SQL');
   await page.getByRole('button', { name: /parse keywords/i }).click();
   await expect(page.getByRole('button', { name: new RegExp(role) })).toBeVisible({ timeout: 15_000 });

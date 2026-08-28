@@ -114,10 +114,10 @@ describe('Person states', () => {
     await queryClient.refetchQueries({ queryKey: ['person-profile', 'person-1'] });
 
     const banner = await screen.findByText(
-      /Couldn’t refresh relationship intelligence and profile evidence/,
+      /Couldn't refresh relationship intelligence and profile evidence/,
     );
     expect(banner).toBeInTheDocument();
-    expect(screen.getAllByText(/Couldn’t refresh/)).toHaveLength(1);
+    expect(screen.getAllByText(/Couldn't refresh/)).toHaveLength(1);
   });
 
   it('says a person is overdue in words, not only in the warning hue', async () => {
@@ -174,7 +174,7 @@ describe('Person states', () => {
     expect(rows).toHaveLength(2);
     await user.click(within(rows[0]!).getByRole('button', { name: 'Settle' }));
 
-    expect(within(rows[0]!).getByRole('button', { name: 'Settling…' })).toBeDisabled();
+    expect(within(rows[0]!).getByRole('button', { name: 'Settling...' })).toBeDisabled();
     // The shared pending flag used to disable this one too.
     expect(within(rows[1]!).getByRole('button', { name: 'Settle' })).toBeEnabled();
 

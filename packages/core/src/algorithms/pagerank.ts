@@ -5,7 +5,7 @@
  * heuristics for social/organizational proximity [Kloumann 2016]. We run power
  * iteration from a seed distribution (the self node, optionally averaged with a
  * target-org node) over a graph whose edges carry per-type transition weights
- * (KNOWS·closeness > WORKED_ON > ATTENDED …). Computed nightly and cached on
+ * (KNOWS·closeness > WORKED_ON > ATTENDED ...). Computed nightly and cached on
  * person nodes; at A5 scale (≤50k nodes) this is well under a second.
  */
 import { PAGERANK } from './constants.js';

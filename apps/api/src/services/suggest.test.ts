@@ -83,7 +83,7 @@ beforeEach(() => {
 });
 
 describe('suggestValues', () => {
-  it('returns a field’s own previous values, most-used first', async () => {
+  it("returns a field's own previous values, most-used first", async () => {
     const values = await suggestValues({ type: 'organization', prop: 'industry' });
     expect(values).toEqual([
       { value: 'Leadership consulting', count: 2 },

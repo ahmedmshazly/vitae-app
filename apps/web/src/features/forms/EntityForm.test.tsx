@@ -88,7 +88,7 @@ describe('EntityForm, subject-bearing types demand an owner', () => {
     expect(screen.getByRole('alert').textContent).toMatch(/pick who this belongs to/i);
   });
 
-  it('renders the descriptor’s own subject prompt', () => {
+  it("renders the descriptor's own subject prompt", () => {
     renderForm(<EntityForm type="publication" onSubmit={vi.fn()} />);
     expect(screen.getByText('Who authored this?')).toBeTruthy();
   });

@@ -86,7 +86,7 @@ export function Correspondence() {
       >
         {rollup.isError ? (
           <ErrorState
-            title="Couldn’t load correspondence"
+            title="Couldn't load correspondence"
             detail={(rollup.error as Error | null)?.message}
             onRetry={() => void rollup.refetch()}
           />

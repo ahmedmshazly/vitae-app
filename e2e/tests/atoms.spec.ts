@@ -59,7 +59,7 @@ test('a failed load says so instead of blaming an empty library', async ({ page 
   // `isError` was unread, so a failure rendered an empty grid reading "No
   // matching atoms, create an atom here, or clear the filters".
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load your atom library');
+  await expect(alert).toContainText("Couldn't load your atom library");
   await expect(alert).toContainText('the atom store is unreachable');
   await expect(page.getByText('No matching atoms')).toHaveCount(0);
 });

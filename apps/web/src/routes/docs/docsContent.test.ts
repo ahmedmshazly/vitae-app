@@ -86,7 +86,7 @@ describe('asking the API for the corpus', () => {
   it('says the connection failed when the request never completes', async () => {
     fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
     await expect(manifestQueryOptions().queryFn()).rejects.toThrow(
-      /Couldn’t reach the documentation index/,
+      /Couldn't reach the documentation index/,
     );
   });
 
@@ -101,7 +101,7 @@ describe('asking the API for the corpus', () => {
     fetchMock.mockResolvedValue(json(500, { error: { code: 'ERROR', message: 'no' } }));
     const options = pageQueryOptions(page);
     expect(options.queryKey).toEqual(['docs', 'page', 'ONE']);
-    await expect(options.queryFn()).rejects.toThrow(/“First” is not available \(500\)/);
+    await expect(options.queryFn()).rejects.toThrow(/'First' is not available \(500\)/);
   });
 
   it('caches the corpus forever, because a build artifact cannot change mid-visit', () => {

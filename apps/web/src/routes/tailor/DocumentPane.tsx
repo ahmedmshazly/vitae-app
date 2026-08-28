@@ -110,7 +110,7 @@ export function DocumentPane({ targetId, draft, onDraft }: Props) {
   if (modelQuery.isError || !modelQuery.data) {
     return (
       <ErrorState
-        title="Couldn’t assemble the document"
+        title="Couldn't assemble the document"
         detail={
           modelQuery.error instanceof Error
             ? modelQuery.error.message

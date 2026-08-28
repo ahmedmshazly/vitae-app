@@ -189,7 +189,7 @@ export function ConnectionRow({
                   disabled={saveProps.isPending}
                   onClick={() => saveProps.mutate()}
                 >
-                  {saveProps.isPending ? 'Saving…' : 'Save'}
+                  {saveProps.isPending ? 'Saving...' : 'Save'}
                 </Button>
               </div>
             </Popover>
@@ -214,7 +214,7 @@ export function ConnectionRow({
         title={`Unlink ${other?.title ?? 'this record'}?`}
         body={
           <>
-            {`Removes the “${label}” relationship. The records themselves are untouched, and Undo is available after.`}
+            {`Removes the '${label}' relationship. The records themselves are untouched, and Undo is available after.`}
             {unlink.isError && (
               <StatusTrace
                 className="mt-3"
@@ -225,7 +225,7 @@ export function ConnectionRow({
             )}
           </>
         }
-        confirmLabel={unlink.isPending ? 'Unlinking…' : 'Unlink'}
+        confirmLabel={unlink.isPending ? 'Unlinking...' : 'Unlink'}
         destructive
         busy={unlink.isPending}
         onConfirm={() => unlink.mutate()}

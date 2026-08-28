@@ -72,7 +72,7 @@ async function wipe() {
 }
 
 async function main() {
-  console.log('Seeding the DEMO space (Jordan’s sample graph)…');
+  console.log("Seeding the DEMO space (Jordan's sample graph)...");
   await wipe();
 
   // ── Skills (JD parser dictionary + Technical Skills section) ───────────────
@@ -246,11 +246,11 @@ async function main() {
   // staying exactly as small as it is.
   const orgRelated = async (src: string, dst: string, kind: string, note: string) =>
     repository.createEdge({ type: 'ORG_RELATED', src, dst, props: { kind, note }, source: 'manual' });
-  await orgRelated(zamba, meridianFreight, 'customer', 'Zamba moves Meridian’s inland freight.');
+  await orgRelated(zamba, meridianFreight, 'customer', "Zamba moves Meridian's inland freight.");
   await orgRelated(sahara, cairoMetro, 'vendor', 'Cairo Metro built the first payment portal.');
   await orgRelated(savanna, karibu, 'partner', 'Grid telemetry runs on Karibu regions.');
   await orgRelated(ubwenge, amani, 'competitor', 'Both chase the same applied-robotics grants.');
-  await orgRelated(nileDelta, sahara, 'subsidiary', 'Absorbed into Sahara’s field-services arm in 2019.');
+  await orgRelated(nileDelta, sahara, 'subsidiary', "Absorbed into Sahara's field-services arm in 2019.");
   await orgRelated(okavango, ictChamber, 'affiliate', 'Joint open-data policy working group.');
 
   // ── People (network) ────────────────────────────────────────────────────────
@@ -753,7 +753,7 @@ async function main() {
   const pFleet = await workProject('Fleet Telemetry Ingestion', { kind: 'work', my_role: 'contractor', status: 'done', outcome: 'One ingestion path for four telematics vendors, with per-vendor validation.' }, '2025-03-01', '2025-11-30', 'led', rZamba);
   const pColdChain = await workProject('Cold-Chain Sensor Monitoring', { kind: 'work', my_role: 'consultant', status: 'paused', outcome: 'Vaccine-fridge excursions detected from cheap sensors, piloted in two districts.' }, '2024-04-01', undefined, 'advisor', tembo);
   const pOpenBus = await workProject('Open Bus-Route Dataset', { kind: 'oss', my_role: 'maintainer', status: 'active', outcome: 'A cleaned, versioned dataset of Kigali bus routes anyone can query.', url: 'https://github.com/jordan-demo/open-bus-routes' }, '2023-06-01', undefined, 'led');
-  const pGeoAtlas = await workProject('District Indicator Atlas', { kind: 'work', my_role: 'consultant', status: 'done', outcome: 'Open indicators mapped to district boundaries for the collective’s partners.' }, '2022-10-01', '2023-03-15', 'led', rFreelance);
+  const pGeoAtlas = await workProject('District Indicator Atlas', { kind: 'work', my_role: 'consultant', status: 'done', outcome: "Open indicators mapped to district boundaries for the collective's partners." }, '2022-10-01', '2023-03-15', 'led', rFreelance);
   const pSpeech = await workProject('Kinyarwanda Speech Corpus', { kind: 'research', my_role: 'co-investigator', status: 'active', outcome: 'A permissively licensed read-speech corpus for low-resource recognition.' }, '2025-09-01', undefined, 'core', cmu);
   const pEnergy = await workProject('Household Energy Dashboard', { kind: 'personal', my_role: 'creator', status: 'done', outcome: 'A year of meter readings turned into a bill-forecasting page.' }, '2021-08-01', '2022-02-28', 'led');
   const pCalibrator = await workProject('Line-Model Calibrator', { kind: 'personal', my_role: 'creator', status: 'active', outcome: 'Fits characters-per-line from compiled PDFs so page estimates stop guessing.' }, '2026-03-01', undefined, 'led');
@@ -986,7 +986,7 @@ async function main() {
     return a.id;
   };
   await award('1st Place: Egyptian National Finals, World Robot Challenge', 'national', '2019-08-10', 'Campus Navigation Robot (Nile University)');
-  await award('Dean’s List', 'org', '2023-06-30', 'Top 5% academic performance, ALU');
+  await award("Dean's List", 'org', '2023-06-30', 'Top 5% academic performance, ALU');
   await award('Best Poster: Graduate Research Symposium', 'org', '2026-05-21', 'Adaptive pipeline orchestration study');
 
   const reference = async (personId: string, relationship: string, blurb: string) => {
@@ -1053,7 +1053,7 @@ async function main() {
   const pubThesis = await publication(
     'Adaptive Scheduling for Streaming Feature Stores', 'thesis',
     'Carnegie Mellon University Africa', ['Jordan Kim'], 1, '2027-04-30',
-    'Master’s thesis in progress; the RL study is its second chapter.',
+    "Master's thesis in progress; the RL study is its second chapter.",
     {}, pRlStudy,
   );
   const pubPatent = await publication(
@@ -1136,7 +1136,7 @@ async function main() {
   await referenceOfKind(who('Prof. Elias Mwangi'), 'Course instructor, CMU-Africa', 'academic', 5, true, 'Consistently the strongest lab reports in a strong cohort.');
   await referenceOfKind(who('Naledi Motsepe'), 'Client at Okavango Data Collective', 'professional', 5, true, 'Delivered a contract that three previous consultants had returned unfinished.');
   await referenceOfKind(who('Bruno Iradukunda'), 'Friend and running partner, eight years', 'personal', 4, true, 'Shows up. That is the whole reference, and it is not a small one.');
-  await referenceOfKind(who('Prisca Nyirahabimana'), 'Co-teacher, Saturday coding club', 'character', 5, true, 'Three years of Saturdays with other people’s children, unpaid and unmissed.');
+  await referenceOfKind(who('Prisca Nyirahabimana'), 'Co-teacher, Saturday coding club', 'character', 5, true, "Three years of Saturdays with other people's children, unpaid and unmissed.");
   await referenceOfKind(who('Ahmed Sobhy'), 'First employer, Nile Delta Systems', 'character', 4, false, 'Prefers not to be contacted in writing; will take a call.');
 
   // Written the other way round, too: Jordan vouching for other people. A
@@ -1868,7 +1868,7 @@ async function main() {
   await event('PyData Kigali workshop day', 'meetup', 'Kigali', 'kLab', '2025-07-26', undefined, true, ['Wanjiku Kamau', 'Hakim Diallo'], 'organizer');
   await event('Kigali Build Weekend', 'hackathon', 'Kigali', 'Norrsken House', dateAgo(96), dateAgo(94), true, ['Emmanuel Rukundo', 'Chidinma Eze'], 'attendee');
   await event('CMU-Africa cohort welcome', 'party', 'Kigali', 'CMU-Africa campus', '2024-08-20', undefined, true, ['Chidinma Eze', 'Kwame Boateng', 'Aline Ingabire'], 'attendee');
-  await event('Sandrine and Bruno’s wedding', 'wedding', 'Musanze', 'Lake Ruhondo', dateAgo(160), undefined, true, ['Bruno Iradukunda', 'Sandrine Mukashema', 'Olivier Bizimana'], 'attendee');
+  await event("Sandrine and Bruno's wedding", 'wedding', 'Musanze', 'Lake Ruhondo', dateAgo(160), undefined, true, ['Bruno Iradukunda', 'Sandrine Mukashema', 'Olivier Bizimana'], 'attendee');
   await event('18-786 Deep Learning Systems, first lecture', 'class', 'Kigali', 'CMU-Africa campus', dateAgo(20), undefined, true, ['Chidinma Eze'], 'student');
   await event('Annual medical check-up', 'appointment', 'Kigali', 'Kimihurura clinic', dateAgo(15), undefined, true, [], 'attendee');
   await event('Zamba Logistics offer conversation', 'appointment', 'Kigali', 'Zamba head office', dateAgo(19), undefined, true, ['Josephine Uwera'], 'attendee');
@@ -2002,7 +2002,7 @@ async function main() {
   await journalFull('A quiet week, deliberately', 47, 4, 5, 'No interviews booked. Ran three times, read the whole Kleppmann chapter, slept.');
   await journalFull('Contract ended', 62, 3, 3, 'Last standup at Zamba. Ten months of fleet data and I still think the vendor formats are a practical joke.');
   await journalFull('Rejected by Lattice, and it was the right call', 138, 2, 2, 'They needed a body in Cape Town. I spent two days being annoyed about it and one day admitting they were right.');
-  await journalFull('Poster day', 160, 5, 5, 'Best poster. Fatima made me cut the claims by half and the half that survived was the true part.', 'Fatima’s red pen.');
+  await journalFull('Poster day', 160, 5, 5, 'Best poster. Fatima made me cut the claims by half and the half that survived was the true part.', "Fatima's red pen.");
   await journalFull('Started the Kinyarwanda class', 160, 4, 4, 'Three years of pointing at things. Enough.');
   await journalFull('The Sokoni design round went badly', 190, 2, 3, 'I described a feature store I had read about as though I had run one. He noticed within four minutes.');
   await journalFull('First week of the contract', 420, 4, 4, 'Four telematics vendors, four schemas, one deadline. I have missed this.');
@@ -2110,9 +2110,9 @@ async function main() {
   await repository.createEdge({ type: 'SHARED_BY', src: book.id, dst: marc, props: { channel: 'Indaba coffee' }, source: 'manual' });
   await repository.createNode({ type: 'media_item', title: 'Lex Fridman #400: RL and robotics', props: { media_kind: 'podcast', consumption_status: 'done', rating: 4 }, source: 'manual' });
 
-  const hl = await repository.createNode({ type: 'highlight', title: 'On log-structured storage', props: { excerpt: 'The log is the heart of the system…', loc_ref: 'ch. 3', thought: 'Applies to my artifact-record design in the RL study.' }, source: 'manual' });
+  const hl = await repository.createNode({ type: 'highlight', title: 'On log-structured storage', props: { excerpt: 'The log is the heart of the system...', loc_ref: 'ch. 3', thought: 'Applies to my artifact-record design in the RL study.' }, source: 'manual' });
   await repository.createEdge({ type: 'ABOUT', src: hl.id, dst: book.id, source: 'manual' });
-  await repository.createNode({ type: 'highlight', title: 'Reward shaping pitfalls', props: { excerpt: 'Shaped rewards leak designer assumptions…', loc_ref: '32:10', thought: 'Cited in the symposium poster.' }, source: 'manual' });
+  await repository.createNode({ type: 'highlight', title: 'Reward shaping pitfalls', props: { excerpt: 'Shaped rewards leak designer assumptions...', loc_ref: '32:10', thought: 'Cited in the symposium poster.' }, source: 'manual' });
 
   await repository.createNode({ type: 'asset', title: 'ThinkPad T14 Gen 5', props: { category: 'electronics', vendor: 'Lenovo', model: 'T14 Gen 5', purchased_on: '2024-09-01', price: { amount: 1250, currency: 'USD' }, warranty_until: '2027-09-01', asset_status: 'owned' }, source: 'manual' });
   await repository.createNode({ type: 'asset', title: 'Saleae Logic 8 analyzer', props: { category: 'electronics', vendor: 'Saleae', purchased_on: '2025-02-10', price: { amount: 399, currency: 'USD' }, asset_status: 'owned' }, source: 'manual' });
@@ -2121,7 +2121,7 @@ async function main() {
   await repository.createNode({ type: 'health_log', title: 'Sleep: 7.5h', props: { metric: 'sleep_h', value: 7.5, unit: 'h', logged_at: daysAgo(0) }, sensitivity: 'sensitive', source: 'manual' });
 
   await repository.createNode({ type: 'account', title: 'Hetzner Cloud', props: { kind: 'online', service: 'Hetzner', url: 'https://console.hetzner.cloud', cost: { amount: 9, currency: 'EUR', period: 'monthly' }, account_status: 'active' }, source: 'manual' });
-  await repository.createNode({ type: 'account', title: 'Bank of Kigali (savings)', props: { kind: 'financial', identifier_masked: '…7204', account_status: 'active' }, sensitivity: 'sensitive', source: 'manual' });
+  await repository.createNode({ type: 'account', title: 'Bank of Kigali (savings)', props: { kind: 'financial', identifier_masked: '...7204', account_status: 'active' }, sensitivity: 'sensitive', source: 'manual' });
 
   // ── The long tail, at the size a real one is ────────────────────────────────
   //
@@ -2288,7 +2288,7 @@ async function main() {
     if (opts.sharedBy) await repository.createEdge({ type: 'SHARED_BY', src: m.id, dst: opts.sharedBy, props: { channel: 'conversation' }, source: 'manual' });
     return m.id;
   };
-  const mStaff = await media('The Staff Engineer’s Path', 'book', 'Tanya Reilly', 'done', { rating: 5, startedDaysAgo: 250, finishedDaysAgo: 210, sharedBy: who('Yasmine Farouk'), takeaways: 'Scope is a thing you are given and a thing you take. Mostly the second.' });
+  const mStaff = await media("The Staff Engineer's Path", 'book', 'Tanya Reilly', 'done', { rating: 5, startedDaysAgo: 250, finishedDaysAgo: 210, sharedBy: who('Yasmine Farouk'), takeaways: 'Scope is a thing you are given and a thing you take. Mostly the second.' });
   const mThinking = await media('Thinking in Systems', 'book', 'Donella Meadows', 'done', { rating: 5, startedDaysAgo: 400, finishedDaysAgo: 360 });
   await media('The Pragmatic Programmer', 'book', 'Hunt and Thomas', 'done', { rating: 4, finishedDaysAgo: 1200 });
   await media('Fundamentals of Data Engineering', 'book', 'Reis and Housley', 'in_progress', { rating: 4, startedDaysAgo: 60 });
@@ -2389,14 +2389,14 @@ async function main() {
       ...(opts.sensitive ? { sensitivity: 'sensitive' as const } : {}),
       source: 'manual',
     });
-  await account('REG electricity', 'utility', 'Rwanda Energy Group', 'active', { masked: '…4471', amount: 18_000, currency: 'RWF', renewalDaysAgo: -8 });
-  await account('WASAC water', 'utility', 'WASAC', 'active', { masked: '…9930', amount: 6_500, currency: 'RWF', renewalDaysAgo: -8 });
+  await account('REG electricity', 'utility', 'Rwanda Energy Group', 'active', { masked: '...4471', amount: 18_000, currency: 'RWF', renewalDaysAgo: -8 });
+  await account('WASAC water', 'utility', 'WASAC', 'active', { masked: '...9930', amount: 6_500, currency: 'RWF', renewalDaysAgo: -8 });
   await account('Canal Box fibre', 'utility', 'Canal Box', 'active', { amount: 35_000, currency: 'RWF', renewalDaysAgo: -3 });
-  await account('MTN Rwanda mobile', 'utility', 'MTN', 'active', { masked: '…0731', amount: 12_000, currency: 'RWF', renewalDaysAgo: -19 });
+  await account('MTN Rwanda mobile', 'utility', 'MTN', 'active', { masked: '...0731', amount: 12_000, currency: 'RWF', renewalDaysAgo: -19 });
   await account('GitHub', 'online', 'GitHub', 'active', { url: 'https://github.com/jordan-demo', username: 'jordan-demo' });
   await account('ORCID', 'online', 'ORCID', 'active', { url: 'https://orcid.org/0000-0000-0000-0000', username: '0000-0000-0000-0000' });
-  await account('Equity Bank (current)', 'financial', 'Equity Bank Rwanda', 'active', { masked: '…5518', sensitive: true });
-  await account('Old Egyptian bank account', 'financial', 'CIB Egypt', 'closed', { masked: '…2204', sensitive: true });
+  await account('Equity Bank (current)', 'financial', 'Equity Bank Rwanda', 'active', { masked: '...5518', sensitive: true });
+  await account('Old Egyptian bank account', 'financial', 'CIB Egypt', 'closed', { masked: '...2204', sensitive: true });
 
   // ── Résumé atoms (the raw material) ─────────────────────────────────────────
   let pinnedLeft = 2;
@@ -2493,7 +2493,7 @@ async function main() {
     { emphasis: 'concise', text: 'AI-assisted inventory checks raised report accuracy ~30%.' },
   ]);
   await atom(rNaser, '2022-08-31', [], [sPostgres], [
-    { emphasis: 'technical', text: 'Modeled the dealership’s sales, stock, and supplier data into a normalized PostgreSQL schema with migration scripts.' },
+    { emphasis: 'technical', text: "Modeled the dealership's sales, stock, and supplier data into a normalized PostgreSQL schema with migration scripts." },
     { emphasis: 'concise', text: 'Modeled dealership data into a normalized PostgreSQL schema.' },
   ]);
   await atom(rNaser, '2022-08-31', [], [sDjango], [
@@ -2575,23 +2575,23 @@ async function main() {
 
     // Junior Web Developer, 2014-2016.
     { owner: rJunior, end: '2016-11-30', metrics: [{ value: 14, unit: 'client sites' }], skills: [sPhp, sLaravel], technical: 'Built and shipped 14 client sites on **PHP and Laravel**, owning delivery from brief to handover on the last six.', concise: 'Built and shipped 14 Laravel client sites end to end.', leadership: 'Owned delivery on six client builds from brief to handover, and set the conventions the other eight were built to.' },
-    { owner: rJunior, end: '2016-11-30', metrics: [{ value: 3.4, unit: 's', label: 'load time' }], skills: [sPhp, sSql], technical: 'Rewrote the agency’s shared query layer, taking median page load from 3.4s to under 900ms across every client site.', concise: 'Rewrote the shared query layer; median load 3.4s to 900ms.' },
-    { owner: rJunior, end: '2016-11-30', skills: [sJs, sFigma], technical: 'Built the reusable component set the agency used for every subsequent build, working directly from the designers’ files.', concise: 'Built the agency’s reusable front-end component set.' },
+    { owner: rJunior, end: '2016-11-30', metrics: [{ value: 3.4, unit: 's', label: 'load time' }], skills: [sPhp, sSql], technical: "Rewrote the agency's shared query layer, taking median page load from 3.4s to under 900ms across every client site.", concise: 'Rewrote the shared query layer; median load 3.4s to 900ms.' },
+    { owner: rJunior, end: '2016-11-30', skills: [sJs, sFigma], technical: "Built the reusable component set the agency used for every subsequent build, working directly from the designers' files.", concise: "Built the agency's reusable front-end component set." },
     { owner: rJunior, end: '2016-11-30', metrics: [{ value: 9, unit: 'invoices/min' }], skills: [sPy, sCv], technical: 'Prototyped Arabic invoice recognition that turned a stack of supplier paperwork into 9 structured records a minute.', concise: 'Prototyped Arabic invoice recognition at 9 records a minute.' },
 
     // Software Engineer, Sahara Fintech, 2016-2019.
     { owner: rSwe, end: '2019-05-31', metrics: [{ value: 6, unit: 'hours', label: 'nightly close' }, { value: 4, unit: 'minutes' }], skills: [sPy, sPostgres], technical: 'Rebuilt the nightly settlement close as a **deterministic Python matcher over PostgreSQL**, taking a six-hour spreadsheet process to four minutes with a full audit trail.', concise: 'Rebuilt the nightly settlement close: six hours to four minutes.', leadership: 'Led the rebuild of the nightly settlement close, taking a six-hour manual process to four minutes and training three engineers to own it.', pinned: true },
     { owner: rSwe, end: '2019-05-31', metrics: [{ value: 99.98, unit: '%', label: 'match rate' }], skills: [sPy, sDq], technical: 'Raised the automated match rate from 96.1% to 99.98% by modelling partial payments and settlement windows explicitly rather than by threshold.', concise: 'Raised automated match rate from 96.1% to 99.98%.', leadership: 'Raised the settlement match rate to 99.98% by getting the finance team to write down rules they had only ever argued about.' },
     { owner: rSwe, end: '2019-05-31', metrics: [{ value: 2.1, unit: 'M', label: 'rows/day' }], skills: [sPostgres, sRedis], technical: 'Tuned the ledger schema and Redis cache path to carry 2.1M transaction rows a day without extending the batch window.', concise: 'Tuned ledger schema and cache to carry 2.1M rows a day.' },
-    { owner: rSwe, end: '2019-05-31', skills: [sPytest, sCi], technical: 'Introduced the team’s first automated test suite and continuous integration pipeline, ending a release process that depended on one person’s laptop.', concise: 'Introduced the team’s first test suite and CI pipeline.', leadership: 'Introduced the team’s first test suite and continuous integration, and ended a release process that ran from one person’s laptop.' },
+    { owner: rSwe, end: '2019-05-31', skills: [sPytest, sCi], technical: "Introduced the team's first automated test suite and continuous integration pipeline, ending a release process that depended on one person's laptop.", concise: "Introduced the team's first test suite and CI pipeline.", leadership: "Introduced the team's first test suite and continuous integration, and ended a release process that ran from one person's laptop." },
     { owner: rSwe, end: '2019-05-31', skills: [sPy, sTechWriting], technical: 'Wrote the replay tooling and its documentation, so a bad settlement day could be reconstructed instead of argued about.', concise: 'Built and documented settlement replay tooling.' },
 
     // Senior Software Engineer, Sahara Fintech, 2019-2021.
-    { owner: rSenior, end: '2021-01-31', metrics: [{ value: 11, unit: 'M', label: 'events/day' }], skills: [sPy, sKafka], technical: 'Designed the streaming anomaly-screening service on **Kafka**, scoring 11M ledger events a day against rules the risk team could edit themselves.', concise: 'Designed streaming anomaly screening over 11M events a day.', leadership: 'Owned the anomaly-screening programme end to end, from the risk team’s requirements through to the on-call rotation that runs it.', pinned: true },
+    { owner: rSenior, end: '2021-01-31', metrics: [{ value: 11, unit: 'M', label: 'events/day' }], skills: [sPy, sKafka], technical: 'Designed the streaming anomaly-screening service on **Kafka**, scoring 11M ledger events a day against rules the risk team could edit themselves.', concise: 'Designed streaming anomaly screening over 11M events a day.', leadership: "Owned the anomaly-screening programme end to end, from the risk team's requirements through to the on-call rotation that runs it.", pinned: true },
     { owner: rSenior, end: '2021-01-31', metrics: [{ value: 63, unit: '%', label: 'false positives' }], skills: [sPy, sExperiment], technical: 'Cut false positives 63% by replacing static thresholds with per-merchant baselines, measured against a held-out month rather than against intuition.', concise: 'Cut screening false positives 63% with per-merchant baselines.' },
     { owner: rSenior, end: '2021-01-31', metrics: [{ value: 4, unit: 'engineers' }], skills: [sMentoring, sStakeholder], technical: 'Mentored four engineers through their first production incidents, and handed the service over cleanly when I left the country.', concise: 'Mentored four engineers and handed the service over cleanly.', leadership: 'Grew four engineers into owners of a service I had built, which is the only reason it survived my leaving.' },
     { owner: rSenior, end: '2021-01-31', skills: [sSecurity, sPostgres], technical: 'Closed a class of privilege-escalation defects by moving authorization out of the application and into row-level policies.', concise: 'Moved authorization into row-level policies, closing a defect class.' },
-    { owner: rSenior, end: '2021-01-31', metrics: [{ value: 18, unit: 'minutes', label: 'MTTR' }], skills: [sCi, sGrafana], technical: 'Built the service’s alerting and dashboards, bringing mean time to recovery from over two hours to 18 minutes.', concise: 'Built alerting and dashboards; MTTR from 2h to 18 minutes.' },
+    { owner: rSenior, end: '2021-01-31', metrics: [{ value: 18, unit: 'minutes', label: 'MTTR' }], skills: [sCi, sGrafana], technical: "Built the service's alerting and dashboards, bringing mean time to recovery from over two hours to 18 minutes.", concise: 'Built alerting and dashboards; MTTR from 2h to 18 minutes.' },
     { owner: rSenior, end: '2021-01-31', skills: [sTechWriting], technical: 'Ran the incident review process for two years, writing every post-mortem as a description of the system rather than of the person on call.', concise: 'Ran the incident review process and wrote every post-mortem.', blocked: true },
 
     // Data Engineer, Savanna Grid, 2021-2022.
@@ -2635,7 +2635,7 @@ async function main() {
     { owner: pFleet, end: '2025-11-30', metrics: [{ value: 4, unit: 'vendors' }], skills: [sPy, sEtl, sDq], technical: 'Specified one ingestion contract that four telematics vendors map onto, with per-vendor adapters that fail at their own boundary.', concise: 'Specified one ingestion contract with four per-vendor adapters.' },
     { owner: pFleet, end: '2025-11-30', metrics: [{ value: 2, unit: 'days', label: 'to onboard' }], skills: [sPy, sTechWriting], technical: 'Reduced new-vendor onboarding from a quarter to two days by making the adapter interface the only thing a new vendor needs.', concise: 'Reduced vendor onboarding from a quarter to two days.' },
     { owner: pFleet, end: '2025-11-30', skills: [sDuck, sDbt], technical: 'Replaced a managed Spark cluster with DuckDB and dbt for the modelling layer, cutting infrastructure cost by four fifths at the same freshness.', concise: 'Replaced Spark with DuckDB and dbt, cutting cost four fifths.' },
-    { owner: pFleet, end: '2025-11-30', skills: [sSignals, sPy], technical: 'Fused GPS with accelerometer traces to detect harsh braking without the vendor’s proprietary and un-auditable score.', concise: 'Fused GPS and accelerometer traces to detect harsh braking.' },
+    { owner: pFleet, end: '2025-11-30', skills: [sSignals, sPy], technical: "Fused GPS with accelerometer traces to detect harsh braking without the vendor's proprietary and un-auditable score.", concise: 'Fused GPS and accelerometer traces to detect harsh braking.' },
     { owner: pColdChain, skills: [sEmbedded, sSignals], technical: 'Designed a fridge-excursion detector that runs on a sub-$10 sensor and a two-week battery, piloted across two districts.', concise: 'Designed a fridge-excursion detector on a sub-$10 sensor.' },
     { owner: pColdChain, metrics: [{ value: 2, unit: 'districts' }], skills: [sPy, sViz], technical: 'Built the district review view around what a health officer can act on in a morning, not around everything the sensor emits.', concise: 'Built the district review view around actionable excursions.' },
     { owner: pOpenBus, metrics: [{ value: 184, unit: 'stars' }], skills: [sPy, sGeo], technical: 'Published and maintain a cleaned, versioned dataset of Kigali bus routes, now used by a data journalist and two student projects.', concise: 'Publish and maintain a cleaned Kigali bus-route dataset.', leadership: 'Started and maintain an open bus-route dataset that other people now build on, including a published news piece.' },
@@ -2657,7 +2657,7 @@ async function main() {
     { owner: pubFleet, end: '2026-03-12', skills: [sSignals, sEmbedded], technical: 'First-author conference paper benchmarking sensor fusion on low-cost fleet telematics, with the road-trial harness released alongside it.', concise: 'First-author paper on sensor fusion for low-cost telematics.' },
     { owner: pubSpeech, end: '2026-07-02', skills: [sNlp], technical: 'Co-authored the journal paper describing a permissively licensed Kinyarwanda read-speech corpus and its quality controls.', concise: 'Co-authored a journal paper on a Kinyarwanda speech corpus.' },
     { owner: pubCost, end: '2025-11-28', skills: [sPy, sAws], technical: 'Sole-author preprint modelling batch-pipeline cost in constrained cloud regions, with the measurement package published for replication.', concise: 'Sole-author preprint on batch-pipeline cost in constrained regions.' },
-    { owner: pubThesis, skills: [sRl, sPyTorch], technical: 'Master’s thesis in progress on adaptive scheduling for streaming feature stores, building on the orchestration study.', concise: 'Master’s thesis on adaptive scheduling for streaming feature stores.' },
+    { owner: pubThesis, skills: [sRl, sPyTorch], technical: "Master's thesis in progress on adaptive scheduling for streaming feature stores, building on the orchestration study.", concise: "Master's thesis on adaptive scheduling for streaming feature stores." },
     { owner: pubPatent, end: '2026-02-20', skills: [sLatex, sPy], technical: 'Named inventor on a filed application covering deterministic document assembly from structured records.', concise: 'Named inventor on a filed deterministic document assembly application.' },
   ];
   for (const spec of atomSpecs) {
@@ -2994,10 +2994,10 @@ Requirements
     emphasis: string;
   }
   const resumeSpecs: ResumeSpec[] = [
-    { targetId: targetFor('Data Platform Engineer', 'Zamba Logistics'), name: `Zamba Logistics / Data Platform Engineer (${dateAgo(47)})`, template: 'cobalt', headline: 'Data Platform Engineer', summary: 'Data engineer who has already run this team’s pipelines under contract, and would rather own them properly.', status: 'sent', createdDaysAgo: 47, coverage: 0.94, pages: 1, emphasis: 'technical' },
+    { targetId: targetFor('Data Platform Engineer', 'Zamba Logistics'), name: `Zamba Logistics / Data Platform Engineer (${dateAgo(47)})`, template: 'cobalt', headline: 'Data Platform Engineer', summary: "Data engineer who has already run this team's pipelines under contract, and would rather own them properly.", status: 'sent', createdDaysAgo: 47, coverage: 0.94, pages: 1, emphasis: 'technical' },
     { targetId: targetFor('Data Platform Engineer', 'Zamba Logistics'), name: `Zamba Logistics / Data Platform Engineer, second pass (${dateAgo(44)})`, template: 'onyx', headline: 'Data Platform Engineer', summary: 'Ten months inside this stack, four telematics vendors, one ingestion contract.', status: 'final', createdDaysAgo: 44, coverage: 0.97, pages: 1, emphasis: 'leadership' },
     { targetId: targetFor('Lead Data Engineer', 'Tembo Health'), name: `Tembo Health / Lead Data Engineer (${dateAgo(32)})`, template: 'cobalt', headline: 'Lead Data Engineer', summary: 'Fourteen years of turning field-collected mess into data a clinician can act on.', status: 'sent', createdDaysAgo: 32, coverage: 0.89, pages: 2, emphasis: 'leadership' },
-    { targetId: targetFor('Senior Data Engineer', 'Savanna Grid'), name: `Savanna Grid / Senior Data Engineer (${dateAgo(23)})`, template: 'argon', headline: 'Senior Data Engineer', summary: 'Built this company’s first telemetry ingestion path; back to build the next one.', status: 'sent', createdDaysAgo: 23, coverage: 0.92, pages: 1, emphasis: 'technical' },
+    { targetId: targetFor('Senior Data Engineer', 'Savanna Grid'), name: `Savanna Grid / Senior Data Engineer (${dateAgo(23)})`, template: 'argon', headline: 'Senior Data Engineer', summary: "Built this company's first telemetry ingestion path; back to build the next one.", status: 'sent', createdDaysAgo: 23, coverage: 0.92, pages: 1, emphasis: 'technical' },
     { targetId: targetFor('Applied Scientist', 'Amani Robotics'), name: `Amani Robotics / Applied Scientist (${dateAgo(16)})`, template: 'cobalt', headline: 'Applied Scientist', summary: 'Reproducible experiments on real hardware, with the error bars printed.', status: 'sent', createdDaysAgo: 16, coverage: 0.81, pages: 1, emphasis: 'technical' },
     { targetId: targetFor('Platform Engineer', 'Karibu Cloud'), name: `Karibu Cloud / Platform Engineer (${dateAgo(10)})`, template: 'onyx', headline: 'Platform Engineer', summary: 'Infrastructure that fails at its own boundary instead of three layers downstream.', status: 'sent', createdDaysAgo: 10, coverage: 0.72, pages: 1, emphasis: 'technical' },
     { targetId: targetFor('Senior Data Engineer', 'Ubwenge Labs'), name: `Ubwenge Labs / Senior Data Engineer, draft (${dateAgo(2)})`, template: 'cobalt', headline: 'Senior Data Engineer', summary: 'Analytics engineering for clients who need the answer before they need the platform.', status: 'draft', createdDaysAgo: 2, coverage: 0.68, pages: 1, emphasis: 'concise' },
@@ -3104,7 +3104,7 @@ Requirements
   await letter(targetFor('Platform Engineer', 'Karibu Cloud'), 'final', 10, { org: 'Karibu Cloud' }, [
     { kind: 'hook', text: 'Most of my infrastructure work has been in service of data pipelines, which is a good school for multi-tenant failure modes.' },
     { kind: 'body', text: 'I have run Kubernetes in production, put a whole pipeline under Terraform including the credential rotation nobody wanted to touch, and written the alerting that took mean time to recovery from two hours to eighteen minutes.' },
-    { kind: 'closer', text: 'I would be arriving as a platform engineer with a data engineer’s instincts about cost.' },
+    { kind: 'closer', text: "I would be arriving as a platform engineer with a data engineer's instincts about cost." },
   ]);
   await letter(targetFor('Senior Data Engineer', 'Ubwenge Labs'), 'draft', 2, { name: 'Michel Habyarimana', title: 'Founder', org: 'Ubwenge Labs' }, [
     { kind: 'hook', text: 'Michel suggested I write to you directly rather than through the form.' },
@@ -3181,7 +3181,7 @@ Requirements
       { text: 'Exhibit B: co-authored journal paper describing a Kinyarwanda read-speech corpus.', cites: [pubSpeech] },
       { text: 'Exhibit C: sole-author preprint on batch-pipeline cost models.', cites: [pubCost] },
       { text: 'Exhibit D: filed patent application on deterministic document assembly.', cites: [pubPatent] },
-      { text: 'Exhibit E: master’s degree in progress at Carnegie Mellon University Africa.', cites: [msc.id] },
+      { text: "Exhibit E: master's degree in progress at Carnegie Mellon University Africa.", cites: [msc.id] },
       { text: 'Exhibit F: international open-data prize for the bus-route dataset.', cites: [pOpenBus] },
     ] },
   ]);
@@ -3618,7 +3618,7 @@ Requirements
   const auroraOrgs = liveNodes.filter((n) => n.type === 'organization' && String(n.title).includes('Aurora Dynamics'));
   check(auroraOrgs.length === 1, `expected exactly one organisation named "Aurora Dynamics", found ${auroraOrgs.length}`);
 
-  // `outputs.spec.ts` asserts every row's "Details for …" label is distinct.
+  // `outputs.spec.ts` asserts every row's "Details for ..." label is distinct.
   const resumeLabels = liveResumes.map((r) => `${r.name} ${String(r.created_at).slice(0, 16)}`);
   check(new Set(resumeLabels).size === resumeLabels.length, 'two outputs share a name and a creation minute, so their row labels collide');
 

@@ -86,7 +86,7 @@ describe('ErrorState', () => {
 
   it('makes an in-flight retry explicit and prevents a duplicate request', () => {
     render(<ErrorState onRetry={() => {}} retrying />);
-    expect(screen.getByRole('button', { name: 'Retrying…' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Retrying...' })).toBeDisabled();
   });
 });
 

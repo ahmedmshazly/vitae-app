@@ -169,7 +169,7 @@ for (const row of rows) byPackage[row.package] = (byPackage[row.package] ?? 0) +
 const proven = new Set(rows.flatMap((r) => r.requirements));
 // `registry.requirements` is an array of records, so the identifiers live in
 // each record's `id`. Read as an object it yields array indices — `"0"`, `"1"`,
-// … — which share no vocabulary with the identifiers tests cite, so every
+// ... — which share no vocabulary with the identifiers tests cite, so every
 // requirement reported as unproven and the artifact said so in a field an
 // operator would reasonably trust.
 const registered = (registry.requirements ?? []).map((r) => r.id);

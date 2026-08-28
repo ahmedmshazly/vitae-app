@@ -92,7 +92,7 @@ for (const base of ROOTS) {
 if (findings.length) {
   console.error(`test-prose findings (${findings.length}):`);
   for (const f of findings.slice(0, 80)) console.error(`  ${f}`);
-  if (findings.length > 80) console.error(`  … ${findings.length - 80} more`);
+  if (findings.length > 80) console.error(`  ... ${findings.length - 80} more`);
   process.exit(1);
 }
 

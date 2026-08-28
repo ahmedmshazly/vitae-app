@@ -176,7 +176,7 @@ export function commitAction(
   alreadyMatched: number,
   pending: boolean,
 ): { label: string; disabled: boolean } {
-  if (pending) return { label: 'Committing…', disabled: true };
+  if (pending) return { label: 'Committing...', disabled: true };
   if (accepted === 0 && alreadyMatched > 0) {
     return { label: `Record ${alreadyMatched} already matched`, disabled: false };
   }
@@ -283,7 +283,7 @@ export function ImportHub() {
   function openImporter(kind: Kind | 'github') {
     if (kind === 'github') {
       if (settings.isError) {
-        flash('Couldn’t read Settings. Add a GitHub token there, then retry.');
+        flash("Couldn't read Settings. Add a GitHub token there, then retry.");
         return;
       }
       if (!settings.data?.github.configured) {
@@ -308,7 +308,7 @@ export function ImportHub() {
     const failed = (detail: string) => {
       setReading(null);
       setReadError({ filename: file.name, detail });
-      flash(`Couldn’t read ${file.name}. Nothing was staged.`, { variant: 'error' });
+      flash(`Couldn't read ${file.name}. Nothing was staged.`, { variant: 'error' });
     };
     setReadError(null);
     setReading(file.name);
@@ -559,7 +559,7 @@ export function ImportHub() {
         ) : readError ? (
           <StatusTrace
             tone="danger"
-            label={`Couldn’t read ${readError.filename}`}
+            label={`Couldn't read ${readError.filename}`}
             detail={`${readError.detail} Nothing was staged.`}
           />
         ) : stage.isPending ? (
@@ -687,7 +687,7 @@ export function ImportHub() {
                   </span>
                   <Mono className="data-source-ledger__status" data-tone={st.tone}>
                     <span className="data-state-dot" aria-hidden />
-                    {pending ? 'working…' : st.label}
+                    {pending ? 'working...' : st.label}
                   </Mono>
                   <Glyph
                     name="chevron-down"
@@ -713,7 +713,7 @@ export function ImportHub() {
               <Textarea
                 id={`${pasteIds}-text`}
                 rows={10}
-                placeholder="Paste your résumé text here…"
+                placeholder="Paste your résumé text here..."
                 value={pasteText}
                 onChange={(e) => setPasteText(e.target.value)}
               />
@@ -724,7 +724,7 @@ export function ImportHub() {
                 disabled={!pasteText.trim() || stage.isPending}
                 onClick={() => stage.mutate({ kind: 'resume', content: pasteText })}
               >
-                {stage.isPending ? 'Staging…' : 'Disassemble'}
+                {stage.isPending ? 'Staging...' : 'Disassemble'}
               </Button>
               <Button onClick={() => setPasteOpen(false)}>Cancel</Button>
             </div>
@@ -764,7 +764,7 @@ export function ImportHub() {
           >
             {batch.isError ? (
               <ErrorState
-                title="Couldn’t load this import batch"
+                title="Couldn't load this import batch"
                 detail={(batch.error as Error | null)?.message}
                 onRetry={() => void batch.refetch()}
               />
@@ -825,7 +825,7 @@ export function ImportHub() {
                         {r.entity === 'atom' && isStaged && (
                           <Select
                             label={`Assign ${r.title} to a role or project`}
-                            placeholder="assign to…"
+                            placeholder="assign to..."
                             disabled={rowDecision.isPending || owners.isLoading || owners.isError}
                             value={(r.payload.owner_node as string) || undefined}
                             onChange={(value) =>
@@ -909,7 +909,7 @@ export function ImportHub() {
                       onClick={() => void owners.refetch()}
                       disabled={owners.isFetching}
                     >
-                      {owners.isFetching ? 'Retrying…' : 'Retry'}
+                      {owners.isFetching ? 'Retrying...' : 'Retry'}
                     </Button>
                   </div>
                 ) : null}
@@ -928,7 +928,7 @@ export function ImportHub() {
                     {isStaged ? (
                       <>
                         <Button onClick={() => discard.mutate()} disabled={discard.isPending}>
-                          {discard.isPending ? 'Discarding…' : 'Discard'}
+                          {discard.isPending ? 'Discarding...' : 'Discard'}
                         </Button>
                         <Button
                           variant="primary"
@@ -947,7 +947,7 @@ export function ImportHub() {
                         disabled={rollback.isPending}
                         aria-label={`Roll back ${batch.data.batch.kind} import from ${batch.data.batch.created_at.slice(0, 10)}: ${batch.data.batch.stats.created ?? batch.data.batch.stats.rows} records`}
                       >
-                        {rollback.isPending ? 'Rolling back…' : 'Roll back batch'}
+                        {rollback.isPending ? 'Rolling back...' : 'Roll back batch'}
                       </Button>
                     ) : (
                       <Button onClick={() => setActive(null)}>Close</Button>
@@ -968,7 +968,7 @@ export function ImportHub() {
       <Section title="Batch history" meta={batches.isSuccess ? history.length : undefined}>
         {batches.isError ? (
           <ErrorState
-            title="Couldn’t load import history"
+            title="Couldn't load import history"
             detail={(batches.error as Error | null)?.message}
             onRetry={() => void batches.refetch()}
           />
@@ -1038,7 +1038,7 @@ export function ImportHub() {
                       disabled={rollback.isPending}
                       aria-label={`Roll back ${b.kind} import from ${when}: ${created} records`}
                     >
-                      {undoing ? 'Rolling back…' : 'Roll back'}
+                      {undoing ? 'Rolling back...' : 'Roll back'}
                     </Button>
                   )}
                 </li>

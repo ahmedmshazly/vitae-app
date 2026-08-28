@@ -25,7 +25,7 @@ const STEPS: Array<{ key: keyof SetupState; label: string; hint: string; to: str
   {
     key: 'self',
     label: 'Set up your profile',
-    hint: 'Your “self” record anchors everything.',
+    hint: "Your 'self' record anchors everything.",
     to: '/settings/profile',
   },
   {

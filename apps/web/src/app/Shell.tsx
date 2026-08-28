@@ -437,7 +437,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <span className="demo-banner__dot" />
               <span className="demo-banner__label">Demo space</span>
               <span className="demo-banner__detail">
-                You are exploring Jordan’s sample graph. Your records remain untouched.
+                You are exploring Jordan's sample graph. Your records remain untouched.
               </span>
               <button type="button" className="demo-banner__back" onClick={toggleSpace}>
                 Back to my data

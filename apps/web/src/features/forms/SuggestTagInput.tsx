@@ -1,8 +1,8 @@
 /**
  * A tag input backed by live suggestions (FR-CAP-003). As you type it queries
- * `GET /suggest/values?kind=…` and offers existing values; free text is always
+ * `GET /suggest/values?kind=...` and offers existing values; free text is always
  * addable. For kinds that map to a node type (skill → skill, city → location)
- * it also offers "＋ Create <type> …" so a typed value becomes a first-class
+ * it also offers "＋ Create <type> ..." so a typed value becomes a first-class
  * entity you can refine later, never forcing a context switch.
  *
  * Three states it used to swallow, every one of them a state the user caused
@@ -62,7 +62,7 @@ export function SuggestTagInput({
   value,
   onChange,
   kind,
-  placeholder = 'Add…',
+  placeholder = 'Add...',
   mono,
   id,
   'aria-label': ariaLabel,
@@ -140,7 +140,7 @@ export function SuggestTagInput({
     try {
       await api.post('/nodes', { type: stubType, title, props: {}, confidence: 0.7 });
       add(title);
-      setCreated(`${stubType.replace('_', ' ')} “${title}”`);
+      setCreated(`${stubType.replace('_', ' ')} '${title}'`);
     } catch (err) {
       setCreateError(
         err instanceof Error ? err.message : `The ${stubType.replace('_', ' ')} could not be created.`,
@@ -293,8 +293,8 @@ export function SuggestTagInput({
             >
               <span className="entity-picker__title">
                 {creating
-                  ? `Creating ${stubType!.replace('_', ' ')} “${draft.trim()}”…`
-                  : `Create ${stubType!.replace('_', ' ')} “${draft.trim()}”, refine later`}
+                  ? `Creating ${stubType!.replace('_', ' ')} '${draft.trim()}'...`
+                  : `Create ${stubType!.replace('_', ' ')} '${draft.trim()}', refine later`}
               </span>
             </button>
           )}

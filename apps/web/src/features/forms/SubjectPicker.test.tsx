@@ -33,12 +33,12 @@ function Harness() {
 }
 
 describe('SubjectPicker', () => {
-  it('sets the subject via That’s me and clears it', async () => {
+  it("sets the subject via That's me and clears it", async () => {
     const user = userEvent.setup();
     renderWithApp(<Harness />);
 
-    expect(await screen.findByRole('button', { name: /That’s me|That's me/ })).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /That’s me|That's me/ }));
+    expect(await screen.findByRole('button', { name: /That's me|That's me/ })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /That's me|That's me/ }));
 
     await waitFor(() => {
       expect(screen.getByText('Me Owner')).toBeInTheDocument();
@@ -46,6 +46,6 @@ describe('SubjectPicker', () => {
     expect(screen.getByText(/you/)).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Clear Whose role is this?' }));
-    expect(await screen.findByRole('button', { name: /That’s me|That's me/ })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /That's me|That's me/ })).toBeInTheDocument();
   });
 });

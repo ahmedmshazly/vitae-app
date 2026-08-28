@@ -303,7 +303,7 @@ export function Ask() {
           <Input
             id="ask-topics"
             aria-label="Topics"
-            placeholder="reinforcement learning, hiring…"
+            placeholder="reinforcement learning, hiring..."
             value={draft.topics}
             onChange={(e) => setDraft({ ...draft, topics: e.target.value })}
           />
@@ -323,7 +323,7 @@ export function Ask() {
         </span>
 
         <Button type="submit" variant="primary" glyph="ask" disabled={ranking.isFetching}>
-          {ranking.isFetching ? 'Ranking…' : 'Ask'}
+          {ranking.isFetching ? 'Ranking...' : 'Ask'}
         </Button>
       </form>
 
@@ -379,7 +379,7 @@ export function Ask() {
           className="network-intelligence__empty"
           glyph="ask"
           title="Nothing asked yet"
-          hint="Say what you need and who it is about: “referral at Nile Robotics about reinforcement learning”, then press Ask. Every result comes back with the reasons it ranked where it did."
+          hint="Say what you need and who it is about: 'referral at Nile Robotics about reinforcement learning', then press Ask. Every result comes back with the reasons it ranked where it did."
         />
       ) : (
         <Section title="Ranked contacts" meta={ranking.data ? results.length : undefined}>
@@ -407,7 +407,7 @@ export function Ask() {
           )}
           {ranking.isError && !ranking.data ? (
             <ErrorState
-              title="Couldn’t rank anyone"
+              title="Couldn't rank anyone"
               detail={(ranking.error as Error | null)?.message}
               onRetry={() => void ranking.refetch()}
             />

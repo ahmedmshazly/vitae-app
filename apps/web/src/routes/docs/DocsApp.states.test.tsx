@@ -257,8 +257,8 @@ describe('reaching the corpus', () => {
   it('says the index itself could not be read, and offers the way to retry', async () => {
     overrides['manifest.json'] = { throws: true };
     renderDocs();
-    expect(await screen.findByText('Couldn’t load the documentation')).toBeInTheDocument();
-    expect(screen.getByText(/Couldn’t reach the documentation index/)).toBeInTheDocument();
+    expect(await screen.findByText("Couldn't load the documentation")).toBeInTheDocument();
+    expect(screen.getByText(/Couldn't reach the documentation index/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
   });
 
@@ -296,7 +296,7 @@ describe('a page whose prose fails', () => {
     renderDocs('/docs/meta/coverage');
 
     expect(
-      await screen.findByText('Couldn’t load “Coverage and contradictions”'),
+      await screen.findByText("Couldn't load 'Coverage and contradictions'"),
     ).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'Coverage and contradictions',

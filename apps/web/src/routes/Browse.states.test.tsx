@@ -51,9 +51,9 @@ describe('Browse states', () => {
     mockApi.get.mockReturnValue(new Promise(() => {}));
     renderBrowse();
 
-    // The subtitle used to read "Loading…", which is a count slot reporting a
+    // The subtitle used to read "Loading...", which is a count slot reporting a
     // state the skeleton underneath it was already reporting.
-    expect(screen.queryByText('Loading…')).not.toBeInTheDocument();
+    expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
   });
 
   it('reports a failed list without taking the create action away with it', async () => {
@@ -61,7 +61,7 @@ describe('Browse states', () => {
     renderBrowse();
 
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Couldn’t load skill records');
+    expect(alert).toHaveTextContent("Couldn't load skill records");
     expect(alert).toHaveTextContent('node store unreachable');
     expect(screen.getByRole('button', { name: 'New skill' })).toBeInTheDocument();
   });

@@ -2,7 +2,7 @@
  * Load a graph bundle into the database (ADR 0005, Phase 3).
  *
  *   pnpm --filter @vitae/api load:bundle -- --file=fixtures/vitae-bundle.golden.json
- *   pnpm --filter @vitae/api load:bundle -- --file=… --space=demo --dry-run
+ *   pnpm --filter @vitae/api load:bundle -- --file=... --space=demo --dry-run
  *
  * Ids are derived from stable bundle references.
  * `externalNodeId(identity_keys[0] ?? "vitae:seed:<ref>")` for nodes and

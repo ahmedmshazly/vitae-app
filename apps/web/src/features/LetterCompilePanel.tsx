@@ -143,7 +143,7 @@ export function LetterCompilePanel({ letterId, letterStatus, hasStoredArtifacts,
 
       {!busy && !failure && !result && (
         <p className="m-0 text-sm text-muted">
-          Compile to preview the PDF. Finalize keeps the PDF and its LaTeX source as this letter’s
+          Compile to preview the PDF. Finalize keeps the PDF and its LaTeX source as this letter's
           artifacts.
         </p>
       )}

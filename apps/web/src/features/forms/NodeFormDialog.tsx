@@ -325,7 +325,7 @@ export function NodeFormDialog({
               disabled={busy || !canWrite}
               title={canWrite ? undefined : WRITE_LOCK_HINT}
             >
-              {busy ? 'Saving…' : nodeId ? 'Save changes' : `Create ${typeLabel(type)}`}
+              {busy ? 'Saving...' : nodeId ? 'Save changes' : `Create ${typeLabel(type)}`}
             </Button>
           </>
         )
@@ -335,7 +335,7 @@ export function NodeFormDialog({
         <div className="entity-form-load-error" role="alert">
           <Glyph name="alert" size={18} />
           <div>
-            <strong>Couldn’t load this record.</strong>
+            <strong>Couldn't load this record.</strong>
             <p>
               {existing.error instanceof Error
                 ? existing.error.message
@@ -365,7 +365,7 @@ export function NodeFormDialog({
             <p role="alert" className="mb-4 flex items-start gap-2 text-sm text-danger">
               <Glyph name="close" size={14} className="mt-0.5 shrink-0" />
               <span>
-                <strong className="font-semibold">Couldn’t save.</strong> {saveError} Nothing was
+                <strong className="font-semibold">Couldn't save.</strong> {saveError} Nothing was
                 lost, everything you typed is still here.
               </span>
             </p>
@@ -434,7 +434,7 @@ export function NodeFormDialog({
             </div>
           ) : checkingDuplicates ? (
             <div className="dedup-live dedup-live--quiet">
-              <Spinner /> Checking for existing records…
+              <Spinner /> Checking for existing records...
             </div>
           ) : null}
           <EntityForm

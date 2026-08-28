@@ -99,7 +99,7 @@ export function AddConnection({
         onOpenChange(o);
       }}
       title="Add connection"
-      description={`Link “${nodeTitle}” to another record with a typed relationship.`}
+      description={`Link '${nodeTitle}' to another record with a typed relationship.`}
       footer={
         <>
           <Button onClick={() => onOpenChange(false)}>Cancel</Button>
@@ -108,7 +108,7 @@ export function AddConnection({
             disabled={!selected || !target || create.isPending}
             onClick={() => create.mutate()}
           >
-            {create.isPending ? 'Linking…' : 'Create link'}
+            {create.isPending ? 'Linking...' : 'Create link'}
           </Button>
         </>
       }
@@ -127,7 +127,7 @@ export function AddConnection({
               value: o.key,
               label: connectionOptionSelectLabel(o),
             }))}
-            placeholder="Choose how they relate…"
+            placeholder="Choose how they relate..."
             clearable={false}
           />
         </Field>

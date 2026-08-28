@@ -186,7 +186,7 @@ export function SelectionPane({
               set onto one page.
             </p>
             <Button variant="primary" disabled={tailorPending} onClick={onRunAuto}>
-              {tailorPending ? 'Selecting…' : 'Auto-select atoms'}
+              {tailorPending ? 'Selecting...' : 'Auto-select atoms'}
             </Button>
             {tailorPending && (
               <StatusTrace tone="live" label="Scoring and packing" detail="One moment" />
@@ -211,7 +211,7 @@ export function SelectionPane({
                   </Chip>
                 </span>
                 <Button variant="ghost" size="sm" disabled={tailorPending} onClick={onRunAuto}>
-                  {tailorPending ? 'Re-selecting…' : 'Re-run'}
+                  {tailorPending ? 'Re-selecting...' : 'Re-run'}
                 </Button>
               </div>
             </div>
@@ -221,7 +221,7 @@ export function SelectionPane({
               <EmptyState
                 glyph="filter"
                 title="The packer selected nothing"
-                hint="No atom scored against these keywords. Pin one below to force it in, or widen the target’s keywords in the rail."
+                hint="No atom scored against these keywords. Pin one below to force it in, or widen the target's keywords in the rail."
               />
             ) : (
               <>
@@ -514,13 +514,13 @@ export function SelectionPane({
                       disabled={saving}
                       onClick={() => alwaysPin.mutate({ id: a.id, pinned: !a.pinned })}
                     >
-                      {saving ? 'Saving…' : a.pinned ? 'Always on' : 'Always'}
+                      {saving ? 'Saving...' : a.pinned ? 'Always on' : 'Always'}
                     </Button>
                     {failedHere && (
                       <StatusTrace
                         className="w-full"
                         tone="danger"
-                        label="Couldn’t change that pin"
+                        label="Couldn't change that pin"
                         detail="The atom is unchanged. Try again."
                       />
                     )}

@@ -103,7 +103,7 @@ export function Ledger() {
       <Section title="What changed" meta={first.isSuccess ? entries.length : undefined}>
         {first.isError ? (
           <ErrorState
-            title="Couldn’t load the ledger"
+            title="Couldn't load the ledger"
             detail={(first.error as Error | null)?.message}
             onRetry={() => void first.refetch()}
           />
@@ -156,12 +156,12 @@ export function Ledger() {
             </ul>
             {nextBefore && (
               <Button onClick={() => void loadMore()} disabled={more.isFetching}>
-                {more.isFetching ? 'Loading…' : 'Load older changes'}
+                {more.isFetching ? 'Loading...' : 'Load older changes'}
               </Button>
             )}
             {more.isError && (
               <ErrorState
-                title="Couldn’t load older changes"
+                title="Couldn't load older changes"
                 detail={(more.error as Error | null)?.message}
                 onRetry={() => void loadMore()}
               />

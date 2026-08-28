@@ -84,7 +84,7 @@ const EMPTY_RECIPIENT: Required<LetterRecipient> = { name: '', title: '', org: '
 
 function atomLabel(atom: AtomRow): string {
   const text = atom.variants.find((v) => v.is_default)?.text ?? atom.variants[0]?.text ?? atom.id;
-  const short = text.length > 72 ? `${text.slice(0, 72)}…` : text;
+  const short = text.length > 72 ? `${text.slice(0, 72)}...` : text;
   return atom.owner_title ? `${atom.owner_title} - ${short}` : short;
 }
 
@@ -358,7 +358,7 @@ export function Letters() {
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <Input
           aria-label="Search letters"
-          placeholder="Search by company or role…"
+          placeholder="Search by company or role..."
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
@@ -390,7 +390,7 @@ export function Letters() {
         // Four queries and not one read `isError`, so a failed load said "No
         // cover letters yet" and invited you to write one you may already have.
         <ErrorState
-          title="Couldn’t load your cover letters"
+          title="Couldn't load your cover letters"
           detail={(lettersQuery.error as Error | null)?.message}
           onRetry={() => void lettersQuery.refetch()}
         />
@@ -562,7 +562,7 @@ export function Letters() {
             </Button>
             <span className="flex-1" />
             <Button variant="primary" disabled={save.isPending} onClick={() => save.mutate()}>
-              {save.isPending ? 'Saving…' : 'Save letter'}
+              {save.isPending ? 'Saving...' : 'Save letter'}
             </Button>
           </>
         }
@@ -715,7 +715,7 @@ export function Letters() {
                   <Textarea
                     id={textId}
                     rows={4}
-                    placeholder={`${block.kind} text…`}
+                    placeholder={`${block.kind} text...`}
                     value={block.text ?? ''}
                     onChange={(e) => updateBlock(index, { text: e.target.value })}
                   />

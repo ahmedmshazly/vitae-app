@@ -50,7 +50,7 @@ describe('vitae.graph.bundle/1', () => {
     expect(b.nodes.every((n) => n.source === 'import_aperture')).toBe(true);
   });
 
-  it('every node’s props validate against its type schema', () => {
+  it("every node's props validate against its type schema", () => {
     const b = graphBundleSchema.parse(golden);
     for (const node of b.nodes) {
       const parsed = NODE_PROPS_SCHEMAS[node.type].safeParse(node.props);

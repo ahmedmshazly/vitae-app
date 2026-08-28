@@ -188,7 +188,7 @@ export function BulkDeleteConfirm({
   const plural = nouns ?? `${noun}s`;
   const title =
     selectedCount === 1
-      ? `Move “${titles[0] ?? `this ${noun}`}” to trash?`
+      ? `Move '${titles[0] ?? `this ${noun}`}' to trash?`
       : `Move ${selectedCount} ${plural} to trash?`;
   return (
     <ConfirmDialog

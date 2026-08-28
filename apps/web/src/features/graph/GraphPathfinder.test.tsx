@@ -41,7 +41,7 @@ describe('GraphPathfinder', () => {
       />,
     );
     expect(screen.getByText('Ada')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Search a destination record…')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search a destination record...')).toBeInTheDocument();
   });
 
   it('clears a chosen destination', async () => {

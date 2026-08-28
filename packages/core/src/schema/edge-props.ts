@@ -15,7 +15,7 @@ export const CADENCE_BY_CLOSENESS: Record<number, number | null> = {
   1: null,
 };
 
-/** Person↔person relation kinds on KNOWS (self’s view of the other person). */
+/** Person↔person relation kinds on KNOWS (self's view of the other person). */
 export const PERSON_RELATIONS = [
   'friend',
   'colleague',

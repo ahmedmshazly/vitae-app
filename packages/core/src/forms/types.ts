@@ -86,7 +86,7 @@ export interface EdgeSubEditor {
  * new one.
  *
  * `direction` means exactly what it does on `EdgeSubEditor`: 'in', this node is
- * the edge dst, so the edge runs person → node (HELD, AUTHORED, EARNED …);
+ * the edge dst, so the edge runs person → node (HELD, AUTHORED, EARNED ...);
  * 'out', this node is the src, so it runs node → person (SHARED_BY).
  */
 export interface SubjectDescriptor {
@@ -112,7 +112,7 @@ export interface FormSection {
 
 export interface TypeFormDescriptor {
   type: NodeType;
-  /** Label for the envelope `title` field ("Full name" for person, …). */
+  /** Label for the envelope `title` field ("Full name" for person, ...). */
   titleLabel: string;
   titlePlaceholder?: string;
   subtitleLabel?: string;

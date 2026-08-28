@@ -93,13 +93,13 @@ describe('QueryBoundary states', () => {
   it('renders the error state with the failure message, and never the children', () => {
     const query = fakeQuery<PeopleResp>({ isError: true, error: new Error('graph unreachable') });
     renderWithApp(
-      <QueryBoundary query={query} errorTitle="Couldn’t load your people">
+      <QueryBoundary query={query} errorTitle="Couldn't load your people">
         {peopleList}
       </QueryBoundary>,
     );
 
     const alert = screen.getByRole('alert');
-    expect(alert).toHaveTextContent('Couldn’t load your people');
+    expect(alert).toHaveTextContent("Couldn't load your people");
     expect(alert).toHaveTextContent('graph unreachable');
     expect(screen.queryByRole('list', { name: 'People' })).not.toBeInTheDocument();
   });
@@ -117,7 +117,7 @@ describe('QueryBoundary states', () => {
     );
 
     expect(screen.getByText('Lina Farouk')).toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveTextContent('Couldn’t refresh this data');
+    expect(screen.getByRole('alert')).toHaveTextContent("Couldn't refresh this data");
     expect(screen.getByRole('alert')).toHaveTextContent('Showing the last available version');
     expect(document.querySelector('.people-region')).toHaveAttribute('data-query-state', 'content');
   });
@@ -341,7 +341,7 @@ describe('QueryBoundary degraded secondary queries', () => {
     );
 
     expect(screen.getByText('Lina Farouk')).toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveTextContent('Couldn’t load the history');
+    expect(screen.getByRole('alert')).toHaveTextContent("Couldn't load the history");
   });
 
   it('says nothing when the secondary query is fine', () => {
@@ -392,7 +392,7 @@ describe('QueryBoundary degraded secondary queries', () => {
     );
 
     expect(screen.getByText('No interactions logged yet')).toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveTextContent('Couldn’t load the history');
+    expect(screen.getByRole('alert')).toHaveTextContent("Couldn't load the history");
   });
 
   it('gathers two failed secondaries into one banner, so no two controls share the name Retry', async () => {
@@ -422,7 +422,7 @@ describe('QueryBoundary degraded secondary queries', () => {
     expect(alerts).toHaveLength(1);
     // One banner names both, because a banner each would have every one of them
     // claim everything else was current while the other had also failed.
-    expect(alerts[0]).toHaveTextContent('Couldn’t load the history and the favour ledger');
+    expect(alerts[0]).toHaveTextContent("Couldn't load the history and the favour ledger");
 
     const retries = screen.getAllByRole('button', { name: 'Retry' });
     expect(retries).toHaveLength(1);
@@ -439,14 +439,14 @@ describe('QueryBoundary degraded secondary queries', () => {
       error: new Error('history pruned'),
     });
     renderWithApp(
-      <QueryBoundary query={history} compact errorTitle="Couldn’t load the history">
+      <QueryBoundary query={history} compact errorTitle="Couldn't load the history">
         {(d) => <p>{d.revisions.length}</p>}
       </QueryBoundary>,
     );
 
     const alert = screen.getByRole('alert');
     expect(alert).toHaveClass('vt-banner');
-    expect(alert).toHaveTextContent('Couldn’t load the history');
+    expect(alert).toHaveTextContent("Couldn't load the history");
     expect(alert).toHaveTextContent('history pruned');
   });
 
@@ -457,7 +457,7 @@ describe('QueryBoundary degraded secondary queries', () => {
       error: new Error('history pruned'),
     });
     renderWithApp(
-      <QueryBoundary query={history} compact errorTitle="Couldn’t load the history">
+      <QueryBoundary query={history} compact errorTitle="Couldn't load the history">
         {(d) => <p>{d.revisions.length}</p>}
       </QueryBoundary>,
     );

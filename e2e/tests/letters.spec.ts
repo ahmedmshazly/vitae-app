@@ -62,7 +62,7 @@ test('a failed load says so instead of claiming you have written none', async ({
   await page.goto('/resume/letters');
 
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load your cover letters');
+  await expect(alert).toContainText("Couldn't load your cover letters");
   await expect(alert).toContainText('the letter store is unreachable');
   await expect(page.getByText('No cover letters yet')).toHaveCount(0);
 });

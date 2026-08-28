@@ -70,7 +70,7 @@ test('a failed settings load says so with a titled error', async ({ page }) => {
 
   await expect(page.getByRole('heading', { name: 'Profile', exact: true })).toBeVisible();
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load settings');
+  await expect(alert).toContainText("Couldn't load settings");
   await expect(alert).toContainText('settings store unreachable');
 });
 
@@ -88,7 +88,7 @@ test('a failed system status reports itself instead of spinning forever', async 
   await page.goto('/settings/system');
 
   const alert = page.getByRole('alert');
-  await expect(alert).toContainText('Couldn’t load system status');
+  await expect(alert).toContainText("Couldn't load system status");
   await expect(alert).toContainText('health endpoint unreachable');
 });
 

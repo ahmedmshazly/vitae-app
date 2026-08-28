@@ -1,5 +1,5 @@
 /**
- * The "That's me" shortcut used to be `{self && …}` over a query destructured
+ * The "That's me" shortcut used to be `{self && ...}` over a query destructured
  * for its data alone, so a slow lookup and a dead one both rendered as the
  * button not being there, and there was nothing on screen to say which.
  */
@@ -20,7 +20,7 @@ const subject = {
   defaultToSelf: true,
 };
 
-const ME = /That’s me|That's me/;
+const ME = /That's me|That's me/;
 
 beforeEach(() => {
   resetMockApi();
@@ -48,7 +48,7 @@ describe('SubjectPicker says why the shortcut is missing', () => {
     });
     renderWithApp(<Harness />);
 
-    expect(await screen.findByText('Couldn’t check who you are')).toBeInTheDocument();
+    expect(await screen.findByText("Couldn't check who you are")).toBeInTheDocument();
     expect(screen.getByText('Search for yourself by name above.')).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Search people/ })).toBeInTheDocument();
   });
@@ -70,7 +70,7 @@ describe('SubjectPicker says why the shortcut is missing', () => {
 
     expect(await screen.findByRole('button', { name: ME })).toBeInTheDocument();
     await waitFor(() => {
-      expect(screen.queryByText('Couldn’t check who you are')).not.toBeInTheDocument();
+      expect(screen.queryByText("Couldn't check who you are")).not.toBeInTheDocument();
     });
   });
 
@@ -81,12 +81,12 @@ describe('SubjectPicker says why the shortcut is missing', () => {
     });
     renderWithApp(<Harness />);
 
-    const line = await screen.findByText('Couldn’t check who you are');
+    const line = await screen.findByText("Couldn't check who you are");
     expect(line.closest('[role="alert"]')).toBeNull();
     expect(line.closest('[role="status"]')).toBeNull();
   });
 
-  it('holds the shortcut’s place while the lookup is still out', async () => {
+  it("holds the shortcut's place while the lookup is still out", async () => {
     const gate = deferred<unknown>();
     mockApi.get.mockImplementation((path: string) =>
       path.startsWith('/auth/me') ? gate.promise : Promise.resolve({ results: [] }),
@@ -94,7 +94,7 @@ describe('SubjectPicker says why the shortcut is missing', () => {
     renderWithApp(<Harness />);
 
     expect(screen.queryByRole('button', { name: ME })).not.toBeInTheDocument();
-    expect(screen.queryByText('Couldn’t check who you are')).not.toBeInTheDocument();
+    expect(screen.queryByText("Couldn't check who you are")).not.toBeInTheDocument();
 
     gate.resolve({ self: { id: 'self-1', title: 'Me Owner' } });
     expect(await screen.findByRole('button', { name: ME })).toBeInTheDocument();
@@ -108,12 +108,12 @@ describe('SubjectPicker says why the shortcut is missing', () => {
     });
     renderWithApp(<Harness />);
 
-    await screen.findByText('Couldn’t check who you are');
+    await screen.findByText("Couldn't check who you are");
     await user.type(screen.getByRole('combobox', { name: /Search people/ }), 'Grace');
     await user.click(await screen.findByRole('option', { name: /Grace Hopper/ }));
 
     await waitFor(() => {
-      expect(screen.queryByText('Couldn’t check who you are')).not.toBeInTheDocument();
+      expect(screen.queryByText("Couldn't check who you are")).not.toBeInTheDocument();
     });
   });
 });

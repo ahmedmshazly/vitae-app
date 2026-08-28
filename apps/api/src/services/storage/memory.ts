@@ -9,7 +9,7 @@
  * Bytes live on disk, not in a process Map. Vitest isolates each file
  * (`isolate: true` default), which gives every file a fresh `globalThis`,
  * while `fileParallelism: false` still shares one Postgres. A résumé
- * finalized in `resumes.integration.test.ts` therefore leaves a `memory/…`
+ * finalized in `resumes.integration.test.ts` therefore leaves a `memory/...`
  * key the backup tests in `api.integration.test.ts` must still be able to
  * read (FR-001).
  */

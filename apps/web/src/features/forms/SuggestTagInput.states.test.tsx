@@ -57,7 +57,7 @@ describe('SuggestTagInput reports what it could not do', () => {
     await user.click(await screen.findByRole('option', { name: /Create skill/ }));
 
     expect(await screen.findByText('Created')).toBeInTheDocument();
-    expect(screen.getByText(/skill “Rust”/)).toBeInTheDocument();
+    expect(screen.getByText(/skill 'Rust'/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Remove Rust' })).toBeInTheDocument();
   });
 

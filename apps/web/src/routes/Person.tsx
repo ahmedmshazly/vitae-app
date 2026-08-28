@@ -300,7 +300,7 @@ export function Person() {
         <PageHeader title="Person" />
         <RegisterRule />
         <ErrorState
-          title="Couldn’t load this person"
+          title="Couldn't load this person"
           detail={(rec.error as Error | null)?.message}
           onRetry={() => void rec.refetch()}
           retrying={rec.isFetching}
@@ -310,7 +310,7 @@ export function Person() {
   if (rec.isLoading || !rec.data)
     return (
       <div className="page page--network page--person-dossier">
-        <PageHeader title="Person" subtitle="Loading…" />
+        <PageHeader title="Person" subtitle="Loading..." />
         <RegisterRule />
         <SkeletonRows rows={6} />
       </div>
@@ -388,7 +388,7 @@ export function Person() {
               {summaryUnavailable ? (
                 <span className="network-dossier__unavailable">Unavailable</span>
               ) : sum.isLoading ? (
-                <Mono>Loading…</Mono>
+                <Mono>Loading...</Mono>
               ) : rel?.relation ? (
                 <Chip>{personRelationLabel(rel.relation)}</Chip>
               ) : (
@@ -410,7 +410,7 @@ export function Person() {
               {profileUnavailable ? (
                 <span className="network-dossier__unavailable">Unavailable</span>
               ) : profile.isLoading ? (
-                <Mono>Loading…</Mono>
+                <Mono>Loading...</Mono>
               ) : (
                 <Mono>
                   {profile.data?.counts.records ?? 0} records · {profile.data?.counts.skills ?? 0}{' '}
@@ -444,7 +444,7 @@ export function Person() {
           title="This person could not be refreshed"
           action={
             <Button size="sm" disabled={rec.isFetching} onClick={() => void rec.refetch()}>
-              {rec.isFetching ? 'Retrying…' : 'Retry record'}
+              {rec.isFetching ? 'Retrying...' : 'Retry record'}
             </Button>
           }
         >
@@ -455,14 +455,14 @@ export function Person() {
         <Banner
           className="network-secondary-state"
           tone="danger"
-          title={`Couldn’t refresh ${degradedNames}`}
+          title={`Couldn't refresh ${degradedNames}`}
           action={
             <Button
               size="sm"
               disabled={degradedBusy}
               onClick={() => degraded.forEach((q) => q.retry())}
             >
-              {degradedBusy ? 'Retrying…' : 'Retry'}
+              {degradedBusy ? 'Retrying...' : 'Retry'}
             </Button>
           }
         >
@@ -474,9 +474,9 @@ export function Person() {
       <ConfirmDialog
         open={confirmDelete}
         onOpenChange={setConfirmDelete}
-        title={`Move “${node.title}” to trash?`}
+        title={`Move '${node.title}' to trash?`}
         body="It stays recoverable from Trash for 30 days; connections are preserved."
-        confirmLabel={remove.isPending ? 'Moving…' : 'Move to trash'}
+        confirmLabel={remove.isPending ? 'Moving...' : 'Move to trash'}
         destructive
         busy={remove.isPending}
         onConfirm={() => {
@@ -644,7 +644,7 @@ export function Person() {
                 ? 'unavailable'
                 : profile.data
                   ? `${profile.data.counts.records} records`
-                  : '…'
+                  : '...'
             }
           >
             {profileUnavailable ? (
@@ -799,7 +799,7 @@ export function Person() {
               summaryUnavailable
                 ? 'unavailable'
                 : sum.isLoading
-                  ? '…'
+                  ? '...'
                   : openFavors.length
                     ? `${openFavors.length} open`
                     : 'balanced'
@@ -861,7 +861,7 @@ export function Person() {
                               onClick={() => settleFavor.mutate(f.id!)}
                             >
                               {settleFavor.isPending && settleFavor.variables === f.id
-                                ? 'Settling…'
+                                ? 'Settling...'
                                 : 'Settle'}
                             </Button>
                           ) : (
@@ -885,7 +885,7 @@ export function Person() {
                     onClick={() => addFavor.mutate('owed_to_me')}
                   >
                     {addFavor.isPending && addFavor.variables === 'owed_to_me'
-                      ? 'Recording…'
+                      ? 'Recording...'
                       : 'They owe'}
                   </Button>
                   <Button
@@ -894,7 +894,7 @@ export function Person() {
                     onClick={() => addFavor.mutate('owed_by_me')}
                   >
                     {addFavor.isPending && addFavor.variables === 'owed_by_me'
-                      ? 'Recording…'
+                      ? 'Recording...'
                       : 'I owe'}
                   </Button>
                 </div>

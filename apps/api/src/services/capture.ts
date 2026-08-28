@@ -200,7 +200,7 @@ function withTypeDefaults(type: NodeType, props: Record<string, unknown>, plan: 
   if (type === 'goal') return { goal_status: 'active', horizon: 'quarter', ...props };
   if (type === 'habit') return { cadence: 'daily', active: true, ...props };
   if (type === 'interaction') {
-    // `interactionProps` requires kind and occurred_at, so `int …` used to fail
+    // `interactionProps` requires kind and occurred_at, so `int ...` used to fail
     // validation with an empty props object. The leading title word names the
     // kind when it is one ("int coffee @Sarah"); a dated capture lands at noon
     // on the named day in the request's timezone (FR-025).

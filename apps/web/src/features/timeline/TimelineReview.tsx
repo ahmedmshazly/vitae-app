@@ -66,7 +66,7 @@ export function TimelineReviewDock({
           header and looked exactly like not having brushed anything yet. */}
       {!waiting && failed && (
         <ErrorState
-          title="Couldn’t summarise that range"
+          title="Couldn't summarise that range"
           detail="The chronograph is unaffected. Retry this range or clear the brush to choose another."
           onRetry={onRetry}
           retryLabel="Retry review"

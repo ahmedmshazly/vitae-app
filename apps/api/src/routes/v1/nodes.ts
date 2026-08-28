@@ -144,7 +144,7 @@ nodesRouter.post(
         pending.set(personId, 'person');
       }
 
-      // 'in' → the edge runs person → this node (HELD, AUTHORED, EARNED …).
+      // 'in' → the edge runs person → this node (HELD, AUTHORED, EARNED ...).
       const [src, dst] = descriptor.direction === 'in' ? [personId, id] : [id, personId];
       edgeInputs.push(
         repository.parseEdgeCreate({
@@ -226,7 +226,7 @@ nodesRouter.patch(
   asyncHandler(async (req, res) => {
     const existing = await repository.getNode(req.params.id, { includeDeleted: true });
     if (!existing) throw new HttpError(404, 'NOT_FOUND', 'node not found');
-    // The update envelope strips system fields (deleted_at, rev, …) so clients
+    // The update envelope strips system fields (deleted_at, rev, ...) so clients
     // can never set them; props are validated against the type's schema.
     const parsed = validateNodeUpdate(existing.type, req.body);
     if (!parsed.ok) throw new ValidationError('invalid node update', parsed.errors);

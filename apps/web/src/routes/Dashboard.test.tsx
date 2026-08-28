@@ -59,7 +59,7 @@ describe('Today, the four states', () => {
     renderToday();
 
     const alert = await screen.findByRole('alert');
-    expect(within(alert).getByText('Couldn’t load today')).toBeInTheDocument();
+    expect(within(alert).getByText("Couldn't load today")).toBeInTheDocument();
     expect(within(alert).getByText('502 upstream')).toBeInTheDocument();
 
     mockApi.get.mockResolvedValueOnce(payload());
@@ -96,7 +96,7 @@ describe('Today, the four states', () => {
 });
 
 describe('Today, mutations', () => {
-  it('completing a reminder confirms with the button’s verb and offers a real Undo', async () => {
+  it("completing a reminder confirms with the button's verb and offers a real Undo", async () => {
     const user = userEvent.setup();
     mockApi.get.mockResolvedValue(payload({ reminders: [{ id: 'r1', note: 'Ping Sam', due_on: TODAY, subject_id: 's1' }] }));
     mockApi.post.mockResolvedValue({});

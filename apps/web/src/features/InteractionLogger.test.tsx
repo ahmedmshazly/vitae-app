@@ -38,7 +38,7 @@ describe('InteractionLogger', () => {
     const save = screen.getByRole('button', { name: 'Save' });
     await user.click(save);
     expect(save).toBeDisabled();
-    expect(save).toHaveTextContent('Saving…');
+    expect(save).toHaveTextContent('Saving...');
 
     resolvePost({ interaction: { id: 'i1' }, strength: { strength: 0.4 } });
     await waitFor(() => {

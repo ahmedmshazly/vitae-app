@@ -83,7 +83,7 @@ describe('buildOwnerIndex', () => {
     expect(index.ownerOf.get('r1')).toBe('me');
   });
 
-  it('never treats an unowned record as the owner’s', () => {
+  it("never treats an unowned record as the owner's", () => {
     // The whole point of the placeholder: "nobody said" must not collapse into
     // "mine", which is how other people's degrees reached the résumé.
     const g = graph(
@@ -128,10 +128,10 @@ describe('skillIdsFor', () => {
     expect([...mine].sort()).toEqual(['claimed', 'evidenced', 'shared']);
   });
 
-  it('does not borrow a skill only someone else’s record uses', () => {
+  it("does not borrow a skill only someone else's record uses", () => {
     const index = buildOwnerIndex(g);
     expect(skillIdsFor('me', g, ownedIdsFor('me', index)).has('theirs')).toBe(false);
-    // …while a shared skill is legitimately both people's.
+    // ...while a shared skill is legitimately both people's.
     expect(skillIdsFor('them', g, ownedIdsFor('them', index)).has('shared')).toBe(true);
   });
 });

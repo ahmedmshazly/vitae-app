@@ -69,7 +69,7 @@ describe('Settings load states', () => {
     renderWithApp(<Settings />, { route: '/settings' });
 
     const alert = await screen.findByRole('alert');
-    expect(within(alert).getByText('Couldn’t load settings')).toBeInTheDocument();
+    expect(within(alert).getByText("Couldn't load settings")).toBeInTheDocument();
     expect(within(alert).getByText('settings store unreachable')).toBeInTheDocument();
 
     serve();
@@ -82,7 +82,7 @@ describe('Settings load states', () => {
     renderWithApp(<Settings />, { route: '/settings' });
 
     const alert = await screen.findByRole('alert');
-    expect(within(alert).getByText('Couldn’t load system status')).toBeInTheDocument();
+    expect(within(alert).getByText("Couldn't load system status")).toBeInTheDocument();
     expect(screen.getByRole('region', { name: /Profile of me/ })).toBeInTheDocument();
   });
 });
@@ -212,7 +212,7 @@ describe('Settings GitHub panel', () => {
     await user.type(within(github).getByLabelText('Personal access token'), 'ghp_x');
     await user.click(within(github).getByRole('button', { name: 'Save' }));
 
-    expect(await within(github).findByText('Couldn’t store the token')).toBeInTheDocument();
+    expect(await within(github).findByText("Couldn't store the token")).toBeInTheDocument();
     expect(within(github).getByText('github rejected the token')).toBeInTheDocument();
   });
 });

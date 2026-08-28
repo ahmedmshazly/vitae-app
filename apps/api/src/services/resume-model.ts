@@ -80,7 +80,7 @@ export interface ResumeSection {
 }
 
 export interface ResumeModel {
-  /** Self-person node id, used by the editor's “edit profile” link. */
+  /** Self-person node id, used by the editor's 'edit profile' link. */
   profileId?: string;
   name: string;
   tagline?: string;

@@ -311,7 +311,7 @@ export function Intros() {
 
       {targets.isError && !targets.data ? (
         <ErrorState
-          title="Couldn’t load your organizations"
+          title="Couldn't load your organizations"
           detail={(targets.error as Error | null)?.message}
           onRetry={() => void targets.refetch()}
         />
@@ -334,7 +334,7 @@ export function Intros() {
             <div className="network-targets__filter">
               <Input
                 aria-label="Filter organizations"
-                placeholder="Filter orgs…"
+                placeholder="Filter orgs..."
                 value={railQ}
                 onChange={(e) => setRailQ(e.target.value)}
               />
@@ -358,7 +358,7 @@ export function Intros() {
 
             {filtered.length === 0 && (
               <div className="network-targets__empty" role="status">
-                No organizations match “{railQ}”.{' '}
+                No organizations match '{railQ}'.{' '}
                 <button type="button" onClick={() => setRailQ('')}>
                   Clear the filter
                 </button>
@@ -404,7 +404,7 @@ export function Intros() {
                   // sent you off to capture people who already exist - the screen
                   // blaming your graph for the server's fault.
                   <ErrorState
-                    title={`Couldn’t work out how to reach ${target.title}`}
+                    title={`Couldn't work out how to reach ${target.title}`}
                     detail={(paths.error as Error | null)?.message}
                     onRetry={() => void paths.refetch()}
                   />

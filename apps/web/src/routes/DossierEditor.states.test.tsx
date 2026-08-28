@@ -135,7 +135,7 @@ describe('DossierEditor states', () => {
     renderEditor();
 
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Couldn’t compile this dossier');
+    expect(alert).toHaveTextContent("Couldn't compile this dossier");
     expect(alert).toHaveTextContent('compile service unavailable');
     expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
     expect(screen.queryByText('No records cited yet')).not.toBeInTheDocument();
@@ -225,7 +225,7 @@ describe('DossierEditor states', () => {
     renderEditor();
     await screen.findByRole('heading', { name: '2026 promotion packet' });
 
-    expect(screen.getByText(/Couldn’t load this audience/)).toBeInTheDocument();
+    expect(screen.getByText(/Couldn't load this audience/)).toBeInTheDocument();
     expect(screen.getByText('grammar unavailable')).toBeInTheDocument();
     // No local copy stands in for the grammar, and the form is gone with it.
     expect(screen.queryByRole('group', { name: 'Add an entry to Scope' })).not.toBeInTheDocument();

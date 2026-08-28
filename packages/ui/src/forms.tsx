@@ -135,7 +135,7 @@ export function Select({
   value,
   onChange,
   options,
-  placeholder = 'Select…',
+  placeholder = 'Select...',
   mono,
   invalid,
   clearable = true,
@@ -227,7 +227,7 @@ export interface TagInputProps {
   mono?: boolean;
   id?: string;
 }
-export function TagInput({ value, onChange, placeholder = 'Add…', mono, id }: TagInputProps) {
+export function TagInput({ value, onChange, placeholder = 'Add...', mono, id }: TagInputProps) {
   const [draft, setDraft] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 

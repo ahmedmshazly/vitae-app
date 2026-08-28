@@ -181,7 +181,7 @@ export function FieldRenderer({ field, ownerType, prefix = 'props', control, reg
                 value={typeof f.value === 'string' ? f.value : undefined}
                 onChange={f.onChange}
                 options={field.options ?? []}
-                placeholder={field.placeholder ?? 'Select…'}
+                placeholder={field.placeholder ?? 'Select...'}
                 invalid={Boolean(error)}
                 clearable={!field.required}
               />

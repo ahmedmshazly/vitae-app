@@ -198,7 +198,7 @@ export async function listTargets(): Promise<Array<Record<string, unknown>>> {
     .sort((a, b) => String(b.updated_at ?? '').localeCompare(String(a.updated_at ?? '')));
 }
 
-/** Persist the Tailor workspace draft (mode, selection, section config…) on the target. */
+/** Persist the Tailor workspace draft (mode, selection, section config...) on the target. */
 export async function updateTargetDraft(id: string, draft: Record<string, unknown>): Promise<void> {
   await repository.docMerge('targets', id, { draft, updated_at: new Date().toISOString() });
 }

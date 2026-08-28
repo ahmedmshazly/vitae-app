@@ -191,7 +191,7 @@ export default function DocsApp() {
         query={manifest}
         loading={<ShellSkeleton />}
         loadingLabel="Loading the documentation index"
-        errorTitle="Couldn’t load the documentation"
+        errorTitle="Couldn't load the documentation"
         retryLabel="Try again"
       >
         {(data) => (

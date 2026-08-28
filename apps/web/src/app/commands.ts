@@ -47,7 +47,7 @@ export function buildCommands({
       : []),
     {
       id: 'new-record',
-      label: 'New record…',
+      label: 'New record...',
       hint: 'n',
       glyph: 'plus',
       keywords: 'create add entity',
@@ -55,7 +55,7 @@ export function buildCommands({
     },
     {
       id: 'capture',
-      label: 'Quick capture…',
+      label: 'Quick capture...',
       hint: '⌘K',
       glyph: 'capture',
       keywords: 'add note',

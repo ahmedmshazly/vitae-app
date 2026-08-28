@@ -288,7 +288,7 @@ describe('Combobox keyboard', () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
     const onSubmit = vi.fn((e: { preventDefault: () => void }) => e.preventDefault());
-    const create: ComboboxItem = { value: 'new', label: 'Create person “Nadia Farouk”', kind: 'create' };
+    const create: ComboboxItem = { value: 'new', label: "Create person 'Nadia Farouk'", kind: 'create' };
     const { rerender } = render(
       <form onSubmit={onSubmit}>
         <Harness items={[PEOPLE[0]!, create]} onSelect={onSelect} />
@@ -302,7 +302,7 @@ describe('Combobox keyboard', () => {
     rerender(
       <form onSubmit={onSubmit}>
         <Harness
-          items={[PEOPLE[0]!, { ...create, disabled: true, disabledReason: 'Creating…' }]}
+          items={[PEOPLE[0]!, { ...create, disabled: true, disabledReason: 'Creating...' }]}
           onSelect={onSelect}
         />
       </form>,
@@ -406,7 +406,7 @@ describe('Combobox states', () => {
     const user = userEvent.setup();
     render(<Harness items={[]} loading />);
     await user.click(input());
-    expect(await screen.findByRole('status')).toHaveTextContent('Searching…');
+    expect(await screen.findByRole('status')).toHaveTextContent('Searching...');
     expect(input()).toHaveAttribute('aria-busy', 'true');
     expect(screen.queryByText('No matches.')).not.toBeInTheDocument();
   });
@@ -426,7 +426,7 @@ describe('Combobox states', () => {
     render(
       <Harness
         onSelect={onSelect}
-        items={[PEOPLE[0]!, { value: 'new', label: 'Create person “Nadia Farouk”', kind: 'create' }]}
+        items={[PEOPLE[0]!, { value: 'new', label: "Create person 'Nadia Farouk'", kind: 'create' }]}
       />,
     );
     await user.click(input());

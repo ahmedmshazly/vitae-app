@@ -261,7 +261,7 @@ export const letterCreateSchema = z.object({
   blocks: z.array(letterBlockSchema).min(1).max(24),
   status: letterStatusSchema.default('draft'),
   recipient: letterRecipientSchema.optional(),
-  /** Overrides the derived "Dear …" line; the renderer supplies a default. */
+  /** Overrides the derived "Dear ..." line; the renderer supplies a default. */
   salutation: z.string().trim().min(1).max(120).optional(),
   /** Overrides "Sincerely,". */
   closing: z.string().trim().min(1).max(120).optional(),

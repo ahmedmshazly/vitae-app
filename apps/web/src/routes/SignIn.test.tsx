@@ -105,7 +105,7 @@ describe('SignIn, pending and failure', () => {
 
     await user.click(screen.getByRole('button', { name: 'Continue with Google' }));
 
-    expect(await screen.findByRole('button', { name: 'Signing in…' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Signing in...' })).toBeInTheDocument();
     // A single shared flag made this one claim to be signing in too.
     expect(screen.getByRole('button', { name: /Developer sign-in/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Developer sign-in/ })).toBeDisabled();

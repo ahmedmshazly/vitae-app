@@ -179,7 +179,7 @@ export function GraphCanvas({
     }
 
     if (shouldShowLabel(n, globalScale, onPath) && !dimmed) {
-      const label = n.title.length > 24 ? `${n.title.slice(0, 23)}…` : n.title;
+      const label = n.title.length > 24 ? `${n.title.slice(0, 23)}...` : n.title;
       // Names are the one thing here drawn outside the zoom transform. Under it
       // the type size has to shrink as you zoom in to stay 11px on screen, and
       // somewhere below 5px this typeface's glyph advances round to whole units,

@@ -183,7 +183,7 @@ describe('buildProposal', () => {
 });
 
 describe('githubLinkNext', () => {
-  it('reads the next page from GitHub’s Link header', () => {
+  it("reads the next page from GitHub's Link header", () => {
     expect(
       githubLinkNext(
         '<https://api.github.com/user/repos?page=2>; rel="next", <https://api.github.com/user/repos?page=3>; rel="last"',

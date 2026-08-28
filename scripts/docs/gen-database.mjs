@@ -45,7 +45,7 @@ for (const st of schemaFile.statements) {
 }
 
 /**
- * Columns of an interface, following `extends DocTable<…>` to the base.
+ * Columns of an interface, following `extends DocTable<...>` to the base.
  *
  * Most tables here declare only their own promoted columns and inherit
  * `space`, `workspace_id`, `id` and `data` from `DocTable`. A reader who is
@@ -112,7 +112,7 @@ for (const st of schemaFile.statements) {
 
 /**
  * The text of every `sql` tagged template in a file, with interpolations kept
- * as `${…}` markers.
+ * as `${...}` markers.
  *
  * A template's substitutions are not always values: `${BASE}` is a shared
  * column fragment, `${sql.raw(name)}` is a table name that arrived as a
@@ -170,7 +170,7 @@ for (const rel of sourceFiles(MIGRATIONS, { tests: false })) {
   const doc = leadingDoc(sf.statements[0], sf);
 
   /**
-   * Functions in this file that create tables. `docTable(db, 'atoms', …)` is
+   * Functions in this file that create tables. `docTable(db, 'atoms', ...)` is
    * where twenty of the thirty-two tables are actually named; a reader that
    * only matched `CREATE TABLE` in template text would find the twelve written
    * out longhand and miss the rest.
@@ -285,7 +285,7 @@ const AREAS = ['apps/api/src', 'packages/testkit/src', 'services/buildsvc/src'];
  * and every position that holds a table name is declared with it, in exactly
  * two forms:
  *
- *   docGet(table: TableName, …)            a parameter, at a known index
+ *   docGet(table: TableName, ...)            a parameter, at a known index
  *   { file: string; table: TableName }     a property, under a known name
  *
  * Reading those eighteen declarations yields the call signatures and property

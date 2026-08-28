@@ -58,12 +58,12 @@ type OutputAction = 'sent' | 'base' | 'duplicate' | 'restore' | 'reexport' | 'ar
  * attribute, so a click on Duplicate or Mark sent read as a click that missed.
  */
 const PENDING_LABEL: Record<OutputAction, string> = {
-  sent: 'Marking sent…',
-  base: 'Setting as base…',
-  duplicate: 'Duplicating…',
-  restore: 'Restoring…',
-  reexport: 'Rebuilding…',
-  archive: 'Archiving…',
+  sent: 'Marking sent...',
+  base: 'Setting as base...',
+  duplicate: 'Duplicating...',
+  restore: 'Restoring...',
+  reexport: 'Rebuilding...',
+  archive: 'Archiving...',
 };
 
 /** What each action says once the server has done it. */
@@ -257,7 +257,7 @@ export function Outputs() {
       <div className="resume-toolbar card">
         <Input
           aria-label="Search outputs"
-          placeholder="Search role, company, or output…"
+          placeholder="Search role, company, or output..."
           value={q}
           onChange={(event) => setQ(event.target.value)}
         />
@@ -295,7 +295,7 @@ export function Outputs() {
         // artifact fetches alone, which have no toast behind them.
         <Banner
           tone="danger"
-          title="Couldn’t open that artifact"
+          title="Couldn't open that artifact"
           onDismiss={() => setArtifactError(null)}
         >
           {artifactError}
@@ -304,7 +304,7 @@ export function Outputs() {
       {refreshFailed ? (
         <Banner
           tone="danger"
-          title="Couldn’t refresh your outputs"
+          title="Couldn't refresh your outputs"
           action={
             <Button size="sm" onClick={() => void listQuery.refetch()}>
               Retry
@@ -318,7 +318,7 @@ export function Outputs() {
         // `isError` was unread, so a failed load rendered the empty panel and
         // invited you to go and tailor résumés you may already have.
         <ErrorState
-          title="Couldn’t load your outputs"
+          title="Couldn't load your outputs"
           detail={(listQuery.error as Error | null)?.message}
           onRetry={() => void listQuery.refetch()}
         />
@@ -417,7 +417,7 @@ export function Outputs() {
                       size="sm"
                       variant="ghost"
                       // An aria-label replaces the content, so the visible
-                      // "Rebuilding…" never reached anyone listening.
+                      // "Rebuilding..." never reached anyone listening.
                       aria-label={
                         rebuilding
                           ? `Rebuilding the artifacts for ${rowName(resume)}`
@@ -428,7 +428,7 @@ export function Outputs() {
                       disabled={rebuilding}
                       onClick={() => mutate.mutate({ action: 'reexport', resume })}
                     >
-                      {rebuilding ? 'Rebuilding…' : 'Rebuild'}
+                      {rebuilding ? 'Rebuilding...' : 'Rebuild'}
                     </Button>
                   )}
                 </div>
@@ -500,7 +500,7 @@ export function Outputs() {
           // `!detail` held forever when the lookup failed, so the sheet span a
           // spinner with nothing to read - the same shape the Life map had.
           <ErrorState
-            title="Couldn’t load this output"
+            title="Couldn't load this output"
             detail={(detailQuery.error as Error | null)?.message}
             onRetry={() => void detailQuery.refetch()}
           />

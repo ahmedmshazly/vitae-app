@@ -169,12 +169,12 @@ export function Repositories() {
         help={
           <InfoPopover
             title="How repositories work"
-            shortcuts={[{ keys: '⌘P', label: 'Command palette → “Sync GitHub”' }]}
+            shortcuts={[{ keys: '⌘P', label: "Command palette → 'Sync GitHub'" }]}
           >
             <p>
               Add a GitHub <strong>personal access token</strong> (repo read scope).{' '}
               <strong>Sync now</strong> pulls your non-fork repos in as <code>repository</code>{' '}
-              nodes and links each repo’s primary language to a <code>skill</code>.
+              nodes and links each repo's primary language to a <code>skill</code>.
             </p>
             <p>
               Each repo is a normal record, open it to add context, connect it to a project, or hide
@@ -202,7 +202,7 @@ export function Repositories() {
                   : 'Sync GitHub: connect a token first'
               }
             >
-              {sync.isPending ? 'Syncing…' : 'Sync now'}
+              {sync.isPending ? 'Syncing...' : 'Sync now'}
             </Button>
           </div>
         }
@@ -363,7 +363,7 @@ export function Repositories() {
       >
         {settings.isError ? (
           <ErrorState
-            title="Couldn’t load GitHub settings"
+            title="Couldn't load GitHub settings"
             detail={(settings.error as Error | null)?.message}
             onRetry={() => void settings.refetch()}
           />
@@ -412,7 +412,7 @@ export function Repositories() {
                   type="password"
                   autoComplete="off"
                   spellCheck={false}
-                  placeholder="ghp_… (repo read scope)"
+                  placeholder="ghp_... (repo read scope)"
                   value={token}
                   onChange={(e) => setToken(e.target.value)}
                   aria-describedby={tokenHelpId}
@@ -426,7 +426,7 @@ export function Repositories() {
                   disabled={!token.trim() || saveToken.isPending}
                 >
                   {saveToken.isPending
-                    ? 'Saving…'
+                    ? 'Saving...'
                     : connection.connected
                       ? 'Replace token'
                       : 'Connect GitHub'}
@@ -439,7 +439,7 @@ export function Repositories() {
                     onClick={() => disconnect.mutate()}
                     aria-label="Disconnect GitHub token"
                   >
-                    {disconnect.isPending ? 'Disconnecting…' : 'Disconnect'}
+                    {disconnect.isPending ? 'Disconnecting...' : 'Disconnect'}
                   </Button>
                 )}
               </div>
@@ -456,7 +456,7 @@ export function Repositories() {
       <Section title="Synced repositories" meta={repos.isSuccess ? list.length : undefined}>
         {repos.isError ? (
           <ErrorState
-            title="Couldn’t load repositories"
+            title="Couldn't load repositories"
             detail={(repos.error as Error | null)?.message}
             onRetry={() => void repos.refetch()}
           />
@@ -485,13 +485,13 @@ export function Repositories() {
                     // check has not answered yet.
                     'Still checking whether GitHub is connected.'
                   : connection.connected
-                    ? 'Hit “Sync now” to pull your repositories in.'
+                    ? "Hit 'Sync now' to pull your repositories in."
                     : 'Add a token above, then sync; your repos and their languages land automatically.'
             }
             action={
               connection.canSync ? (
                 <Button variant="primary" disabled={sync.isPending} onClick={() => sync.mutate()}>
-                  {sync.isPending ? 'Syncing…' : 'Sync now'}
+                  {sync.isPending ? 'Syncing...' : 'Sync now'}
                 </Button>
               ) : undefined
             }

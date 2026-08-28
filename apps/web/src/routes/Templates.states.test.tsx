@@ -72,7 +72,7 @@ describe('Templates states', () => {
     render();
 
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Couldn’t load résumé templates');
+    expect(alert).toHaveTextContent("Couldn't load résumé templates");
     expect(alert).toHaveTextContent('template registry unavailable');
     expect(screen.queryByText('No résumé templates are available')).not.toBeInTheDocument();
   });
@@ -90,7 +90,7 @@ describe('Templates states', () => {
     });
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Couldn’t refresh the template catalogue',
+      "Couldn't refresh the template catalogue",
     );
     expect(screen.getByRole('article', { name: 'Cobalt' })).toBeInTheDocument();
   });
@@ -151,13 +151,13 @@ describe('Templates states', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Make default: Onyx' }));
 
     // The name has to move with the state: an aria-label replaces the content,
-    // so the visible "Making default…" reached nobody listening.
+    // so the visible "Making default..." reached nobody listening.
     expect(await screen.findByRole('button', { name: 'Making default: Onyx' })).toBeDisabled();
     // The default is a single value, so a second click would race the first and
     // every other control locks. That is why the reason is stated out loud
     // rather than left as an unexplained grey button.
     expect(screen.getByRole('button', { name: 'Make default: Argon' })).toBeDisabled();
-    const notice = screen.getByText('Setting Onyx as the default…');
+    const notice = screen.getByText('Setting Onyx as the default...');
     expect(notice.closest('[role="status"]')).not.toBeNull();
   });
 
