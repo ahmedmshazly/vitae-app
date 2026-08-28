@@ -10,12 +10,13 @@
  * documented it.
  *
  * Two kinds of coverage count, and the registry says which applies where.
- * Most reference material is covered by a generated catalog — 135 endpoints
- * and 178 design tokens do not each need an essay, and a hand-maintained list
- * of them would be wrong within a week. What a generator cannot produce is
- * meaning: what a screen is for, what an algorithm optimises, what a package
- * owns, how a procedure is run. Those domains are marked `requires_prose` and
- * must be claimed by a curated page's `covers:` field.
+ * Most reference material is covered by a generated catalog, since 135
+ * endpoints and 178 design tokens do not each need an essay, and a
+ * hand-maintained list of them would be wrong within a week. What a generator
+ * cannot produce is meaning: what a screen is for, what an algorithm
+ * optimises, what a package owns, how a procedure is run. Those domains are
+ * marked `requires_prose` and must be claimed by a curated page's `covers:`
+ * field.
  *
  * `undocumented` in the registry is a ratchet, not an exemption list. It
  * records exactly what is uncovered today; the gate fails when something new
@@ -61,7 +62,7 @@ for (const [domain, spec] of Object.entries(registry.catalogs)) {
   try {
     artifact = JSON.parse(readFileSync(abs, 'utf8'));
   } catch (error) {
-    problems.push(`${domain}: ${spec.artifact} is not readable JSON — ${error.message}`);
+    problems.push(`${domain}: ${spec.artifact} is not readable JSON: ${error.message}`);
     continue;
   }
   // A gate that throws on a damaged input tells a contributor less than one
@@ -170,7 +171,7 @@ if (update) {
   registry.undocumented = uncovered;
   writeFileSync(join(root, REGISTRY), `${JSON.stringify(registry, null, 2)}\n`);
   const total = Object.values(uncovered).reduce((n, v) => n + v.length, 0);
-  console.log(`docs-coverage: ratchet updated — ${total} item(s) still undocumented`);
+  console.log(`docs-coverage: ratchet updated, ${total} item(s) still undocumented`);
   process.exit(problems.length ? 1 : 0);
 }
 
@@ -178,7 +179,7 @@ for (const [domain, ids] of Object.entries(uncovered)) {
   const known = new Set(baseline[domain] ?? []);
   const regressed = ids.filter((id) => !known.has(id));
   if (regressed.length) {
-    problems.push(`${domain}: newly undocumented — ${regressed.join(', ')}. `
+    problems.push(`${domain}: newly undocumented items are ${regressed.join(', ')}. `
       + `Add a page under ${CORPUS}/ whose covers: lists ${domain}:<id>.`);
   }
 }

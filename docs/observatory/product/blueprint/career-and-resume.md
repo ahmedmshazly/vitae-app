@@ -1,7 +1,7 @@
 ---
 id: PRD-BP-CAREER
 title: "Blueprint: Career and the résumé engine"
-summary: The move engine — runway, tailor, outputs — keeps its shape; applications get real writes, letters get compile parity, and Dossiers join as the second derived artifact.
+summary: The move engine (runway, tailor, outputs) keeps its shape; applications get real writes, letters get compile parity, and Dossiers join as the second derived artifact.
 audience: [maintainer, designer, developer]
 domain: product
 type: reference

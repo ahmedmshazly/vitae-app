@@ -1,5 +1,5 @@
 /**
- * The ledger (FR-PROV-002): the revision history read back as a feed — a
+ * The ledger (FR-PROV-002): the revision history read back as a feed. A
  * write appears newest-first with its verb, its changed fields, and a title
  * taken from its own snapshot, and the page cursor never repeats an entry.
  */

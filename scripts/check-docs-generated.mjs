@@ -11,7 +11,7 @@
  *
  * The generator list is the directory, not a constant. A hardcoded list is one
  * more thing to forget to update, and the failure mode of forgetting is a new
- * generator whose output is never checked — exactly the drift this exists to
+ * generator whose output is never checked, exactly the drift this exists to
  * prevent.
  *
  * Every generator runs even after one fails. A contributor who regenerates

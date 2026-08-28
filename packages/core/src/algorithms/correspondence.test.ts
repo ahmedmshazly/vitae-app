@@ -27,8 +27,8 @@ describe('rankReactivation', () => {
         // Three meetings this week: active, not a candidate.
         { personId: 'current-friend', closeness: 4, interactions: burst(1, 3) },
         // Two messages around a year ago: dormant, but never strong. (A
-        // single interaction can never be dormant — the adaptive threshold
-        // needs a gap history — which is itself the model behaving.)
+        // single interaction can never be dormant, because the adaptive
+        // threshold needs a gap history, which is itself the model behaving.)
         {
           personId: 'faint-contact',
           closeness: 1,

@@ -70,7 +70,7 @@ export function Manifesto() {
               <p>
                 People, roles, projects, applications, interactions, and achievement evidence enter a typed,
                 versioned network. Warm paths, reconnect work, career output, and exports are views over that
-                record—not fresh silos asking you to reconstruct your life in a new format.
+                record, not fresh silos asking you to reconstruct your life in a new format.
               </p>
               <p>
                 A trusted system should show its working without demanding that you become its operator. Vitae keeps

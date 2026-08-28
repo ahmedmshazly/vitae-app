@@ -1,6 +1,6 @@
 ## Summary
 
-<!-- What changed and why (1–3 bullets). -->
+<!-- What changed and why (1 to 3 bullets). -->
 
 ## Test plan
 

@@ -1,7 +1,7 @@
 ---
 id: PRD-PEOPLE
 title: Who Vitae is for
-summary: One person signs in to an installation; everybody else in the graph is a record, not a user. Four personas now name who that one person is — and what each of them would pay for.
+summary: One person signs in to an installation; everybody else in the graph is a record, not a user. Four personas now name who that one person is, and what each of them would pay for.
 audience: [user, designer, maintainer]
 domain: product
 type: explanation

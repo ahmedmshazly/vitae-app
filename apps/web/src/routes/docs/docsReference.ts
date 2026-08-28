@@ -7,9 +7,9 @@
  * separation is the whole point: prose that enumerates what a generator can
  * index is prose nobody keeps up to date.
  *
- * Eleven catalogs, one renderer. Each is described here as a spec — where its
+ * Eleven catalogs, one renderer. Each is described here as a spec: where its
  * data lives, what identifies a row, which few fields are worth a column, and
- * what a reader would want to narrow by — because eleven hand-written tables
+ * what a reader would want to narrow by, because eleven hand-written tables
  * would be eleven places for the same layout bug and eleven things to update
  * when an artifact gains a field. Everything not given a column is still shown:
  * a row expands to whatever the artifact actually holds, so this surface cannot
@@ -54,7 +54,7 @@ export interface CatalogSpec {
    * Is this artifact generated at build time rather than committed?
    *
    * The per-symbol atlas is too large and too churny to keep in the repository
-   * — a rename would rewrite thousands of lines — so it is produced by the
+   * (a rename would rewrite thousands of lines), so it is produced by the
    * build and never committed. A checkout that has not run `pnpm docs:gen` will
    * not have it, and this says so rather than letting the catalog look broken.
    */

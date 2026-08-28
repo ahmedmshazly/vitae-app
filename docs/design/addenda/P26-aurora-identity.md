@@ -6,8 +6,8 @@
 > `packages/ui/src/styles/tokens.css`. Aurora's central prescriptions are now
 > refused by `scripts/check-brand-bans.mjs`, which fails the build on gradients,
 > on blurred glow shadows outside the two approved tokens, on a second easing
-> curve, on durations off the token scale, and on raw hex outside the token file
-> — so the gradients, glows, ambient washes, spring easing, 120/180/320ms
+> curve, on durations off the token scale, and on raw hex outside the token
+> file, so the gradients, glows, ambient washes, spring easing, 120/180/320ms
 > durations and cyan palette below cannot ship. This page is kept as the record
 > of an identity that was tried and removed on purpose; the rest of it is
 > unedited.

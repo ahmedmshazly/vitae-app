@@ -6,7 +6,7 @@
  * JSON file per page holding its typed blocks. The API serves that directory,
  * privately; it is deliberately not under `apps/web/public/`, because anything
  * there is copied into the bundle and served to anyone who asks. Nothing here parses
- * Markdown, resolves a link or decides an order — all of that happened at build
+ * Markdown, resolves a link or decides an order. All of that happened at build
  * time, where a mistake fails a gate instead of a reader's screen.
  *
  * The types below are hand-written against that output rather than generated
@@ -386,7 +386,7 @@ export interface DocsNeighbours {
 
 /**
  * What comes before and after in reading order. The manifest is already in
- * that order, so this is array arithmetic rather than a traversal — which is
+ * that order, so this is array arithmetic rather than a traversal, which is
  * the point of the builder emitting an ordered list instead of a tree.
  */
 export function neighbours(manifest: DocsManifest, page: DocsPageSummary): DocsNeighbours {

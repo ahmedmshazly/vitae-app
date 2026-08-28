@@ -85,8 +85,8 @@ export async function ensureSelfPerson(app: Express, token: string): Promise<str
 
 /**
  * Ensure self and create a person. Manual person creates already insert a
- * self→person KNOWS edge (see nodes route); do not add a second one — favors
- * and CRM helpers use `findKnowsEdge`, which returns the first match.
+ * self→person KNOWS edge (see nodes route); do not add a second one, because
+ * favors and CRM helpers use `findKnowsEdge`, which returns the first match.
  */
 export async function createKnowsPerson(
   app: Express,

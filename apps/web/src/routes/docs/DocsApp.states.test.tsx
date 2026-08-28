@@ -9,7 +9,7 @@
  * The structural claim under test is the split boundary: the manifest decides
  * whether a page exists, and the page's own content is a second, separate
  * request. That is what lets a title, a breadcrumb and the reading-order links
- * render while the prose is still in flight — and what makes a failed prose
+ * render while the prose is still in flight, and what makes a failed prose
  * fetch a compact banner inside the article rather than a blank screen.
  */
 import { StrictMode } from 'react';
@@ -156,7 +156,7 @@ const pages: Record<string, DocsPageContent> = {
     // file, so a correctly spelled identifier here would be recorded as a
     // citation, and the register would hold this test up as evidence for a
     // requirement it does not exercise. This keeps the shape the rail has to
-    // render without entering the citation grammar — which is also why this
+    // render without entering the citation grammar, which is also why this
     // comment describes that spelling rather than demonstrating it.
     requirements: ['FR-EXAMPLE-ONLY'],
     related: [
@@ -219,7 +219,7 @@ beforeEach(() => {
 });
 
 /**
- * The surface as it really mounts: no Shell, no ToastProvider, no auth — and
+ * The surface as it really mounts: no Shell, no ToastProvider, no auth, and
  * inside `StrictMode`, because `main.tsx` mounts the application inside one.
  *
  * That last part is not decoration. StrictMode runs every mount effect twice
@@ -263,7 +263,7 @@ describe('reaching the corpus', () => {
   });
 
   // The corpus is private. Every read goes through the authenticated client, so
-  // a reader without the owner's session gets nothing — see docsContent.test.ts
+  // a reader without the owner's session gets nothing. See docsContent.test.ts
   // for what each refusal says.
   it('reads the corpus through the authenticated API, not from a public file', async () => {
     renderDocs('/docs/meta/coverage');
@@ -343,7 +343,7 @@ describe('a page that loaded', () => {
     const legend = screen.getByText('Written for');
     // Deliberately not `toBeVisible`. Everything a QueryBoundary renders sits
     // inside a `motion.div` that mounts at opacity 0 and animates up, and
-    // jsdom does not reliably flush that frame — so `toBeVisible` on any
+    // jsdom does not reliably flush that frame, so `toBeVisible` on any
     // loaded content measures the entrance animation rather than the element.
     // What this test is actually about is that the legend is text on the page
     // and not an aria-label nobody can see, which these two assertions say
@@ -422,8 +422,8 @@ describe('a page that loaded', () => {
   // past the skip link.
   //
   // `renderDocs` mounts inside StrictMode, so this runs the mount effect twice
-  // the way a real browser does. The guard it replaced — a ref set to true on
-  // the first pass — passed a single-pass render and failed the double one.
+  // the way a real browser does. The guard it replaced, a ref set to true on
+  // the first pass, passed a single-pass render and failed the double one.
   it('does not take focus on the first page a reader opens', async () => {
     renderDocs('/docs/meta/coverage');
     await screen.findByText('Nine checks run in CI.');
@@ -434,7 +434,7 @@ describe('a page that loaded', () => {
   // On a wide screen the rail is a right-hand column and this is invisible.
   // On a phone the column collapses into document order, and with the rail
   // first the measured distance from the title to the first sentence was
-  // 1,748px — two and a half screens of table of contents. A screen reader
+  // 1,748px, two and a half screens of table of contents. A screen reader
   // heard "checked against" before the page had said anything.
   it('puts the article before the rail that describes it', async () => {
     renderDocs('/docs/meta/coverage');

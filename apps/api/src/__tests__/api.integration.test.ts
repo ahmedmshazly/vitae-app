@@ -133,7 +133,7 @@ d('Vitae API (integration)', () => {
     // At any real instant, at least one of these two zones sits on a
     // different calendar date from the server host. Before the fix, capture
     // resolved ^today with the host clock while every read surface answered
-    // "today" in the request timezone — so for a few hours every night a
+    // "today" in the request timezone. So for a few hours every night a
     // captured task and its follow-up reminder landed one day in the future
     // and Today's queue rightly refused to show them. That is exactly how a
     // gate run that started at 02:40 host-local lost its Done rows.

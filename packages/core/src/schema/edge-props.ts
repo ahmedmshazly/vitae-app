@@ -174,7 +174,7 @@ export const reportsToProps = z.object({
 
 /**
  * An introduction as a first-class fact (SRS FR-COMM-003): the edge connects
- * the two people who now know each other; `via` names the broker — a person
+ * the two people who now know each other; `via` names the broker: a person
  * id when recorded from a profile, tolerated as written otherwise. The
  * warm-path search already treats the edge as a connection hop.
  */

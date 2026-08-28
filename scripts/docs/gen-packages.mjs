@@ -4,8 +4,8 @@
  * for, what it depends on, and which of them the repository-wide commands
  * actually reach.
  *
- * A list of package names is not worth generating — `ls packages/` gives that.
- * Two things here cannot be seen by looking:
+ * A list of package names is not worth generating, since `ls packages/` gives
+ * that. Two things here cannot be seen by looking:
  *
  * The dependency direction. `@vitae/core` must not import from `@vitae/api`;
  * `@vitae/ui` must not import from `@vitae/web`. Those rules are architecture,
@@ -83,8 +83,8 @@ for (const row of rows) {
 /**
  * The edges the source actually walks, as opposed to the ones the manifests
  * declare. `@vitae/core` resolves to a bare specifier in an import statement,
- * so matching the package name against the specifier prefix is exact — these
- * are workspace packages, not paths.
+ * so matching the package name against the specifier prefix is exact, because
+ * these are workspace packages, not paths.
  */
 const graph = importGraph(list.map((p) => p.dir));
 const observed = new Map(rows.map((r) => [r.name, new Set()]));
@@ -112,13 +112,13 @@ for (const row of rows) {
  * API is: its `exports` field points at `./src/env.ts`, raw TypeScript, so the
  * compiler follows the import into the source and checks it as part of the
  * importing project. A package that ships built `.js` with `.d.ts` alongside
- * gets no such coverage — the compiler reads the declarations and never sees
- * the implementation.
+ * gets no such coverage, because the compiler reads the declarations and never
+ * sees the implementation.
  *
  * So the distinction is real and worth carrying: `direct` means the workspace
  * runs its own compiler, `transitive` means another workspace's run reaches its
  * source, and `none` means no workspace compiler sees it. `none` is a statement
- * about `pnpm -r typecheck` and nothing else — `@vitae/buildsvc` compiles under
+ * about `pnpm -r typecheck` and nothing else: `@vitae/buildsvc` compiles under
  * `tsc` inside its own container build, which CI does run, and a field derived
  * from package manifests cannot see that.
  */

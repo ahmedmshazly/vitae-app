@@ -4,7 +4,7 @@
  * Every node the corpus can contain is listed here, and nothing else can
  * arrive: `scripts/docs/lib/markdown.mjs` parses a closed dialect, so this
  * renderer covers it exhaustively and never needs `dangerouslySetInnerHTML`.
- * That is the security argument for owning the parser — there is no HTML in
+ * That is the security argument for owning the parser: there is no HTML in
  * the pipeline to sanitise, because no stage ever produces any.
  *
  * Two rules shape the markup. Anything that can overflow gets its own

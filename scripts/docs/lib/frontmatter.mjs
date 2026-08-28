@@ -1,8 +1,8 @@
 /**
  * The metadata block at the top of a documentation page.
  *
- * Every page in the corpus declares what it is — audience, domain, status, the
- * source files it describes, the requirements it satisfies — and several gates
+ * Every page in the corpus declares what it is (audience, domain, status, the
+ * source files it describes, the requirements it satisfies), and several gates
  * read that block: the coverage ratchet asks what a page covers, the status
  * badge asks what it claims, the link checker asks what it points at. They all
  * need the same reader, and a page that parses differently in two of them is
@@ -10,7 +10,7 @@
  *
  * This reads a deliberately small subset of YAML, closed rather than partial:
  * scalars, inline lists, block lists, and comments. It is not a YAML parser
- * and does not pretend to be one — anchors, nesting, multi-line strings and
+ * and does not pretend to be one: anchors, nesting, multi-line strings and
  * flow maps are rejected with the line number rather than silently
  * misinterpreted, because a metadata block that quietly means something other
  * than it appears to is worse than one that fails to load.
@@ -31,7 +31,7 @@ function scalar(raw) {
   return text;
 }
 
-/** `[a, b]` — one level, scalars only, which is all a metadata list ever is. */
+/** `[a, b]`: one level, scalars only, which is all a metadata list ever is. */
 function inlineList(text) {
   const inner = text.slice(1, -1).trim();
   if (inner === '') return [];
@@ -96,7 +96,7 @@ export function frontmatter(text, { file = '<input>' } = {}) {
   }
 
   // A key that took the block-list branch but got no items is an empty value,
-  // not an empty list — `verified_at:` with nothing after it means unknown.
+  // not an empty list: `verified_at:` with nothing after it means unknown.
   const rest = lines.slice(end + 1).join('\n');
   const body = rest.replace(/^\n+/, '');
   return {

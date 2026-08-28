@@ -16,7 +16,7 @@
  * `NODE_ENV` to production for a build, then writes `development` back if the
  * capture was false and the env file said so. A value in `.env` therefore
  * outranks the build command, and nothing inside `vite.config.ts` can
- * intervene — the capture that decides it already happened.
+ * intervene, because the capture that decides it already happened.
  *
  * The result was a local `pnpm build` that emitted the development JSX
  * runtime and the build machine's absolute source paths, ran about a megabyte
@@ -69,7 +69,7 @@ const largest = [...sizes].sort((a, b) => b.kb - a.kb)[0];
  * no production build. The absolute path is the same runtime's `_jsxFileName`
  * constants: every component's location on the machine that ran the build,
  * readable by anyone the bundle is served to. `check-public-release.mjs` bans
- * exactly that string, and cannot see these — its file list comes from
+ * exactly that string, and cannot see these, because its file list comes from
  * `git ls-files --others --exclude-standard`, and `dist/` is git-ignored.
  */
 function developmentSignals(names) {

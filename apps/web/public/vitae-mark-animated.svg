@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-  <!-- Quiet: static Weighted V — no looping glow or SMIL theatre. -->
+  <!-- Quiet: static Weighted V, no looping glow or SMIL theatre. -->
   <rect width="40" height="40" fill="#0F0F0F"/>
   <path d="M6.8 7.5 L20 31 L31.2 7.5 L29.4 7.5 L20 26.6 L12 7.5 Z" fill="#FAFAF8"/>
 </svg>

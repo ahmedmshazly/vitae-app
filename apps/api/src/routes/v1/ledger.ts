@@ -8,8 +8,8 @@ export const ledgerRouter: Router = Router();
  * What changed since the operator last looked (SRS FR-PROV-002). Every
  * mutation already writes a revision in the same transaction; this reads
  * that history back as a feed. Each entry names the operation, the subject,
- * and the fields its diff touched, and labels itself from its own snapshot —
- * a stored title cannot go stale the way a join against the live record can,
+ * and the fields its diff touched, and labels itself from its own snapshot.
+ * A stored title cannot go stale the way a join against the live record can,
  * and it still names records that have since been deleted.
  */
 ledgerRouter.get(

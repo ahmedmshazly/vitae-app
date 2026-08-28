@@ -11,7 +11,7 @@
  *
  * It deliberately does NOT build a `ts.Program`. A program resolves modules,
  * loads lib.d.ts and type-checks, which costs seconds per package and needs a
- * correct tsconfig for every workspace. Nothing here needs a type — only shape.
+ * correct tsconfig for every workspace. Nothing here needs a type, only shape.
  * `ts.createSourceFile` gives that in milliseconds and cannot be affected by a
  * build state, which is what makes the generators reproducible in CI.
  */
@@ -175,7 +175,7 @@ function rootIdentifier(node) {
  */
 export function methodCalls(sf, { objects = null, methods = null } = {}) {
   // Both filters accept a list or a predicate. They took different shapes for
-  // a while — `objects` a function, `methods` an array — which reads fine at
+  // a while (`objects` a function, `methods` an array), which reads fine at
   // the three call sites that were written together and throws at the fourth.
   const accepts = (filter) => {
     if (!filter) return () => true;
@@ -249,17 +249,17 @@ export { ts };
  * `import('./x.js')` call sites, which `importsOf` deliberately does not
  * return.
  *
- * A static import declaration and a dynamic import mean different things — one
+ * A static import declaration and a dynamic import mean different things. One
  * is a hard dependency resolved at load, the other is a chunk boundary the
- * bundler is asked to split on — and a caller measuring bundle shape needs to
+ * bundler is asked to split on, and a caller measuring bundle shape needs to
  * tell them apart. But a caller asking "what depends on this module" needs both,
  * and in this repository it needs the dynamic ones most: `App.tsx` reaches 46 of
  * its route modules only this way, so a reverse-dependency map built from
  * static imports alone reports most of the product's screens as orphaned.
  *
  * When the loader is the first argument of a call whose next argument is a
- * string — the `lazyNamed(() => import('./Dashboard.js'), 'Dashboard')` shape
- * this codebase uses to lazy-load a named export — that string is recorded as
+ * string (the `lazyNamed(() => import('./Dashboard.js'), 'Dashboard')` shape
+ * this codebase uses to lazy-load a named export), that string is recorded as
  * the imported name. Nothing is guessed beyond that shape; every other dynamic
  * import is reported as a module edge with no named symbol, because that is all
  * the source says.
@@ -294,17 +294,17 @@ export function dynamicImports(sf) {
 }
 
 /**
- * `export { x } from './y.js'` — the dependency edge a re-export creates.
+ * `export { x } from './y.js'`: the dependency edge a re-export creates.
  *
  * `importsOf` returns import declarations only, and for most questions that is
  * the right set. But a re-export is a load-bearing dependency in both
  * directions: the re-exporting module cannot resolve without the target, and
  * the target's symbols reach consumers only through it. This repository leans
- * on the form heavily — every package barrel is built from it, and three route
+ * on the form heavily: every package barrel is built from it, and three route
  * modules are nothing but `export { GraphView, default } from
- * '../features/graph/GraphView.js'` — so a graph built from import
- * declarations alone reports the file holding the actual screen as imported by
- * nobody while the two-line shim in front of it looks like the implementation.
+ * '../features/graph/GraphView.js'`. A graph built from import declarations
+ * alone reports the file holding the actual screen as imported by nobody while
+ * the two-line shim in front of it looks like the implementation.
  *
  * Rows match `importsOf`'s shape so a caller can concatenate the two lists.
  * `star` marks `export * from`, where the names are whatever the target

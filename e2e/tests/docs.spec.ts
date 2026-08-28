@@ -32,7 +32,7 @@ function watchForApiCalls(page: Page): string[] {
  *
  * The shared `signIn` helper waits for the Today dashboard, because most specs
  * are about the product. These are about the documentation, which needs a
- * session and nothing else — no seeded graph, no dashboard query, no workspace.
+ * session and nothing else: no seeded graph, no dashboard query, no workspace.
  * Waiting for Today would make every test in this file fail whenever something
  * unrelated to documentation broke, and would make the file unrunnable against
  * a stack whose database is merely out of date.
@@ -50,7 +50,7 @@ async function signInToRead(page: Page) {
 
 /**
  * Every test below reads the corpus, and the corpus is private. Signing in as
- * the owner is therefore setup rather than something under test — except in the
+ * the owner is therefore setup rather than something under test, except in the
  * one test that clears the session on purpose to prove the refusal.
  */
 test.beforeEach(async ({ page }) => {
@@ -283,7 +283,7 @@ test('an explainer runs the real algorithm in the page', async ({ page }) => {
 });
 
 /**
- * Wide content — tables, diagrams, code — scrolls inside its own container.
+ * Wide content (tables, diagrams, code) scrolls inside its own container.
  * The page body never scrolls sideways, at any width. This is the rule that
  * makes a documentation surface usable on a phone, and the one that a single
  * wide table quietly breaks.

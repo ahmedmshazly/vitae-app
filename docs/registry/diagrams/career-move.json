@@ -2,14 +2,14 @@
   "$schema": "../schema/diagram.schema.json",
   "id": "DGM-CAREER-MOVE",
   "title": "The full career move: capture, target, tailor, apply, follow up",
-  "summary": "Fourteen phases across six surfaces, from a fact captured months earlier to an outcome recorded — and the stretch near the end, where the application itself lives, that no browser test walks.",
+  "summary": "Fourteen phases across six surfaces, from a fact captured months earlier to an outcome recorded. Near the end, where the application itself lives, is the stretch that no browser test walks.",
   "kind": "lanes",
   "requirements": [
     "FR-CAP-001",
     "FR-RES-011",
     "FR-IMP-001"
   ],
-  "note": "This is the arc the product exists for, and it is also where the coverage register is most uneven. Everything up to and including the compiled document is exercised end to end, several phases by more than one spec. The stretch from the moment a job becomes an application you are tracking was the gap, and it is closing: `e2e/tests/application-status.spec.ts` now opens an application dossier and walks the status machine through it, including the move the guard refuses and the correction that is the way out. What is still unwalked is the rest of the dossier screen - the interview rounds, the linked target and résumé - and the list at `/career/applications`. Two specs reach `/career` — the shell's deep-link test checks the rail's current-page marker, and the résumé hub's narrow-viewport test clicks straight through to Résumé — but neither looks at what the screen is for, and the applications nav link is only ever checked for its href. The gap is a journey-register gap, not a total absence of testing: the list and dossier screens have seven unit cases between them and the read projection has two API integration cases. It is simply the case that nobody has written down the end-to-end path through applying that must never break, which is exactly what the five unnamed journeys J2, J3, J5, J6 and J7 leave room for. One boundary that used to sit inside this arc has gone: a cover letter is a document now, not just text. It compiles to the same PDF-plus-source pair as a résumé, through the same compiler, so both ends of an application - what you send and what you say - leave the product the same way.",
+  "note": "This is the arc the product exists for, and it is also where the coverage register is most uneven. Everything up to and including the compiled document is exercised end to end, several phases by more than one spec. The stretch from the moment a job becomes an application you are tracking was the gap, and it is closing: `e2e/tests/application-status.spec.ts` now opens an application dossier and walks the status machine through it, including the move the guard refuses and the correction that is the way out. What is still unwalked is the rest of the dossier screen - the interview rounds, the linked target and résumé - and the list at `/career/applications`. Two specs reach `/career` (the shell's deep-link test checks the rail's current-page marker, and the résumé hub's narrow-viewport test clicks straight through to Résumé), but neither looks at what the screen is for, and the applications nav link is only ever checked for its href. The gap is a journey-register gap, not a total absence of testing: the list and dossier screens have seven unit cases between them and the read projection has two API integration cases. It is simply the case that nobody has written down the end-to-end path through applying that must never break, which is exactly what the five unnamed journeys J2, J3, J5, J6 and J7 leave room for. One boundary that used to sit inside this arc has gone: a cover letter is a document now, not just text. It compiles to the same PDF-plus-source pair as a résumé, through the same compiler, so both ends of an application - what you send and what you say - leave the product the same way.",
   "sources": [
     "apps/web/src/App.tsx",
     "apps/web/src/routes/career/CareerOverview.tsx",
@@ -78,7 +78,7 @@
     {
       "id": "applications",
       "label": "Applications",
-      "note": "The Career workspace. The list and the dossier are the same component behind two addresses — `/career` and `/career/applications` both render it."
+      "note": "The Career workspace. The list and the dossier are the same component behind two addresses: `/career` and `/career/applications` both render it."
     },
     {
       "id": "followup",
@@ -164,7 +164,7 @@
       "covered_by": [
         "e2e/tests/target-lifecycle.spec.ts"
       ],
-      "note": "A target has a four-value status of its own — saved, active, applied, closed — which is a separate vocabulary from the eight-value application status and from a job posting's five. Nothing in the code keeps the three in step."
+      "note": "A target has a four-value status of its own (saved, active, applied, closed), which is a separate vocabulary from the eight-value application status and from a job posting's five. Nothing in the code keeps the three in step."
     },
     {
       "id": "compile",
@@ -196,7 +196,7 @@
       "covered_by": [
         "e2e/tests/letters.spec.ts"
       ],
-      "note": "Draft, final or sent — a three-value status of its own. Blocks may cite an evidence bullet or carry free text. No compile: letters produce no PDF, by an explicit deferral in the code rather than an oversight."
+      "note": "Draft, final or sent: a three-value status of its own. Blocks may cite an evidence bullet or carry free text. No compile: letters produce no PDF, by an explicit deferral in the code rather than an oversight."
     },
     {
       "id": "record_application",
@@ -212,7 +212,7 @@
       "label": "Work the dossier: interviews, referral, deadline, outcome",
       "route": "/career/applications/:id",
       "covered_by": [],
-      "note": "No browser coverage. The dossier is where the arc actually converges — the posting, the interview rounds in stage order with the next un-finished one surfaced, the person who referred you, the target and the résumé that was sent — and it is also where the terminal outcome is finally recorded. Two unit cases."
+      "note": "No browser coverage. The dossier is where the arc actually converges: the posting, the interview rounds in stage order with the next un-finished one surfaced, the person who referred you, the target and the résumé that was sent. It is also where the terminal outcome is finally recorded. Two unit cases."
     },
     {
       "id": "next_step",
@@ -222,7 +222,7 @@
       "covered_by": [
         "e2e/tests/today.spec.ts"
       ],
-      "note": "An application's `next_step_date` or `deadline`, whichever is sooner, becomes an overdue, today or upcoming flag — and stops counting once the application closes. Today's queue is covered for completing a reminder and undoing it from the toast; the applications side of that same signal is not."
+      "note": "An application's `next_step_date` or `deadline`, whichever is sooner, becomes an overdue, today or upcoming flag, and stops counting once the application closes. Today's queue is covered for completing a reminder and undoing it from the toast; the applications side of that same signal is not."
     },
     {
       "id": "warm_intro",

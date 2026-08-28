@@ -1,7 +1,7 @@
 ---
 id: PRD-BP-TODAY
 title: "Blueprint: Today and the planner"
-summary: Today stays the calm agenda and gains the one thing it cannot answer — what changed since you last looked. The planner keeps its job. The Ledger is added here.
+summary: Today stays the calm agenda and gains the one thing it cannot answer: what changed since you last looked. The planner keeps its job. The Ledger is added here.
 audience: [maintainer, designer, developer]
 domain: product
 type: reference

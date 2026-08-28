@@ -5,7 +5,7 @@
  * statuses are declared once: the enum, the pipeline partition and the
  * outcomes must agree, because a ninth status added to one of them and
  * forgotten in the others is exactly the drift this collapse exists to stop.
- * The second is the transition machine — which moves are recordings of
+ * The second is the transition machine: which moves are recordings of
  * something that happened, and which are mistakes.
  */
 import { describe, expect, it } from 'vitest';
@@ -28,7 +28,7 @@ describe('the application status vocabulary', () => {
   });
 
   it('partitions exactly into the open pipeline and the three outcomes', () => {
-    // Not "covers" — partitions. A status in both halves, or in neither,
+    // Not "covers". Partitions. A status in both halves, or in neither,
     // means one of the three lists was edited alone.
     expect([...APPLICATION_PIPELINE, ...APPLICATION_OUTCOMES].sort()).toEqual(
       [...APPLICATION_STATUSES].sort(),

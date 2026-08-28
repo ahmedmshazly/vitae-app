@@ -8,7 +8,7 @@
  *
  * The tokenizer is not written here. `@vitae/core`'s `algorithms/text.ts`
  * already normalises, tokenises and stems for the product's own search, and it
- * is already tested and already tuned to keep technical tokens intact — `c++`
+ * is already tested and already tuned to keep technical tokens intact: `c++`
  * and `node.js` survive it. Using it means a reader who searches the
  * documentation and a reader who searches their own graph get the same idea of
  * what a word is, and there is one stemmer in this repository rather than two
@@ -18,7 +18,7 @@
  * config loader; the scorer runs in the browser. A field weight or a stemming
  * rule that differed between them would silently rank against an index built
  * under different assumptions, which is the kind of defect that never produces
- * an error — only quietly wrong results.
+ * an error, only quietly wrong results.
  */
 import { STOPWORDS, stem, tokenize } from '@vitae/core';
 import type { DocsAudience, DocsPageSummary, DocsStatus, DocsType } from './docsModel.js';
@@ -107,7 +107,7 @@ function addTerms(into: Map<string, number>, text: string, weight: number): numb
  * Build the index. Deterministic: the same corpus produces byte-identical JSON.
  *
  * That matters because the artifact is regenerated in CI and compared. Sorting
- * the term list and the postings is what makes the comparison meaningful — a
+ * the term list and the postings is what makes the comparison meaningful. A
  * map's insertion order would otherwise turn a reordered page into a diff.
  */
 export function buildDocsIndex(inputs: readonly DocsIndexInput[]): DocsSearchIndex {

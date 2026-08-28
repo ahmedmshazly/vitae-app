@@ -41,7 +41,7 @@ test('correspondence has no automated a11y violations', async ({ page }) => {
   await expectNoA11yViolations(page);
 });
 
-test('J7: the correspondence truth — imbalance, a recorded broker, and the step into the person', async ({
+test('J7: the correspondence truth: imbalance, a recorded broker, and the step into the person', async ({
   page,
 }) => {
   await signIn(page);

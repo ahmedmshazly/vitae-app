@@ -34,7 +34,7 @@ export const docsRouter: Router = Router();
  * The gate in front of `/api` is not enough here, and the difference is the
  * whole reason this exists. Self-hosted, `authGate` already admits nobody but
  * `OWNER_EMAIL`, so this check is redundant. In Cloud mode it admits *any*
- * verified Google account — that is the point of Cloud mode — and without this
+ * verified Google account (that is the point of Cloud mode), and without this
  * check, turning Cloud on would hand the corpus to every person who signed up.
  * It would do it silently, on a flag flip, with no diff to review.
  *
@@ -68,7 +68,7 @@ docsRouter.use(ownerOnly);
  * Read from `process.env` on each request rather than from the validated env
  * object, which is the same choice `cloudEnabled()` makes and for the same
  * reason: the validated object is parsed once at import, so a deployment that
- * mounts the corpus after start — and every test that varies it — would be
+ * mounts the corpus after start, and every test that varies it, would be
  * reading a value frozen before the directory existed. The schema in
  * `packages/config` still declares and validates the variable; this only
  * decides when it is read.
@@ -91,8 +91,8 @@ function contentRoot(): string | null {
 /**
  * Resolve a request path to a real file inside `root`, or null.
  *
- * Null covers every refusal — traversal, absolute paths, a symlink pointing
- * out, a directory, a missing file — and the caller answers all of them with
+ * Null covers every refusal: traversal, absolute paths, a symlink pointing
+ * out, a directory, a missing file. The caller answers all of them with
  * the same 404. Distinguishing "outside the root" from "does not exist" would
  * tell a caller where the root is and what is next to it.
  */
@@ -143,7 +143,7 @@ function privately(res: Parameters<Parameters<Router['get']>[1]>[1]): void {
  *
  * The manifest is the test, not the directory. A bind mount whose host path
  * does not exist is created empty by the container runtime, so "the directory
- * exists" is true on a deployment that was never given a corpus at all — and
+ * exists" is true on a deployment that was never given a corpus at all, and
  * every file request would then 404 individually instead of saying, once, that
  * nothing was published. A reader would go looking for a broken link; the
  * problem is a missing deploy step.

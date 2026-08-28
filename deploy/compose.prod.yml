@@ -50,7 +50,7 @@ services:
       #
       # OWNER_EMAIL keeps two jobs under this flag: it claims the pre-Cloud
       # graph on first bootstrap, and it is still the only identity the
-      # documentation corpus is served to — see apps/api/src/routes/v1/docs.ts.
+      # documentation corpus is served to. See apps/api/src/routes/v1/docs.ts.
       #
       # Billing is a separate matter. Without the Paddle server credentials in
       # .env a new workspace trials and then goes read-only with no way to pay.
@@ -65,9 +65,9 @@ services:
       #
       # Mounted rather than baked in, for the same reason as the CA bundle
       # below: republishing the documentation is then a file copy instead of an
-      # image rebuild. Build it on a machine with the repository checked out —
-      # the compiler reads the tracked file set with git, which no build
-      # context has — and copy the result here:
+      # image rebuild. Build it on a machine with the repository checked out,
+      # because the compiler reads the tracked file set with git, which no build
+      # context has. Copy the result here:
       #   pnpm docs:build && rsync -a docs/.compiled/ <host>:deploy/docs-content/
       #
       # Read-only: nothing should ever write to it. If the directory is absent

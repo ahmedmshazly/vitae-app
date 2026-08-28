@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://vitae.invalid/registry/diagram.schema.json",
   "title": "Vitae documentation diagram",
-  "description": "One diagram, declared rather than drawn. Identifiers allow an underscore because a state, actor or node id is often the literal value the code uses — a subscription really is `past_due` — and an id that differs from the source it cites is an id a reader cannot match against the code. The reading surface renders four shapes from these files and produces a table equivalent from the same fields, so a diagram cannot say something its accessible form does not.",
+  "description": "One diagram, declared rather than drawn. Identifiers allow an underscore because a state, actor or node id is often the literal value the code uses (a subscription really is `past_due`), and an id that differs from the source it cites is an id a reader cannot match against the code. The reading surface renders four shapes from these files and produces a table equivalent from the same fields, so a diagram cannot say something its accessible form does not.",
   "type": "object",
   "required": ["id", "title", "summary", "kind", "sources"],
   "additionalProperties": false,

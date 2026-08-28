@@ -81,8 +81,8 @@ citing identifiers itself.
 ## V-002 - the API integration step borrowed a build service it does not own
 
 **Seen to fail.** `letters.integration.test.ts > compiles a letter to the same
-artifact pair shape a résumé compiles to` — `expected false to be true`, with
-nothing after the colon in `compile failed: `.
+artifact pair shape a résumé compiles to` reports `expected false to be true`,
+with nothing after the colon in `compile failed: `.
 
 That empty message is the whole diagnosis, once the pieces are read together.
 

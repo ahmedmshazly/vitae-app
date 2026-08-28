@@ -71,7 +71,7 @@ if [ "${1:-}" = "--check" ]; then
   # is missing is created empty, so "the directory is there" proves nothing.
   "${SSH[@]}" "cd ${APP_DIR} && if [ -f deploy/docs-content/manifest.json ]; then \
       echo \"published: \$(grep -c '\"route\"' deploy/docs-content/manifest.json) page entries\"; \
-    else echo 'NOT published — /api/v1/docs will answer 503'; fi"
+    else echo 'NOT published, so /api/v1/docs will answer 503'; fi"
   curl -fsS --max-time 10 "$HEALTH_URL" && echo
   exit 0
 fi

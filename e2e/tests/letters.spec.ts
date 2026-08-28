@@ -145,7 +145,7 @@ test.describe('letter compile', () => {
     expect(response.ok(), await response.text()).toBe(true);
     const body = (await response.json()) as { pdfBase64: string | null; offline: boolean };
     const prefix = Buffer.from(body.pdfBase64 ?? '', 'base64').subarray(0, 5).toString('utf8');
-    // Dual-path: a real PDF, or an honest offline — never a shape-only success.
+    // Dual-path: a real PDF, or an honest offline. Never a shape-only success.
     expect(body.offline || prefix === '%PDF-').toBe(true);
     expect(Boolean(body.pdfBase64) && body.offline).toBe(false);
     await expect(

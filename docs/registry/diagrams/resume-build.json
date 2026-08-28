@@ -4,7 +4,7 @@
   "title": "Producing a compiled résumé",
   "summary": "One POST /resumes/finalize: selection against the parsed job description, model assembly, a signed compile in the sealed build container, and the fit loop that recompiles until the document is one page.",
   "kind": "sequence",
-  "note": "Drawn for POST /api/v1/resumes/finalize, the only path that runs the whole chain; /resumes/model stops after assembly and /resumes/compile stops after the first compile. Nothing in this path calls a language model — the same graph, job description and template produce the same PDF byte for byte, because SOURCE_DATE_EPOCH is fixed from the target's created_at. Artifacts are skipped entirely when NODE_ENV is 'test' (resumes.ts:402), so a test run finalizes without touching object storage.",
+  "note": "Drawn for POST /api/v1/resumes/finalize, the only path that runs the whole chain; /resumes/model stops after assembly and /resumes/compile stops after the first compile. Nothing in this path calls a language model: the same graph, job description and template produce the same PDF byte for byte, because SOURCE_DATE_EPOCH is fixed from the target's created_at. Artifacts are skipped entirely when NODE_ENV is 'test' (resumes.ts:402), so a test run finalizes without touching object storage.",
   "requirements": [
     "FR-RES-008",
     "FR-RES-009",
@@ -118,7 +118,7 @@
       "to": "resume-service",
       "label": "buildFullModel: group by owner, fold in skills, education, awards, contacts",
       "kind": "call",
-      "note": "The model is scoped to the person node marked is_self. With no such anchor it produces an EMPTY model (resume-model.ts:477) rather than rendering the whole graph under a placeholder name — the graph holds other people's roles and degrees.",
+      "note": "The model is scoped to the person node marked is_self. With no such anchor it produces an EMPTY model (resume-model.ts:477) rather than rendering the whole graph under a placeholder name. The graph holds other people's roles and degrees.",
       "source": "apps/api/src/services/resume-model.ts:463"
     },
     {
@@ -140,7 +140,7 @@
     {
       "from": "build-service",
       "to": "resume-service",
-      "label": "401 BAD_SIGNATURE — missing header, >5min skew, or digest mismatch",
+      "label": "401 BAD_SIGNATURE: missing header, >5min skew, or digest mismatch",
       "kind": "refusal",
       "source": "services/buildsvc/src/server.ts:176"
     },
@@ -155,7 +155,7 @@
     {
       "from": "build-service",
       "to": "resume-service",
-      "label": "{ pdf (base64), pages, text } — or 400 COMPILE_ERROR with a guessed section and log tail",
+      "label": "{ pdf (base64), pages, text }, or 400 COMPILE_ERROR with a guessed section and log tail",
       "kind": "return",
       "note": "A compile failure is a structured error, not a 500. If the service is unreachable at all, the client returns { offline: true } and the caller falls back to a .tex download (FR-RES-013).",
       "source": "services/buildsvc/src/server.ts:222"
@@ -165,7 +165,7 @@
       "to": "resume-service",
       "label": "coverage: measure the parsed keywords against the extracted PDF text",
       "kind": "aside",
-      "note": "Measured from the output, not the model that produced it — that is what catches a keyword the selection intended to include but the template hyphenated or pushed off the page. The gate passes at 0.95 weighted.",
+      "note": "Measured from the output, not the model that produced it. That is what catches a keyword the selection intended to include but the template hyphenated or pushed off the page. The gate passes at 0.95 weighted.",
       "source": "apps/api/src/services/resume.ts:431"
     },
     {

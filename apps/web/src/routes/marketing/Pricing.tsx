@@ -101,7 +101,7 @@ export function Pricing() {
             <h2 id="pricing-fit-heading">Built for the person carrying the career story.</h2>
             <p>
               Vitae Cloud Individual is for an experienced professional who wants a dependable record
-              before a career move—not a recruiter seat, a sales CRM, a shared company workspace, or a social network.
+              before a career move, not a recruiter seat, a sales CRM, a shared company workspace, or a social network.
             </p>
           </div>
           <ul aria-label="Plan boundaries">

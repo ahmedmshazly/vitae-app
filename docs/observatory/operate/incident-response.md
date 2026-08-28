@@ -1,7 +1,7 @@
 ---
 id: OPS-INCIDENT
 title: Responding to an incident
-summary: The signals a Vitae instance actually emits, the ones it does not, and which procedure to reach for per symptom — assembled from evidence, not from a record.
+summary: The signals a Vitae instance actually emits, the ones it does not, and which procedure to reach for per symptom; assembled from evidence, not from a record.
 audience: [operator, security]
 domain: operate
 type: task

@@ -4,7 +4,7 @@
  * The last test is the one that earns its place: it opens the real generated
  * artifacts and checks that every column and facet names a field they actually
  * contain. A spec is written once and then never looked at again, so the way it
- * fails is silent — a generator renames a field, the column keeps rendering, and
+ * fails is silent: a generator renames a field, the column keeps rendering, and
  * every cell in it quietly reads as an em dash. This catches that at the moment
  * the generator changes rather than the day someone notices.
  */

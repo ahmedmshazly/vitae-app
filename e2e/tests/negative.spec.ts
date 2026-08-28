@@ -31,7 +31,7 @@ test('API rejects a malformed Bearer token with 401', async ({ request }) => {
 test('an invalid filter clause surfaces as a warning chip, not a crash', async ({ page }) => {
   await signIn(page);
   await page.goto('/search?q=is:wombat');
-  // Chip text is `${raw}: ${reason}` — reason lists the allowed is: enums.
+  // Chip text is `${raw}: ${reason}`, and reason lists the allowed is: enums.
   await expect(page.getByText(/is:wombat:.*archived/i)).toBeVisible({ timeout: 10_000 });
   await expect(page.getByRole('heading', { name: 'Search' })).toBeVisible();
 });

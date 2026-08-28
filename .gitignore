@@ -85,7 +85,7 @@ docs/generated/atlas.json
 # DOCS_CONTENT_DIR, never from the web bundle.
 docs/.compiled/
 # Kept as a safety net. The corpus must never be written under apps/web/public/
-# again — anything there is copied into the bundle and served to anyone.
+# again: anything there is copied into the bundle and served to anyone.
 apps/web/public/docs-content/
 
 # The corpus as published to a deployment host, copied there by

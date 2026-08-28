@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Build the engineering atlas: every first-party source file, every symbol it
- * exports, and — the part that cannot be read off any single file — who
+ * exports, and (the part that cannot be read off any single file) who
  * depends on each of them.
  *
  * This is the artifact that makes "document every small part" survivable. Prose
@@ -19,7 +19,7 @@
  *   what does this file reach for, and does that cross a boundary it should not
  *
  * Two artifacts come out. `atlas.json` carries every symbol and is generated at
- * build time, never committed — a per-symbol index churns on every rename and
+ * build time, never committed: a per-symbol index churns on every rename and
  * would bury real changes in a diff nobody reads. `atlas-summary.json` carries
  * the counts, the per-package rollup and the public surface, which are the
  * things whose movement is worth reviewing.
@@ -35,7 +35,7 @@ const list = packages();
 /**
  * What a file is, from where it sits and what it holds.
  *
- * Path alone is not enough — `apps/api/src/services/export.ts` is a service by
+ * Path alone is not enough: `apps/api/src/services/export.ts` is a service by
  * its directory, but `packages/core/src/algorithms/text.ts` is an algorithm by
  * its directory and a schema module by its content. Directory first, since this
  * repository organises by role, and content only to break ties.
@@ -81,7 +81,7 @@ function resolveSpecifier(specifier, fromFile, barrels) {
   if (!pkg) return null;
 
   // A subpath import resolves through the manifest's `exports` map, not by
-  // guessing a path. `@vitae/config` has no barrel at all — it publishes one
+  // guessing a path. `@vitae/config` has no barrel at all. It publishes one
   // subpath, `./env`, pointing straight at the TypeScript source, and a
   // resolver that only understood barrels would report the module every server
   // process boots through as imported by nothing.
@@ -105,7 +105,7 @@ function resolveSpecifier(specifier, fromFile, barrels) {
  * re-exports.
  *
  * Without this the atlas is close to useless for `@vitae/core` and
- * `@vitae/ui`, because nothing outside those packages imports a module — every
+ * `@vitae/ui`, because nothing outside those packages imports a module: every
  * consumer imports the package, and a reverse-dependency map would show 46
  * files with no consumers behind one index with fifty.
  */
@@ -154,11 +154,11 @@ function barrelOf(pkg) {
         for (const el of st.exportClause.elements) symbols.set(el.name.text, target);
         continue;
       }
-      // `export * from './x.js'` — every name that module exports, following
-      // through if that module is itself a barrel. `@vitae/core` re-exports
-      // `./algorithms/index.js`, which re-exports twenty modules; stopping at
-      // the first hop attributes every algorithm to the index and reports all
-      // twenty as imported by nothing.
+      // `export * from './x.js'` covers every name that module exports,
+      // following through if that module is itself a barrel. `@vitae/core`
+      // re-exports `./algorithms/index.js`, which re-exports twenty modules;
+      // stopping at the first hop attributes every algorithm to the index and
+      // reports all twenty as imported by nothing.
       for (const [name, owner] of resolveStar(target, new Set())) symbols.set(name, owner);
     }
     return { file: rel, symbols };
@@ -230,7 +230,7 @@ for (const pkg of list) {
 
 /**
  * The dependency edges, resolved. Each import is attributed twice: to the file
- * it names, and — when the name reaches through a barrel — to the module that
+ * it names, and (when the name reaches through a barrel) to the module that
  * actually defines the symbol, which is the edge a person cares about.
  */
 for (const [rel, row] of files) {
@@ -309,7 +309,7 @@ const RUN_NOT_IMPORTED = new Set(['entry', 'script', 'migration', 'test-support'
  * declared: package manifest scripts and container start commands.
  *
  * `services/buildsvc/src/server.ts` is the whole reason the LaTeX service
- * exists and nothing in the repository imports it — `package.json` says `node
+ * exists and nothing in the repository imports it: `package.json` says `node
  * dist/server.js` and the Dockerfile repeats it as `CMD`. Guessing from the
  * filename would work here and fail on the next one, so the manifest is read
  * instead. Compiled paths are mapped back to source, because a script names
@@ -347,7 +347,7 @@ const isToolConfig = (rel) => /(^|\/)(vitest|vite|playwright|tailwind|eslint)\.[
  *
  * A module imported only by its own test is not the same finding as a module
  * imported by nothing at all. The first is production code that is proven to
- * work and called by no one — a deletion candidate, or a screen wired up
+ * work and called by no one, a deletion candidate or a screen wired up
  * somewhere the graph cannot see. The second may simply be run rather than
  * imported. Collapsing them into one list makes both unactionable, so they are
  * reported apart.

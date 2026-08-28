@@ -4,7 +4,7 @@
   "title": "How a session is obtained and how the API decides who is calling",
   "summary": "Google sign-in and the loopback-only developer shortcut, then the three token paths the gate tries and the authorisation rule that differs by mode.",
   "kind": "sequence",
-  "note": "Two things here are gated closed in a default build. The developer shortcut is off unless AUTH_ENABLE_DEV_LOGIN is set — .env.example:56 sets it true for local work — and packages/config/src/env.ts:117 refuses to start a NODE_ENV=production process with it set at all; even when on it answers only loopback callers. Cloud enrolment is off unless VITAE_CLOUD_ENABLED is set, which .env.example:40 leaves false, so in a default build /auth/bootstrap returns 409 SELF_HOSTED_MODE and the OWNER_EMAIL comparison is the whole authorisation rule. GET /auth/me is the one route in this flow reachable without a session; it is special-cased above the public-path check rather than by it.",
+  "note": "Two things here are gated closed in a default build. The developer shortcut is off unless AUTH_ENABLE_DEV_LOGIN is set (.env.example:56 sets it true for local work), and packages/config/src/env.ts:117 refuses to start a NODE_ENV=production process with it set at all; even when on it answers only loopback callers. Cloud enrolment is off unless VITAE_CLOUD_ENABLED is set, which .env.example:40 leaves false, so in a default build /auth/bootstrap returns 409 SELF_HOSTED_MODE and the OWNER_EMAIL comparison is the whole authorisation rule. GET /auth/me is the one route in this flow reachable without a session; it is special-cased above the public-path check rather than by it.",
   "requirements": [
     "FR-015",
     "FR-SET-001",
@@ -110,7 +110,7 @@
       "to": "browser",
       "label": "Set-Cookie vitae_session (httpOnly, sameSite lax, 24h)",
       "kind": "return",
-      "note": "The token is the session and is not echoed in the body — that would put an owner credential in JS reach and in every proxy log. The one exception is an emulator run, where the test client has no cookie jar.",
+      "note": "The token is the session and is not echoed in the body: echoing it would put an owner credential in JS reach and in every proxy log. The one exception is an emulator run, where the test client has no cookie jar.",
       "source": "apps/api/src/routes/v1/auth.ts:39"
     },
     {
@@ -124,7 +124,7 @@
     {
       "from": "auth-gate",
       "to": "browser",
-      "label": "401 UNAUTHENTICATED — no token at all",
+      "label": "401 UNAUTHENTICATED: no token at all",
       "kind": "refusal",
       "source": "apps/api/src/middleware/auth.ts:142"
     },
@@ -155,7 +155,7 @@
     {
       "from": "auth-gate",
       "to": "browser",
-      "label": "401 UNAUTHORIZED — neutral, identical for every rejection reason",
+      "label": "401 UNAUTHORIZED: neutral, identical for every rejection reason",
       "kind": "refusal",
       "note": "Self-host: the verified email must equal OWNER_EMAIL. Cloud: any verified google or dev identity with a uid passes here, and membership decides the rest. The message never reveals the allow-list.",
       "source": "apps/api/src/middleware/auth.ts:151"

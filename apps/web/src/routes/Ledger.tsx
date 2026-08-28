@@ -87,14 +87,14 @@ export function Ledger() {
     <div className="page">
       <PageHeader
         title="Ledger"
-        subtitle="Every change to the record, newest first — the history every write already keeps."
+        subtitle="Every change to the record, newest first: the history every write already keeps."
         help={
           <InfoPopover title="Where this comes from">
             <p>
               Every mutation writes a revision in the same transaction as the change itself:
               the operation, a snapshot, the exact fields that moved, and the source it came
-              from. The Ledger reads that history back. Nothing here is derived or inferred —
-              a row exists because a write happened.
+              from. The Ledger reads that history back. Nothing here is derived or inferred.
+              A row exists because a write happened.
             </p>
           </InfoPopover>
         }
@@ -115,7 +115,7 @@ export function Ledger() {
           <EmptyState
             glyph="journal"
             title="No changes yet"
-            hint="Capture something and its revision appears here — every write keeps its history."
+            hint="Capture something and its revision appears here. Every write keeps its history."
           />
         ) : (
           <>

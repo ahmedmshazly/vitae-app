@@ -1,7 +1,7 @@
 ---
 id: PRD-JOURNEYS
 title: The journeys that must work
-summary: All eight journey identifiers now carry statements — three verified end to end, three whose shipped steps await a spec that names them, and two authored for planned capabilities.
+summary: All eight journey identifiers now carry statements: three verified end to end, three whose shipped steps await a spec that names them, and two authored for planned capabilities.
 audience: [maintainer, developer]
 domain: product
 type: reference

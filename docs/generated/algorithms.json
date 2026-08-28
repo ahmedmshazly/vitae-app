@@ -503,7 +503,7 @@
       "id": "correspondence",
       "module": "packages/core/src/algorithms/correspondence.ts",
       "title": "Correspondence rollup (SRS FR-COMM-002): dormant-but-once-strong ties ranked for reactivation, and the brokers introductions have flowed through.",
-      "description": "Correspondence rollup (SRS FR-COMM-002): dormant-but-once-strong ties ranked for reactivation, and the brokers introductions have flowed through. The reactivation ranking is deliberately zero new mathematics: a tie's history is re-read with the same Hawkes kernel that scores it today — `computeTieStrength` evaluated at each interaction instant — so the peak and the present come from one model and two screens can never disagree about what \"strong\" means. The organizational research this surfaces is blunt: reconnected dormant ties outperform active ones, and people left to choose reconnect with whoever feels comfortable instead of whoever would help. A computed, explained ranking is the corrective (NFR-PRIV-003).",
+      "description": "Correspondence rollup (SRS FR-COMM-002): dormant-but-once-strong ties ranked for reactivation, and the brokers introductions have flowed through. The reactivation ranking is deliberately zero new mathematics: a tie's history is re-read with the same Hawkes kernel that scores it today (`computeTieStrength` evaluated at each interaction instant), so the peak and the present come from one model and two screens can never disagree about what \"strong\" means. The organizational research this surfaces is blunt: reconnected dormant ties outperform active ones, and people left to choose reconnect with whoever feels comfortable instead of whoever would help. A computed, explained ranking is the corrective (NFR-PRIV-003).",
       "pure": true,
       "kind": "algorithm",
       "exports": [
@@ -574,7 +574,7 @@
           "name": "correspondenceProfile",
           "kind": "function",
           "line": 222,
-          "doc": "The per-person correspondence profile (SRS FR-COMM-001): reciprocity, per-direction reply latency, unanswered inbound, and the contact-day distribution — every figure carrying the interaction ids that produced it (NFR-PRIV-003).",
+          "doc": "The per-person correspondence profile (SRS FR-COMM-001): reciprocity, per-direction reply latency, unanswered inbound, and the contact-day distribution, every figure carrying the interaction ids that produced it (NFR-PRIV-003).",
           "source": "packages/core/src/algorithms/correspondence.ts:222"
         },
         {
@@ -1226,7 +1226,7 @@
           "name": "findIntroPaths",
           "kind": "function",
           "line": 67,
-          "doc": "Find up to `maxPaths` simple paths self → … → targetOrg, ranked by the product of hop strengths.",
+          "doc": "Find up to `maxPaths` simple paths self → ...",
           "source": "packages/core/src/algorithms/graph-paths.ts:67"
         }
       ],
@@ -1601,7 +1601,7 @@
       "id": "pagerank",
       "module": "packages/core/src/algorithms/pagerank.ts",
       "title": "Personalized PageRank over the typed life graph (SRS §10.7.3).",
-      "description": "Personalized PageRank over the typed life graph (SRS §10.7.3). PPR is the principled generalization of ad-hoc \"shared org / 2-hop\" heuristics for social/organizational proximity [Kloumann 2016]. We run power iteration from a seed distribution (the self node, optionally averaged with a target-org node) over a graph whose edges carry per-type transition weights (KNOWS·closeness > WORKED_ON > ATTENDED …). Computed nightly and cached on person nodes; at A5 scale (≤50k nodes) this is well under a second.",
+      "description": "Personalized PageRank over the typed life graph (SRS §10.7.3). PPR is the principled generalization of ad-hoc \"shared org / 2-hop\" heuristics for social/organizational proximity [Kloumann 2016]. We run power iteration from a seed distribution (the self node, optionally averaged with a target-org node) over a graph whose edges carry per-type transition weights (KNOWS·closeness > WORKED_ON > ATTENDED ...). Computed nightly and cached on person nodes; at A5 scale (≤50k nodes) this is well under a second.",
       "pure": true,
       "kind": "algorithm",
       "exports": [
@@ -2562,7 +2562,7 @@
         {
           "path": "replyPairMaxGapDays",
           "value": "60",
-          "doc": "A direction change further apart than this is a new thread, not a reply — without the cap, answering an eight-month-old message would record an eight-month \"reply latency\", which is dormancy wearing the wrong label.",
+          "doc": "A direction change further apart than this is a new thread, not a reply.",
           "line": 54
         },
         {

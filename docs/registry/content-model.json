@@ -1,6 +1,6 @@
 {
   "$schema": "./schema/content-model.schema.json",
-  "note": "The shape of a documentation page: the vocabularies its metadata may use, the sections its body must carry, and the sections of the corpus it may live in. `scripts/check-docs-pages.mjs` enforces this and the reading surface renders from it, so a status badge and the gate that judges it cannot disagree. Every vocabulary here carries a `label` a surface may print and a `note` saying what the term means; keeping the three the same shape is what stops a definition being rendered where a name belongs. A page names the domain of the directory it sits in; the few pages at the corpus root — its entrance and its glossary — are documentation about the documentation, and name `meta`.",
+  "note": "The shape of a documentation page: the vocabularies its metadata may use, the sections its body must carry, and the sections of the corpus it may live in. `scripts/check-docs-pages.mjs` enforces this and the reading surface renders from it, so a status badge and the gate that judges it cannot disagree. Every vocabulary here carries a `label` a surface may print and a `note` saying what the term means; keeping the three the same shape is what stops a definition being rendered where a name belongs. A page names the domain of the directory it sits in; the few pages at the corpus root (its entrance and its glossary) are documentation about the documentation, and name `meta`.",
   "corpus": "docs/observatory",
   "audiences": {
     "user": {
@@ -155,5 +155,5 @@
     "explanation": ["In short", "How it works", "Mechanics", "Related"]
   },
   "app_routes": [],
-  "app_routes_note": "Paths under /docs that the application serves but no page produces — search, the glossary index, reference catalogs. Every entry must appear in docs/generated/routes.json, so this list cannot promise a destination the router does not mount."
+  "app_routes_note": "Paths under /docs that the application serves but no page produces: search, the glossary index, reference catalogs. Every entry must appear in docs/generated/routes.json, so this list cannot promise a destination the router does not mount."
 }

@@ -49,7 +49,7 @@ export function todayIso(now: Date = new Date()): string {
 
 /**
  * The request's calendar "now" as a local-midnight Date, for callers that
- * take a `Date` and read only its calendar fields — the capture grammar's
+ * take a `Date` and read only its calendar fields: the capture grammar's
  * `^today` / `^fri` tokens above all (FR-025). Handing such a caller a bare
  * `new Date()` resolves relative dates on the host's calendar, which is one
  * day off from the user's for a few hours every night.

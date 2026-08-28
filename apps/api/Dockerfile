@@ -39,7 +39,7 @@ ENV TEMPLATES_DIR=/app/templates
 # --ignore-unfixed does not suppress it because upstream HAS fixed it: the
 # first npm carrying a patched tar (10.9.9) was published one day after the
 # last Node 22 release, so no node:22 digest exists to move to. Nothing in
-# this image runs npm — CMD is tsx, HEALTHCHECK is node — so the CLI comes out
+# this image runs npm (CMD is tsx, HEALTHCHECK is node), so the CLI comes out
 # rather than being chased version to version. The `deps` stage keeps its own
 # npm and corepack and is discarded.
 RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx \

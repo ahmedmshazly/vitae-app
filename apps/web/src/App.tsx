@@ -111,8 +111,8 @@ function PublicPage({ children, metadataPath }: { children: ReactNode; metadataP
 /**
  * The public root recognises a returning session. The hint is synchronous, so
  * this route still never waits on Firebase or the API: a visitor whose last
- * known session was usable goes straight to Today — the auth gate remains the
- * authority, and a stale hint costs one honest hop back to this door — while
+ * known session was usable goes straight to Today (the auth gate remains the
+ * authority, and a stale hint costs one honest hop back to this door), while
  * everyone else gets the landing page in the same paint they always did.
  */
 function RootDoor() {
@@ -268,15 +268,15 @@ export function App() {
         }
       />
       {/*
-        The documentation *corpus* is private — it is served by the API behind
-        the owner allow-list — but this route is still declared above the
+        The documentation *corpus* is private: it is served by the API behind
+        the owner allow-list. This route is still declared above the
         wildcard below, and deliberately.
 
         `AuthGate` claims every path it reaches and bounces a signed-out visitor
         to the public home page with no explanation. A reader who bookmarked a
         documentation page and later signed out would simply find themselves
         somewhere else. Rendering the shell instead lets the surface say what
-        actually happened — the corpus is private, sign in as the owner — which
+        actually happened (the corpus is private, sign in as the owner), which
         is the more useful answer and gives nothing away: every byte of the
         corpus arrives from an authenticated request, so an anonymous visitor
         reaches an empty frame and a sentence.
@@ -350,7 +350,7 @@ function AuthedApp() {
               <Routes>
                 {/* No `/` here, and there must never be one. AuthGate is
                     mounted at `path="*"`, which ranks below the exact `/`
-                    above it, so the root never reaches this tree — a redirect
+                    above it, so the root never reaches this tree. A redirect
                     here once cost a defect apiece in Shell.tsx and
                     shell.spec.ts before anyone noticed it could not run. The
                     product question it left open is now answered where the

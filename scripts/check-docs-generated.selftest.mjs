@@ -75,8 +75,8 @@ check('one stale artifact fails and is named', { alpha: true, beta: false }, {
   reject: ['gen-alpha.mjs'],
 });
 
-// A gate that stops at the first failure makes a contributor regenerate,
-// re-run, and discover the next one — one build at a time.
+// A gate that stops at the first failure makes a contributor regenerate and
+// re-run for every stale artifact, discovering them one build at a time.
 check('every stale artifact is reported, not just the first', { alpha: false, beta: true, gamma: false }, {
   exit: 1,
   expect: ['2 of 3', 'gen-alpha.mjs', 'gen-gamma.mjs'],

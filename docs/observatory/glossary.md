@@ -1,7 +1,7 @@
 ---
 id: GLOSSARY
 title: Glossary
-summary: What this repository's words mean here — the graph vocabulary, the résumé engine, the code, the hosted plane, and the terms this documentation uses about itself.
+summary: What this repository's words mean here: the graph vocabulary, the résumé engine, the code, the hosted plane, and the terms this documentation uses about itself.
 audience: [user, designer, developer, maintainer, operator, security]
 domain: meta
 type: reference

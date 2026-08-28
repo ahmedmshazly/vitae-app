@@ -217,7 +217,7 @@ export function Landing() {
                 When the right role arrives, your career should already be in order.
               </h1>
               <p className="mk-hero__sub">
-                Vitae connects the people, work, and evidence behind your next move—so a warm
+                Vitae connects the people, work, and evidence behind your next move, so a warm
                 introduction, credible résumé, or important conversation starts with a record you
                 can inspect.
               </p>

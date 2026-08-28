@@ -4,10 +4,10 @@
  * the migration that created it, and the code that queries it.
  *
  * Two sources, because they answer different questions and neither answers
- * both. `apps/api/src/db/schema.ts` is Kysely's typed view — authoritative for
+ * both. `apps/api/src/db/schema.ts` is Kysely's typed view, authoritative for
  * what the running application believes exists right now, and the only place
  * the columns carry documentation. The migrations under db/migrations are the
- * history — the only place indexes, constraints and extensions appear at all,
+ * history, the only place indexes, constraints and extensions appear at all,
  * since Kysely's model has no concept of an index.
  *
  * Reading only the schema would produce a catalog with no indexes, which for a
@@ -147,7 +147,7 @@ function sqlTemplates(sf) {
  *
  * Two of the thirty-two tables are created inside `for (const child of
  * ['import_rows', 'import_raw_chunks'])`, so their names never appear next to
- * the words CREATE TABLE — the DDL says `CREATE TABLE ${sql.raw(child)}` and
+ * the words CREATE TABLE: the DDL says `CREATE TABLE ${sql.raw(child)}` and
  * the names are in the array above it. Without this they are real tables in a
  * shipped migration that the catalog reports as belonging to no migration at
  * all, which is the one thing a migration catalog exists to answer.
@@ -271,15 +271,15 @@ const AREAS = ['apps/api/src', 'packages/testkit/src', 'services/buildsvc/src'];
  *
  * Almost nothing here names a table in a Kysely call. Twenty-four of the
  * thirty-two tables hold identically shaped documents reached through one
- * generic repository — `repository.docGet('atoms', id)` — and the export bundle
+ * generic repository (`repository.docGet('atoms', id)`), and the export bundle
  * names its collections in a declarative manifest. A scan for `selectFrom`
  * finds the eight relational tables and reports the rest of the graph, the
  * career graph included, as never queried.
  *
- * The alternative — treat any string that equals a table name as a reference —
- * is worse than the gap it fixes. `meta`, `tags` and `templates` are ordinary
- * words that appear all over an application, and a catalog that cannot tell a
- * table from a noun is not evidence of anything.
+ * The alternative, treating any string that equals a table name as a
+ * reference, is worse than the gap it fixes. `meta`, `tags` and `templates`
+ * are ordinary words that appear all over an application, and a catalog that
+ * cannot tell a table from a noun is not evidence of anything.
  *
  * So the annotation is the rule. `TableName` is a real type in this repository
  * and every position that holds a table name is declared with it, in exactly
@@ -381,7 +381,7 @@ const list = [...tables.values()].sort((a, b) => a.name.localeCompare(b.name));
 const allIndexes = list.flatMap((t) => t.indexes);
 
 // Tables the migrations create that Kysely does not model are reachable only
-// through raw SQL — a real fact about the system, not a defect in this reader.
+// through raw SQL, a real fact about the system, not a defect in this reader.
 const modelled = new Set(list.map((t) => t.name));
 const unmodelled = [...new Set(migrations.flatMap((m) => m.creates))].filter((t) => !modelled.has(t) && !t.startsWith('${')).sort();
 

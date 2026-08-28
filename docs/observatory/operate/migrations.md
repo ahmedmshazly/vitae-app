@@ -120,8 +120,8 @@ that.
 > `--down` is destructive. "Reversible" here means the schema change can be
 > undone, not that your data survives it. Two of the ten migrations drop tables
 > with `CASCADE` on the way down: the initial schema migration drops every
-> graph table — nodes, edges, revisions, atoms, résumés, attachments and the
-> rest — and the Cloud control-plane migration drops the users, workspaces,
+> graph table (nodes, edges, revisions, atoms, résumés, attachments and the
+> rest), and the Cloud control-plane migration drops the users, workspaces,
 > subscription and billing-event tables and removes the workspace column from
 > twenty-four document tables. Rolling all the way back empties the database.
 > Take a snapshot first.

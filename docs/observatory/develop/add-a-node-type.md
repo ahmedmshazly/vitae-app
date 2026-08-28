@@ -1,7 +1,7 @@
 ---
 id: DEV-NODETYPE
 title: Adding a node or edge type
-summary: The typed graph is one string union with several registries hanging off it — which of them the compiler enforces, which a named test enforces, and which nothing enforces.
+summary: The typed graph is one string union with several registries hanging off it: which of them the compiler enforces, which a named test enforces, and which nothing enforces.
 audience: [developer]
 domain: develop
 type: task
@@ -41,8 +41,8 @@ registries are keyed by the union, and the difference between them is how loudly
 each one complains when you forget it.
 
 > [!NOTE]
-> `docs/ONBOARDING.md` gives a four-step recipe for this — the union, the props
-> schema, a glyph, and optionally the Browse navigation — and closes with "that's
+> `docs/ONBOARDING.md` gives a four-step recipe for this (the union, the props
+> schema, a glyph, and optionally the Browse navigation) and closes with "that's
 > it". It is incomplete. It omits the form descriptor, which the compiler
 > requires; the "+ New" menu groups, which three named tests require; and the
 > entity catalog template, without which the reference explorer throws at module

@@ -2,10 +2,10 @@
   "$schema": "../schema/diagram.schema.json",
   "id": "DGM-IMPORT-LIFECYCLE",
   "title": "An import batch, from upload to committed or discarded",
-  "summary": "Everything stages, nothing commits without review, everything rolls back by batch — and the raw upload is deleted at every exit, not only the successful one.",
+  "summary": "Everything stages, nothing commits without review, everything rolls back by batch. The raw upload is deleted at every exit, not only the successful one.",
   "kind": "state",
   "requirements": ["FR-006", "FR-010", "FR-020"],
-  "note": "Two things this machine says that the stored `status` string does not. First, a commit with any failed row leaves the batch's persisted status as `staged` while stamping `committed_at` and marking the rows that succeeded — the batch is genuinely in a fifth condition, shown here as `partially committed`, and the code's own comment calls it partially staged so the owner can fix and re-commit (FR-020). Second, the raw upload is purged at every terminal exit, not only the clean one: committing, discarding and rolling back all call `purgeRawImport` (apps/api/src/services/imports.ts:541), because an address book, a calendar or a résumé is the most sensitive artifact in the system and re-importing is a re-upload, not a re-parse. Two boundaries worth stating: `rollbackImport` checks no status at all, so it will run against a discarded or already-rolled-back batch and simply remove nothing; and a batch that reaches `discarded` is never swept by retention, which only collects abandoned `staged` batches, so the row persists indefinitely with its raw content already gone. Direct GitHub synchronisation is deliberately not in this machine: it writes repository and skill nodes straight into the graph with `source_ref: 'github_sync'` and creates no batch document, so it never appears in batch history and cannot be rolled back through these endpoints — which makes the `'github'` member of the batch kind union (apps/api/src/services/imports.ts:89) a value nothing ever produces.",
+  "note": "Two things this machine says that the stored `status` string does not. First, a commit with any failed row leaves the batch's persisted status as `staged` while stamping `committed_at` and marking the rows that succeeded. The batch is genuinely in a fifth condition, shown here as `partially committed`, and the code's own comment calls it partially staged so the owner can fix and re-commit (FR-020). Second, the raw upload is purged at every terminal exit, not only the clean one: committing, discarding and rolling back all call `purgeRawImport` (apps/api/src/services/imports.ts:541), because an address book, a calendar or a résumé is the most sensitive artifact in the system and re-importing is a re-upload, not a re-parse. Two boundaries worth stating: `rollbackImport` checks no status at all, so it will run against a discarded or already-rolled-back batch and simply remove nothing; and a batch that reaches `discarded` is never swept by retention, which only collects abandoned `staged` batches, so the row persists indefinitely with its raw content already gone. Direct GitHub synchronisation is deliberately not in this machine: it writes repository and skill nodes straight into the graph with `source_ref: 'github_sync'` and creates no batch document, so it never appears in batch history and cannot be rolled back through these endpoints, which makes the `'github'` member of the batch kind union (apps/api/src/services/imports.ts:89) a value nothing ever produces.",
   "sources": [
     "apps/api/src/services/imports.ts",
     "apps/api/src/routes/v1/imports.ts",
@@ -30,7 +30,7 @@
     {
       "id": "partially_committed",
       "label": "Partially committed",
-      "note": "Some rows created records, at least one failed with a stated reason, and the failed ones stay `staged` so they remain retryable. The batch's persisted status is still the string `staged` — this is a distinct condition, not a distinct value — and `committed_at` is set even though the batch is not closed. The raw upload has NOT been purged, because only a clean run closes the batch."
+      "note": "Some rows created records, at least one failed with a stated reason, and the failed ones stay `staged` so they remain retryable. The batch's persisted status is still the string `staged` (this is a distinct condition, not a distinct value), and `committed_at` is set even though the batch is not closed. The raw upload has NOT been purged, because only a clean run closes the batch."
     },
     {
       "id": "committed",
@@ -41,19 +41,19 @@
       "id": "discarded",
       "label": "Discarded",
       "terminal": true,
-      "note": "Nothing was created, and the raw upload is deleted with the decision. Discarding is treated as a deletion intent, not as an abandonment (FR-006). The batch document itself survives — retention only sweeps abandoned `staged` batches — so the history row remains with its content already gone."
+      "note": "Nothing was created, and the raw upload is deleted with the decision. Discarding is treated as a deletion intent, not as an abandonment (FR-006). The batch document itself survives (retention only sweeps abandoned `staged` batches), so the history row remains with its content already gone."
     },
     {
       "id": "rolled_back",
       "label": "Rolled back",
       "terminal": true,
-      "note": "Every node, edge and atom carrying the batch id as `source_ref` is soft-deleted — so they enter the ordinary 30-day trash, they are not erased — and the raw upload is purged. Re-importing means re-uploading the file."
+      "note": "Every node, edge and atom carrying the batch id as `source_ref` is soft-deleted, so they enter the ordinary 30-day trash rather than being erased, and the raw upload is purged. Re-importing means re-uploading the file."
     },
     {
       "id": "swept",
       "label": "Abandoned and swept",
       "terminal": true,
-      "note": "A batch left `staged` for longer than the 30-day retention window is hard-deleted by the purge, taking its rows and raw chunks with it through ON DELETE CASCADE. This is the only path that removes the batch document itself. It collects a partially committed batch too, because that batch's persisted status is also `staged` — the records its successful rows created are not touched, only the batch and its remaining staged rows."
+      "note": "A batch left `staged` for longer than the 30-day retention window is hard-deleted by the purge, taking its rows and raw chunks with it through ON DELETE CASCADE. This is the only path that removes the batch document itself. It collects a partially committed batch too, because that batch's persisted status is also `staged`. The records its successful rows created are not touched, only the batch and its remaining staged rows."
     }
   ],
   "transitions": [
@@ -67,14 +67,14 @@
     {
       "from": "staged",
       "to": "staged",
-      "label": "PATCH /api/v1/imports/:id/rows/:rowId — accept, skip, or edit the payload",
+      "label": "PATCH /api/v1/imports/:id/rows/:rowId to accept, skip, or edit the payload",
       "note": "The review step. A row already marked committed refuses to be edited.",
       "source": "apps/api/src/services/imports.ts:667"
     },
     {
       "from": "staged",
       "to": "committed",
-      "label": "POST /api/v1/imports/:id/commit — every accepted row succeeded",
+      "label": "POST /api/v1/imports/:id/commit; every accepted row succeeded",
       "note": "Refuses unless the batch's status is `staged`. Bundle edges are resolved last, once every accepted node has an identifier; a single rejected edge does not abort the rest.",
       "source": "apps/api/src/services/imports.ts:1087"
     },

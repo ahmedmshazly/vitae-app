@@ -9,8 +9,8 @@ web
 Vitae is built for four people, named as personas P1 through P4 in the
 documentation corpus, in priority order:
 
-- **The deliberate mover (P1, primary).** An experienced professional — ten to
-  twenty years of history — preparing a career move over the next three to
+- **The deliberate mover (P1, primary).** An experienced professional with ten
+  to twenty years of history, preparing a career move over the next three to
   twelve months. Their bar is privacy: neither their current employer nor a
   hosted AI service may see the search. They are the paying customer the
   hosted plan names, and the self-hosted operator the shipped product serves.
@@ -36,7 +36,7 @@ turns verified evidence into documents that prove things.
 ## Product Purpose
 
 Vitae is the career system of record: it remembers what you did, keeps your
-relationships warm, and proves both on demand — without ever sending your
+relationships warm, and proves both on demand, without ever sending your
 history to a service you do not control. It turns scattered career and life
 records into one private, connected graph and makes the next useful action
 obvious: whom to reconnect with, which evidence supports a claim, what changed
@@ -44,7 +44,7 @@ since you last looked, what to compile or export. Success means the graph
 stays trustworthy, earns a place in everyday planning, and remains portable
 outside Vitae.
 
-Life records — journals, trips, habits, events — are the evidence substrate of
+Life records (journals, trips, habits, events) are the evidence substrate of
 the career story, not a second product. Trips explain gaps, journals feed
 evidence, habits feed momentum. The long-tail record types are deliberately
 served by generic surfaces; that is a decision, not a backlog.
@@ -57,10 +57,10 @@ ATS-safe LaTeX résumé generation without runtime AI-provider calls. Every
 recommendation remains traceable to the user's own evidence.
 
 Two engines share the one graph. **The move** is episodic and is what sells:
-job description in, evidence-selected documents and warm paths out — the work
+job description in, evidence-selected documents and warm paths out: the work
 active-search tools charge for monthly, done here without surrendering the
 history to anyone. **The system** is always-on and is what retains: capture,
-relationship cadence, provenance, and the periodic proofs — the ground
+relationship cadence, provenance, and the periodic proofs: the ground
 personal-CRM tools stand on, held here by a typed graph rather than a contact
 list. The strategic consequence is one line: sell the move, keep the system.
 A graph that accrues evidence between searches is the answer to the churn
@@ -70,7 +70,7 @@ The product's three bets are evidenced, not asserted: weak ties causally move
 careers (a 2022 randomized experiment across twenty million professional-
 network users), dormant ties are the highest-yield reconnections and people
 systematically pick the comfortable over the valuable ones (organizational
-research from 2011 through 2023 — a documented bias a deterministic reconnect
+research from 2011 through 2023; a documented bias a deterministic reconnect
 ranking corrects), and memory for one's own accomplishments decays within
 weeks (diary, wearable-camera, and retrospective-survey studies). The checked-
 in source product is self-hosted today; a hosted Cloud release must satisfy
@@ -83,8 +83,8 @@ web. Core rituals include daily follow-up review, quick capture, browsing a
 people-and-organization network, inspecting graph and timeline views,
 importing external records, resolving identity collisions, managing job
 applications, tailoring résumé variants, compiling PDFs, and exporting or
-deleting data. Periodic rituals — a review season, a petition, a
-reinvestigation — compile evidence dossiers from the same graph.
+deleting data. Periodic rituals (a review season, a petition, a
+reinvestigation) compile evidence dossiers from the same graph.
 
 ## Capabilities and Constraints
 
@@ -125,7 +125,7 @@ rather than decoration. The redesign may make the identity more expressive but
 must preserve its seriousness, privacy, and evidence-first voice. Existing
 wordmarks, marks, and product captures are source assets; fabricated product
 screenshots or unverified commercial claims are not permitted. No ads, no
-usage credits, no contact caps, no export upsells, no telemetry — these are
+usage credits, no contact caps, no export upsells, no telemetry. These are
 commitments, not defaults.
 
 ## Evidence on Hand

@@ -659,7 +659,7 @@
       ],
       "defaults": {
         "emptyMessage": "'No matches.'",
-        "loadingMessage": "'Searching…'",
+        "loadingMessage": "'Searching...'",
         "openOnFocus": "true",
         "side": "'bottom'",
         "align": "'start'"
@@ -2940,7 +2940,7 @@
         }
       ],
       "defaults": {
-        "placeholder": "'Select…'",
+        "placeholder": "'Select...'",
         "clearable": "true"
       },
       "classes": [
@@ -3688,7 +3688,7 @@
         }
       ],
       "defaults": {
-        "placeholder": "'Add…'"
+        "placeholder": "'Add...'"
       },
       "classes": [
         "vt-tags",

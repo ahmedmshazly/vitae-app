@@ -6,7 +6,7 @@ import { apiGet, apiPatch, expectOkJson } from './helpers/api';
 
 /**
  * The Ledger (FR-PROV-002): the revision history every write already keeps,
- * read back as a feed — and the record history that now opens into field
+ * read back as a feed, and the record history that now opens into field
  * diffs (FR-PROV-003). The feed is real data, so these tests make the change
  * they expect to see rather than assuming an empty world.
  */

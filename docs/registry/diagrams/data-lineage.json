@@ -12,7 +12,7 @@
     "FR-SET-007",
     "INT-5"
   ],
-  "note": "The claim this diagram is really making is that the list of exits is short and each one is nameable. Only two kinds of thing leave: a bundle the person asked for, and the minimum a third party needs to do its job. Three details worth pulling out. Records marked sensitive are excluded from an export unless the person opts in, and the exclusion is transitive — edges touching a sensitive record, and the revisions and atoms that describe it, go too, because a partial exclusion would leave the shape of what was hidden. The one outbound payload that is text a person wrote is the place query sent to an unauthenticated public geocoder. And the control-plane tables are deliberately outside the graph repository — identities, memberships, lifecycle and provider events are operational records, not exportable career data, which is exactly what keeps them out of the export bundle. Nothing here models an analytics pipeline, a telemetry sink, a message queue or a model provider, because the repository contains none: there is no LLM call anywhere in the API, and the \"Ask\" surface is a deterministic ranking over the local graph.",
+  "note": "The claim this diagram is really making is that the list of exits is short and each one is nameable. Only two kinds of thing leave: a bundle the person asked for, and the minimum a third party needs to do its job. Three details worth pulling out. Records marked sensitive are excluded from an export unless the person opts in, and the exclusion is transitive: edges touching a sensitive record, and the revisions and atoms that describe it, go too, because a partial exclusion would leave the shape of what was hidden. The one outbound payload that is text a person wrote is the place query sent to an unauthenticated public geocoder. And the control-plane tables are deliberately outside the graph repository. Identities, memberships, lifecycle and provider events are operational records, not exportable career data, which is exactly what keeps them out of the export bundle. Nothing here models an analytics pipeline, a telemetry sink, a message queue or a model provider, because the repository contains none: there is no LLM call anywhere in the API, and the \"Ask\" surface is a deterministic ranking over the local graph.",
   "sources": [
     "apps/api/src/routes/v1/capture.ts",
     "apps/api/src/routes/v1/nodes.ts",
@@ -116,7 +116,7 @@
       "id": "raw_uploads",
       "label": "Raw upload chunks",
       "zone": "store",
-      "note": "The original bytes of an import, kept only while the batch is open for review, and deleted at every exit — commit, discard, or rollback. The most sensitive artifact in the system is also the shortest-lived.",
+      "note": "The original bytes of an import, kept only while the batch is open for review, and deleted at every exit: commit, discard, or rollback. The most sensitive artifact in the system is also the shortest-lived.",
       "source": "apps/api/src/services/imports.ts:541"
     },
     {

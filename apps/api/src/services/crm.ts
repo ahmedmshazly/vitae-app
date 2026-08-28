@@ -752,7 +752,7 @@ export async function correspondenceRollup(preloaded?: Graph): Promise<{
 
 /**
  * The per-person correspondence profile: reciprocity, per-direction reply
- * latency, unanswered inbound, contact-day distribution — computed from the
+ * latency, unanswered inbound, contact-day distribution, computed from the
  * person's logged interactions with their stated directions. Interactions
  * without a stated direction are reported in `coverage`, never guessed at.
  */

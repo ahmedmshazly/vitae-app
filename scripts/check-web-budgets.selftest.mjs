@@ -3,14 +3,14 @@
  * Prove the web budget gate rejects what it claims to reject.
  *
  * This gate spent release 1.0.0 reporting `ok` on a bundle nobody deploys. It
- * was not broken in the way `check-test-coverage-map.mjs` was — its arithmetic
- * was right — it was simply pointed at a development build, and a development
+ * was not broken in the way `check-test-coverage-map.mjs` was. Its arithmetic
+ * was right. It was simply pointed at a development build, and a development
  * build is about a megabyte larger than the real one. The gate said 98% of the
  * limit and meant nothing by it.
  *
  * A size gate cannot notice that on its own: every number it has is a number
  * about the files in front of it. So the cases below assert the two properties
- * that separate a measurement from a coincidence — that each limit can
+ * that separate a measurement from a coincidence: that each limit can
  * actually be exceeded, and that a bundle which should not be measured at all
  * is refused before any size verdict is reached.
  *
@@ -33,9 +33,9 @@ let failures = 0;
  *
  * `chunks` maps a file name to `{ kb, contains }`. The file is padded to
  * exactly `kb` kibibytes so the gate's `Math.ceil` reports that number, and
- * `contains` is a marker placed inside it — the development JSX runtime's call
- * form, or the fixture's own absolute path standing in for a build machine's.
- * Passing `chunks: null` leaves `dist/assets` absent entirely.
+ * `contains` is a marker placed inside it: either the development JSX
+ * runtime's call form, or the fixture's own absolute path standing in for a
+ * build machine's. Passing `chunks: null` leaves `dist/assets` absent entirely.
  */
 function fixture({ chunks, totalJsKb, largestChunkKb }) {
   const dir = mkdtempSync(join(tmpdir(), 'vitae-web-budgets-'));

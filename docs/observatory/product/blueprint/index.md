@@ -1,7 +1,7 @@
 ---
 id: PRD-BP
 title: The re-conception blueprint
-summary: A verdict and a better-version specification for every screen, grouped by hub — what stays, what sharpens, what gets elevated, and the three surfaces that get added.
+summary: A verdict and a better-version specification for every screen, grouped by hub: what stays, what sharpens, what gets elevated, and the three surfaces that get added.
 audience: [maintainer, designer, developer]
 domain: product
 type: index

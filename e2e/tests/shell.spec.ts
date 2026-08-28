@@ -221,8 +221,8 @@ test('mobile dock, capture, search, and More sheet keep every workspace reachabl
 test('the root recognises a returning session and goes to Today', async ({ page }) => {
   await signIn(page);
   // A returning visitor types the bare address. The public root reads the
-  // session hint synchronously — it still never waits on Firebase or the
-  // API — and hands them to Today instead of the marketing page. The auth
+  // session hint synchronously (it still never waits on Firebase or the
+  // API) and hands them to Today instead of the marketing page. The auth
   // gate stays the authority; the signIn above is what made the hint honest.
   await page.goto('/');
   await expect(page).toHaveURL(/\/today$/);

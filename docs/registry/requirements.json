@@ -2,7 +2,7 @@
   "$schema": "./schema/requirements.schema.json",
   "note": "Curated requirement register. The register began as pure recovery: docs/specs/srs.md defined no identifiers, so every statement was recovered from the code, tests, workflows and roadmap rows that cite the identifier. Since 2026-08-26 it carries a second regime under ADR 0007: statements authored forward as product decisions, each marked as authored in its reconstruction note and carrying review \"confirmed\". Recovered statements keep review \"needs-review\", because none has been confirmed against an authored specification that survives. Identifiers are adopted verbatim and are never renumbered, because renumbering would invalidate live citations across source and continuous integration.",
   "provenance_vocabulary": {
-    "reconstructed": "A statement recovered from at least one citation that names this identifier and describes a single behavior — or, where the reconstruction note says so, a statement authored as a product decision under ADR 0007.",
+    "reconstructed": "A statement recovered from at least one citation that names this identifier and describes a single behavior; or, where the reconstruction note says so, a statement authored as a product decision under ADR 0007.",
     "unrecoverable": "The identifier is asserted by a grouped or ranged citation, but no individual statement can be attributed without inventing the split. No statement is recorded."
   },
   "implementation_status_vocabulary": {
@@ -73,7 +73,7 @@
     },
     {
       "range": "NFR-REL-001, NFR-REL-002",
-      "observation": "No citations. When this register was recovered, only two non-functional identifiers were cited anywhere in the repository, NFR-REL-003 and NFR-MNT-002 — the original set was organized by quality attribute rather than numbered in one sequence, and almost all of it was lost. The non-functional set that exists today was authored forward under ADR 0007 on 2026-08-26; these two numbers stay unallocated because reusing them for new statements would counterfeit recovery."
+      "observation": "No citations. When this register was recovered, only two non-functional identifiers were cited anywhere in the repository, NFR-REL-003 and NFR-MNT-002. The original set was organized by quality attribute rather than numbered in one sequence, and almost all of it was lost. The non-functional set that exists today was authored forward under ADR 0007 on 2026-08-26; these two numbers stay unallocated because reusing them for new statements would counterfeit recovery."
     },
     {
       "range": "INT-4",
@@ -437,11 +437,11 @@
       "capability": "CAP-CAREER",
       "kind": "functional",
       "title": "An application is a typed record with a status machine",
-      "statement": "An application is a graph record carrying a typed status machine, and the career runway groups applications by live stage — draft, applied, screening, interview, offer — with terminal outcomes presented apart from the live stages rather than mixed into them.",
+      "statement": "An application is a graph record carrying a typed status machine, and the career runway groups applications by live stage (draft, applied, screening, interview, offer), with terminal outcomes presented apart from the live stages rather than mixed into them.",
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
-      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007 — the career capability shipped with no requirement naming what it does. Enforced by the application property schema in packages/core/src/schema/node-props.ts and the runway grouping in apps/web/src/routes/career/CareerOverview.tsx; neither cites this identifier, so the attribution is recorded here."
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007: the career capability shipped with no requirement naming what it does. Enforced by the application property schema in packages/core/src/schema/node-props.ts and the runway grouping in apps/web/src/routes/career/CareerOverview.tsx; neither cites this identifier, so the attribution is recorded here."
     },
     {
       "id": "FR-CAR-002",
@@ -481,7 +481,7 @@
       "capability": "CAP-COMMS",
       "kind": "functional",
       "title": "A correspondence profile per person",
-      "statement": "For any person with logged interactions, a correspondence profile must be computable deterministically: reciprocity ratio, median reply latency in each direction, unanswered inbound count, and the distribution of contact days — each figure decomposing into the interactions that produced it.",
+      "statement": "For any person with logged interactions, a correspondence profile must be computable deterministically: reciprocity ratio, median reply latency in each direction, unanswered inbound count, and the distribution of contact days, with each figure decomposing into the interactions that produced it.",
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
@@ -503,7 +503,7 @@
       "capability": "CAP-COMMS",
       "kind": "functional",
       "title": "Introductions are first-class facts",
-      "statement": "An introduction must be recordable as a first-class fact — who introduced whom, when, in what context — feeding broker detection, warm-path evidence, and the favor ledger.",
+      "statement": "An introduction must be recordable as a first-class fact (who introduced whom, when, in what context), feeding broker detection, warm-path evidence, and the favor ledger.",
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
@@ -606,11 +606,11 @@
       "capability": "CAP-RELATIONSHIPS",
       "kind": "functional",
       "title": "The favor ledger is part of the relationship record",
-      "statement": "A favor must be recordable on the relationship it belongs to, in either direction — owed to the operator or owed by them — with a settle state and dates. The ledger is visible on the person and editable without leaving them, and a concurrent edit to the relationship is refused rather than silently overwritten.",
+      "statement": "A favor must be recordable on the relationship it belongs to, in either direction (owed to the operator or owed by them), with a settle state and dates. The ledger is visible on the person and editable without leaving them, and a concurrent edit to the relationship is refused rather than silently overwritten.",
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
-      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007 — the ledger shipped with no requirement naming it. Enforced by the favor properties on the relationship edge in packages/core/src/schema/edge-props.ts and the favors route in apps/api/src/routes/v1/favors.ts, whose concurrency refusal is the EDGE_CHANGED conflict; neither cites this identifier, so the attribution is recorded here."
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007: the ledger shipped with no requirement naming it. Enforced by the favor properties on the relationship edge in packages/core/src/schema/edge-props.ts and the favors route in apps/api/src/routes/v1/favors.ts, whose concurrency refusal is the EDGE_CHANGED conflict; neither cites this identifier, so the attribution is recorded here."
     },
     {
       "id": "FR-DOS-001",
@@ -628,7 +628,7 @@
       "capability": "CAP-DOSSIER",
       "kind": "functional",
       "title": "Dossier templates address named audiences",
-      "statement": "Dossier templates must address named audiences — a promotion review, a petition exhibit list, a clearance or background history — each with its own section grammar and inclusion rules, sharing one selection and compile pipeline underneath.",
+      "statement": "Dossier templates must address named audiences (a promotion review, a petition exhibit list, a clearance or background history), each with its own section grammar and inclusion rules, sharing one selection and compile pipeline underneath.",
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
@@ -790,11 +790,11 @@
       "capability": "CAP-PROV",
       "kind": "functional",
       "title": "Provenance is visible on the record",
-      "statement": "Every record surface must be able to show where a fact came from — source, source reference, and confidence — as inspectable provenance rather than hidden columns, and provenance must be filterable wherever records are searched.",
+      "statement": "Every record surface must be able to show where a fact came from (source, source reference, and confidence) as inspectable provenance rather than hidden columns, and provenance must be filterable wherever records are searched.",
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
-      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007, and corrected the same day: the first note claimed the surfaces did not present provenance, which undersold shipped reality — the source-and-confidence chip was already a design-system primitive on eight screens. What was genuinely missing, the source reference, now renders on the record header beside the chip, and the search grammar filters on source. The chip predates this identifier; the reference cites it in apps/web/src/routes/Record.tsx."
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007, and corrected the same day: the first note claimed the surfaces did not present provenance, which undersold shipped reality: the source-and-confidence chip was already a design-system primitive on eight screens. What was genuinely missing, the source reference, now renders on the record header beside the chip, and the search grammar filters on source. The chip predates this identifier; the reference cites it in apps/web/src/routes/Record.tsx."
     },
     {
       "id": "FR-PROV-002",
@@ -812,11 +812,11 @@
       "capability": "CAP-PROV",
       "kind": "functional",
       "title": "History opens into field-level diffs",
-      "statement": "A record's history must open into field-level diffs between revisions — what changed, from what, to what — not only a count of revision ticks.",
+      "statement": "A record's history must open into field-level diffs between revisions (what changed, from what, to what), not only a count of revision ticks.",
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
-      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007 and shipped the same day: the record screen's history rows disclose the stored field diff — a row with changes unfolds, a row without stays a row. The diffs were in the revision rows all along."
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007 and shipped the same day: the record screen's history rows disclose the stored field diff: a row with changes unfolds, a row without stays a row. The diffs were in the revision rows all along."
     },
     {
       "id": "FR-RES-001",
@@ -1031,7 +1031,7 @@
       "capability": "CAP-RESUME",
       "kind": "functional",
       "title": "Letters compile like résumés",
-      "statement": "A finalized cover letter must compile to the same artifact pair as a résumé — PDF plus source — through the same sandboxed compiler, with the same escape guarantees and the same graceful degradation when the compiler is unreachable.",
+      "statement": "A finalized cover letter must compile to the same artifact pair as a résumé (PDF plus source) through the same sandboxed compiler, with the same escape guarantees and the same graceful degradation when the compiler is unreachable.",
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
@@ -1207,7 +1207,7 @@
       "capability": "CAP-PLATFORM",
       "kind": "non-functional",
       "title": "Every routed screen is scanned for accessibility",
-      "statement": "Every route the application mounts must be scanned by an automated accessibility check in the end-to-end suite, and the count of scanned screens is a ratchet: it may grow and must not silently shrink. Visual surfaces — the graph, the timeline, the map — must each keep a keyboard-operable list equivalent, and motion must respect the reduced-motion preference.",
+      "statement": "Every route the application mounts must be scanned by an automated accessibility check in the end-to-end suite, and the count of scanned screens is a ratchet: it may grow and must not silently shrink. Visual surfaces (the graph, the timeline, the map) must each keep a keyboard-operable list equivalent, and motion must respect the reduced-motion preference.",
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
@@ -1218,7 +1218,7 @@
       "capability": "CAP-EXPORT",
       "kind": "non-functional",
       "title": "Leaving is a supported feature",
-      "statement": "The complete graph must export to open formats — JSON Lines per collection and a Markdown vault readable by plain-text tools — with a checksummed manifest, and a restore from that bundle must round-trip document identity. No commercial state may degrade export: a locked workspace keeps its way out.",
+      "statement": "The complete graph must export to open formats (JSON Lines per collection and a Markdown vault readable by plain-text tools) with a checksummed manifest, and a restore from that bundle must round-trip document identity. No commercial state may degrade export: a locked workspace keeps its way out.",
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
@@ -1266,7 +1266,7 @@
       "implementation_status": "partial",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
-      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. The mechanics exist — scripts/backup-to-s3.sh, docs/runbooks/restore-drill.md, FR-EXP-012 and FR-EXP-013 — but the objectives themselves are numbers this repository cannot supply: backup retention and recovery targets are among the operational facts docs/CLOUD-LAUNCH.md records as needing outside confirmation. The stated remainder is exactly those numbers and their cadence."
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. The mechanics exist (scripts/backup-to-s3.sh, docs/runbooks/restore-drill.md, FR-EXP-012 and FR-EXP-013), but the objectives themselves are numbers this repository cannot supply: backup retention and recovery targets are among the operational facts docs/CLOUD-LAUNCH.md records as needing outside confirmation. The stated remainder is exactly those numbers and their cadence."
     },
     {
       "id": "NFR-OPS-002",
@@ -1277,7 +1277,7 @@
       "implementation_status": "partial",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
-      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. The server half is enforced by the method-based entitlement gate in apps/api/src/middleware/workspace.ts; the shell banner names the lock, and the shared write entry points — the new-record menu, both capture triggers, the entity form dialog, and the bulk bars — disable themselves with the lock explained at the control. The stated remainder is the long tail of per-screen inline mutations (the interaction logger, tailoring autosave, reminder completion), which still rely on the server refusal being surfaced rather than pre-empted."
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. The server half is enforced by the method-based entitlement gate in apps/api/src/middleware/workspace.ts; the shell banner names the lock, and the shared write entry points (the new-record menu, both capture triggers, the entity form dialog, and the bulk bars) disable themselves with the lock explained at the control. The stated remainder is the long tail of per-screen inline mutations (the interaction logger, tailoring autosave, reminder completion), which still rely on the server refusal being surfaced rather than pre-empted."
     },
     {
       "id": "NFR-PERF-001",
@@ -1353,7 +1353,7 @@
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
       "review": "confirmed",
-      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. Enforced by the mutation-cache error net in apps/web/src/main.tsx and by the feedback grammar the end-to-end suite asserts screen by screen — the four-state distinction is its most-tested invariant; the enforcing code does not cite this identifier, so the attribution is recorded here."
+      "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007. Enforced by the mutation-cache error net in apps/web/src/main.tsx and by the feedback grammar the end-to-end suite asserts screen by screen. The four-state distinction is its most-tested invariant; the enforcing code does not cite this identifier, so the attribution is recorded here."
     },
     {
       "id": "NFR-SEC-001",

@@ -197,7 +197,7 @@
     {
       "id": "CAP-DOSSIER",
       "title": "Evidence dossiers",
-      "summary": "Derived evidence packets that generalize the résumé pipeline for audiences beyond hiring: a promotion review, a petition exhibit list, a clearance history — single-subject, deterministic, with a provenance appendix.",
+      "summary": "Derived evidence packets that generalize the résumé pipeline for audiences beyond hiring: a promotion review, a petition exhibit list, a clearance history. Each packet is single-subject, deterministic, and carries a provenance appendix.",
       "status": "implemented",
       "surfaces": [
         "/career/dossiers"

@@ -1,7 +1,7 @@
 ---
 id: PRD-BP-RECORD
 title: "Blueprint: records and browsing"
-summary: The generic record screen is the workhorse for nineteen long-tail types and gets the biggest elevation in the product — provenance made visible and history made legible.
+summary: The generic record screen is the workhorse for nineteen long-tail types and gets the biggest elevation in the product, with provenance made visible and history made legible.
 audience: [maintainer, designer, developer]
 domain: product
 type: reference

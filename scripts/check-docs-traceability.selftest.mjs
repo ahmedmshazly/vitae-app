@@ -10,7 +10,7 @@
  *
  * So each case below builds a small, self-consistent fixture repository, breaks
  * exactly one thing, and asserts that the gate names that thing. The first case
- * asserts the unbroken fixture passes — without it, every later case could be
+ * asserts the unbroken fixture passes. Without it, every later case could be
  * succeeding for the wrong reason.
  */
 import { execFileSync, execSync } from 'node:child_process';

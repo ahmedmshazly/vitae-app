@@ -3,8 +3,8 @@
  * ranked for reactivation, and the brokers introductions have flowed through.
  *
  * The reactivation ranking is deliberately zero new mathematics: a tie's
- * history is re-read with the same Hawkes kernel that scores it today —
- * `computeTieStrength` evaluated at each interaction instant — so the peak
+ * history is re-read with the same Hawkes kernel that scores it today
+ * (`computeTieStrength` evaluated at each interaction instant), so the peak
  * and the present come from one model and two screens can never disagree
  * about what "strong" means. The organizational research this surfaces is
  * blunt: reconnected dormant ties outperform active ones, and people left to
@@ -28,13 +28,13 @@ export interface ReactivationTieInput {
 
 export interface ReactivationCandidate {
   personId: string;
-  /** The tie as it stands now — status is 'dormant' for every candidate. */
+  /** The tie as it stands now. Status is 'dormant' for every candidate. */
   current: TieStrength;
   /** The tie at its historical best, same model, evaluated then. */
   peak: TieStrength;
   /** When the peak was reached (the interaction instant that produced it). */
   peakAt: string;
-  /** Ranking score: what was lost — peak strength, discounted by nothing. */
+  /** Ranking score: what was lost. Peak strength, discounted by nothing. */
   score: number;
 }
 
@@ -50,7 +50,7 @@ const MS = 1;
  * Rank dormant ties by how strong they once were. A tie qualifies when its
  * current status is dormant and its historical peak strength reached
  * `minPeakStrength`; it ranks by that peak, then by how long it has been
- * quiet — the most valuable loss first, not the most comfortable.
+ * quiet. The most valuable loss first, not the most comfortable.
  */
 export function rankReactivation(
   ties: ReactivationTieInput[],
@@ -113,7 +113,7 @@ export interface BrokerTally {
 
 /**
  * Who introductions have flowed through: a tally of the `met_via` labels the
- * relationship edges already carry. Free text by design — the broker a
+ * relationship edges already carry. Free text by design: the broker a
  * person credits is a fact about the relationship, not a graph join.
  */
 export function brokerTally(metVia: Array<string | null | undefined>): BrokerTally[] {
@@ -160,7 +160,7 @@ export interface CorrespondenceProfile {
   unansweredInbound: { count: number; eventIds: string[] };
   contactDays: {
     totalDays: number;
-    /** Trailing months, oldest first, zero-filled — chart-ready, no gaps. */
+    /** Trailing months, oldest first, zero-filled: chart-ready, no gaps. */
     months: Array<{ month: string; days: number }>;
   };
 }
@@ -209,14 +209,14 @@ function median(values: number[]): number | null {
 /**
  * The per-person correspondence profile (SRS FR-COMM-001): reciprocity,
  * per-direction reply latency, unanswered inbound, and the contact-day
- * distribution — every figure carrying the interaction ids that produced it
+ * distribution, every figure carrying the interaction ids that produced it
  * (NFR-PRIV-003).
  *
  * Reply pairs derive from direction alternation in the time-ordered
  * directional history: the last event of one run and the first event of the
  * next opposite run form a reply, unless the gap exceeds
  * `CORRESPONDENCE.replyPairMaxGapDays`. Events without a stated direction
- * are excluded from directional figures and reported in `coverage` — they
+ * are excluded from directional figures and reported in `coverage`. They
  * still count as contact.
  */
 export function correspondenceProfile(
@@ -293,7 +293,7 @@ export interface RecordedBrokerTally {
 /**
  * Brokers by recorded introduction (SRS FR-COMM-003): a tally over INTRODUCED
  * edges' `via`, each count carrying the edges behind it. Distinct from
- * `brokerTally`, which counts free-text met-via credits — the two are
+ * `brokerTally`, which counts free-text met-via credits. The two are
  * presented as separate labeled groups, never fuzzy-merged, because equating
  * a person id with a matching string would be a guess.
  */

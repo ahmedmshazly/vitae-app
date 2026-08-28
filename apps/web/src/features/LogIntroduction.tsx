@@ -9,8 +9,8 @@ import { useSelfPerson } from './forms/SubjectPicker.js';
 /**
  * Log an introduction (SRS FR-COMM-003): who introduced you to this person,
  * when, in what context. Writes the INTRODUCED edge between the two people
- * the introduction connected, crediting the broker in `via` — which feeds
- * broker detection on the rollup and the warm-path hop evidence — and can
+ * the introduction connected, crediting the broker in `via` (which feeds
+ * broker detection on the rollup and the warm-path hop evidence), and can
  * record the debt in the broker's favor ledger in the same gesture.
  */
 export function LogIntroduction({

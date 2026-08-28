@@ -112,8 +112,8 @@ account cannot be enrolled automatically."*
 These come back from the API rather than the sign-in screen, and they usually
 mean the session expired while the tab was open. The API answers `401` with
 *"Sign-in required."* when there is no token at all, and with *"This is a
-private system."* on a self-hosted instance — or *"A verified Google sign-in is
-required."* on Cloud - when the token is present but the account is not the one
+private system."* on a self-hosted instance (or *"A verified Google sign-in is
+required."* on Cloud) when the token is present but the account is not the one
 this instance admits. The message is deliberately neutral: it never reveals
 whether a particular address is on the allow list.
 

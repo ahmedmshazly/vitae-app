@@ -34,11 +34,11 @@ const OUT = 'docs/generated/traceability.json';
  * The registries are the obvious case: they define the ids, so reading them
  * back as citations would make every requirement cite itself. The
  * documentation toolchain is the case that actually caused damage. Its doc
- * comments explain the identifier grammar by naming real identifiers —
+ * comments explain the identifier grammar by naming real identifiers:
  * `citations.mjs` documents the families using `FR-RES-009` and `FR-SRCH-001`,
  * and the selftests feed the parser `FR-012` because a parser must be shown to
- * find it — and a scan that reads them credits eight requirements to files
- * that implement none of them. Seven moved from documents-only to
+ * find it. A scan that reads them credits eight requirements to files that
+ * implement none of them. Seven moved from documents-only to
  * implemented-untested on exactly that evidence before this rule existed.
  *
  * A mention inside the machinery that reads citations proves something about

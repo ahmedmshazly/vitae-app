@@ -1,8 +1,8 @@
 /**
  * The renderer for the compiled block model.
  *
- * The dialect is closed — `scripts/docs/lib/markdown.mjs` emits nine block
- * types and six inline types and nothing else — so this suite renders one of
+ * The dialect is closed: `scripts/docs/lib/markdown.mjs` emits nine block
+ * types and six inline types and nothing else. So this suite renders one of
  * each and checks the parts a reader depends on but a screenshot would not
  * show: what a link says about where it goes, what a table's region is called,
  * what a copy button reports when the browser refuses.

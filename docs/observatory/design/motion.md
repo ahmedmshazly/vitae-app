@@ -1,7 +1,7 @@
 ---
 id: DSN-MOTION
 title: Motion, and why there is so little
-summary: One easing curve, three durations, five named variants, and a gate that catches some of it — plus the marketing scoping rule that the shipped routes outgrew.
+summary: One easing curve, three durations, five named variants, and a gate that catches some of it, plus the marketing scoping rule that the shipped routes outgrew.
 audience: [designer, developer]
 domain: design
 type: explanation

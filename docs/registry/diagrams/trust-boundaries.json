@@ -2,10 +2,10 @@
   "$schema": "../schema/diagram.schema.json",
   "id": "DGM-TRUST-BOUNDARIES",
   "title": "Every process and store, by trust zone",
-  "summary": "Six zones, from the open internet to a compiler on a sealed network, and what crosses each boundary. Position in the middleware stack — not a declaration — decides which routes answer without a session.",
+  "summary": "Six zones, from the open internet to a compiler on a sealed network, and what crosses each boundary. Position in the middleware stack, not a declaration, decides which routes answer without a session.",
   "kind": "topology",
   "requirements": ["FR-004", "FR-015", "FR-027", "FR-SET-001", "INT-1", "INT-5"],
-  "note": "Three things a reader should carry away. First, the routes that answer without a session do so because of where they are registered, not because anything declares them public: the two health probes and the payment webhook sit above the gate in `createApp`, and nothing would notice if a future route were added above it by accident. Second, the sealed zone is sealed by deployment, not by code — in production compose the buildsvc container is on a network marked `internal: true` with no route out, with a read-only root filesystem and a tmpfs, and its Tectonic package cache is warmed at image build time so it needs no network at request time. Third, the boundary between the browser and the API is an explicit CORS allow-list built from configured origins, never an origin reflector. Two deployment facts, stated because they are easy to miss: the browser application is not served by this API at all — it is a static bundle on Vercel, while the API, the proxy and the compiler are three containers on one virtual machine — and locally the Postgres container is a development convenience, never a deployment target, because production points at RDS. Nothing here models a queue, a cache tier or a CDN, because the repository contains none.",
+  "note": "Three things a reader should carry away. First, the routes that answer without a session do so because of where they are registered, not because anything declares them public: the two health probes and the payment webhook sit above the gate in `createApp`, and nothing would notice if a future route were added above it by accident. Second, the sealed zone is sealed by deployment, not by code: in production compose the buildsvc container is on a network marked `internal: true` with no route out, with a read-only root filesystem and a tmpfs, and its Tectonic package cache is warmed at image build time so it needs no network at request time. Third, the boundary between the browser and the API is an explicit CORS allow-list built from configured origins, never an origin reflector. Two deployment facts, stated because they are easy to miss: the browser application is not served by this API at all (it is a static bundle on Vercel, while the API, the proxy and the compiler are three containers on one virtual machine), and locally the Postgres container is a development convenience, never a deployment target, because production points at RDS. Nothing here models a queue, a cache tier or a CDN, because the repository contains none.",
   "sources": [
     "apps/api/src/app.ts",
     "apps/api/src/middleware/auth.ts",
@@ -78,7 +78,7 @@
       "id": "browser",
       "label": "The person's browser",
       "zone": "open",
-      "note": "Runs the single-page application. Carries a session cookie or a bearer identity token, plus the chosen data space and the browser's IANA timezone on every request — the last because \"today\", \"overdue\" and streaks are calendar questions the server cannot answer without it.",
+      "note": "Runs the single-page application. Carries a session cookie or a bearer identity token, plus the chosen data space and the browser's IANA timezone on every request. The timezone is there because \"today\", \"overdue\" and streaks are calendar questions the server cannot answer without it.",
       "source": "apps/web/src/lib/api.ts:58"
     },
     {
@@ -106,7 +106,7 @@
       "id": "health_probes",
       "label": "Liveness and readiness probes",
       "zone": "app",
-      "note": "Registered above the gate, so both answer without a session. `/health` returns a fixed object and touches nothing. `/ready` runs a database probe and, when it fails, returns a stringified driver error that can name a host or a port — an intentional trade for operability, not nothing.",
+      "note": "Registered above the gate, so both answer without a session. `/health` returns a fixed object and touches nothing. `/ready` runs a database probe and, when it fails, returns a stringified driver error that can name a host or a port: an intentional trade for operability, not nothing.",
       "source": "apps/api/src/app.ts:58"
     },
     {

@@ -3,7 +3,7 @@
  * Prove the shared AST layer reads what it claims to read.
  *
  * Every generated artifact in docs/generated/ is derived through this module,
- * so a misreading here is not one wrong page — it is twelve reference surfaces
+ * so a misreading here is not one wrong page but twelve reference surfaces
  * that agree with each other and disagree with the code. The failures are
  * silent by nature: a missed import shape produces a smaller dependency graph,
  * not an error, and a smaller graph looks exactly like a smaller codebase.

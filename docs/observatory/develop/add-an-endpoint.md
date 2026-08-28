@@ -1,7 +1,7 @@
 ---
 id: DEV-ENDPOINT
 title: Adding an API endpoint
-summary: A procedure for adding an operation to the v1 API — the route, the service, the tests, the map entry, the OpenAPI refresh, and the gates that judge each.
+summary: A procedure for adding an operation to the v1 API, covering the route, the service, the tests, the map entry, the OpenAPI refresh, and the gates that judge each.
 audience: [developer]
 domain: develop
 type: task

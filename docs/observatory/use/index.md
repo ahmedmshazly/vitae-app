@@ -1,7 +1,7 @@
 ---
 id: USE
 title: Use
-summary: How to work Vitae day to day — the first hour, every screen, the four tasks the product exists for, and what to do when one of them fails.
+summary: How to work Vitae day to day: the first hour, every screen, the four tasks the product exists for, and what to do when one of them fails.
 audience: [user, designer]
 domain: use
 type: index

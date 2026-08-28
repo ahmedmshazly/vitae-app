@@ -6,9 +6,9 @@ export const correspondenceRouter: Router = Router();
 
 /**
  * The correspondence rollup (SRS FR-COMM-002): dormant-but-once-strong ties
- * ranked for reactivation, with the evidence for each — peak strength and
+ * ranked for reactivation, with the evidence for each: peak strength and
  * when it stood, current strength, quiet days, and the factor decomposition
- * the interface shows (NFR-PRIV-003) — plus the brokers the relationship
+ * the interface shows (NFR-PRIV-003), plus the brokers the relationship
  * edges credit for introductions. Reciprocity and reply latency live on the
  * per-person profile at /people/:id/correspondence (FR-COMM-001), computed
  * from operator-stated directions and never from a guess.
@@ -29,7 +29,7 @@ correspondenceRouter.get(
       })),
       considered_dormant: rollup.consideredDormant,
       brokers: rollup.brokers,
-      // FR-COMM-003: brokers by recorded INTRODUCED edges — a separate labeled
+      // FR-COMM-003: brokers by recorded INTRODUCED edges, a separate labeled
       // group from the free-text met-via credits above, never merged.
       introduced_brokers: rollup.introducedBrokers.map((b) => ({
         via: b.via,

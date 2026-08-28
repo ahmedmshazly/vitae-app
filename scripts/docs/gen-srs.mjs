@@ -89,7 +89,7 @@ for (const cap of capabilities.capabilities) {
   put();
   for (const req of rows) {
     const evidence = EVIDENCE_PROSE[trace.requirements?.[req.id]?.evidence] ?? 'not yet derived';
-    put(`#### ${req.id} — ${req.title ?? 'No statement recovered'}`);
+    put(`#### ${req.id}: ${req.title ?? 'No statement recovered'}`);
     put();
     put(req.statement ?? '_No statement is recorded for this identifier._');
     put();
@@ -134,7 +134,7 @@ for (const [name, family] of Object.entries(requirements.families ?? {})) {
 }
 put();
 for (const marker of requirements.unmodelled_markers ?? []) {
-  put(`**\`${marker.marker}\`** — ${marker.observation}`);
+  put(`**\`${marker.marker}\`**: ${marker.observation}`);
   put();
   put(`Cited at ${marker.cited_at.map((c) => `\`${c}\``).join(', ')}.`);
   put();

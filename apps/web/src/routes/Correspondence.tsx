@@ -45,7 +45,7 @@ interface Rollup {
 /**
  * Correspondence (SRS FR-COMM-002): dormant-but-once-strong ties ranked for
  * reactivation, and the brokers introductions have flowed through. The
- * research is blunt — reconnected dormant ties outperform active ones, and
+ * research is blunt: reconnected dormant ties outperform active ones, and
  * people left to choose reconnect with whoever feels comfortable instead of
  * whoever would help. This ranking is the corrective, and it shows its
  * arithmetic (NFR-PRIV-003).
@@ -65,7 +65,7 @@ export function Correspondence() {
     <div className="page">
       <PageHeader
         title="Correspondence"
-        subtitle="The ties worth reactivating, ranked by what they once were — not by what feels easy."
+        subtitle="The ties worth reactivating, ranked by what they once were, not by what feels easy."
         help={
           <InfoPopover title="How this ranks">
             <p>

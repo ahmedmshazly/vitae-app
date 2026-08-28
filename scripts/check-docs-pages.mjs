@@ -7,7 +7,7 @@
  * exist at all: both have to read every page, and two readers of the same page
  * eventually disagree. A page whose metadata block will not parse also
  * produces a cascade of meaningless link failures, so the checks are ordered
- * instead of separated — a page that cannot be read is reported once and its
+ * instead of separated: a page that cannot be read is reported once and its
  * links are not judged.
  *
  * What it enforces:
@@ -233,8 +233,8 @@ for (const page of pages) {
   if (required) {
     const actual = page.headings.filter((h) => h.level === 2).map((h) => h.text);
     if (JSON.stringify(actual) !== JSON.stringify(required)) {
-      fail(rel, `type "${data.type}" must carry exactly these sections, in order — ${required.join(' / ')} `
-        + `— but has ${actual.length ? actual.join(' / ') : '(none)'}`);
+      fail(rel, `type "${data.type}" must carry exactly these sections, in order: ${required.join(' / ')}. `
+        + `It has ${actual.length ? actual.join(' / ') : '(none)'}`);
     }
   }
 }

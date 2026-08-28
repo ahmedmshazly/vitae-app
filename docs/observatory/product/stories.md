@@ -1,7 +1,7 @@
 ---
 id: PRD-STORIES
 title: The stories behind the journeys
-summary: User stories for all eight journeys, told from the four personas, each with acceptance criteria that cite the requirement register — so "would someone pay for this" is answerable line by line.
+summary: User stories for all eight journeys, told from the four personas, each with acceptance criteria that cite the requirement register, so "would someone pay for this" is answerable line by line.
 audience: [maintainer, developer, designer]
 domain: product
 type: reference

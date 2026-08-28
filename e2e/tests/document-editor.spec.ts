@@ -10,8 +10,8 @@ test('live résumé paper exposes contact, section, entry, and skill controls', 
   await expect(paper).toBeVisible({ timeout: 15_000 });
   // Located by section rather than by loose text. `getByText` defaults to
   // exact:false, which is a case-insensitive *substring* match over the whole
-  // paper, so any selected bullet containing "education" — the seed already
-  // carries one reading "education-research" — would match this as well as the
+  // paper, so any selected bullet containing "education" (the seed already
+  // carries one reading "education-research") would match this as well as the
   // heading and put the locator in strict-mode violation. The section carries
   // its key in the DOM, so ask for the heading of the section itself: that
   // cannot be satisfied by body text, which makes it the stronger assertion as

@@ -1,6 +1,6 @@
 {
   "$schema": "./schema/journeys.schema.json",
-  "note": "Curated journey register. J1, J4 and J8 were recovered: they are named in the header and test titles of e2e/tests/journeys.spec.ts, in two API integration test titles, and in the continuous-integration step that runs them. J2, J3, J5, J6 and J7 were empty rows implied by the numbering until 2026-08-26, when they were authored as product decisions under ADR 0007 — closing DOC-D-029. An authored journey lists no e2e spec until a spec names its identifier; the gate requires the identifier inside any spec listed here.",
+  "note": "Curated journey register. J1, J4 and J8 were recovered: they are named in the header and test titles of e2e/tests/journeys.spec.ts, in two API integration test titles, and in the continuous-integration step that runs them. J2, J3, J5, J6 and J7 were empty rows implied by the numbering until 2026-08-26, when they were authored as product decisions under ADR 0007, closing DOC-D-029. An authored journey lists no e2e spec until a spec names its identifier; the gate requires the identifier inside any spec listed here.",
   "status_vocabulary": {
     "verified": "Named in the repository and exercised end to end by a browser test that runs in continuous integration.",
     "partial": "The journey's steps ship and tests cover them, but no spec names the journey's identifier, so the register cannot claim it end to end.",
@@ -35,12 +35,12 @@
       "e2e": [
         "e2e/tests/exploration.spec.ts"
       ],
-      "note": "Authored 2026-08-26 under ADR 0007; verified the same day when e2e/tests/exploration.spec.ts named the journey in the tests that walk it — reconnect lane on Today, interaction log with live strength recompute, ask with its factor decomposition, composer send-and-log."
+      "note": "Authored 2026-08-26 under ADR 0007; verified the same day when e2e/tests/exploration.spec.ts named the journey in the tests that walk it: reconnect lane on Today, interaction log with live strength recompute, ask with its factor decomposition, composer send-and-log."
     },
     {
       "id": "J3",
       "title": "Bring the past in without wrecking the graph",
-      "statement": "The operator stages a LinkedIn or contacts export, reviews rows with per-row accept and skip and per-row subject assignment, commits the batch, works the duplicate queue on shared evidence, merges with an undo window, and can roll the whole batch back — ending with a graph that gained history without gaining a second self.",
+      "statement": "The operator stages a LinkedIn or contacts export, reviews rows with per-row accept and skip and per-row subject assignment, commits the batch, works the duplicate queue on shared evidence, merges with an undo window, and can roll the whole batch back, ending with a graph that gained history without gaining a second self.",
       "status": "verified",
       "capabilities": [
         "CAP-IMPORT",
@@ -52,7 +52,7 @@
         "e2e/tests/import.spec.ts",
         "e2e/tests/duplicates.spec.ts"
       ],
-      "note": "Authored 2026-08-26 under ADR 0007; verified the same day. exploration.spec.ts walks stage → commit → rollback and duplicate → merge → undo against the real stack; import.spec.ts and duplicates.spec.ts cover the review-screen states. Per-row subject assignment is exercised by unit coverage rather than a browser walk — recorded here so the claim stays inspectable."
+      "note": "Authored 2026-08-26 under ADR 0007; verified the same day. exploration.spec.ts walks stage → commit → rollback and duplicate → merge → undo against the real stack; import.spec.ts and duplicates.spec.ts cover the review-screen states. Per-row subject assignment is exercised by unit coverage rather than a browser walk; that is recorded here so the claim stays inspectable."
     },
     {
       "id": "J4",
@@ -71,7 +71,7 @@
     {
       "id": "J5",
       "title": "Prove it with a dossier",
-      "statement": "Facing a promotion review, a petition, or a reinvestigation, the operator selects the evidence records that carry the claim, chooses the audience template, and compiles a single-subject packet whose every claim cites its records, closed by a provenance appendix — from a graph that was already capturing the evidence as it happened.",
+      "statement": "Facing a promotion review, a petition, or a reinvestigation, the operator selects the evidence records that carry the claim, chooses the audience template, and compiles a single-subject packet whose every claim cites its records, closed by a provenance appendix, from a graph that was already capturing the evidence as it happened.",
       "status": "verified",
       "capabilities": [
         "CAP-DOSSIER",
@@ -87,7 +87,7 @@
     {
       "id": "J6",
       "title": "Leave with everything",
-      "statement": "The operator exports the complete graph — every collection as JSON Lines, a Markdown vault readable anywhere, a checksummed manifest — verifies the checksums, restores the bundle on a fresh install with identity intact, and reads the vault in a plain-text editor with no Vitae anywhere in sight.",
+      "statement": "The operator exports the complete graph (every collection as JSON Lines, a Markdown vault readable anywhere, a checksummed manifest), verifies the checksums, restores the bundle on a fresh install with identity intact, and reads the vault in a plain-text editor with no Vitae anywhere in sight.",
       "status": "partial",
       "capabilities": [
         "CAP-EXPORT"

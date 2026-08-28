@@ -1,7 +1,7 @@
 ---
 id: ARC-ALGORITHMS
 title: The deterministic algorithms
-summary: Every algorithm module in the shared domain package — its inputs, its formula, the constants that tune it, and where it stops being reliable.
+summary: Every algorithm module in the shared domain package: its inputs, its formula, the constants that tune it, and where it stops being reliable.
 audience: [developer, maintainer]
 domain: architecture
 type: explanation

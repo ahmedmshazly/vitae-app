@@ -1,7 +1,7 @@
 ---
 id: DEV-GATES
 title: The gates a change must pass
-summary: Every automated check between a change and main — what it enforces, what it scans, how it fails, how to record an exception, and where the gates do not reach.
+summary: Every automated check between a change and main: what it enforces, what it scans, how it fails, how to record an exception, and where the gates do not reach.
 audience: [developer, maintainer]
 domain: develop
 type: reference

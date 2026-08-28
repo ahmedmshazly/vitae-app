@@ -12,7 +12,7 @@
  *
  * The second is safety by construction. A general parser emits raw HTML,
  * which a React renderer can only display through `dangerouslySetInnerHTML`
- * plus a sanitiser — another dependency, and a permanent obligation to keep it
+ * plus a sanitiser, another dependency, and a permanent obligation to keep it
  * ahead of bypasses. Owning the subset means the renderer supports exactly
  * what this file emits and nothing else: there is no HTML to sanitise because
  * no HTML is ever produced.
@@ -34,7 +34,7 @@
  * Everything else is refused with a file and line rather than silently
  * misread. That asymmetry is deliberate: a *block* that means something other
  * than it looks like is a documentation defect, so unsupported block syntax
- * throws. Inline text is the opposite — an unpaired asterisk or bracket is
+ * throws. Inline text is the opposite: an unpaired asterisk or bracket is
  * ordinary prose, so unmatched inline delimiters stay literal instead of
  * turning a sentence about `a * b` into an error.
  */
@@ -206,7 +206,7 @@ export function plain(nodes) {
  * tree, so the words a reader can find are decided once, here, where the tree
  * is produced. Code is included: someone searching for a command or a
  * configuration key is searching for something that only ever appears inside a
- * fenced block. Alternative text is included for the reason a figure has it —
+ * fenced block. Alternative text is included for the reason a figure has it:
  * it is the content of the image, not decoration around it.
  */
 export function blockText(blocks) {
@@ -360,8 +360,8 @@ export function markdown(body, { file = '<input>', startLine = 1 } = {}) {
       }
 
       // A tag is the opposite: the author sees an element, the reader sees the
-      // element spelled out as text. There is no sanitiser here by design —
-      // that is the point — so refuse it rather than misrepresent it.
+      // element spelled out as text. There is no sanitiser here by design,
+      // which is the point, so refuse it rather than misrepresent it.
       if (/^\s*<[a-zA-Z/!]/.test(line)) {
         throw new Error(`${at(i)}: raw HTML is not part of the documentation dialect`);
       }
@@ -438,7 +438,7 @@ export function markdown(body, { file = '<input>', startLine = 1 } = {}) {
         const tone = alert && ALERTS.has(alert[1].toLowerCase()) ? alert[1].toLowerCase() : null;
         if (alert && !tone) {
           throw new Error(
-            `${at(i)}: unknown alert [!${alert[1]}] — use note, tip, important, warning or caution`,
+            `${at(i)}: unknown alert [!${alert[1]}]. Use note, tip, important, warning or caution`,
           );
         }
         // The nested parse reads a copy with the `>` markers removed, at the

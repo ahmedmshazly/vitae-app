@@ -2,7 +2,7 @@
  * One documentation page.
  *
  * The manifest has already told the shell that this route exists, so nothing
- * here handles "not found" — that decision was made before this component
+ * here handles "not found". That decision was made before this component
  * mounted. What it does handle is the page's own content arriving or failing,
  * which is why only the prose goes through `QueryBoundary` while the header
  * and the pager render from the manifest immediately. A reader who follows a
@@ -16,7 +16,7 @@
  * the accessibility tree, and one printable document.
  *
  * Because the grid places by name, the order below is free to be the reading
- * order rather than the drawing order — and the reading order is the article
+ * order rather than the drawing order, and the reading order is the article
  * first. The rail describes the page: its contents, what the page was checked
  * against, what it relates to. On a wide screen the grid lifts it into the
  * right-hand column and nothing about that is visible. On a phone the column
@@ -317,7 +317,7 @@ export function DocsPage({
   //
   // The first page a reader opens is not a navigation. Focusing then puts a
   // heavy ring around the title of every page anyone opens from a fresh tab or
-  // a pasted link, reporting a move that nobody made — and it takes focus off
+  // a pasted link, reporting a move that nobody made. It also takes focus off
   // the document body, so the first Tab lands after the title instead of on
   // the skip link. The ring is right when it says where focus went; it is
   // noise when nothing went anywhere.

@@ -2,8 +2,8 @@
  * The workspace as a set of packages and files, read from the same manifests
  * pnpm reads.
  *
- * Several generators need the same three things — which packages exist, which
- * files are first-party source, and who imports what — and each one deriving
+ * Several generators need the same three things (which packages exist, which
+ * files are first-party source, and who imports what), and each one deriving
  * them separately is how two catalogs end up disagreeing about how many
  * packages this repository has. The globs come from pnpm-workspace.yaml rather
  * than a hard-coded list, so adding a package to the workspace adds it here.

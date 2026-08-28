@@ -7,8 +7,8 @@
  * what a reader sees. Two failure modes matter and they pull in opposite
  * directions, so the cases below are split to match.
  *
- * A block that quietly means something other than it looks like — a table with
- * a missing cell, a fence that swallowed the rest of the page — is a
+ * A block that quietly means something other than it looks like (a table with
+ * a missing cell, a fence that swallowed the rest of the page) is a
  * documentation defect that no reviewer would catch, so those must throw with
  * a line number. Inline text is the reverse: an unpaired asterisk or a `[sic]`
  * is ordinary prose, and refusing it would make the dialect unusable for

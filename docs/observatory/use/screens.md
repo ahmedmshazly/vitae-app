@@ -1,7 +1,7 @@
 ---
 id: USE-SCREENS
 title: Every screen, and what it is for
-summary: What each screen in Vitae exists to do, what you do there, and what its empty state is telling you — grouped by the work rather than by the URL.
+summary: What each screen in Vitae exists to do, what you do there, and what its empty state is telling you, grouped by the work rather than by the URL.
 audience: [user, designer]
 domain: use
 type: reference

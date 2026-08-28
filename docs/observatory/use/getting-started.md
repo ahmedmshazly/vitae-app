@@ -171,7 +171,7 @@ The markers are the same everywhere:
 > [!WARNING]
 > The priority token is `!p2`, with the `p`. The task example shown in the
 > capture dialog itself writes `!2`, which the parser does not recognise as a
-> priority — it ends up as part of the title instead. This is a defect in the
+> priority; it ends up as part of the title instead. This is a defect in the
 > example, not in the grammar.
 
 The leading keys cover the record types you capture most often - `p` person,

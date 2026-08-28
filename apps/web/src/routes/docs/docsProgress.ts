@@ -4,7 +4,7 @@
  * A corpus of fifty pages is not read in one sitting, and the thing a returning
  * reader most needs is the one thing a static site cannot normally tell them:
  * where they stopped. This keeps that in `localStorage` and nowhere else. It is
- * not synced, not sent anywhere, and not readable by the API — the documentation
+ * not synced, not sent anywhere, and not readable by the API. The documentation
  * surface has no session and makes no requests, and remembering a reading
  * position must not be the thing that changes either of those.
  *
@@ -22,7 +22,7 @@ const KEY = 'vitae.docs.progress.v1';
  * How many pages are remembered.
  *
  * Bounded because the list is written on every navigation and an unbounded one
- * would grow until a quota refused it — silently, on the reader's machine, long
+ * would grow until a quota refused it, silently, on the reader's machine, long
  * after anyone could connect the failure to this file.
  */
 const LIMIT = 200;

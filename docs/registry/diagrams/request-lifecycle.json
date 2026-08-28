@@ -4,7 +4,7 @@
   "title": "An authenticated API request, end to end",
   "summary": "One POST from the browser through every middleware in registration order to Postgres and back, with the refusal each gate can issue instead.",
   "kind": "sequence",
-  "note": "The stack is drawn in Express registration order (apps/api/src/app.ts:31-71), because position is what decides reachability: anything registered above the gate at app.ts:62 answers without a session. The two Cloud middlewares — workspace resolution and the entitlement gate — are no-ops unless VITAE_CLOUD_ENABLED is set, which .env.example:40 leaves false, so in a default build the request goes straight from the auth gate to the router and the legacy real/demo space from spaceMiddleware is the partition. POST /api/v1/nodes is drawn as the concrete route; every other authenticated route passes the same stack.",
+  "note": "The stack is drawn in Express registration order (apps/api/src/app.ts:31-71), because position is what decides reachability: anything registered above the gate at app.ts:62 answers without a session. The two Cloud middlewares (workspace resolution and the entitlement gate) are no-ops unless VITAE_CLOUD_ENABLED is set, which .env.example:40 leaves false, so in a default build the request goes straight from the auth gate to the router and the legacy real/demo space from spaceMiddleware is the partition. POST /api/v1/nodes is drawn as the concrete route; every other authenticated route passes the same stack.",
   "requirements": [
     "FR-010",
     "FR-014",
@@ -45,7 +45,7 @@
     {
       "id": "security",
       "label": "cspNonce + helmet + cors",
-      "note": "Per-request CSP nonce, Helmet headers, and an explicit CORS allow-list built from WEB_ORIGIN — never an origin reflector."
+      "note": "Per-request CSP nonce, Helmet headers, and an explicit CORS allow-list built from WEB_ORIGIN, never an origin reflector."
     },
     {
       "id": "body-parser",
@@ -110,7 +110,7 @@
       "to": "body-parser",
       "label": "CSP nonce, Helmet headers, CORS allow-list",
       "kind": "call",
-      "note": "script-src is nonce-based with strict-dynamic; frame-ancestors none. Inline styles and any HTTPS image/connect source are permitted — the soft edge of the policy.",
+      "note": "script-src is nonce-based with strict-dynamic; frame-ancestors none. Inline styles and any HTTPS image/connect source are permitted: the soft edge of the policy.",
       "source": "apps/api/src/app.ts:32"
     },
     {
@@ -118,7 +118,7 @@
       "to": "context",
       "label": "parse JSON body against the applicable limit",
       "kind": "call",
-      "note": "The import parser is mounted at app.ts:51, ahead of the default at :52. A router-local parser would run too late — the 2 MB default rejects first (FR-010).",
+      "note": "The import parser is mounted at app.ts:51, ahead of the default at :52. A router-local parser would run too late: the 2 MB default rejects first (FR-010).",
       "source": "apps/api/src/app.ts:51"
     },
     {
@@ -142,7 +142,7 @@
       "to": "error-handler",
       "label": "401 UNAUTHENTICATED (no token) or UNAUTHORIZED (rejected)",
       "kind": "refusal",
-      "note": "Three token paths are tried in cost order — local dev JWT, primary Firebase project, configured companion project — and DGM-AUTHENTICATION draws them. The refusal is written directly to the response, not thrown, and its message is neutral in every failure case so a probe holding a token learns nothing about why.",
+      "note": "Three token paths are tried in cost order (local dev JWT, primary Firebase project, configured companion project), and DGM-AUTHENTICATION draws them. The refusal is written directly to the response, not thrown, and its message is neutral in every failure case so a probe holding a token learns nothing about why.",
       "source": "apps/api/src/middleware/auth.ts:142"
     },
     {
@@ -180,7 +180,7 @@
       "to": "repository",
       "label": "validate the body, then open one transaction",
       "kind": "call",
-      "note": "The route does its reads first — endpoint checks for every implied edge — before the first stage, so a write never half-lands on a missing reference.",
+      "note": "The route does its reads first (endpoint checks for every implied edge) before the first stage, so a write never half-lands on a missing reference.",
       "source": "apps/api/src/routes/v1/nodes.ts:174"
     },
     {
@@ -205,7 +205,7 @@
       "label": "committed; the in-process write generation and the search generation are bumped",
       "kind": "return",
       "source": "apps/api/src/db/repository.ts:636",
-      "note": "Memoised read models and the search index compare generations rather than guessing with a timer, so a value written a moment ago is visible on the next read. A failure to publish the invalidation is logged, never rethrown — the write is already committed and must not be reported as failed (repository.ts:650)."
+      "note": "Memoised read models and the search index compare generations rather than guessing with a timer, so a value written a moment ago is visible on the next read. A failure to publish the invalidation is logged, never rethrown: the write is already committed and must not be reported as failed (repository.ts:650)."
     },
     {
       "from": "router",

@@ -23,7 +23,7 @@
  * the numeronym for accessibility, and `packages/ui/src/styles/base.css:123`
  * cites `NFR-A11Y-001` beside the rule that draws every focus ring in the
  * product. A pattern that cannot spell the family cannot see the citation, and
- * an unseen citation is indistinguishable from an unwritten one — so the
+ * an unseen citation is indistinguishable from an unwritten one, so the
  * requirement was absent from the register, absent from the generated
  * traceability, and reported by nothing.
  *
@@ -109,7 +109,7 @@ export function compareIds(a, b) {
  * A generated block is derived from the register, so reading identifiers back
  * out of it would count the register as evidence for itself. The requirement
  * table in `docs/specs/srs.md` lists every identifier the register knows,
- * including the ones it records as cited nowhere — which would make them cited.
+ * including the ones it records as cited nowhere, which would make them cited.
  *
  * Lines are blanked rather than removed so that every `path:line` reported
  * after a generated block still points at the right line.

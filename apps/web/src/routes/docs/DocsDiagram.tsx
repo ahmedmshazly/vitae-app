@@ -8,8 +8,8 @@
  * with the image.
  *
  * The accessible equivalent is not an afterthought or a second page. The table
- * is always in the document — visually hidden until a reader asks for it, and
- * always read by assistive technology — while the drawing is marked
+ * is always in the document (visually hidden until a reader asks for it, and
+ * always read by assistive technology), while the drawing is marked
  * `aria-hidden`, because it is a second presentation of the table and not a
  * second set of facts. That is the only arrangement in which the two cannot
  * disagree.
@@ -472,7 +472,7 @@ export function DocsDiagram({ spec }: { spec: DocsDiagramSpec }) {
 
       {/* A wide diagram scrolls inside this box, and a box that scrolls has to
           be reachable by keyboard or its right-hand side is unreachable
-          without a mouse — WCAG 2.1.1, and the reason Safari needs it. It is
+          without a mouse (WCAG 2.1.1, and the reason Safari needs it). It is
           named rather than left as a bare focus stop, and the name says where
           the same content is in text, because the drawing itself is hidden
           from assistive technology as a duplicate of the table. */}

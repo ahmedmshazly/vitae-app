@@ -1,7 +1,7 @@
 ---
 id: PRD-BOUNDARIES
 title: What Vitae does not do
-summary: The product's edges, stated precisely — including what the workspace-partitioned schema did and did not change, and why the hosted plane is closed rather than absent.
+summary: The product's edges, stated precisely, including what the workspace-partitioned schema did and did not change, and why the hosted plane is closed rather than absent.
 audience: [user, maintainer, security]
 domain: product
 type: explanation

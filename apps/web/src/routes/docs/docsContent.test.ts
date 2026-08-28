@@ -4,8 +4,8 @@
  * The corpus moved behind the API's default-deny gate, so the interesting
  * behaviour here is what a refusal says and what every request carries. A
  * reader who is signed out must be told the documentation is private rather
- * than that the build is broken — those send them to entirely different places
- * — and a deployment with no corpus in it is an operator's problem, not theirs.
+ * than that the build is broken: those send them to entirely different places.
+ * And a deployment with no corpus in it is an operator's problem, not theirs.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DOCS_CONTENT_BASE, manifestQueryOptions, pageQueryOptions } from './docsContent.js';
@@ -47,7 +47,7 @@ describe('asking the API for the corpus', () => {
 
   it('reads from the API mount, not from a file beside the application', () => {
     // The static tree is gone. Anything still pointing at `docs-content` would
-    // be requesting a path the public host no longer serves — and must not.
+    // be requesting a path the public host no longer serves, and must not.
     expect(DOCS_CONTENT_BASE).toBe('/docs');
   });
 

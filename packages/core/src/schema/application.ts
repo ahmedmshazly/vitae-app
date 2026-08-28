@@ -52,7 +52,7 @@ export const APPLICATION_OUTCOMES = [
  *
  * The rule is forward-permissive: from any open stage you may move to any
  * later open stage, or close on any of the three outcomes. Not every role has
- * a recruiter screen, so `applied → interview` has to be recordable — a
+ * a recruiter screen, so `applied → interview` has to be recordable. A
  * machine that refused it would be refusing a fact that happened, which is the
  * one thing this product will not do. What it does refuse is the pair of moves
  * that can only be a mistake: walking an application backwards down the
@@ -60,7 +60,7 @@ export const APPLICATION_OUTCOMES = [
  *
  * This is the shape of a recorded transition. Correcting a status that was
  * entered wrongly in the first place is a different act, and belongs to
- * whichever writer offers it — the map says what follows what, not what an
+ * whichever writer offers it. The map says what follows what, not what an
  * operator is permitted to fix.
  */
 export const APPLICATION_STATUS_FLOW: Readonly<
@@ -92,7 +92,7 @@ export function isApplicationStatus(value: unknown): value is ApplicationStatus 
 /**
  * Statuses the generic edit form may offer: the current value (re-saving other
  * fields is not a transition) plus every legal onward move. Correction is a
- * different claim and belongs to the dedicated control — a generic PATCH
+ * different claim and belongs to the dedicated control. A generic PATCH
  * cannot send `correction: true`.
  */
 export function applicationStatusOptionsFor(current: ApplicationStatus): readonly ApplicationStatus[] {

@@ -5,7 +5,7 @@
  * what a page is: where it lives, what route it answers, which headings it
  * offers as anchors, which links it makes. Two readers would eventually
  * disagree, and the disagreement would show up as a gate passing a page the
- * reader cannot render — the failure this whole effort exists to prevent. So
+ * reader cannot render, the failure this whole effort exists to prevent. So
  * there is one reader, and both callers use it.
  */
 import { execFileSync } from 'node:child_process';
@@ -18,7 +18,7 @@ import { markdown, plain } from './markdown.mjs';
  * Every page file in the corpus, committed or not.
  *
  * Tracked files alone would be wrong here. The authoring loop is write a page,
- * run the gate, fix what it says — and a gate that cannot see a file until it
+ * run the gate, fix what it says. A gate that cannot see a file until it
  * has been staged gives no feedback on the new page while reporting a broken
  * link on the page that points at it, which reads as a bug in the wrong file.
  * Ignored files stay invisible, so a scratch directory is still a way out.
@@ -99,8 +99,8 @@ export function readCorpus(root, corpus) {
  * How a link in the corpus is meant to resolve.
  *
  * Intra-corpus links are relative `.md` paths so that a page reads correctly
- * both in the application and on the repository host — a link that only works
- * in one of the two is a link that will be written wrong. `/docs/...` is
+ * both in the application and on the repository host, since a link that works
+ * in only one of the two is a link that will be written wrong. `/docs/...` is
  * reserved for the routes the application serves that no page produces, and
  * everything else is refused so that a source file is cited through the
  * `sources:` field or inline code rather than through a link that silently

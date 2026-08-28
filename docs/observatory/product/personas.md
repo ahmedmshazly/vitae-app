@@ -1,7 +1,7 @@
 ---
 id: PRD-PERSONAS
 title: The four people
-summary: The personas the product definition is built around — who they are, what a day of theirs looks like, what they pay for today, which journeys they own, and what would lose each of them.
+summary: The personas the product definition is built around: who they are, what a day of theirs looks like, what they pay for today, which journeys they own, and what would lose each of them.
 audience: [maintainer, designer, developer]
 domain: product
 type: reference

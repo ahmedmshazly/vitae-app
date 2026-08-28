@@ -15,7 +15,7 @@
  * manages focus, escape and dismissal for you and one that only looks like it
  * does. And the class names each component emits are recorded, because the
  * component and the stylesheet that dresses it live in different files with
- * nothing linking them — `vt-skel` in feedback.tsx and `.vt-skel` in a
+ * nothing linking them: `vt-skel` in feedback.tsx and `.vt-skel` in a
  * stylesheet are one design decision split across two directories.
  */
 import { readFileSync } from 'node:fs';
@@ -63,7 +63,7 @@ function membersOf(typeNode, sf, interfaces) {
  * What the caller gets when they pass nothing.
  *
  * Defaults live in the destructuring pattern (`{ height = 14 }`), not in the
- * type, so they are invisible to anyone reading the interface — which is
+ * type, so they are invisible to anyone reading the interface, which is
  * exactly why they belong in a reference that a person consults instead of the
  * source. `SkeletonRows` defaults `count` to 6 and `label` to "Loading"; the
  * interface says only that both are optional.

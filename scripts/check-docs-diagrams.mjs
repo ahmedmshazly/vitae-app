@@ -13,7 +13,7 @@
  *                the same one, so a page naming a diagram gets the one it meant
  *
  *   references   every step, transition and link names something the same file
- *                declares — an arrow to an actor that does not exist is a
+ *                declares, so an arrow to an actor that does not exist is a
  *                drawing bug that would otherwise render as an arrow to nowhere
  *
  *   evidence     every `sources` path and every `source` line exists in the
@@ -73,7 +73,7 @@ try {
  * Does this `path:line` citation still point at a line that exists?
  *
  * The line number is the part that rots first and the part nobody notices. A
- * citation without one is allowed — some things are true of a whole file — but
+ * citation without one is allowed (some things are true of a whole file), but
  * one that names a line past the end of that file is stale by construction.
  */
 function checkCitation(where, field, value) {
@@ -91,7 +91,7 @@ function checkCitation(where, field, value) {
   if (line === undefined) return;
   // A file ending in a newline splits into one more piece than it has lines,
   // and counting that phantom made the gate accept a citation exactly one line
-  // past the end — the single most likely off-by-one a stale citation has.
+  // past the end, the single most likely off-by-one a stale citation has.
   const count = readFileSync(abs, 'utf8').replace(/\n$/, '').split('\n').length;
   if (Number(line) > count) {
     fail(where, `${field} names ${path}:${line}, but that file has ${count} line(s). The code moved; re-read it.`);

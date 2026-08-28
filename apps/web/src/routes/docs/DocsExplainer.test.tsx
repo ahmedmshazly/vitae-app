@@ -3,7 +3,7 @@
  *
  * The claim worth testing is exactly that. So these compute the expected answer
  * by calling the same `@vitae/core` function the product calls and assert the
- * surface shows it — if the explainer ever reimplemented the formula to make a
+ * surface shows it. If the explainer ever reimplemented the formula to make a
  * nicer demonstration, these fail. They also pin the reference date, because an
  * example that reads the clock cannot be written down or compared.
  */

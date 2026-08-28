@@ -2,9 +2,9 @@
   "$schema": "../schema/diagram.schema.json",
   "id": "DGM-IMPORT-PIPELINE",
   "title": "Taking an external file into the graph",
-  "summary": "A file read in the browser, parsed and duplicate-checked into a staging batch, reviewed row by row by a person, and only then committed — with rollback still available afterwards.",
+  "summary": "A file read in the browser, parsed and duplicate-checked into a staging batch, reviewed row by row by a person, and only then committed, with rollback still available afterwards.",
   "kind": "sequence",
-  "note": "Nothing reaches the graph without an explicit commit: staging writes only to imports, import_rows and import_raw_chunks. Files are never uploaded as multipart — the browser reads them with FileReader and posts the text as JSON, which is why app.ts:51 mounts a 15 MB parser for this prefix ahead of the 2 MB default. Duplicate detection runs once, at staging time, against the graph as it was then; it is not re-run at commit, so a long review can go stale. The GitHub sync route (routes/v1/imports.ts:60) is a different shape entirely — it writes directly with no staging — and is not drawn here.",
+  "note": "Nothing reaches the graph without an explicit commit: staging writes only to imports, import_rows and import_raw_chunks. Files are never uploaded as multipart: the browser reads them with FileReader and posts the text as JSON, which is why app.ts:51 mounts a 15 MB parser for this prefix ahead of the 2 MB default. Duplicate detection runs once, at staging time, against the graph as it was then; it is not re-run at commit, so a long review can go stale. The GitHub sync route (routes/v1/imports.ts:60) is a different shape entirely, writing directly with no staging, and is not drawn here.",
   "requirements": [
     "FR-002",
     "FR-006",
@@ -110,7 +110,7 @@
       "to": "dedup",
       "label": "per row: score against existing candidates of the same type",
       "kind": "call",
-      "note": "A bundle row with a matching external identity key short-circuits to 'probable' before any scoring. Otherwise people go through weighted field comparison (email, phone, name trigram, shared org domain), and other types hit bespoke rules first — exact URL for links, title and date for events, normalised name for skills and education, title and company for roles — falling back to the generic entity comparison only when none of those fire. Atom rows are never duplicate-checked at all.",
+      "note": "A bundle row with a matching external identity key short-circuits to 'probable' before any scoring. Otherwise people go through weighted field comparison (email, phone, name trigram, shared org domain), and other types hit bespoke rules first (exact URL for links, title and date for events, normalised name for skills and education, title and company for roles), falling back to the generic entity comparison only when none of those fire. Atom rows are never duplicate-checked at all.",
       "source": "apps/api/src/services/imports.ts:569"
     },
     {
@@ -126,13 +126,13 @@
       "to": "postgres",
       "label": "write the batch, the raw upload in chunks, and every staged row",
       "kind": "call",
-      "note": "A 'probable' duplicate defaults the row to skip and everything else to accept (services/imports.ts:589). That default is the only thing the machine decides — it is a proposal, and it is reversible in the next step.",
+      "note": "A 'probable' duplicate defaults the row to skip and everything else to accept (services/imports.ts:589). That default is the only thing the machine decides: it is a proposal, and it is reversible in the next step.",
       "source": "apps/api/src/services/imports.ts:614"
     },
     {
       "from": "imports-route",
       "to": "person",
-      "label": "201 { batch, rows } — nothing has touched the graph",
+      "label": "201 { batch, rows }: nothing has touched the graph",
       "kind": "return",
       "source": "apps/api/src/routes/v1/imports.ts:56"
     },
@@ -141,15 +141,15 @@
       "to": "imports-route",
       "label": "PATCH /imports/:id/rows/:rowId { decision, payload? }",
       "kind": "call",
-      "note": "This is the confirmation step. A reviewer flips accept/skip per row and may patch the payload — which is also how an unassigned résumé line gets an owner before it can become an atom.",
+      "note": "This is the confirmation step. A reviewer flips accept/skip per row and may patch the payload, which is also how an unassigned résumé line gets an owner before it can become an atom.",
       "source": "apps/web/src/routes/ImportHub.tsx:301"
     },
     {
       "from": "person",
       "to": "imports-route",
-      "label": "POST /imports/:id/discard — abandon the batch",
+      "label": "POST /imports/:id/discard to abandon the batch",
       "kind": "refusal",
-      "note": "Discarding is a deletion intent: discardImport (services/imports.ts:1104) purges the raw upload — address book, calendar, resume text — with the batch. FR-006: nothing survives a discard.",
+      "note": "Discarding is a deletion intent: discardImport (services/imports.ts:1104) purges the raw upload (address book, calendar, resume text) with the batch. FR-006: nothing survives a discard.",
       "source": "apps/api/src/routes/v1/imports.ts:110"
     },
     {
@@ -185,7 +185,7 @@
     {
       "from": "imports-route",
       "to": "person",
-      "label": "{ created, failed } — and POST /imports/:id/rollback is still available",
+      "label": "{ created, failed }, and POST /imports/:id/rollback is still available",
       "kind": "return",
       "note": "Rollback (routes/v1/imports.ts:110) soft-deletes every node, edge and atom the batch created and purges the raw upload, so a committed batch is not a one-way door.",
       "source": "apps/api/src/routes/v1/imports.ts:97"

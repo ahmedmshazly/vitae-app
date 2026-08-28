@@ -60,8 +60,8 @@ peopleRouter.get(
 
 /**
  * The correspondence profile with this person (SRS FR-COMM-001): reciprocity,
- * per-direction reply latency, unanswered inbound, and the contact-day rhythm — every
- * figure decomposing into the interactions behind it, with a coverage
+ * per-direction reply latency, unanswered inbound, and the contact-day rhythm. Every
+ * figure decomposes into the interactions behind it, with a coverage
  * header saying how much of the history carries a stated direction at all.
  */
 peopleRouter.get(

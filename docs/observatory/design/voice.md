@@ -1,7 +1,7 @@
 ---
 id: DSN-VOICE
 title: Voice and content design
-summary: How the interface talks: active, specific, one name per thing, no apologies — and which of those rules a script actually checks.
+summary: How the interface talks (active, specific, one name per thing, no apologies), and which of those rules a script actually checks.
 audience: [designer, user]
 domain: design
 type: explanation

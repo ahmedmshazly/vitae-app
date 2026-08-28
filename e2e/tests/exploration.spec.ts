@@ -20,7 +20,7 @@ test('Today: queue, habits, reconnect, and the reference tier', async ({ page })
   await expect(page.getByRole('heading', { name: 'How things stand' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Applications' })).toBeVisible();
   // Either verb. The toggle is named after the habit it toggles, and which
-  // verb it carries depends on whether today is already ticked — `seed.ts`
+  // verb it carries depends on whether today is already ticked. `seed.ts`
   // checks "Deep work 2h" on `daysAgo(0)`, so on a freshly seeded database it
   // reads "Uncheck". This line asserted "Check" and so failed on exactly the
   // fresh seed CI runs, while passing locally against a database whose habit
@@ -30,7 +30,7 @@ test('Today: queue, habits, reconnect, and the reference tier', async ({ page })
   await expect(page.getByRole('button', { name: /^(Check|Uncheck) Deep work 2h/ })).toBeVisible();
 });
 
-test('J2: log an interaction from a person page — strength recomputes', async ({ page }) => {
+test('J2: logging an interaction from a person page recomputes strength', async ({ page }) => {
   await signIn(page);
   await page.goto('/people');
   // A row's checkbox carries a visually-hidden "Select <name>" label, so the
@@ -83,7 +83,7 @@ EMAIL:playwright.import@e2e.test
 ORG:E2E Test Org
 END:VCARD`;
 
-test('J3: import — stage a vCard, commit, then roll the batch back', async ({ page }) => {
+test('J3: import: stage a vCard, commit, then roll the batch back', async ({ page }) => {
   await signIn(page);
   await page.goto('/import');
 
@@ -143,7 +143,7 @@ async function rollbackCommittedImports(page: Page, filename: string) {
   }
 }
 
-test('J3: duplicates — import a duplicate, merge it, undo the merge', async ({ page }) => {
+test('J3: duplicates: import a duplicate, merge it, undo the merge', async ({ page }) => {
   await signIn(page);
   // A failed assertion must not poison later runs with another Sarah import.
   await rollbackCommittedImports(page, 'dup.vcf');

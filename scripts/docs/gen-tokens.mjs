@@ -3,7 +3,7 @@
  * Build docs/generated/tokens.json: the design tokens, what each one is for,
  * where it is overridden, and who actually uses it.
  *
- * `tokens.css` is unusually well commented — the file explains why 3px is the
+ * `tokens.css` is unusually well commented: the file explains why 3px is the
  * largest radius and what contrast ratio each ink value was measured at. Prose
  * that restated any of that would be a copy that goes stale. What prose cannot
  * do, and what nothing in the repository currently answers, is the reverse
@@ -12,7 +12,7 @@
  * reason to generate this rather than write it.
  *
  * Two disagreements are worth recording as data. A token declared and never
- * referenced is dead weight — the file's own "Legacy aliases" section says to
+ * referenced is dead weight. The file's own "Legacy aliases" section says to
  * remove each alias once its last consumer lands, and this is the measurement
  * that makes that instruction actionable. A token referenced but never declared
  * is worse: `var(--ae-typo)` silently resolves to nothing and the property is
@@ -77,7 +77,7 @@ function declarations(rel) {
       continue;
     }
     if (token === '{') {
-      // The selector is whatever follows the previous statement — the last
+      // The selector is whatever follows the previous statement: the last
       // `}`, `;` or comment close, whichever is nearest. Starting from `}`
       // alone swallows the `@import` above `@theme inline` and the scope stops
       // being recognisable as Tailwind's.
@@ -117,8 +117,8 @@ function declarations(rel) {
        * report teaches people to ignore it.
        */
       consumed_by: scope.startsWith('@theme') ? 'tailwind' : 'css',
-      // Everything outside the base block is a conditional override — coarse
-      // pointers, reduced motion, print — and that is the token's whole
+      // Everything outside the base block is a conditional override (coarse
+      // pointers, reduced motion, print), and that is the token's whole
       // responsive and accessibility story.
       conditional: scopes.length > 1 || (scope !== ':root' && !scope.startsWith('@theme')),
       source: `${rel}:${lineAt(m.index)}`,
@@ -165,7 +165,7 @@ for (const rel of cssFiles) {
  *
  * This is not fastidiousness. `app.css` carries a note explaining that a rule
  * once read `box-shadow: var(--ae-edge-light)`, "a token that does not exist
- * and so drew nothing at all" — the comment is the record of the fix. Scanning
+ * and so drew nothing at all". The comment is the record of the fix. Scanning
  * it as live code reports the one defect the codebase has already repaired, and
  * a drift report whose only finding is fictional is worse than no report.
  */

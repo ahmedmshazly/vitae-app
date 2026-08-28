@@ -25,7 +25,7 @@
  * The generated catalogs are copied out alongside them, unchanged. They are
  * the other half of the documentation: prose explains why something is the way
  * it is, and these answer what exists. Copying rather than transforming is
- * deliberate — the reading surface shows whatever the artifact holds, including
+ * deliberate: the reading surface shows whatever the artifact holds, including
  * fields nobody thought to give a column, so this surface cannot under-report
  * the file it reads.
  *
@@ -324,8 +324,8 @@ emit(
       headings: page.headings.filter((h) => h.level > 1 && h.level < 4),
       text: [
         blockText(page.blocks.filter((b, i) => !(i === 0 && b.type === 'heading' && b.level === 1))),
-        // A diagram carries real words — actor names, transitions, trust
-        // zones — and a reader searching for one of them should find the page
+        // A diagram carries real words (actor names, transitions, trust
+        // zones), and a reader searching for one of them should find the page
         // that shows it, not only the pages that spell it out in prose.
         ...page.blocks
           .filter((b) => b.type === 'diagram')
@@ -343,7 +343,7 @@ emit(
  * Static JSON for the same reason the pages are: it is fetched only when a
  * reader opens that catalog, and it never enters the JavaScript budget. The
  * requirement register comes from the registry rather than from
- * `docs/generated/`, because it is curated — the identifiers were adopted from
+ * `docs/generated/`, because it is curated: the identifiers were adopted from
  * the code that already cited them, and a generator would have nothing to
  * derive the wording from.
  */

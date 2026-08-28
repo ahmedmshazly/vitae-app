@@ -248,7 +248,7 @@
       "default": null,
       "constraints": [],
       "section": "LaTeX build service (SRS §8.4)",
-      "description": "── Off-box backups (scripts/backup-to-s3.sh; see docs/runbooks/restore-drill.md) S3 URI prefix for automated full exports (includeSensitive). IAM least privilege on …/exports/* only. Prefer GHA OIDC or an EC2 instance role; no keys in git.",
+      "description": "── Off-box backups (scripts/backup-to-s3.sh; see docs/runbooks/restore-drill.md) S3 URI prefix for automated full exports (includeSensitive). IAM least privilege on .../exports/* only. Prefer GHA OIDC or an EC2 instance role; no keys in git.",
       "requirements": [],
       "source": "scripts/backup-to-s3.sh:49",
       "reads": [
@@ -1566,10 +1566,10 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/check-docs-coverage.mjs:32",
+      "source": "scripts/check-docs-coverage.mjs:33",
       "reads": [
-        "scripts/check-docs-coverage.mjs:32",
         "scripts/check-docs-coverage.mjs:33",
+        "scripts/check-docs-coverage.mjs:34",
         "scripts/check-docs-diagrams.mjs:36",
         "scripts/check-docs-generated.mjs:25",
         "scripts/check-docs-generated.mjs:26",

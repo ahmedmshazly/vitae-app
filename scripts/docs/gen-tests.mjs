@@ -4,8 +4,8 @@
  * what it exercises, and which requirements it is evidence for.
  *
  * A count of tests proves nothing. The questions worth answering are which
- * command runs a given file, what a given file protects, and — the one that
- * matters most and that nothing in the repository currently answers — which
+ * command runs a given file, what a given file protects, and (the one that
+ * matters most and that nothing in the repository currently answers) which
  * test files no command runs at all.
  *
  * That last one is not hypothetical here. The test scripts do not say "run
@@ -63,7 +63,7 @@ const dirOf = new Map(list.map((p) => [p.json.name, p.dir]));
  *
  * "Which command runs this file" and "does this file run before a merge" are
  * different questions, and only the second one decides whether a test protects
- * anything. `pnpm -r test` reaches every workspace, but no CI job runs it —
+ * anything. `pnpm -r test` reaches every workspace, but no CI job runs it:
  * the workflow names individual scripts and individual filters, so a workspace
  * whose name appears in neither is tested only by whoever remembers to.
  *
@@ -168,8 +168,8 @@ for (const row of rows) byPackage[row.package] = (byPackage[row.package] ?? 0) +
 /** Which requirement identifiers have a test citing them, and which do not. */
 const proven = new Set(rows.flatMap((r) => r.requirements));
 // `registry.requirements` is an array of records, so the identifiers live in
-// each record's `id`. Read as an object it yields array indices — `"0"`, `"1"`,
-// ... — which share no vocabulary with the identifiers tests cite, so every
+// each record's `id`. Read as an object it yields array indices (`"0"`, `"1"`,
+// ...), which share no vocabulary with the identifiers tests cite, so every
 // requirement reported as unproven and the artifact said so in a field an
 // operator would reasonably trust.
 const registered = (registry.requirements ?? []).map((r) => r.id);
@@ -177,7 +177,7 @@ const registered = (registry.requirements ?? []).map((r) => r.id);
 // content problem and belongs to check-docs-traceability, which names it. A
 // total vocabulary mismatch means this file is reading the registry wrongly,
 // and the resulting artifact is indistinguishable from a genuine absence of all
-// test coverage — so it fails here instead of being published.
+// test coverage, so it fails here instead of being published.
 if (registered.length > 0 && proven.size > 0 && ![...proven].some((id) => registered.includes(id))) {
   throw new Error(
     'gen-tests: no requirement identifier cited by a test appears in the registry. ' +

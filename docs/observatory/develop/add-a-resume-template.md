@@ -100,8 +100,8 @@ argon takes the value and ignores it rather than diverging from the contract.
 > `templates/onyx/main.tex` each restate that template's line model inline, and
 > both copies are stale: argon's comment says 52 lines per page where its
 > `line-model.json` says 40, and onyx's says 54 where its JSON says 49. The JSON
-> is the authority — it is the file the compiler service calibrates against and
-> the file the API loads — and the figures above are taken from it. Cobalt
+> is the authority: it is the file the compiler service calibrates against and
+> the file the API loads. The figures above are taken from it. Cobalt
 > carries no such comment.
 
 ## The contracts a template obeys

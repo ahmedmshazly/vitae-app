@@ -47,8 +47,8 @@ export const CORRESPONDENCE = {
   /** Candidates shown; the register says how many were considered. */
   maxCandidates: 25,
   /**
-   * A direction change further apart than this is a new thread, not a reply —
-   * without the cap, answering an eight-month-old message would record an
+   * A direction change further apart than this is a new thread, not a reply.
+   * Without the cap, answering an eight-month-old message would record an
    * eight-month "reply latency", which is dormancy wearing the wrong label.
    */
   replyPairMaxGapDays: 60,

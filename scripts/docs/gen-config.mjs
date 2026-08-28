@@ -6,14 +6,14 @@
  * Four things in this repository describe the configuration surface and none of
  * them describes all of it:
  *
- *   1. `serverEnvSchema` (packages/config/src/env.ts) — Zod, fail-fast at boot,
- *      and the only source that can reject a bad value.
- *   2. `ImportMetaEnv` (apps/web/src/vite-env.d.ts) — the browser contract.
+ *   1. `serverEnvSchema` (packages/config/src/env.ts) is Zod, fail-fast at
+ *      boot, and the only source that can reject a bad value.
+ *   2. `ImportMetaEnv` (apps/web/src/vite-env.d.ts) is the browser contract.
  *      Vite inlines these at BUILD time, so a missing one is not a boot error;
  *      it is `undefined` inside a shipped bundle. Different failure, own scope.
- *   3. Raw `process.env.X` reads — no schema, no default, no boot check.
+ *   3. Raw `process.env.X` reads have no schema, no default, no boot check.
  *      VITAE_CLOUD_ENABLED and every PADDLE_* credential live only here.
- *   4. `.env.example` — the file an operator actually copies.
+ *   4. `.env.example` is the file an operator actually copies.
  *
  * A catalog built from any single one is wrong in a way that costs somebody a
  * deployment, so this reads all four and records the disagreements as data.
@@ -282,7 +282,7 @@ function webContract() {
  *
  * `process.env[MAP[period]]` is a read whose key is not in the expression at
  * all. When a file performs a dynamic read like that, the uppercase string
- * literals in the same file are recorded as `computed` — evidence that they
+ * literals in the same file are recorded as `computed`, evidence that they
  * are env names sitting beside a dynamic lookup, which is weaker than a direct
  * read and labelled as such rather than being silently promoted or dropped.
  */
@@ -337,7 +337,7 @@ function codeReads() {
 }
 
 /**
- * Configuration read by the deployment material — compose files, unit files,
+ * Configuration read by the deployment material: compose files, unit files,
  * the Caddyfile and the shell scripts under deploy/.
  *
  * A `${NAME}` in a shell script is usually a local variable, not configuration:
@@ -347,8 +347,8 @@ function codeReads() {
  *
  * Order settles it. Two forms mean "this comes from the environment":
  *
- *   NAME="${NAME:-default}"      the canonical shell default idiom — the read
- *                                on the right runs before the assignment
+ *   NAME="${NAME:-default}"      the canonical shell default idiom, where the
+ *                                read on the right runs before the assignment
  *   ...${NAME}... before NAME=   read first, assigned later as a fallback
  *                                (restore-from-s3.sh does exactly this with
  *                                BACKUP_DAY: line 42 reads it, 43 fills it in)

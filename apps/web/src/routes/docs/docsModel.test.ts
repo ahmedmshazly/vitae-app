@@ -2,8 +2,8 @@
  * The questions the manifest answers without reading anything else.
  *
  * These helpers are the only place the documentation surface makes a decision
- * about structure — which page a URL is, what comes next, what a breadcrumb
- * contains — so they are tested against a manifest rather than against the
+ * about structure (which page a URL is, what comes next, what a breadcrumb
+ * contains), so they are tested against a manifest rather than against the
  * real corpus. The corpus grows every commit; the rules do not.
  */
 import { describe, expect, it } from 'vitest';
@@ -171,7 +171,7 @@ describe('status and audience vocabulary', () => {
 
   // The page header prints the label and the search facets print the note, so
   // an entry that carried only one of the two would put a definition where a
-  // name belongs — which is exactly what it used to do.
+  // name belongs, which is exactly what it used to do.
   it('reads a declared audience as both a name and a sentence', () => {
     expect(audienceMeta(manifest, 'developer')).toEqual({
       label: 'Developer',

@@ -4,7 +4,7 @@
  * The corpus moved behind this API because it is a map of the whole system:
  * every trust boundary, every known gap, and a generated half that enumerates
  * every route, endpoint, table and exported symbol in the repository. So the
- * first two tests are the ones that matter — an anonymous request gets nothing,
+ * first two tests are the ones that matter: an anonymous request gets nothing,
  * and a request from an identity that is not the owner gets nothing either.
  *
  * The rest is file access. A route that maps a URL onto a path under a
@@ -90,7 +90,7 @@ describe('who may read it once anyone can sign up', () => {
   // The reason this suite exists. Self-hosted, `authGate` admits nobody but the
   // owner and the router's own check is redundant. In Cloud mode the gate
   // admits every verified Google account, so without that check turning Cloud
-  // on would hand the corpus to every subscriber — silently, on a flag flip.
+  // on would hand the corpus to every subscriber, silently, on a flag flip.
   const originalCloud = process.env.VITAE_CLOUD_ENABLED;
 
   beforeAll(() => {
@@ -183,7 +183,7 @@ describe('what the file server refuses', () => {
     // Telling the two apart would say where the root is and what sits beside
     // it. The encoded form is used because Express normalises a literal `..`
     // out of the path before routing, so only the encoded one ever reaches
-    // this handler — which is also why the literal cases above are answered by
+    // this handler, which is also why the literal cases above are answered by
     // the router never matching rather than by the check inside it.
     const missing = await request(app).get('/api/v1/docs/nope.json').set(authHeader(token));
     const outside = await request(app)

@@ -3,7 +3,7 @@
  * Build docs/generated/algorithms.json: the deterministic core, its tuning
  * constants, and who calls it.
  *
- * `packages/core/src/algorithms/` is the part of Vitae that decides things —
+ * `packages/core/src/algorithms/` is the part of Vitae that decides things:
  * how strong a relationship is, who to call next, which evidence goes on a
  * résumé, whether two records are the same person. Everything else moves data
  * around. It is also the part a reader cannot understand from its exports
@@ -19,7 +19,7 @@
  *   - its callers, resolved through the `@vitae/core` barrel.
  *
  * That last one needs the barrel. Nothing outside the package imports
- * `algorithms/tie-strength.js` — everything imports `@vitae/core`, so a naive
+ * `algorithms/tie-strength.js`. Everything imports `@vitae/core`, so a naive
  * reverse-dependency sweep reports every algorithm as having no consumers.
  * Mapping each exported symbol back to the module that declares it is what
  * turns "who uses this" from an unanswerable question into a list.
@@ -133,8 +133,8 @@ for (const rel of sourceFiles(DIR, { tests: false })) {
     title: firstSentence(doc),
     description: doc,
     // A pure module is one an explainer can run in the browser with fictional
-    // inputs. Everything here is pure by construction — no import that is not
-    // a sibling algorithm or a type — and recording it is what lets the docs
+    // inputs. Everything here is pure by construction (no import that is not
+    // a sibling algorithm or a type), and recording it is what lets the docs
     // surface call the real function instead of restating its formula.
     pure: !sf.statements.some(
       (st) =>
@@ -157,8 +157,8 @@ for (const rel of sourceFiles(DIR, { tests: false })) {
 
 /**
  * Resolve `@vitae/core` imports back to the algorithm that declares each
- * symbol. Anything imported from the barrel that is not an algorithm export —
- * a schema, a repository type — simply does not match, which is the correct
+ * symbol. Anything imported from the barrel that is not an algorithm export
+ * (a schema, a repository type) simply does not match, which is the correct
  * outcome rather than a miss to compensate for.
  */
 const graph = importGraph(['apps/api/src', 'apps/web/src', 'packages/core/src', 'services/buildsvc/src']);

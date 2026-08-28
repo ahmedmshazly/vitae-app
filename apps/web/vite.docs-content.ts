@@ -16,7 +16,7 @@ function compile(): void {
  *
  * The corpus is not a web asset any more: it is served by the API behind the
  * owner allow-list, out of the directory `DOCS_CONTENT_DIR` names. Nothing in
- * this bundle reads it, so this plugin no longer runs at build time — it exists
+ * this bundle reads it, so this plugin no longer runs at build time. It exists
  * purely so that editing a page during development recompiles it and the API
  * serves the new text on the next request.
  *

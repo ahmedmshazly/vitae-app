@@ -24,7 +24,7 @@ const NOTE_APPEND = 'note_append';
 
 export async function commitCapture(raw: string, opts: { lastViewedId?: string } = {}): Promise<CaptureResult> {
   // ^today and ^fri are calendar questions, answered in the request timezone
-  // (FR-025) — the host clock is a day ahead of some users every night.
+  // (FR-025). The host clock is a day ahead of some users every night.
   const plan = parseCapture(raw, userCalendarNow());
   const created: CaptureResult['created'] = { nodes: [], edges: [], reminders: [], tags: [] };
 

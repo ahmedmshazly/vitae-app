@@ -5,7 +5,7 @@
  * The rail shows every section but expands only the one being read. A corpus
  * of a hundred pages listed in full is a rail nobody scans; a corpus with one
  * section open is a rail that answers "where am I and what else is here". No
- * state is involved — the open section is derived from the route, so the rail
+ * state is involved: the open section is derived from the route, so the rail
  * cannot disagree with the page beside it, and a deep link opens correctly.
  */
 import { Link } from 'react-router-dom';

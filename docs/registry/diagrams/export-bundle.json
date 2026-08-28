@@ -4,7 +4,7 @@
   "title": "Producing an export bundle and restoring from one",
   "summary": "A streamed ZIP of every durable collection with per-file checksums, and the privileged restore that verifies all of them before it writes a single row.",
   "kind": "sequence",
-  "note": "The two halves have different front doors and that asymmetry is real, not a drawing simplification. Export is an authenticated HTTP route the browser calls. Restore has NO route: restoreBundle is reached only from the CLI script apps/api/src/scripts/restore.ts, run by an operator against an extracted directory with the API env pointed at the target database. The share-safe export (includeSensitive false) is deliberately not restorable — restore.ts:61 refuses it outright, because entire collections come back as empty files.",
+  "note": "The two halves have different front doors and that asymmetry is real, not a drawing simplification. Export is an authenticated HTTP route the browser calls. Restore has NO route: restoreBundle is reached only from the CLI script apps/api/src/scripts/restore.ts, run by an operator against an extracted directory with the API env pointed at the target database. The share-safe export (includeSensitive false) is deliberately not restorable: restore.ts:61 refuses it outright, because entire collections come back as empty files.",
   "requirements": [
     "FR-006",
     "FR-009",
@@ -42,7 +42,7 @@
     {
       "id": "postgres",
       "label": "Postgres",
-      "note": "Walked id-ordered with keyset paging (id > last), 500 rows at a time — not OFFSET, which would re-scan the prefix on every page."
+      "note": "Walked id-ordered with keyset paging (id > last), 500 rows at a time. Not OFFSET, which would re-scan the prefix on every page."
     },
     {
       "id": "storage",

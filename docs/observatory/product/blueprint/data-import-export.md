@@ -1,6 +1,6 @@
 ---
 id: PRD-BP-DATA
-title: "Blueprint: Data — imports, integrity, exports"
+title: "Blueprint: Data imports, integrity, and exports"
 summary: The chain-of-custody surfaces stay; the import hub gains the longitudinal update path that turns re-import from a hazard into a habit.
 audience: [maintainer, designer, developer]
 domain: product
@@ -14,7 +14,7 @@ sources:
   - docs/registry/requirements.json
 ---
 
-# Blueprint: Data - imports, integrity, exports
+# Blueprint: Data imports, integrity, and exports
 
 This hub is where trust is won or lost. P4 judges the product here first;
 P3's evidence is only as good as the custody chain that brought it in.

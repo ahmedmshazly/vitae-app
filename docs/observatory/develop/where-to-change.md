@@ -1,7 +1,7 @@
 ---
 id: DEV-WHERE
 title: Where a change belongs
-summary: Eight workspaces in two layers, five edges between them, and the rule that decides which one owns a change — plus what really holds the boundary.
+summary: Eight workspaces in two layers, five edges between them, and the rule that decides which one owns a change, plus what really holds the boundary.
 audience: [developer, maintainer]
 domain: develop
 type: explanation

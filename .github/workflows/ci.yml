@@ -263,7 +263,7 @@ jobs:
       # The web build's half of the auth story. This job already starts the
       # Firebase Auth emulator, but nothing told the SPA about it, so
       # `googleSignInAvailable` was false and the sign-in page rendered without
-      # its Google button — a page no developer has ever seen, because every
+      # its Google button, a page no developer has ever seen, because every
       # developer machine has these five lines from .env.example. Three specs
       # were failing on the difference. Values are the documented local ones;
       # `assertHostedConfiguration` in apps/web/vite.config.ts rejects exactly

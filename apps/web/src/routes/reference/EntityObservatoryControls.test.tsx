@@ -53,7 +53,7 @@ describe('the observatory cockpit drawer', () => {
     expect(drawer).toHaveAttribute('aria-hidden', 'true');
     // The attribute has to actually reach the DOM. It was written as
     // `{...{ inert: '' }}`, which React 18 honoured and React 19 reads as a
-    // boolean — the empty string is false, so the attribute silently vanished
+    // boolean: the empty string is false, so the attribute silently vanished
     // on the upgrade and nothing but the e2e axe sweep noticed. jsdom does not
     // implement the `inert` *property*, so this asserts the attribute; that it
     // actually removes the tab stops is what entity-catalog.spec.ts checks, in

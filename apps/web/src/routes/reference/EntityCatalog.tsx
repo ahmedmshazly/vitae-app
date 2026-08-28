@@ -666,7 +666,7 @@ export function EntityCatalog() {
   return (
     <div className="ec ec--observatory" data-print-mode={printMode ?? 'atlas'}>
       {/* This screen mounts outside Shell, so it inherits none of the shell's
-          chrome — including its skip link. Ahead of the content sit a back
+          chrome, including its skip link. Ahead of the content sit a back
           link, seven output buttons and a three-way tab strip, and a keyboard
           reader crossed all of them on arrival and again after every lens
           change. */}

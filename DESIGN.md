@@ -69,7 +69,7 @@ dots, rings, meters, and compact badges. Spacing comes from the seven-step `4 / 
 32 / 48px` scale. Dense rows begin at `36px`; app ledgers commonly resolve to `42–44px`. Precise
 pointer targets never fall below `32px`, and coarse-pointer targets become `44px`.
 
-Reserve `--ae-shadow-overlay` for transient overlays—dialogs, sheets, popovers, tooltips, toasts,
+Reserve `--ae-shadow-overlay` for transient overlays: dialogs, sheets, popovers, tooltips, toasts,
 and compact floating instrument/map controls. Ordinary panels, cards, canvases, and document
 previews use containment and ruling rather than elevation.
 
@@ -79,7 +79,7 @@ previews use containment and ruling rather than elevation.
   titles in normal case at a responsive `27–38px`, medium weight, with tight tracking.
 - IBM Plex Mono carries data, dates, counts, provenance, keyboard hints, stage numbers, register
   labels, and compact uppercase section labels. The `--ae-font-display` token also resolves to this
-  mono face, but it is for headings—not clickable controls or small body copy.
+  mono face, but it is for headings, not clickable controls or small body copy.
 - App section and card headings are compact mono labels; page titles remain visibly larger and
   sans. Do not collapse those two levels into one treatment.
 - Source Serif 4 is an editorial exception used by the public manifesto body and quotations.
@@ -92,9 +92,9 @@ runtime font or font-CDN dependency. Keep system fallbacks, but do not add a net
 
 The authenticated shell has four persistent levels:
 
-1. The primary rail contains the Vitae mark, global find (`⌘P`), the six workspace hubs—Today,
-   Network, Career, Explore, Data, Settings—the primary Capture action (`⌘K`), Help, system status,
-   and the user-controlled collapse button.
+1. The primary rail contains the Vitae mark, global find (`⌘P`), the six workspace hubs (Today,
+   Network, Career, Explore, Data, Settings), the primary Capture action (`⌘K`), Help, system
+   status, and the user-controlled collapse button.
 2. The top bar contains the breadcrumb, a second global command/search affordance, demo-space
    control, structured-new and Capture actions, reminders, and sign-out.
 3. The workspace strip names the current workspace and exposes only its local destinations. Explore
@@ -178,7 +178,7 @@ Feedback is both textual and animated, but animation never substitutes for the t
   retryable error, distinct first-use and filtered-empty states, then content. Cached data stays
   visible during refresh; refresh failure becomes a banner rather than a false blank screen.
   Secondary-query failures degrade the affected detail without erasing truthful primary content.
-- Skeletons pulse opacity only—never shimmer—and include a polite loading label. The skeleton
+- Skeletons pulse opacity only, never shimmer. They include a polite loading label. The skeleton
   unmounts before resolved content enters; do not cross-fade the two.
 - Empty states are compact invitations with a real next action or filter escape, not decorative
   illustration. Error states use `role="alert"`, plain-language detail, and Retry where possible.
@@ -282,4 +282,4 @@ rebuilding focus trapping, escape behavior, announcement timing, or swipe handli
    with focus behavior, and run the relevant accessibility tests when shared patterns change.
 
 When a screen feels generic, the correction is usually structural: strengthen the lead question,
-show the trace to its evidence, and replace repeated containers with a ledger—not add decoration.
+show the trace to its evidence, and replace repeated containers with a ledger, not add decoration.

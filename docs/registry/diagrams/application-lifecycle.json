@@ -37,12 +37,12 @@
     {
       "id": "interview",
       "label": "Interview",
-      "note": "Interview rounds are separate `interview` nodes joined by `INTERVIEW_FOR` edges, each with its own outcome enum — scheduled, passed, failed, pending, cancelled (packages/core/src/schema/node-props.ts:228). A failed round does not move the application; a person does."
+      "note": "Interview rounds are separate `interview` nodes joined by `INTERVIEW_FOR` edges, each with its own outcome enum: scheduled, passed, failed, pending, cancelled (packages/core/src/schema/node-props.ts:228). A failed round does not move the application; a person does."
     },
     {
       "id": "offer",
       "label": "Offer",
-      "note": "An offer is on the table. Still open — the decision has not been recorded."
+      "note": "An offer is on the table. Still open: the decision has not been recorded."
     },
     {
       "id": "accepted",

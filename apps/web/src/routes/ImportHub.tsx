@@ -475,7 +475,7 @@ export function ImportHub() {
           <InfoPopover title="Why staging">
             <p>
               A file import parses and checks for duplicates before it writes. You accept or skip
-              each row, then commit—or discard the batch and leave the graph untouched.
+              each row, then commit, or discard the batch and leave the graph untouched.
             </p>
             <p>
               GitHub syncs directly after connection. Every committed file batch can still be rolled

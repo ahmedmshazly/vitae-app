@@ -4,7 +4,7 @@
   "title": "The payment provider's webhook",
   "summary": "How a request with no session authenticates itself by HMAC over raw bytes, how a duplicate or out-of-order delivery is neutralised, and the one thing it is allowed to change.",
   "kind": "sequence",
-  "note": "This whole flow is gated closed in a default build: cloudEnabled() reads VITAE_CLOUD_ENABLED, which .env.example:40 leaves false, and the handler returns 404 CLOUD_DISABLED before touching the body. Note also that the Cloud and Paddle variables are read straight from process.env in cloud/config.ts, not through the validated schema in packages/config/src/env.ts, so none of the boot-time production refusals cover them. The webhook is the only thing that changes what a workspace may do — a checkout creates a provider transaction and grants nothing, and returning from a checkout page proves nothing.",
+  "note": "This whole flow is gated closed in a default build: cloudEnabled() reads VITAE_CLOUD_ENABLED, which .env.example:40 leaves false, and the handler returns 404 CLOUD_DISABLED before touching the body. Note also that the Cloud and Paddle variables are read straight from process.env in cloud/config.ts, not through the validated schema in packages/config/src/env.ts, so none of the boot-time production refusals cover them. The webhook is the only thing that changes what a workspace may do: a checkout creates a provider transaction and grants nothing, and returning from a checkout page proves nothing.",
   "requirements": [
     "FR-105"
   ],
@@ -88,7 +88,7 @@
     {
       "from": "paddle-module",
       "to": "error-handler",
-      "label": "401 INVALID_WEBHOOK_SIGNATURE — no secret, stale timestamp, or digest mismatch",
+      "label": "401 INVALID_WEBHOOK_SIGNATURE: no secret, stale timestamp, or digest mismatch",
       "kind": "refusal",
       "note": "Three ways to fail: the timestamp must be within five seconds of now; each candidate digest must be 64 hex characters of the right byte length before it is decoded, so malformed attacker input is a clean false rather than a timingSafeEqual length exception; and the comparison itself is constant time.",
       "source": "apps/api/src/cloud/paddle.ts:157"
@@ -96,7 +96,7 @@
     {
       "from": "paddle-module",
       "to": "error-handler",
-      "label": "400 INVALID_WEBHOOK — not a Buffer, or no event_id/event_type after parsing",
+      "label": "400 INVALID_WEBHOOK: not a Buffer, or no event_id/event_type after parsing",
       "kind": "refusal",
       "note": "Two separate checks: the body must be a raw Buffer (routes/webhooks/paddle.ts:13), and parsePaddleWebhook (cloud/paddle.ts:170) must find both an event_id and an event_type. Parsing happens only after the signature verified, so there is never a parsed object to be confused about.",
       "source": "apps/api/src/routes/webhooks/paddle.ts:19"
@@ -138,7 +138,7 @@
       "to": "paddle-module",
       "label": "compare the provider timestamp against the stored one; mark stale if older or absent",
       "kind": "aside",
-      "note": "The provider's own timestamp is the ordering key. Once one has been recorded, an older — or an entirely un-timestamped — retry can only be audit evidence; it must never roll a customer's entitlement backwards.",
+      "note": "The provider's own timestamp is the ordering key. Once one has been recorded, an older retry, or an entirely un-timestamped one, can only be audit evidence; it must never roll a customer's entitlement backwards.",
       "source": "apps/api/src/cloud/paddle.ts:277"
     },
     {
@@ -146,7 +146,7 @@
       "to": "postgres",
       "label": "not stale: upsert billing_customers and billing_subscriptions",
       "kind": "call",
-      "note": "Status, billing period, current period end, cancel-at-period-end and the raw payload. Nothing about the plan's price comes from the event — the price catalogue is server-owned.",
+      "note": "Status, billing period, current period end, cancel-at-period-end and the raw payload. Nothing about the plan's price comes from the event: the price catalogue is server-owned.",
       "source": "apps/api/src/cloud/paddle.ts:281"
     },
     {
