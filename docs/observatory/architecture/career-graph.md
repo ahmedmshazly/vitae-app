@@ -28,8 +28,8 @@ related: [ARC-OVERVIEW, ARC-PERSISTENCE, ARC-RESUME, ARC-ALGORITHMS]
 
 ## In short
 
-Everything Vitae stores is either a node — a person, a role, a project, a skill,
-a talk — or an edge between two of them. An edge is a first-class record with
+Everything Vitae stores is either a node - a person, a role, a project, a skill,
+a talk - or an edge between two of them. An edge is a first-class record with
 its own fields, not a pointer. The relationship *is* the data: what you know
 about knowing someone lives on the edge that says you know them.
 
@@ -46,8 +46,8 @@ for every place that listed them.
 
 Node types come in three families. The career core is what the product is built
 around and each of those types has bespoke screens. The life core is the
-surrounding record — events, interactions, tasks, goals, habits, journal
-entries, ideas, links, documents, subscriptions and posts — that gives the
+surrounding record - events, interactions, tasks, goals, habits, journal
+entries, ideas, links, documents, subscriptions and posts - that gives the
 career material its context. The proposed family is schema-only: the shapes
 exist and validate, but the product has not grown surfaces for them.
 
@@ -71,7 +71,7 @@ stranger's credentials on someone's résumé.
 **Thirty-four node types and twenty-nine edge types.** Counted from the source
 of truth, `packages/core/src/types.ts`, where `NODE_TYPES` is composed from
 three arrays: 16 career-core, 11 life-core and 7 proposed. `EDGE_TYPES` is a
-single array of 29 — INTRODUCED joined it on 2026-08-26 (FR-COMM-003).
+single array of 29 - INTRODUCED joined it on 2026-08-26 (FR-COMM-003).
 
 Three documents in this repository disagree with that, and all three are wrong:
 
@@ -105,10 +105,10 @@ unreachable branch.
 `packages/core/src/schema/envelope.ts` defines four schemas: what a caller may
 send when creating a node, the system-managed fields a persisted node also
 carries, and the same pair for edges. A create envelope covers identity and
-provenance — title, subtitle, notes, a date range with an explicit precision,
+provenance - title, subtitle, notes, a date range with an explicit precision,
 status, pinning, sensitivity, the provenance source and reference, and a
-confidence score. The system fields — the identifier, the timestamps, the
-soft-delete and merge markers, and the revision number — are added by the
+confidence score. The system fields - the identifier, the timestamps, the
+soft-delete and merge markers, and the revision number - are added by the
 repository and are not settable by a caller.
 
 The update envelopes are derived from the create envelopes by making every
@@ -126,8 +126,8 @@ document identity. The first key is primary and determines that identity.
 `packages/core/src/schema/validate.ts` validates in two stages and returns a
 discriminated result rather than throwing, so a route or an importer can show
 field-level errors. Stage one parses the envelope. Stage two looks up the
-per-type property schema — `propsSchemaFor(type)` for nodes,
-`edgePropsSchemaFor(type)` for edges — and parses `props` against it, prefixing
+per-type property schema - `propsSchemaFor(type)` for nodes,
+`edgePropsSchemaFor(type)` for edges - and parses `props` against it, prefixing
 any error path with `props` so the message points at the field a person can see.
 
 ### Edge endpoints are typed
@@ -158,7 +158,7 @@ edges, all running person → record.
 descriptors rather than restating them, so a new subject-bearing type is picked
 up automatically and the two lists cannot drift. On the read side,
 `apps/api/src/services/subjects.ts` makes one pass over the edges to build an
-owner index — who owns what, what is unowned, and what is claimed twice.
+owner index - who owns what, what is unowned, and what is claimed twice.
 
 Two invariants follow:
 

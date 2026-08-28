@@ -12,9 +12,9 @@ KNOWS edge (the relationship itself) in place on the person profile.
    `label →` (node is source) or `← label` (node is destination), with the
    catalog description as help text.
 2. **Entity picker** for the other endpoint, restricted to the edge's legal
-   node types; inline "Create …" stubs allowed.
+   node types; inline "Create ..." stubs allowed.
 3. **Props mini-form** per edge type (department, involvement, level,
-   centrality, nights, outcome, shared_on…).
+   centrality, nights, outcome, shared_on...).
 4. Primary "Create link" → `POST /edges`; toast with **Undo** (edge
    soft-delete).
 

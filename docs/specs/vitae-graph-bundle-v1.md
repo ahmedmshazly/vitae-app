@@ -18,7 +18,7 @@ contract tests fail until both sides agree.
   "schema_version": 1,
   "source": {
     "system": "aperture",
-    "run_id": "3f2b…",           // optional; the producing run
+    "run_id": "3f2b...",           // optional; the producing run
     "exported_at": "2026-07-28T12:00:00Z"
   },
   "nodes": [
@@ -28,13 +28,13 @@ contract tests fail until both sides agree.
       "identity_keys": ["linkedin:person:jsmith"],
       "title": "Jane Smith",
       "subtitle": "Staff Engineer at Acme",
-      "props": { "headline": "…", "city": "Cairo" },
+      "props": { "headline": "...", "city": "Cairo" },
       "start_date": "2019-04-01",               // optional, YYYY-MM-DD
       "end_date": null,
       "date_precision": "month",
       "notes_md": "",
       "source": "import_aperture",
-      "source_ref": "aperture:run:3f2b…",
+      "source_ref": "aperture:run:3f2b...",
       "confidence": 0.9
     }
   ],
@@ -47,7 +47,7 @@ contract tests fail until both sides agree.
       "start_date": null,
       "end_date": null,
       "source": "import_aperture",
-      "source_ref": "aperture:run:3f2b…",
+      "source_ref": "aperture:run:3f2b...",
       "confidence": 0.9
     }
   ]
@@ -80,7 +80,7 @@ Format: `<system>:<kind>:<key>`, lowercased, no whitespace.
 | person | `linkedin:person:jsmith` |
 | company | `linkedin:company:acme-corp` |
 | job | `linkedin:job:3812004421` |
-| post | `linkedin:post:urn-li-activity-7012…` |
+| post | `linkedin:post:urn-li-activity-7012...` |
 
 Rules:
 

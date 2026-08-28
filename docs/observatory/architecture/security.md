@@ -39,7 +39,7 @@ Vitae denies by default. Every route under the API prefix requires a verified
 identity, and the six routes that answer without one do so for reasons you can
 check individually. Three of those six sit outside the gate because of where
 they are registered in the middleware stack, not because anything declares them
-public — a distinction that matters, because the list that *looks* like the
+public - a distinction that matters, because the list that *looks* like the
 declaration of public routes contains an entry it cannot actually govern.
 
 Beyond the gate, the system has four other places where untrusted data crosses
@@ -50,8 +50,8 @@ states all four.
 
 ## How it works
 
-The gate is one middleware mounted at the API prefix. It resolves a token —
-either the local development session or a Google identity token — and then
+The gate is one middleware mounted at the API prefix. It resolves a token -
+either the local development session or a Google identity token - and then
 applies an authorisation rule that depends on the mode: a self-hosted install
 compares the verified email against the configured owner, and a hosted install
 accepts any verified identity and lets workspace membership decide what it can
@@ -118,8 +118,8 @@ trade for operability rather than as nothing.
 receives the untouched request bytes, because parsing and re-serialising the
 body would change what was signed. Verification requires a timestamp within five
 seconds, validates the candidate digest's textual form and byte length before
-comparing — so malformed attacker input is a clean false rather than an
-exception — and compares in constant time. When the hosted mode is off the
+comparing - so malformed attacker input is a clean false rather than an
+exception - and compares in constant time. When the hosted mode is off the
 handler returns a 404 before doing anything else. Possession of the shared
 secret is the authentication; there is no session to present.
 
@@ -127,8 +127,8 @@ secret is the authentication; there is no session to present.
 set; even with the flag on it refuses any caller that is not on the loopback
 interface; and the environment schema refuses to start a production process with
 the flag set at all. The issued token leaves as an `httpOnly` cookie and is not
-echoed in the body — echoing it would put an owner credential in reach of
-scripts and into every proxy log — with one exception for emulator runs, where
+echoed in the body - echoing it would put an owner credential in reach of
+scripts and into every proxy log - with one exception for emulator runs, where
 the test client has no cookie jar.
 
 **`/api/v1/auth/me` is public because the browser has to ask who it is before it
@@ -136,7 +136,7 @@ can render a sign-in screen.** It resolves a token when one is present and
 returns nulls when it is not. It also returns two booleans about the deployment
 in either case: whether the hosted mode is on, and whether developer sign-in is
 enabled. Both are things an anonymous caller learns, and the second is worth
-knowing about — it tells a caller whether the dev-login route is worth probing,
+knowing about - it tells a caller whether the dev-login route is worth probing,
 though the loopback check and the production refusal are what actually stop it.
 
 ### The public-path list contains an entry it cannot match
@@ -149,7 +149,7 @@ The pattern anchors on `/health` alone and can never match.
 `/health` is reachable because `app.ts:58` registers it four lines above the
 gate, and for no other reason. Anything that reads the public-path list as *the*
 inventory of unauthenticated routes is describing a mechanism that does not
-govern the route it names — and would also miss the two routes registered above
+govern the route it names - and would also miss the two routes registered above
 the gate that the list does not mention at all. The generated API catalog labels
 these correctly, distinguishing `public` from `outside-auth-gate`.
 
@@ -170,7 +170,7 @@ scattered through the source they would otherwise have to read.
 
 It is now served by this API, from a router mounted inside the v1 tree and
 therefore *below* `app.use('/api', authGate)`. It declares no public paths, so
-it inherits the default-deny gate — but unlike every other router it does *not*
+it inherits the default-deny gate - but unlike every other router it does *not*
 rely on that gate alone to decide who may read it, and the reason is worth
 following.
 
@@ -186,7 +186,7 @@ So `apps/api/src/routes/v1/docs.ts` carries its own ownership test, applied to
 every request before any file is resolved, and it does not consult the mode.
 The corpus is a property of the installation rather than of a tenant: it
 describes this system's trust boundaries and enumerates its whole surface, and
-no subscriber has any business reading that. A non-owner receives `403` — not
+no subscriber has any business reading that. A non-owner receives `403` - not
 `404`, because the caller is already authenticated and hiding the route's
 existence would buy nothing while costing them an explanation.
 
@@ -201,7 +201,7 @@ nobody meant to publish. Containment is checked twice, and the second check is
 there because the first was not enough.
 
 The first check resolves the requested path against the root and asserts the
-result is inside it, separator included — `startsWith` alone would accept a
+result is inside it, separator included - `startsWith` alone would accept a
 sibling directory whose name merely begins with the root's. That is what
 catches a traversal spelled in the URL. It has to catch the percent-encoded
 form specifically, because Express normalises a literal `..` out of the path
@@ -214,12 +214,12 @@ filesystem passed that check and was then read. The first version of this
 router had exactly that hole. Its own test suite found it, and the fix is the
 second check: `realpathSync` both the candidate and the root, then assert
 containment again on the paths that will actually be opened. This is the
-difference between a defence that was reasoned about and one that was tried —
+difference between a defence that was reasoned about and one that was tried -
 and it is why the suite spells the traversal cases out rather than assuming
 them.
 
-Every refusal — a traversal, an absolute path, a link pointing out, a
-directory, a file that is not there — returns the same 404 with the same body,
+Every refusal - a traversal, an absolute path, a link pointing out, a
+directory, a file that is not there - returns the same 404 with the same body,
 so a caller cannot learn where the root is or what sits beside it.
 
 Two response details follow from the corpus being private rather than merely
@@ -230,7 +230,7 @@ somehow is not JSON cannot be served as something a browser will execute.
 
 A file request against a deployment that was never given a corpus answers 503
 with a code naming that specific condition, rather than an empty documentation
-set — the difference between an operator's missing build step and a reader's
+set - the difference between an operator's missing build step and a reader's
 broken link.
 
 The integration suite proves the part that matters: an anonymous request is
@@ -239,8 +239,8 @@ who is not the owner. A real token is not the same thing as permission.
 
 The `/docs` address in the browser is a separate question and answers without a
 session on purpose. It renders an empty frame and a sentence naming the account
-to sign in with, because the alternative — the workspace gate's silent redirect
-— sends a reader to debug a build that is working. The frame holds no corpus
+to sign in with, because the alternative, the workspace gate's silent redirect,
+sends a reader to debug a build that is working. The frame holds no corpus
 text. Every page, the navigation and the search index arrive from an
 authenticated request or not at all.
 
@@ -267,9 +267,9 @@ and defers the real decision to workspace membership, which
 [The Cloud workspace and billing plane](cloud-plane.md) covers.
 
 Refusals carry a neutral message and no detail. A request with no credential is
-told a sign-in is required; every other refusal — an invalid token, a token from
+told a sign-in is required; every other refusal - an invalid token, a token from
 the wrong provider, an unverified email, a verified identity that is not the
-owner — returns the same status, code and message, so a probe holding a token
+owner - returns the same status, code and message, so a probe holding a token
 learns nothing about why it was refused.
 
 ### Response headers and origins
@@ -295,7 +295,7 @@ then applies a second check for combinations that are each individually valid.
 In production it refuses to start when developer sign-in is enabled, when the
 build service secret is one of the published development defaults, when the
 session secret looks like a placeholder, or when the database URL still points
-at localhost — the last because a production process that quietly fell back to
+at localhost - the last because a production process that quietly fell back to
 the local default would come up healthy against an empty database and start
 accepting writes into it.
 
@@ -340,9 +340,9 @@ start without a secret, and refuses to start in production with one of the
 published development defaults. It binds to loopback unless told otherwise, so a
 bare process is not on the network. Compilation runs in untrusted mode with no
 shell escape, in a per-request temporary directory that is removed afterwards,
-against a package cache warmed at image build time — the image build itself
+against a package cache warmed at image build time - the image build itself
 proves the cache is complete by re-running the warm step with the network
-disabled — and the container runs as an unprivileged user.
+disabled - and the container runs as an unprivileged user.
 
 ### Files and exports
 
@@ -353,14 +353,14 @@ workspace, with the reason recorded in place: a shared content hash across two
 tenants is itself an information leak, even though the object would be
 identical.
 
-Where a person’s data enters, where it rests, and every way it leaves:
+Where a person's data enters, where it rests, and every way it leaves:
 
 ```diagram
 DGM-DATA-LINEAGE
 ```
 
 On the way out, records marked sensitive are excluded from an export unless the
-person explicitly opts in, and the exclusion is transitive — the edges that
+person explicitly opts in, and the exclusion is transitive - the edges that
 touch a sensitive record, and the revisions and atoms that describe it, are
 excluded too. A partial exclusion would be worse than none, because it would
 leave the shape of what was hidden.
@@ -370,8 +370,8 @@ leave the shape of what was hidden.
 Three, stated because a security page that only listed defences would be
 misleading.
 
-The Cloud plane is the most security-sensitive code in the repository — tenant
-isolation, entitlement, and a payment webhook — and none of its five modules has
+The Cloud plane is the most security-sensitive code in the repository - tenant
+isolation, entitlement, and a payment webhook - and none of its five modules has
 a colocated test suite. Its only automated coverage is a single integration file
 of four cases.
 

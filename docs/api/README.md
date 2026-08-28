@@ -107,9 +107,9 @@ transaction ID; access changes only after a verified webhook is recorded.
 
 ```http
 POST /api/v1/targets
-{ "role_title": "Senior ML Engineer", "company": "Nile", "jd_raw": "…" }
+{ "role_title": "Senior ML Engineer", "company": "Nile", "jd_raw": "..." }
 
-201 → { "target": { "id": "…", "parsed": {
+201 → { "target": { "id": "...", "parsed": {
   "parser_version": "2.0.0-bm25f",
   "keywords": [ { "term": "Python", "weight": 4.11, "skill_id": "s_py", "sections": ["requirements"], "spans": [[24,30]] } ]
 } } }

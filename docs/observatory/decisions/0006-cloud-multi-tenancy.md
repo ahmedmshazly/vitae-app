@@ -79,7 +79,7 @@ chosen by a request header and there were only two of them.
 ADR 0005 had moved the data plane to Postgres three weeks earlier and kept
 `(space, id)` as the primary key of every document table. That key was correct
 for one owner and one sample dataset. It is wrong for two customers, because
-two customers legitimately hold rows with the same id — most obviously the
+two customers legitimately hold rows with the same id - most obviously the
 singleton documents the application allocates by name rather than by UUID.
 
 The requirements document of the time denied multi-tenant hosting outright.
@@ -108,7 +108,7 @@ workspaces.
 What the composite key buys is that the boundary stops depending on a query
 being written correctly. Under `(space, id)`, a read that forgot its workspace
 filter could return another tenant's row for a colliding id, and a write that
-forgot it could overwrite one — 007's own comment on the unique index says
+forgot it could overwrite one - 007's own comment on the unique index says
 upserts must target the tenant key, never the legacy key, or a reused
 identifier could overwrite another customer's row. Under `(workspace_id, id)`,
 the id alone is no longer an identity, so the same mistake produces a
@@ -130,7 +130,7 @@ the webhook, below.
 
 Migration 007 also creates a control plane that sits outside the graph
 repository: identities, workspaces, memberships, a lifecycle row per workspace,
-and the billing records. `control-plane.ts` explains the separation — these are
+and the billing records. `control-plane.ts` explains the separation - these are
 control-plane records, not exportable career data, and they are deliberately
 not reachable through the repository that serves the graph.
 
@@ -163,7 +163,7 @@ that does not parse falls back to read-only rather than to full access.
 
 `db/space.ts` holds the current `{space, workspaceId}` in an
 `AsyncLocalStorage`; `workspaceMiddleware` is what puts a resolved workspace
-there. `db/repository.ts` reads it per call and adds `workspace_id = …` to
+there. `db/repository.ts` reads it per call and adds `workspace_id = ...` to
 every read, write, upsert and delete it issues.
 
 That is the whole enforcement surface for the graph, and it holds because the
@@ -180,7 +180,7 @@ workspace's export cannot block another's.
 
 ### The payment provider authenticates with a signature, not a session
 
-`/webhooks/paddle` is mounted at `apps/api/src/app.ts:50` — before the JSON body
+`/webhooks/paddle` is mounted at `apps/api/src/app.ts:50` - before the JSON body
 parsers and outside `/api` altogether, so the default-deny gate never sees it.
 Both halves of that placement are deliberate and both are documented in the
 code. It is outside `/api` because a provider request carries no user session
@@ -206,8 +206,8 @@ unauthenticated write path tolerable:
   duplicate and changes no state.
 - **In order.** Migration 008 adds the provider's own update timestamp and an
   index on it. Before applying an event the transaction locks the workspace's
-  lifecycle row — chosen over locking the subscription row because a first-ever
-  subscription event has no subscription row to lock — and then discards any
+  lifecycle row - chosen over locking the subscription row because a first-ever
+  subscription event has no subscription row to lock - and then discards any
   event whose provider timestamp is not newer than the stored one. An
   untimestamped retry counts as stale once a timestamp exists, so a late
   delivery cannot roll an entitlement backwards. Stale events are still
@@ -217,7 +217,7 @@ unauthenticated write path tolerable:
   An event naming no known workspace is stored unlinked and grants nothing.
 
 Entitlement is webhook-only in both directions. The API creates a transaction
-from a plan catalogue it owns — `packages/core/src/cloud/individual-plan.ts`
+from a plan catalogue it owns - `packages/core/src/cloud/individual-plan.ts`
 holds the plan code, the permitted billing periods, the entitlement names and
 the lifecycle windows, while provider price identifiers stay in deployment
 configuration because they belong to a particular provider catalogue rather
@@ -261,7 +261,7 @@ moved existing rows without rewriting their documents.
 **Accepted.** Two partition columns now coexist on every document table, and
 migration 010's trigger can rewrite a tenant key from the legacy one. In Cloud
 mode the repository always writes `space = 'real'`, so the trigger's condition
-cannot be reached through a request — but it is a write path that changes a
+cannot be reached through a request - but it is a write path that changes a
 tenant key based on a legacy column, and it is compatibility scaffolding that
 will need removing rather than leaving.
 
@@ -283,9 +283,9 @@ workspace.
 Request traffic never reaches it in Cloud mode, because `workspaceMiddleware`
 either establishes a context or fails the request. Everything that runs outside
 a request does reach it. Eight of the twelve scripts in `apps/api/src/scripts/`
-establish no context at all — the graph audit, the subject backfill, the export
+establish no context at all - the graph audit, the subject backfill, the export
 bundle, the migration runner, the résumé probe, the restore, the seed and the
-import tidy — so each operates on the legacy workspace regardless of what the
+import tidy - so each operates on the legacy workspace regardless of what the
 operator intended, and none takes a workspace argument. The retention purge and
 the API's scheduled sweep do it correctly, by enumerating the active
 non-system workspaces and running once inside each.
@@ -339,11 +339,11 @@ design above.
 5. **Test depth is one example per property.** All five server-side Cloud
    modules are mapped as covered in `docs/testing/source-test-map.json`, and
    every one of them names the same suite: `cloud.integration.test.ts`, which
-   is four cases. They assert the right properties — a second user's workspace
+   is four cases. They assert the right properties - a second user's workspace
    is isolated, a header cannot select a workspace the caller is not a member
    of, a read-only workspace still reads and exports but cannot mutate,
    checkout will not reach a provider without a server-owned catalogue, and a
-   signed event is accepted once while a stale later delivery is ignored — at
+   signed event is accepted once while a stale later delivery is ignored - at
    roughly one example each. The webhook has one negative case, a
    correctly-shaped signature carrying a non-hexadecimal digest, and none for a
    missing signature header, for a timestamp outside the tolerance, for an event

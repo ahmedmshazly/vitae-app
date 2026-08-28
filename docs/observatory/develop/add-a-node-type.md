@@ -31,7 +31,7 @@ related: [DEV, DEV-WHERE, DEV-TESTING, DEV-GATES]
 ## What a type is here
 
 `packages/core/src/types.ts` holds two string-literal unions and everything
-else follows from them. `NODE_TYPES` composes three groups — 16 career types,
+else follows from them. `NODE_TYPES` composes three groups - 16 career types,
 11 life types and 7 proposed types, 34 in all. `EDGE_TYPES` is a flat list of
 28 relationship types.
 
@@ -64,8 +64,8 @@ work for a new type the moment its schema exists.
 **No subject registration.** Whether a record belongs to a person is derived
 from the form descriptor's `subject` field, so declaring it there is enough;
 `SUBJECT_BEARING_TYPES` and the read-path helpers pick it up automatically. A
-type that belongs to nobody — organisations, skills, locations are shared
-vocabulary rather than property — declares no subject.
+type that belongs to nobody - organisations, skills, locations are shared
+vocabulary rather than property - declares no subject.
 
 ## Adding a node type
 
@@ -77,7 +77,7 @@ they carry the intent of the type and `NODE_TYPES` is their concatenation, so
 the composed union updates itself.
 
 The moment you do this, `pnpm typecheck` starts failing in two places. That is
-the design working — the next two steps are what it is asking for.
+the design working - the next two steps are what it is asking for.
 
 ### 2. Add the props schema and register it
 
@@ -86,7 +86,7 @@ per-type fields and register it in `NODE_PROPS_SCHEMAS`.
 
 That registry closes with `satisfies Record<NodeType, z.ZodType>`, so a missing
 key is a compile error rather than a runtime surprise. Existing schemas are
-`.passthrough()` — unknown keys survive a `validate` and a `PATCH` instead of
+`.passthrough()` - unknown keys survive a `validate` and a `PATCH` instead of
 being silently stripped, which is what lets an import or an older revision
 round-trip.
 
@@ -107,8 +107,8 @@ inline props exist in that edge's schema.
 ### 4. Add it to the "+ New" menu
 
 In `apps/web/src/features/forms/NewEntityMenu.tsx`, add the type to one of the
-`NEW_ENTITY_MENU_GROUPS`. This is not compiler-enforced — the groups are typed
-as `readonly NodeType[]`, and a shorter list is still a valid one — but three
+`NEW_ENTITY_MENU_GROUPS`. This is not compiler-enforced - the groups are typed
+as `readonly NodeType[]`, and a shorter list is still a valid one - but three
 tests compare it against `NODE_TYPES` and will fail:
 `NewEntityMenu.test.ts`, `Collections.test.ts` (the collection tiles reuse the
 same groups) and `entityCatalogModel.test.ts`.
@@ -143,10 +143,10 @@ The same shape, one list shorter.
 
 1. Add the literal to `EDGE_TYPES` in `packages/core/src/types.ts`.
 2. Add a props schema and register it in `EDGE_PROPS_SCHEMAS`
-   (`satisfies Record<EdgeType, z.ZodType>` — compile error if missing).
+   (`satisfies Record<EdgeType, z.ZodType>` - compile error if missing).
 3. Add a descriptor to `EDGE_FORM_DESCRIPTORS` in
    `packages/core/src/forms/edge-forms.ts`, typed `Record<EdgeType,
-   EdgeFormDescriptor>` — also a compile error if missing.
+   EdgeFormDescriptor>` - also a compile error if missing.
 4. Declare its endpoints. The descriptor's `srcTypes` and `dstTypes` are the
    matrix `edgeEndpointsAllowed()` enforces on edge creation, with `'*'`
    meaning any type. A relationship with real constraints should say so here
@@ -156,7 +156,7 @@ The same shape, one list shorter.
    `entityCatalogModel.test.ts` compares `CATALOG_RELATIONS` against
    `EDGE_TYPES`, and the model reads the catalog while it loads.
 
-An edge type needs no glyph and no menu entry — edges are created from a
+An edge type needs no glyph and no menu entry - edges are created from a
 record's form rather than from the global picker.
 
 > [!WARNING]

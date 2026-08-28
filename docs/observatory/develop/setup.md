@@ -208,7 +208,7 @@ pnpm test:all
 > one is described on [the gates a change must pass](quality-gates.md).
 
 `pnpm test:api` needs Postgres, so run `pnpm dev:db` first. It creates and
-migrates its own `vitae_test` database rather than using the one you seeded —
+migrates its own `vitae_test` database rather than using the one you seeded -
 the suites truncate between tests, and pointing them at a developer's data
 would destroy it.
 
@@ -226,7 +226,7 @@ interpolation in `compose.yaml`. Put a generated secret in `.env`.
 **The API starts but every request comes back 401.** Everything under `/api` is
 behind a default-deny gate. Sign in through the web application, or use the
 developer sign-in route, and confirm the address you signed in as matches
-`OWNER_EMAIL` — a non-matching identity is refused by design.
+`OWNER_EMAIL` - a non-matching identity is refused by design.
 
 **Sign-in offers no Google button.** The web build needs its own half of the
 emulator configuration, not only the emulator itself: the five `VITE_FIREBASE_*`

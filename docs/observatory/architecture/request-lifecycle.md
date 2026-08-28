@@ -38,8 +38,8 @@ lands on one of thirty-three mounted routers, and reaches a service that
 composes work and a repository that talks to Postgres.
 
 The order of that stack is not decoration. Two of the steps are only correct
-because of where they sit relative to the others, and one of them — the payment
-webhook — has to run before the request body is parsed at all, or its signature
+because of where they sit relative to the others, and one of them - the payment
+webhook - has to run before the request body is parsed at all, or its signature
 stops verifying.
 
 ## How it works
@@ -48,14 +48,14 @@ The browser sends its request through one typed client, so there is exactly one
 place where transport policy is decided. That client attaches the session
 (a cookie in local development, a bearer token in production), the data-space
 selector, and the browser's IANA timezone. Even file downloads go through it,
-because a download issued with a bare `fetch` once inherited only the cookie —
+because a download issued with a bare `fetch` once inherited only the cookie -
 which meant it failed in a bearer-only production and, worse, quietly exported
 the real graph while the person was looking at demonstration data.
 
 On the server the request meets middleware in registration order. First come
 the parts that must observe everything: a request identifier, the security
 headers, and the cross-origin allow-list. Then the body parsers. Then the
-per-request context — data partition and timezone — held in async-local storage
+per-request context - data partition and timezone - held in async-local storage
 so that any code reached from this request can ask for them without threading a
 parameter through every call.
 
@@ -81,7 +81,7 @@ supplies a token, otherwise the `httpOnly` session cookie sent by
 timezone. Ordinary calls abort after 60 seconds; downloads get ten minutes,
 because an export bundle is streamed entry by entry and is legitimately slow.
 Responses are cached by TanStack Query with a five-second staleness window, no
-retry and no refetch on window focus (`apps/web/src/main.tsx`) — a deliberately
+retry and no refetch on window focus (`apps/web/src/main.tsx`) - a deliberately
 dull cache, because the interesting invalidation happens on the server.
 
 The timezone header exists because "today", "overdue", a habit streak and an
@@ -113,7 +113,7 @@ this route takes a raw `Buffer` and nothing else may touch it first.
 
 **The enlarged import parser is registered before the default one**
 (`app.ts:51-52`). Express runs body parsers in registration order, so a
-router-local parser mounted deeper never gets a say — the 2 MB default rejects
+router-local parser mounted deeper never gets a say - the 2 MB default rejects
 the request first. A connections export of a few megabytes therefore failed
 with a generic 500 until the limit was hoisted here.
 
@@ -180,8 +180,8 @@ served, with each endpoint's source location, gate, schemas and tests.
 Every error leaves as `{ error: { code, message, details?, request_id } }`.
 Validation failures are 422 with field-level detail, missing records are 404,
 and a thrown `HttpError` carries its own status and code. Body-parser failures
-are mapped explicitly — oversized to 413, unparseable to 400, unsupported
-encoding to 415, an interrupted upload to 400 — because they used to fall
+are mapped explicitly - oversized to 413, unparseable to 400, unsupported
+encoding to 415, an interrupted upload to 400 - because they used to fall
 through to the generic handler and tell a person that something went wrong when
 the real answer was that their file was too large. Anything unrecognised is
 logged with the request id and answered with a neutral 500.

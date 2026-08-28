@@ -50,10 +50,10 @@ the compile is given a fixed source date. That matters more than it might sound:
 it is what makes a résumé reproducible months later, and it is why nothing in
 the path calls a language model.
 
-The pipeline splits cleanly between deciding and rendering. Deciding — parsing,
-scoring, selection, the trim plan — is pure functions in the shared domain
-package, testable without a database. Rendering — turning the chosen bullets
-into LaTeX — happens in the API, because that is where escaping belongs: every
+The pipeline splits cleanly between deciding and rendering. Deciding - parsing,
+scoring, selection, the trim plan - is pure functions in the shared domain
+package, testable without a database. Rendering - turning the chosen bullets
+into LaTeX - happens in the API, because that is where escaping belongs: every
 value that reaches the document passes the sanitisation layer on the way, and
 the build service is deliberately too ignorant to be trusted with the job.
 
@@ -69,7 +69,7 @@ on a day the container is down.
 
 1. **Parse.** A pasted job description becomes a weighted keyword set, using a
    dictionary of the skill nodes already in the graph plus novel candidate terms
-   found in the text. The result is stored as a target record and is editable —
+   found in the text. The result is stored as a target record and is editable -
    the parse proposes, the person decides.
 2. **Score.** Every atom (a résumé bullet with its variants, metrics and
    provenance) is scored against those keywords, with a recency factor and a
@@ -116,7 +116,7 @@ They differ in three ways that matter to the pipeline:
 A template's line model declares how many characters fit on a line, how many
 lines fit on a page, and the overhead of an entry header and a section header.
 Those four numbers are what the selection budget and the live page meter are
-computed from, which is why they are calibrated rather than guessed — see below.
+computed from, which is why they are calibrated rather than guessed - see below.
 
 There are three templates but only two renderers. `cobalt` has its own macro
 vocabulary and gets a bespoke renderer; `onyx` and `argon` share a generic one
@@ -142,9 +142,9 @@ carried into the build, not properties of the template.
 
 ### Rendering and escaping
 
-A template's source contains guillemet tokens — the accent colour, the name, the
+A template's source contains guillemet tokens - the accent colour, the name, the
 contact line, the headline, the tagline block, the summary block and the
-sections — which the renderer replaces. After splicing, the output is asserted
+sections - which the renderer replaces. After splicing, the output is asserted
 to contain no surviving token; an unresolved one throws rather than compiling to
 a document with `«SECTIONS»` printed in it.
 
@@ -165,7 +165,7 @@ Every request is signed with an HMAC over the timestamp and the raw body, with a
 five-minute skew window, and the service refuses to start without a secret or
 with one of the published development defaults in production. Compilation runs
 `--untrusted`, with no shell escape, in a per-request temporary directory,
-against a package cache warmed at image build time — the runtime has no network,
+against a package cache warmed at image build time - the runtime has no network,
 so `--only-cached` makes a cache miss fail immediately rather than spending
 minutes in DNS timeouts. The source date is passed in, which is what makes
 repeat exports byte-identical.
@@ -179,8 +179,8 @@ part of the document.
 
 `services/buildsvc/src/calibrate.ts` runs during the image build. It compiles
 every shipped template with a fixture containing every construct the renderers
-can emit — each weight and size of each font family, links, and every glyph
-macro the escape layer can produce — which is what warms the package cache with
+can emit - each weight and size of each font family, links, and every glyph
+macro the escape layer can produce - which is what warms the package cache with
 the exact preamble each template needs. It then binary-searches the number of
 body lines that still fit on one page and compares that measured capacity with
 the template's configured `lines_per_page`, failing the image build if they
@@ -211,7 +211,7 @@ Coverage is measured from the text extracted from the compiled PDF, not from the
 model that produced it. Each parsed keyword's weight counts as covered when its
 term appears in that text; the score is the covered weight over the total
 weight, and the gate passes at 0.95. Measuring the output rather than the input
-is the point — it catches a keyword that the selection intended to include but
+is the point - it catches a keyword that the selection intended to include but
 that the template swallowed, hyphenated or pushed off the page.
 
 ## Related

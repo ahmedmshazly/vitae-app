@@ -52,7 +52,7 @@ Identifiers are stable. Cite them as `DOC-D-001`.
 
 ## Severity 1: quality gates that do not hold
 
-### DOC-D-001 — `pnpm test:map` never reports a missing module
+### DOC-D-001 - `pnpm test:map` never reports a missing module
 
 > **Resolved.** What follows is the state before the fix, kept because the record of
 > what was wrong is the point of this document. The fix is in the resolved table at
@@ -82,7 +82,7 @@ unconditionally truthy and every line after it in the loop is unreachable.
 The second loop, which verifies that declared test files exist, still runs. Only
 the primary check is dead.
 
-### DOC-D-002 — the gap is where the newest code lives
+### DOC-D-002 - the gap is where the newest code lives
 
 `scripts/check-test-coverage-map.mjs` is unchanged since `20f2b86 Release Vitae
 1.0.0`. Sixteen of the eighteen unguarded modules were added in the three
@@ -90,7 +90,7 @@ feature commits after it.
 
 | Commit | Unguarded modules introduced |
 | --- | --- |
-| `1e2c502 feat(cloud)` | `apps/api/src/cloud/paddle.ts`, `apps/api/src/middleware/workspace.ts`, `apps/api/src/routes/v1/billing.ts`, `apps/api/src/routes/webhooks/paddle.ts`, `apps/api/src/services/control-plane.ts`, `apps/api/src/db/migrations/007`–`010`, `apps/web/src/lib/paddle.ts` |
+| `1e2c502 feat(cloud)` | `apps/api/src/cloud/paddle.ts`, `apps/api/src/middleware/workspace.ts`, `apps/api/src/routes/v1/billing.ts`, `apps/api/src/routes/webhooks/paddle.ts`, `apps/api/src/services/control-plane.ts`, `apps/api/src/db/migrations/007`-`010`, `apps/web/src/lib/paddle.ts` |
 | `ffd9819 feat(marketing)` | `CareerEvidence.tsx`, `CloudAction.tsx`, `HowItWorks.tsx`, `SecurityOwnership.tsx`, `WarmPaths.tsx` under `apps/web/src/routes/marketing/` |
 | `cfccb40 feat` | `apps/api/src/routes/v1/applications.ts`, `apps/web/src/routes/career/application-view.ts`, `apps/web/src/routes/career/ApplicationActions.tsx` |
 
@@ -105,7 +105,7 @@ node scripts/check-test-coverage-map.mjs   # prints ok
 git log --format='%h %ad' --date=short -1 -- scripts/check-test-coverage-map.mjs
 ```
 
-### DOC-D-030 — `pnpm lint` fails on `main`
+### DOC-D-030 - `pnpm lint` fails on `main`
 
 > **Resolved.** What follows is the state before the fix, kept because the record of
 > what was wrong is the point of this document. The fix is in the resolved table at
@@ -132,7 +132,7 @@ Reproduce:
 git stash -u && pnpm lint; echo "exit=$?"; git stash pop
 ```
 
-### DOC-D-035 — an entire package's tests never run
+### DOC-D-035 - an entire package's tests never run
 
 `packages/ui` declares `"test": "vitest run"` and contains **226 cases across
 nine files**. Nothing runs them.
@@ -161,7 +161,7 @@ node -e "console.log(require('./docs/generated/tests.json').summary.workspaces_a
 pnpm --filter @vitae/ui test   # 226 pass, run by no gate
 ```
 
-### DOC-D-040 — a skip link that scrolls without skipping, and two surfaces with none
+### DOC-D-040 - a skip link that scrolls without skipping, and two surfaces with none
 
 > **Resolved.** What follows is the state before the fix, kept because the record
 > of what was wrong is the point of this document. The fix is in the resolved
@@ -182,11 +182,11 @@ stop."* Three later surfaces declared the same `id` without the attribute.
 
 | Surface | Skip link | Target | `tabindex` |
 | --- | --- | --- | --- |
-| Application shell | `Shell.tsx:191` | `Shell.tsx:408` | `-1` — correct |
+| Application shell | `Shell.tsx:191` | `Shell.tsx:408` | `-1` - correct |
 | Marketing chrome | `Chrome.tsx:217` | `Chrome.tsx:221` | absent |
 | Entity reference | none | `EntityCatalog.tsx:755` | absent |
 | Prerendered public pages | none | `public/seo.ts:255` | absent |
-| Documentation | `DocsApp.tsx:118` | `DocsApp.tsx:44,98` | `-1` — fixed in this work |
+| Documentation | `DocsApp.tsx:118` | `DocsApp.tsx:44,98` | `-1` - fixed in this work |
 
 Only one row is the defect in the title. `Chrome.tsx` has a working skip link
 pointing at a target that cannot take focus, so it scrolls and does not skip.
@@ -194,7 +194,7 @@ pointing at a target that cannot take focus, so it scrolls and does not skip.
 The next two rows are a different, larger problem that the first framing of this
 entry hid by counting targets instead of links. `/reference/entities` has no
 skip link at all, and it puts a back link, seven output buttons and a three-way
-tab strip ahead of its content — crossed on arrival and again after every lens
+tab strip ahead of its content - crossed on arrival and again after every lens
 change.
 
 The `seo.ts` row was a mistake. That is the static body served before any
@@ -217,8 +217,8 @@ targetTabIndex: null   focusAfterSkip: "BODY"   focusIsTargetOrInside: false
 ```
 
 That measurement was taken while the documentation was still served as static
-files by the web host. It is not any more — the corpus is private and comes
-from the API behind the owner allow-list — so reproducing this one means
+files by the web host. It is not any more - the corpus is private and comes
+from the API behind the owner allow-list - so reproducing this one means
 signing in as the owner first, and the deployment must have been given a
 compiled corpus at all. The finding and the fix are unaffected; only the way
 you get to the page has changed.
@@ -226,7 +226,7 @@ you get to the page has changed.
 Two accessibility gates run over these surfaces and neither can see it.
 
 `runAxe` (`apps/web/src/test/a11y.ts`) applies no tag filter, so axe-core's
-`skip-link` rule does run — the rule whose own help text reads *"The skip-link
+`skip-link` rule does run - the rule whose own help text reads *"The skip-link
 target should exist and be focusable"*. Its implementation tests something
 weaker:
 
@@ -248,7 +248,7 @@ The Playwright scan never reaches the rule. `skip-link` is tagged
 
 Both gates report green truthfully and neither statement means what a reader of
 the result would assume: one rule implements less than its description promises,
-the other is excluded by tag. The shape is `DOC-D-001` again — a check that
+the other is excluded by tag. The shape is `DOC-D-001` again - a check that
 cannot go red.
 
 Reproduce:
@@ -259,7 +259,7 @@ grep -rn 'skip-link\|docs-skip\|ec-skip' apps/web/src | grep -v test   # links, 
 node -e "const a=require('./node_modules/.pnpm/axe-core@4.12.1/node_modules/axe-core');console.log(a.getRules().find(r=>r.ruleId==='skip-link').tags)"
 ```
 
-### DOC-D-041 — following the setup instructions turns `pnpm build` into a development build
+### DOC-D-041 - following the setup instructions turns `pnpm build` into a development build
 
 > **Resolved.** What follows is the state before the fix, kept because the record
 > of what was wrong is the point of this document. The fix is in the resolved
@@ -277,7 +277,7 @@ on that machine no longer builds for production, and says nothing about it.
 | | with the documented `.env` | with no `.env` |
 | --- | --- | --- |
 | files containing `jsxDEV(` | 49 | 0 |
-| files containing an absolute `/home/…` path | 49 | 0 |
+| files containing an absolute `/home/...` path | 49 | 0 |
 | total JavaScript | 5,875 kB | 4,850 kB |
 | largest chunk | `index` 1,455 kB | `EntityObservatoryGraph` 1,385 kB |
 | `check-web-budgets.mjs` | ok | ok |
@@ -303,7 +303,7 @@ bare checkout. Both produce the correct artifact. What ships is fine.
 The local budget gate measures an artifact nobody deploys. Run
 `VITAE_REQUIRE_BUDGETS=true pnpm test:performance` on a set-up machine and it
 reports `total 5875kb, largest index-UL8_rbwL.js 1455kb` against limits of 6,000
-and 1,500 — 98% of one, 97% of the other — and exits 0. CI, measuring the real
+and 1,500 - 98% of one, 97% of the other - and exits 0. CI, measuring the real
 bundle, sees 4,850 kB and 1,385 kB. A developer sizing a new lazy route against
 their own run believes there is 125 kB of headroom. There is **1,150 kB**. The
 chunk the local run names as largest is not even the largest chunk in a real
@@ -314,7 +314,7 @@ guard written to catch exactly that cannot see it. `check-public-release.mjs:29`
 bans `/home/<handle>` across tracked *and* untracked files, but its file list
 comes from `git ls-files --others --exclude-standard`, and `.gitignore:9` ignores
 `apps/web/dist/`. No documented workflow uploads a locally built `dist/`, so this
-is latent rather than shipped — but the command in `DEPLOYMENT.md` is the same
+is latent rather than shipped - but the command in `DEPLOYMENT.md` is the same
 command a developer runs locally, and nothing between the two would notice.
 
 Reproduce:
@@ -332,7 +332,7 @@ grep -l 'jsxDEV(' apps/web/dist/assets/*.js | wc -l   # 0
 
 ## Severity 2: reference surfaces that under-report reality
 
-### DOC-D-003 — the OpenAPI document covers under half the API
+### DOC-D-003 - the OpenAPI document covers under half the API
 
 `docs/api/openapi.json` describes **49 paths / 53 operations**. The routers
 declare **133 handlers**.
@@ -352,7 +352,7 @@ Consequence for this project: the API reference must be generated by walking
 `apps/api/src/routes/**/*.ts` and joining to `V1_MOUNT_PREFIXES`, never by
 reading `openapi.json`.
 
-### DOC-D-004 — `docs/api/README.md` documents 17 of 34 mount prefixes
+### DOC-D-004 - `docs/api/README.md` documents 17 of 34 mount prefixes
 
 Absent: `/suggest`, `/letters`, `/docs`, `/settings`, `/habits`,
 `/people/{personId}/favors`, `/orgs`, `/intros`, `/composer`, `/graph`,
@@ -361,7 +361,7 @@ Absent: `/suggest`, `/letters`, `/docs`, `/settings`, `/habits`,
 
 Source of truth: `apps/api/src/openapi/mounts.ts`.
 
-### DOC-D-005 — the requirement spine is severed
+### DOC-D-005 - the requirement spine is severed
 
 > **Resolved.** What follows is the state before the fix, kept because the record of
 > what was wrong is the point of this document. The fix is in the resolved table at
@@ -377,14 +377,14 @@ grep -rhoE "\b(FR|NFR)-[A-Z]*-?[0-9]{3}\b" --include='*.ts' --include='*.tsx' \
 grep -coE "\b(FR|NFR)-[A-Z]*-?[0-9]{3}\b" docs/specs/srs.md                             # 0
 ```
 
-Families in use: `FR-001`–`FR-027`, `FR-102`, `FR-104`, `FR-105`, `FR-CAP-*`,
+Families in use: `FR-001`-`FR-027`, `FR-102`, `FR-104`, `FR-105`, `FR-CAP-*`,
 `FR-CON-*`, `FR-EXP-*`, `FR-ORG-*`, `FR-RES-*`, `FR-SET-*`, `FR-SRCH-*`,
 `FR-VIS-*`, `NFR-REL-003`. No requirement can be traced to its implementation or
 its tests.
 
-### DOC-D-006 — nine section references point into a document with no sections
+### DOC-D-006 - nine section references point into a document with no sections
 
-`docs/ARCHITECTURE.md` cites SRS `§10.7.1`–`§10.7.6` (lines 137-142), `§6.6`
+`docs/ARCHITECTURE.md` cites SRS `§10.7.1`-`§10.7.6` (lines 137-142), `§6.6`
 (143), `§8.4` (144), `§5.1` (145), and `§10.7` (21). `docs/specs/srs.md` contains
 **zero** numbered sections.
 
@@ -396,24 +396,24 @@ grep -cE "^#{2,3} [0-9]" docs/specs/srs.md        # 0 numbered sections
 `docs/ROADMAP.md` additionally cites `§4.2-4.7`, `§4.3.22-28`, `M0`, `INT-1`,
 `IMP-001..006`, `VIS-001/002/003`, and `EXP-012/013`, none of which resolve.
 
-### DOC-D-007 — `restore-drill.md` cites a section that does not exist
+### DOC-D-007 - `restore-drill.md` cites a section that does not exist
 
 `docs/runbooks/restore-drill.md:105` links `docs/DEPLOYMENT.md` **§8**.
 `docs/DEPLOYMENT.md` has numbered sections 1 through 5.
 
-### DOC-D-008 — no user documentation exists
+### DOC-D-008 - no user documentation exists
 
 There are no task guides, no screen reference, no troubleshooting material, and
 no FAQ. `docs/ONBOARDING.md` is contributor onboarding, not user onboarding. A
 first-time user has the marketing site and the running application, nothing else.
 
-### DOC-D-009 — no package has a README
+### DOC-D-009 - no package has a README
 
 All seven first-party packages are undocumented at their root: `packages/core`,
 `packages/ui`, `packages/config`, `packages/testkit`, `apps/web`, `apps/api`,
 `services/buildsvc`.
 
-### DOC-D-042 — a requirement family with a digit in its name is invisible to the tooling
+### DOC-D-042 - a requirement family with a digit in its name is invisible to the tooling
 
 > **Resolved.** What follows is the state before the fix, kept because the record
 > of what was wrong is the point of this document. The fix is in the resolved
@@ -427,13 +427,13 @@ All seven first-party packages are undocumented at their root: `packages/core`,
 
 `NFR-A11Y-001` is not in `docs/registry/requirements.json`, is not in that file's
 `id_aliases`, and does not appear anywhere in `docs/generated/traceability.json`.
-It is not merely undefined — it cannot be read. Both patterns in
+It is not merely undefined - it cannot be read. Both patterns in
 `scripts/docs/lib/citations.mjs:19` spell a family name as uppercase letters
 only:
 
 ```js
-const CITATION = /\b((?:FR|NFR)(?:-[A-Z]{2,4})?)-(\d{3})…/g;
-const ALIAS = /(^|[^A-Z-])([A-Z]{2,4})-(\d{3})…/g;
+const CITATION = /\b((?:FR|NFR)(?:-[A-Z]{2,4})?)-(\d{3}).../g;
+const ALIAS = /(^|[^A-Z-])([A-Z]{2,4})-(\d{3}).../g;
 ```
 
 `A11Y` contains digits, so `[A-Z]{2,4}` cannot express it. Tracing `CITATION`
@@ -455,7 +455,7 @@ lies, and `check-docs-traceability.mjs` correctly reports that every citation it
 can see resolves. The set it can see is smaller than the set that exists, and
 nothing says so. A sweep of every tracked readable file for the loose form
 `[A-Z][A-Z0-9]{1,5}-\d{3}` found exactly one identifier the strict grammar
-misses, so the blind spot is currently one requirement wide — but it is the
+misses, so the blind spot is currently one requirement wide - but it is the
 accessibility requirement, cited on the rule that draws every focus ring in the
 product.
 
@@ -469,7 +469,7 @@ grep -c A11Y docs/generated/traceability.json               # 0
 
 ---
 
-### DOC-D-043 — sixteen map entries declared a module untested while its tests sat beside it
+### DOC-D-043 - sixteen map entries declared a module untested while its tests sat beside it
 
 > **Resolved.** What follows is the state before the fix, kept because the record
 > of what was wrong is the point of this document. The fix is in the resolved
@@ -497,15 +497,15 @@ two bulk-delete features, four Atlas panels and three further reference modules.
 The cause is one function away from `DOC-D-001`. `colocatedTest()` built its
 candidates by swapping extensions, so the only shapes it could recognise were
 `<name>.test.ts`, `<name>.test.tsx` and `<name>.spec.ts`. This repository's
-other convention is a facet suffix — `Person.states.test.tsx`,
-`AtlasCanvas.error.test.tsx`, `Person.log.test.ts` — and eighty-four such files
+other convention is a facet suffix - `Person.states.test.tsx`,
+`AtlasCanvas.error.test.tsx`, `Person.log.test.ts` - and eighty-four such files
 sit beside a module of the same stem inside the three directories the gate
 walks. It could see none of them, so it demanded a map entry for each; whoever
 wrote the entry was recording the gate's view of the world, and the map
 inherited it.
 
-Thirteen of the sixteen arrived that way. The other three — `app/routes.ts`,
-`Org.tsx` and `Person.tsx` — do have a plainly named suite, so the gate found
+Thirteen of the sixteen arrived that way. The other three - `app/routes.ts`,
+`Org.tsx` and `Person.tsx` - do have a plainly named suite, so the gate found
 it, skipped the module and never opened the entry beside it. That is the second
 half of the defect and the more durable one: the `tests` field was written by
 hand and read by nobody, in a file whose whole purpose is to be checked.
@@ -537,7 +537,7 @@ beside it`.
 
 ## Severity 3: contradictions between documentation and shipped code
 
-### DOC-D-010 — the Cloud subsystem is a documentation blackout
+### DOC-D-010 - the Cloud subsystem is a documentation blackout
 
 Occurrences of `cloud`, `workspace`, `tenant`, `billing` and `paddle`:
 
@@ -553,34 +553,34 @@ stack (`workspaceMiddleware`, `entitlementGate`, `AsyncLocalStorage`), a billing
 control plane, and a signed webhook receiver. None of it is described in the
 architecture guide.
 
-### DOC-D-011 — the required Cloud ADR was never written
+### DOC-D-011 - the required Cloud ADR was never written
 
 `GOVERNANCE.md` states: *"Major changes to storage, authentication, public APIs,
 or deployment policy need an architecture decision record and an upgrade path."*
 
 The Cloud plane changed all four:
 
-- storage: `apps/api/src/db/migrations/007`–`010`, including a primary-key change
+- storage: `apps/api/src/db/migrations/007`-`010`, including a primary-key change
 - authentication: `apps/api/src/middleware/workspace.ts`
 - public APIs: `/api/v1/billing`, `/webhooks/paddle`
 - deployment policy: `VITE_PUBLIC_CLOUD_ENABLED`, provisioning gate
 
-`docs/adr/` holds `0001`–`0005`. There is no `0006`.
+`docs/adr/` holds `0001`-`0005`. There is no `0006`.
 
-### DOC-D-012 — the SRS denies a capability the schema implements
+### DOC-D-012 - the SRS denies a capability the schema implements
 
 > **Resolved.** What follows is the state before the fix, kept because the record of
 > what was wrong is the point of this document. The fix is in the resolved table at
 > the end.
 
 `docs/specs/srs.md:25`: *"Vitae does not provide multi-tenant hosting, social
-networking, behavioural…"*
+networking, behavioural..."*
 
 `apps/api/src/db/migrations/009-workspace-primary-keys.ts` makes
 `(workspace_id, id)` the primary key across the graph tables. The document is
 marked *"current for v1.0.0"*.
 
-### DOC-D-013 — the security section under-reports the public surface by three routes
+### DOC-D-013 - the security section under-reports the public surface by three routes
 
 `docs/ARCHITECTURE.md:166-167`: *"only `/health` and the dev-login/logout
 endpoints are public"*.
@@ -600,7 +600,7 @@ Three routes are missing from the guide, one of which accepts unauthenticated
 POST bodies from a payment provider. `app.ts:47-49` documents the webhook
 decision correctly in a code comment; the architecture guide never picked it up.
 
-### DOC-D-014 — a superseded brand identity carries no supersession marker
+### DOC-D-014 - a superseded brand identity carries no supersession marker
 
 `docs/design/addenda/P26-aurora-identity.md` prescribes gradients, glow, and an
 electric-cyan accent. `scripts/check-brand-bans.mjs` fails the build on
@@ -611,7 +611,7 @@ The file contains no occurrence of `supersede`, `superseded`, `historical`, or
 `not current`. Its H1 reads as current guidance. A contributor who reads it first
 will implement patterns that cannot pass CI.
 
-### DOC-D-015 — the motion amendment excludes the pages it now needs to cover
+### DOC-D-015 - the motion amendment excludes the pages it now needs to cover
 
 `docs/design/MOTION.md:144-151` scopes its marketing register to `/`, `/tour` and
 `/manifesto`, with line 151 reading **"Permitted on those three routes and
@@ -621,7 +621,7 @@ nowhere else"**.
 `/product/career-evidence`, `/product/warm-paths`, and `/security-and-ownership`.
 By the document's own rule these pages are non-compliant.
 
-### DOC-D-016 — the design system's public route list is nine routes out of date
+### DOC-D-016 - the design system's public route list is nine routes out of date
 
 `DESIGN.md:120-121` names `/`, `/tour`, `/manifesto`, `/guides`, `/resources`,
 legal/status pages, `/reference/entities`, and `/welcome`.
@@ -645,7 +645,7 @@ legal/status pages, `/reference/entities`, and `/welcome`.
 | `DOC-D-023` | `docs/ARCHITECTURE.md:6` cites `constitution.md` as *"the non-negotiable principles"*. The file does not exist. ADR 0002 and ADR 0003 cite it too. | absence |
 | `DOC-D-024` | `docs/specs/merge-plan.md:12` and `:24` contain a self-referential redirect, `app.vitae.example` to `app.vitae.example` (301), left behind by placeholder scrubbing. | same file |
 | `DOC-D-025` | `packages/core/src/algorithms/graph-paths.ts:102` branches on edge type `INTRODUCED`. `EDGE_TYPES` does not contain it. The branch is unreachable. | `packages/core/src/types.ts` |
-| `DOC-D-026` | `packages/config/package.json` declares no `scripts`, so `pnpm -r typecheck` and `pnpm -r test` silently skip the package. **Partly corrected by `DOC-D-039`:** the package is skipped as a unit, but its source *is* type-checked, transitively, by every consumer that imports it. The `pnpm -r test` half stands — it has no tests. | same file |
+| `DOC-D-026` | `packages/config/package.json` declares no `scripts`, so `pnpm -r typecheck` and `pnpm -r test` silently skip the package. **Partly corrected by `DOC-D-039`:** the package is skipped as a unit, but its source *is* type-checked, transitively, by every consumer that imports it. The `pnpm -r test` half stands - it has no tests. | same file |
 | `DOC-D-027` | **Resolved; see the table at the end.** `pnpm test:brand` is in `test:all` but absent from `.github/workflows/ci.yml`. Line 65 runs `test:map && test:prose && test:public` only. The brand guard never runs in CI. | `.github/workflows/ci.yml:65` |
 | `DOC-D-028` | `docs/DEPLOYMENT.md:142` advises pairing exports with *"managed Postgres backups for short recovery windows"* without stating the window. `docs/runbooks/postgres-restore.md` records that the PITR window is **1 day, not the 7 the design assumed**, because the account is on a Free Tier plan. The operational constraint exists in one document and not the one operators are pointed at first. | both files |
 | `DOC-D-029` | CI names journeys `J1 capture`, `J4 résumé`, `J8 trash/restore`. The numbering implies J2, J3, J5, J6 and J7 exist as product journeys with no executable coverage. No document records which journeys exist or which are covered. | `.github/workflows/ci.yml:319` |
@@ -653,9 +653,9 @@ legal/status pages, `/reference/entities`, and `/welcome`.
 | `DOC-D-033` | `apps/api/src/middleware/auth.ts:35` lists `/^\/health$/` as a public path. `authGate` is mounted at `/api` (`apps/api/src/app.ts:62`) and matches against `req.baseUrl + req.path` (`auth.ts:127`), which therefore always begins `/api`. The pattern can never match. `/health` is reachable without authentication because `app.ts:58` registers it four lines *above* the gate, not because it is declared public. A security page that presented `PUBLIC_PATHS` as the list of unauthenticated routes would be describing a mechanism that does not govern the route it names. | `apps/api/src/middleware/auth.ts:35,127`, `apps/api/src/app.ts:58,62` |
 | `DOC-D-034` | Five production modules totalling **1,601 lines** are imported only by their own tests: `apps/web/src/components/ListToolbar.tsx` (275), `apps/web/src/lib/format-date.ts` (372), `apps/web/src/lib/selection.ts` (217), `apps/web/src/lib/unsaved-changes.tsx` (288), `packages/ui/src/combobox.tsx` (449). Each is tested and passing; nothing in the product reaches any of them. Documenting them as behaviour a user can observe would assert functionality the application does not expose, so the corpus must treat them as unreferenced code rather than as features. | `docs/generated/atlas-summary.json`, `summary.consumed_only_by_tests` |
 | `DOC-D-036` | Four design tokens are declared and never consumed: `--ae-data-idea`, `--ae-data-practice` and `--ae-data-other` (`packages/ui/src/styles/tokens.css:177-180`), and `--ae-trace-current` (`:57`). The `--ae-data-*` family is referenced by literal name throughout `apps/web/src/styles/`, never assembled from a variable, so these four are genuinely unreferenced rather than dynamically constructed the way `--ae-viz-N` is. A token catalog must show them as declared-unused rather than as part of the working palette. | `docs/generated/tokens.json`, `summary.unused` |
-| `DOC-D-037` | Four `@vitae/ui` exports have no importer outside the package: `Card`, `Combobox`, `HelpTip`, `Toast`. `Toast` is the one that looks used and is not — `apps/web/src/features/Toast.tsx` imports `ToastProvider` from the library and exports a `ToastProvider` of its own (`:89`), so 31 modules depend on the application's toast while the library's `Toast` component has no consumer at all. A component catalog that counted name matches would report the opposite. | `docs/generated/components.json`, `summary.unused` |
+| `DOC-D-037` | Four `@vitae/ui` exports have no importer outside the package: `Card`, `Combobox`, `HelpTip`, `Toast`. `Toast` is the one that looks used and is not - `apps/web/src/features/Toast.tsx` imports `ToastProvider` from the library and exports a `ToastProvider` of its own (`:89`), so 31 modules depend on the application's toast while the library's `Toast` component has no consumer at all. A component catalog that counted name matches would report the opposite. | `docs/generated/components.json`, `summary.unused` |
 | `DOC-D-038` | `packages/ui/src/forms.tsx:34` applies `vt-fld--error` to a field wrapper whenever the field carries an error. No stylesheet defines `.vt-fld--error`. `.vt-fld`, `.vt-fld__label`, `.vt-fld__help`, `.vt-fld__req` and `.vt-fld__error` all exist, so the error *message* is styled while the error *state of the container* renders nothing at all. Two further classes have no rule: `.vt-info`, whose children `__title`, `__body`, `__shortcut` and `__shortcuts` are each styled, and `.vt-cbx__input`, which sits inside the component `DOC-D-037` records as having no consumer. | `docs/generated/components.json`, `summary.unstyled_classes`; `packages/ui/src/forms.tsx:34` |
-| `DOC-D-039` | `@vitae/e2e` is type-checked by nothing. It declares neither `typecheck` nor `build`, and no workspace imports it, so its **250 cases** — the entire browser acceptance suite — are compiled only at the moment Playwright runs a file. Verified by appending `const x: number = 'a'` to `e2e/tests/helpers/a11y.ts`: `pnpm typecheck` and `pnpm build` both exit 0. The same probe corrects `DOC-D-026` — placed in `packages/config/src/env.ts` it **is** reported, and the root `pnpm typecheck` exits 2, because that package publishes TypeScript source through its `exports` map and each consumer's compiler follows it. Config is checked as a side effect of being imported; e2e is not checked anywhere. `services/buildsvc` also declares no `typecheck`, but `"build": "tsc"` covers it through `pnpm build` at `.github/workflows/ci.yml:98`. | measured; `docs/generated/packages.json`, `summary.workspace_typecheck` |
+| `DOC-D-039` | `@vitae/e2e` is type-checked by nothing. It declares neither `typecheck` nor `build`, and no workspace imports it, so its **250 cases** - the entire browser acceptance suite - are compiled only at the moment Playwright runs a file. Verified by appending `const x: number = 'a'` to `e2e/tests/helpers/a11y.ts`: `pnpm typecheck` and `pnpm build` both exit 0. The same probe corrects `DOC-D-026` - placed in `packages/config/src/env.ts` it **is** reported, and the root `pnpm typecheck` exits 2, because that package publishes TypeScript source through its `exports` map and each consumer's compiler follows it. Config is checked as a side effect of being imported; e2e is not checked anywhere. `services/buildsvc` also declares no `typecheck`, but `"build": "tsc"` covers it through `pnpm build` at `.github/workflows/ci.yml:98`. | measured; `docs/generated/packages.json`, `summary.workspace_typecheck` |
 
 ---
 
@@ -715,11 +715,11 @@ cannot contain that commit's hash. Resolve a subject with
 | `DOC-D-012` | `docs(traceability): define every requirement the code cites` | `docs/specs/srs.md` no longer denies multi-tenant hosting. The replacement states what migration `009-workspace-primary-keys` established, names the workspace boundary as a shipped property of the schema, and says in the document itself that the earlier sentence was corrected rather than repeated, so a reader who remembers the old claim can see it was withdrawn on evidence. |
 | `DOC-D-027` | `fix(testing): let the source-to-test gate fail again` | `pnpm test:brand` added to the `quality` job in `.github/workflows/ci.yml`. |
 | `DOC-D-030` | `fix(testing): let the source-to-test gate fail again` | `let` to `const` in `apps/api/src/services/control-plane.ts:100`. No behaviour change. `pnpm lint` now exits 0 with 40 pre-existing warnings and no errors. |
-| `DOC-D-042` | `fix(traceability): let a family name carry a digit` | `FAMILY` in `scripts/docs/lib/citations.mjs` is now one exported pattern, `[A-Z][A-Z0-9]{1,4}`, that the citation reader, the sort order and `check-docs-traceability.mjs` all build their expressions from; a digit still may not open a family name, so `SHA-256` and `3D-001` are refused as before. `NFR-A11Y-001` is registered from the evidence in `base.css` and marked `needs-review`. The register's JSON Schema cannot import the constant, so `citations.selftest.mjs` asserts the two spellings match and was seen to fail when they were made to differ. Measured effect: traceability went from 348 citations across 133 files to 351 across 134 — `packages/ui/src/styles/base.css` had been absent from the graph entirely, because its only identifier was unreadable rather than unwritten. |
-| `DOC-D-040` | `fix(a11y): make the skip links skip` | `Chrome.tsx`'s main carries `tabIndex={-1}`, so its skip link now moves focus rather than only the viewport. `/reference/entities` gained the skip link it never had, with the same off-screen-until-focused treatment the shell and the marketing chrome use, and `.ec-main:focus` suppresses the ring the way `.content:focus` does at `apps/web/src/styles/app.css:3554` — a page-height element turns a `box-shadow` ring into two vertical lines. `seo.ts` was left alone: the row naming it was wrong, and the entry above now says why. Both surfaces are asserted by tests that were run against the unfixed code and seen to fail: a new `apps/web/src/routes/marketing/Chrome.test.tsx`, and a case added to `apps/web/src/routes/reference/EntityCatalog.states.test.tsx`. |
-| `DOC-D-041` | `fix(build): make a local pnpm build a production build` | `NODE_ENV` removed from `.env.example`, which is the only file in the repository that put it on a developer's machine; the comment left in its place explains why it must not come back. Because an existing `.env` is user-owned and was not edited, `scripts/check-web-budgets.mjs` now refuses a bundle carrying the development JSX runtime or the build machine's absolute paths, before it forms any opinion about size — so the residue announces itself instead of being measured. Seen to fail: `49 of 55 chunks carry the development JSX runtime`, exit 1. `scripts/check-web-budgets.selftest.mjs` runs seven cases ahead of every invocation. |
+| `DOC-D-042` | `fix(traceability): let a family name carry a digit` | `FAMILY` in `scripts/docs/lib/citations.mjs` is now one exported pattern, `[A-Z][A-Z0-9]{1,4}`, that the citation reader, the sort order and `check-docs-traceability.mjs` all build their expressions from; a digit still may not open a family name, so `SHA-256` and `3D-001` are refused as before. `NFR-A11Y-001` is registered from the evidence in `base.css` and marked `needs-review`. The register's JSON Schema cannot import the constant, so `citations.selftest.mjs` asserts the two spellings match and was seen to fail when they were made to differ. Measured effect: traceability went from 348 citations across 133 files to 351 across 134 - `packages/ui/src/styles/base.css` had been absent from the graph entirely, because its only identifier was unreadable rather than unwritten. |
+| `DOC-D-040` | `fix(a11y): make the skip links skip` | `Chrome.tsx`'s main carries `tabIndex={-1}`, so its skip link now moves focus rather than only the viewport. `/reference/entities` gained the skip link it never had, with the same off-screen-until-focused treatment the shell and the marketing chrome use, and `.ec-main:focus` suppresses the ring the way `.content:focus` does at `apps/web/src/styles/app.css:3554` - a page-height element turns a `box-shadow` ring into two vertical lines. `seo.ts` was left alone: the row naming it was wrong, and the entry above now says why. Both surfaces are asserted by tests that were run against the unfixed code and seen to fail: a new `apps/web/src/routes/marketing/Chrome.test.tsx`, and a case added to `apps/web/src/routes/reference/EntityCatalog.states.test.tsx`. |
+| `DOC-D-041` | `fix(build): make a local pnpm build a production build` | `NODE_ENV` removed from `.env.example`, which is the only file in the repository that put it on a developer's machine; the comment left in its place explains why it must not come back. Because an existing `.env` is user-owned and was not edited, `scripts/check-web-budgets.mjs` now refuses a bundle carrying the development JSX runtime or the build machine's absolute paths, before it forms any opinion about size - so the residue announces itself instead of being measured. Seen to fail: `49 of 55 chunks carry the development JSX runtime`, exit 1. `scripts/check-web-budgets.selftest.mjs` runs seven cases ahead of every invocation. |
 | `DOC-D-032` | `docs(traceability): define every requirement the code cites` | Found while editing, not during the audit, so it has no open row above: the stack table in `docs/specs/srs.md` named the web application as *"React 18 and Vite"*, while `apps/web/package.json:29` pins `react: ^19.2.8`. Corrected in the same edit. This is the same fact as `DOC-D-020`, which remains open in its second location, `apps/web/package.json:6`. |
-| `DOC-D-043` | `fix(testing): let the coverage map see the tests beside it` | `colocatedTest()` is replaced by `siblingTests()`, which lists the directory instead of guessing filenames. Plain `<name>.test.ts`, `.test.tsx` and `.spec.ts` count on their name, because a few of them prove a component through the content module it renders; facet-named files count only when they import the module, so `Foo.helpers.test.ts` can never be read as proof of `Foo.ts`. That costs recall deliberately: fifty-two of the eighty-four facet suites import their module and count, and the other thirty-two still require a map entry. A second rule closes the half nothing was reading — an entry with an empty `tests` array now fails when a sibling suite exists, which is what caught these sixteen. All sixteen entries now name their real suites and `$schema_note` states both rules. Seen to fail: the two new cases in `scripts/check-test-coverage-map.selftest.mjs` were run against `HEAD`'s checker and reported `expected exit 0, got 1` and `expected exit 1, got 0`. An entry that names some of its siblings but not all of them is incomplete rather than false, and is left alone. |
-| `DOC-D-006` | `docs(product): author the definition forward around four personas` | Closed in two halves. The architecture guide's ten `§` references were replaced with registered identifiers one commit earlier (`docs(product): point surfaces and citations at what ships`); this commit rewrote `docs/ROADMAP.md`, so its `§4.x`, `M0`, and prefix-less citations are gone too — every SRS cell now carries canonical registered identifiers. The registered-but-uncited hazard a roadmap rewrite used to pose was pre-empted by the anchor section added in `docs(specs): anchor the fragile identifiers, and open ADR 0007`, which cites the twenty-one grouped-citation dependents individually. |
-| `DOC-D-031` | `docs(product): author the definition forward around four personas` | The roadmap no longer plans a nightly `pg_dump` to R2 that nothing produces. Its recovery row states what ships — `scripts/backup-to-s3.sh`, wired to `pnpm backup:s3`, uploading a full export bundle to S3 — and what awaits operational confirmation (cadence and objectives), citing `NFR-OPS-001`, `FR-EXP-012`, and `FR-EXP-013`. The two-way R2-versus-S3 divergence is gone because only one system is described anywhere. |
-| `DOC-D-029` | `docs(product): give every journey a statement, and its stories` | `J2`, `J3`, `J5`, `J6` and `J7` carry authored statements under ADR 0007, with two honest statuses distinguishing them: `partial` for journeys whose steps ship but whose identifier no spec names (J2, J3, J6 — covered unnamed by `exploration.spec.ts`, `import.spec.ts`, `duplicates.spec.ts`, `export.spec.ts`), and a new `planned` status for journeys riding on registered intent (J5 dossiers, J7 correspondence). The journeys page and `docs/registry/journeys.json` no longer describe empty rows, and `docs/observatory/product/stories.md` gives all eight journeys acceptance criteria that cite the requirement register. |
+| `DOC-D-043` | `fix(testing): let the coverage map see the tests beside it` | `colocatedTest()` is replaced by `siblingTests()`, which lists the directory instead of guessing filenames. Plain `<name>.test.ts`, `.test.tsx` and `.spec.ts` count on their name, because a few of them prove a component through the content module it renders; facet-named files count only when they import the module, so `Foo.helpers.test.ts` can never be read as proof of `Foo.ts`. That costs recall deliberately: fifty-two of the eighty-four facet suites import their module and count, and the other thirty-two still require a map entry. A second rule closes the half nothing was reading - an entry with an empty `tests` array now fails when a sibling suite exists, which is what caught these sixteen. All sixteen entries now name their real suites and `$schema_note` states both rules. Seen to fail: the two new cases in `scripts/check-test-coverage-map.selftest.mjs` were run against `HEAD`'s checker and reported `expected exit 0, got 1` and `expected exit 1, got 0`. An entry that names some of its siblings but not all of them is incomplete rather than false, and is left alone. |
+| `DOC-D-006` | `docs(product): author the definition forward around four personas` | Closed in two halves. The architecture guide's ten `§` references were replaced with registered identifiers one commit earlier (`docs(product): point surfaces and citations at what ships`); this commit rewrote `docs/ROADMAP.md`, so its `§4.x`, `M0`, and prefix-less citations are gone too - every SRS cell now carries canonical registered identifiers. The registered-but-uncited hazard a roadmap rewrite used to pose was pre-empted by the anchor section added in `docs(specs): anchor the fragile identifiers, and open ADR 0007`, which cites the twenty-one grouped-citation dependents individually. |
+| `DOC-D-031` | `docs(product): author the definition forward around four personas` | The roadmap no longer plans a nightly `pg_dump` to R2 that nothing produces. Its recovery row states what ships - `scripts/backup-to-s3.sh`, wired to `pnpm backup:s3`, uploading a full export bundle to S3 - and what awaits operational confirmation (cadence and objectives), citing `NFR-OPS-001`, `FR-EXP-012`, and `FR-EXP-013`. The two-way R2-versus-S3 divergence is gone because only one system is described anywhere. |
+| `DOC-D-029` | `docs(product): give every journey a statement, and its stories` | `J2`, `J3`, `J5`, `J6` and `J7` carry authored statements under ADR 0007, with two honest statuses distinguishing them: `partial` for journeys whose steps ship but whose identifier no spec names (J2, J3, J6 - covered unnamed by `exploration.spec.ts`, `import.spec.ts`, `duplicates.spec.ts`, `export.spec.ts`), and a new `planned` status for journeys riding on registered intent (J5 dossiers, J7 correspondence). The journeys page and `docs/registry/journeys.json` no longer describe empty rows, and `docs/observatory/product/stories.md` gives all eight journeys acceptance criteria that cite the requirement register. |

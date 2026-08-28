@@ -54,7 +54,7 @@ The reason is the two halves above, taken together. The curated half describes
 every trust boundary in the system and names the gaps that are known rather
 than closed. The generated half enumerates every route, endpoint, configuration
 key, table, migration and exported symbol in the repository. Published openly,
-that is a map of the software for anyone who wants one — and the map is more
+that is a map of the software for anyone who wants one - and the map is more
 useful to someone attacking the system than to anyone else, because the people
 it was written for can sign in.
 
@@ -117,7 +117,7 @@ already know. Nothing here expects to be read in order, but every page names
 the page before and after it, so it can be.
 
 The [Glossary](glossary.md) is the other way in. A word earns a place in it
-only where the ordinary meaning would mislead — "verified" means checked
+only where the ordinary meaning would mislead - "verified" means checked
 against code on a stated date, "gated" means built but closed, and a "journey"
 is a registered identifier rather than a figure of speech.
 

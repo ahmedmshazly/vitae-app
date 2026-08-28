@@ -36,9 +36,9 @@ related: [ARC-REQUEST, ARC-GRAPH, ARC-ALGORITHMS, ARC-SECURITY]
 ## In short
 
 Vitae is one repository holding eight packages. Two of them are the product a
-person uses — a browser application and an HTTP API — and two more are the
+person uses - a browser application and an HTTP API - and two more are the
 shared libraries it is built from: the domain model with its algorithms, and the
-design system. The remaining four are supporting parts — the environment
+design system. The remaining four are supporting parts - the environment
 schema, the test fixtures, a container that turns LaTeX into a PDF, and the
 browser acceptance suite.
 
@@ -57,9 +57,9 @@ one without reading the other.
 
 The seam between the API and the browser is the HTTP contract, not a shared
 module. The browser cannot import a server module, so a change to how a record
-is stored cannot leak into a screen by accident. What the two genuinely share —
+is stored cannot leak into a screen by accident. What the two genuinely share -
 the node and edge vocabulary, the validation schemas, the algorithms, the
-résumé plan — lives in one place that both may import.
+résumé plan - lives in one place that both may import.
 
 Inside the API there is a second rule with the same shape: a route may call a
 service, a service may call the repository, and only the repository knows how a
@@ -68,9 +68,9 @@ as the reason the file exists, after an earlier storage engine let it erode into
 several hundred direct database calls spread across the codebase.
 
 The two lower layers are deliberately ignorant. The design system knows nothing
-about careers — it exports inputs, dialogs and glyph shapes, and would serve a
+about careers - it exports inputs, dialogs and glyph shapes, and would serve a
 different product without noticing. The build service knows nothing about
-résumés — it receives a LaTeX document and returns a PDF. Neither can be
+résumés - it receives a LaTeX document and returns a PDF. Neither can be
 tempted into a domain decision, because neither has the vocabulary to express
 one.
 
@@ -87,7 +87,7 @@ type unions, the Zod envelope and per-type property schemas, the form
 descriptors, the deterministic algorithms, and the hosted plan contract. It is
 pure TypeScript with no I/O and no workspace dependencies. **Nothing in the
 repository may be imported by it; everything else may import it.** That
-direction is the whole point — a shared shape defined anywhere else would need
+direction is the whole point - a shared shape defined anywhere else would need
 two definitions or a dependency pointing the wrong way, which is what FR-019
 forbids. Its entry point is one of the most depended-on modules in the
 repository.
@@ -98,8 +98,8 @@ package and declares React only as a peer dependency, so it cannot pull a
 second copy of React into the application bundle. **It may not import
 `@vitae/core`, and only the browser application may import it.** Keeping the
 domain out of it is what stops a primitive growing a `person` special case. It
-is the most depended-on code in the repository, and — as the documentation
-audit records — the one package whose 226 test cases no continuous-integration
+is the most depended-on code in the repository, and - as the documentation
+audit records - the one package whose 226 test cases no continuous-integration
 job runs, so a regression in it would reach nearly every screen unseen.
 
 ### The two supporting libraries
@@ -115,7 +115,7 @@ though it declares no `typecheck` script of its own.
 `@vitae/testkit` (`packages/testkit`) owns deterministic factories, fixed
 clocks and fixtures shared between suites. It depends on `@vitae/core` for the
 shapes it builds. **It is a development dependency of the API and must never be
-imported by production code** — a factory reachable from a route is a way to
+imported by production code** - a factory reachable from a route is a way to
 write fixture data into a real graph.
 
 ### The two product packages
@@ -142,7 +142,7 @@ network. It exports nothing and is imported by nothing. **The only way to reach
 it is the HTTP boundary**, which is what lets it be sandboxed as hard as it is.
 
 `@vitae/e2e` (`e2e`) owns the browser acceptance suite. It has no source files
-at all — every file in it is a test — and nothing imports it. **It depends on
+at all - every file in it is a test - and nothing imports it. **It depends on
 the built product from outside, never on its modules**, which is also why
 nothing type-checks it: it declares neither a `typecheck` nor a `build` script,
 so its 250 cases are compiled only at the moment Playwright runs a file.

@@ -52,8 +52,8 @@ live search.
 Two ways.
 
 **Marking a résumé sent.** In Outputs, **Mark sent** on a finalised résumé
-creates the application from the job target it was built for — role title,
-company, today's date, status *applied* — and links the résumé to it. This is
+creates the application from the job target it was built for - role title,
+company, today's date, status *applied* - and links the résumé to it. This is
 the path that keeps the document and the application attached to each other
 without you doing anything.
 
@@ -81,7 +81,7 @@ you are tracking before you have written anything.
 
 The five pipeline stages are ordered and shown as columns on the runway. The
 three outcomes are kept separately, so a closed application does not crowd a
-live one — and they sort last, so the list you scroll is the list you are
+live one - and they sort last, so the list you scroll is the list you are
 working.
 
 The API validates the stage. An unrecognised value is refused with *"Unknown
@@ -90,7 +90,7 @@ application status."*
 ## The runway
 
 `/career` and `/career/applications` are the same screen. It opens with four
-figures — active, in interviews, offers, and due now — then **Next moves**, then
+figures - active, in interviews, offers, and due now - then **Next moves**, then
 the runway grouped by stage.
 
 **Next moves** is the part that earns the screen. Each application can carry a
@@ -105,9 +105,9 @@ is a calendar question and answering it in the wrong zone produces an answer
 that is wrong for one day in every cycle.
 
 A search box and a stage filter narrow the runway, and both live in the URL. If
-the filter matches nothing, the screen says so — *"No applications match. The
+the filter matches nothing, the screen says so - *"No applications match. The
 application records are still here; the current search or stage filter is hiding
-them."* — rather than showing the empty-library message, which would be a
+them."* - rather than showing the empty-library message, which would be a
 different and untrue claim.
 
 ## The dossier
@@ -130,7 +130,7 @@ location mode, salary range, job URL.
 
 **People and company** links the organisation and whoever referred you.
 
-**Materials** links the three artefacts an application accumulates — the job
+**Materials** links the three artefacts an application accumulates - the job
 posting, the tailoring target, and the résumé sent. With none of them linked it
 says so in one line rather than showing three empty panels, which is a
 different claim: *no posting, target, or résumé linked* is a fact about your
@@ -150,7 +150,7 @@ agenda, which is why an application due in five weeks does not shout at you.
 can see next week rather than only today.
 
 **The reminders drawer**, on the top bar's bell, lists reminders with a due
-count on the bell itself. A reminder can be marked done — with an undo — or
+count on the bell itself. A reminder can be marked done - with an undo - or
 snoozed by seven days. Overdue and due-today are judged against your local
 calendar date for the same reason the runway is.
 
@@ -166,28 +166,28 @@ you send anything.
 
 ### Who should I contact?
 
-The default lens. Compose the need as a sentence — I need *[a referral]* at
-*[Aurora Dynamics]* about *[reinforcement learning]* in *[Nairobi]* — and press
+The default lens. Compose the need as a sentence - I need *[a referral]* at
+*[Aurora Dynamics]* about *[reinforcement learning]* in *[Nairobi]* - and press
 **Ask**.
 
 The result is a ranked list where every rank is decomposed into the factors
 that produced it: affiliation with the organisation, topic overlap, tie
 strength, geography, favours owed, and network proximity. The bar beside each
-person is the shape of the score — one wide segment means one dominant reason;
+person is the shape of the score - one wide segment means one dominant reason;
 several segments mean the case rests on several recorded facts.
 
 The weights are yours. They live in Settings under ranking constants, and
 changing them changes every future ranking. That is deliberate: the ranking is
 a calculation you own, not a judgement handed to you.
 
-Each result opens into the evidence behind it — recent interactions, open
-follow-ups, what you share, and talking points — so the ask you write is
+Each result opens into the evidence behind it - recent interactions, open
+follow-ups, what you share, and talking points - so the ask you write is
 grounded in something you can check.
 
 Two empty states matter here. With nothing asked yet it shows an example rather
 than a blank screen. When nobody matches, it says *"No one to call"* and
-explains what makes a person rankable — a tie to you, topics on that tie, or a
-role at the organisation you named — rather than implying you know nobody.
+explains what makes a person rankable - a tie to you, topics on that tie, or a
+role at the organisation you named - rather than implying you know nobody.
 
 ### Warm paths
 
@@ -205,7 +205,7 @@ you can already reach, and each destination states how many people and open
 roles support that position.
 
 With no route it says *"No warm path to [organisation] yet"* and names the
-record that would create one — link someone you know to a role there, or add a
+record that would create one - link someone you know to a role there, or add a
 person who works there. It sends you to People rather than leaving you at a
 dead end.
 
@@ -221,7 +221,7 @@ With fictional data, tracking one application from interest to interview.
 2. Before applying, the reach lens shows one warm path: a former colleague who
    now holds a role there. It is two hops and both ties are strong.
 3. The contact lens, asked for a referral at Aurora Dynamics about
-   reinforcement learning, ranks that same colleague first, and shows why —
+   reinforcement learning, ranks that same colleague first, and shows why -
    affiliation and topic overlap, on a tie with three logged interactions.
 4. Jordan logs the outreach as an interaction and queues a follow-up reminder
    for a week out.

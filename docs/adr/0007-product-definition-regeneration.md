@@ -5,7 +5,7 @@
 - **Supersedes:** nothing. Amends the epistemic status of `docs/specs/srs.md`:
   the register stops being purely recovered and starts carrying authored
   statements, each marked as such.
-- **Scope:** the product-definition corpus — requirements register, capability
+- **Scope:** the product-definition corpus - requirements register, capability
   and journey registers, `PRODUCT.md`, `docs/ROADMAP.md`, and the observatory
   `product/` section. No storage, authentication, public API, or deployment
   behavior changes under this record.
@@ -15,7 +15,7 @@
 The requirement register says of itself that its statements are "recovered, not
 transcribed": no authored specification survives, seventeen identifiers carry
 no statement at all, and only three non-functional requirements exist for a
-system whose deepest promises — privacy, determinism, durability of ownership —
+system whose deepest promises - privacy, determinism, durability of ownership -
 are all non-functional. There are no personas, no user stories, no acceptance
 criteria, and five of the eight registered journeys are deliberately empty
 rows. The product this describes is meanwhile complete enough to sell: a hosted
@@ -33,18 +33,18 @@ Author the definition forward, under the same traceability gates that guard the
 recovered register.
 
 1. **Who it is for.** Four personas, registered P1 through P4 in the corpus:
-   the deliberate mover (an experienced professional preparing a career move —
+   the deliberate mover (an experienced professional preparing a career move -
    the paying customer the hosted plan already names), the consultant or
    fractional professional (a portfolio career run on relationships and
    per-engagement evidence), the periodic prover (someone who must periodically
-   assemble a verifiable account of their own history — a promotion packet, an
+   assemble a verifiable account of their own history - a promotion packet, an
    immigration petition's exhibits, a clearance form's ten-year record), and
    the privacy-first self-hoster (the operator who runs the free system,
    never pays, and keeps the export and no-lock-in commitments honest).
 
 2. **What it is.** The positioning is a career system of record: private,
    evidence-led, deterministic. The episodic career move is what sells; the
-   always-on system — capture, relationship cadence, provenance — is what
+   always-on system - capture, relationship cadence, provenance - is what
    retains. Life records remain the evidence substrate of the career story
    rather than a second product: the generic record surfaces that serve the
    long-tail types are a decision, not a gap.
@@ -93,7 +93,7 @@ recovered register.
 **Negative / accepted**
 
 - The register loses its purity: it becomes a mixture of recovered and
-  authored statements. The mitigation is honesty in place — every authored
+  authored statements. The mitigation is honesty in place - every authored
   statement is marked as authored in its reconstruction note, so a reader can
   always tell which epistemic regime an entry belongs to.
 - Planned requirements are promises, and promises rot. The traceability gate
@@ -106,7 +106,7 @@ recovered register.
 
 **Deliberately deferred**
 
-- Persona and story registry files with schema and gate wiring — until
+- Persona and story registry files with schema and gate wiring - until
   end-to-end specs cite their identifiers.
 - Any commercial fact: pricing, contracting entity, merchant of record, refund
   policy, and support ownership stay recorded as open in

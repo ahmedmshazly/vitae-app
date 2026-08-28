@@ -66,7 +66,7 @@ read-only root filesystem, no new privileges, and a writable `/tmp` and nothing
 more.
 
 Postgres is the system of record and is not one of the three. It runs
-separately — managed, in the documented topology — which is the reason the
+separately - managed, in the documented topology - which is the reason the
 container host can be rebuilt without ceremony while the database cannot.
 
 ### Why the deploy is manual
@@ -90,7 +90,7 @@ them at deploy time would be catching them too late.
 Container base images must be digest-pinned. The guard greps the two
 Dockerfiles and the production compose file for an unpinned `FROM` or `image:`,
 and it carries a self-test that feeds it a deliberately unpinned reference and
-fails the job if the guard no longer catches it — a gate nobody has watched
+fails the job if the guard no longer catches it - a gate nobody has watched
 fail is a gate nobody should trust.
 
 Both production images are scanned for critical, fixed vulnerabilities, and a
@@ -168,7 +168,7 @@ described above serves no documentation. A request for any file under
 `/api/v1/docs` answers 503 with a code saying no corpus was built into this
 deployment, `GET /api/v1/docs` itself reports it neither configured nor
 available, and the reading surface repeats the message. That is the intended
-answer for that situation — the alternative, an empty documentation set, would
+answer for that situation - the alternative, an empty documentation set, would
 send someone looking for pages that were never compiled.
 
 To give an instance its documentation:
@@ -227,7 +227,7 @@ will serve traffic are the same release. The force-recreate is also deliberate:
 a changed tag alone does not make every Compose version replace a running
 container.
 
-Afterwards the script polls readiness — not liveness — twenty times at three
+Afterwards the script polls readiness - not liveness - twenty times at three
 second intervals. If readiness never comes, it prints the last forty lines of
 the API log and exits non-zero.
 
@@ -243,16 +243,16 @@ For a read-only report of what is currently deployed, which changes nothing:
 is what a platform uses to decide whether to restart the container.
 
 `GET /ready` asks whether this instance should receive traffic. It answers 503
-while starting or draining, when the database is unreachable, and — in
-production only — when the build service does not answer its own health check.
+while starting or draining, when the database is unreachable, and - in
+production only - when the build service does not answer its own health check.
 The database probe is bounded at two seconds and cached for five, because a
 probe that hangs takes the instance down with it.
 
 The consequence is a coupling an operator should know before meeting it at two
 in the morning: **in production, a build service that is down makes the API
 report itself not ready, and a deploy that waits on readiness will therefore
-never finish.** The API can still serve everything except compilation — a
-failed compile degrades to a `.tex` download rather than an error — but the
+never finish.** The API can still serve everything except compilation - a
+failed compile degrades to a `.tex` download rather than an error - but the
 deploy script cannot tell the difference between that and a broken release.
 Check the build service before assuming the release is at fault.
 
@@ -263,7 +263,7 @@ forces the exit. A deploy should never drop a compile or an import mid-write.
 ### Verifying a release
 
 - `GET /health` answers 200.
-- `GET /ready` answers 200 — which means Postgres and the build service both
+- `GET /ready` answers 200 - which means Postgres and the build service both
   answered.
 - Signing in as the configured owner works, and a different identity is refused
   without being told who the owner is.

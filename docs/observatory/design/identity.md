@@ -28,7 +28,7 @@ order: 1
 Vitae looks like a precise instrument at rest. The interface is dark only,
 achromatic, and flat: matte near-black fields, bone-white ink, one-pixel ruling,
 and no accent colour at all. Brightness does the work an accent hue usually
-does, which leaves the entire colour budget free to mean something — a record
+does, which leaves the entire colour budget free to mean something - a record
 type, an outcome, a state. This identity is called Quiet, it landed in August
 2026, and it is the third one this repository has on record. The other two were
 tried and removed, and a script now fails the build on several of the things
@@ -55,7 +55,7 @@ The superseded one to know about is **Aurora Signal**, specified in
 `docs/design/addenda/P26-aurora-identity.md`. It is the dangerous document in
 this repository for anyone starting from the design folder, because until this
 documentation was written its heading read as current guidance and its
-prescriptions are not merely out of fashion — they are refused by the build.
+prescriptions are not merely out of fashion - they are refused by the build.
 Aurora asks for gradients on hero controls, a soft glow on hover, a cyan glow
 focus ring, ambient radial washes on the shell, spring easing with overshoot,
 and durations of 120/180/320ms. Each of those is a named failure in the ban
@@ -86,7 +86,7 @@ dark ground without guarding for anything else.
 There is exactly one place where the product draws light-on-dark's opposite: a
 simulated sheet of paper. Résumé previews, the live document editor and the
 schema atlas all render a printed page inside a dark application, and the
-interface ramp cannot express that — body ink on white is invisible and a
+interface ramp cannot express that - body ink on white is invisible and a
 hairline on white is not there at all. A separate `--paper-*` family exists for
 that surface only.
 
@@ -109,7 +109,7 @@ accent for this screen".
 The corollary is a hard rule rather than a preference: colour is never the only
 carrier of meaning. Every state ships a glyph and a word alongside its tone, and
 every categorical encoding ships a shape and a direct label. The components
-enforce this for you where they can — see [Layout and component
+enforce this for you where they can - see [Layout and component
 patterns](patterns.md).
 
 ## Mechanics
@@ -126,17 +126,17 @@ preserved, so prose describing a banned pattern is not mistaken for shipping it.
 
 Seven rules run over stylesheets:
 
-- **gradient** — any `linear-`, `radial-` or `conic-gradient(`.
-- **backdrop-filter** — the glassmorphism ban, in CSS or in a style object.
-- **shadow** — a `box-shadow` whose blur slot is non-zero. A zero-blur shadow is
+- **gradient** - any `linear-`, `radial-` or `conic-gradient(`.
+- **backdrop-filter** - the glassmorphism ban, in CSS or in a style object.
+- **shadow** - a `box-shadow` whose blur slot is non-zero. A zero-blur shadow is
   a ring, which is a border drawn outside the box, and passes. A declaration
   naming the overlay-shadow or focus-ring token is exempt.
-- **easing** — the first `cubic-bezier()` on a line, if it is not the one curve.
-- **duration** — on a timing declaration, any millisecond value outside the nine
+- **easing** - the first `cubic-bezier()` on a line, if it is not the one curve.
+- **duration** - on a timing declaration, any millisecond value outside the nine
   allowed numbers, or any value written in seconds.
-- **hover-transform** — a line beginning `transform:` under a `:hover` selector.
+- **hover-transform** - a line beginning `transform:` under a `:hover` selector.
   Hover is not a state change, so it gets tone and never travel.
-- **raw-hex** — any hex literal outside the token file and outside a print block.
+- **raw-hex** - any hex literal outside the token file and outside a print block.
 
 Two of them also run over TypeScript, alongside one rule that applies only
 there: gradients, `backdropFilter`, and Tailwind's `animate-bounce`,
@@ -165,8 +165,8 @@ ways. This is the concrete reason it cannot be treated as guidance.
 
 `apps/web/src/styles/entity-observatory.css` still declares local properties
 called `--obs-cyan` and `--obs-cyan-soft`. The names survived the rebrand; the
-colour did not. Both are aliases onto the achromatic ramp — the accent and the
-soft ink — and the file's own comment says so. Nothing cyan ships. It is worth
+colour did not. Both are aliases onto the achromatic ramp - the accent and the
+soft ink - and the file's own comment says so. Nothing cyan ships. It is worth
 knowing about only so that finding the word in a grep does not send anyone
 looking for a second palette.
 
@@ -188,7 +188,7 @@ agree. Change one and change all three.
 ### Where the values live
 
 `packages/ui/src/styles/tokens.css` is the definition site for every value, and
-the `raw-hex` rule exists to keep it that way — a hex code in a component is a
+the `raw-hex` rule exists to keep it that way - a hex code in a component is a
 bug the build will report. `docs/design/IDENTITY.md` is a hand-maintained
 extract of that file and has already drifted from it in at least one place: it
 publishes the contrast floor as `#8C8C89` at 5.7:1, while the token file
@@ -198,12 +198,12 @@ renders.
 
 ## Related
 
-- [Tokens and the scales they enforce](tokens.md) — the scales this identity is
+- [Tokens and the scales they enforce](tokens.md) - the scales this identity is
   made of, and why each one has the number of steps it has.
-- [Motion, and why there is so little](motion.md) — the one easing, the three
+- [Motion, and why there is so little](motion.md) - the one easing, the three
   durations, and the two registers.
-- [Layout and component patterns](patterns.md) — how the identity turns into a
+- [Layout and component patterns](patterns.md) - how the identity turns into a
   screen.
-- [Voice and content design](voice.md) — the same restraint applied to words.
-- [About these documents](../meta/index.md) — the audited record of what the
+- [Voice and content design](voice.md) - the same restraint applied to words.
+- [About these documents](../meta/index.md) - the audited record of what the
   older design documents claimed and where each claim was corrected.

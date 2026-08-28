@@ -41,23 +41,23 @@ that is a git-ignored `.env`; on a host it is the platform's secret manager
 where one exists, and `deploy/.env` where one does not. Names are published in
 `.env.example` and `deploy/.env.example`; values never are.
 
-**A file-backed store.** One credential — the GitHub token used for repository
-sync — can be written by the application itself, into a git-ignored `.secrets/`
+**A file-backed store.** One credential - the GitHub token used for repository
+sync - can be written by the application itself, into a git-ignored `.secrets/`
 directory with the directory at `0700` and the file at `0600`, written to a
 temporary file and renamed with an fsync so a crash cannot leave a half-written
 credential. This exists so a self-hosted instance can connect an integration
 from its own settings screen without an operator editing a file.
 
 **Nowhere else, deliberately.** No third-party credential is stored as
-application data. The database keeps only non-secret synchronisation metadata —
-when a sync last ran, an entity tag — plus a note of *where* the secret lives.
+application data. The database keeps only non-secret synchronisation metadata -
+when a sync last ran, an entity tag - plus a note of *where* the secret lives.
 That rule is the reason an export bundle, a database dump, or a leaked backup
 does not hand someone a working credential to another service. A surface that
 reports whether a credential is configured reports presence, never the value.
 
 The two backends have a precedence, and it is not symmetrical. If the
 environment supplies the value, it wins, and the application refuses to write a
-file copy — rotation belongs in the secret manager, and a competing copy on
+file copy - rotation belongs in the secret manager, and a competing copy on
 disk would defeat the point. The file store is writable only when the
 environment is silent.
 
@@ -166,7 +166,7 @@ than an image rebuild. Download the current bundle for your database's region
 and replace the file in place.
 
 This matters more than it sounds. The API will not fall back to accepting an
-unverified certificate — a missing or wrong bundle is a start-up failure rather
+unverified certificate - a missing or wrong bundle is a start-up failure rather
 than a silently interceptable connection. An expired bundle therefore takes the
 API down rather than degrading it.
 
@@ -176,7 +176,7 @@ Also not covered by the runbook. The service-account JSON is supplied to the
 API as a single-line value in the deployment environment, and it is what lets
 the API verify users' sign-in tokens. Rotating it means issuing a new key in
 the identity provider's console, replacing the value, recreating the API
-container, and then revoking the old key — in that order, because revoking
+container, and then revoking the old key - in that order, because revoking
 first means nobody can sign in during the gap.
 
 ## The repository sync token
@@ -194,7 +194,7 @@ system.
 ## The backup identity
 
 The backup script writes to object storage. Prefer an instance role or a
-federated identity over a long-lived key pair — the example policies in
+federated identity over a long-lived key pair - the example policies in
 `deploy/aws/` are shaped for exactly that, with a trust policy for a federated
 continuous-integration identity and a bucket policy scoped to the single export
 prefix rather than the whole bucket.
@@ -223,7 +223,7 @@ never be placed in a value that the web build reads.
 
 In order, because each step tests a different secret:
 
-1. `GET /ready` answers 200 — the API reached the database and the build
+1. `GET /ready` answers 200 - the API reached the database and the build
    service.
 2. `GET /api/v1/status` reports the database, storage and build service all
    healthy. That is the only check that exercises the storage credential.

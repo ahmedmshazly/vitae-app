@@ -1,6 +1,6 @@
 # Coverage matrix
 
-Owner map for Vitae’s test program. Every critical flow and production module
+Owner map for Vitae's test program. Every critical flow and production module
 must land in an executable layer below. Update
 [`source-test-map.json`](./source-test-map.json) when adding modules; CI runs
 `pnpm test:map` to reject unmapped sources.
@@ -12,7 +12,7 @@ must land in an executable layer below. Update
 | `packages/core` | 37 | 32 colocated `*.test.ts` |
 | `apps/api` (non-scripts) | 77 | 13 (`*.test.ts` + `__tests__`) |
 | `apps/web` | 122 | 36 |
-| Playwright e2e | — | 46 specs |
+| Playwright e2e | - | 46 specs |
 | `@vitae/testkit` | new | unit tests for clock/factories |
 
 The Playwright row was re-measured on 2026-08-25 with
@@ -125,7 +125,7 @@ helpers (~50+).
 | Secrets | `services/secrets.test.ts` |
 | Error / request-context | `middleware/error.test.ts`, `middleware/request-context.test.ts` |
 | Error envelope contract | `__tests__/contracts/error-envelope.contract.test.ts` |
-| OpenAPI contract | `__tests__/contracts/openapi.contract.test.ts` — mount inventory + drift vs `docs/api/openapi.json` (`pnpm openapi` / `pnpm test:contract`) |
+| OpenAPI contract | `__tests__/contracts/openapi.contract.test.ts` - mount inventory + drift vs `docs/api/openapi.json` (`pnpm openapi` / `pnpm test:contract`) |
 | Thin CRM/ops routes | `ask\|composer\|favors\|habits\|intros\|orgs\|people\|places\|reminders\|status.integration.test.ts` |
 | Shared helper | `__tests__/helpers/app.ts` (`ensureSelfPerson`, `createKnowsPerson`) + `@vitae/testkit` factories |
 
@@ -133,7 +133,7 @@ High-risk API modules and the monolith-backed route-split wave are `covered`.
 OpenAPI phase 1 documents paths/methods/auth/shared Error (+ detailed critical
 writes); deep per-response schemas for every endpoint are deferred.
 Thin CRM/ops routes (ask, composer, favors, habits, intros, orgs, people,
-places, reminders, status) have focused integration suites — **API route
+places, reminders, status) have focused integration suites - **API route
 deferred count is 0**.
 
 ## E2E coverage wave (space-aware fixtures + negatives + browsers)
@@ -143,8 +143,8 @@ deferred count is 0**.
 | Space-aware API helper | `e2e/tests/helpers/api.ts` (`x-vitae-space` from page) |
 | Fixtures | `e2e/tests/helpers/fixtures.ts` (uses api helper) |
 | Negative journeys | `e2e/tests/negative.spec.ts` (401, bad bearer, invalid filter, demo/real isolation) |
-| Multi-browser | `e2e/playwright.config.ts` — Chromium default; `VITAE_E2E_BROWSERS=all` adds Firefox, WebKit, Pixel 7 |
-| Visual | `visual-baselines.spec.ts` — Chromium desktop landing + sign-in (always on) |
+| Multi-browser | `e2e/playwright.config.ts` - Chromium default; `VITAE_E2E_BROWSERS=all` adds Firefox, WebKit, Pixel 7 |
+| Visual | `visual-baselines.spec.ts` - Chromium desktop landing + sign-in (always on) |
 
 Arbitrary per-spec Postgres spaces are not a product feature (space is only
 `real` \| `demo`); isolation is stamped fixture data + space header fidelity +
@@ -154,9 +154,9 @@ the demo/real leakage test.
 
 | Piece | Command / path |
 |-------|----------------|
-| Security suite | `pnpm test:security` — HTTP hardening + auth/CSP unit tests |
-| Resilience | `pnpm test:resilience` — buildsvc offline/HMAC + readiness fail-closed |
-| Performance budgets | `pnpm test:performance` — `docs/testing/web-budgets.json` vs `apps/web/dist` |
+| Security suite | `pnpm test:security` - HTTP hardening + auth/CSP unit tests |
+| Resilience | `pnpm test:resilience` - buildsvc offline/HMAC + readiness fail-closed |
+| Performance budgets | `pnpm test:performance` - `docs/testing/web-budgets.json` vs `apps/web/dist` |
 | Authenticated DAST | still deferred (needs ephemeral stack job) |
 
 ## Writing policy for tests

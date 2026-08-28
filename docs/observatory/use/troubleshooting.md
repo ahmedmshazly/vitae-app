@@ -73,9 +73,9 @@ current view in place"* while cached data is being updated. Nothing is wrong.
 **Degraded.** A red banner over a screen that is still rendering. Two forms:
 
 - *"Couldn't load [the history and the favour ledger]"*, with the body
-  *"Everything else on this screen is current."* — a secondary region failed;
+  *"Everything else on this screen is current."* - a secondary region failed;
   the rest of the screen is true.
-- *"Couldn't refresh this data"*, with *"Showing the last available version."* —
+- *"Couldn't refresh this data"*, with *"Showing the last available version."* -
   a refresh failed after data had already arrived. What you are looking at is
   real but may be stale.
 
@@ -96,7 +96,7 @@ This is a build problem. Nothing you do in the browser will fix it.
 
 ### "Sign-in failed."
 
-Whatever the identity provider said, passed through — a popup you closed, the
+Whatever the identity provider said, passed through - a popup you closed, the
 wrong account, an unauthorised domain. The specific reason is printed after the
 bold lead.
 
@@ -113,7 +113,7 @@ These come back from the API rather than the sign-in screen, and they usually
 mean the session expired while the tab was open. The API answers `401` with
 *"Sign-in required."* when there is no token at all, and with *"This is a
 private system."* on a self-hosted instance — or *"A verified Google sign-in is
-required."* on Cloud — when the token is present but the account is not the one
+required."* on Cloud - when the token is present but the account is not the one
 this instance admits. The message is deliberately neutral: it never reveals
 whether a particular address is on the allow list.
 
@@ -154,7 +154,7 @@ service means nothing will compile anywhere in the workspace.
 
 The service was reachable and the document did not typeset. The detail carries
 the error code, the message, and the section it happened near when that is
-known — for example `COMPILE_ERROR: … (near section: experience)`. The LaTeX
+known - for example `COMPILE_ERROR: ... (near section: experience)`. The LaTeX
 log tail is behind a disclosure below it, and the `.tex` source is offered for
 download so you can reproduce it outside Vitae.
 
@@ -220,7 +220,7 @@ listed; use **Rebuild artifacts** on it once storage is back.
 ### "Not saving. Your last changes are only in this tab."
 
 The Tailor autosave failed. This appears in the page header, where the header
-also promises that everything is autosaved — so the promise and its withdrawal
+also promises that everything is autosaved - so the promise and its withdrawal
 are in the same place.
 
 Do not navigate away. Copy anything you cannot lose, then retry by making
@@ -236,7 +236,7 @@ signals, so this one never claims your work is unsaved.
 
 One of the two queries the workspace needs failed, and the message ends *"the
 workspace below is incomplete."* The panes that depend on the failed query will
-be empty — which is why the message is there, because an empty pane on its own
+be empty - which is why the message is there, because an empty pane on its own
 reads as *you have nothing*.
 
 ## Importing
@@ -246,7 +246,7 @@ reads as *you have nothing*.
 Refused with `422` and the code `INVALID_IMPORT_CONTENT`. The message names the
 problem. For an Aperture bundle: *"not valid JSON: expected a
 vitae.graph.bundle export"*, or *"not a valid vitae.graph.bundle: [field]:
-[message]; …"* listing the first few specific errors.
+[message]; ..."* listing the first few specific errors.
 
 Nothing is staged and nothing is written. Fix the file and stage again.
 
@@ -267,9 +267,9 @@ different source.
 
 ### GitHub
 
-*"Add a GitHub token in Settings first."* — no credential is configured.
+*"Add a GitHub token in Settings first."* - no credential is configured.
 
-*"GitHub rejected the token, it may be revoked or expired."* — the credential
+*"GitHub rejected the token, it may be revoked or expired."* - the credential
 exists and GitHub refused it. Issue a new personal access token with repository
 read scope and save it again.
 
@@ -293,7 +293,7 @@ at the door:
 - *"checksum mismatch for [file], bundle is corrupt"*
 - *"bundle is missing [file] listed in the manifest"*
 - *"[file]: manifest count [n] does not match [m]"*
-- *"unsupported bundle schema_version …"*
+- *"unsupported bundle schema_version ..."*
 - *"share-safe exports are intentionally incomplete; restore requires a full
   sensitive backup"*
 
@@ -347,7 +347,7 @@ longer than answering a query.
 
 The generic `500`. It means an error reached the server's outermost handler
 without being classified. The response carries a `request_id`, and the server
-logs the same id with the stack — so if you are self-hosting, that id is how you
+logs the same id with the stack - so if you are self-hosting, that id is how you
 find it.
 
 ## Read-only and account states
@@ -380,7 +380,7 @@ broke, which is why that one offers a hard reload as well as an in-place retry.
 
 ## Nothing at this address
 
-**"Not found"** — *"That address does not match anything in this space."* — is
+**"Not found"** - *"That address does not match anything in this space."* - is
 the signed-in 404, and it lists every workspace. It exists because a dead URL
 used to render the dashboard, which made a broken link look exactly like a
 successful navigation home.
@@ -395,8 +395,8 @@ the public home page rather than shown a login wall.
 **"The documentation is private. Sign in at /signin with the account that owns
 this instance, then open this page again."** means the address is fine and you
 are not. The documentation is served by the API, which refuses it to anyone who
-is not the owner, so a signed-out reader — or a reader signed in as somebody
-else — gets the empty frame and this sentence rather than a redirect. It is
+is not the owner, so a signed-out reader - or a reader signed in as somebody
+else - gets the empty frame and this sentence rather than a redirect. It is
 worded to stop you debugging a build that is working.
 
 **"No documentation was built into this deployment, so there is nothing to read
@@ -408,7 +408,7 @@ to be pointed at the result; this message means it was not. See
 ## Where to look when nothing obvious is wrong
 
 `/settings/system` is the health screen. It reports each service check
-individually — the database, attachment storage, and the build service — with
+individually - the database, attachment storage, and the build service - with
 its detail, alongside live record counts.
 
 The database check is a **write**, not a read. That is deliberate: a database

@@ -32,7 +32,7 @@ about: a pure function gets a unit test, a route gets an integration test
 against a real Postgres, a screen gets a component test in a simulated browser,
 and a journey gets a real browser. On top of that sits an unusual second
 mechanism: a checked-in map that names, for every production module, what
-proves it — and a gate that fails when a module has neither a test beside it nor
+proves it - and a gate that fails when a module has neither a test beside it nor
 an entry in the map. The map is the reason it is hard to add untested code here
 by accident.
 
@@ -64,7 +64,7 @@ Where the cases actually are, counted from the generated test catalog:
 
 That distribution is worth a second look. The browser suite is 46 spec files
 and a quarter of all cases, which is why it is slow and why it is the last
-thing to run. And `@vitae/ui` has more cases than the API — 226 of them — none
+thing to run. And `@vitae/ui` has more cases than the API - 226 of them - none
 of which any gate runs. [The gates page](quality-gates.md) has that in full.
 
 ### Where a test goes
@@ -75,7 +75,7 @@ suffix for a module with several suites: `Person.states.test.tsx`,
 `AtlasCanvas.error.test.tsx`, `Person.log.test.ts`.
 
 Two directories break colocation on purpose. `apps/api/src/__tests__/` holds
-the suites that are not about one module — the contract suites, the security
+the suites that are not about one module - the contract suites, the security
 suites, the resilience suites, and the shared application helper that boots the
 Express app once per worker and mints a developer token. `e2e/tests/` holds the
 browser specs, which are about journeys rather than modules.
@@ -86,7 +86,7 @@ A unit or component test needs nothing. An API test needs Postgres, and takes
 care of the rest itself: `apps/api/vitest.config.ts` declares a global setup
 that creates and migrates a separate `vitae_test` database and points every
 suite at it, whatever `DATABASE_URL` says in your `.env`. That redirection is a
-data-safety measure, not a convenience — the suites truncate between tests, so
+data-safety measure, not a convenience - the suites truncate between tests, so
 a suite that ran against a seeded development database would destroy it. For
 the same reason `fileParallelism` is off: truncation is global to the database,
 so two files running at once would clear each other's fixtures mid-test.
@@ -102,7 +102,7 @@ only the demo seed creates.
 
 `docs/testing/source-test-map.json` names 256 production modules and, for each
 one, its risk class, the layers that own it, and the test files that prove it.
-`scripts/check-test-coverage-map.mjs` — the `pnpm test:map` gate — walks three
+`scripts/check-test-coverage-map.mjs` - the `pnpm test:map` gate - walks three
 directories, `packages/core/src`, `apps/api/src` and `apps/web/src`, skipping
 anything matched by the map's own `exclude_globs` (barrel files, declaration
 files, test files, the API's one-off scripts, the web entry point).
@@ -124,9 +124,9 @@ A map entry looks like this:
 ```
 
 `risk` is from the risk classes in `docs/testing/coverage-matrix.md`, and it
-sets the evidence the matrix expects: a critical module — authentication,
+sets the evidence the matrix expects: a critical module - authentication,
 tenancy isolation, retention purge, export and restore, the LaTeX escape layer,
-the compiler's signing — is expected to have unit, integration and negative-path
+the compiler's signing - is expected to have unit, integration and negative-path
 coverage, where a medium one needs a happy path, an empty state and an error.
 Of the 256 mapped modules, 11 are critical, 29 high, 212 medium and 4 low.
 
@@ -141,8 +141,8 @@ A plainly named sibling counts on its name alone: `<name>.test.ts`,
 the content module it renders rather than by importing the component, so
 demanding an import would reject them.
 
-A facet-named sibling — anything else starting `<name>.` and ending `.test.ts`,
-`.test.tsx` or `.spec.ts` — counts **only if it imports the module**. That rule
+A facet-named sibling - anything else starting `<name>.` and ending `.test.ts`,
+`.test.tsx` or `.spec.ts` - counts **only if it imports the module**. That rule
 costs recall deliberately. Of the eighty-four facet suites sitting beside a
 module of the same stem, fifty-two import it and count; the other thirty-two
 reach their module through a route render or a content module and still require
@@ -153,7 +153,7 @@ as proof is the failure this gate exists to prevent.
 The practical consequence for an API route is concrete. The route integration
 suites drive the whole application through the shared helper rather than
 importing the router, so `applications.integration.test.ts` does **not** satisfy
-the gate for `applications.ts` — which is why that module has the map entry
+the gate for `applications.ts` - which is why that module has the map entry
 shown above. Add a route file and you will add a map entry.
 
 The four ways the gate fails, each reproduced against a fixture tree:
@@ -174,7 +174,7 @@ suite sat in the same directory, and nothing read that field.
 
 `pnpm test:map` is not `node scripts/check-test-coverage-map.mjs`. It is
 `node scripts/check-test-coverage-map.selftest.mjs && node
-scripts/check-test-coverage-map.mjs` — a self-test that builds fixture
+scripts/check-test-coverage-map.mjs` - a self-test that builds fixture
 repositories, points the real checker at each one through `VITAE_MAP_ROOT`, and
 asserts the exit code, running ahead of every real invocation.
 
@@ -184,7 +184,7 @@ returns the input unchanged when the pattern misses, so every walked module
 resolved to its own path and counted as tested. It printed `source-test-map: ok`
 for months while modules landed with no test and no entry. The function was
 replaced with one that lists the directory and matches real names, which has no
-silent identity case — and the self-test exists so that a future regression
+silent identity case - and the self-test exists so that a future regression
 announces itself rather than being inferred from a passing build.
 
 The same pattern is used elsewhere. `test:performance` runs its own self-test
@@ -196,15 +196,15 @@ fail.
 
 `packages/core` is required to be deterministic: identical inputs, identical
 outputs, no randomness anywhere in the algorithms. Three layers hold that.
-Property tests generate arbitrary inputs and assert invariants — the escape
+Property tests generate arbitrary inputs and assert invariants - the escape
 layer's suite requires that any input compiles and never leaks an active TeX
 control sequence. Metamorphic tests assert relationships between runs rather
 than fixed values. A golden corpus pins exact outputs, so a change in a scoring
 constant shows up as a diff rather than as a slightly different résumé.
 
 Mutation testing is the check on the assertions themselves. Stryker mutates
-five protected modules — the escape layer, the capture and filter grammars,
-subject assignment, and schema validation — and fails below a score of 60. It
+five protected modules - the escape layer, the capture and filter grammars,
+subject assignment, and schema validation - and fails below a score of 60. It
 is slow, it is opt-in locally, and it runs in no gate.
 
 ### What the numbers do not tell you
@@ -212,8 +212,8 @@ is slow, it is opt-in locally, and it runs in no gate.
 Test counts are not coverage. Two measurements in the generated catalogs say so
 directly: 130 of the 137 registered API endpoints have a test associated with
 them, and of the 99 identifiers in the requirement register, only 22 are cited
-from inside a test file. The second figure measures citation, not proof — a
-requirement can be thoroughly tested by a suite that never names it — but it
+from inside a test file. The second figure measures citation, not proof - a
+requirement can be thoroughly tested by a suite that never names it - but it
 does mean the requirement-to-test trail is thin, and that a claim of the form
 "this requirement is proven" cannot be read off the suite today.
 
@@ -223,6 +223,6 @@ does mean the requirement-to-test trail is thin, and that a claim of the form
 the list of things that will actually refuse a change, including the ones that
 run nowhere. [Where a change belongs](where-to-change.md) decides which
 workspace you are testing in the first place. Each of the three worked
-procedures — [an endpoint](add-an-endpoint.md), [a node or edge
-type](add-a-node-type.md), [a résumé template](add-a-resume-template.md) —
+procedures - [an endpoint](add-an-endpoint.md), [a node or edge
+type](add-a-node-type.md), [a résumé template](add-a-resume-template.md) -
 names the map entry its change requires.

@@ -38,8 +38,8 @@ keeps its own `vitae_e2e` database and binds API 4010, web 5183 and buildsvc
 containers were left alone; the gate reuses Postgres by design, and the
 build service sits on 8787, which the gate does not own.
 
-No deployment was written to. The two production origins were read from outside
-— health, readiness and two unauthenticated requests that must be refused — and
+No deployment was written to. The two production origins were read from outside:
+health, readiness and two unauthenticated requests that must be refused, and
 nothing else.
 
 No application source was modified. The four changes are a regenerated artifact,
@@ -48,13 +48,13 @@ never calls. What production runs is byte-identical before and after.
 
 ---
 
-## V-001 — a generated artifact was committed a step behind its own commit
+## V-001 - a generated artifact was committed a step behind its own commit
 
 **Seen to fail.** `pnpm docs:check` →
 `docs/generated/traceability.json: is stale. Run 'pnpm docs:gen' and commit the result.`
 
 Commit `781f041` added seven files. Two of them are read by the citation
-scanner — `apps/api/src/services/storage/memory.ts`, which cites `FR-001`, and
+scanner - `apps/api/src/services/storage/memory.ts`, which cites `FR-001`, and
 `apps/web/src/lib/last-viewed.ts`. The commit regenerated `docs/generated/*`,
 but did so *before* those files were staged, and the generator reads the
 **tracked** file set through git. It therefore indexed a tree that did not yet
@@ -74,11 +74,11 @@ The second `docs:gen` pass is not superstition: when the register block grows,
 every line number below it shifts, and one pass records the pre-shift numbers.
 
 **Fixed** by regenerating and committing. `docs:check` now reports
-`ok (131 requirements, 19 capabilities, 8 journeys, 920 citations)` — 918 after
+`ok (131 requirements, 19 capabilities, 8 journeys, 920 citations)` - 918 after
 the regeneration, and two more once this report joined the tracked set and began
 citing identifiers itself.
 
-## V-002 — the API integration step borrowed a build service it does not own
+## V-002 - the API integration step borrowed a build service it does not own
 
 **Seen to fail.** `letters.integration.test.ts > compiles a letter to the same
 artifact pair shape a résumé compiles to` — `expected false to be true`, with
@@ -88,7 +88,7 @@ That empty message is the whole diagnosis, once the pieces are read together.
 
 The test accepts two outcomes and refuses a third. Either the build service
 answered and a real PDF came back, or it was unreachable and `offline` says so.
-It took the **reachable** branch and still failed, which is the third outcome —
+It took the **reachable** branch and still failed, which is the third outcome -
 a compiler that is up and failing.
 
 `apps/api/src/services/buildsvc-client.ts` sets `offline: true` only inside its
@@ -99,7 +99,7 @@ Hence a failure message that ends at the colon.
 
 The reason it was reachable and rejecting: `api_integration()` in
 `scripts/ci-local.sh` pinned `DATABASE_URL`, the Auth emulator host, the owner,
-the session secret and `BUILDSVC_HMAC_SECRET` — but not `BUILDSVC_URL`. That one
+the session secret and `BUILDSVC_HMAC_SECRET` - but not `BUILDSVC_URL`. That one
 dependency was left to the environment, where `packages/config/src/env.ts`
 defaults it to `http://localhost:8787` and the repository `.env` sets the same.
 A developer with `docker compose up -d buildsvc` running therefore had the API
@@ -121,7 +121,7 @@ on a machine with no development build service running, because the connection
 is refused and the test takes its offline branch. The workflow's
 `api-integration` job runs no build service and has no `.env`, so upstream this
 case has only ever taken that branch. The result depended on whether an
-unrelated container happened to be up — a gate that answers "would CI accept
+unrelated container happened to be up - a gate that answers "would CI accept
 this" differently depending on the developer's docker state.
 
 **Fixed** by pinning `BUILDSVC_URL=http://127.0.0.1:9` in `api_integration()`,
@@ -135,7 +135,7 @@ takes, and the real-PDF branch is exercised in the e2e layer, where the gate
 starts the build service itself and shares its secret with the API.
 
 `test:mirror` compares which scripts and workspaces the two gates run, and
-explicitly not their environments or ports — "those differ on purpose" — so
+explicitly not their environments or ports - "those differ on purpose" - so
 pinning a variable locally does not put the mirror out of step.
 
 **Recorded, not fixed.** A signature rejection from the compiler reaches the
@@ -144,7 +144,7 @@ is an honesty gap in the error envelope rather than a defect in this sweep's
 scope, and fixing it is a design decision about what the envelope owes its
 reader.
 
-## V-003 — dependency advisories below the enforced threshold
+## V-003 - dependency advisories below the enforced threshold
 
 `pnpm audit --audit-level=high`, which is the gate, passes. Lowering the
 threshold to `low` surfaces six.
@@ -153,9 +153,9 @@ threshold to `low` surfaces six.
 | --- | --- | --- | --- |
 | moderate | `react-router` | `apps/web → react-router-dom@6.30.4` | **yes** |
 | moderate | `react-router-dom` | `apps/web` | **yes** |
-| moderate | `ajv` | `@stryker-mutator/core` | no — mutation testing |
-| moderate | `re2` | `firebase-tools → superstatic` | no — Auth emulator |
-| low | `@babel/core` | `@stryker-mutator/instrumenter` | no — mutation testing |
+| moderate | `ajv` | `@stryker-mutator/core` | no - mutation testing |
+| moderate | `re2` | `firebase-tools → superstatic` | no - Auth emulator |
+| low | `@babel/core` | `@stryker-mutator/instrumenter` | no - mutation testing |
 
 `docs/observatory/develop/quality-gates.md` sets the policy: the gate fails on
 high or critical, and a `pnpm.overrides` entry is the sanctioned way to clear an
@@ -165,19 +165,19 @@ The two that ship cannot be cleared that way. `react-router` is patched only at
 ≥ 7.18.0 and the installed line is 6.30.4, so no 6.x release fixes it; the
 advisory against `react-router-dom` reports no patched version at all, because
 in v7 that package stopped being the entry point. Both therefore resolve to the
-same action — a v6 → v7 major migration, which changes routing semantics across
+same action - a v6 → v7 major migration, which changes routing semantics across
 every route in the application. That is a scope change with real breakage risk
 and it does not belong inside a verification sweep. Recorded here so the
 decision is deliberate rather than unnoticed.
 
 ---
 
-## V-004 — a latent strict-mode flake in the document editor spec
+## V-004 - a latent strict-mode flake in the document editor spec
 
 **Reasoned, not seen.** It has not fired, and the suite is green with it in
 place. It is recorded because it was found while reviewing what a much larger
 demo graph would do to the existing locators, and because the same class of
-defect has fired here before — commit `0a1c577`, "the panel's evidence lists
+defect has fired here before - commit `0a1c577`, "the panel's evidence lists
 made note text ambiguous".
 
 `e2e/tests/document-editor.spec.ts` asserted `paper.getByText('Education')`.
@@ -185,7 +185,7 @@ Playwright's `getByText(string)` defaults to `exact: false`, which is a
 case-insensitive **substring** match, scoped here only to the whole résumé
 paper. The demo seed already carries an atom containing `education-research`.
 If atom selection ever places that bullet on the paper, the locator matches
-both it and the section heading, and strict mode fails the test — a data
+both it and the section heading, and strict mode fails the test - a data
 change presenting as a product defect.
 
 **Fixed** by locating the heading of the section itself:
@@ -202,13 +202,13 @@ and got the same treatment.
 
 This is a strengthening, not a relaxation: an assertion that can only be
 satisfied by a section heading is narrower than one that any body text on the
-page can satisfy. The ratchets confirm nothing was traded away — 52 specs,
+page can satisfy. The ratchets confirm nothing was traded away - 52 specs,
 294 tests, 1025 assertions, unchanged.
 
-## V-005 — the documented multi-browser mode cannot pass, for two unrelated reasons
+## V-005 - the documented multi-browser mode cannot pass, for two unrelated reasons
 
-**Seen to fail.** `VITAE_E2E_BROWSERS=all` over seven core specs — foundation,
-sign-in, shell, today, search, forms and the résumé hub — 45 tests per project.
+**Seen to fail.** `VITAE_E2E_BROWSERS=all` over seven core specs - foundation,
+sign-in, shell, today, search, forms and the résumé hub - 45 tests per project.
 
 | Project | Result |
 | --- | --- |
@@ -241,7 +241,7 @@ project running the entire desktop suite, excluding only the visual baselines.
 mobile project runs the cases that mean something at that width, and that is
 harness design rather than a defect repair. The dishonest fix is a blanket
 `testIgnore` for the files that fail, which would produce a green mobile project
-that proves less than nothing — a claim of mobile coverage with the failing
+that proves less than nothing - a claim of mobile coverage with the failing
 cases removed. `e2e-review-2026-08-25.md` recorded this mode as broken under
 E2E-H-012; it is still broken, in two new ways, and saying so is worth more than
 a manufactured pass.
@@ -258,15 +258,15 @@ OpenJDK 21.0.11 for the Auth emulator, Playwright Chromium/WebKit/Firefox.
 
 Two gate runs were lost to causes outside the tree, and are named here so the
 count of runs in this document reconciles. One was killed mid-suite by the task
-runner that owned it — 282 of 284 browser tests had passed and none had failed,
+runner that owned it - 282 of 284 browser tests had passed and none had failed,
 but an interrupted run is not a result and is not counted as one. The other was
 abandoned once a concurrent session's untracked scratch files began failing
 `test:public` and attributing environment keys to files this repository does not
 contain.
 
 That second one is worth a sentence, because the gate was right both times.
-`check-public-release.mjs` scans untracked files deliberately — a private string
-in the working tree is one `git add -A` away from shipping — and the
+`check-public-release.mjs` scans untracked files deliberately - a private string
+in the working tree is one `git add -A` away from shipping - and the
 configuration generator indexes what is actually there rather than what is
 committed. Neither was a false positive; the working tree genuinely held files
 that would have failed the release. The fix was for those files to leave the
@@ -276,7 +276,7 @@ nothing untracked but one deliberately private runbook.
 
 ### The gate
 
-`./scripts/ci-local.sh --full` — twenty steps, in the workflow's order.
+`./scripts/ci-local.sh --full` - twenty steps, in the workflow's order.
 
 | Step | Baseline | After |
 | --- | --- | --- |
@@ -284,7 +284,7 @@ nothing untracked but one deliberately private runbook.
 | Typecheck | ok | ok |
 | Lint | ok | ok |
 | Repository gates (map, prose, public, brand) | ok | ok |
-| Generated documentation | **failed — V-001** | ok |
+| Generated documentation | **failed - V-001** | ok |
 | Harness gates (mirror, ratchets, workflow) | ok | ok |
 | Unit tests (core + testkit) | ok | ok |
 | Design system (`@vitae/ui`) | ok | ok |
@@ -295,11 +295,11 @@ nothing untracked but one deliberately private runbook.
 | Digest-pin guard | ok | ok |
 | Production build | ok | ok |
 | Web performance budgets | ok | ok |
-| API integration | **failed — V-002** | ok |
+| API integration | **failed - V-002** | ok |
 | Docker image · api | ok | ok |
 | Docker image · buildsvc | ok | ok |
-| E2E (Playwright) | ok — 284 passed in 10.0m | ok — 284 passed in 20.0m |
-| E2E cloud mode | ok — 12 passed in 21.6s | ok — 12 passed |
+| E2E (Playwright) | ok - 284 passed in 10.0m | ok - 284 passed in 20.0m |
+| E2E cloud mode | ok - 12 passed in 21.6s | ok - 12 passed |
 
 The final column is one run, on the committed tree, with every step green.
 
@@ -326,7 +326,7 @@ headroom is now half what it was.
 That is the price of a demo worth looking at, and it is worth paying at this
 size. It is recorded because the next person to grow that seed should know they
 are spending a budget rather than a free resource, and because a suite killed by
-its own timeout reports nothing at all — which is a worse outcome than a slow
+its own timeout reports nothing at all - which is a worse outcome than a slow
 suite.
 
 ### The suites the gate does not run
@@ -350,7 +350,7 @@ once a sweep.
 ### Ratchets
 
 `e2e-ratchets: ok (52 specs, 294 tests, 1025 assertions, 0 quarantined,
-3 sleeps, 4 toBeTruthy, 46 screens scanned, 0 unscanned)` — floors met exactly,
+3 sleeps, 4 toBeTruthy, 46 screens scanned, 0 unscanned)` - floors met exactly,
 ceilings unchanged. No floor was lowered and no ceiling was raised.
 
 ## Production verification
@@ -359,7 +359,7 @@ Both halves of the running deployment were checked from outside, against the
 live system rather than against the configuration meant to produce it.
 
 Hosts are not named here. This file ships publicly and
-`check-public-release.mjs` refuses the deployment's real hostnames — which it
+`check-public-release.mjs` refuses the deployment's real hostnames - which it
 did to a draft of this very section, correctly, and after this sweep had already
 recorded another session's file for the same offence. The gate does not care
 whose text it is.
@@ -385,13 +385,13 @@ is byte-identical to the SPA shell. Not exposed.
 | `GET /api/v1/docs/index`, unauthenticated | **401** |
 
 The two 401s are the result worth having. Default-deny holds on the live system,
-and the private corpus is behind the owner allow-list in production — not merely
+and the private corpus is behind the owner allow-list in production - not merely
 in the source that was deployed.
 
 The 200 from `/ready` is stronger evidence than its body suggests, and the body
 is why this nearly became a false finding. It reports only a database check,
 while `docs/DEPLOYMENT.md` promises readiness gates on Postgres *and* the build
-service — which reads like documentation overstating the code. It is the
+service - which reads like documentation overstating the code. It is the
 reverse: `readinessHandler` in `apps/api/src/middleware/health.ts` probes both
 and answers 503 if either is unreachable, and only the success payload omits the
 second result. The document is right, the compiler is up in production, and the
@@ -433,7 +433,7 @@ no `.first()`, and nothing anywhere said that a résumé output may therefore no
 be named for a workflow. The knowledge lived in whoever last broke it.
 
 The seed now **asserts its own invariants before it finishes** and throws with a
-named failure if one is broken — exactly one target called "Machine Learning
+named failure if one is broken - exactly one target called "Machine Learning
 Engineer", Aurora Dynamics reachable through Marc Uwimana and no one else,
 distinct output row labels, and each no-`.first()` wording checked against the
 text that actually reaches the screen its assertion runs on, and no wider.
@@ -444,14 +444,14 @@ time with a sentence saying which invariant broke, instead of surfacing forty
 minutes later as an unexplained strict-mode violation in a browser test.
 
 It also corrected a miscount it found: this file claimed to cover 33 node types
-where the catalogue holds 34, and `post` — the one type never seeded — was
+where the catalogue holds 34, and `post` - the one type never seeded - was
 exactly what the wrong number hid.
 
 One thing the expansion got wrong, caught by `pnpm test:public` before it could
 be committed: a seeded software subscription named a third-party brand, which
 `check-public-release.mjs` bans from a tree that ships publicly. Replaced with an
 unrelated developer-tooling subscription. Recorded rather than quietly fixed,
-because it is the gate doing exactly what it exists for — the reference was
+because it is the gate doing exactly what it exists for - the reference was
 plausible demo content and would not have looked wrong to a reader.
 
 ## Lint warnings
@@ -491,7 +491,7 @@ record of a test program that had none.
 ## Known gaps, stated rather than papered over
 
 - **`services/buildsvc` has no tests of its own.** Not one test file. It is
-  covered only indirectly — through the API's resilience suite, which asserts
+  covered only indirectly - through the API's resilience suite, which asserts
   its absence is handled, and through the e2e compiles that exercise it as a
   black box. Its own request signing, timeout handling and page counting have no
   unit coverage. This sweep did not add any; that is a body of work, not a fix.

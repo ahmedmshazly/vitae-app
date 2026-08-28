@@ -16,11 +16,11 @@ sources:
 # Blueprint: Today and the planner
 
 The Today hub is the retention ritual: the screen that must earn a daily open
-from P1 between searches and from P2 always. Its current shape — needs-you
+from P1 between searches and from P2 always. Its current shape - needs-you
 queue, habits, reconnect lane, momentum with published weights, getting
-started — is right. What it lacks is memory of the operator's absence.
+started - is right. What it lacks is memory of the operator's absence.
 
-## `/today` — Today
+## `/today` - Today
 
 **Verdict: SHARPEN.**
 
@@ -31,7 +31,7 @@ generalizes), and the six-step getting-started checklist that hides itself.
 
 The better version adds one region and one rule:
 
-- **A "since you were away" strip** — the Ledger's first three entries
+- **A "since you were away" strip** - the Ledger's first three entries
   (FR-PROV-002) rendered compactly when anything changed since the last
   visit: records touched by an import commit, a merge, a purge warning.
   Absent entirely when nothing changed; never a zero-count box (the empty
@@ -46,7 +46,7 @@ appears only when the ledger has entries newer than the previous session;
 each entry links to its record and its diff (FR-PROV-002, FR-PROV-003);
 axe-scanned like every routed screen (NFR-A11Y-002).
 
-## `/today/planner` — Planner
+## `/today/planner` - Planner
 
 **Verdict: KEEP.**
 
@@ -55,15 +55,15 @@ horizon is clear" when empty. It does its one job. The only planned change
 rides in from elsewhere: rows gain the same provenance chip every record
 surface gains (FR-PROV-001).
 
-## The Ledger — ADD, under Today
+## The Ledger - ADD, under Today
 
-**Verdict: ADD — delivered 2026-08-26** at `/today/ledger`, in the workspace
+**Verdict: ADD - delivered 2026-08-26** at `/today/ledger`, in the workspace
 strip and the palette. The "since you were away" strip on Today remains the
 open half of this page's SHARPEN verdict.
 
 The system writes a complete, in-transaction revision history for every
 mutation and then never shows it. The Ledger is that history as a surface: a
-reverse-chronological feed answering *what changed since I last looked* —
+reverse-chronological feed answering *what changed since I last looked* -
 each entry naming the operation, the record, the source (a capture, an
 import batch, a merge, a purge), and opening into the field-level diff
 (FR-PROV-002, FR-PROV-003).

@@ -21,7 +21,7 @@ within weeks, so the system's value compounds exactly as fast as capture is
 frictionless. These surfaces are the product's best-engineered loop and the
 blueprint's job here is mostly to protect them.
 
-## ⌘K — Quick capture
+## ⌘K - Quick capture
 
 **Verdict: KEEP.**
 
@@ -37,25 +37,25 @@ story begin at the moment of writing.
 
 Personas: all four; P1/P2 own the J1 stories.
 
-## `n` — New record menu and forms
+## `n` - New record menu and forms
 
 **Verdict: KEEP.**
 
 Every node type creatable through schema-driven forms with inline duplicate
 detection (FR-CAP-002, FR-008); the coverage test that forbids an
-import-only type stays load-bearing. The long-tail types stay in the menu —
+import-only type stays load-bearing. The long-tail types stay in the menu -
 the substrate decision in `PRODUCT.md` is deliberate.
 
-## ⌘P — The palette
+## ⌘P - The palette
 
 **Verdict: KEEP.**
 
 Records and thirty-one actions in one list, accent-insensitive matching
 (FR-SRCH-004). When the Ledger, Correspondence, and Dossiers ship, each adds
-its palette action in the same release — a surface that is not in the
+its palette action in the same release - a surface that is not in the
 palette does not exist.
 
-## `/search` — Search results
+## `/search` - Search results
 
 **Verdict: SHARPEN.**
 
@@ -76,5 +76,5 @@ idle grammar list shows a runnable `source:` example; no ranking change.
 
 **Verdict: KEEP.**
 
-Complete-with-undo, snooze, the due badge. Its discipline — no mutation
-fails silently (NFR-REL-004) — is the standard the new surfaces inherit.
+Complete-with-undo, snooze, the due badge. Its discipline - no mutation
+fails silently (NFR-REL-004) - is the standard the new surfaces inherit.

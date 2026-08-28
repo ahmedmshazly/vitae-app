@@ -144,7 +144,7 @@ This is a reference. Read the group you are standing in rather than the whole
 page.
 
 Every entry says three things: what the screen is for, what you do there, and
-what its empty state means — because in a system you fill in yourself, an empty
+what its empty state means - because in a system you fill in yourself, an empty
 screen is the state you will meet first, and the difference between *"you have
 not done this yet"* and *"this could not load"* matters more here than anywhere
 else in the interface.
@@ -156,14 +156,14 @@ Today, Network, Career, Explore, Data, Settings. A screen's canonical address
 starts with its workspace, so the Résumé outputs live at
 `/career/resume/outputs` and the identity audit at `/data/identity`.
 
-Many screens are also mounted at an older, shorter address — `/people`,
+Many screens are also mounted at an older, shorter address - `/people`,
 `/resume/tailor`, `/trash`. Those are the same screen; they are kept mounted so
 bookmarks and shared links survive. All navigation inside the product points at
 the canonical form. Both forms resolve to the same workspace in the rail.
 
 Anything under `/docs` and `/reference/entities` is neither: those are reading
 surfaces that describe the system rather than your records. They differ in who
-may read them — the entity catalogue is open, the documentation is not — and
+may read them - the entity catalogue is open, the documentation is not - and
 the section below says why.
 
 ## The public site
@@ -226,7 +226,7 @@ says **"No way in"** and names the missing environment variables, because that
 is a build problem and pretending otherwise wastes the reader's time.
 
 `/signup` on a Cloud instance offers a 14-day trial and carries a billing
-period chosen on the pricing page through to the billing screen — as a
+period chosen on the pricing page through to the billing screen - as a
 preference, not as an entitlement.
 
 ## The two reading surfaces
@@ -236,12 +236,12 @@ workspace chrome to inherit. Only one of them is open.
 
 | Screen | What it is for | Who may read it |
 | --- | --- | --- |
-| `/reference/entities` | Every record type, connection type and relation kind the system knows — 34 record types and 28 connection types — generated from the same constants the API validates against. It describes the schema, not your data. Two views: a schema observatory of how the types relate, and an A4 atlas made to be printed. | Anyone. Its content is compiled into the build, so it needs no account and never waits on the API. |
+| `/reference/entities` | Every record type, connection type and relation kind the system knows - 34 record types and 28 connection types - generated from the same constants the API validates against. It describes the schema, not your data. Two views: a schema observatory of how the types relate, and an A4 atlas made to be printed. | Anyone. Its content is compiled into the build, so it needs no account and never waits on the API. |
 | `/docs` | The documentation you are reading. | The owner of the instance, signed in. |
 
 The documentation was open until August 2026 and is not any more. Every page of
 it is fetched from the API, which refuses the request unless it carries a
-verified identity — and on a self-hosted install, unless that identity is the
+verified identity - and on a self-hosted install, unless that identity is the
 configured `OWNER_EMAIL`. The reason is what the corpus is: its curated half
 describes every trust boundary and every known gap in the system, and its
 generated half enumerates every route, endpoint, table, migration and exported
@@ -265,8 +265,8 @@ shares one frame.
 
 The **left rail** holds the six workspaces, each with a one-line description,
 plus a search button, a capture button and a link to Help. Its foot carries a
-live system indicator — *Systems nominal*, *System attention needed*, *Status
-unavailable*, or *Checking system* — that links to the system screen. The rail
+live system indicator - *Systems nominal*, *System attention needed*, *Status
+unavailable*, or *Checking system* - that links to the system screen. The rail
 collapses to icons, by choice or automatically between 701 and 1080 pixels
 wide.
 
@@ -287,8 +287,8 @@ Four keys work everywhere:
 | `Esc` | Close the active palette, drawer or dialog and restore focus |
 
 The `⌘P` palette carries named actions alongside record matches, so
-capabilities are findable by name — "New résumé", "Sync GitHub repositories",
-"Who should I contact?", "Export & backup" — rather than only by knowing which
+capabilities are findable by name - "New résumé", "Sync GitHub repositories",
+"Who should I contact?", "Export & backup" - rather than only by knowing which
 screen holds them.
 
 While the demo space is active, a banner sits under the strip for the whole
@@ -305,7 +305,7 @@ session and offers the way back.
 that question rather than by category: one prioritised queue, **Needs you**,
 merging reminders, open tasks and deadlines by how overdue each is; then
 **Habits** and **Reconnect**, the two daily rituals; then **How things stand**,
-which is where the numbers live — application funnel, goals, momentum with its
+which is where the numbers live - application funnel, goals, momentum with its
 factor breakdown, recent captures.
 
 A deadline only enters the queue once it is within seven days. An application
@@ -327,19 +327,19 @@ is clear."*
 **The Ledger** is the history every write already keeps, read back as a feed:
 what changed, newest first. Each entry speaks its operation as a verb, links a
 record entry to its record, lists the fields that moved, and carries the
-source it came from — labelled from its own stored snapshot, so a deleted
+source it came from - labelled from its own stored snapshot, so a deleted
 record still shows the name it had. Older pages load on request. Its empty
 state is *"No changes yet"*, and a failed load says so rather than posing as
 an empty history.
 
 The signed-in root, `/`, is not an application screen, but it now recognises
-you. The public root reads a synchronous session hint — set only when a
-usable session was last seen in this browser — and sends a returning visitor
+you. The public root reads a synchronous session hint - set only when a
+usable session was last seen in this browser - and sends a returning visitor
 to `/today` without waiting on anything. A first-time or signed-out visitor
 gets the marketing page exactly as before, and the auth gate remains the
 authority: a stale hint costs one hop back to the landing page. This answers
 the product question `apps/web/src/App.tsx` held open after an earlier
-redirect attempt, placed where that comment said it belonged — on the public
+redirect attempt, placed where that comment said it belonged - on the public
 route.
 
 ## Network
@@ -355,8 +355,8 @@ route.
 | Correspondence | `/network/correspondence` |
 
 **Network home** is an index, not a dashboard. It states what the workspace is
-for — *"A relationship is not a contact card. It is a history, a rhythm, and a
-next honest action."* — and leads with the decision screen rather than the
+for - *"A relationship is not a contact card. It is a history, a rhythm, and a
+next honest action."* - and leads with the decision screen rather than the
 directories.
 
 **People** is the directory, with relationship strength, cadence and context on
@@ -381,12 +381,12 @@ work happens:
   records they came from.
 - **Correspondence** (FR-COMM-001), computed from the interactions whose
   who-reached-out direction the operator stated: reciprocity, median reply
-  latency in each direction, unanswered inbound, and contact days by month —
+  latency in each direction, unanswered inbound, and contact days by month -
   each figure opening into the interactions behind it, under a coverage line
   that says how much of the history states a direction at all. A history with
   no stated directions gets an explanation, never a guessed ratio. The same
   panel lists recorded introductions, and **Log introduction** (FR-COMM-003)
-  records one — who brokered it, when, in what context — optionally crediting
+  records one - who brokered it, when, in what context - optionally crediting
   the broker's favor ledger in the same gesture.
 
 Each of those panels is a separate query, and each fails on its own: a broken
@@ -400,8 +400,8 @@ roles and open positions.
 relationship decision, chosen by a query parameter.
 
 - The **contact lens**, the default, is *"Who should I call?"* You compose a
-  need as a sentence — I need *[a referral]* at *[an organisation]* about
-  *[topics]* in *[a city]* — and get a ranked list where every rank is broken
+  need as a sentence - I need *[a referral]* at *[an organisation]* about
+  *[topics]* in *[a city]* - and get a ranked list where every rank is broken
   into the factors that produced it: affiliation, topics, tie strength,
   geography, favours owed, network proximity. The weights are yours, in
   Settings. With nothing asked yet it says so and shows an example. If nobody
@@ -416,19 +416,19 @@ relationship decision, chosen by a query parameter.
 `/ask/people` and `/intros` are the older addresses for the two lenses.
 
 **Correspondence** is the hub's reactivation lens: dormant ties that were
-once strong, ranked by their historical peak — the same model that scores a
+once strong, ranked by their historical peak - the same model that scores a
 tie today, re-read at each logged interaction, so the peak and the present
 cannot disagree. Each candidate shows its peak, when it stood, how quiet it
 has been, and the factor chips behind the number. An **Out of balance**
 register ranks ties by reciprocity imbalance, computed by the same profile
-function the person page shows (FR-COMM-001) — a tie needs four
+function the person page shows (FR-COMM-001) - a tie needs four
 direction-stated interactions before its balance counts as a fact. The
 **Brokers** register keeps two labeled groups apart by design (FR-COMM-003):
 brokers tallied from recorded INTRODUCED edges, linked as people, and the
-free-text met-via credits as written — merging them on a matching string
+free-text met-via credits as written - merging them on a matching string
 would be a guess. Two empties are told apart: *"No dormant ties"* when
-cadence is holding, and *"Nothing worth reactivating"* — with the considered
-count — when dormant ties exist but none was once strong enough to rank.
+cadence is holding, and *"Nothing worth reactivating"* - with the considered
+count - when dormant ties exist but none was once strong enough to rank.
 
 ## Career
 
@@ -447,7 +447,7 @@ count — when dormant ties exist but none was once strong enough to rank.
 | Templates | `/career/resume/templates`, also `/resume/templates` |
 
 **Career** and **Applications** are the same component: the runway. Applications
-are grouped by stage — draft, applied, screening, interview, offer — with
+are grouped by stage - draft, applied, screening, interview, offer - with
 outcomes (accepted, rejected, withdrawn) kept separately so a closed
 application does not crowd a live one. Above the runway, **Next moves** lists
 what is overdue or due, drawn from each application's next step or deadline.
@@ -459,7 +459,7 @@ hiding them.
 **An application** is the dossier: the next move, the interview loop with each
 round's date, format, interviewers, preparation notes and reflection, working
 notes, the application register of dates and channel, the people and company
-involved, and the materials — job posting, tailoring target, résumé sent. With
+involved, and the materials - job posting, tailoring target, résumé sent. With
 none of those linked it says so in one line rather than showing three empty
 panels.
 
@@ -467,8 +467,8 @@ panels.
 newest first, each named by the audience it is written for rather than by a
 format. A dossier is not a résumé and does not sit in the résumé pipeline: a
 résumé argues for a role, and a dossier answers a reader who is entitled to
-check. Three audiences ship — a promotion review, a petition exhibit list, and
-a background history — and choosing between them shows you each one's sections
+check. Three audiences ship - a promotion review, a petition exhibit list, and
+a background history - and choosing between them shows you each one's sections
 and what they are for before you commit, because the audience decides what the
 document will ask you for.
 
@@ -513,8 +513,8 @@ targets and outputs, the five workflow shortcuts, and the most recent outputs.
 
 **Atom library** holds the achievement bullets every tailored résumé is built
 from. Each atom belongs to a role or project, has a kind, may carry metrics and
-evidence, and can hold several wording variants — technical, leadership,
-concise, detailed — of which one is the default. Empty, it explains what an
+evidence, and can hold several wording variants - technical, leadership,
+concise, detailed - of which one is the default. Empty, it explains what an
 atom is; filtered to nothing, it says so instead.
 
 **Tailor** is the workspace where a job description becomes a document. Four
@@ -561,7 +561,7 @@ Its filter grammar is the same one the search screen uses.
 **Life map** draws the graph itself: filters by type, lenses, path mode, a peek
 panel showing the selected record's connections, and keyboard movement from a
 node to its neighbours. Empty, it says *"Nothing to
-explore yet"* and names what would draw it — people, organisations and projects,
+explore yet"* and names what would draw it - people, organisations and projects,
 and the ties between them. A failure says *"Couldn't draw the map"*, which is a
 different sentence.
 
@@ -589,7 +589,7 @@ bookmarked or sent to someone with the same graph.
 | Trash | `/data/trash`, also `/trash` |
 
 **Data home** states the workspace's promise: your graph should be inspectable
-at every boundary — before import, during reconciliation, and at export — and
+at every boundary - before import, during reconciliation, and at export - and
 that no import commits until its staged records have been reviewed.
 
 **Imports** is a chain of custody with four visible stages: choose source, read
@@ -600,7 +600,7 @@ started from batch history has somewhere to fail. Empty, it says *"No imports
 yet"* and repeats the rule: everything stages before it commits.
 
 **Identity audit** is the duplicate queue. Candidates are scored with readable
-evidence — shared emails, names, organisations — rather than a bare similarity
+evidence - shared emails, names, organisations - rather than a bare similarity
 number, and each cluster walks you through four questions: are these the same
 thing, which record survives, what happens to each field, and what happens to
 the relationships. Merges are reversible for 30 days. Empty, it says *"No
@@ -611,8 +611,8 @@ automatically.
 in as records, and links each repository's primary language to a skill. The
 token is encrypted at rest and never returned to the browser after saving.
 
-**Exports & backups** builds a portable archive — one JSONL per collection, an
-Obsidian-compatible Markdown vault, and a manifest with SHA-256 checksums — and
+**Exports & backups** builds a portable archive - one JSONL per collection, an
+Obsidian-compatible Markdown vault, and a manifest with SHA-256 checksums - and
 exports saved views as CSV. The sensitive-records switch is the important
 control on the screen and it says exactly what each setting costs: including
 them makes the only bundle you can fully restore from; excluding them makes a
@@ -639,19 +639,19 @@ early. Empty, it says *"Trash is empty"* and states the retention promise again.
 three slices below it are one screen that shows a different section depending
 on the address:
 
-- **Profile** — your "self" record and the contact information career documents
+- **Profile** - your "self" record and the contact information career documents
   use.
-- **Preferences** — résumé defaults (template, accent, wording emphasis), the
+- **Preferences** - résumé defaults (template, accent, wording emphasis), the
   ranking constants that reshape the contact lens, and the skill aliases that
   teach the job-description parser which nicknames mean which skills.
-- **System** — live service health check by check, the GitHub connection, and
+- **System** - live service health check by check, the GitHub connection, and
   the owner identity.
 
 **Billing & access** is the Cloud lifecycle screen: trial or subscription
 state, the plan, the provider portal, and the export path. It only exists on a
 Cloud-enabled instance; on any other build it redirects to `/settings`. Its
-five access states — full trial access, paid access active, payment needs
-attention, read-only access, deletion scheduled — each say what you can still
+five access states - full trial access, paid access active, payment needs
+attention, read-only access, deletion scheduled - each say what you can still
 do, and both restricted states put the export link on screen rather than
 burying it.
 
@@ -668,7 +668,7 @@ burying it.
 properties, its notes, its connections, and its revision history with one tick
 per revision. Edit, Pin and Delete live in the header; deletion asks for
 confirmation and moves the record to Trash. Its connections panel, when empty,
-says the thing worth saying — *"Connections are what make this a graph rather
+says the thing worth saying - *"Connections are what make this a graph rather
 than a list."*
 
 **Browse a type** is the plain register for one record type, used by the types
@@ -678,14 +678,14 @@ instead. A type the schema does not know renders *"Unknown type"* rather than
 an error page.
 
 **Search** is ranked full-text search over everything, with a composable filter
-grammar it parses back at you as chips. The grammar is listed on the screen —
+grammar it parses back at you as chips. The grammar is listed on the screen -
 `type:`, `tag:`, `org:`, `city:`, `after:`, `before:`, `has:`, `is:`, `source:`,
-`shared_by:` — with an example of each that you can click to try. No matches
+`shared_by:` - with an example of each that you can click to try. No matches
 suggests relaxing a filter and reminds you that deleted records stay in Trash
 for 30 days.
 
 **Help & shortcuts** is one screen: the four keyboard shortcuts, the four-word
-model — records, connections, traces, lenses — and the way into the entity
+model - records, connections, traces, lenses - and the way into the entity
 catalogue. It belongs to no workspace, and the frame says so rather than
 guessing.
 

@@ -37,7 +37,7 @@ has been repaired, and where.
 ## How these pages reach a reader
 
 The corpus is Markdown in `docs/observatory/`. A build step compiles it into
-JSON — one file per page, plus a manifest and a search text — and copies the
+JSON - one file per page, plus a manifest and a search text - and copies the
 generated catalogs in beside it. The reading surface fetches those files; it
 never parses Markdown in the browser.
 
@@ -75,8 +75,8 @@ resolved on the page and recorded in the inventory rather than reproduced.
 
 Nothing here invents functionality, security guarantees, benchmarks, prices,
 operating status or legal commitments. Where a fact needs confirmation from
-someone outside this repository — commercial terms, legal entity, operating
-status of any hosted service — the page says so and carries the needs-review
+someone outside this repository - commercial terms, legal entity, operating
+status of any hosted service - the page says so and carries the needs-review
 badge instead of a number.
 
 Examples use fictional demonstration data. No screenshot is fabricated.

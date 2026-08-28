@@ -57,7 +57,7 @@
     {
       "from": "paddle",
       "to": "webhook-route",
-      "label": "POST /webhooks/paddle with header paddle-signature: ts=…;h1=…",
+      "label": "POST /webhooks/paddle with header paddle-signature: ts=...;h1=...",
       "kind": "call",
       "note": "No session, no cookie, no bearer token. Possession of the shared secret is the authentication.",
       "source": "apps/api/src/app.ts:50"
@@ -112,7 +112,7 @@
     {
       "from": "paddle-module",
       "to": "postgres",
-      "label": "INSERT the event on provider_event_id … ON CONFLICT DO NOTHING",
+      "label": "INSERT the event on provider_event_id ... ON CONFLICT DO NOTHING",
       "kind": "call",
       "note": "The unique provider event id is the idempotency key. This is the exactly-once boundary: a redelivery loses the insert race and never reaches the lifecycle transition.",
       "source": "apps/api/src/cloud/paddle.ts:221"
@@ -128,7 +128,7 @@
     {
       "from": "paddle-module",
       "to": "postgres",
-      "label": "SELECT … FOR UPDATE on workspace_lifecycles to serialize this workspace's events",
+      "label": "SELECT ... FOR UPDATE on workspace_lifecycles to serialize this workspace's events",
       "kind": "call",
       "note": "The lifecycle row is locked first, not the subscription row: a durable lifecycle row exists for every workspace, whereas FOR UPDATE alone cannot lock the absent subscription row on a first subscription. That is what makes ordering hold under concurrent delivery as well as ordinary retries.",
       "source": "apps/api/src/cloud/paddle.ts:250"

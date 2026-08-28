@@ -31,8 +31,8 @@ related: [PRD-PURPOSE, PRD-PEOPLE, PRD-CAPABILITIES]
 Vitae holds a deliberately small shape. It is one person's private records
 rather than a shared workspace; it computes with published arithmetic rather
 than a language model; and it publishes nothing outward. A hosted version does
-exist in this repository — built, tested, and held closed by two separate gates
-— but nobody is being served by it, and the prices attached to it are terms
+exist in this repository (built, tested, and held closed by two separate gates),
+but nobody is being served by it, and the prices attached to it are terms
 written down rather than a service anyone can buy. This page states each of
 those edges precisely, because the difference between *absent*, *closed* and
 *intended* is exactly where product documentation usually goes wrong.
@@ -52,7 +52,7 @@ filled.
 **No telemetry, no profiling, no advertising.** Nothing measures the operator.
 
 **No social layer.** People in the graph are records, not accounts. Nobody is
-notified that they were written about, and nothing is published outward — there
+notified that they were written about, and nothing is published outward - there
 is no public profile, no shared link, no web publishing surface.
 
 **No live account sync.** External data arrives as a staged import that the
@@ -122,8 +122,8 @@ promoted `(workspace_id, id)` to the primary key of all 24.
 
 The reason for 009 is worth knowing, because it explains why the change could not
 be confined to Cloud builds. A unique index alone would still have left the old
-key in place, and singleton documents — a search-generation counter, for instance
-— would then collide between two workspaces that each legitimately hold one. The
+key in place, and singleton documents, a search-generation counter for instance,
+would then collide between two workspaces that each legitimately hold one. The
 partition had to become identity, not an extra column.
 
 The consequence is that a self-hosted install has a workspace-partitioned schema
@@ -184,7 +184,7 @@ copy of self-hosted records.
 **Not a team product.** The intended launch shape is one private personal
 workspace per verified person. Team workspaces, recruiter workflows and
 additional identity providers are outside the first release. Opening the plane
-would create more graphs, not more people inside one graph — the boundary in
+would create more graphs, not more people inside one graph - the boundary in
 [who Vitae is for](who-it-serves.md) survives it intact.
 
 **Not a substitute for published terms.** The launch guide is a release boundary,

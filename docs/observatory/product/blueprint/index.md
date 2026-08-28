@@ -41,7 +41,7 @@ for.
 
 ## The headline moves
 
-1. The signed-in root `/` finally redirects to Today — the recorded open
+1. The signed-in root `/` finally redirects to Today - the recorded open
    question is answered in favor of the operator, not the marketing page.
 2. A locked workspace disables its write controls at the point of use
    (NFR-OPS-002); the banner stops being the only honest element on the page.
@@ -49,7 +49,7 @@ for.
    **the Ledger** (FR-PROV-002) under Today, **Correspondence** (FR-COMM-001,
    FR-COMM-002) under Network, and **Dossiers** (FR-DOS-001, FR-DOS-002)
    under Career.
-4. Provenance — already stored on every record — becomes visible everywhere a
+4. Provenance - already stored on every record - becomes visible everywhere a
    record is shown (FR-PROV-001).
 5. The six-hub information architecture stays. It matched the four-word model
    (records, connections, traces, lenses), it tested well, and every addition

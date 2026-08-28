@@ -31,8 +31,8 @@ related: [OPS-DEPLOY, OPS-SECRETS, OPS-INCIDENT, OPS-MIGRATE]
 # Configuration and its failure modes
 
 This page is about behaviour, not inventory. The list of every configuration
-key — its scope, type, default, constraints, the file that declares it and the
-files that read it — is derived from the source and lives in
+key - its scope, type, default, constraints, the file that declares it and the
+files that read it - is derived from the source and lives in
 `docs/generated/config.json`. What a generator cannot tell you is what actually
 happens when one of them is wrong, and that is what is written down here.
 
@@ -65,8 +65,8 @@ a file the deployment reads where one does not.
 Only the server environment is validated as a schema. `packages/config/src/env.ts`
 declares a Zod schema and `loadServerEnv` parses `process.env` against it once,
 caching the result. Twenty of the seventy-nine keys the generated catalog
-knows about are declared there. Everything else — the Paddle credentials, the
-templates directory, the backup destination and the rest — is read straight
+knows about are declared there. Everything else - the Paddle credentials, the
+templates directory, the backup destination and the rest - is read straight
 from the environment at the point of use, by the module or shell script that
 needs it.
 
@@ -83,8 +83,8 @@ and the reason.
 
 **Unsafe-combination checking.** `assertSafeCombination` runs after parsing and
 rejects values that are individually legal but unsafe together. It returns
-immediately unless `NODE_ENV` is `production`. That is the correct behaviour —
-a development machine must be allowed to run development settings — but it
+immediately unless `NODE_ENV` is `production`. That is the correct behaviour -
+a development machine must be allowed to run development settings - but it
 means every guard described under *dangerous* below is inert on a process whose
 `NODE_ENV` is anything other than `production`.
 
@@ -168,13 +168,13 @@ Certificate verification is not in the schema. The certificate bundle key is
 declared optional, so an environment without it parses cleanly. The refusal
 happens when the connection pool is constructed in `apps/api/src/db/pg.ts`:
 
-- Host `localhost`, `127.0.0.1` or `postgres` — TLS is not used at all. The
+- Host `localhost`, `127.0.0.1` or `postgres` - TLS is not used at all. The
   third of those is the Compose service name, which is how a container-to-container
   connection on a private network is exempted.
-- Any other host with no certificate bundle — the module throws at import,
+- Any other host with no certificate bundle - the module throws at import,
   naming the host. Because the API imports it at start-up, this is a boot
   failure in practice, just not one the schema produced.
-- Any other host with a bundle — the bundle is accepted either as PEM text or
+- Any other host with a bundle - the bundle is accepted either as PEM text or
   as a path to a file, and the certificate is verified. There is no fallback to
   accepting an unverified certificate, because that fallback accepts any
   certificate at all and makes the connection quietly interceptable.
@@ -220,8 +220,8 @@ under the documentation mount answers 503 with a code naming that condition,
 and the reading surface repeats it as an operator's problem rather than a
 reader's. The two are worth distinguishing because a documentation set that
 reports itself empty sends somebody to look for missing pages that were never
-built. The mount's own index answers separately, with two booleans — whether a
-directory is configured at all, and whether it exists — which is how you tell
+built. The mount's own index answers separately, with two booleans - whether a
+directory is configured at all, and whether it exists - which is how you tell
 *not built* from *built somewhere else* without opening the container.
 
 **A relative value is resolved against the repository root, not the working
@@ -234,7 +234,7 @@ documentation reporting itself unavailable for no visible reason.
 **It is read from the environment on each request rather than from the parsed
 object.** The schema still declares and validates it; this only decides when it
 is read. The consequence is that a corpus mounted after the process started is
-picked up without a restart — which is the opposite of every other key on this
+picked up without a restart - which is the opposite of every other key on this
 page, and is the same choice the hosted-mode flag makes.
 
 **Do not build the corpus under `apps/web/public/`.** Everything in that
@@ -261,8 +261,8 @@ first deployment and do not assume the boot check has your back; see
 **The hosted web build is only checked on one host.** A build refuses to
 proceed when it carries the local-only Firebase demo values, an emulator flag
 that is not `false`, or an API base URL pointing at localhost. That check runs
-only when the build detects it is running on Vercel. On any other static host —
-which the deployment documentation explicitly permits — nothing runs it, and a
+only when the build detects it is running on Vercel. On any other static host -
+which the deployment documentation explicitly permits - nothing runs it, and a
 bundle built with development values will publish without complaint.
 
 **A `NODE_ENV` in a local `.env` silently downgrades every local build.** Vite
@@ -271,7 +271,7 @@ that a build sets for itself. The result is a development build: larger,
 carrying the development JSX runtime, and embedding absolute source paths in
 the emitted JavaScript. `.env.example` deliberately omits the key for this
 reason. Continuous integration and the documented host build both run from a
-bare checkout with no `.env`, so what ships is unaffected — but a locally
+bare checkout with no `.env`, so what ships is unaffected - but a locally
 measured bundle is not the bundle that ships, and the measurement gap is
 recorded in [About these documents](../meta/index.md).
 
@@ -290,8 +290,8 @@ production procedure, and the distinction it draws is the one people get wrong.
 
 Sign-in runs against the Firebase Auth emulator; the data plane does not. There
 is no Firestore in this system, so there is nothing to emulate below the
-identity layer. The runbook starts Auth on port 9099 with its UI on 4001 — the
-ports come from `firebase.json` — and the Admin SDK targets the emulator when
+identity layer. The runbook starts Auth on port 9099 with its UI on 4001 - the
+ports come from `firebase.json` - and the Admin SDK targets the emulator when
 the emulator host variable is set. It tells you explicitly not to configure
 database-emulator variables, because they would be configuring a data plane
 that no longer exists.

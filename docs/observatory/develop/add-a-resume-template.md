@@ -57,8 +57,8 @@ section below on calibration is where that difference is actually expressed.
 The default (`DEFAULT_TEMPLATE_KEY`), and the only one with a macro vocabulary
 of its own.
 
-A 9pt `extarticle` on A4 with narrow margins — 1.35 cm at the sides, 0.9 cm at
-the top — setting Charter for the body and a scaled Helvetica-alike for the
+A 9pt `extarticle` on A4 with narrow margins - 1.35 cm at the sides, 0.9 cm at
+the top - setting Charter for the body and a scaled Helvetica-alike for the
 name and headings, with `microtype` for spacing. Section headings are set in
 the accent colour above a rule. Three macros carry the layout: `\cventry`
 places a role, a subtitle line and a right-aligned date range in a
@@ -89,7 +89,7 @@ so that an applicant tracking system reading the extracted text finds what it
 expects. `ats_strict` is true in its metadata, and it is the only template for
 which that is so.
 
-88 characters per line, 40 lines per page — the least capacity of the three,
+88 characters per line, 40 lines per page - the least capacity of the three,
 which is the direct cost of the wider margins and the larger body size. Its
 single accent option is near-black. It still accepts the accent token, and its
 own comment says why: the token contract is shared across every template, so
@@ -111,7 +111,7 @@ argon takes the value and ignores it rather than diverging from the contract.
 `renderTemplate` in `apps/api/src/services/resume.ts` performs exactly seven
 substitutions on the file: `«ACCENT_HEX»`, `«NAME»`, `«CONTACT_LINE»`,
 `«HEADLINE»`, `«TAGLINE_BLOCK»`, `«SUMMARY_BLOCK»` and `«SECTIONS»`. There is
-no eighth, and there is no mechanism for adding one from inside a template — a
+no eighth, and there is no mechanism for adding one from inside a template - a
 new token means editing the renderer.
 
 Every value is escaped before it is spliced. That is the whole point of doing
@@ -121,7 +121,7 @@ place, the build service stays ignorant, and URLs go through a separate
 renderer rather than by a person.
 
 After splicing, `assertNoUnresolvedTokens` scans the output for any remaining
-`«…»` and throws. A template with a typo in a token name fails the compile with
+`«...»` and throws. A template with a typo in a token name fails the compile with
 a message naming the token rather than producing a résumé with a guillemet in
 it.
 
@@ -134,7 +134,7 @@ implementation of a four-method interface: `contactLine`, `taglineBlock`,
 which emits `\section` and `itemize`.
 
 The registry is typed `Record<string, TemplateRenderer>` and `rendererFor()`
-falls back to `generic`. Nothing forces a new key to be registered — an
+falls back to `generic`. Nothing forces a new key to be registered - an
 unregistered template silently gets the generic renderer, which is correct only
 if the template's LaTeX defines no macros of its own.
 
@@ -149,7 +149,7 @@ screen shows. The submodular knapsack that chooses which bullets make the page
 budgets against the same number.
 
 So a wrong `lines_per_page` does not produce a wrong label. It produces a
-résumé that selects the wrong content — too little, or one that spills to a
+résumé that selects the wrong content - too little, or one that spills to a
 second page.
 
 That is why the number is measured rather than trusted. `verifyLineModel` in
@@ -166,7 +166,7 @@ on the template's name: a `key === 'cobalt'` branch chose between two hardcoded
 token maps, and every directory had to come out at exactly one page with a
 line model to match. That is a fine rule for three résumé layouts and an
 impassable one for anything else, and it is the reason cover letters could be
-stored for months but never compiled — the first letter template would have
+stored for months but never compiled - the first letter template would have
 failed the **image build**, long before anyone could try to use it.
 
 Each directory now carries its own `calibration.json`:
@@ -204,9 +204,9 @@ the calibration script twice:
    was not fetched in the first pass, the image build fails here rather than
    the compile failing on somebody's résumé six months later.
 
-It writes `warmed-manifest.json` — the honest list of `key@version` pairs the
+It writes `warmed-manifest.json` - the honest list of `key@version` pairs the
 image actually warmed, plus the configured and measured line figures and, per
-template, what page count was expected against what was measured — and the
+template, what page count was expected against what was measured - and the
 service serves that from `/healthz`. The version is scraped out of the first
 `vN.N.N` in the template's own `main.tex`, which is why the header comment
 carries one.
@@ -230,8 +230,8 @@ The templates screen reads that manifest through the API and compares it
 against the template catalog, reporting "3 of 4 calibrated" rather than an
 unconditional ready when they disagree.
 
-At request time the service compiles with `tectonic --untrusted` — no shell
-escape — in a per-request `/tmp` working directory, with no network, honouring
+At request time the service compiles with `tectonic --untrusted` - no shell
+escape - in a per-request `/tmp` working directory, with no network, honouring
 `SOURCE_DATE_EPOCH` so a re-export is byte-identical. The calibration job in
 continuous integration builds this image and reruns the offline pass on every
 commit.
@@ -256,7 +256,7 @@ the first calibration pass or the image will not build.
 default to nothing, `"Letter"` and an empty list.
 
 Start `lines_per_page` from an estimate. Calibration will tell you the real
-number, and you will correct it — see step 6.
+number, and you will correct it - see step 6.
 
 ### 3. Decide the macro vocabulary
 
@@ -270,14 +270,14 @@ register the key in `RENDERERS`. Remember that forgetting this step is silent.
 This is the step that is easy to miss and fails at image-build time.
 
 `splice()` in `services/buildsvc/src/calibrate.ts` chooses between two token
-maps with a literal comparison — `templateKey === 'cobalt' ? COBALT_TOKENS :
+maps with a literal comparison - `templateKey === 'cobalt' ? COBALT_TOKENS :
 GENERIC_TOKENS`. A template with its own macros gets the generic sample
 content, whose `«SECTIONS»` block uses `\section` and `itemize`, and the
 compile will fail on the undefined macro. If your template needs a different
 map, add it and extend that branch.
 
 The sample content is not arbitrary. Its comment states the rule: everything
-the renderers can emit must appear at least once — regular, bold and italic in
+the renderers can emit must appear at least once - regular, bold and italic in
 both serif and sans at every size the template uses, `\href`, and every glyph
 macro the escape layer can produce. Anything missing from the fixture is a font
 or a glyph the cache never warms, and the failure lands at runtime with the
@@ -296,7 +296,7 @@ Four places, none of which discovers your directory on its own:
 
 The first is the one that surprises people. The calibration script discovers
 templates by listing the directory, so a new family is warmed, calibrated and
-reported in `/healthz` without any registration at all — while `listTemplates()`
+reported in `/healthz` without any registration at all - while `listTemplates()`
 does not return it, `GET /api/v1/resumes/templates` does not offer it, and
 `PATCH /api/v1/resumes/templates/default` rejects it as unknown. The two halves
 of the system disagree about what exists, and the half that compiles is the
@@ -311,7 +311,7 @@ docker compose build buildsvc
 Read the calibration output. It prints, per template, the page count and then
 `line model <configured>, rendered capacity <measured> (±3)`. If the build
 fails with `line model drift`, put the measured number in `line-model.json` and
-build again. Do not widen the tolerance — the whole selection budget rests on
+build again. Do not widen the tolerance - the whole selection budget rests on
 this figure.
 
 ### 7. Compile something real
@@ -335,8 +335,8 @@ claim about itself; the PDF is the truth.
 | `lines_per_page` off by more than three | `<key>: line model drift, configured N lines/page, rendered capacity M` |
 | A token this repository does not splice | a compile error naming the unresolved token |
 | Macros with no matching sample content | `template <key>: no sample content for token «X»` |
-| Not registering the key in `listTemplates()` | nothing — the template is warmed and never offered |
-| Not registering a renderer | nothing — the generic renderer is used silently |
+| Not registering the key in `listTemplates()` | nothing - the template is warmed and never offered |
+| Not registering a renderer | nothing - the generic renderer is used silently |
 
 The last two are the reason this page exists rather than a three-line recipe.
 

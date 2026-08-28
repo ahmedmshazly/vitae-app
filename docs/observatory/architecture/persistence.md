@@ -43,7 +43,7 @@ actually destroys it.
 
 ## How it works
 
-The obvious design — a typed column per field — was considered and rejected.
+The obvious design - a typed column per field - was considered and rejected.
 The risk this schema is built against is not query speed; it is fidelity. The
 export bundle has to round-trip the whole graph without loss, and a hand-written
 codec across two dozen collections is two dozen chances to drop a field. The
@@ -64,16 +64,16 @@ do, at the cost of a formatting round-trip that could quietly reshape every
 timestamp in the database.
 
 Migrations are plain TypeScript files run by the query builder's own migrator
-under `tsx`. There is no build step anywhere in the API — it runs TypeScript
-directly in production — and a migration tool that needed compiling would be the
+under `tsx`. There is no build step anywhere in the API - it runs TypeScript
+directly in production - and a migration tool that needed compiling would be the
 first thing to break that. Every migration in the tree defines both directions.
 
 ## Mechanics
 
 ### The document table shape
 
-Each durable table carries the same three columns — the legacy space selector,
-the document identifier, and the document itself as `jsonb` — plus whatever
+Each durable table carries the same three columns - the legacy space selector,
+the document identifier, and the document itself as `jsonb` - plus whatever
 generated columns that table needs. The generator function in the initial
 migration takes the queryable field list and emits
 `GENERATED ALWAYS AS (data->>'field') STORED` for each.
@@ -92,7 +92,7 @@ For the current table, column, index and migration inventory, read
 ### Two partition keys, and why there are two
 
 The original partition was a `space` column with two values, `real` and `demo`,
-part of every primary key and injected by one query helper — chosen so that a
+part of every primary key and injected by one query helper - chosen so that a
 forgotten filter is a missing-column error rather than a silent data leak.
 
 That column cannot represent customer tenancy. A browser chose it with a
@@ -103,8 +103,8 @@ demonstration rows into an unassigned system workspace, with a foreign key that
 restricts deletion of a workspace that still owns rows.
 
 Adding a unique index on the new pair was not enough. As long as `(space, id)`
-remained the primary key, a singleton document — the search generation marker,
-for instance, whose identifier is a fixed string — would collide between two
+remained the primary key, a singleton document - the search generation marker,
+for instance, whose identifier is a fixed string - would collide between two
 Cloud workspaces. `009-workspace-primary-keys` therefore promotes the existing
 `(workspace_id, id)` unique index to be each table's primary key and drops the
 old one, replacing the child foreign keys with workspace-aware equivalents in
@@ -118,7 +118,7 @@ alone land where they used to. Repository writes always pass an explicit
 workspace and never rely on it.
 
 The repository filters on **both** columns on every read and every write, and
-its upserts conflict on the tenant key rather than the legacy one — the comment
+its upserts conflict on the tenant key rather than the legacy one - the comment
 in the migration is explicit that conflicting on `(space, id)` could let a
 reused identifier overwrite another workspace's row.
 
@@ -131,7 +131,7 @@ operation, a timestamp, the actor, the provenance source, a full snapshot and a
 shallow diff against the previous state. Because both writes are in one
 transaction there is no state in which the record moved and its history did not.
 That is the audit log and the undo substrate at the same time, and it is why
-multi-document work — an import, a merge, a résumé finalisation — composes
+multi-document work - an import, a merge, a résumé finalisation - composes
 staged writes inside one transaction rather than issuing them one at a time.
 
 Revision numbers are monotonic per record. An update merges the patch over the
@@ -152,7 +152,7 @@ DGM-DELETION-LIFECYCLE
 ```
 
 The thirty-day promise is kept by a separate purge, which hard-deletes records
-past the cutoff along with everything that exists only to describe them — their
+past the cutoff along with everything that exists only to describe them - their
 revisions, reminders, taggings, attachments, and for nodes the edges that
 touched them. Audit history for records that still exist is untouched, and the
 merge ledger keeps its pre-images so a merge stays undoable inside its own
@@ -164,7 +164,7 @@ command line, or from an external scheduler.
 A committed transaction bumps an in-process write generation and publishes a
 cross-process search generation as an ordinary arithmetic update. Read models
 that memoise a full-graph scan store the generation alongside their snapshot and
-rebuild only when it moves — a timer alone is wrong in both directions, too long
+rebuild only when it moves - a timer alone is wrong in both directions, too long
 and a record created a moment ago is missing, too short and the scan never stops.
 The search index uses a generation rather than a dirty flag for a subtler
 reason: a mutation arriving during an in-flight rebuild bumps the counter, and

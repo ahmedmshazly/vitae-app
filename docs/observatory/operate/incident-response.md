@@ -62,8 +62,8 @@ The database probe is bounded at two seconds and its result cached for five, so
 
 **`GET /api/v1/status`** is the richer check and tests something `/ready` does
 not: it performs a *write*, not a read. That distinction matters during an
-incident. A database that is reachable but read-only — a failed-over replica, a
-full volume — passes readiness and fails status. It also reports storage and
+incident. A database that is reachable but read-only - a failed-over replica, a
+full volume - passes readiness and fails status. It also reports storage and
 build-service health and live record counts.
 
 **`GET /api/v1/metrics`** reports in-process counters: active requests, aborted
@@ -74,7 +74,7 @@ is happening now" and never "what happened last night".
 **The access log.** Every response emits one structured JSON line with a
 timestamp, a request identifier, the method, the route pattern, the path, the
 status and the duration. Server errors go to standard error, client errors to
-warning, everything else to standard output — so severity is greppable without
+warning, everything else to standard output - so severity is greppable without
 parsing. The same request identifier is echoed in the `x-request-id` response
 header and included in error envelopes, which is how a user's report of "it
 failed" becomes a specific line in the log.
@@ -87,7 +87,7 @@ Two of those five are behind the default-deny gate. `/health` and `/ready` are
 mounted before it and answer an unauthenticated caller; the status and metrics
 routes sit under `/api` and need a signed-in owner. If sign-in is the thing
 that is broken, you have readiness, the logs and the container state, and
-nothing else — plan for that case rather than discovering it.
+nothing else - plan for that case rather than discovering it.
 
 On the documented topology these are container logs:
 
@@ -109,8 +109,8 @@ another way of saying they are not configured now.
 
 **Nothing records who did what.** There is no audit log. The access log records
 what was called and what it returned, not who called it. For a single-operator
-instance that is a smaller gap than it sounds — there is one admitted identity
-— but it means after-the-fact attribution is limited to correlating a request
+instance that is a smaller gap than it sounds (there is one admitted identity),
+but it means after-the-fact attribution is limited to correlating a request
 identifier with a timestamp.
 
 **Metrics do not survive a restart.** If the instance has already been
@@ -143,14 +143,14 @@ recoverable hour into a restore.
 | --- | --- | --- |
 | Readiness says `database unreachable` | Database down, credentials changed, certificate bundle expired, network path lost | [Configuration](configuration.md) for the certificate failure mode; [Backup and restore](backup-and-restore.md) if the database itself is gone |
 | Status shows the database check failing on a write while readiness passes | Read-only replica, exhausted disk | Provider console; recovery tiers in [Backup and restore](backup-and-restore.md) |
-| Readiness says `build service unreachable` | The compiler container is down or unhealthy | [Deploying an instance](deploy.md) — and note this blocks a deploy from completing |
+| Readiness says `build service unreachable` | The compiler container is down or unhealthy | [Deploying an instance](deploy.md) - and note this blocks a deploy from completing |
 | Résumés download as `.tex` instead of PDF | The compiler is unreachable; the API degraded on purpose | [Deploying an instance](deploy.md) |
 | Every compile returns 401 | The two halves of the build-service signing key disagree | [Secrets and rotation](secrets-and-rotation.md) |
 | The API will not start at all | A configuration refusal; the error names every failing value | [Configuration](configuration.md) |
 | A deploy never becomes ready | Often the compiler, not the release | [Deploying an instance](deploy.md) |
 | Records are missing or wrong after a schema change | A migration did something unintended | [Running database migrations](migrations.md), then [Backup and restore](backup-and-restore.md) |
 | Records are missing with no schema change | Retention purge, a forced restore, or a deletion | [Backup and restore](backup-and-restore.md) |
-| A credential may have been exposed | — | [Secrets and rotation](secrets-and-rotation.md), rotate before investigating |
+| A credential may have been exposed | - | [Secrets and rotation](secrets-and-rotation.md), rotate before investigating |
 | The last backup is old or absent | The scheduled job stopped and nothing said so | [Backup and restore](backup-and-restore.md) |
 
 ## Data loss
@@ -180,7 +180,7 @@ The order that keeps options open:
 
 If the loss is a soft delete rather than a failure, note that a scheduled purge
 runs daily inside the API process and permanently removes records past the
-retention window. Once it has run, the trash is not the place to look — a
+retention window. Once it has run, the trash is not the place to look - a
 backup is.
 
 ## Suspected compromise
@@ -190,7 +190,7 @@ takes hours, and the credential is doing damage the whole time.
 
 Then reason about reach. Every credential and what it protects is tabulated in
 [Secrets and rotation](secrets-and-rotation.md). Treat the exposure as reaching
-everything that credential can reach, until you can show otherwise — and note
+everything that credential can reach, until you can show otherwise - and note
 what you cannot show: with no audit log, this system cannot demonstrate that a
 credential was *not* used.
 
@@ -223,7 +223,7 @@ authority over the instance to decide and write down.
   recovery point or recovery time objective exists anywhere in this repository,
   and none is stated on any page here.
 - Whether an alert should exist for backup age, readiness failure and error
-  rate — and where it should go.
+  rate - and where it should go.
 
 When those are decided, this page should be replaced by the runbook
 `docs/CLOUD-LAUNCH.md` asks for, rather than extended.

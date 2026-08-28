@@ -7,8 +7,8 @@ are in [`docs/specs/srs.md`](specs/srs.md).
 ## 1. The one-paragraph version
 
 Vitae stores a person's whole life and career as a typed graph: **nodes**
-(people, roles, projects, skills, interactions…) and first-class **edges**
-(KNOWS, WORKED_ON, USES_SKILL…), versioned with full provenance. From that graph
+(people, roles, projects, skills, interactions...) and first-class **edges**
+(KNOWS, WORKED_ON, USES_SKILL...), versioned with full provenance. From that graph
 it answers two questions a technical career runs on: *"who should I call?"* (an
 explainable CRM ranking) and *"what do I say about myself for this job?"* (a
 deterministic, ATS-safe, one-page LaTeX résumé). Every "intelligent" behaviour is
@@ -184,7 +184,7 @@ offline.
 
 ## 8. Where to change things
 
-| I want to… | Go to… |
+| I want to... | Go to... |
 |---|---|
 | Add a node type | `packages/core/src/types.ts` + `schema/node-props.ts` |
 | Tune a ranking weight | `packages/core/src/algorithms/constants.ts` |

@@ -55,7 +55,7 @@ creation assigns new IDs and would orphan every edge.
 Postgres on RDS is the system of record and already lives **off-VM**. Compose
 volumes are mostly Caddy/certs, not graph data. Durability is an automated
 **full export ZIP** to versioned S3 (same G4 shape the restore drill already
-uses), not a second dump format and not “put Postgres on the VM.”
+uses), not a second dump format and not "put Postgres on the VM."
 
 RDS PITR and manual snapshots cover short operational mistakes; the export
 bundle is the portable tier. See [`postgres-restore.md`](postgres-restore.md).
@@ -65,13 +65,13 @@ bundle is the portable tier. See [`postgres-restore.md`](postgres-restore.md).
 `BACKUP_S3_URI` example: `s3://vitae-backups/prod`
 
 ```
-…/exports/YYYY-MM-DD/vitae-export.zip
-…/exports/YYYY-MM-DD/backup-manifest.json   # day, project_id, zip_sha256, includes_sensitive: true
-…/exports/LATEST                            # plaintext day, e.g. 2026-07-16
+.../exports/YYYY-MM-DD/vitae-export.zip
+.../exports/YYYY-MM-DD/backup-manifest.json   # day, project_id, zip_sha256, includes_sensitive: true
+.../exports/LATEST                            # plaintext day, e.g. 2026-07-16
 ```
 
 Secrets stay out of S3 objects unencrypted beyond what the export already
-contains (your graph). IAM is least-privilege on one prefix (`…/exports/*`).
+contains (your graph). IAM is least-privilege on one prefix (`.../exports/*`).
 Cloudinary URLs are a CDN, **not** a backup (optional Phase B: asset inventory).
 
 ### Operator commands
@@ -91,7 +91,7 @@ DATABASE_URL=postgresql://vitae:vitae@127.0.0.1:5433/vitae_drill \
   CONFIRM=YES BACKUP_S3_URI=s3://vitae-backups/prod pnpm restore:s3
 
 # Pin a day; overwrite non-empty target only with eyes open
-CONFIRM=YES FORCE=1 BACKUP_DAY=2026-07-15 BACKUP_S3_URI=s3://…/prod pnpm restore:s3
+CONFIRM=YES FORCE=1 BACKUP_DAY=2026-07-15 BACKUP_S3_URI=s3://.../prod pnpm restore:s3
 ```
 
 `scripts/restore-from-s3.sh` downloads the ZIP, checks the sidecar checksum, then

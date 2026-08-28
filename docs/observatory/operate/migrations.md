@@ -92,7 +92,7 @@ fails halfway leaves the database as it was. There is no half-applied state to
 reason about, and no cleanup step.
 
 **One runner at a time.** The migrator takes a Postgres advisory lock before it
-starts. A second invocation — a retried deploy, a second operator — waits
+starts. A second invocation - a retried deploy, a second operator - waits
 rather than racing.
 
 **One order, permanently.** The runner refuses to proceed if a migration
@@ -131,13 +131,13 @@ one. Walking back several is several invocations, each one further from the
 data you had.
 
 The safe reading of `down` is that it restores the *shape*, and that is all it
-promises. Where a migration only added derived structure — a generated column,
-an index, a trigger — reverting it costs nothing but the structure. Where a
+promises. Where a migration only added derived structure - a generated column,
+an index, a trigger - reverting it costs nothing but the structure. Where a
 migration created a table that has since been written to, reverting it takes
 the rows with it.
 
 Before a schema change you are unsure of, take a manual database snapshot. It
-costs nothing to keep briefly and is the fastest way back — faster than a
+costs nothing to keep briefly and is the fastest way back - faster than a
 restore from an export bundle, and it is the tier designed for exactly this.
 [Backup and restore](backup-and-restore.md) has the command and explains where
 it sits among the recovery tiers.
@@ -151,8 +151,8 @@ A migration that cannot apply to an empty database fails the pipeline.
 
 Nothing tests a migration against production-shaped data. Both jobs start from
 an empty database, so a migration whose `up` is correct on an empty schema and
-wrong against existing rows — a backfill, a type narrowing, a uniqueness
-constraint that real data violates — passes the pipeline and fails on the
+wrong against existing rows - a backfill, a type narrowing, a uniqueness
+constraint that real data violates - passes the pipeline and fails on the
 host. Read the migration, not the pipeline result, before applying one of
 those.
 

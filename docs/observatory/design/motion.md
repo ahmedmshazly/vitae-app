@@ -78,13 +78,13 @@ The product register is everything under the application shell and all of the
 design system. The marketing register is the public pages someone reads once
 while deciding whether to care, and it is allowed gestures a daily tool is not:
 scroll choreography, longer durations, larger travel, real product recordings,
-and count-ups on figures. The easing is not part of that latitude — there is
-still one curve — and every standing ban holds in both registers unchanged.
+and count-ups on figures. The easing is not part of that latitude - there is
+still one curve - and every standing ban holds in both registers unchanged.
 
 The written amendment scopes the marketing register to three routes and says
 "and nowhere else" (`docs/design/MOTION.md:151`; its opening precedence note at
 `:11` also names a fourth path that is now only a legacy redirect). **That
-scoping is superseded.** Five more marketing pages have since shipped —
+scoping is superseded.** Five more marketing pages have since shipped -
 verified against the route tree in `apps/web/src/App.tsx`, where eight public
 pages now render inside the marketing chrome, with a ninth path redirecting into
 them. Read literally, the older rule makes every one of those five pages
@@ -105,8 +105,8 @@ animates from JavaScript runs 130ms in and 90ms out on the brand curve, and
 short-circuits to no animation under reduced motion. Nothing currently uses the
 longer durations or larger travel the amendment permits.
 
-The known debt that the motion contract records — a second easing curve passed
-inline on two marketing pages — is no longer present. One of those two files no
+The known debt that the motion contract records - a second easing curve passed
+inline on two marketing pages - is no longer present. One of those two files no
 longer imports a motion runtime at all, and the other declares the brand curve
 as a local constant. That fixes the curve but not the underlying shape: the
 control points now exist as hand-typed copies in three TypeScript files, and the
@@ -130,7 +130,7 @@ From JavaScript, `apps/web/src/lib/motion.ts` ships each variant twice: as a
 hook that reads the reduced-motion preference itself, and as the pure function
 underneath that takes the preference explicitly. **Prefer the hook.** A flag you
 have to remember to pass is a flag that gets forgotten, and the primitive exists
-only for the two cases a hook cannot serve — a preference coming from somewhere
+only for the two cases a hook cannot serve - a preference coming from somewhere
 other than the media query, and a call inside a `.map()`.
 
 The preference has exactly one source in the repository. The design system's own
@@ -149,7 +149,7 @@ worth stating rather than glossing.
 | enter | Shipped. Drives dialogs and overlays in CSS, the boundary component's resolved phases, and per-item list entrances where a screen opts in |
 | exit | Shipped. Drives dialog and overlay closes in CSS, the toast, and the bulk-action bar |
 | emphasis | Shipped, on exactly one row in the daily view |
-| route | Shipped, entrance only — see below |
+| route | Shipped, entrance only - see below |
 | reorder | **Defined and unused.** No production code calls it; only its own tests do |
 
 The route case is a correction to the motion contract's own status table, which
@@ -158,7 +158,7 @@ in an exit-animation boundary. The code now records that as a decision rather
 than a gap: wrapping it held the outgoing element on screen until its exit
 finished, but that element renders whatever its children currently are, so every
 navigation mounted the incoming screen inside the outgoing wrapper, faded it
-out, destroyed it, and mounted it a second time — losing an open dialog, a typed
+out, destroyed it, and mounted it a second time - losing an open dialog, a typed
 character, or a click that had just landed. Keying the region on the path mounts
 each screen once and still carries it in. Route swaps enter and do not exit, on
 purpose.
@@ -207,7 +207,7 @@ checker rather than assumed:
 - Travel and scale distance. The entrance-travel token is enforced nowhere.
 - Stagger arithmetic. The cap is review's job.
 - Loops. An infinite animation only trips a rule if its duration is off scale.
-- Glow drawn some other way — a text shadow, a drop-shadow filter, a shadow set
+- Glow drawn some other way - a text shadow, a drop-shadow filter, a shadow set
   from a style object, or a blurred shadow sitting beside an approved token in
   one declaration.
 - Spring, overshoot and bounce, and whether a new animation has a reduced-motion
@@ -228,11 +228,11 @@ the codebase knowingly owes.
 
 ## Related
 
-- [Tokens and the scales they enforce](tokens.md) — the duration, easing,
+- [Tokens and the scales they enforce](tokens.md) - the duration, easing,
   travel and stagger tokens, and the two media queries that change them.
-- [Loading, empty, error and unavailable](states.md) — where the skeleton, the
+- [Loading, empty, error and unavailable](states.md) - where the skeleton, the
   spinner and the entrance actually appear.
-- [The Quiet Observatory](identity.md) — the standing bans that hold in both
+- [The Quiet Observatory](identity.md) - the standing bans that hold in both
   registers.
-- [Accessibility commitments](accessibility.md) — reduced motion as an
+- [Accessibility commitments](accessibility.md) - reduced motion as an
   accessibility promise rather than a preference.

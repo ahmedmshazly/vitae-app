@@ -45,7 +45,7 @@ rankings, and [Design](design/index.md) covers the surface vocabulary.
 | Node | A typed record. Thirty-four types are defined in three tiers: sixteen career types with bespoke screens, eleven life types, and seven long-tail types that exist in the schema and have no dedicated interface. |
 | Provenance | The `source`, `source_ref` and `confidence` fields carried by every record, saying where it came from and how far to trust it. Ten source values exist, one of which is manual entry. |
 | Reconnect | The ranking that surfaces ties you value highly and have let decay, as the product of those two terms. A close friend contacted yesterday drops off the lane on its own. |
-| Register rule | The hairline under a page header. Its ticks encode something true about the page — revisions of a record, days of the week — and a screen with nothing true to encode gets a plain rule rather than decorative ticks. |
+| Register rule | The hairline under a page header. Its ticks encode something true about the page - revisions of a record, days of the week - and a screen with nothing true to encode gets a plain rule rather than decorative ticks. |
 | Runway | The complete list of applications, closed ones included, ordered so that whatever needs attention soonest comes first. It is a view over ordinary `application` nodes, not a separate stored model. |
 | Saved view | A named filter query, kept so it can be reopened from the navigation. The screen that manages them is titled Library, answers at both `/collections` and `/explore/library`, and calls them reusable lenses. |
 | Self | The one person node marked `is_self`. It anchors every relationship query: warm-path search starts there, and any score described as proximity is proximity to it. |
@@ -62,7 +62,7 @@ The résumé engine reuses several ordinary words for narrower things.
 
 | Term | What it means here |
 | --- | --- |
-| Atom | One reusable claim about your work — an achievement, a responsibility, a summary fragment or a skill line — owned by a role or project node. Atoms are what the engine scores and selects; a résumé here is assembled from them rather than written straight through. |
+| Atom | One reusable claim about your work - an achievement, a responsibility, a summary fragment or a skill line - owned by a role or project node. Atoms are what the engine scores and selects; a résumé here is assembled from them rather than written straight through. |
 | ATS strict | A trait a template declares about itself. It is shown to you as a chip and read by nothing in the compile path, so it describes an intention of the layout rather than a constraint the build enforces. |
 | Blocked | A per-atom flag that keeps an atom out of every selection. Its opposite is pinned, which forces one in whatever it scores. |
 | Budget | The number of rendered lines the selection may fill, taken from the chosen template's line model. A `budget_lines` field also exists in the résumé configuration schema with a default of 54, and no code reads it. |
@@ -70,7 +70,7 @@ The résumé engine reuses several ordinary words for narrower things.
 | Emphasis | Which register a wording is in: technical, leadership, concise or detailed. An atom carries at most one variant per emphasis, at most four in all, and exactly one of them is the default. |
 | Fit loop | What runs when the compiled PDF is longer than one page. Each pass prefers swapping a variant for its concise wording over dropping an atom, it stops after three passes, and the remaining overflow is handed back for a manual decision. |
 | Letter | A cover letter, built from hook, body and closer blocks that each hold free text, an atom, or both. It is attached to a target and compiled by the same service as a résumé. |
-| Line model | Four constants per template — characters per line, lines per page, and the overhead of an entry and of a section — calibrated against a real compile. They let the engine decide what fits before paying for a compile. |
+| Line model | Four constants per template - characters per line, lines per page, and the overhead of an entry and of a section - calibrated against a real compile. They let the engine decide what fits before paying for a compile. |
 | Target | A saved job description together with the weighted keyword set parsed out of it. Parsing is deterministic and the keywords are editable, so the thing being tailored to is visible and arguable. |
 | Template | A LaTeX résumé family under `templates/`, each a directory with a document and a line model. Three ship, and `cobalt` is the default. See [Develop](develop/index.md) for adding one. |
 | Variant | One wording of one atom at one emphasis. Because a concise variant costs fewer lines for the same keyword coverage, the engine can shorten a résumé by swapping wordings instead of dropping claims. |

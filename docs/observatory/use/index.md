@@ -17,7 +17,7 @@ sources:
 
 This section is written for the person whose career is in the graph. It
 assumes you have a running instance and an account that can sign in, and it
-assumes nothing else — not that you have read the product section, not that you
+assumes nothing else - not that you have read the product section, not that you
 know what a node is, not that you have any records yet.
 
 Everything here describes behaviour that exists in the code today. Where a
@@ -43,8 +43,8 @@ the screen reference is looked up rather than read through.
 
 Vitae serves two things from one origin, and they follow different rules.
 
-The **public site** — the home page, the product pages, the tour, the guides,
-the legal and status documents, and the sign-in door — is reachable with no
+The **public site** - the home page, the product pages, the tour, the guides,
+the legal and status documents, and the sign-in door - is reachable with no
 account and never waits on authentication or on the API. Its content is a typed
 registry compiled into the build, so it is the same for every visitor.
 
@@ -60,7 +60,7 @@ it shows is compiled into the build, so it never waits on the API. **This
 documentation does need one.** Its route is mounted above the authentication
 gate so that a signed-out reader is told what happened rather than silently
 redirected, but the corpus itself is fetched from the API and refused to
-anyone who is not the owner of the instance — because it describes every trust
+anyone who is not the owner of the instance - because it describes every trust
 boundary in the system and enumerates every route, endpoint, table and exported
 symbol in the repository. [Every screen, and what it is for](screens.md)
 separates the three.

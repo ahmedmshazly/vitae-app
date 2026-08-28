@@ -13,8 +13,8 @@ related: [DEV-SETUP, DEV-WHERE, DEV-TESTING, DEV-GATES, DEV-ENDPOINT, DEV-NODETY
 # Develop
 
 This section is for someone about to change the code. It answers four questions
-in the order they come up — can I run it, where does my change go, what proves
-it, and what will refuse it — and then walks three changes end to end.
+in the order they come up - can I run it, where does my change go, what proves
+it, and what will refuse it - and then walks three changes end to end.
 
 Nothing here is aspirational. Every command on these pages was run or read out
 of the root `package.json` before it was written down, and every gate was read
@@ -28,7 +28,7 @@ says so and says which one is right.
 application: the exact Node and pnpm releases the workspace declares, the two
 containers and one emulator the local stack needs, and the ports they occupy.
 Read it first if you have never run this repository, and read its first section
-even if you have — the Node floor printed in the older onboarding guide is not
+even if you have - the Node floor printed in the older onboarding guide is not
 the one the workspace enforces.
 
 ## Then
@@ -52,22 +52,22 @@ the packages a recursive command silently skips.
 Each of these is a complete procedure, including what to add to the
 source-to-test map and which gate catches which mistake.
 
-[Adding an API endpoint](add-an-endpoint.md) — a route on an existing mount,
+[Adding an API endpoint](add-an-endpoint.md) - a route on an existing mount,
 and the extra steps a new mount prefix demands.
 
-[Adding a node or edge type](add-a-node-type.md) — the typed career graph is
+[Adding a node or edge type](add-a-node-type.md) - the typed career graph is
 one string union with several registries hanging off it; the compiler catches
 some of the omissions and named tests catch the rest.
 
-[Adding a résumé template](add-a-resume-template.md) — what the three shipped
+[Adding a résumé template](add-a-resume-template.md) - what the three shipped
 template families are, what constrains them, how the compiler image warms and
 calibrates them, and what a fourth would need.
 
 ## What this section does not cover
 
 Deploying, migrating, backing up and recovering an instance belong to
-[Operate](../operate/index.md). The shape of the system itself — the request
-lifecycle, the typed graph, the trust boundaries — belongs to
+[Operate](../operate/index.md). The shape of the system itself - the request
+lifecycle, the typed graph, the trust boundaries - belongs to
 [Architecture](../architecture/index.md). The visual and interaction rules a
 change to a screen has to obey belong to [Design](../design/index.md). The
 rules these documents are themselves held to, and the audited inventory of what

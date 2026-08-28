@@ -60,7 +60,7 @@ The web application never sees `@vitae/config`: it reads configuration through
 Vite's own `import.meta.env`, so an environment key added for the API is not
 automatically available to a screen. And nothing outside `apps/web` imports
 `@vitae/ui`, which makes the design system a leaf that only one consumer can
-break — and, as [the gates page](quality-gates.md) records, one whose own tests
+break - and, as [the gates page](quality-gates.md) records, one whose own tests
 no gate runs.
 
 ### Inside the API
@@ -75,10 +75,10 @@ registered above the authentication gate rather than declared public.
 
 Below that, three directories and a rule:
 
-- `routes/v1/` — one router per mount prefix, registered in `routes/v1/index.ts`.
+- `routes/v1/` - one router per mount prefix, registered in `routes/v1/index.ts`.
   Routes stay thin: read the request, call a service, shape the response.
-- `services/` — the application work. This is where a new behaviour normally goes.
-- `db/` — persistence. `repository.ts` owns reads and writes, soft deletion,
+- `services/` - the application work. This is where a new behaviour normally goes.
+- `db/` - persistence. `repository.ts` owns reads and writes, soft deletion,
   transactions and the revision trail; `space.ts` owns the tenancy scoping that
   every query runs inside.
 
@@ -90,14 +90,14 @@ and it is what keeps a behaviour testable without a request.
 
 `apps/web/src/` splits by lifespan rather than by feature:
 
-- `app/` — the shell, the route table, the command palette registry. Long-lived.
-- `routes/` — one module per screen, grouped into `career/`, `marketing/`,
+- `app/` - the shell, the route table, the command palette registry. Long-lived.
+- `routes/` - one module per screen, grouped into `career/`, `marketing/`,
   `reference/`, `tailor/`, `workspaces/` and `docs/`. Screens are lazily loaded
   from `App.tsx`, which is why a new screen costs almost nothing in the entry
   bundle and why a screen imported eagerly costs a great deal.
-- `features/` — cross-screen behaviour: capture, the quick switcher, bulk
+- `features/` - cross-screen behaviour: capture, the quick switcher, bulk
   actions, forms.
-- `components/`, `lib/`, `styles/` — application-local presentation, helpers
+- `components/`, `lib/`, `styles/` - application-local presentation, helpers
   and stylesheets.
 
 A component that more than one application could use belongs in `@vitae/ui`
@@ -109,7 +109,7 @@ imported by every screen, so anything added there is paid for by all of them.
 `packages/core` owns the vocabulary and the deterministic logic: the node and
 edge type unions and their Zod schemas under `schema/`, the form descriptors
 under `forms/`, and nineteen algorithm modules under `algorithms/`. Nothing in
-it performs I/O, and nothing in it is allowed to be non-deterministic — the same
+it performs I/O, and nothing in it is allowed to be non-deterministic - the same
 inputs must produce the same outputs, and there are tests that assert exactly
 that. It is the only workspace both applications import, which is why anything
 that must agree across the wire lives here.
@@ -158,8 +158,8 @@ Each package's `exports` map is the boundary, and it is a narrow one:
 | `@vitae/config` | `./env` only |
 | `@vitae/testkit` | `.`, `./clock`, `./ids`, `./factories` |
 
-An import of an unpublished subpath — `@vitae/core/src/algorithms/dedup.js`, say
-— does not resolve. That is the mechanism that stops one workspace reaching into
+An import of an unpublished subpath, say `@vitae/core/src/algorithms/dedup.js`,
+does not resolve. That is the mechanism that stops one workspace reaching into
 another's internals, and it fails at build time in both the type checker and the
 bundler.
 
@@ -208,9 +208,9 @@ that state, and no gate reports it.
 
 [How this repository tests itself](testing.md) explains what has to prove the
 change once you have placed it. [The gates a change must
-pass](quality-gates.md) is the reference for what will refuse it. The three worked procedures —
+pass](quality-gates.md) is the reference for what will refuse it. The three worked procedures -
 [an endpoint](add-an-endpoint.md), [a node or edge type](add-a-node-type.md),
-[a résumé template](add-a-resume-template.md) — each take one of the rows above
+[a résumé template](add-a-resume-template.md) - each take one of the rows above
 end to end.
 
 The reasoning behind the layering itself, rather than its current shape, is in

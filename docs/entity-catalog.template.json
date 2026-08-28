@@ -434,7 +434,7 @@
       },
       "create_subject": null,
       "form_edges": [],
-      "notes": "Create form has no inline edges; Add Connection exposes ORG_RELATED (parent, partner, competitor, …) and other legal org endpoints."
+      "notes": "Create form has no inline edges; Add Connection exposes ORG_RELATED (parent, partner, competitor, ...) and other legal org endpoints."
     },
     "role": {
       "group": "Career",
@@ -2185,7 +2185,7 @@
         },
         "identifier_masked": {
           "type": "string",
-          "note": "masked only (…4242); never store credentials"
+          "note": "masked only (...4242); never store credentials"
         },
         "cost": {
           "type": "object",
@@ -2373,7 +2373,7 @@
             "note": "derived"
           }
         },
-        "notes": "Person ↔ person, typed relationship (friend, colleague, family, …)."
+        "notes": "Person ↔ person, typed relationship (friend, colleague, family, ...)."
       },
       "HELD": {
         "label": "Held role",

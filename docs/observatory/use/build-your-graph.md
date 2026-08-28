@@ -57,7 +57,7 @@ quickly enough that you keep doing it.
 
 Two things, and only two.
 
-A **record** — a node — is a fact of one of 34 types. Person, organisation,
+A **record** - a node - is a fact of one of 34 types. Person, organisation,
 role, project, repository, skill, education, certification, course,
 publication, talk, award, reference, job posting, application and interview are
 the career types. Event, interaction, task, goal, habit, journal entry, idea,
@@ -71,7 +71,7 @@ sensitive, a provenance source, and a confidence between 0 and 1. Beneath that
 sits a `props` object validated by a schema specific to that type, so a role
 has an employment type and a person has emails.
 
-A **connection** — an edge — is also a record. It has one of 28 types, a
+A **connection** - an edge - is also a record. It has one of 28 types, a
 direction, its own dates, its own notes, its own provenance and confidence, and
 its own type-specific properties. That is why a relationship in Vitae can carry
 closeness, a relation kind, and a cadence: the edge is a thing you can write on,
@@ -102,7 +102,7 @@ creates the person, an organisation stub if one does not exist, the tag and the
 note, connected.
 
 Capture is deterministic. Nothing about it is generative, which is what makes
-the preview trustworthy — the chips are the plan, and the plan is what gets
+the preview trustworthy - the chips are the plan, and the plan is what gets
 written.
 
 The `n` leading key is the exception to the pattern: it appends a note to the
@@ -111,7 +111,7 @@ record you last looked at rather than creating a new one.
 ### The structured form, for a fact with detail
 
 Press `n` outside a text field, or use the **New** control in the top bar. You
-get a grouped type picker — Career, Content, Job search, Life, Long tail — and
+get a grouped type picker - Career, Content, Job search, Life, Long tail - and
 then the form for that type, generated from the same schema the API validates
 against. Every creatable type is in that menu; the menu and the canonical type
 list are compared by a test, so a new schema cannot arrive with no way to
@@ -157,9 +157,9 @@ about because they explain where records you did not type came from:
 - A GitHub sync creates a repository record per repository, and links its
   primary language to a skill.
 
-Every record shows where it came from. Its provenance is one of ten sources —
+Every record shows where it came from. Its provenance is one of ten sources -
 manual, the six import kinds, a parsed résumé, an Aperture bundle, or the
-system itself — and it is on the record rather than in a log.
+system itself - and it is on the record rather than in a log.
 
 ## Working a person
 
@@ -170,8 +170,8 @@ worth doing three things there for anyone who matters.
 relationship strength the system cannot work out on its own, and setting it is
 what turns *"No relationship signal yet"* into a real score.
 
-**Log an interaction.** The one-tap logger offers five kinds — coffee, call,
-video, message, meeting — takes a required description of what happened, and
+**Log an interaction.** The one-tap logger offers five kinds - coffee, call,
+video, message, meeting - takes a required description of what happened, and
 optionally queues a follow-up reminder on a date. The schema behind it knows
 nine kinds in all, adding email, comment, encounter and outreach, which is what
 an import can produce even though the logger does not offer them. Relationship
@@ -194,13 +194,13 @@ roles and openings attached to it.
 An **atom** is one achievement bullet, and it is the unit the résumé engine
 selects from. Atoms live in the atom library.
 
-Each atom belongs to a **role or project** — that is what `owner_node` means,
+Each atom belongs to a **role or project** - that is what `owner_node` means,
 and the API refuses an atom whose owner is not a live role or project. So the
 prerequisite for writing evidence is that the work itself is a record.
 
 An atom carries:
 
-- a **kind** — achievement, responsibility, summary fragment, or skill line;
+- a **kind** - achievement, responsibility, summary fragment, or skill line;
 - **metrics**, each a value with an optional unit and label;
 - **evidence**, each either a link to another record or a URL, with an optional
   label;
@@ -210,8 +210,8 @@ An atom carries:
 - **wording variants**, one per emphasis.
 
 The variants are the part people underuse. An atom may carry up to four
-wordings of the same claim — **technical**, **leadership**, **concise** and
-**detailed** — with one marked default. Emphasis values must be unique within
+wordings of the same claim - **technical**, **leadership**, **concise** and
+**detailed** - with one marked default. Emphasis values must be unique within
 an atom, so there is exactly one of each at most. When a résumé is tailored,
 the engine may pick a different variant of the same atom for a different job,
 and swapping a long variant for the concise one is one of the moves the
@@ -229,8 +229,8 @@ with metrics for the runtime and the delivery rate, evidence pointing at the
 repository record, skills for ETL and PostgreSQL, and a concise variant that
 says the same thing in one line.
 
-The library flags atoms that are **incomplete** — a single variant, or no
-skills — because those are the atoms that will score poorly and be dropped
+The library flags atoms that are **incomplete** - a single variant, or no
+skills - because those are the atoms that will score poorly and be dropped
 first. That filter is the fastest way to spend a productive twenty minutes.
 
 ## Notes, sensitivity and pinning
@@ -249,8 +249,8 @@ searchable with `is:pinned`.
 
 ## Fixing what you got wrong
 
-Records are versioned. Every record's screen carries its revision history —
-create, update, append, archive, restore, merge, delete — with one tick per
+Records are versioned. Every record's screen carries its revision history -
+create, update, append, archive, restore, merge, delete - with one tick per
 revision along the header rule, and the panel says when it is showing only the
 most recent ticks of a longer history.
 
@@ -259,7 +259,7 @@ preserved, stays recoverable for 30 days, and is purged after that. Restoring
 brings back the record and the edges that were hidden with it.
 
 Duplicates are a separate problem with a separate screen. If you have imported
-the same person twice, do not delete one — merge them from the identity audit,
+the same person twice, do not delete one - merge them from the identity audit,
 which rewires the relationships and keeps the alternate name as an inspectable
 prior identity. That merge is reversible for 30 days.
 
@@ -268,8 +268,8 @@ prior identity. That merge is reversible for 30 days.
 Three tools, in increasing order of ceremony:
 
 - `⌘P` fuzzy-matches every record by title and jumps straight to it.
-- `/search` ranks full-text matches and accepts the filter grammar —
-  `type:person tag:ml city:Kigali after:2025-01-01` — parsed back as chips so
+- `/search` ranks full-text matches and accepts the filter grammar -
+  `type:person tag:ml city:Kigali after:2025-01-01` - parsed back as chips so
   you can see what it understood.
 - `/explore/library` is the same grammar with a running count and the ability
   to save a query as a named view, which then appears in the Explore strip and

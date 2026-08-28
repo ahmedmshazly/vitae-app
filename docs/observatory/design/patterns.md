@@ -28,7 +28,7 @@ A Vitae screen is a ledger, not a dashboard. Instead of a grid of equally
 weighted cards, a screen establishes one lead question or action and then uses
 ruled indexes, registers, dossiers and lanes for everything supporting it. The
 shared component library holds 60 components and 4 hooks, and several of them
-make decisions on your behalf that are easy to get wrong by hand — which part of
+make decisions on your behalf that are easy to get wrong by hand - which part of
 a row is the link, whether a selected state is readable without colour, whether
 a card that lights up under the cursor can actually be clicked. Almost none of
 this is machine-checked; it holds because the primitives make the correct thing
@@ -54,7 +54,7 @@ now are.
 
 The rail is 272px expanded and 68px compact, and the compact state has three
 different causes. The reader can collapse it. Between 701px and 1080px the shell
-forces it compact — through a JavaScript media query rather than CSS, because
+forces it compact - through a JavaScript media query rather than CSS, because
 the rail's labels are React children and a media query cannot stop them
 rendering. At 700px and below the rail is removed entirely and replaced by a
 fixed six-column bottom dock with a raised capture control in the centre slot
@@ -71,7 +71,7 @@ query rather than by a breakpoint.
 The generic workspace home is a fixed composition: an eyebrow, the page header,
 a ruled workflow trace, a short editorial purpose statement, one dominant
 numbered lead destination, and then an ordered ruled index of the rest. The
-trace names a four-stage sequence — orient, inspect, decide, act — with the
+trace names a four-stage sequence - orient, inspect, decide, act - with the
 first stage current on entry.
 
 Two workspaces are deliberate exceptions. The daily view opens straight onto its
@@ -83,7 +83,7 @@ obvious first move, and those two already have one.
 The rule this replaces is worth stating directly, because it is the most common
 way a screen goes generic: **do not use an equal-card dashboard grid as a page
 skeleton.** When a screen feels bland the correction is almost always
-structural — strengthen the lead question, show the trace to the evidence, and
+structural - strengthen the lead question, show the trace to the evidence, and
 replace repeated containers with a ledger. It is not decoration, and there is no
 decoration available to add.
 
@@ -98,13 +98,13 @@ for contextual help, and a right-aligned action slot. Every screen explains
 itself the same way.
 
 `Section` is a titled region, and it is a labelled `section` element with a real
-`h2` — a landmark a reader can jump between, not a box. Regions are separated by
+`h2` - a landmark a reader can jump between, not a box. Regions are separated by
 a heading and space rather than by card chrome, because a screen of bordered
 boxes all at the same weight has no hierarchy at all.
 
 `RegisterRule` is the hairline under the header, optionally carrying ticks. The
-ticks must encode something true about the page — revisions of a record, days of
-the current week, decade boundaries on a timeline — and a screen with nothing
+ticks must encode something true about the page - revisions of a record, days of
+the current week, decade boundaries on a timeline - and a screen with nothing
 true to encode passes none and gets a plain rule. There is deliberately no prop
 for how many ticks would look nice.
 
@@ -125,8 +125,8 @@ the row's link, never inside it.
 
 Selection is the other decision the component makes. A selected row is not just
 a background and a bar; `Row` emits `aria-selected` when the caller gave it a
-role from a selectable collection, and `aria-current` otherwise — which is the
-honest meaning of a master-and-detail list — and it also grows a check glyph and
+role from a selectable collection, and `aria-current` otherwise - which is the
+honest meaning of a master-and-detail list - and it also grows a check glyph and
 the word for its state, so the selection survives being read without colour.
 
 Hover changes tone and never position. That one is enforced: the
@@ -153,7 +153,7 @@ that already carries the `h2`, and promoting every card title to an `h3` would
 fabricate a document outline the page does not have.
 
 Worth knowing before you reach for it: the shared `Card` is fully implemented
-and styled and has no importers at all — the generated component catalogue lists
+and styled and has no importers at all - the generated component catalogue lists
 it among the unused. The application's cards are a screen-local `.card` class
 in `apps/web/src/styles/app.css:329`, and the hover rule just below it lights
 every card's border whether or not anything inside it responds. That is exactly
@@ -185,11 +185,11 @@ module answers it. That file is the list.
 
 ## Related
 
-- [The Quiet Observatory](identity.md) — the identity these compositions
+- [The Quiet Observatory](identity.md) - the identity these compositions
   express, and the bans that shape them.
-- [Tokens and the scales they enforce](tokens.md) — the spacing, radius and
+- [Tokens and the scales they enforce](tokens.md) - the spacing, radius and
   control-height scales a composition is built from.
-- [Loading, empty, error and unavailable](states.md) — what any of these
+- [Loading, empty, error and unavailable](states.md) - what any of these
   compositions shows before its data arrives.
-- [Accessibility commitments](accessibility.md) — the semantics the primitives
+- [Accessibility commitments](accessibility.md) - the semantics the primitives
   emit, and which of them a test actually asserts.

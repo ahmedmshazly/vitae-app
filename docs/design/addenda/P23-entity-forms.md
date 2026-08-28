@@ -35,7 +35,7 @@ Modal dialog (`--ae-surface-overlay`, 1px `--ae-border-strong`, radius-lg,
    picker + USES_SKILL multi; application → APPLIED_TO + REFERRED_BY). Each is
    an EntityPicker (async fuzzy search, keyboard nav) with trailing
    "Create {type} '{query}'" stub rows, and per-link inline props (department,
-   involvement, nights…).
+   involvement, nights...).
 4. **Notes:** markdown textarea.
 5. **Actions:** Cancel + primary "Create {type}" / "Save changes".
 
@@ -43,7 +43,7 @@ Modal dialog (`--ae-surface-overlay`, 1px `--ae-border-strong`, radius-lg,
 
 - Field errors inline under the input (danger text, `role="alert"`); the same
   Zod schemas the API enforces run client-side first.
-- Busy: primary button → "Saving…", disabled.
+- Busy: primary button → "Saving...", disabled.
 - Create success: toast "Created {title}" with **Undo** (soft-delete
   compensating call), navigate to the new record.
 - Sensitive types (health_log) default envelope sensitivity to `sensitive`.

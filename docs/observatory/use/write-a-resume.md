@@ -66,14 +66,14 @@ no skills, and those are the ones that will be dropped first.
 
 You also need the build service running if you want a PDF. Vitae compiles with
 Tectonic in a separate service. Without it you still get the complete LaTeX
-source and every number on the screen, but no rendered page — the interface says
+source and every number on the screen, but no rendered page - the interface says
 so plainly rather than failing silently.
 
 The résumé hub at `/career/resume` is the front door: counts of atoms, targets
 and outputs, the five screens the work moves through, and your most recent
 outputs.
 
-## Step 1 — Make a target from the job description
+## Step 1 - Make a target from the job description
 
 A **target** is a job description you have parsed. Open Tailor
 (`/career/resume/tailor`), press **New target** in the left rail, and fill
@@ -85,7 +85,7 @@ catalogue and its aliases as its dictionary. That is why the skill aliases in
 Settings matter: teaching it that `k8s` means Kubernetes changes every future
 parse.
 
-The active target lands in the URL as `?target=…`, so a tailoring session
+The active target lands in the URL as `?target=...`, so a tailoring session
 survives a reload and can be reopened from a bookmark.
 
 A target carries a status of saved, active, applied or closed, and can be
@@ -101,7 +101,7 @@ more with *"a target may contain at most 40 keywords"*.
 Correcting the keywords is usually the minute best spent in the whole
 process, because everything downstream is scored against them.
 
-## Step 2 — Let it score, then steer
+## Step 2 - Let it score, then steer
 
 As soon as a target is active, every atom in your library is scored against its
 keywords, independently of whether it is selected. Each score opens into its
@@ -119,7 +119,7 @@ overrule it:
 
 The page meter shows lines used against the budget, so you can see the packing
 decision rather than guess at it. If no atom scored against the keywords, the
-pane says so and names both fixes — pin one in, or widen the target's keywords.
+pane says so and names both fixes - pin one in, or widen the target's keywords.
 
 **Manual** hands you every atom grouped by role and project with a checkbox
 each, and the included set is fully drag-orderable. Use it when you know
@@ -128,12 +128,12 @@ exactly what this application needs.
 Both modes re-run themselves as you change things, debounced, so the page
 estimate stays honest while you work.
 
-## Step 3 — Shape the document
+## Step 3 - Shape the document
 
 The middle pane is the document as it will be typeset, and it is editable in
 place:
 
-- toggle and reorder **sections** — summary, and whichever sections your
+- toggle and reorder **sections** - summary, and whichever sections your
   evidence produces;
 - reorder entries within a section, and bullets within an entry;
 - disable a contact field, a skill, an entry or a bullet you do not want on
@@ -143,27 +143,27 @@ place:
 
 The right pane holds the presentation choices:
 
-- **Template** — the layout, from the three below.
-- **Accent** — a colour from the template's own curated palette. The API
+- **Template** - the layout, from the three below.
+- **Accent** - a colour from the template's own curated palette. The API
   refuses anything else with *"Accent must be selected from the curated
   palette."*
-- **Wording emphasis** — which variant of each atom to prefer: technical,
+- **Wording emphasis** - which variant of each atom to prefer: technical,
   leadership, concise or detailed. You can also override the emphasis for a
   single atom.
 
 Everything you change is autosaved to that target, debounced, and the header
 says which of four states the save is in. If saving stops working the header
-says so in words — *"Not saving. Your last changes are only in this tab."* —
+says so in words - *"Not saving. Your last changes are only in this tab."* -
 rather than continuing to show a stale "draft saved".
 
-## Step 4 — Compile
+## Step 4 - Compile
 
 **Compile PDF** sends the assembled model to the build service, which renders
 LaTeX and returns a real PDF plus its page count and its keyword coverage.
 
 Coverage is weighted: each keyword contributes its weight, and the gate is
 95%. The panel shows the percentage, whether it passed, and which keywords are
-not covered — capped in the display, with a count of how many more there are so
+not covered - capped in the display, with a count of how many more there are so
 a document missing 25 keywords never looks like it is missing 12.
 
 Compiling can end in one of three honest ways, and the screen distinguishes
@@ -179,22 +179,22 @@ them:
 None of those is a dead end, which is the point: the document is complete
 either way, and the failure is about typesetting it.
 
-## Step 5 — Finalise
+## Step 5 - Finalise
 
 **Finalize** is the step that produces a saved output, and it does more than
 save. It runs a one-page fit loop and then judges the result against two gates.
 
 The **fit loop** reacts to the real page count from Tectonic rather than to the
-line estimate. Each iteration prefers swapping an atom to its concise variant —
-same coverage, fewer lines — and only drops the lowest-scoring unpinned atom if
+line estimate. Each iteration prefers swapping an atom to its concise variant -
+same coverage, fewer lines - and only drops the lowest-scoring unpinned atom if
 no swap is available. It runs at most three iterations. If the document is still
 over one page after that, the output is marked **needs manual trim** and you are
 told to drop or reword bullets and finalise again.
 
 The two gates are:
 
-- **one page** — the compiled document is exactly one page;
-- **coverage** — weighted keyword coverage is at least 95%.
+- **one page** - the compiled document is exactly one page;
+- **coverage** - weighted keyword coverage is at least 95%.
 
 An output that clears both is saved with status **final**. An output that
 clears neither, or only one, is saved as a **draft**. The receipt on screen
@@ -207,7 +207,7 @@ rather than doing it quietly.
 
 ## The templates
 
-Three layouts ship, each with its own line model — the characters-per-line
+Three layouts ship, each with its own line model - the characters-per-line
 figure the page budget is computed from.
 
 | Template | What it is | Page size | ATS-strict |
@@ -231,7 +231,7 @@ target snapshot it was built from, its coverage, its fit decisions, the
 evidence it selected, and its stored artifacts. From here you can:
 
 - **Download** the stored PDF or LaTeX source;
-- **Rebuild artifacts** when a document has no stored file — recompiling from
+- **Rebuild artifacts** when a document has no stored file - recompiling from
   its saved selection, which is what makes an output reproducible rather than
   merely archived;
 - **Duplicate** it as a starting point;
@@ -239,8 +239,8 @@ evidence it selected, and its stored artifacts. From here you can:
 - **Mark sent**, which is where the résumé workspace hands over to the
   application pipeline.
 
-**Mark sent** creates an application record from the target — role title,
-company, today's date, status applied — and links the résumé to it. It refuses
+**Mark sent** creates an application record from the target - role title,
+company, today's date, status applied - and links the résumé to it. It refuses
 a draft with a message that says exactly what to do: re-run Finalize, and it
 must fit one page and cover at least 95% of the job description's keywords. It
 also refuses a second send, because re-sending would create a duplicate
@@ -270,7 +270,7 @@ role at Aurora Dynamics.
    them in the rail.
 3. Auto-select. The pane packs eleven atoms onto the page and the meter shows
    the budget nearly full. Two atoms about embedded work score poorly for this
-   target — leave them out.
+   target - leave them out.
 4. Pin the atom about the pipeline rebuild, because it is the strongest thing
    in the library for this role and it should not be a casualty of the fit
    loop.
@@ -287,7 +287,7 @@ role at Aurora Dynamics.
 
 ## When it goes wrong
 
-Every failure this process can produce — an offline build service, a compile
-error, a failed autosave, a scoring failure, a refused finalise — is described
+Every failure this process can produce - an offline build service, a compile
+error, a failed autosave, a scoring failure, a refused finalise - is described
 in [When something does not work](troubleshooting.md), with the message the
 code actually emits.

@@ -70,7 +70,7 @@
     {
       "from": "browser",
       "to": "resumes-route",
-      "label": "POST /resumes/finalize { targetId, templateKey, pins, blocks, atomOrder, … }",
+      "label": "POST /resumes/finalize { targetId, templateKey, pins, blocks, atomOrder, ... }",
       "kind": "call",
       "source": "apps/api/src/routes/v1/resumes.ts:266"
     },

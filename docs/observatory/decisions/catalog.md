@@ -60,7 +60,7 @@ reconstruction reads.
 ## What supersedes what
 
 Only one supersession relation exists between two records, and both ends of it
-agree — which is worth stating, because the usual failure is a record that has
+agree - which is worth stating, because the usual failure is a record that has
 been replaced without being told so.
 
 | Record | Supersedes | Superseded by |
@@ -75,7 +75,7 @@ been replaced without being told so.
 
 ADR 0005 bounds its own reach: its scope line reads "the data plane only.
 Firebase **Auth** stays; Cloudinary stays." So what it withdrew from ADR 0001
-is the storage engine and everything ADR 0001 built to compensate for it — the
+is the storage engine and everything ADR 0001 built to compensate for it - the
 in-memory ranking passes, the FlexSearch index standing in for full-text
 search, the JSON-string encoding for nested arrays. It did not withdraw the
 Firebase identity provider or the Cloudinary storage adapter, which ADR 0001
@@ -85,8 +85,8 @@ ADR 0006 supersedes nothing. It extends the storage model ADR 0005 established
 rather than replacing it: records are still whole documents in a `jsonb`
 column with generated columns beside them, and the change is to which columns
 form the key. That extension does strain a premise ADR 0001 introduced and ADR
-0004 relied on — a single-user system with a hard scale ceiling, where an
-in-memory pass over the whole graph is acceptable — because a hosted service
+0004 relied on - a single-user system with a hard scale ceiling, where an
+in-memory pass over the whole graph is acceptable - because a hosted service
 runs that pass once per tenant. Neither record has been revisited, and this
 catalogue is not the place to revise them.
 
@@ -145,7 +145,7 @@ specification by section and assumption number: `SRS §4.1 / §12.3-D1` and
 no `§` character anywhere and no `A2` or `A5`; it is organised into named
 sections carrying `FR-`, `INT-` and `NFR-` identifiers instead.
 
-The identifier-shaped citations do still resolve — `FR-SET-004` in ADR 0003 and
+The identifier-shaped citations do still resolve - `FR-SET-004` in ADR 0003 and
 `FR-SET-001` elsewhere are both defined in `docs/registry/requirements.json`.
 The numbered sections and lettered assumptions do not, and the register's own
 note explains why: it says of its entries that "none has been confirmed against

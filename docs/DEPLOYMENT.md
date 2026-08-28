@@ -105,8 +105,8 @@ The API serves it instead, from `GET /api/v1/docs/*`, behind the same
 default-deny gate and `OWNER_EMAIL` allow-list that protect the graph. A reader
 who is not signed in as the owner is refused, and the browser tells them so.
 
-Compile it on a machine with the repository checked out — the compiler reads
-the tracked file set with `git`, which a Docker build context does not have —
+Compile it on a machine with the repository checked out - the compiler reads
+the tracked file set with `git`, which a Docker build context does not have -
 and copy the result to the API host:
 
 ```bash

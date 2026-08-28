@@ -223,7 +223,7 @@ and `*.spec.*`**, skipping lines that open with a comment marker but not trailin
 | Travel and scale distance. `--ae-motion-rise` is not enforced anywhere | `transform: translateY(40px) scale(0.8);` |
 | Stagger arithmetic. The cap of 4 steps is review's job | `animation-delay: calc(var(--ae-motion-stagger) * 9);` |
 | Loops. `infinite` is never checked; a loop only trips `duration` if its duration is off scale | `animation: vt-x 130ms var(--ae-ease) infinite;` |
-| Glow drawn some other way, or a blurred shadow sitting beside a token in one declaration | `text-shadow: 0 0 8px …`, `filter: drop-shadow(0 0 8px …)`, a `boxShadow` style object, `box-shadow: var(--ae-shadow-overlay), 0 0 12px …;` |
+| Glow drawn some other way, or a blurred shadow sitting beside a token in one declaration | `text-shadow: 0 0 8px ...`, `filter: drop-shadow(0 0 8px ...)`, a `boxShadow` style object, `box-shadow: var(--ae-shadow-overlay), 0 0 12px ...;` |
 | Spring, overshoot, bounce, and whether a new animation has a reduced-motion path | nothing detects any of them |
 | Anything outside the four scanned roots | `e2e/`, `index.html`, Tailwind config, docs |
 

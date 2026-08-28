@@ -49,7 +49,7 @@ exists](#adding-an-operation-to-an-existing-mount), which is most changes, and
 **It requires authentication.** `authGate` is mounted at `/api`, so every path
 below it is default-deny. The gate's public-path list is matched against
 `req.baseUrl + req.path`, which under that mount always begins `/api`, so an
-entry there has to be spelled in full — `/api/v1/auth/logout`, not `/logout`.
+entry there has to be spelled in full - `/api/v1/auth/logout`, not `/logout`.
 An endpoint that must be reachable with no identity at all is better registered
 above the gate in `app.ts`, which is how the liveness and readiness endpoints
 work.
@@ -111,7 +111,7 @@ Three things are doing work there.
 middleware instead of hanging the request. Every async handler in this codebase
 is wrapped; an unwrapped one is a bug that shows up as a timeout.
 
-`safeParse` and an explicit `HttpError(422, 'VALIDATION', …, issues)` is the
+`safeParse` and an explicit `HttpError(422, 'VALIDATION', ..., issues)` is the
 validation idiom. Passing the Zod issues as the fourth argument puts them in
 `error.details`, which the contract suite checks for on a 422.
 
@@ -120,7 +120,7 @@ The two repository errors map themselves: `ValidationError` becomes 422
 `VALIDATION` and `NotFoundError` becomes 404 `NOT_FOUND`, so a service that
 throws them needs nothing from the route.
 
-Imports are relative with an explicit `.js` extension —
+Imports are relative with an explicit `.js` extension -
 `import { asyncHandler, HttpError } from '../../middleware/error.js'`. There are
 no path aliases, and `apps/api` compiles under `NodeNext`, which requires the
 extension.
@@ -138,7 +138,7 @@ const res = await request(app).post('/api/v1/widgets/check').set(authHeader(toke
 ```
 
 `getAuthedApp()` boots the Express application once per worker and mints a
-developer token. These suites need Postgres — `pnpm dev:db` first — and they
+developer token. These suites need Postgres - `pnpm dev:db` first - and they
 create and migrate their own `vitae_test` database rather than touching the one
 you seeded.
 
@@ -152,7 +152,7 @@ critical.
 This step is easy to miss and the gate will not let you.
 
 The route suite drives the application through the helper rather than importing
-the router, so the source-to-test gate does not count it as a sibling test —
+the router, so the source-to-test gate does not count it as a sibling test -
 see [what counts as a test beside
 it](testing.md#what-counts-as-a-test-beside-it). A router file therefore needs
 an entry in `docs/testing/source-test-map.json`:
@@ -196,7 +196,7 @@ exactly that reason.
 
 **Declare the prefix.** Add it to `V1_MOUNT_PREFIXES` in
 `apps/api/src/openapi/mounts.ts`. Express parameters are written in OpenAPI
-form there — `:personId` becomes `{personId}`. Both the OpenAPI builder and the
+form there - `:personId` becomes `{personId}`. Both the OpenAPI builder and the
 contract suite import this list, and the generated API catalog compares the
 declared list against the mounted one, so a mismatch in either direction is
 reported by `pnpm docs:check` as a stale artifact.
@@ -216,11 +216,11 @@ makes the document useful to a client; the gate will not make you.
 | Un-awaited repository call inside a transaction | `pnpm lint` | `no-floating-promises`, an error rather than a warning |
 | Relative import missing its `.js` | `pnpm typecheck` | unresolved module under `NodeNext` |
 | New router file with no map entry | `pnpm test:map` | `Unmapped production modules (1): apps/api/src/routes/v1/widgets.ts` |
-| Map entry naming a test that is not there | `pnpm test:map` | `…: missing test …` |
+| Map entry naming a test that is not there | `pnpm test:map` | `...: missing test ...` |
 | Mount registered but not declared, or the reverse | `pnpm docs:check` | `docs/generated/api.json` reported stale |
 | Edited the OpenAPI builder without regenerating | `pnpm test:contract` | the committed document does not equal the generated one |
 | An error path that does not use the envelope | `pnpm test:contract` | the envelope assertion fails |
-| An em dash or a filler phrase in a test title | `pnpm test:prose` | `<file>:<line>: title matches …` |
+| An em dash or a filler phrase in a test title | `pnpm test:prose` | `<file>:<line>: title matches ...` |
 
 Nothing checks that your endpoint is reachable from the product. Five modules
 in this repository are imported only by their own tests; an endpoint with no

@@ -26,8 +26,8 @@ the work itself in another, and the evidence that it happened in a third. Vitae
 is where those become one record: a typed graph of people, organisations, roles,
 projects, skills and the interactions between them, kept privately by the person
 whose career it is. Because the graph is typed rather than a pile of notes, the
-product can answer questions a folder of documents cannot — who to reconnect
-with before an opportunity closes, which evidence supports a line on a résumé —
+product can answer questions a folder of documents cannot - who to reconnect
+with before an opportunity closes, which evidence supports a line on a résumé -
 and it answers them with arithmetic you can inspect instead of a model you
 cannot.
 
@@ -36,8 +36,8 @@ cannot.
 ### One graph, several lenses
 
 There is one store of records and no second copy of anything. What look like
-separate products — a contact list, a timeline, a map, a job pipeline, a résumé
-builder — are lenses over the same nodes and edges. Adding an interaction with a
+separate products - a contact list, a timeline, a map, a job pipeline, a résumé
+builder - are lenses over the same nodes and edges. Adding an interaction with a
 person changes what the reconnect list suggests, what the timeline shows, and
 which evidence is available to a résumé, because all four are reading the same
 rows.
@@ -70,8 +70,8 @@ and the record does not leave the machine it is kept on.
 
 The private application is organised around five task-led areas rather than
 around the data model: a daily view, the network, career work, exploration, and
-the data itself, with settings and help alongside. A session is usually short —
-capture what just happened, look at what the day suggests, act on one thing —
+the data itself, with settings and help alongside. A session is usually short -
+capture what just happened, look at what the day suggests, act on one thing -
 with the long sessions reserved for tailoring a résumé or reconciling an import.
 
 ## Mechanics
@@ -84,7 +84,7 @@ validate against it and an unknown type is rejected at the boundary.
 
 | Tier | Count | What it covers |
 | --- | ---: | --- |
-| Career | 16 | People, organisations, roles, projects, skills, credentials, and the job-search records — posting, application, interview |
+| Career | 16 | People, organisations, roles, projects, skills, credentials, and the job-search records - posting, application, interview |
 | Life | 11 | The things that happen around the career: events, interactions, tasks, goals, habits, writing, links, documents |
 | Long-tail | 7 | Places, trips, media, highlights, assets, health logs, accounts |
 
@@ -104,10 +104,10 @@ it does.
 
 ### One envelope, per-type contents
 
-Every node carries the same envelope regardless of type — title, optional
+Every node carries the same envelope regardless of type - title, optional
 subtitle, notes, a start and end date with an explicit precision, a status, a
 pinned flag, a sensitivity marker, a provenance source with a reference, and a
-confidence between 0 and 1 — and puts everything type-specific in `props`,
+confidence between 0 and 1 - and puts everything type-specific in `props`,
 validated by a schema chosen by the node's type. Edges carry a matching
 envelope with a source, a destination and an `is_current` flag.
 
@@ -130,7 +130,7 @@ none impure, and none unreferenced by the product. That last figure matters more
 than the first: an algorithm nothing calls is a paper claim, and the catalog is
 generated precisely so the claim cannot outlive the call site.
 
-The named ones are ordinary, published techniques rather than novel ones —
+The named ones are ordinary, published techniques rather than novel ones -
 Hawkes tie strength, Personalized PageRank, BM25F keyword weighting,
 Fellegi-Sunter record linkage, budgeted submodular selection. Choosing
 well-understood methods is part of the same decision as choosing determinism:

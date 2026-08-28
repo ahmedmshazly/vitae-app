@@ -1939,7 +1939,7 @@
     "/letters/{id}/finalize": {
       "post": {
         "operationId": "finalizeLetter",
-        "summary": "Compile and keep the PDF and source as this letter’s artifacts",
+        "summary": "Compile and keep the PDF and source as this letter's artifacts",
         "tags": [
           "letters"
         ],

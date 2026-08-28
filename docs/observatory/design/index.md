@@ -18,8 +18,8 @@ glow, no glass, and one easing curve for every animation in the product. The
 whole colour budget is spent on data and on outcomes, so nothing is left over
 for decoration.
 
-This section explains why the constraints are the shape they are, and — more
-usefully — which of them a machine will actually stop you from breaking.
+This section explains why the constraints are the shape they are, and - more
+usefully - which of them a machine will actually stop you from breaking.
 
 ## The pages
 
@@ -49,8 +49,8 @@ easing curve, a duration off the token scale, travel on hover, a raw hex outside
 the definition file, and three of Tailwind's stock animations. It runs in
 continuous integration, so each of those is a rule with teeth.
 
-Everything else in this section — composition, hierarchy, when a card is
-allowed, whether a state is announced — is convention. Each page says which of
+Everything else in this section - composition, hierarchy, when a card is
+allowed, whether a state is announced - is convention. Each page says which of
 the two it is describing, because a reader deciding how hard to push back
 deserves to know whether the answer is "a person disagreed with you" or "the
 build will not go green".

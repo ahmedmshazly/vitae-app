@@ -63,7 +63,7 @@ is a build problem, not something you can fix from the browser.
 ## Signing in
 
 Open `/signin`. While the browser is being checked for an existing session you
-see the sign-in screen with its buttons skeletonised rather than a spinner —
+see the sign-in screen with its buttons skeletonised rather than a spinner -
 resolving the session reveals the door instead of replacing one screen with
 another.
 
@@ -73,7 +73,7 @@ picked a billing period, it carries that choice through to the billing screen
 after the account exists. The choice is carried, not trusted: price and access
 are decided by the server.
 
-If sign-in fails, the reason is shown in words — a closed popup, the wrong
+If sign-in fails, the reason is shown in words - a closed popup, the wrong
 account, an unauthorised domain. If the account signed in but its workspace
 could not be prepared, you stay at the door with *"Workspace setup needs
 attention"* rather than being dropped into a half-built workspace.
@@ -90,13 +90,13 @@ three moves and then gets out of the way:
 | `⌘P` | Search records, jump to a workspace, or run an action |
 
 Dismissing it sets a flag in this browser's local storage, so it does not come
-back. It is not an onboarding wizard and there is nothing to complete in it —
+back. It is not an onboarding wizard and there is nothing to complete in it -
 the resumable checklist lives on Today instead.
 
 ## Today, and the setup ledger
 
-`/today` is the agenda, not a dashboard. It answers one question — what needs
-me now — and it is organised in that order: a single prioritised queue called
+`/today` is the agenda, not a dashboard. It answers one question - what needs
+me now - and it is organised in that order: a single prioritised queue called
 **Needs you** that merges reminders, open tasks and near deadlines by how
 overdue each is; then the two daily rituals, **Habits** and **Reconnect**; then
 everything that is only a number, under **How things stand**.
@@ -108,15 +108,15 @@ Above the agenda, while setup is incomplete, sits a checklist driven by real
 state rather than by clicks. Its six steps are the shortest path to a graph
 that does something:
 
-1. **Set up your profile** — your "self" record anchors everything.
-2. **Add someone you know** — people power relationship context and reconnect
+1. **Set up your profile** - your "self" record anchors everything.
+2. **Add someone you know** - people power relationship context and reconnect
    nudges.
-3. **Log an interaction** — a chat, coffee or call, which is what updates
+3. **Log an interaction** - a chat, coffee or call, which is what updates
    cadence.
-4. **Connect GitHub** — repositories become records, and their primary
+4. **Connect GitHub** - repositories become records, and their primary
    languages become skills.
-5. **Add résumé evidence** — reusable achievement statements.
-6. **Build a résumé** — turn a job description into a tailored one-pager.
+5. **Add résumé evidence** - reusable achievement statements.
+6. **Build a résumé** - turn a job description into a tailored one-pager.
 
 The checklist hides itself once complete and can be dismissed before then. Each
 step is a link into the screen that satisfies it, so you can leave it half-done
@@ -128,8 +128,8 @@ The top bar carries a **View demo** control. It switches the whole application
 to a separate demo data space holding a sample graph for a fictional engineer,
 Jordan Kim: organisations, people, roles, projects, skills, applications,
 interviews, atoms and a finalised résumé. A banner stays on screen the whole
-time — *"You are exploring Jordan's sample graph. Your records remain
-untouched."* — with a control to return.
+time - *"You are exploring Jordan's sample graph. Your records remain
+untouched."* - with a control to return.
 
 The space is carried on every request, so switching also clears the cached
 query results and returns you to the home route. Nothing you do in the demo
@@ -164,9 +164,9 @@ The markers are the same everywhere:
 | `@@name` | an organisation, read the same way |
 | `#word` | a tag, lowercased |
 | `^date` | a date: `^2026-09-12`, `^today`, `^tomorrow`, `^yesterday`, or a weekday such as `^fri` |
-| `!p1`–`!p4` | a priority |
+| `!p1`-`!p4` | a priority |
 | `> text` | everything after the first `>` is a note |
-| a bare `https://…` | a URL, and with no leading key it makes the record a link |
+| a bare `https://...` | a URL, and with no leading key it makes the record a link |
 
 > [!WARNING]
 > The priority token is `!p2`, with the `p`. The task example shown in the
@@ -174,7 +174,7 @@ The markers are the same everywhere:
 > priority — it ends up as part of the title instead. This is a defect in the
 > example, not in the grammar.
 
-The leading keys cover the record types you capture most often — `p` person,
+The leading keys cover the record types you capture most often - `p` person,
 `o` organisation, `t` task, `i` idea, `j` journal entry, `e` event, `int`
 interaction, `m` media, `l` link, `k` skill, `g` goal, `h` habit, and `n` to
 append a note to the record you last looked at. Leave the leading key off and
@@ -195,7 +195,7 @@ search over everything in the graph. Matching ignores accents, so typing
 `resume` finds *Résumé*.
 
 Type the name you just captured, press Enter on it, and you land on the record.
-That round trip — capture, find, open — is the loop the rest of the product is
+That round trip - capture, find, open - is the loop the rest of the product is
 built on.
 
 ## Give the fact somewhere to belong
@@ -232,8 +232,8 @@ The left rail holds six workspaces, and every screen belongs to exactly one:
 | Settings | Identity and system controls |
 
 Below them sits **Help & shortcuts** at `/help`, which is one screen: the four
-keyboard shortcuts, the four-word model the product is built on — records,
-connections, traces, lenses — and a link into the entity catalogue that lists
+keyboard shortcuts, the four-word model the product is built on - records,
+connections, traces, lenses - and a link into the entity catalogue that lists
 every record and connection type the system knows. The catalogue describes the
 schema rather than your data, so it needs no account.
 

@@ -45,24 +45,24 @@ a statement, and the capabilities it crosses.
 
 | Journey | State | Crosses |
 | --- | --- | --- |
-| `J1` — capture a person in under a minute | Verified end to end | `CAP-CAPTURE`, `CAP-SEARCH` |
-| `J2` — keep a valued tie warm | Verified end to end | `CAP-RELATIONSHIPS` |
-| `J3` — bring the past in without wrecking the graph | Verified end to end | `CAP-IMPORT`, `CAP-IDENTITY` |
-| `J4` — turn a job description into a tailored résumé | Verified end to end | `CAP-RESUME` |
-| `J5` — prove it with a dossier | Planned | `CAP-DOSSIER`, `CAP-PROV`, `CAP-RESUME` |
-| `J6` — leave with everything | Partial: export half named in its spec; restore is the drill | `CAP-EXPORT` |
-| `J7` — see the correspondence truth | Verified end to end | `CAP-COMMS`, `CAP-RELATIONSHIPS` |
-| `J8` — recover a deleted record from trash | Verified end to end | `CAP-ORGANIZE`, `CAP-DATA-CORE` |
+| `J1` - capture a person in under a minute | Verified end to end | `CAP-CAPTURE`, `CAP-SEARCH` |
+| `J2` - keep a valued tie warm | Verified end to end | `CAP-RELATIONSHIPS` |
+| `J3` - bring the past in without wrecking the graph | Verified end to end | `CAP-IMPORT`, `CAP-IDENTITY` |
+| `J4` - turn a job description into a tailored résumé | Verified end to end | `CAP-RESUME` |
+| `J5` - prove it with a dossier | Planned | `CAP-DOSSIER`, `CAP-PROV`, `CAP-RESUME` |
+| `J6` - leave with everything | Partial: export half named in its spec; restore is the drill | `CAP-EXPORT` |
+| `J7` - see the correspondence truth | Verified end to end | `CAP-COMMS`, `CAP-RELATIONSHIPS` |
+| `J8` - recover a deleted record from trash | Verified end to end | `CAP-ORGANIZE`, `CAP-DATA-CORE` |
 
 Between them, the eight journeys cross twelve of the nineteen capabilities.
-Seven remain journey-less — foundation, platform, and operate by their
+Seven remain journey-less - foundation, platform, and operate by their
 cross-cutting nature; auth, career, explore, and the hosted plane as honest
 gaps a future journey may still claim.
 
 ## The five that were empty rows
 
 Until 2026-08-26, `J2`, `J3`, `J5`, `J6` and `J7` existed only because the
-numbering said they did — empty rows with status `unknown`, held open because
+numbering said they did - empty rows with status `unknown`, held open because
 inventing a statement would have been indistinguishable from recovering one.
 That refusal was recorded as `DOC-D-029` in the
 [documentation inventory](../meta/index.md).
@@ -71,7 +71,7 @@ That refusal was recorded as `DOC-D-029` in the
 the five statements were *authored* as product decisions, marked authored in
 the register, never presented as recovered. Two distinctions keep the entries
 honest. A journey whose steps all ship but whose identifier appears in no spec
-title is `partial` — the register does not claim end-to-end coverage it cannot
+title is `partial` - the register does not claim end-to-end coverage it cannot
 point to, even where dedicated specs exercise every step unnamed. A journey
 that rides on capabilities registered as intent is `planned`. Each journey's
 stories, with acceptance criteria citing the requirement register, live in
@@ -107,7 +107,7 @@ the browser suite.
 
 The register gives `J1` a target of sixty seconds, and the header of the spec
 file states it. No test enforces it. The spec asserts the steps complete, not the
-elapsed time, and the file's own configured ceiling is 120 seconds — a budget for
+elapsed time, and the file's own configured ceiling is 120 seconds - a budget for
 a journey that waits on a search index and a PDF compile, not a performance
 target.
 
@@ -126,7 +126,7 @@ Playwright over the whole `e2e/tests` directory: 45 spec files and 250 cases, th
 entire browser acceptance suite. The three named journeys are three of those
 cases.
 
-The suite runs single-worker and not in parallel, deliberately — the journeys
+The suite runs single-worker and not in parallel, deliberately - the journeys
 share one data space and mutate the same graph, so parallel files race on drafts
 and the search index and can starve the single API process during a compile.
 Continuous integration allows one retry, because the stack under test is real and
@@ -135,7 +135,7 @@ a cold-start hiccup is not a product defect.
 ## What keeps a coverage claim honest
 
 `scripts/check-docs-traceability.mjs` fails the build if a journey names an
-end-to-end spec that does not exist, and — the check that matters — if the
+end-to-end spec that does not exist, and - the check that matters - if the
 journey's identifier cannot be found anywhere inside the spec it names. A path
 that happens to exist is not evidence. The identifier has to be in the file, which
 in practice means in the test title, where a person renaming the test will see it.

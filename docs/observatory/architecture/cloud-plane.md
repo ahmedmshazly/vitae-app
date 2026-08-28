@@ -39,7 +39,7 @@ related: [ARC-PERSISTENCE, ARC-SECURITY, ARC-REQUEST, ARC-OVERVIEW]
 Vitae has a complete hosted-service layer in the repository: a tenant partition
 on every stored record, a control plane that owns identities, memberships and
 subscription lifecycle, a checkout path, and a signed webhook receiver that is
-the only thing allowed to grant paid access. It is switched off — a default
+the only thing allowed to grant paid access. It is switched off - a default
 build does not enable it, the public surface refuses to present itself as
 launched without several deliberately configured values, and nothing here
 asserts that a hosted service is operating.
@@ -72,8 +72,8 @@ returning from a checkout page proves nothing. The only thing that changes what
 a workspace may do is a webhook whose signature verified, applied inside a
 transaction that also records the event exactly once.
 
-The lifecycle moves forward on its own. Access states expire — a trial ends, a
-payment grace period ends — and rather than depending on a scheduled worker
+The lifecycle moves forward on its own. Access states expire - a trial ends, a
+payment grace period ends - and rather than depending on a scheduled worker
 that might not have run, the expiry transition is evaluated when a request
 resolves its workspace. It is idempotent, so a missed job cannot leave a lapsed
 workspace writable.
@@ -90,8 +90,8 @@ rewriting their documents: real rows to a claimable legacy workspace, demo rows
 to an unassigned system workspace, both seeded by the same migration.
 
 That index alone was not enough. As long as the legacy `(space, id)` pair
-remained each table's primary key, a singleton document — one whose identifier
-is a fixed string, such as the search generation marker — would collide between
+remained each table's primary key, a singleton document - one whose identifier
+is a fixed string, such as the search generation marker - would collide between
 two tenants. `009-workspace-primary-keys` therefore promotes the existing
 unique index to be the primary key of every document table, drops the old one,
 and replaces the legacy child foreign keys with workspace-aware equivalents in
@@ -119,7 +119,7 @@ Four layers, in the order a request meets them.
 2. **Async context.** The resolved workspace is placed in async-local storage
    for the rest of the request. The repository reads it on every call rather
    than caching it, filters every read and every write on it, and directs its
-   upserts at the tenant key — the migration comment is explicit that
+   upserts at the tenant key - the migration comment is explicit that
    conflicting on the legacy key could let a reused identifier overwrite
    another tenant's row.
 3. **The database.** The primary key and the foreign keys make cross-tenant
@@ -143,8 +143,8 @@ caller to wrap the work in `runInWorkspace` with an identifier it supplies
 itself.
 
 The two maintenance paths that exist today do this correctly and are worth
-reading as the pattern: the retention purge — both the daily interval on the
-running process and the command-line script — asks the control plane for the
+reading as the pattern: the retention purge - both the daily interval on the
+running process and the command-line script - asks the control plane for the
 active non-system workspaces and wraps each one, falling back to the legacy
 two-space behaviour when the hosted mode is off. Any new job must do the same;
 nothing enforces it, and forgetting it is not an error but a silent operation on
@@ -194,8 +194,8 @@ identity endpoint beside it is, because it creates a private workspace and
 starts a trial. It refuses when a verified email already belongs to a different
 account identifier, rather than merging two people. A first-time user gets
 exactly one personal workspace on a trial. The configured legacy owner gets a
-one-time claim on the pre-Cloud graph — taking ownership of the legacy workspace
-if and only if it is still unowned — rather than a silent copy of the data.
+one-time claim on the pre-Cloud graph - taking ownership of the legacy workspace
+if and only if it is still unowned - rather than a silent copy of the data.
 Billing control rows are created before any checkout is requested, so the
 workspace's own record of its state exists even if the person closes the
 checkout overlay. Every branch writes a lifecycle event.
@@ -238,7 +238,7 @@ A verified event is then applied in one transaction:
    event there is no subscription row to lock, so serialisation would not hold
    under concurrent delivery.
 4. Order by the provider's own timestamp. Once a timestamp has been recorded, an
-   older — or an entirely un-timestamped — retry can only be audit evidence; it
+   older - or an entirely un-timestamped - retry can only be audit evidence; it
    must never roll a customer's entitlement backwards. The column and its index
    were added by a follow-up migration precisely for this.
 5. Upsert the customer and subscription records, then apply the derived access
@@ -303,9 +303,9 @@ The documentation corpus is deliberately outside all of this: it is served only
 to `OWNER_EMAIL` whatever mode the deployment is in. See
 [Trust boundaries and data handling](security.md).
 
-**Is not built at all:** a lifecycle worker — expiry is evaluated on the request
+**Is not built at all:** a lifecycle worker - expiry is evaluated on the request
 path and nothing runs on a schedule; a cross-instance export lease; a workspace
-switcher in the browser — the middleware accepts a workspace header, and no
+switcher in the browser - the middleware accepts a workspace header, and no
 client in the repository sends one, so a person with two memberships would
 always get the older; and the incident-response runbook that
 `docs/CLOUD-LAUNCH.md` requires.

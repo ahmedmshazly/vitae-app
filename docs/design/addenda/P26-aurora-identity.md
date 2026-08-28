@@ -1,4 +1,4 @@
-# SUPERSEDED — P26: "Aurora Signal" product identity (2026-07 rebrand)
+# SUPERSEDED - P26: "Aurora Signal" product identity (2026-07 rebrand)
 
 > **Superseded by the 2026-08 "Quiet" identity. Do not implement anything on
 > this page.** Quiet is specified in [`../brand-book.html`](../brand-book.html),

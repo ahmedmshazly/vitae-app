@@ -34,8 +34,8 @@ decision downstream follows from it.
 
 The person who runs an installation is called the operator throughout this
 repository. They are assumed to be an experienced professional with a long
-history worth connecting — enough past roles, projects and relationships that
-remembering them unaided has stopped working — and enough concern about where
+history worth connecting - enough past roles, projects and relationships that
+remembering them unaided has stopped working - and enough concern about where
 that history goes that running the software themselves is worth the effort.
 
 The operator does everything: captures records, resolves duplicates, decides
@@ -62,9 +62,9 @@ computed, notes.
 This puts a real obligation on the operator rather than on the software, and the
 repository says so directly: a self-hosted deployment is operated by its owner,
 who is responsible for access control, retention and lawful handling of the data
-in it. The product supplies the tools that make that possible — a sensitivity
+in it. The product supplies the tools that make that possible - a sensitivity
 flag on every record, a real-and-demo split for anything that will be shared, a
-full export, and a purge that actually deletes — but it cannot supply the
+full export, and a purge that actually deletes - but it cannot supply the
 judgement.
 
 ### Who this documentation is written for
@@ -82,10 +82,10 @@ self-hosted install.
 A hosted offering is designed and partly built, and it is not open. Its intended
 customer is P1, the deliberate mover: an experienced professional preparing a
 deliberate career move, who already has meaningful work and relationships but
-needs those facts connected before an opportunity arrives — explicitly not
+needs those facts connected before an opportunity arrives - explicitly not
 someone managing a sales pipeline, recruiting a team, or generating generic
 résumés at volume. P2 and P3 shape retention and expansion rather than the
-launch pitch, and P4 never pays by design — the flywheel that keeps the paid
+launch pitch, and P4 never pays by design - the flywheel that keeps the paid
 product honest.
 
 Read that as a design brief rather than as a description of anyone being served.
@@ -101,7 +101,7 @@ In a default build the request gate admits exactly one address. `authGate` in
 `apps/api/src/middleware/auth.ts` resolves the caller's identity from either a
 verified Google sign-in or a local development session, and then compares the
 resulting email against a single configured owner address. Anything else is
-refused with a deliberately neutral message — the response never reveals what the
+refused with a deliberately neutral message - the response never reveals what the
 allow-list contains, so an unauthorised caller learns nothing about who the
 operator is.
 

@@ -53,7 +53,7 @@ six jobs, one of which cannot run on this repository at all today.
 | Production build | `pnpm build`, an assertion that the SPA exists, `test:performance` with budgets required, the digest-pin guard, the API image build, a vulnerability scan of that image, and an SPDX bill of materials |
 | API integration (Postgres) | `test:contract`, `test:security`, `test:resilience`, then the whole API suite against a Postgres service |
 | LaTeX line-model calibration | Builds the compiler image and recompiles the calibration fixtures with the network disabled |
-| E2E journeys (Playwright) | The full stack — Postgres, auth emulator, compiler container, API, built web — then the browser suite |
+| E2E journeys (Playwright) | The full stack - Postgres, auth emulator, compiler container, API, built web - then the browser suite |
 
 The dependency-review job is conditioned on `github.event.repository.private
 == false`. The action it calls needs a licence that is not available to a
@@ -74,7 +74,7 @@ in this repository.
 Runs `tsc --noEmit` in every workspace that declares the script: `@vitae/api`,
 `@vitae/web`, `@vitae/core`, `@vitae/testkit` and `@vitae/ui`. Three workspaces
 declare no `typecheck` script, and what happens to them is not the same in each
-case — see [where the gates do not reach](#where-the-gates-do-not-reach).
+case - see [where the gates do not reach](#where-the-gates-do-not-reach).
 
 There is no exception mechanism. `strict` is on repository-wide, along with
 `noUncheckedIndexedAccess`, `noImplicitOverride` and
@@ -88,20 +88,20 @@ ignored explicitly because ESLint does not read `.gitignore`.
 
 Most rules are warnings. Two are errors, and they are scoped to `apps/api`
 because they need type information and are slow: `no-floating-promises` and
-`await-thenable`. The first is the one that matters — the repository's
+`await-thenable`. The first is the one that matters - the repository's
 `stage*` methods are async, and an un-awaited call inside a transaction is a
 write that can land after the transaction has committed or rolled back, which
 `tsc` will not tell you about.
 
-Three React Compiler diagnostics — `set-state-in-effect`, `refs` and
-`immutability` — are deliberately set to `warn` rather than `error`, because
+Three React Compiler diagnostics - `set-state-in-effect`, `refs` and
+`immutability` - are deliberately set to `warn` rather than `error`, because
 they fire on screens that predate the compiler and are already scheduled for
 rework. The configuration records the exact counts and states the rule: the
 number only moves down. Do not add new ones.
 
 ## Repository hygiene
 
-### `pnpm test:map` — source-to-test ownership
+### `pnpm test:map` - source-to-test ownership
 
 **Enforces** that every production module has either a test beside it or an
 entry in `docs/testing/source-test-map.json`, and that no entry claims a module
@@ -118,37 +118,37 @@ itself](testing.md#what-counts-as-a-test-beside-it).
 
 **Exception**: add the module to the map with an empty `tests` array and an
 `exclude_reason` sentence. Thirty-four entries currently take that route. A
-structural exemption — a whole class of file that should never be walked — goes
+structural exemption - a whole class of file that should never be walked - goes
 in `exclude_globs` instead.
 
 The script is invoked through a self-test that must pass first. That is not
 ceremony: this gate once printed `ok` unconditionally for months.
 
-### `pnpm test:prose` — prose in tests
+### `pnpm test:prose` - prose in tests
 
 **Enforces** that test titles and line comments carry no em or en dash and none
 of a short list of filler phrases, among them `comprehensive (test|suite|coverage)`,
 `leverages`, `seamless`, `furthermore` and `in conclusion`.
 
 **Scans** `packages/core/src`, `packages/testkit/src`, `packages/ui/src`,
-`apps/api/src`, `apps/web/src` and `e2e/tests` — every `*.test.*` and
+`apps/api/src`, `apps/web/src` and `e2e/tests` - every `*.test.*` and
 `*.spec.*` file, plus anything under a `helpers/` directory.
 
-**Fails** with `<file>:<line>: title|comment matches …`, printing the first
+**Fails** with `<file>:<line>: title|comment matches ...`, printing the first
 eighty findings and a count of the rest.
 
 **Exception**: `docs/testing/prose-allowlist.json`, which holds either whole
 file paths or substrings that may appear. The file's own note asks you to
 document the invariant rather than paste the glyph into every title.
 
-### `pnpm test:public` — pre-release identifiers
+### `pnpm test:public` - pre-release identifiers
 
 **Enforces** that no identifier from the private pre-release project reaches
 the public tree: the maintainer's handle and name, the private hostname, the
 maintainer's home directory path, and the brand names of a list of external
 coding assistants. It also refuses a tracked `.env` or `deploy/.env`.
 
-**Scans** every tracked file plus every untracked file `git` does not ignore —
+**Scans** every tracked file plus every untracked file `git` does not ignore -
 so a draft you have not staged is already in scope. It prints the number of
 files it read on success.
 
@@ -158,7 +158,7 @@ string fragments at runtime so the checker cannot flag its own source.
 **Exception**: none. There is no allow-list, by design. This catches known
 historical values and is not a substitute for secret scanning or review.
 
-### `pnpm test:brand` — the standing design bans
+### `pnpm test:brand` - the standing design bans
 
 **Enforces** the bans recorded in the identity documents: no gradients on
 chrome, no `backdrop-filter`, no blurred shadow that does not name an
@@ -190,9 +190,9 @@ the skeleton, and two print stylesheets where a literal colour is the point.
 > generated test catalog lists it among the scripts continuous integration
 > invokes. The finding was real when it was made and has been repaired.
 
-### `pnpm docs:check` — the documentation gates
+### `pnpm docs:check` - the documentation gates
 
-Five checkers, each preceded by its own self-test — ten self-tests in total
+Five checkers, each preceded by its own self-test - ten self-tests in total
 before the first real check runs. All five judge the corpus as it is written.
 None of them compiles it into what the reading surface fetches, and no other
 job does either; that hole is described under *Where the gates do not reach*.
@@ -224,7 +224,7 @@ job does either; that hole is described under *Where the gates do not reach*.
   mounts. The check that earns its place is the citations: every `path:line` a
   diagram cites must point at a line that still exists, so a diagram stops
   passing the moment the code it describes is refactored. A state the code
-  declares that nothing reaches is a finding rather than an error — it is
+  declares that nothing reaches is a finding rather than an error - it is
   marked `unreachable` with an explanation, and the gate then verifies that
   nothing has started reaching it.
 - **Traceability.** The requirement, capability and journey registers are
@@ -256,7 +256,7 @@ chunk within `largestChunkKb`, both read from `docs/testing/web-budgets.json`
 (6,000 kB and 1,500 kB today).
 
 The first check is the interesting one. Before it formed any opinion about
-size, this gate used to measure whatever was in `dist/` — and a `NODE_ENV` line
+size, this gate used to measure whatever was in `dist/` - and a `NODE_ENV` line
 in a local `.env` outranks the `production` that `vite build` sets for itself,
 so a local build could carry the development JSX runtime and the build
 machine's absolute source paths while passing at 98% of a limit it was not
@@ -290,8 +290,8 @@ as a build artifact.
 
 ### LaTeX line-model calibration
 
-Its own job. It builds the compiler image — which itself compiles every
-template twice, the second time with the network disabled — and then recompiles
+Its own job. It builds the compiler image - which itself compiles every
+template twice, the second time with the network disabled - and then recompiles
 the calibration fixtures offline. It fails when a template will not compile,
 when a fixture spills to a second page, or when a template's declared
 `lines_per_page` is more than three lines away from its measured capacity.
@@ -329,7 +329,7 @@ script to run and no error to report.
 
 Half of that is less serious than it sounds. The package publishes TypeScript
 source through its `exports` map, so every consumer's compiler follows it and
-type-checks it in passing — a deliberate type error in `packages/config/src/env.ts`
+type-checks it in passing - a deliberate type error in `packages/config/src/env.ts`
 does fail the root `pnpm typecheck`, by way of `@vitae/api`. The generated
 package catalog records it as type-checked transitively rather than directly.
 The other half stands: the package has no tests, and no gate would notice if it
@@ -344,7 +344,7 @@ as above. `@vitae/buildsvc` and `@vitae/e2e` are type-checked by nothing.
 `@vitae/buildsvc` is covered in practice: it declares `"build": "tsc"`, and
 `pnpm build` runs in the build job. `@vitae/e2e` is not covered at all. It
 declares neither `typecheck` nor `build`, and no workspace imports it, so its
-**250 cases** — the entire browser acceptance suite — are compiled only at the
+**250 cases** - the entire browser acceptance suite - are compiled only at the
 moment Playwright runs a file. A type error in a helper surfaces as a failing
 journey rather than as a failing type check.
 
@@ -370,7 +370,7 @@ pnpm docs:build
 ```
 
 Two smaller holes sit beside it. The compiled corpus is git-ignored, so
-`test:public` — which scans tracked and untracked-but-not-ignored files — never
+`test:public` - which scans tracked and untracked-but-not-ignored files - never
 sees it. And nothing fails a build that writes the corpus back under
 `apps/web/public/`, where it would be copied into the bundle and served to
 anyone; `.gitignore` still lists the old path, which stops it being committed
@@ -386,7 +386,7 @@ and stops nothing else.
 | `pnpm test:coverage` | V8 coverage for core and testkit |
 | `pnpm test:core` | `@vitae/core` on its own, which `test:unit` covers in the pipeline |
 
-Visual, mutation and coverage are opt-in by intention — the first needs a
+Visual, mutation and coverage are opt-in by intention - the first needs a
 running stack, the second is slow. `pnpm test` is not opt-in by intention; it is
 the invocation nothing calls.
 
@@ -416,8 +416,8 @@ those files asks for a reason rather than a suppression.
 | `test:performance` | `docs/testing/web-budgets.json` | a new number, and a note saying what the headroom is for |
 | `docs:check` coverage | `docs/registry/coverage.json` | a tightened ratchet; it may shrink and never grow |
 | `pnpm audit` | `pnpm.overrides` in the root manifest | a pinned version that clears the advisory |
-| `test:public` | nowhere | — |
-| `typecheck` | nowhere | — |
+| `test:public` | nowhere | - |
+| `typecheck` | nowhere | - |
 
 There is no inline suppression comment anywhere in this scheme. That is the
 point: an exception costs a sentence in a file somebody will read, rather than
@@ -427,7 +427,7 @@ a token on a line nobody will.
 
 [How this repository tests itself](testing.md) explains the layers these gates
 run, and the source-to-test map in full. [Setting up a working
-checkout](setup.md) has the commands. The three worked procedures —
+checkout](setup.md) has the commands. The three worked procedures -
 [an endpoint](add-an-endpoint.md), [a node or edge type](add-a-node-type.md),
-[a résumé template](add-a-resume-template.md) — each say which of these gates
+[a résumé template](add-a-resume-template.md) - each say which of these gates
 catches which mistake.

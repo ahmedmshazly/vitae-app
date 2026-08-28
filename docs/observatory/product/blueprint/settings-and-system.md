@@ -25,7 +25,7 @@ text, the credential that reports presence and never value (NFR-SEC-004).
 **Verdict: KEEP.** The self record and contact block; résumé defaults; the
 Ask weights auto-saving; the skill-alias taxonomy that teaches the parser.
 When Correspondence ships, its constants surface here the same way the Ask
-weights do — one constants editor pattern (FR-SET-004), no second idiom.
+weights do - one constants editor pattern (FR-SET-004), no second idiom.
 
 ## `/settings/system`
 
@@ -38,23 +38,23 @@ style at its best.
 **Verdict: SHARPEN.** Two bounded fixes:
 
 - **It joins the navigation.** The screen is in the route table, the
-  breadcrumb map, and the Settings tiles, but not `WORKSPACE_NAV.settings` —
+  breadcrumb map, and the Settings tiles, but not `WORKSPACE_NAV.settings` -
   so on a Cloud build it never appears in the workspace strip. An oversight,
   not a decision; it ends.
 - **The lifecycle explains itself in place.** The access-state chip and the
   trial register stay; each state names its next honest action (continue,
   update payment, export) beside the chip, not only in the banner.
 
-## The locked-workspace state — cross-cutting
+## The locked-workspace state - cross-cutting
 
 **Verdict: SHARPEN, product-wide.** The recorded gap: the server refuses
 writes on a locked workspace and the banner says so, but roughly sixty
-routes' write controls stay enabled — every one an invitation to a refusal.
+routes' write controls stay enabled - every one an invitation to a refusal.
 
 The better version is one shared answer, not sixty local ones: a
 `useCanWrite()` gate derived from the same access state the banner reads,
-disabling the write entry points — new-record menu, capture commit, form
-dialogs, bulk bars, per-screen primary actions — each with the lock explained
+disabling the write entry points - new-record menu, capture commit, form
+dialogs, bulk bars, per-screen primary actions - each with the lock explained
 at the control (NFR-OPS-002). Reads, export, billing, and sign-out stay
 untouched, which is the requirement's other half.
 
@@ -62,7 +62,7 @@ Acceptance: on a `read_only` workspace the cloud suite asserts controls are
 disabled with the lock named, not merely that the server refuses; on an
 `active` workspace nothing changes; the gate has no per-screen forks.
 
-## `/help` — Help and shortcuts
+## `/help` - Help and shortcuts
 
 **Verdict: SHARPEN.** The four shortcuts and the four-word model stay. Two
 small honesty fixes: the documentation surface's own palette (opened with

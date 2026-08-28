@@ -81,7 +81,7 @@ and swipe handling are the things most often reimplemented badly, and they have
 already been argued through once here.
 
 **The route target can hold focus.** The skip link points at the content region,
-which carries a negative tab index — the attribute that makes an element
+which carries a negative tab index - the attribute that makes an element
 focusable by script without adding a tab stop. Without it a skip link moves the
 viewport and leaves focus where it was, so the reader tabs and lands back at the
 top of the navigation they were trying to skip.
@@ -101,7 +101,7 @@ specs call it, at 41 call sites.
 
 Before each page scan the helper finishes every running animation and waits a
 frame. That is not a convenience: scanning mid-transition sampled half-opacity
-ink and reported contrast failures the settled screen never shows — a heading at
+ink and reported contrast failures the settled screen never shows - a heading at
 2.19:1, a primary button at 4.33:1. Infinite animations are skipped, because
 they have no end to jump to.
 
@@ -143,13 +143,13 @@ would assume. The defect this once hid has been fixed; the blind spot has not.
 
 **Contrast is only ever checked in the browser suite.** A component test can
 never fail on it, so a colour regression is invisible until a page scan reaches
-the screen that uses it — and the previous item lists screens no page scan
+the screen that uses it - and the previous item lists screens no page scan
 reaches.
 
 ### What to run when you change a shared pattern
 
 The unit and browser suites both matter here, and they check different things.
-Component scans catch structure — roles, names, nesting, labelling. Page scans
+Component scans catch structure - roles, names, nesting, labelling. Page scans
 catch what only a real browser knows: contrast, focus order through a rendered
 layout, and whether an overlay actually hid the page behind it. A change to a
 shared primitive deserves both, plus the design system's own suite, which
@@ -157,11 +157,11 @@ nothing else will run for you.
 
 ## Related
 
-- [Tokens and the scales they enforce](tokens.md) — the contrast floors,
+- [Tokens and the scales they enforce](tokens.md) - the contrast floors,
   control-boundary rule and target sizes this page depends on.
-- [Layout and component patterns](patterns.md) — the semantics the shared
+- [Layout and component patterns](patterns.md) - the semantics the shared
   primitives emit on your behalf.
-- [Loading, empty, error and unavailable](states.md) — the live-region
+- [Loading, empty, error and unavailable](states.md) - the live-region
   behaviour of every state a screen can be in.
-- [Motion, and why there is so little](motion.md) — reduced motion, and the five
+- [Motion, and why there is so little](motion.md) - reduced motion, and the five
   layers that have to agree about it.

@@ -59,7 +59,7 @@ which one won.
 
 Two notes for anyone who greps and finds a contradiction of their own.
 `pg_dump` appears in the architecture notes and in the earliest decision record
-as a *property of Postgres* — the reason a relational store was wanted — not as
+as a *property of Postgres* - the reason a relational store was wanted - not as
 a backup this system takes. R2 appears in a storage-adapter comment as a
 service Cloudinary could be swapped for; that is where attachments live, not
 where backups go.
@@ -82,9 +82,9 @@ would reach for them.
 
 | Tier | Mechanism | Reaches back | Covers | Restores into |
 | --- | --- | --- | --- | --- |
-| Point-in-time recovery | The managed database's automated backups | The provider's retention window — see below | A mistaken delete, a bad migration | The same provider only |
+| Point-in-time recovery | The managed database's automated backups | The provider's retention window - see below | A mistaken delete, a bad migration | The same provider only |
 | Manual snapshot | A snapshot taken deliberately before a risky change | Until you delete it | A change you know is risky | The same provider only |
-| Export archive | `scripts/backup-to-s3.sh` on a schedule | Whatever the bucket keeps — see below | Losing the provider account, vendor exit, format independence | Anything that can run this API |
+| Export archive | `scripts/backup-to-s3.sh` on a schedule | Whatever the bucket keeps - see below | Losing the provider account, vendor exit, format independence | Anything that can run this API |
 
 The first two are the fast ones and they are also the narrow ones: they restore
 to a new database instance at the same provider and nowhere else. The third is
@@ -94,7 +94,7 @@ format the system can read back rather than a vendor's internal representation.
 The recovery runbook records that the point-in-time window on the account it
 was written against is **one day, not the seven the design assumed**, because
 that account's plan caps it there. If that is still true, the export archive is
-not a nice-to-have — it is the only tier that reaches back further than
+not a nice-to-have - it is the only tier that reaches back further than
 yesterday. See *What cannot be confirmed here* below.
 
 ## Taking a backup
@@ -113,9 +113,9 @@ environment:
 BACKUP_S3_URI=s3://your-private-bucket/vitae pnpm backup:s3
 ```
 
-The objects land as `…/exports/YYYY-MM-DD/vitae-export.zip`, a
+The objects land as `.../exports/YYYY-MM-DD/vitae-export.zip`, a
 `backup-manifest.json` beside it recording the day, source, archive checksum
-and the sensitivity flag, and a plaintext `…/exports/LATEST` naming the most
+and the sensitivity flag, and a plaintext `.../exports/LATEST` naming the most
 recent day. Uploads are server-side encrypted with S3-managed keys by default,
 or with a customer-managed key if one is named; the script sets the encryption
 on the upload itself rather than relying on the bucket's default.
@@ -159,7 +159,7 @@ instance better.
 
 A GitHub Actions workflow used to do this job before the database moved. It was
 retired because a hosted runner has no route to a private database, and the
-workflow file is no longer in the repository — the link to it in the restore
+workflow file is no longer in the repository - the link to it in the restore
 drill runbook does not resolve. Do not go looking for it.
 
 ## Restoring
@@ -205,7 +205,7 @@ unzip vitae-export-<timestamp>.zip -d /tmp/vitae-bundle
 pnpm --filter @vitae/api restore /tmp/vitae-bundle
 ```
 
-The target database must already have the schema applied — see
+The target database must already have the schema applied - see
 [Running database migrations](migrations.md).
 
 ### Why the bundle is trustworthy
@@ -227,7 +227,7 @@ Document identities are preserved exactly. That is the property that makes the
 whole thing work: every record carries its original identity, so edges,
 revisions and atom references stay valid across the round trip. It is also why
 you must never replay the exported records through the ordinary creation
-endpoints as a restore path — creation assigns new identities and would orphan
+endpoints as a restore path - creation assigns new identities and would orphan
 every edge.
 
 The forced replacement path writes before it prunes rather than emptying the
@@ -245,7 +245,7 @@ The drill exports, verifies every checksum and count against the manifest,
 opens the human-readable vault tree to confirm records are legible without this
 software at all, restores into a fresh empty database, and then compares the
 restored instance's manifest counts against the bundle's and spot-checks a few
-real queries — a search, a person page, a résumé output.
+real queries - a search, a person page, a résumé output.
 
 `docs/runbooks/postgres-restore.md` applies in an emergency, and is the one to
 reach for when the question is "how do I get the database back". It carries the

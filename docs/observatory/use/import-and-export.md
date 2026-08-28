@@ -40,7 +40,7 @@ related: [USE-GRAPH, USE-SCREENS, USE-TROUBLE]
 # Getting data in and out
 
 The Data workspace holds one promise: your graph should be inspectable at every
-boundary — before an import writes anything, while identities are being
+boundary - before an import writes anything, while identities are being
 reconciled, and at the moment you take everything back out.
 
 The two halves of that promise work in opposite directions but follow the same
@@ -77,20 +77,20 @@ What happens to a file between choosing it and committing anything:
 DGM-IMPORT-PIPELINE
 ```
 
-1. **Choose source** — file, text, or a connected service.
-2. **Read safely** — parse the content and check each row against your existing
+1. **Choose source** - file, text, or a connected service.
+2. **Read safely** - parse the content and check each row against your existing
    records for identity collisions. Nothing is written.
-3. **Review evidence** — accept, skip, or reassign each staged row.
-4. **Commit or undo** — one batch is one recovery unit.
+3. **Review evidence** - accept, skip, or reassign each staged row.
+4. **Commit or undo** - one batch is one recovery unit.
 
-A staged batch is isolated from the graph. It has a status — staged,
-committed, discarded or rolled back — and until it is committed, discarding it
+A staged batch is isolated from the graph. It has a status - staged,
+committed, discarded or rolled back - and until it is committed, discarding it
 leaves the graph exactly as it was.
 
 ### Reviewing rows
 
 Each staged row shows what it parsed to, its confidence, and, where one was
-found, the existing record it probably duplicates — with the evidence for that
+found, the existing record it probably duplicates - with the evidence for that
 verdict and its weight, not only a percentage. You set each row to **accept**
 or **skip**.
 
@@ -124,7 +124,7 @@ the ones that were committed.
 ### When a file will not parse
 
 A file the parser cannot read is refused at staging with a message that names
-the problem — for an Aperture bundle, *"not valid JSON: expected a
+the problem - for an Aperture bundle, *"not valid JSON: expected a
 vitae.graph.bundle export"*, or a list of the specific field errors. Nothing is
 staged and nothing is written.
 [When something does not work](troubleshooting.md) covers the rest.
@@ -134,8 +134,8 @@ staged and nothing is written.
 `/data/identity` is the duplicate queue, and it is the screen to use instead of
 deleting one of a pair by hand.
 
-Candidates are scored with evidence you can read — shared emails, matching
-names, the same organisation — rather than an opaque similarity number, and a
+Candidates are scored with evidence you can read - shared emails, matching
+names, the same organisation - rather than an opaque similarity number, and a
 duplicate candidate requires shared evidence rather than name similarity alone.
 Probable pairs default toward caution, which means the screen asks rather than
 acts.
@@ -150,7 +150,7 @@ Each cluster walks four questions in order:
    shown before you commit.
 
 A merge tombstones the dropped record, rewires its relationships onto the
-survivor, and keeps the alternate name as a learned alias — which is why the
+survivor, and keeps the alternate name as a learned alias - which is why the
 screen has a **Learned aliases** panel. A merge is reversible for 30 days, and
 the undo refuses if the merged record has been edited since, rather than
 silently discarding that edit.
@@ -196,9 +196,9 @@ you are about to download is visible in advance.
 **Include sensitive records** is a switch, and the screen states exactly what
 each position costs:
 
-- **On** — *"This is a complete backup, the only export you can fully restore
+- **On** - *"This is a complete backup, the only export you can fully restore
   from. Store it somewhere you would store a password."*
-- **Off** — *"Safe to share: sensitive records and everything referencing them
+- **Off** - *"Safe to share: sensitive records and everything referencing them
   are left out, which also means this bundle cannot rebuild your database."*
 
 The exclusion is transitive. A share-safe bundle drops sensitive records *and
@@ -206,9 +206,9 @@ everything that references them*, which is why it cannot be a restore source.
 That is not a limitation to work around; it is what makes the share-safe bundle
 safe to share.
 
-The status line above reflects the choice while you are still deciding —
+The status line above reflects the choice while you are still deciding -
 *"Complete-backup scope selected · Includes sensitive records"* or *"Share-safe
-scope selected · Not a complete restore source"* — so the scope is never
+scope selected · Not a complete restore source"* - so the scope is never
 something you discover afterwards.
 
 ### Saved views as CSV
@@ -228,7 +228,7 @@ flight is refused with *"Another export is already running."* rather than
 producing two half-archives.
 
 Downloads go through the same authenticated transport as everything else,
-carrying your session and the current data space — so an export taken while you
+carrying your session and the current data space - so an export taken while you
 are viewing the demo space exports the demo space, not your real graph.
 
 ### Backup status
@@ -249,7 +249,7 @@ It is deliberately strict, and the strictness is the feature:
   *"checksum mismatch for [file], bundle is corrupt"*;
 - every per-collection count must match the file;
 - the bundle's schema version must be one this restore understands;
-- a **share-safe** export is refused outright — *"share-safe exports are
+- a **share-safe** export is refused outright - *"share-safe exports are
   intentionally incomplete; restore requires a full sensitive backup"*;
 - it refuses to write into a non-empty database unless explicitly forced.
 

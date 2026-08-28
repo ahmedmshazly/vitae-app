@@ -52,7 +52,7 @@ a flat list.
 | Around the edges | `CAP-OPERATE`, `CAP-PLATFORM`, `CAP-CLOUD` | Running an instance, the constraints that hold across every screen, and the hosted control plane |
 
 `CAP-PLATFORM` is the one that reads oddly and is doing the most work. It holds
-the cross-cutting behaviour no single screen owns — request correlation, error
+the cross-cutting behaviour no single screen owns - request correlation, error
 mapping, timezone handling, accessible overlays, the shared contracts, the rules
 that keep the graph read once per view. Without a row of its own, that behaviour
 would be attributed to whichever feature last touched it and would lose its
@@ -74,7 +74,7 @@ The spine has three links, and each one is a different kind of statement.
    the file and line. 134 files cite something; 352 citations exist in total.
    This link is mechanical and cannot be argued with.
 3. **File to kind of evidence.** Each citation is bucketed by where it was
-   found — production source, test, or document — because those are not equal
+   found - production source, test, or document - because those are not equal
    evidence. A citation in source shows the behaviour exists. A citation in a
    test shows something is protecting it. A citation in a document shows only
    that somebody wrote it down.
@@ -85,7 +85,7 @@ requirements, take each requirement's cited files.
 
 A worked example, in the relationship-intelligence capability. One of its
 requirements is cited from an API route, the screen that renders the result, the
-ranking algorithm itself, and two shared components — and from one algorithm
+ranking algorithm itself, and two shared components - and from one algorithm
 test. Four production citations and one test citation, so the generator classes
 it as implemented and tested, and a maintainer changing the ranking has the five
 places to look handed to them.
@@ -105,7 +105,7 @@ false claim about test coverage.
 These measure where an *identifier is written*, not whether behaviour is covered.
 A capture requirement is cited from a route, a service, a screen and the capture
 grammar module, and from no test file at all, so it counts as
-`implemented-untested` — while the generated algorithm catalog reports that
+`implemented-untested` - while the generated algorithm catalog reports that
 same grammar module has tests, along with every other algorithm module. The
 behaviour is covered; the citation is missing from the test.
 
@@ -130,7 +130,7 @@ because splitting a range into individual statements would be inventing product
 claims.
 
 **Two capabilities have no requirements.** `CAP-FOUNDATION` and `CAP-CAREER`
-both join to an empty list. For the foundation that is expected — a monorepo and
+both join to an empty list. For the foundation that is expected - a monorepo and
 a continuous-integration pipeline are not the sort of thing anyone wrote a
 numbered requirement for. For career tracking it is a real gap: applications,
 the pipeline overview and the application dossier are shipped, reachable
@@ -144,8 +144,8 @@ along with the missing architecture decision record it implies.
 
 **The `surfaces` field is not machine-checked.** Each row lists the routes
 through which its capability is reached. Seven of the entries used to name
-paths the router does not mount — an earlier information architecture the route
-tree moved past — and were corrected against `docs/generated/routes.json` on
+paths the router does not mount - an earlier information architecture the route
+tree moved past - and were corrected against `docs/generated/routes.json` on
 2026-08-26. No gate holds them there: a future route move can silently strand
 them again, so treat a `surfaces` value as a claim to spot-check against
 `docs/generated/routes.json`, not as a checked address.
