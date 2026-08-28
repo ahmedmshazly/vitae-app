@@ -1032,7 +1032,7 @@ Status: implemented · Evidence: cited by documents only · Provenance: reconstr
 
 > Authored 2026-08-26 as a product decision under ADR 0007, not recovered from a citation. Enforced by the end-to-end ratchets in docs/testing/e2e-ratchets.json, which check accessibility coverage by screen, and by the list equivalents the explore surfaces ship; the enforcing files do not cite this identifier, so the attribution is recorded here.
 
-#### NFR-MNT-002: The module boundary is enforced, not merely agreed
+#### NFR-MNT-002: The module boundary is enforced rather than agreed
 
 No workspace outside packages/core may import another workspace's internal modules. The boundary must be machine-enforced so that a violation fails the build rather than depending on review to notice it.
 

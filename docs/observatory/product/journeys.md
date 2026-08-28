@@ -86,7 +86,7 @@ single-page application against the real API and Postgres.
 line naming a person with an organisation, a tag, a date and a note, checks the
 parse appears as preview chips, commits it, and then finds the new record through
 the fuzzy quick-switcher. Finding it afterwards is the point: it is the step that
-proves the write reached the search index and not merely the database.
+proves the write reached the search index as well as the database.
 
 **J4** opens the tailoring surface, starts a target session, pastes a job
 description, parses it into weighted keywords, auto-selects evidence against the

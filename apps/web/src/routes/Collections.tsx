@@ -48,7 +48,7 @@ export function Collections() {
   const [params, setParams] = useSearchParams();
   const q = params.get('q') ?? '';
   const queryTokens = tokens(q);
-  /** A query the results request will actually run, not just any `?q=`. */
+  /** A query the results request will actually run, rather than any `?q=`. */
   const active = q.trim().length > 0;
   const [draft, setDraft] = useState('');
   const qc = useQueryClient();

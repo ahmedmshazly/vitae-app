@@ -427,7 +427,7 @@ All seven first-party packages are undocumented at their root: `packages/core`,
 
 `NFR-A11Y-001` is not in `docs/registry/requirements.json`, is not in that file's
 `id_aliases`, and does not appear anywhere in `docs/generated/traceability.json`.
-It is not merely undefined - it cannot be read. Both patterns in
+It is undefined, and it cannot be read at all. Both patterns in
 `scripts/docs/lib/citations.mjs:19` spell a family name as uppercase letters
 only:
 

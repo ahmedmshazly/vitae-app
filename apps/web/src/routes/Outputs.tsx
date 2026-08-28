@@ -280,8 +280,8 @@ export function Outputs() {
           options={TEMPLATE_OPTIONS}
         />
         {/* The count is the only report that a keystroke changed the register,
-            and nothing moves focus when it does, so it has to be announced and
-            not merely redrawn. Mounted whatever the state: a live region
+            and nothing moves focus when it does, so it has to be announced
+            rather than redrawn. Mounted whatever the state: a live region
             created together with its first message is one nothing was
             watching. */}
         <Mono className="u-faint" role="status" aria-live="polite" aria-label="Outputs shown">

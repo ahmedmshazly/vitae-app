@@ -1239,7 +1239,7 @@
       "id": "NFR-MNT-002",
       "capability": "CAP-PLATFORM",
       "kind": "non-functional",
-      "title": "The module boundary is enforced, not merely agreed",
+      "title": "The module boundary is enforced rather than agreed",
       "statement": "No workspace outside packages/core may import another workspace's internal modules. The boundary must be machine-enforced so that a violation fails the build rather than depending on review to notice it.",
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",

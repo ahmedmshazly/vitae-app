@@ -43,7 +43,7 @@ function renderControls(drawerOpen: boolean) {
 }
 
 describe('the observatory cockpit drawer', () => {
-  it('is inert while closed, not merely hidden from the accessibility tree', () => {
+  it('is inert while closed, rather than only hidden from the accessibility tree', () => {
     const { container } = renderControls(false);
     const drawer = container.querySelector('.ec-observatory-drawer');
 

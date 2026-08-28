@@ -111,7 +111,7 @@ describe('SignIn, pending and failure', () => {
     expect(screen.getByRole('button', { name: /Developer sign-in/ })).toBeDisabled();
   });
 
-  it('reports a failed sign-in with a word and a glyph, not just a colour', async () => {
+  it('reports a failed sign-in with a word and a glyph, never a colour alone', async () => {
     const user = userEvent.setup();
     auth.signInGoogle = vi
       .fn()

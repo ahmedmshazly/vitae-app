@@ -123,8 +123,8 @@ link. Scoping the target to the main region gives the link the name a person
 would give it and keeps the actions operable. Row actions therefore sit beside
 the row's link, never inside it.
 
-Selection is the other decision the component makes. A selected row is not just
-a background and a bar; `Row` emits `aria-selected` when the caller gave it a
+Selection is the other decision the component makes. A selected row carries more
+than a background and a bar; `Row` emits `aria-selected` when the caller gave it a
 role from a selectable collection, and `aria-current` otherwise - which is the
 honest meaning of a master-and-detail list - and it also grows a check glyph and
 the word for its state, so the selection survives being read without colour.

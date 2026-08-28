@@ -190,7 +190,7 @@ export function Duplicates() {
     <div className="page dedup-page data-workspace-page data-identity-page">
       <PageHeader
         title="Identity audit"
-        subtitle="Explainable matching across every entity type. Vitae suggests; you decide."
+        subtitle="Explainable matching across every record type. Vitae suggests; you decide."
         help={
           <InfoPopover title="How matching works">
             <p>
@@ -362,7 +362,7 @@ export function Duplicates() {
               </strong>
               <span>
                 <Mono>{probable}</Mono> probable across <Mono>{typeCount}</Mono>{' '}
-                {typeCount === 1 ? 'entity type' : 'entity types'}
+                {typeCount === 1 ? 'record type' : 'record types'}
               </span>
             </div>
 

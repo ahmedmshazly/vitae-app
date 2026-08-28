@@ -1,4 +1,4 @@
-# Vitae Brand Assets (Quiet, 2026-08)
+# Vitae brand assets (quiet, 2026-08)
 
 Accent is brightness, not hue: ink `#FAFAF8` on ground `#0F0F0F`. Instrument Sans +
 IBM Plex Mono. The Weighted V mark is one closed path, two arm weights. Never coloured,

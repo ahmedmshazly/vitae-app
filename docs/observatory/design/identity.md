@@ -55,7 +55,7 @@ The superseded one to know about is **Aurora Signal**, specified in
 `docs/design/addenda/P26-aurora-identity.md`. It is the dangerous document in
 this repository for anyone starting from the design folder, because until this
 documentation was written its heading read as current guidance and its
-prescriptions are not merely out of fashion - they are refused by the build.
+prescriptions are out of fashion, and the build refuses them outright.
 Aurora asks for gradients on hero controls, a soft glow on hover, a cyan glow
 focus ring, ambient radial washes on the shell, spring easing with overshoot,
 and durations of 120/180/320ms. Each of those is a named failure in the ban

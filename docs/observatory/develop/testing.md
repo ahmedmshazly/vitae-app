@@ -27,7 +27,7 @@ related: [DEV, DEV-SETUP, DEV-WHERE, DEV-GATES, DEV-ENDPOINT, DEV-NODETYPE, DEV-
 
 There are 1,942 test cases in 307 files, and none of them are skipped or
 pending. They are organised into layers, each with its own command, and the
-layer is chosen by what a test needs in order to run rather than by what it is
+layer is chosen by what a test needs to run rather than by what it is
 about: a pure function gets a unit test, a route gets an integration test
 against a real Postgres, a screen gets a component test in a simulated browser,
 and a journey gets a real browser. On top of that sits an unusual second

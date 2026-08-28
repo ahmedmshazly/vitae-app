@@ -385,8 +385,8 @@ is byte-identical to the SPA shell. Not exposed.
 | `GET /api/v1/docs/index`, unauthenticated | **401** |
 
 The two 401s are the result worth having. Default-deny holds on the live system,
-and the private corpus is behind the owner allow-list in production - not merely
-in the source that was deployed.
+and the private corpus is behind the owner allow-list in production, rather than
+only in the source that was deployed.
 
 The 200 from `/ready` is stronger evidence than its body suggests, and the body
 is why this nearly became a false finding. It reports only a database check,

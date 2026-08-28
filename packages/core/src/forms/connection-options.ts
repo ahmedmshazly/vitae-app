@@ -69,7 +69,7 @@ const GROUP_ORDER: ConnectionOptionGroup[] = [
   'Other',
 ];
 
-/** Legal options for a node, derived from (not merely approximating) the API matrix. */
+/** Legal options for a node, derived from the API matrix rather than approximating it. */
 export function connectionOptionsFor(nodeType: NodeType): ConnectionOption[] {
   const options: ConnectionOption[] = [];
 

@@ -59,7 +59,7 @@ at the control (NFR-OPS-002). Reads, export, billing, and sign-out stay
 untouched, which is the requirement's other half.
 
 Acceptance: on a `read_only` workspace the cloud suite asserts controls are
-disabled with the lock named, not merely that the server refuses; on an
+disabled with the lock named, rather than only that the server refuses; on an
 `active` workspace nothing changes; the gate has no per-screen forks.
 
 ## `/help` - Help and shortcuts

@@ -29,13 +29,13 @@
   --ae-border-control: #727271; /* 3.98:1 canvas / 3.26:1 overlay */
 
   /* ── Ink (contrast measured against the lightest surface a value can
-     appear on, not merely against canvas) ── */
+     appear on, rather than against canvas) ── */
   --ae-fg-strong: #fafaf8; /* 18.3:1 canvas / 15.0:1 overlay */
   --ae-fg: #e8e8e6; /* 15.6:1 / 12.8:1, body text, default */
   --ae-fg-soft: #c9c9c6; /* 11.6:1 / 9.5:1, secondary prose */
   --ae-muted: #a3a3a0; /* 7.6:1 / 6.2:1, labels, inactive nav, metadata */
   /* Floor of the system, held above 4.5:1 against the lightest surface,
-     not merely the canvas. The lightest ground is --ae-accent-bg, the
+     rather than the canvas. The lightest ground is --ae-accent-bg, the
      selected-row fill, which is a step above --ae-surface-overlay and which
      the old value missed at 4.49:1. Do not darken. Nothing may go below this. */
   --ae-faint: #8f8f8c; /* 5.9:1 canvas / 4.9:1 overlay / 4.7:1 accent-bg */

@@ -57,8 +57,8 @@ describe('Combobox ARIA', () => {
     expect(input()).toHaveAttribute('aria-controls', listbox.id);
     expect(within(listbox).getAllByRole('option')).toHaveLength(3);
 
-    // The option the user moves to is announced by id, and marked, not merely
-    // tinted.
+    // The option the user moves to is announced by id, and marked rather than
+    // only tinted.
     await user.keyboard('{ArrowDown}');
     const first = options()[0]!;
     expect(input()).toHaveAttribute('aria-activedescendant', first.id);
