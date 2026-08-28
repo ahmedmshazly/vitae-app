@@ -2,8 +2,8 @@
   "generated_by": "scripts/docs/gen-traceability.mjs",
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
-    "files_scanned": 943,
-    "files_citing": 242,
+    "files_scanned": 946,
+    "files_citing": 244,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,7 +20,7 @@
   },
   "totals": {
     "registered": 131,
-    "citations": 917,
+    "citations": 920,
     "implemented_and_tested": 35,
     "implemented_untested": 57,
     "tested_only": 3,
@@ -38,6 +38,7 @@
       "evidence": "implemented-and-tested",
       "sources": [
         "apps/api/src/services/restore.ts:137",
+        "apps/api/src/services/storage/memory.ts:14",
         "apps/web/src/routes/ExportPage.tsx:53"
       ],
       "tests": [
@@ -53,7 +54,9 @@
         "docs/observatory/meta/coverage-and-contradictions.md:380",
         "docs/observatory/product/stories.md:163",
         "docs/observatory/product/stories.md:170",
-        "docs/observatory/use/import-and-export.md:24"
+        "docs/observatory/use/import-and-export.md:24",
+        "docs/testing/verification-2026-08-27.md:58",
+        "docs/testing/verification-2026-08-27.md:65"
       ]
     },
     "FR-002": {
@@ -2892,6 +2895,9 @@
       "NFR-SEC-002",
       "INT-5"
     ],
+    "apps/api/src/services/storage/memory.ts": [
+      "FR-001"
+    ],
     "apps/api/src/services/suggest.ts": [
       "FR-CAP-003"
     ],
@@ -3655,6 +3661,9 @@
     ],
     "docs/testing/e2e-review-2026-08-25.md": [
       "FR-016"
+    ],
+    "docs/testing/verification-2026-08-27.md": [
+      "FR-001"
     ],
     "e2e/tests/application-status.spec.ts": [
       "FR-CAR-003"

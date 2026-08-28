@@ -78,17 +78,17 @@
       "reads": [
         "scripts/ci-local.sh:101",
         "scripts/ci-local.sh:105",
-        "scripts/ci-local.sh:340",
-        "scripts/ci-local.sh:372",
-        "scripts/ci-local.sh:376",
-        "scripts/ci-local.sh:387",
-        "scripts/ci-local.sh:403",
-        "scripts/ci-local.sh:408",
-        "scripts/ci-local.sh:447",
-        "scripts/ci-local.sh:449",
-        "scripts/ci-local.sh:455",
-        "scripts/ci-local.sh:463",
-        "scripts/ci-local.sh:471"
+        "scripts/ci-local.sh:358",
+        "scripts/ci-local.sh:390",
+        "scripts/ci-local.sh:394",
+        "scripts/ci-local.sh:405",
+        "scripts/ci-local.sh:421",
+        "scripts/ci-local.sh:426",
+        "scripts/ci-local.sh:465",
+        "scripts/ci-local.sh:467",
+        "scripts/ci-local.sh:473",
+        "scripts/ci-local.sh:481",
+        "scripts/ci-local.sh:489"
       ],
       "read_by": [
         "deploy"
@@ -1196,8 +1196,8 @@
       "source": "apps/api/src/cloud/config.ts:47",
       "reads": [
         "apps/api/src/cloud/config.ts:47",
-        "scripts/ci-local.sh:459",
-        "scripts/ci-local.sh:472"
+        "scripts/ci-local.sh:477",
+        "scripts/ci-local.sh:490"
       ],
       "read_by": [
         "api",
@@ -1480,9 +1480,9 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/ci-local.sh:286",
+      "source": "scripts/ci-local.sh:304",
       "reads": [
-        "scripts/ci-local.sh:286"
+        "scripts/ci-local.sh:304"
       ],
       "read_by": [
         "deploy"
@@ -1684,10 +1684,10 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/ci-local.sh:400",
+      "source": "scripts/ci-local.sh:418",
       "reads": [
-        "scripts/ci-local.sh:400",
-        "scripts/ci-local.sh:404"
+        "scripts/ci-local.sh:418",
+        "scripts/ci-local.sh:422"
       ],
       "read_by": [
         "deploy"

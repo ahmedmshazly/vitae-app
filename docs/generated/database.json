@@ -114,7 +114,7 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 467,
+          "line": 2433,
           "test": false
         },
         {
@@ -245,9 +245,16 @@
         },
         {
           "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 3630,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 463,
+          "line": 2429,
           "test": false
         },
         {
@@ -294,7 +301,7 @@
         }
       ],
       "source": "apps/api/src/db/schema.ts:219",
-      "reads": 7,
+      "reads": 8,
       "writes": 6
     },
     {
@@ -421,7 +428,7 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 449,
+          "line": 2415,
           "test": false
         },
         {
@@ -1446,6 +1453,13 @@
       ],
       "queried_by": [
         {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 3137,
+          "test": false
+        },
+        {
           "file": "apps/api/src/services/dossier.ts",
           "method": "docGet",
           "access": "repository",
@@ -1476,7 +1490,7 @@
       ],
       "source": "apps/api/src/db/schema.ts:224",
       "reads": 3,
-      "writes": 2
+      "writes": 3
     },
     {
       "name": "edges",
@@ -1777,7 +1791,7 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 372,
+          "line": 1975,
           "test": false
         },
         {
@@ -1998,6 +2012,13 @@
           "test": true
         },
         {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 3321,
+          "test": false
+        },
+        {
           "file": "apps/api/src/services/imports.ts",
           "method": "docBulkPut",
           "access": "repository",
@@ -2028,7 +2049,7 @@
       ],
       "source": "apps/api/src/db/schema.ts:232",
       "reads": 4,
-      "writes": 4
+      "writes": 5
     },
     {
       "name": "imports",
@@ -2162,6 +2183,13 @@
           "test": true
         },
         {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 3299,
+          "test": false
+        },
+        {
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
@@ -2213,7 +2241,7 @@
       ],
       "source": "apps/api/src/db/schema.ts:231",
       "reads": 4,
-      "writes": 4
+      "writes": 5
     },
     {
       "name": "letters",
@@ -2362,6 +2390,13 @@
       ],
       "queried_by": [
         {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 3061,
+          "test": false
+        },
+        {
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
@@ -2392,7 +2427,7 @@
       ],
       "source": "apps/api/src/db/schema.ts:223",
       "reads": 3,
-      "writes": 2
+      "writes": 3
     },
     {
       "name": "merges",
@@ -2650,9 +2685,16 @@
         },
         {
           "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docMerge",
+          "access": "repository",
+          "line": 2734,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 597,
+          "line": 2726,
           "test": false
         },
         {
@@ -2714,7 +2756,7 @@
       ],
       "source": "apps/api/src/db/schema.ts:235",
       "reads": 8,
-      "writes": 11
+      "writes": 12
     },
     {
       "name": "meta_runs",
@@ -3253,6 +3295,13 @@
           "test": false
         },
         {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 3255,
+          "test": false
+        },
+        {
           "file": "apps/api/src/services/capture.ts",
           "method": "docPut",
           "access": "repository",
@@ -3269,7 +3318,7 @@
       ],
       "source": "apps/api/src/db/schema.ts:226",
       "reads": 3,
-      "writes": 5
+      "writes": 6
     },
     {
       "name": "resumes",
@@ -3462,9 +3511,16 @@
         },
         {
           "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 3584,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 648,
+          "line": 3015,
           "test": false
         },
         {
@@ -3483,7 +3539,7 @@
         }
       ],
       "source": "apps/api/src/db/schema.ts:222",
-      "reads": 6,
+      "reads": 7,
       "writes": 4
     },
     {
@@ -3586,6 +3642,20 @@
           "test": false
         },
         {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 3453,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 3475,
+          "test": false
+        },
+        {
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
@@ -3608,8 +3678,8 @@
         }
       ],
       "source": "apps/api/src/db/schema.ts:217",
-      "reads": 3,
-      "writes": 3
+      "reads": 4,
+      "writes": 4
     },
     {
       "name": "saved_views",
@@ -3712,7 +3782,7 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 592,
+          "line": 2710,
           "test": false
         },
         {
@@ -3803,6 +3873,13 @@
       "indexes": [],
       "queried_by": [
         {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 3232,
+          "test": false
+        },
+        {
           "file": "apps/api/src/services/capture.ts",
           "method": "docPut",
           "access": "repository",
@@ -3833,7 +3910,7 @@
       ],
       "source": "apps/api/src/db/schema.ts:228",
       "reads": 2,
-      "writes": 3
+      "writes": 4
     },
     {
       "name": "tags",
@@ -3901,6 +3978,13 @@
       "indexes": [],
       "queried_by": [
         {
+          "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 3221,
+          "test": false
+        },
+        {
           "file": "apps/api/src/services/capture.ts",
           "method": "docPut",
           "access": "repository",
@@ -3938,7 +4022,7 @@
       ],
       "source": "apps/api/src/db/schema.ts:227",
       "reads": 3,
-      "writes": 3
+      "writes": 4
     },
     {
       "name": "targets",
@@ -4070,9 +4154,16 @@
         },
         {
           "file": "apps/api/src/scripts/seed-demo.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 3583,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docMerge",
           "access": "repository",
-          "line": 642,
+          "line": 2982,
           "test": false
         },
         {
@@ -4112,7 +4203,7 @@
         }
       ],
       "source": "apps/api/src/db/schema.ts:221",
-      "reads": 6,
+      "reads": 7,
       "writes": 4
     },
     {

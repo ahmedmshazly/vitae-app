@@ -5440,7 +5440,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 42
+      "lines": 54
     },
     {
       "file": "e2e/tests/dossier.spec.ts",

@@ -2,7 +2,7 @@
   "by_package": {
     "@vitae/api": {
       "files": 113,
-      "lines": 22775,
+      "lines": 25780,
       "exports": 413,
       "undocumented": 298
     },
@@ -88,7 +88,7 @@
     },
     "script": {
       "files": 12,
-      "lines": 2902,
+      "lines": 5907,
       "exports": 0,
       "undocumented": 0
     },
@@ -737,10 +737,10 @@
   "summary": {
     "files": 372,
     "test_files": 360,
-    "lines": 86842,
+    "lines": 89847,
     "exports": 1863,
     "undocumented_exports": 1283,
-    "edges": 1707,
+    "edges": 1709,
     "untested": 137,
     "no_consumer": [],
     "consumed_only_by_tests": [
@@ -761,7 +761,7 @@
       },
       {
         "file": "packages/core/src/index.ts",
-        "dependents": 87
+        "dependents": 88
       },
       {
         "file": "packages/ui/src/feedback.tsx",
@@ -781,7 +781,7 @@
       },
       {
         "file": "packages/core/src/types.ts",
-        "dependents": 42
+        "dependents": 43
       },
       {
         "file": "apps/api/src/middleware/error.ts",
