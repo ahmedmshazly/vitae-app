@@ -340,7 +340,7 @@ function yearOf(parsed: Parsed, timeZone: string | undefined): string {
  * year, and "2021 to now" for a span the caller says is still running.
  *
  * The open span is the point of the function. A role that is still going must
- * never render as "2021 to null" or as "2021 to —", so pass `{ current: true }`
+ * never render as "2021 to null" or as "2021 to `NO_DATE_MARK`", so pass `{ current: true }`
  * and it renders as "2021 to now"; `e2e/tests/timeline.spec.ts` asserts the
  * literal words "to now". A missing end date on its own is not that claim,
  * because a job that ended in a year nobody recorded looks exactly the same in

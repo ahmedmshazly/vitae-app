@@ -28,6 +28,7 @@ describe('escapeLatex', () => {
   });
 
   it('handles typographic and TeX-sensitive punctuation explicitly', () => {
+    // prose-gate: the input has to contain the characters being escaped
     expect(escapeLatex('a~b^c – — · •')).toBe(
       'a\\textasciitilde{}b\\textasciicircum{}c \\textendash{} \\textemdash{} \\textperiodcentered{} \\textbullet{}',
     );

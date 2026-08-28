@@ -43,7 +43,7 @@ console.log('anchors');
 check('a heading slug matches the GitHub rule',
   slug('How it works: the request lifecycle'), 'how-it-works-the-request-lifecycle');
 check('punctuation is dropped, not replaced',
-  slug('`normalizeForMatch()` — why?'), 'normalizeformatch--why');
+  slug('`normalizeForMatch()` — why?'), 'normalizeformatch--why'); // prose-gate: a heading the slugger must survive
 check('non-ASCII letters survive',
   slug('Übersicht der Daten'), 'übersicht-der-daten');
 check('a removed symbol leaves both of its spaces, as GitHub does',

@@ -163,9 +163,11 @@ the demo/real leakage test.
 
 - Titles: condition + observable result, present tense, no filler.
 - Comments: durable intent, invariant, or non-obvious fixture choice only.
-- Never bulk-strip typographic dashes; allow-list UI empty glyph `'—'`, LaTeX
-  escape map keys, product copy fixtures, and intentional regexes.
-- Checker: `pnpm test:prose` (AST over `describe`/`it` titles and comments).
+- Never bulk-strip typographic dashes. The checker already blanks the shapes
+  that earn one: the UI empty glyph alone in its literal, an en dash spanning a
+  range, and a regular-expression character class. A fixture that genuinely
+  needs the character says so with a `prose-gate:` comment and a reason.
+- Checker: `pnpm test:prose`, over source, tests and docs alike.
 
 ## CI gates (every PR)
 

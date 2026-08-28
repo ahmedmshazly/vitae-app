@@ -1,10 +1,4 @@
 {
   "files": [],
-  "substrings": [
-    "—",
-    "–",
-    "empty-value glyph",
-    "LaTeX escape"
-  ],
-  "note": "Substrings that may appear in titles/comments when discussing intentional typographic dashes or product fixtures. Prefer documenting the invariant rather than pasting the glyph into every title."
+  "note": "Whole files exempt from scripts/check-test-prose.mjs, for source that works on typographic characters rather than writing with them. Paths only. A substring exemption is not available on purpose: the previous allowlist named the em dash itself, which exempted every line containing one and let the gate pass while roughly fifteen hundred accumulated. If a legitimate shape keeps tripping the gate, add it to KEEP in the script so it stays exempt everywhere, rather than exempting a whole file."
 }

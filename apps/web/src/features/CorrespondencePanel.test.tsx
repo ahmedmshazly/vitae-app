@@ -72,7 +72,7 @@ describe('CorrespondencePanel (FR-COMM-001)', () => {
     const user = userEvent.setup();
     await user.click(screen.getByText('Reply latency'));
     expect(
-      screen.getByText(/your reply in 2 days: 2026-08-01 — They wrote → 2026-08-03 — I answered/),
+      screen.getByText(/your reply in 2 days: 2026-08-01 · They wrote → 2026-08-03 · I answered/),
     ).toBeInTheDocument();
 
     await user.click(screen.getByText('Contact days'));

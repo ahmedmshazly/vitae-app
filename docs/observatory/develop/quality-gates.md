@@ -124,22 +124,38 @@ in `exclude_globs` instead.
 The script is invoked through a self-test that must pass first. That is not
 ceremony: this gate once printed `ok` unconditionally for months.
 
-### `pnpm test:prose` - prose in tests
+### `pnpm test:prose` - prose anyone will read
 
-**Enforces** that test titles and line comments carry no em or en dash and none
-of a short list of filler phrases, among them `comprehensive (test|suite|coverage)`,
-`leverages`, `seamless`, `furthermore` and `in conclusion`.
+**Enforces** two rules with deliberately different reach. Characters no keyboard
+produces - em dash, free en dash, curly quote, ellipsis character, non-breaking
+space - are rejected on every line, because a stray one is wrong wherever it
+lands. A list of filler phrases is checked only where prose lives:
+`comprehensive (test|suite|coverage)`, `leverage` used as a verb, `seamless`,
+`furthermore`, `in conclusion` and `not just X but Y`.
+Five inflated words, among them `crucial` and
+`pivotal`, are reported per file at three or more, because one is a word choice
+and three is a habit.
 
-**Scans** `packages/core/src`, `packages/testkit/src`, `packages/ui/src`,
-`apps/api/src`, `apps/web/src` and `e2e/tests` - every `*.test.*` and
-`*.spec.*` file, plus anything under a `helpers/` directory.
+**Scans** every `.ts`, `.tsx`, `.js`, `.mjs`, `.cjs`, `.css` and `.md` file
+under the five source packages, `apps/api/src`, `apps/web/src`, `e2e/tests`,
+`e2e/cloud`, `scripts` and `docs`. That is all source, not only tests, and the
+prose targets inside it are line comments, block comments, test titles, string
+literals, and every markdown line outside a fence.
 
-**Fails** with `<file>:<line>: title|comment matches ...`, printing the first
-eighty findings and a count of the rest.
+**Knows the difference** between a dash written and a dash used as data. The
+empty-value glyph alone in its literal, an en dash spanning a range like
+`42–44px`, a regular-expression character class, and anything inside markdown
+inline code are blanked before the character check runs. Those need no
+exception because the script derives them.
 
-**Exception**: `docs/testing/prose-allowlist.json`, which holds either whole
-file paths or substrings that may appear. The file's own note asks you to
-document the invariant rather than paste the glyph into every title.
+**Fails** with `<file>:<line>: <what it found>`, printing the first eighty
+findings and a count of the rest.
+
+**Exception**: a `prose-gate:` marker in a comment, on the offending line or the
+one above it, carrying a reason. `docs/testing/prose-allowlist.json` still takes
+whole file paths and is currently empty. It no longer takes substrings: it used
+to list the em dash itself, which exempted every line containing one, and the
+gate stayed green while roughly fifteen hundred accumulated behind it.
 
 ### `pnpm test:public` - pre-release identifiers
 
@@ -147,6 +163,11 @@ document the invariant rather than paste the glyph into every title.
 the public tree: the maintainer's handle and name, the private hostname, the
 maintainer's home directory path, and the brand names of a list of external
 coding assistants. It also refuses a tracked `.env` or `deploy/.env`.
+
+The name is the one exception, and it is allowed only in `AUTHORS`,
+`GOVERNANCE.md`, `LICENSE`, `NOTICE` and the root `package.json`, which exist to
+carry it. The home directory and the private host have no exception in any file,
+including those five: they leak a machine and a host rather than credit anyone.
 
 **Scans** every tracked file plus every untracked file `git` does not ignore -
 so a draft you have not staged is already in scope. It prints the number of
@@ -411,12 +432,12 @@ those files asks for a reason rather than a suppression.
 | Gate | Where the exception goes | What it needs |
 | --- | --- | --- |
 | `test:map` | `docs/testing/source-test-map.json` | an `exclude_reason` on the entry, or an `exclude_globs` pattern for a whole class |
-| `test:prose` | `docs/testing/prose-allowlist.json` | a file path or an allowed substring |
+| `test:prose` | a `prose-gate:` comment on the line, or `docs/testing/prose-allowlist.json` | a reason on the marker; a file path in the allowlist. Substrings are not accepted |
 | `test:brand` | `docs/design/brand-ban-allowlist.json` | rule, file, optional line or match, and a `reason` |
 | `test:performance` | `docs/testing/web-budgets.json` | a new number, and a note saying what the headroom is for |
 | `docs:check` coverage | `docs/registry/coverage.json` | a tightened ratchet; it may shrink and never grow |
 | `pnpm audit` | `pnpm.overrides` in the root manifest | a pinned version that clears the advisory |
-| `test:public` | nowhere | - |
+| `test:public` | `attributionFiles` in the script, for the name only | a path added by hand. The home directory and the private host are never exempt |
 | `typecheck` | nowhere | - |
 
 There is no inline suppression comment anywhere in this scheme. That is the

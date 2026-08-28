@@ -1554,7 +1554,7 @@
       ],
       "tests": [
         "packages/core/src/algorithms/latex-escape.test.ts:17",
-        "packages/core/src/algorithms/latex-escape.test.ts:105"
+        "packages/core/src/algorithms/latex-escape.test.ts:106"
       ],
       "documents": [
         "docs/ARCHITECTURE.md:144",

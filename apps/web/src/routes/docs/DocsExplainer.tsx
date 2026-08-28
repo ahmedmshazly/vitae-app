@@ -344,6 +344,7 @@ function TextExplainer() {
 // ---------------------------------------------------------------------------
 
 function LatexExplainer() {
+  // prose-gate: the sample is here to be escaped, so it carries what escaping is for
   const [value, setValue] = useState('Raised revenue 40% & cut costs ~$2M — see #3 {final}');
   const fieldId = useId();
   const escaped = useMemo(() => escapeLatex(value), [value]);

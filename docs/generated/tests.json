@@ -6624,7 +6624,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 155
+      "lines": 156
     },
     {
       "file": "packages/core/src/algorithms/line-model.test.ts",

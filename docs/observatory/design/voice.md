@@ -6,7 +6,7 @@ audience: [designer, user]
 domain: design
 type: explanation
 status: verified
-verified_at: 2026-08-24
+verified_at: 2026-08-28
 sources:
   - docs/design/IDENTITY.md
   - CONTRIBUTING.md
@@ -101,8 +101,10 @@ Before writing a message, check whether the component is going to supply one.
   people", "the history", "the favour ledger" - sized to sit inside a sentence.
 
 Two typographic details are conventions the existing copy keeps: the apostrophe
-is the typographic one rather than the straight quote, and a message ends on a
-full stop when it is a sentence.
+is the straight one a keyboard actually produces, and a message ends on a full
+stop when it is a sentence. The curly apostrophe was the convention until the
+copy was swept; it reads as autocorrect, and `pnpm test:prose` now rejects it
+along with the curly double quote, the ellipsis character and the em dash.
 
 ### An announcement is composed, not assembled
 
@@ -115,20 +117,24 @@ announced has to be written as a sentence rather than laid out as one.
 
 ### What is checked, and what is not
 
-Two prose gates run in continuous integration, and **neither of them reads a
-single word of product copy**.
-
-`scripts/check-test-prose.mjs` flags em and en dashes and a short list of filler
-phrases, and it looks only at test titles and single-line comments under six
-source roots. Its allowlist exists for deliberate product and fixture strings.
+Two prose gates run in continuous integration, and **one of them now reads
+product copy, but only for its punctuation**.
 
 `scripts/check-public-release.mjs` scans every tracked file for a small set of
 private identifiers left over from a pre-release project. It is a hygiene guard on what ships publicly, not
 a style checker.
 
-So every rule on this page - the lexicon, sentence case, the surviving verb, the
-absence of apologies - is held by review and by the components making the right
-words the default. A button labelled with the wrong noun will not fail a build.
+`scripts/check-test-prose.mjs` is the one that grew. It reads every source and
+markdown file under eleven roots, and inside them it reads comments, test
+titles, string literals and markdown lines. So the label on a button is now in
+scope. What it can decide about that label is narrow: the characters, and a
+short list of phrases no interface should contain. It rejects an em dash in a
+label; it has no opinion about the noun in it.
+
+So the rest of this page - the lexicon, sentence case, the surviving verb, the
+absence of apologies - is still held by review and by the components making the
+right words the default. A button labelled with the wrong noun will not fail a
+build. A button labelled with the wrong dash will.
 
 ### The contributor prose rules
 

@@ -131,7 +131,7 @@ export function CorrespondencePanel({
   const byId = new Map(interactions.map((i) => [i.id, i]));
   const name = (id: string): string => {
     const hit = byId.get(id);
-    return hit ? `${hit.at ? hit.at.slice(0, 10) : 'undated'} — ${hit.title}` : id;
+    return hit ? `${hit.at ? hit.at.slice(0, 10) : 'undated'} · ${hit.title}` : id;
   };
 
   if (profile.coverage.total === 0) {
