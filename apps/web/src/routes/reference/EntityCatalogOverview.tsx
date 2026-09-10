@@ -19,47 +19,61 @@ const OFFSET_Y = VIEW_HEIGHT / 2;
  * packages/ui/src/styles/tokens.css and fails when one drifts: three of these
  * had already drifted, so the exported "canonical" map was not the map anyone
  * saw on screen.
+ *
+ * These are the **light theme's** values, and a file that has left the app
+ * cannot follow `data-theme`, so the exported sheet is a light sheet whichever
+ * theme produced it. That is the right default for a diagram people print, and
+ * it is the reason the entries are literals rather than a snapshot of whatever
+ * the exporting document happened to compute.
+ *
+ * Several of these now coincide, because the `--ae-*` names are compatibility
+ * aliases and the new palette has fewer surfaces than Quiet did: entity and
+ * relation nodes are both `--bg-2`. Shape and the 1.4px stroke are what
+ * separate them, which was already true when the two fills were `#1c1c1c` and
+ * `#262626`.
  */
 export const OVERVIEW_INK = {
-  '--ae-bg': '#0f0f0f',
-  '--ae-surface': '#151515',
-  '--ae-surface-raised': '#1c1c1c',
-  '--ae-accent-bg': '#262626',
-  '--ae-border-strong': '#3f3f3f',
-  '--ae-border-control': '#727271',
-  '--ae-fg': '#e8e8e6',
-  '--ae-fg-soft': '#c9c9c6',
-  '--ae-fg-strong': '#fafaf8',
+  '--ae-bg': '#f2f0ea',
+  '--ae-surface': '#ffffff',
+  '--ae-surface-raised': '#e9e6de',
+  '--ae-accent-bg': '#e9e6de',
+  '--ae-border-strong': '#d6d2c8',
+  '--ae-border-control': '#d6d2c8',
+  '--ae-fg': '#0b0b0d',
+  '--ae-fg-soft': '#5b584f',
+  '--ae-fg-strong': '#0b0b0d',
 } as const;
 
 /**
  * The wildcard hatch is filled from a presentation attribute on the node
  * rather than from a rule here, because its pattern id is per-instance (see
  * `idPrefix`) and a stylesheet cannot name an id it does not know.
+ *
+ * The two family names mirror `--ae-font-sans` and `--ae-font-mono`, which
+ * alias the identity's own faces. Each keeps a generic fallback, because an
+ * exported file cannot carry the self-hosted woff2 with it.
  */
 export const OVERVIEW_SVG_EXPORT_STYLE = `
   .ec-overview__backdrop{fill:${OVERVIEW_INK['--ae-bg']};stroke:${OVERVIEW_INK['--ae-border-strong']};stroke-width:2}
   .ec-overview__group rect{fill:${OVERVIEW_INK['--ae-surface-raised']};stroke:${OVERVIEW_INK['--ae-border-strong']};stroke-width:2}
-  .ec-overview__group>text,.ec-overview__relation-zone>text{fill:${OVERVIEW_INK['--ae-fg']};font:600 18px "Instrument Sans Variable",sans-serif}
+  .ec-overview__group>text,.ec-overview__relation-zone>text{fill:${OVERVIEW_INK['--ae-fg']};font:600 18px "Space Grotesk",sans-serif}
   .ec-overview__relation-zone rect{fill:${OVERVIEW_INK['--ae-surface']};stroke:${OVERVIEW_INK['--ae-border-control']};stroke-width:2}
   .ec-overview__hatch{stroke:${OVERVIEW_INK['--ae-fg']};stroke-width:1}
   .ec-overview__node rect,.ec-overview__node path{stroke:${OVERVIEW_INK['--ae-fg-soft']};stroke-width:1.4}
   .ec-overview__node--entity rect{fill:${OVERVIEW_INK['--ae-surface-raised']}}
   .ec-overview__node--relation path{fill:${OVERVIEW_INK['--ae-accent-bg']}}
-  .ec-overview__node text{fill:${OVERVIEW_INK['--ae-fg-strong']};font:600 12px "IBM Plex Mono",monospace}
-  .ec-overview__legend text{fill:${OVERVIEW_INK['--ae-fg-soft']};font:500 13px "Instrument Sans Variable",sans-serif}
+  .ec-overview__node text{fill:${OVERVIEW_INK['--ae-fg-strong']};font:600 12px "Space Mono",monospace}
+  .ec-overview__legend text{fill:${OVERVIEW_INK['--ae-fg-soft']};font:500 13px "Space Grotesk",sans-serif}
 `;
 
-const GROUP_BOUNDS: Record<
-  CatalogGroup,
-  { x: number; y: number; width: number; height: number }
-> = {
-  Career: { x: 80, y: 40, width: 470, height: 410 },
-  Content: { x: 80, y: 515, width: 470, height: 420 },
-  'Job search': { x: 1110, y: 55, width: 410, height: 300 },
-  Life: { x: 1090, y: 390, width: 430, height: 345 },
-  'Long tail': { x: 700, y: 750, width: 620, height: 215 },
-};
+const GROUP_BOUNDS: Record<CatalogGroup, { x: number; y: number; width: number; height: number }> =
+  {
+    Career: { x: 80, y: 40, width: 470, height: 410 },
+    Content: { x: 80, y: 515, width: 470, height: 420 },
+    'Job search': { x: 1110, y: 55, width: 410, height: 300 },
+    Life: { x: 1090, y: 390, width: 430, height: 345 },
+    'Long tail': { x: 700, y: 750, width: 620, height: 215 },
+  };
 
 function coordinates(node: CatalogGraphNode): { x: number; y: number } {
   return { x: node.structuredX + OFFSET_X, y: node.structuredY + OFFSET_Y };
@@ -98,9 +112,8 @@ export function EntityCatalogOverview({
     >
       <title id={titleId}>Vitae complete entity and relation map</title>
       <desc id={descId}>
-        All entity types are grouped around first-class relation diamonds. The canonical
-        relation matrix on the next sheet lists the exact source and target types every
-        relation accepts.
+        All entity types are grouped around first-class relation diamonds. The canonical relation
+        matrix on the next sheet lists the exact source and target types every relation accepts.
       </desc>
       <defs>
         <pattern id={patternId} width="8" height="8" patternUnits="userSpaceOnUse">

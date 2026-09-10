@@ -1,7 +1,7 @@
 /**
- * The five-variant motion system (brand-book.html ch.08). Nothing outside
- * this list gets animated without being added here first, if you can't name
- * the state change an animation reports, delete it.
+ * The five-variant motion system. Nothing outside this list gets animated
+ * without being added here first, if you can't name the state change an
+ * animation reports, delete it.
  *
  * Every variant takes the caller's `useReducedMotion()` value explicitly and
  * collapses to an instant, zero-duration state change when true. State
@@ -25,11 +25,22 @@ import { useMemo } from 'react';
 import { useReducedMotion } from '@vitae/ui';
 import type { Transition, Variants } from 'motion/react';
 
-const EASE = [0.32, 0.72, 0, 1] as const; // --ae-ease, the only easing
-const DUR = 0.13; // --ae-dur
-const DUR_FAST = 0.09; // --ae-dur-fast, exits, hover, anything leaving
-const DUR_SLOW = 0.22; // --ae-dur-slow, reorder and layout shifts only
-const STAGGER_STEP = 0.025; // 25ms
+/**
+ * --e-out, the identity's default curve, which --ae-ease aliases. Framer wants
+ * seconds and a control-point tuple where CSS wants milliseconds and a
+ * `cubic-bezier()`, so these five numbers are the one place the token values
+ * are mirrored by hand.
+ *
+ * The identity also ships --e-pop and --e-settle, and neither appears here on
+ * purpose: both overshoot, and every variant below reports a state change to
+ * something the user is reading. Overshoot belongs to the logo build and the
+ * chip pop, which are CSS classes in packages/ui/src/styles/motion.css.
+ */
+export const EASE = [0.2, 0.7, 0.2, 1] as const;
+export const DUR = 0.26; // --ae-dur / --d-base, 260ms
+export const DUR_FAST = 0.14; // --ae-dur-fast / --d-quick, exits, hover, anything leaving
+export const DUR_SLOW = 0.52; // --ae-dur-slow / --d-long, reorder and layout shifts only
+export const STAGGER_STEP = 0.025; // --ae-motion-stagger, 25ms
 
 /** enter's stagger caps at 5 children, slice lists to 5 before mapping;
  * the 6th item onward appears alongside the 5th. `Variants` can't enforce

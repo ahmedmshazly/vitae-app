@@ -92,7 +92,7 @@ describe('DotGrid', () => {
   it('draws an unchecked slot rather than leaving a hole', () => {
     const { container } = render(<DotGrid days={[false]} label="Writing" />);
     const dot = container.querySelector<HTMLElement>('.vt-dotgrid__dot')!;
-    expect(dot.style.background).toBe('var(--ae-border)');
+    expect(dot.style.background).toBe('var(--line)');
   });
 });
 

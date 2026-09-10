@@ -10,10 +10,17 @@
  * against a matchMedia this file controls: `setPreference()` flips the answer
  * and notifies subscribers the way a real MediaQueryList would.
  */
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { Transition, Variants } from 'motion/react';
 import {
+  DUR,
+  DUR_FAST,
+  DUR_SLOW,
+  EASE,
   STAGGER_CAP,
   emphasis,
   enter,
@@ -266,7 +273,7 @@ describe('reduced motion', () => {
 
   it('still moves when motion is allowed', () => {
     expect(frame(enter(MOVING), 'initial').y).toBe(4);
-    expect(frame(enter(MOVING), 'animate').transition?.duration).toBe(0.13);
+    expect(frame(enter(MOVING), 'animate').transition?.duration).toBe(0.26);
   });
 });
 
@@ -325,12 +332,60 @@ describe('easing', () => {
     expect(frame(route(MOVING), 'exit').transition?.ease).toBe('linear');
   });
 
+  // The identity ships three curves, but only --e-out reaches these variants:
+  // --e-pop and --e-settle overshoot, and none of the five states below is a
+  // thing that should sail past where it is going. So "one easing" still holds
+  // inside the motion system, it is just no longer the only one in the product.
   it('every other variant uses the one easing curve', () => {
-    const curve = [0.32, 0.72, 0, 1];
+    const curve = [0.2, 0.7, 0.2, 1];
     expect(frame(enter(MOVING), 'animate').transition?.ease).toEqual(curve);
     expect(enterItem(MOVING, 0).transition.ease).toEqual(curve);
     expect(frame(emphasis(MOVING), 'animate').transition?.ease).toEqual(curve);
     expect(timing(reorder(MOVING))?.ease).toEqual(curve);
     expect(frame(route(MOVING), 'animate').transition?.ease).toEqual(curve);
+  });
+});
+
+/**
+ * Framer takes seconds and a control-point tuple; CSS takes milliseconds and a
+ * `cubic-bezier()`. There is no way to share one literal between them, so this
+ * module retypes the token values and this is the test that says so out loud.
+ *
+ * It reads packages/ui/src/styles/tokens.css as text rather than through
+ * `getComputedStyle`, because jsdom does not load the stylesheet and does not
+ * substitute custom properties. That is also why it reads the `--d-*` and
+ * `--e-out` tokens directly rather than the `--ae-*` aliases: an alias's
+ * declared value is the string `var(--d-base)`, which says nothing about what
+ * it resolves to.
+ */
+describe('the JS mirror of the motion tokens', () => {
+  const TOKENS = readFileSync(
+    join(dirname(fileURLToPath(import.meta.url)), '../../../../packages/ui/src/styles/tokens.css'),
+    'utf8',
+  );
+
+  /** The first declared value of one custom property, stopped at the semicolon. */
+  function token(name: string): string {
+    const match = TOKENS.match(new RegExp(`${name}:\\s*([^;]+);`));
+    if (!match) throw new Error(`tokens.css does not declare ${name}`);
+    return match[1].trim();
+  }
+
+  it('spends the same durations tokens.css declares', () => {
+    expect(token('--d-quick')).toBe(`${DUR_FAST * 1000}ms`);
+    expect(token('--d-base')).toBe(`${DUR * 1000}ms`);
+    expect(token('--d-long')).toBe(`${DUR_SLOW * 1000}ms`);
+  });
+
+  it('spends the stagger step tokens.css declares', () => {
+    expect(token('--motion-stagger')).toBe(`${STEP * 1000}ms`);
+  });
+
+  it('draws the same curve --e-out draws', () => {
+    expect(token('--e-out')).toBe(`cubic-bezier(${EASE.join(', ')})`);
+  });
+
+  it('rises by the distance --motion-rise declares', () => {
+    expect(token('--motion-rise')).toBe(`${frame(enter(MOVING), 'initial').y}px`);
   });
 });

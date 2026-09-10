@@ -59,7 +59,7 @@ describe('useAnimatedNumber', () => {
     now = 0;
     nextId = 1;
     queue = [];
-    setDurationToken('130ms');
+    setDurationToken('260ms');
     cancel = vi.fn((id: number) => {
       queue = queue.filter((frame) => frame.id !== id);
     });
@@ -98,11 +98,11 @@ describe('useAnimatedNumber', () => {
     flush(0);
     expect(result.current).toBe(50);
 
-    flush(65);
+    flush(130);
     expect(result.current).toBeGreaterThan(50);
     expect(result.current).toBeLessThan(100);
 
-    flush(65);
+    flush(130);
     expect(result.current).toBe(100);
     expect(pending()).toBe(0);
   });
@@ -115,7 +115,7 @@ describe('useAnimatedNumber', () => {
     flush(0);
     samples.push(result.current);
     for (let i = 0; i < 7; i += 1) {
-      flush(20);
+      flush(40);
       samples.push(result.current);
     }
 
@@ -131,10 +131,10 @@ describe('useAnimatedNumber', () => {
     const { result, rerender } = render(90);
     rerender({ target: 10 });
     flush(0);
-    flush(65);
+    flush(130);
     expect(result.current).toBeLessThan(90);
     expect(result.current).toBeGreaterThan(10);
-    flush(65);
+    flush(130);
     expect(result.current).toBe(10);
   });
 
@@ -142,7 +142,7 @@ describe('useAnimatedNumber', () => {
     const { result, rerender } = render(0);
     rerender({ target: 100 });
     flush(0);
-    flush(65);
+    flush(130);
     const midflight = result.current;
     expect(midflight).toBeGreaterThan(0);
     expect(midflight).toBeLessThan(100);
@@ -153,9 +153,9 @@ describe('useAnimatedNumber', () => {
 
     flush(0);
     expect(result.current).toBe(midflight);
-    flush(65);
+    flush(130);
     expect(result.current).toBeLessThan(midflight);
-    flush(65);
+    flush(130);
     expect(result.current).toBe(0);
     expect(pending()).toBe(0);
   });
@@ -190,12 +190,12 @@ describe('useAnimatedNumber', () => {
   });
 
   it('honours a custom duration', () => {
-    const { result, rerender } = render(0, { duration: 220 });
+    const { result, rerender } = render(0, { duration: 520 });
     rerender({ target: 100 });
     flush(0);
-    flush(130);
+    flush(300);
     expect(result.current).toBeLessThan(100);
-    flush(90);
+    flush(220);
     expect(result.current).toBe(100);
   });
 
@@ -224,11 +224,11 @@ describe('useAnimatedNumber', () => {
     flush(0);
     expect(result.current).toBe(10);
 
-    flush(65);
+    flush(130);
     expect(result.current).toBeGreaterThan(10);
     expect(result.current).toBeLessThan(100);
 
-    flush(65);
+    flush(130);
     expect(result.current).toBe(100);
     expect(pending()).toBe(0);
   });
@@ -261,14 +261,14 @@ describe('useAnimatedNumber', () => {
   });
 
   it('takes its duration from --ae-dur when the caller names none', () => {
-    setDurationToken('220ms');
+    setDurationToken('520ms');
     const { result, rerender } = render(0);
     rerender({ target: 100 });
 
     flush(0);
-    flush(130);
+    flush(300);
     expect(result.current).toBeLessThan(100);
-    flush(90);
+    flush(220);
     expect(result.current).toBe(100);
   });
 
@@ -290,7 +290,7 @@ describe('useAnimatedNumber', () => {
 
   it('will not let a named duration animate on a page whose --ae-dur is gone', () => {
     document.documentElement.style.removeProperty('--ae-dur');
-    const { result, rerender } = render(0, { duration: 220 });
+    const { result, rerender } = render(0, { duration: 520 });
     rerender({ target: 100 });
     expect(result.current).toBe(100);
     expect(pending()).toBe(0);
@@ -307,13 +307,13 @@ describe('readDurationToken', () => {
   });
 
   it('reads milliseconds', () => {
-    setDurationToken('130ms');
-    expect(readDurationToken()).toBe(130);
+    setDurationToken('260ms');
+    expect(readDurationToken()).toBe(260);
   });
 
   it('reads seconds as milliseconds', () => {
-    setDurationToken('0.22s');
-    expect(readDurationToken()).toBe(220);
+    setDurationToken('0.52s');
+    expect(readDurationToken()).toBe(520);
   });
 
   it('is null for a value that is not a time', () => {

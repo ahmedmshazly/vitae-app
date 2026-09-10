@@ -5,12 +5,13 @@
  * a width can be handed to a CSS transition. ChargeRing, StrengthDonut,
  * StrengthBar, FactorBar, DotGrid and ClosenessDots all snap: their value is
  * an SVG geometry or a count of filled cells, which CSS cannot interpolate.
- * A score changing is a nameable state change, which is what brand-book ch.08
- * says motion is for, so those components get the same 130ms as Meter through
+ * A score changing is a nameable state change, which is what the motion law
+ * says motion is for, so those components get the same 260ms as Meter through
  * this hook instead of going without.
  *
  * Deliberately not a spring, not a runtime, not a dependency: one requestAnimationFrame
- * loop over the single easing curve, --ae-ease. It reports the change and stops.
+ * loop over the identity's default easing curve, --ae-ease (`--e-out`). It
+ * reports the change and stops.
  *
  * ## The stylesheet is the master switch
  *
@@ -35,17 +36,21 @@
  *
  * The `duration` option chooses how long the ease runs, not whether it runs:
  * with no token there is no motion whatever it says. Pass `--ae-dur-slow`'s
- * 220ms for a value that needs longer; that is the only other sensible number.
+ * 520ms for a value that needs longer; that is the only other sensible number.
  */
 import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from './use-reduced-motion.js';
 
-// --ae-ease control points. The CSS is cubic-bezier(0.32, 0.72, 0, 1); the
-// curve's endpoints are fixed at (0,0) and (1,1), so these four numbers are
-// the whole definition.
-const P1X = 0.32;
-const P1Y = 0.72;
-const P2X = 0;
+// --e-out control points, which --ae-ease aliases. The CSS is
+// cubic-bezier(0.2, 0.7, 0.2, 1); the curve's endpoints are fixed at (0,0) and
+// (1,1), so these four numbers are the whole definition.
+//
+// The identity has three curves now, and this hook deliberately mirrors only
+// this one. --e-pop and --e-settle both overshoot, and a number that sails past
+// its target before settling reads as a miscount rather than as a change.
+const P1X = 0.2;
+const P1Y = 0.7;
+const P2X = 0.2;
 const P2Y = 1;
 
 const EPSILON = 1e-6;
@@ -149,7 +154,7 @@ export function readDurationToken(): number | null {
 export interface AnimatedNumberOptions {
   /**
    * Milliseconds the ease runs for, when it runs at all. Defaults to the
-   * document's own --ae-dur (130ms once tokens.css is loaded). It cannot turn
+   * document's own --ae-dur (260ms once tokens.css is loaded). It cannot turn
    * motion on where the stylesheet says there is none.
    */
   duration?: number;

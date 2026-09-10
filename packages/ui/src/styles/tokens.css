@@ -16,14 +16,14 @@
   --line: #d6d2c8;
 
   /* ── Quadrant colours (semantic, never decorative) ── */
-  --do: #d8321a;       /* Do — red */
-  --sched: #1e4fd6;    /* Schedule — blue */
-  --deleg: #e0a800;    /* Delegate — yellow (action colour) */
-  --elim: #7a756a;     /* Eliminate — dashed outline */
+  --do: #d8321a; /* Do — red */
+  --sched: #1e4fd6; /* Schedule — blue */
+  --deleg: #e0a800; /* Delegate — yellow (action colour) */
+  --elim: #7a756a; /* Eliminate — dashed outline */
 
   /* ── Derived ── */
-  --on-q: #0b0b0d;     /* Text on quadrant fills (near-black) */
-  --focus: #1e4fd6;    /* Focus ring in light mode (blue) */
+  --on-q: #0b0b0d; /* Text on quadrant fills (near-black) */
+  --focus: #1e4fd6; /* Focus ring in light mode (blue) */
 
   /* ── Typography ── */
   --display: 'Archivo Black', Impact, sans-serif;
@@ -104,6 +104,141 @@
   --data-practice: var(--viz-6);
   --data-media: var(--viz-7);
   --data-other: var(--viz-8);
+
+  /* ── Compatibility aliases ─────────────────────────────────────────────
+     Hundreds of CSS and TS files still name the previous identity's --ae-*
+     tokens. Every one of them is aliased here so nothing resolves to
+     nothing, and each alias is written as a var() onto a new token rather
+     than as a literal, which is what makes a theme switch reach the old call
+     sites: :root and [data-theme='dark'] both match <html>, so var(--bg)
+     inside this block computes against whichever theme is active.
+
+     Remove each alias once its last consumer has migrated. The token drift
+     report (docs/generated/tokens.json, `summary.unused`) is the measurement
+     that says which ones are safe to drop.
+
+     Three groups do not go through the new tokens, on purpose:
+
+       - The type scale keeps its Quiet pixel values. Remapping --ae-text-*
+         onto --t-* would silently restyle every screen that has not been
+         rebuilt yet, which is a visual change disguised as a rename.
+       - success / warning / danger / ember / info have no counterpart in the
+         four quadrant colours, so they stay as literals until the semantic
+         ramp is designed.
+       - --ae-muted-strong and the three --ae-accent-*soft names were already
+         aliases under Quiet; they keep pointing at the same siblings they
+         did there, one hop further along. ── */
+  --ae-rail: var(--bg);
+  --ae-bg: var(--bg);
+  --ae-surface: var(--card);
+  --ae-surface-raised: var(--bg-2);
+  --ae-surface-overlay: var(--card);
+  --ae-surface-sunken: var(--bg);
+
+  --ae-border: var(--line);
+  --ae-border-strong: var(--line);
+  --ae-border-control: var(--line);
+
+  --ae-fg-strong: var(--ink);
+  --ae-fg: var(--ink);
+  --ae-fg-soft: var(--ink-2);
+  --ae-muted: var(--ink-2);
+  --ae-faint: var(--ink-2);
+
+  --ae-accent: var(--deleg);
+  --ae-accent-ink: var(--on-q);
+  --ae-accent-bg: var(--bg-2);
+  --ae-accent-2: var(--sched);
+
+  --ae-trace-idle: var(--line);
+  --ae-trace-live: var(--sched);
+  --ae-trace-current: var(--ink);
+
+  --ae-font-sans: var(--sans);
+  --ae-font-mono: var(--mono);
+  --ae-font-display: var(--display);
+
+  --ae-radius-sm: var(--radius-sm);
+  --ae-radius: var(--radius);
+  --ae-radius-lg: var(--radius-lg);
+  --ae-radius-full: var(--radius-full);
+
+  --ae-space-1: var(--space-1);
+  --ae-space-2: var(--space-2);
+  --ae-space-3: var(--space-3);
+  --ae-space-4: var(--space-4);
+  --ae-space-5: var(--space-5);
+  --ae-space-6: var(--space-6);
+  --ae-space-8: var(--space-8);
+
+  --ae-row-h: var(--row-h);
+  --ae-control-h-sm: var(--control-h-sm);
+  --ae-control-h: var(--control-h);
+  --ae-control-h-lg: var(--control-h-lg);
+  --ae-hit-target: var(--hit-target);
+
+  --ae-shadow-overlay: var(--shadow-overlay);
+  --ae-focus-ring: var(--focus-ring);
+
+  --ae-ease: var(--e-out);
+  --ae-dur-fast: var(--d-quick);
+  --ae-dur: var(--d-base);
+  --ae-dur-slow: var(--d-long);
+  --ae-motion-rise: var(--motion-rise);
+  --ae-motion-stagger: var(--motion-stagger);
+
+  --ae-z-overlay: var(--z-overlay);
+  --ae-z-popover: var(--z-popover);
+  --ae-z-toast: var(--z-toast);
+  --ae-overlay: var(--overlay);
+
+  --ae-viz-1: var(--viz-1);
+  --ae-viz-2: var(--viz-2);
+  --ae-viz-3: var(--viz-3);
+  --ae-viz-4: var(--viz-4);
+  --ae-viz-5: var(--viz-5);
+  --ae-viz-6: var(--viz-6);
+  --ae-viz-7: var(--viz-7);
+  --ae-viz-8: var(--viz-8);
+
+  --ae-data-person: var(--data-person);
+  --ae-data-work: var(--data-work);
+  --ae-data-place: var(--data-place);
+  --ae-data-event: var(--data-event);
+  --ae-data-idea: var(--data-idea);
+  --ae-data-practice: var(--data-practice);
+  --ae-data-media: var(--data-media);
+  --ae-data-other: var(--data-other);
+
+  /* Quiet's type scale, in pixels. Not remapped onto --t-*: see above. */
+  --ae-text-xs: 11px;
+  --ae-text-sm: 12px;
+  --ae-text-base: 14px;
+  --ae-text-md: 15px;
+  --ae-text-lg: 17px;
+  --ae-text-xl: 21px;
+  --ae-text-2xl: 30px;
+  --ae-text-3xl: 44px;
+  --ae-text-4xl: 64px;
+  --ae-leading-tight: 1.2;
+  --ae-leading-normal: 1.55;
+
+  /* Semantic states. No quadrant colour means these, so they stay literal. */
+  --ae-success: #7eb795;
+  --ae-warning: #c8a344;
+  --ae-danger: #e17263;
+  --ae-ember: #c98a3d;
+  --ae-info: #9a9484;
+
+  --ae-trace-success: var(--ae-success);
+  --ae-trace-warning: var(--ae-warning);
+  --ae-trace-danger: var(--ae-danger);
+
+  /* Aliases of aliases, carried over from Quiet's own legacy block. */
+  --ae-muted-strong: var(--ae-muted);
+  --ae-accent-strong: var(--ae-accent);
+  --ae-accent-soft: var(--ae-fg-soft);
+  --ae-accent-bg-soft: var(--ae-surface-raised);
 
   /* ── Simulated paper (résumé previews only) ── */
   --paper-bg: #ffffff;
@@ -200,7 +335,12 @@
   }
 }
 
-/* ── Reduced motion ── */
+/* ── Reduced motion ──
+   Zeroing the three durations is the whole switch. The --ae-dur* aliases are
+   var() references to these, so they zero with them and there is no second
+   place to keep in step; packages/ui/src/use-animated-number.ts reads --ae-dur
+   off the root element for exactly that reason, which is how one CSS media
+   query also governs a JS animation. ── */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --d-quick: 0ms;

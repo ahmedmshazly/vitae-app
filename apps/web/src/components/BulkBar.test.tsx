@@ -56,10 +56,32 @@ function ruleBody(selector: string): string {
   return CHROME.match(new RegExp(`\\${selector}\\s*\\{([^}]*)\\}`))?.[1] ?? '';
 }
 
+/**
+ * A layer token as a number, following `var()` hops to get there.
+ *
+ * The `--ae-*` names are compatibility aliases now: `--ae-z-overlay` is
+ * declared as `var(--z-overlay)`, so reading one declaration deep finds a
+ * string rather than a number. Resolving the chain is what keeps this
+ * assertion about the layer the bar actually paints on, instead of about
+ * which spelling of the token the stylesheet happened to use.
+ */
 function tokenValue(name: string): number {
-  const found = TOKENS.match(new RegExp(`${name}:\\s*(-?\\d+)`));
-  if (!found) throw new Error(`tokens.css does not define ${name}`);
-  return Number(found[1]);
+  const seen = new Set<string>();
+  let current = name;
+  for (;;) {
+    if (seen.has(current)) throw new Error(`tokens.css loops through ${current}`);
+    seen.add(current);
+    const found = TOKENS.match(new RegExp(`${current}:\\s*([^;]+);`));
+    if (!found) throw new Error(`tokens.css does not define ${current}`);
+    const value = found[1].trim();
+    const hop = /^var\(\s*(--[\w-]+)\s*\)$/.exec(value);
+    if (!hop) {
+      const number = Number(/^-?\d+/.exec(value)?.[0]);
+      if (!Number.isFinite(number)) throw new Error(`${name} resolves to ${value}, not a number`);
+      return number;
+    }
+    current = hop[1];
+  }
 }
 
 describe('BulkBar', () => {
@@ -288,9 +310,7 @@ describe('BulkBar', () => {
   });
 
   it('bulkBarIsDetached rejects a bar that was put back in the header', () => {
-    renderWithApp(
-      <PageHeader title="People" actions={<BulkBar count={2} onClear={vi.fn()} />} />,
-    );
+    renderWithApp(<PageHeader title="People" actions={<BulkBar count={2} onClear={vi.fn()} />} />);
 
     expect(bulkBarIsDetached(bar())).toBe(false);
   });

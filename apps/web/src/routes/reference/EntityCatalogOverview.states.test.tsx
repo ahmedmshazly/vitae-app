@@ -22,15 +22,31 @@ const SHEET_NAME = /complete entity and relation map/i;
    `new URL(literal, import.meta.url)` into an asset URL, so this is the one
    way to reach the real declarations. */
 const HERE = dirname(fileURLToPath(import.meta.url));
-const TOKENS = readFileSync(
-  join(HERE, '../../../../../packages/ui/src/styles/tokens.css'),
-  'utf8',
-);
+const TOKENS = readFileSync(join(HERE, '../../../../../packages/ui/src/styles/tokens.css'), 'utf8');
 
-/** The declared value of one custom property, stopped before any comment. */
+/**
+ * What one custom property finally resolves to, following `var()` hops.
+ *
+ * The `--ae-*` names are compatibility aliases now: each is declared as a
+ * `var()` onto one of the new tokens, so reading a single declaration finds
+ * the string `var(--bg)` where this test wants `#f2f0ea`. Only the light
+ * theme's `:root` values are followed, which is the theme the exported sheet
+ * is pinned to; `TOKENS.match` finds the first declaration in the file and the
+ * light block is first by construction.
+ */
 function tokenValue(name: string): string {
-  const match = TOKENS.match(new RegExp(`${name}:\\s*([^;]+);`));
-  return match ? match[1].trim() : `(${name} is not declared)`;
+  const seen = new Set<string>();
+  let current = name;
+  for (;;) {
+    if (seen.has(current)) return `(${name} loops through ${current})`;
+    seen.add(current);
+    const match = TOKENS.match(new RegExp(`${current}:\\s*([^;]+);`));
+    if (!match) return `(${current} is not declared)`;
+    const value = match[1].trim();
+    const hop = /^var\(\s*(--[\w-]+)\s*\)$/.exec(value);
+    if (!hop) return value;
+    current = hop[1];
+  }
 }
 
 function idsWithin(sheet: Element): string[] {
@@ -95,8 +111,6 @@ describe('EntityCatalogOverview states', () => {
 
   it('sends a reader after exact endpoints to the sheet that lists them', () => {
     render(<EntityCatalogOverview />);
-    expect(
-      screen.getByRole('img', { name: /canonical\s+relation\s+matrix/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /canonical\s+relation\s+matrix/i })).toBeInTheDocument();
   });
 });
