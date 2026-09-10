@@ -14,6 +14,7 @@
  * not editing this list. Turning that into a red test would only get it
  * silenced.
  */
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -78,4 +79,15 @@ describe('@vitae/ui exports', () => {
     const present = new Set(readdirSync(join(PACKAGE_ROOT, 'src/styles/fonts')));
     expect(referenced.filter((file) => !present.has(file))).toEqual([]);
   });
+
+  it('ships four distinct Space Grotesk weights, not one file under four names', () => {
+    const dir = join(PACKAGE_ROOT, 'src/styles/fonts');
+    const hashes = ['400', '500', '600', '700'].map((weight) =>
+      createHash('sha256')
+        .update(readFileSync(join(dir, `SpaceGrotesk-${weight}.woff2`)))
+        .digest('hex'),
+    );
+    expect(new Set(hashes).size).toBe(4);
+  });
 });
+

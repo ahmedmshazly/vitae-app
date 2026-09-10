@@ -58,6 +58,44 @@
   --font-sans: var(--sans);
   --font-mono: var(--mono);
 
+  /* Quiet utility bridge. Existing screens still spell text-muted, bg-canvas,
+     text-sm, border-control, text-danger. Those names have to keep resolving
+     through the --ae-* aliases (Quiet pixels, theme-aware colour) or they
+     inherit body colour / Tailwind's default type scale. */
+  --color-canvas: var(--ae-bg);
+  --color-surface: var(--ae-surface);
+  --color-raised: var(--ae-surface-raised);
+  --color-overlay: var(--ae-surface-overlay);
+  --color-rail: var(--ae-rail);
+  --color-ink-strong: var(--ae-fg-strong);
+  --color-ink-soft: var(--ae-fg-soft);
+  --color-muted: var(--ae-muted);
+  --color-faint: var(--ae-faint);
+  --color-hairline: var(--ae-border);
+  --color-strong: var(--ae-border-strong);
+  --color-control: var(--ae-border-control);
+  --color-accent: var(--ae-accent);
+  --color-accent-ink: var(--ae-accent-ink);
+  --color-accent-bg: var(--ae-accent-bg);
+  --color-success: var(--ae-success);
+  --color-warning: var(--ae-warning);
+  --color-danger: var(--ae-danger);
+  --color-ember: var(--ae-ember);
+  --color-info: var(--ae-info);
+  --radius-sm: var(--ae-radius-sm);
+  --radius: var(--ae-radius);
+  --radius-lg: var(--ae-radius-lg);
+  --text-xs: var(--ae-text-xs);
+  --text-sm: var(--ae-text-sm);
+  --text-base: var(--ae-text-base);
+  --text-md: var(--ae-text-md);
+  --text-lg: var(--ae-text-lg);
+  --text-xl: var(--ae-text-xl);
+  --text-2xl: var(--ae-text-2xl);
+  --text-3xl: var(--ae-text-3xl);
+  --text-4xl: var(--ae-text-4xl);
+  --ease-quiet: var(--ae-ease);
+
   /* Type scale */
   --text-hero: var(--t-hero);
   --text-h1: var(--t-h1);
@@ -70,9 +108,11 @@
   --text-label: var(--t-label);
   --text-chip: var(--t-chip);
 
-  /* Leading */
-  --leading-tight: 0.9;
-  --leading-normal: 1.5;
+  /* Leading. Existing `leading-tight` / `leading-normal` utilities must keep
+     Quiet 1.2 / 1.55; remapping them onto the rebuilt --t-* scale would
+     silently restyle every unmigrated screen. */
+  --leading-tight: var(--ae-leading-tight);
+  --leading-normal: var(--ae-leading-normal);
 
   /* Motion */
   --ease-out: var(--e-out);
@@ -87,6 +127,7 @@
   --duration-long: var(--d-long);
 
   /* Ban stock animations that violate motion rules */
+  /* deletes Tailwind bounce, does not use it */
   --animate-bounce: initial;
   --animate-ping: initial;
   --animate-pulse: initial;

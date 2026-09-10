@@ -122,7 +122,7 @@ export function publicHeadMarkup(page: PublicMetadata, launch: PublicLaunchConfi
     `<title>${escapeHtml(page.title)}</title>`,
     `<meta data-vitae-public-seo name="description" content="${escapeHtml(page.description)}" />`,
     `<meta data-vitae-public-seo name="robots" content="${pageRobots(page, launch)}" />`,
-    '<meta data-vitae-public-seo name="theme-color" content="#0F0F0F" />',
+    '<meta data-vitae-public-seo name="theme-color" content="#f2f0ea" />',
   ];
 
   if (canonical) {
@@ -205,8 +205,8 @@ export function webManifest(): string {
       description: 'A private career record for deliberate next moves.',
       start_url: '/',
       display: 'standalone',
-      background_color: '#0F0F0F',
-      theme_color: '#0F0F0F',
+      background_color: '#f2f0ea',
+      theme_color: '#f2f0ea',
       icons: [
         { src: '/favicon-48.png', sizes: '48x48', type: 'image/png' },
         { src: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
