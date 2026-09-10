@@ -1,196 +1,111 @@
 /*
- * Vitae design tokens: the single authoritative palette (SRS INT-3).
- * "Quiet" identity (2026-08 rebrand): achromatic dark, no accent hue,
- * paper-white as the only signal. Emphasis by weight, not by colour.
- * colour is left free to mean something (semantic states, categorical
- * data), not spent on chrome. Full rationale: docs/design/brand-book.html.
- *
- * Standing bans (brand-book.html ch.02/07): no gradients on chrome, no
- * glow/halo shadows, no glassmorphism, no shimmer, no ambient washes, no
- * decorative illustration in empty states. Each was tried in a previous
- * identity and removed on purpose, do not reintroduce any of them here.
+ * Fourfold design tokens for Vitae.
+ * Light theme is default. Switch with data-theme="dark" | "hc" on <html>.
+ * Quadrant colours are semantic — red=Do, blue=Schedule, yellow=Delegate, dashed=Eliminate.
+ * Yellow (Delegate) is the action colour: primary buttons, links, focus, selection.
+ * Red (Do) is never a button. Blue (Schedule) is live/scheduled. Dashed (Eliminate) is the box you empty on purpose.
  */
-:root {
+:root,
+[data-theme='light'] {
   /* ── Surfaces ── */
-  --ae-rail: #0a0a0a; /* one step below canvas, the app reads as content on a frame */
-  --ae-bg: #0f0f0f;
-  --ae-surface: #151515;
-  --ae-surface-raised: #1c1c1c;
-  --ae-surface-overlay: #232323;
-  /* A recessed register/canvas well. It is deliberately only two points off
-     the canvas: depth in Living Ledger comes from containment and trace
-     geometry, never a glow or a card shadow. */
-  --ae-surface-sunken: #0d0d0d;
-  --ae-border: #2b2b2b; /* decorative hairlines only: 1.35:1 vs canvas */
-  --ae-border-strong: #3f3f3f; /* emphasis, chip outlines, scrollbars: 1.82:1 */
-  /* Any border that is the ONLY thing defining a control needs WCAG 1.4.11's
-     3:1 non-text contrast, which border-strong doesn't clear. This is the
-     fix, not a third arbitrary shade. */
-  --ae-border-control: #727271; /* 3.98:1 canvas / 3.26:1 overlay */
+  --bg: #f2f0ea;
+  --bg-2: #e9e6de;
+  --card: #ffffff;
+  --ink: #0b0b0d;
+  --ink-2: #5b584f;
+  --line: #d6d2c8;
 
-  /* ── Ink (contrast measured against the lightest surface a value can
-     appear on, rather than against canvas) ── */
-  --ae-fg-strong: #fafaf8; /* 18.3:1 canvas / 15.0:1 overlay */
-  --ae-fg: #e8e8e6; /* 15.6:1 / 12.8:1, body text, default */
-  --ae-fg-soft: #c9c9c6; /* 11.6:1 / 9.5:1, secondary prose */
-  --ae-muted: #a3a3a0; /* 7.6:1 / 6.2:1, labels, inactive nav, metadata */
-  /* Floor of the system, held above 4.5:1 against the lightest surface,
-     rather than the canvas. The lightest ground is --ae-accent-bg, the
-     selected-row fill, which is a step above --ae-surface-overlay and which
-     the old value missed at 4.49:1. Do not darken. Nothing may go below this. */
-  --ae-faint: #8f8f8c; /* 5.9:1 canvas / 4.9:1 overlay / 4.7:1 accent-bg */
+  /* ── Quadrant colours (semantic, never decorative) ── */
+  --do: #d8321a;       /* Do — red */
+  --sched: #1e4fd6;    /* Schedule — blue */
+  --deleg: #e0a800;    /* Delegate — yellow (action colour) */
+  --elim: #7a756a;     /* Eliminate — dashed outline */
 
-  /* ── Accent, paper white. There is no accent hue; do not introduce a
-     coloured accent "for just this one screen." ── */
-  --ae-accent: #fafaf8; /* primary fill, active marker, focus ring, selection */
-  --ae-accent-ink: #0f0f0f; /* text on accent fills: 18.3:1 */
-  --ae-accent-bg: #262626; /* selected row / active tab ground */
-  --ae-accent-2: #a3a3a0; /* "live": provenance, sync, edges. Never an action. */
+  /* ── Derived ── */
+  --on-q: #0b0b0d;     /* Text on quadrant fills (near-black) */
+  --focus: #1e4fd6;    /* Focus ring in light mode (blue) */
 
-  /* ── Ledger traces ──
-     These are roles, not a second palette. A trace is the connective tissue
-     between records, stages, and background work. Neutral/live stay on the
-     achromatic ramp; outcome roles alias the semantic colours below. Every
-     rendered trace also carries a node shape and text, never colour alone. */
-  --ae-trace-idle: #3f3f3f;
-  --ae-trace-live: #a3a3a0;
-  --ae-trace-current: #fafaf8;
+  /* ── Typography ── */
+  --display: 'Archivo Black', Impact, sans-serif;
+  --sans: 'Space Grotesk', system-ui, sans-serif;
+  --mono: 'Space Mono', ui-monospace, monospace;
 
-  /* ── Semantic (≥4.5:1 on all four surfaces; always shipped with an icon +
-     label, never colour alone; never used as a chart series) ── */
-  --ae-success: #7eb795; /* 6.8:1 overlay */
-  --ae-warning: #c8a344; /* 6.6:1 */
-  --ae-danger: #e17263; /* 5.1:1, fills nothing; a destructive button is an
-    outline, only the final confirm inside a dialog may be filled */
-  --ae-ember: #c98a3d; /* 5.4:1, streaks/celebration only, never a second
-    accent, never an error or warning */
-  --ae-info: #9a9484; /* 5.2:1 */
-  --ae-trace-success: var(--ae-success);
-  --ae-trace-warning: var(--ae-warning);
-  --ae-trace-danger: var(--ae-danger);
+  /* Type scale */
+  --t-hero: clamp(46px, 8.4vw, 124px);
+  --t-h1: clamp(34px, 4.6vw, 64px);
+  --t-h2: clamp(24px, 2.6vw, 36px);
+  --t-stat: clamp(22px, 2.4vw, 32px);
+  --t-lead: clamp(16px, 1.5vw, 19px);
+  --t-body: 16px;
+  --t-ui: 13px;
+  --t-small: 12.5px;
+  --t-label: 11px;
+  --t-chip: 10px;
 
-  /* ── Typography ──
-     'Instrument Sans Variable' / 'IBM Plex Mono' are the family names the
-     installed @fontsource packages actually register (verified against
-     node_modules, the brand book's own 'InstrumentSans'/'PlexMono' are
-     private names for its self-embedded specimen fonts and won't match
-     anything loaded here; using them literally would silently fall through
-     to the system fallback for every piece of text in the app). */
-  --ae-font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --ae-font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
-  --ae-font-display: var(
-    --ae-font-mono
-  ); /* page/section titles only, never
-    a clickable control, never below 15px. Weight 500, caps, 0.2em tracking
-    applied via the .u-display utility (base.css), not encodable in a single
-    font-family value. */
+  /* ── Geometry ── */
+  --radius-sm: 2px;
+  --radius: 3px;
+  --radius-lg: 5px;
+  --radius-full: 999px;
 
-  --ae-text-xs: 11px; /* nothing renders below this, ever */
-  --ae-text-sm: 12px;
-  --ae-text-base: 14px; /* default */
-  --ae-text-md: 15px;
-  --ae-text-lg: 17px;
-  --ae-text-xl: 21px;
-  --ae-text-2xl: 30px;
-  --ae-text-3xl: 44px;
-  --ae-text-4xl: 64px;
+  /* Spacing scale (7 steps) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-8: 48px;
 
-  --ae-leading-tight: 1.2; /* headings, single-line rows */
-  --ae-leading-normal: 1.55; /* everything else */
+  --row-h: 36px;
+  --control-h-sm: 26px;
+  --control-h: 32px;
+  --control-h-lg: 44px;
+  --hit-target: 32px;
 
-  /* ── Geometry, deliberately tight. Large radii are the strongest signal
-     of a generated card grid; 3px reads as a cut edge, not a pill. ── */
-  --ae-radius-sm: 2px;
-  --ae-radius: 3px;
-  --ae-radius-lg: 5px;
-  --ae-radius-full: 999px;
+  /* ── Elevation ── */
+  --shadow-overlay: 0 16px 40px -12px rgba(0, 0, 0, 0.35);
+  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--focus);
 
-  /* Seven steps, no others. Gaps come from flex/grid gap, never per-element
-     margins that collapse or double. */
-  --ae-space-1: 4px;
-  --ae-space-2: 8px;
-  --ae-space-3: 12px;
-  --ae-space-4: 16px;
-  --ae-space-5: 24px;
-  --ae-space-6: 32px;
-  --ae-space-8: 48px;
-
-  --ae-row-h: 36px;
-  /* Painted controls may stay compact on precise pointers, but their target
-     never drops below 32px. Coarse pointers promote the same token to 44px in
-     the media query below, without requiring every component to invent a
-     phone-only size. */
-  --ae-control-h-sm: 26px;
-  --ae-control-h: 32px;
-  --ae-control-h-lg: 44px;
-  --ae-hit-target: 32px;
-
-  /* ── Elevation, dialogs and popovers may carry exactly one soft shadow;
-     nothing else may. No colour tint, no glow. ── */
-  --ae-shadow-overlay: 0 16px 40px -12px rgba(0, 0, 0, 0.55);
-  --ae-focus-ring: 0 0 0 2px var(--ae-bg), 0 0 0 4px var(--ae-accent);
-
-  /* ── Motion, there is one easing. Exits use literal `linear`, not a
-     token: a leaving element should not decelerate, it should just go. ── */
-  --ae-ease: cubic-bezier(0.32, 0.72, 0, 1);
-  --ae-dur-fast: 90ms; /* exits, hover, anything leaving */
-  --ae-dur: 130ms; /* default, entrances, emphasis, route swaps */
-  --ae-dur-slow: 220ms; /* reorder and layout shifts only */
-  /* The two numbers the choreography rules are made of. Both were literals
-     in three places each (motion.ts, @keyframes vt-rise-in, and a hand-rolled
-     copy in the app's CSS that got the cap wrong), which is exactly how the
-     CSS stagger drifted to eleven steps while the JS one stayed at five. */
-  --ae-motion-rise: 4px; /* entrance travel; nothing moves further */
-  --ae-motion-stagger: 25ms; /* step between children, capped at 5 (125ms) */
+  /* ── Motion ── */
+  --e-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --e-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --e-settle: cubic-bezier(0.22, 1.2, 0.36, 1);
+  --d-quick: 140ms;
+  --d-base: 260ms;
+  --d-long: 520ms;
+  --motion-rise: 4px;
+  --motion-stagger: 25ms;
 
   /* ── Layers ── */
-  --ae-z-overlay: 1000;
-  --ae-z-popover: 1050;
-  --ae-z-toast: 1100;
+  --z-overlay: 1000;
+  --z-popover: 1050;
+  --z-toast: 1100;
 
-  /* ── Overlay backdrop, dimmed, never blurred. No backdrop-filter. ── */
-  --ae-overlay: rgba(0, 0, 0, 0.66);
+  /* ── Overlay backdrop ── */
+  --overlay: rgba(0, 0, 0, 0.5);
 
-  /* ── Categorical viz hues (graph node types, series). Fixed slot order,
-     never cycled, a ninth series folds into "Other" or gets a second
-     encoding, it is never a generated hue. Validated (lightness band,
-     chroma floor, adjacent-pair CVD separation, ≥3:1 contrast) against both
-     #0F0F0F and #232323. Identity is never colour-alone: every type also
-     carries its glyph shape and a direct label. ── */
-  --ae-viz-1: #1f9c86;
-  --ae-viz-2: #b08a18;
-  --ae-viz-3: #6e8fd0;
-  --ae-viz-4: #c8503f;
-  --ae-viz-5: #a87bc0;
-  --ae-viz-6: #7e9b3a;
-  --ae-viz-7: #d4649b;
-  --ae-viz-8: #c56a2a;
+  /* ── Categorical viz hues (fixed slot order, never cycled) ── */
+  --viz-1: #1f9c86;
+  --viz-2: #b08a18;
+  --viz-3: #6e8fd0;
+  --viz-4: #c8503f;
+  --viz-5: #a87bc0;
+  --viz-6: #7e9b3a;
+  --viz-7: #d4649b;
+  --viz-8: #c56a2a;
 
-  /* Stable, named data roles for screens that know the meaning of a series.
-     Generic charts continue to use --ae-viz-1..8 in fixed slot order. These
-     aliases prevent "person happened to be series 1 here, series 4 there"
-     when a Living Ledger view renders several record families. */
-  --ae-data-person: var(--ae-viz-1);
-  --ae-data-work: var(--ae-viz-2);
-  --ae-data-place: var(--ae-viz-3);
-  --ae-data-event: var(--ae-viz-4);
-  --ae-data-idea: var(--ae-viz-5);
-  --ae-data-practice: var(--ae-viz-6);
-  --ae-data-media: var(--ae-viz-7);
-  --ae-data-other: var(--ae-viz-8);
+  /* ── Semantic aliases for data roles ── */
+  --data-person: var(--viz-1);
+  --data-work: var(--viz-2);
+  --data-place: var(--viz-3);
+  --data-event: var(--viz-4);
+  --data-idea: var(--viz-5);
+  --data-practice: var(--viz-6);
+  --data-media: var(--viz-7);
+  --data-other: var(--viz-8);
 
-  /* ── Simulated paper ──────────────────────────────────────────────────
-     The one light surface the product owns. Résumé previews, the live
-     document editor and the schema atlas all draw a printed page inside a
-     dark-only app, and the --ae-* ramp cannot express that: --ae-fg on white
-     is invisible and --ae-border on white is not there. These are the page's
-     own ink, not a second theme, and nothing outside a document preview may
-     use them.
-
-     --paper-affordance carries the editor's own controls sitting on the page
-     (drag grips, empty hints, field stubs). Those are app chrome that happens
-     to land on the document, so they answer to the app's contrast standard:
-     6.0:1 on white. Its predecessor was 3.21:1 and axe caught it. ── */
+  /* ── Simulated paper (résumé previews only) ── */
   --paper-bg: #ffffff;
   --paper-ink: #1e1e1e;
   --paper-ink-strong: #111111;
@@ -204,25 +119,99 @@
   --paper-affordance-border: #9aa2ad;
   --paper-struck: #9ba0a6;
   --paper-fill: #d8dee8;
-
-  /* ── Legacy aliases, real consumers exist in screens not yet rebuilt
-     under Quiet. Remove each alias once its last consumer lands. ── */
-  --ae-muted-strong: var(--ae-muted);
-  --ae-accent-strong: var(--ae-accent);
-  --ae-accent-soft: var(--ae-fg-soft);
-  --ae-accent-bg-soft: var(--ae-surface-raised);
 }
 
-@media (pointer: coarse) {
-  :root {
-    --ae-hit-target: 44px;
+/* ── Dark theme ── */
+[data-theme='dark'] {
+  --bg: #0b0b0d;
+  --bg-2: #121215;
+  --card: #17171b;
+  --ink: #f4f1ea;
+  --ink-2: #a9a59b;
+  --line: #2a2a31;
+  --do: #ff3d1f;
+  --sched: #3d7bff;
+  --deleg: #ffc61a;
+  --elim: #c9c3b8;
+  --on-q: #0b0b0d;
+  --focus: #ffc61a;
+  --shadow-overlay: 0 16px 40px -12px rgba(0, 0, 0, 0.55);
+  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--focus);
+  --overlay: rgba(0, 0, 0, 0.66);
+}
+
+/* ── High contrast theme ── */
+[data-theme='hc'] {
+  --bg: #ffffff;
+  --bg-2: #f0f0f0;
+  --card: #ffffff;
+  --ink: #000000;
+  --ink-2: #333333;
+  --line: #000000;
+  --do: #cc0000;
+  --sched: #0000cc;
+  --deleg: #cc9900;
+  --elim: #666666;
+  --on-q: #000000;
+  --focus: #0000cc;
+  --shadow-overlay: 0 0 0 3px #000000;
+  --focus-ring: 0 0 0 3px #000000;
+  --overlay: rgba(0, 0, 0, 0.8);
+}
+
+/* ── System fallbacks ── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #0b0b0d;
+    --bg-2: #121215;
+    --card: #17171b;
+    --ink: #f4f1ea;
+    --ink-2: #a9a59b;
+    --line: #2a2a31;
+    --do: #ff3d1f;
+    --sched: #3d7bff;
+    --deleg: #ffc61a;
+    --elim: #c9c3b8;
+    --on-q: #0b0b0d;
+    --focus: #ffc61a;
+    --shadow-overlay: 0 16px 40px -12px rgba(0, 0, 0, 0.55);
+    --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--focus);
+    --overlay: rgba(0, 0, 0, 0.66);
   }
 }
 
+@media (prefers-contrast: more) {
+  :root:not([data-theme]) {
+    --bg: #ffffff;
+    --bg-2: #f0f0f0;
+    --card: #ffffff;
+    --ink: #000000;
+    --ink-2: #333333;
+    --line: #000000;
+    --do: #cc0000;
+    --sched: #0000cc;
+    --deleg: #cc9900;
+    --elim: #666666;
+    --on-q: #000000;
+    --focus: #0000cc;
+    --shadow-overlay: 0 0 0 3px #000000;
+    --focus-ring: 0 0 0 3px #000000;
+    --overlay: rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --ae-dur-fast: 0ms;
-    --ae-dur: 0ms;
-    --ae-dur-slow: 0ms;
+    --d-quick: 0ms;
+    --d-base: 0ms;
+    --d-long: 0ms;
+  }
+}
+
+/* ── Coarse pointer (touch) ── */
+@media (pointer: coarse) {
+  :root {
+    --hit-target: 44px;
   }
 }

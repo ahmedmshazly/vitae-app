@@ -63,6 +63,9 @@ Thumbs.db
 2026-*.txt
 e2e/2026-*.txt
 
+# Isolated git worktrees for feature branches.
+.worktrees/
+
 # Machine-generated local review output.
 /reviews/
 

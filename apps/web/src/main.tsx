@@ -3,29 +3,21 @@ import { createRoot } from 'react-dom/client';
 import { MutationCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 
-// Self-hosted fonts (SRS C4, no runtime CDN)
-import '@fontsource-variable/instrument-sans';
-import '@fontsource/ibm-plex-sans/400.css';
-import '@fontsource/ibm-plex-sans/500.css';
-import '@fontsource/ibm-plex-sans/600.css';
-import '@fontsource/ibm-plex-sans/700.css';
-import '@fontsource/ibm-plex-mono/400.css';
-import '@fontsource/ibm-plex-mono/500.css';
-import '@fontsource/ibm-plex-mono/600.css';
-import '@fontsource/source-serif-4/400.css';
-import '@fontsource/source-serif-4/600.css';
-import '@fontsource/source-serif-4/400-italic.css';
-
-// Tailwind v4 entry + @theme inline alias of the Quiet tokens below, must
+// Tailwind v4 entry + @theme inline alias of the design tokens below, must
 // come before the hand-authored chain so preflight loses specificity ties
 // by source order (see styles/theme.css).
 import './styles/theme.css';
 
+// The design system: tokens, base (which carries the self-hosted @font-face
+// rules, so no runtime CDN — SRS C4), motion, then the component sheets.
 import '@vitae/ui/styles/tokens.css';
 import '@vitae/ui/styles/base.css';
+import '@vitae/ui/styles/motion.css';
 import '@vitae/ui/styles/components.css';
 import '@vitae/ui/styles/layout.css';
 import '@vitae/ui/styles/toast.css';
+
+// App styles
 import './styles/app.css';
 import './styles/network.css';
 import './styles/dedup.css';
@@ -44,6 +36,7 @@ import './styles/marketing.css';
 // .ec-header__actions, .ec-header__brand) where load order alone decided
 // the winner.
 
+import { ThemeProvider } from '@vitae/ui';
 import { App } from './App.js';
 import { flashToast } from './features/Toast.js';
 
@@ -65,9 +58,14 @@ const queryClient = new QueryClient({
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <App />
-      </BrowserRouter>
+      {/* Outside the router: the theme is a property of the document, not of
+          the route, and it writes data-theme on <html> once rather than on
+          every navigation. */}
+      <ThemeProvider>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <App />
+        </BrowserRouter>
+      </ThemeProvider>
     </QueryClientProvider>
   </StrictMode>,
 );

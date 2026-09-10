@@ -1,4 +1,54 @@
-/* Vitae base styles: minimal reset + typographic defaults on the token system. */
+/* Fourfold — base styles. Minimal reset + typographic defaults on the token system. */
+
+@font-face {
+  font-family: 'Archivo Black';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/ArchivoBlack-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/SpaceGrotesk-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./fonts/SpaceGrotesk-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./fonts/SpaceGrotesk-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./fonts/SpaceGrotesk-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Space Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/SpaceMono-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Space Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./fonts/SpaceMono-700.woff2') format('woff2');
+}
 
 *,
 *::before,
@@ -13,52 +63,33 @@ body,
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light dark;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
-  background: var(--ae-bg);
-  color: var(--ae-fg);
-  font-family: var(--ae-font-sans);
-  font-size: var(--ae-text-base);
-  line-height: var(--ae-leading-normal);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: var(--t-body);
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-h1,
-h2,
-h3,
-h4,
-p,
-figure {
+h1, h2, h3, h4, p, figure {
   margin: 0;
 }
 
-/* Inside @layer base so Tailwind's utilities (which live in @layer utilities)
-   can override it. Unlayered CSS beats *any* layer no matter the source order,
-   so as plain rules these silently defeated `no-underline` on every link.
-   which matters because a list row is a link several elements wide, and
-   underlining its title, date and chip together reads as damage. Layering only
-   the anchor rules keeps the blast radius to exactly that. */
 @layer base {
   a {
-    color: var(--ae-accent);
+    color: var(--deleg);
     text-decoration: none;
   }
   a:hover {
     text-decoration: underline;
   }
-  /* A link inside a sentence is told apart from the sentence by its colour
-     alone, and in this palette that is accent ink on muted body text: 2.41:1,
-     under the 3:1 the rule asks for and under what anyone reading grey prose
-     can see. A prose link carries an underline, so the difference is a shape.
-     Row links are several elements wide and underlining them reads as damage,
-     which is why this reaches only the bare anchors that sit inside running
-     text. Anything with a class of its own is a component and keeps its own
-     treatment. */
   p > a:not([class]),
   li > a:not([class]),
   dd > a:not([class]) {
@@ -80,28 +111,38 @@ button,
   touch-action: manipulation;
 }
 
-/* Data is always monospace, part of Vitae's identity (SRS design DNA). */
+/* Data is always monospace — part of Fourfold's identity */
 .u-mono {
-  font-family: var(--ae-font-mono);
+  font-family: var(--mono);
   font-variant-numeric: tabular-nums;
 }
-/* Page/section titles only, never a clickable control (IDENTITY.md ch. 04).
-   A single font-family custom property can't carry the caps + tracking +
-   weight that make up the display treatment, so this bundles all three. */
+
+/* Display: Archivo Black, uppercase, tight tracking, line-height 0.9 */
 .u-display {
-  font-family: var(--ae-font-display);
+  font-family: var(--display);
+  font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 0.9;
+  text-wrap: balance;
 }
+
+/* Labels/chips: Space Mono, uppercase, 0.06em tracking */
+.ff-label {
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 .u-muted {
-  color: var(--ae-muted);
+  color: var(--ink-2);
 }
 .u-faint {
-  color: var(--ae-faint);
+  color: var(--elim);
 }
 .u-strong {
-  color: var(--ae-fg-strong);
+  color: var(--ink);
 }
 .u-truncate {
   overflow: hidden;
@@ -120,30 +161,30 @@ button,
   border: 0;
 }
 
-/* Visible focus everywhere (WCAG 2.1 AA: NFR-A11Y-001). */
+/* Visible focus everywhere (WCAG 2.1 AA) */
 :focus-visible {
   outline: none;
-  box-shadow: var(--ae-focus-ring);
-  border-radius: var(--ae-radius-sm);
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
 }
 
 ::selection {
-  background: var(--ae-accent-bg);
-  color: var(--ae-fg-strong);
+  background: var(--deleg);
+  color: var(--on-q);
 }
 
-/* Custom scrollbars that fit the palette. */
+/* Custom scrollbars */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--ae-border-strong) transparent;
+  scrollbar-color: var(--line) transparent;
 }
 *::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 *::-webkit-scrollbar-thumb {
-  background: var(--ae-border-strong);
-  border-radius: var(--ae-radius-full);
+  background: var(--line);
+  border-radius: var(--radius-full);
   border: 3px solid transparent;
   background-clip: content-box;
 }

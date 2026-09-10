@@ -1,130 +1,108 @@
 /*
- * Tailwind v4 entry point. `@theme inline` aliases the Quiet tokens defined
+ * Tailwind v4 entry point. `@theme inline` aliases the Fourfold tokens defined
  * in packages/ui/src/styles/tokens.css onto Tailwind's utility namespaces,
- * so `bg-canvas`, `text-muted`, `border-control`, `rounded-lg` etc. resolve
- * to the same --ae-* custom properties as the rest of the app, the two
- * systems can never disagree. `inline` (not a plain @theme block) because
- * these values reference custom properties defined in a different file,
- * not literals Tailwind can bake in at build time.
+ * so `bg-ground`, `text-ink`, `border-line`, `rounded-card` etc. resolve
+ * to the same --* custom properties as the rest of the app.
  *
- * Raw values stay inside this block; a hex code or bare --ae-* reference in
- * a component is a bug (docs/design/IDENTITY.md ch. "Utility naming").
+ * `inline` (not a plain @theme block) because these values reference
+ * custom properties defined in a different file, not literals Tailwind
+ * can bake in at build time.
+ *
+ * Raw values stay inside this block; a hex code or bare --* reference in
+ * a component is a bug.
  */
 @import 'tailwindcss';
 
 @theme inline {
   /* Surfaces */
-  --color-canvas: var(--ae-bg);
-  --color-surface: var(--ae-surface);
-  --color-raised: var(--ae-surface-raised);
-  --color-overlay: var(--ae-surface-overlay);
-  --color-rail: var(--ae-rail);
+  --color-ground: var(--bg);
+  --color-ground2: var(--bg-2);
+  --color-card: var(--card);
 
   /* Ink */
-  --color-ink: var(--ae-fg);
-  --color-ink-strong: var(--ae-fg-strong);
-  --color-ink-soft: var(--ae-fg-soft);
-  --color-muted: var(--ae-muted);
-  --color-faint: var(--ae-faint);
+  --color-ink: var(--ink);
+  --color-ink2: var(--ink-2);
+  --color-elim: var(--elim);
 
   /* Borders */
-  --color-hairline: var(--ae-border);
-  --color-strong: var(--ae-border-strong);
-  --color-control: var(--ae-border-control);
+  --color-line: var(--line);
 
-  /* Accent, one token, every color-utility prefix (bg-accent, text-accent,
-     ring-accent, ...) comes free from Tailwind's namespace model. */
-  --color-accent: var(--ae-accent);
-  --color-accent-ink: var(--ae-accent-ink);
-  --color-accent-bg: var(--ae-accent-bg);
+  /* Quadrant colours (semantic) */
+  --color-do: var(--do);
+  --color-sched: var(--sched);
+  --color-deleg: var(--deleg);
+  --color-elim-q: var(--elim);
 
-  /* Semantic */
-  --color-success: var(--ae-success);
-  --color-warning: var(--ae-warning);
-  --color-danger: var(--ae-danger);
-  --color-ember: var(--ae-ember);
-  --color-info: var(--ae-info);
+  /* Derived */
+  --color-onq: var(--on-q);
+  --color-focus: var(--focus);
 
   /* Categorical viz, fixed slot order, never cycled */
-  --color-viz-1: var(--ae-viz-1);
-  --color-viz-2: var(--ae-viz-2);
-  --color-viz-3: var(--ae-viz-3);
-  --color-viz-4: var(--ae-viz-4);
-  --color-viz-5: var(--ae-viz-5);
-  --color-viz-6: var(--ae-viz-6);
-  --color-viz-7: var(--ae-viz-7);
-  --color-viz-8: var(--ae-viz-8);
+  --color-viz-1: var(--viz-1);
+  --color-viz-2: var(--viz-2);
+  --color-viz-3: var(--viz-3);
+  --color-viz-4: var(--viz-4);
+  --color-viz-5: var(--viz-5);
+  --color-viz-6: var(--viz-6);
+  --color-viz-7: var(--viz-7);
+  --color-viz-8: var(--viz-8);
 
-  /* Radius, not in the spec's own utility table (that one's color-only),
-     but without this a future `rounded-lg` silently pulls Tailwind's
-     default radius scale instead of ours. */
-  --radius-sm: var(--ae-radius-sm);
-  --radius: var(--ae-radius);
-  --radius-lg: var(--ae-radius-lg);
-  --radius-full: var(--ae-radius-full);
+  /* Radius */
+  --radius-chip: var(--radius-sm);
+  --radius-control: var(--radius);
+  --radius-card: var(--radius-lg);
+  --radius-full: var(--radius-full);
 
   /* Fonts */
-  --font-sans: var(--ae-font-sans);
-  --font-mono: var(--ae-font-mono);
-  --font-display: var(--ae-font-display);
+  --font-display: var(--display);
+  --font-sans: var(--sans);
+  --font-mono: var(--mono);
 
-  /* Type scale. Without these, `text-sm` silently resolves to Tailwind's own
-     0.875rem instead of Quiet's 12px, and the only way to hit a token size
-     from a utility is a hardcoded px value, which the identity forbids. */
-  --text-xs: var(--ae-text-xs);
-  --text-sm: var(--ae-text-sm);
-  --text-base: var(--ae-text-base);
-  --text-md: var(--ae-text-md);
-  --text-lg: var(--ae-text-lg);
-  --text-xl: var(--ae-text-xl);
-  --text-2xl: var(--ae-text-2xl);
-  --text-3xl: var(--ae-text-3xl);
-  --text-4xl: var(--ae-text-4xl);
+  /* Type scale */
+  --text-hero: var(--t-hero);
+  --text-h1: var(--t-h1);
+  --text-h2: var(--t-h2);
+  --text-stat: var(--t-stat);
+  --text-lead: var(--t-lead);
+  --text-body: var(--t-body);
+  --text-ui: var(--t-ui);
+  --text-small: var(--t-small);
+  --text-label: var(--t-label);
+  --text-chip: var(--t-chip);
 
-  --leading-tight: var(--ae-leading-tight);
-  --leading-normal: var(--ae-leading-normal);
+  /* Leading */
+  --leading-tight: 0.9;
+  --leading-normal: 1.5;
 
-  /* Motion. Until this landed, theme.css bridged colour, radius and type but
-     nothing about movement, so every `transition-*` utility in the app
-     silently ran Tailwind's stock ease-out at 150ms while the rest of the
-     product ran --ae-ease at 130ms. Overriding the two defaults means a bare
-     `transition-colors` is on the brand curve without anyone opting in, and
-     `ease-quiet` names the curve for the cases that set it explicitly.
+  /* Motion */
+  --ease-out: var(--e-out);
+  --ease-pop: var(--e-pop);
+  --ease-settle: var(--e-settle);
+  --default-transition-timing-function: var(--e-out);
+  --default-transition-duration: var(--d-base);
 
-     There is deliberately no `duration-*` alias: Tailwind v4 has no such
-     theme namespace, and the supported spelling is the custom-property
-     shorthand, `duration-(--ae-dur)` / `duration-(--ae-dur-fast)`. */
-  --ease-quiet: var(--ae-ease);
-  --default-transition-timing-function: var(--ae-ease);
-  --default-transition-duration: var(--ae-dur);
+  /* Durations as custom properties for shorthand: duration-(--d-quick) etc. */
+  --duration-quick: var(--d-quick);
+  --duration-base: var(--d-base);
+  --duration-long: var(--d-long);
 
-  /* Tailwind ships four stock animations and three of them are banned motion:
-     bounce and ping are overshoot, pulse is the pulsing glow ch.08 rules out.
-     They were one keystroke from any component with nothing stopping them.
-     `initial` removes the utility, so `animate-bounce` no longer compiles at
-     all rather than compiling and failing review later. `animate-spin` is
-     left alone; an indeterminate spinner is permitted. */
+  /* Ban stock animations that violate motion rules */
   --animate-bounce: initial;
   --animate-ping: initial;
   --animate-pulse: initial;
 
-  /* The one elevation. Without this, `shadow-lg` is Tailwind's shadow and
-     nothing points at the token tokens.css reserves for dialogs and popovers. */
-  --shadow-overlay: var(--ae-shadow-overlay);
+  /* Elevation */
+  --shadow-overlay: var(--shadow-overlay);
+
+  /* Z-index (Tailwind v4 has no --z-* theme namespace, use custom props directly) */
 }
 
 /*
  * Not bridged, on purpose:
  *
- * Spacing. --ae-space-* is a seven-step scale (4 8 12 16 24 32 48) with no
- * step 7, and Tailwind's --spacing is a single multiplier. Naming the steps
- * (--spacing-5 and so on) works, but the same scale also backs w-*, h-* and
- * size-*, so aliasing it would resize controls as a side effect: h-8 would go
- * from 32px to 48px. Steps 1 to 4 already agree with the token scale; 5, 6
- * and 8 do not, and each usage needs to be looked at rather than rewritten in
- * bulk. That happens screen by screen in the interface sweep.
+ * Spacing: --space-* is a 7-step scale (4 8 12 16 24 32 48). Tailwind's
+ * --spacing is a single multiplier. Aliasing it would resize controls as
+ * a side effect. Use var(--space-*) directly.
  *
- * Z-index. Tailwind v4 has no --z-* theme namespace, so --ae-z-overlay,
- * --ae-z-popover and --ae-z-toast are only reachable as custom properties.
- * Use them directly; layering is the design system's call, not a utility's.
+ * Z-index: Use var(--z-*) directly; layering is the design system's call.
  */

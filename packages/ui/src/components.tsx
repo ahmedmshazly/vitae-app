@@ -2,6 +2,7 @@
  * Vitae primitive components. Small and composable: the design
  * system's job is consistency (mono-for-data, visible provenance, explainable
  * scores), not a heavy component framework. Styles live in styles/components.css.
+ * Fourfold identity: semantic quadrant colours, yellow action, CSS-first motion.
  */
 import {
   forwardRef,
@@ -353,11 +354,11 @@ export interface ChargeRingProps {
 /**
  * Circular arc showing 1 − quiet/cadence: full = fresh, empty = overdue.
  *
- * Magnitude, so it is a sequential scale: one hue (the accent) stepping down
- * in opacity, never a hue ramp. The three off-token blues and browns this used
- * to fade through read as *categories* rather than as less-of-the-same, and
- * none of them were tokens. The arc length carries the value on its own, the
- * caller is still expected to print the number beside it.
+ * Magnitude, so it is a sequential scale: one hue (Delegate yellow) stepping
+ * down in opacity, never a hue ramp. The three off-token blues and browns this
+ * used to fade through read as *categories* rather than as less-of-the-same,
+ * and none of them were tokens. The arc length carries the value on its own,
+ * the caller is still expected to print the number beside it.
  */
 export function ChargeRing({ quiet, cadence, size = 56, children }: ChargeRingProps) {
   const r = 25;
@@ -371,13 +372,13 @@ export function ChargeRing({ quiet, cadence, size = 56, children }: ChargeRingPr
       title={`${quiet}d quiet · target ${cadence}d`}
     >
       <svg width={size} height={size} viewBox="0 0 56 56" aria-hidden>
-        <circle cx="28" cy="28" r={r} fill="none" stroke="var(--ae-border)" strokeWidth="2.5" />
+        <circle cx="28" cy="28" r={r} fill="none" stroke="var(--line)" strokeWidth="2.5" />
         <circle
           cx="28"
           cy="28"
           r={r}
           fill="none"
-          stroke="var(--ae-accent)"
+          stroke="var(--deleg)"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeDasharray={dash}
@@ -404,13 +405,13 @@ export function StrengthDonut({ strength, size = 104, label }: StrengthDonutProp
   return (
     <span className="vt-donut" style={{ width: size, height: size }}>
       <svg width={size} height={size} viewBox="0 0 104 104" aria-hidden>
-        <circle cx="52" cy="52" r={r} fill="none" stroke="var(--ae-border)" strokeWidth="6" />
+        <circle cx="52" cy="52" r={r} fill="none" stroke="var(--line)" strokeWidth="6" />
         <circle
           cx="52"
           cy="52"
           r={r}
           fill="none"
-          stroke="var(--ae-accent)"
+          stroke="var(--deleg)"
           strokeWidth="6"
           strokeLinecap="round"
           strokeDasharray={`${(s * circ).toFixed(1)} ${circ}`}
@@ -436,15 +437,10 @@ export interface DotGridProps {
    * from assistive tech, which is what it was before, a silent 30 dots. */
   label?: string;
 }
-export function DotGrid({
-  days,
-  color = 'var(--ae-accent)',
-  recentWindow = 12,
-  label,
-}: DotGridProps) {
+export function DotGrid({ days, color = 'var(--deleg)', recentWindow = 12, label }: DotGridProps) {
   // An unchecked slot has to be visible as a slot, or a sparse grid reads as a
-  // short grid. --ae-surface-raised is 1.15:1 on the canvas; --ae-border is the
-  // dimmest thing that still draws.
+  // short grid. --bg-2 is 1.05:1 on the canvas; --line is the dimmest thing
+  // that still draws.
   const done = days.filter(Boolean).length;
   const summary = label ? `${label}: ${done} of the last ${days.length} days` : undefined;
   return (
@@ -459,7 +455,7 @@ export function DotGrid({
           key={i}
           className="vt-dotgrid__dot"
           style={{
-            background: on ? color : 'var(--ae-border)',
+            background: on ? color : 'var(--line)',
             opacity: on ? (i >= days.length - recentWindow ? 1 : 0.45) : 1,
           }}
         />

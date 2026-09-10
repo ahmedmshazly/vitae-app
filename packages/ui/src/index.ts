@@ -6,6 +6,7 @@ export * from './overlay.js';
 export * from './feedback.js';
 export * from './layout.js';
 export * from './toast.js';
+export * from './theme-provider.js';
 
 // Hooks. The package still carries no animation runtime dependency: both of
 // these are plain React plus matchMedia, and design-system animation stays in
