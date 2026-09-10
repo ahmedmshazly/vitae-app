@@ -1,0 +1,38 @@
+[
+  {
+    "id": "inbox-sets-p1",
+    "input": {
+      "rule": {
+        "enabled": true,
+        "condition": { "kind": "predicate", "field": "status", "operator": "eq", "value": "inbox" },
+        "actions": [{ "field": "priority", "value": "p1" }]
+      },
+      "item": { "status": "inbox" }
+    },
+    "expected": { "matches": true, "patch": { "priority": "p1" } }
+  },
+  {
+    "id": "disabled-rule-skips",
+    "input": {
+      "rule": {
+        "enabled": false,
+        "condition": { "kind": "predicate", "field": "status", "operator": "eq", "value": "inbox" },
+        "actions": [{ "field": "priority", "value": "p1" }]
+      },
+      "item": { "status": "inbox" }
+    },
+    "expected": { "matches": false }
+  },
+  {
+    "id": "due-set-does-not-match-undated",
+    "input": {
+      "rule": {
+        "enabled": true,
+        "condition": { "kind": "predicate", "field": "due", "operator": "is_set" },
+        "actions": [{ "field": "status", "value": "next" }]
+      },
+      "item": { "status": "inbox" }
+    },
+    "expected": { "matches": false }
+  }
+]

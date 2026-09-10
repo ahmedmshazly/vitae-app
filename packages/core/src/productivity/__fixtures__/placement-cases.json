@@ -1,0 +1,84 @@
+[
+  {
+    "id": "override-beats-urgency",
+    "now": "2026-09-04",
+    "urgency_window_days": 7,
+    "input": {
+      "due": "2026-09-01",
+      "importance": "critical",
+      "quadrant_override": { "quadrant": "eliminate", "set_at": "2026-09-03" }
+    },
+    "expected": { "quadrant": "eliminate", "reason": "placed_by_you" }
+  },
+  {
+    "id": "due-past",
+    "now": "2026-09-04",
+    "urgency_window_days": 7,
+    "input": { "due": "2026-09-01", "importance": "none" },
+    "expected": { "quadrant": "delegate", "reason": "due_past" }
+  },
+  {
+    "id": "due-within-window",
+    "now": "2026-09-04",
+    "urgency_window_days": 7,
+    "input": { "due": "2026-09-07", "importance": "none" },
+    "expected": { "quadrant": "delegate", "reason": "due_within_window" }
+  },
+  {
+    "id": "target-past",
+    "now": "2026-09-04",
+    "urgency_window_days": 7,
+    "input": { "target": "2026-09-01", "importance": "none" },
+    "expected": { "quadrant": "delegate", "reason": "target_past" }
+  },
+  {
+    "id": "target-within-window",
+    "now": "2026-09-04",
+    "urgency_window_days": 7,
+    "input": { "target": "2026-09-06", "importance": "none" },
+    "expected": { "quadrant": "delegate", "reason": "target_within_window" }
+  },
+  {
+    "id": "follow-up-due",
+    "now": "2026-09-04",
+    "urgency_window_days": 7,
+    "input": { "follow_up": "2026-09-03", "importance": "none" },
+    "expected": { "quadrant": "delegate", "reason": "follow_up_due" }
+  },
+  {
+    "id": "waiting-patience-exceeded",
+    "now": "2026-09-04",
+    "urgency_window_days": 7,
+    "waiting_patience_days": 7,
+    "waiting_on_name": "Sam",
+    "input": {
+      "status": "waiting",
+      "waiting_on": "person-sam",
+      "waiting_since": "2026-08-26",
+      "waiting_patience_days": 7,
+      "importance": "none"
+    },
+    "expected": { "quadrant": "delegate", "reason": "waiting_patience_exceeded" }
+  },
+  {
+    "id": "no-signal-eliminate",
+    "now": "2026-09-04",
+    "urgency_window_days": 7,
+    "input": { "importance": "none" },
+    "expected": { "quadrant": "eliminate", "reason": "no_signal" }
+  },
+  {
+    "id": "importance-asserted-schedule",
+    "now": "2026-09-04",
+    "urgency_window_days": 7,
+    "input": { "importance": "important" },
+    "expected": { "quadrant": "schedule", "reason": "importance_asserted" }
+  },
+  {
+    "id": "due-past-and-important",
+    "now": "2026-09-04",
+    "urgency_window_days": 7,
+    "input": { "due": "2026-09-01", "importance": "important" },
+    "expected": { "quadrant": "do", "reason": "due_past" }
+  }
+]

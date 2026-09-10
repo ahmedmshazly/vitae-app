@@ -1,0 +1,25 @@
+[
+  {
+    "id": "plain-title",
+    "input": { "text": "Renew passport", "now": "2026-09-04T15:00:00.000Z" },
+    "expected": { "title": "Renew passport", "fields": {} }
+  },
+  {
+    "id": "priority-p1",
+    "input": { "text": "Renew passport !p1", "now": "2026-09-04T15:00:00.000Z" },
+    "expected": { "title": "Renew passport", "fields": { "priority": "p1" } }
+  },
+  {
+    "id": "entity-mention",
+    "input": { "text": "Ask @sam about the lease", "now": "2026-09-04T15:00:00.000Z" },
+    "expected": {
+      "title": "Ask about the lease",
+      "fields": { "entity": { "name": "sam", "unresolved": true } }
+    }
+  },
+  {
+    "id": "due-date-only",
+    "input": { "text": "Renew passport due 2026-09-11", "now": "2026-09-04T15:00:00.000Z" },
+    "expected": { "title": "Renew passport", "fields": { "due": "2026-09-11" } }
+  }
+]

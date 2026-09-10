@@ -1,0 +1,35 @@
+[
+  {
+    "id": "one-completion-complete-history",
+    "input": {
+      "window_start": "2026-08-29",
+      "window_end": "2026-09-04",
+      "time_zone": "Africa/Cairo",
+      "history_completeness": "complete",
+      "completions": 1
+    },
+    "expected": { "completions": 1, "history_completeness": "complete" }
+  },
+  {
+    "id": "sparse-revisions-declared",
+    "input": {
+      "window_start": "2026-08-01",
+      "window_end": "2026-09-04",
+      "time_zone": "Africa/Cairo",
+      "history_completeness": "sparse",
+      "completions": 0
+    },
+    "expected": { "completions": 0, "history_completeness": "sparse" }
+  },
+  {
+    "id": "unknown-history-not-a-zero-claim",
+    "input": {
+      "window_start": "2026-01-01",
+      "window_end": "2026-09-04",
+      "time_zone": "UTC",
+      "history_completeness": "unknown",
+      "completions": 0
+    },
+    "expected": { "completions": 0, "history_completeness": "unknown" }
+  }
+]

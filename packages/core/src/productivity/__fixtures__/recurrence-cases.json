@@ -1,0 +1,48 @@
+[
+  {
+    "id": "daily-fixed",
+    "input": {
+      "rrule": "FREQ=DAILY",
+      "mode": "fixed",
+      "from": "2026-09-07",
+      "count": 3,
+      "exceptions": []
+    },
+    "expected": { "dates": ["2026-09-07", "2026-09-08", "2026-09-09"] }
+  },
+  {
+    "id": "weekly-weekdays",
+    "input": {
+      "rrule": "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR",
+      "mode": "fixed",
+      "from": "2026-09-07",
+      "count": 5,
+      "exceptions": []
+    },
+    "expected": {
+      "dates": ["2026-09-07", "2026-09-08", "2026-09-09", "2026-09-10", "2026-09-11"]
+    }
+  },
+  {
+    "id": "weekly-from-completion",
+    "input": {
+      "rrule": "FREQ=WEEKLY",
+      "mode": "from_completion",
+      "from": "2026-09-09",
+      "count": 2,
+      "exceptions": []
+    },
+    "expected": { "dates": ["2026-09-09", "2026-09-16"] }
+  },
+  {
+    "id": "daily-with-exception",
+    "input": {
+      "rrule": "FREQ=DAILY",
+      "mode": "fixed",
+      "from": "2026-09-07",
+      "count": 3,
+      "exceptions": ["2026-09-08"]
+    },
+    "expected": { "dates": ["2026-09-07", "2026-09-09", "2026-09-10"] }
+  }
+]
