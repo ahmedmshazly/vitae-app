@@ -72,7 +72,7 @@ describe('@vitae/ui exports', () => {
 
   it('names the fonts base.css declares, so no @font-face points at nothing', () => {
     const base = readFileSync(join(PACKAGE_ROOT, 'src/styles/base.css'), 'utf8');
-    const referenced = [...base.matchAll(/url\('\.\/fonts\/([^']+)'\)/g)].map((m) => m[1]);
+    const referenced = [...base.matchAll(/url\('\.\/fonts\/([^']+)'\)/g)].map((m) => m[1]!);
     expect(referenced.length).toBeGreaterThan(0);
 
     const present = new Set(readdirSync(join(PACKAGE_ROOT, 'src/styles/fonts')));

@@ -58,7 +58,7 @@ function blockBody(head: string): string {
 function declarations(css: string): Map<string, string> {
   const out = new Map<string, string>();
   for (const m of css.matchAll(/(--[\w-]+)\s*:\s*([^;{}]+);/g)) {
-    out.set(m[1], m[2].replace(/\s+/g, ' ').trim());
+    out.set(m[1]!, m[2]!.replace(/\s+/g, ' ').trim());
   }
   return out;
 }
@@ -80,7 +80,7 @@ function resolve(name: string, scope: Map<string, string> = ROOT): string | null
     if (value === undefined) return null;
     const hop = /^var\(\s*(--[\w-]+)\s*\)$/.exec(value);
     if (!hop) return value;
-    current = hop[1];
+    current = hop[1]!;
   }
 }
 

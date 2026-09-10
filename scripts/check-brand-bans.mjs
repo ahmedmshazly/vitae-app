@@ -20,10 +20,14 @@ const allow = existsSync(allowPath) ? JSON.parse(readFileSync(allowPath, 'utf8')
 const CSS_ROOTS = ['packages/ui/src/styles', 'apps/web/src/styles'];
 const CODE_ROOTS = ['packages/ui/src', 'apps/web/src'];
 
-/** The one easing. tokens.css: "Everything. There is one easing." */
-const EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
-/** 90 / 130 / 220 are the tokens; 25..125 are the stagger steps ch.08 caps at 5. */
-const ALLOWED_MS = new Set([0, 25, 50, 75, 90, 100, 125, 130, 220]);
+/** The three curves tokens.css declares; exits may use `linear` (not checked here). */
+const ALLOWED_EASE = new Set([
+  'cubic-bezier(0.2, 0.7, 0.2, 1)',
+  'cubic-bezier(0.34, 1.56, 0.64, 1)',
+  'cubic-bezier(0.22, 1.2, 0.36, 1)',
+]);
+/** 140 / 260 / 520 are the duration tokens; 25 is stagger-only. */
+const ALLOWED_MS = new Set([0, 25, 140, 260, 520]);
 
 const RULES = {
   gradient: {
@@ -43,7 +47,12 @@ const RULES = {
       const m = line.match(/box-shadow\s*:\s*([^;]+)/);
       if (!m) return false;
       const value = m[1];
-      if (value.includes('var(--ae-shadow-overlay)') || value.includes('var(--ae-focus-ring)')) {
+      if (
+        value.includes('var(--shadow-overlay)') ||
+        value.includes('var(--focus-ring)') ||
+        value.includes('var(--ae-shadow-overlay)') ||
+        value.includes('var(--ae-focus-ring)')
+      ) {
         return false;
       }
       if (/\bnone\b|\binherit\b|\bunset\b/.test(value)) return false;
@@ -65,15 +74,16 @@ const RULES = {
     },
   },
   easing: {
-    why: 'a second easing curve (ch.08: there is one easing)',
+    why: 'an easing curve off the three declared in tokens.css (ch.08)',
     test: (line) => {
       const m = line.match(/cubic-bezier\s*\([^)]*\)/);
       if (!m) return false;
-      return m[0].replace(/\s+/g, ' ').toLowerCase() !== EASE;
+      const curve = m[0].replace(/\s+/g, ' ').toLowerCase();
+      return !ALLOWED_EASE.has(curve);
     },
   },
   duration: {
-    why: 'a duration off the 90 / 130 / 220ms token scale (ch.08)',
+    why: 'a duration off the 140 / 260 / 520ms token scale (ch.08)',
     test: (line) => {
       if (!/(transition|animation|animation-duration|animation-delay|transition-duration|transition-delay)\s*:/.test(line)) {
         return false;
@@ -87,7 +97,11 @@ const RULES = {
   },
   'hover-transform': {
     why: 'travel on hover; hover is not a state change, so it gets tone only (ch.08)',
-    test: (line, ctx) => ctx.selector.includes(':hover') && /^\s*transform\s*:/.test(line),
+    test: (line, ctx) => {
+      if (!ctx.selector.includes(':hover') || !/^\s*transform\s*:/.test(line)) return false;
+      // The copied identity ships .ff-hover-lift as the one permitted hover lift.
+      return !ctx.selector.includes('ff-hover-lift');
+    },
   },
   'raw-hex': {
     why: 'a raw hex outside the token system (IDENTITY.md "Utility naming")',
