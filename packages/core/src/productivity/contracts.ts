@@ -19,6 +19,23 @@ export type Quadrant = (typeof QUADRANTS)[number];
 export const quadrantSchema = z.enum(QUADRANTS);
 
 /**
+ * Command write token for an override. The person names a quadrant; the
+ * handler stamps `set_at`. Do not send the persisted object on a command.
+ */
+export const quadrantOverrideTokenSchema = quadrantSchema;
+export type QuadrantOverrideToken = Quadrant;
+
+/**
+ * Persisted / placement / read-model override. `set_at` is a calendar date
+ * in the workspace timezone (ADR 0010).
+ */
+export const quadrantOverrideSchema = z.object({
+  quadrant: quadrantSchema,
+  set_at: isoDate,
+});
+export type QuadrantOverride = z.infer<typeof quadrantOverrideSchema>;
+
+/**
  * Why a card sits in a quadrant. Copied from Fourfold `placement.ts` so Task 3
  * can implement `placeItem` against the same keys the fixtures already name.
  */
@@ -117,6 +134,104 @@ export const commandEnvelopeSchema = z.object({
 export type CommandEnvelope = z.infer<typeof commandEnvelopeSchema>;
 
 export const dateOnlySchema = isoDate;
+
+/**
+ * Fourfold `PREDICATE_OPERATORS` from `rules/condition.ts`. Do not invent more.
+ */
+export const PREDICATE_OPERATORS = [
+  'eq',
+  'neq',
+  'is_set',
+  'is_not_set',
+  'contains',
+  'before',
+  'after',
+] as const;
+export type PredicateOperator = (typeof PREDICATE_OPERATORS)[number];
+export const predicateOperatorSchema = z.enum(PREDICATE_OPERATORS);
+
+/**
+ * Vitae names for Fourfold `MATCH_FIELDS`. Date columns use the compatibility
+ * map (`due_at` → `due`, `target_at` → `target`). Composition is `all` / `any`
+ * / `not` only.
+ */
+export const MATCH_FIELDS = [
+  'title',
+  'type',
+  'importance',
+  'priority',
+  'status',
+  'due',
+  'target',
+  'scheduled',
+  'follow_up',
+  'waiting_since',
+  'completed_at',
+  'project_id',
+  'waiting_on',
+  'waiting_patience_days',
+  'effort_min',
+  'quadrant_override',
+  'quadrant',
+] as const;
+export type MatchField = (typeof MATCH_FIELDS)[number];
+export const matchFieldSchema = z.enum(MATCH_FIELDS);
+
+/**
+ * Values a rule action actually writes in Fourfold tests: scalars, null, or
+ * `{ days }` for `before` / `after`.
+ */
+export const ruleActionValueSchema = z.union([
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.null(),
+  z.object({ days: z.number() }),
+]);
+export type RuleActionValue = z.infer<typeof ruleActionValueSchema>;
+
+export const ruleActionSchema = z.object({
+  field: z.string().min(1).max(120),
+  value: ruleActionValueSchema,
+});
+export type RuleAction = z.infer<typeof ruleActionSchema>;
+
+export const predicateConditionSchema = z.object({
+  kind: z.literal('predicate'),
+  field: matchFieldSchema,
+  operator: predicateOperatorSchema,
+  value: ruleActionValueSchema.optional(),
+});
+
+export type RuleCondition =
+  | z.infer<typeof predicateConditionSchema>
+  | { kind: 'all'; conditions: RuleCondition[] }
+  | { kind: 'any'; conditions: RuleCondition[] }
+  | { kind: 'not'; condition: RuleCondition };
+
+export const ruleConditionSchema: z.ZodType<RuleCondition> = z.lazy(() =>
+  z.discriminatedUnion('kind', [
+    predicateConditionSchema,
+    z.object({
+      kind: z.literal('all'),
+      conditions: z.array(ruleConditionSchema),
+    }),
+    z.object({
+      kind: z.literal('any'),
+      conditions: z.array(ruleConditionSchema),
+    }),
+    z.object({
+      kind: z.literal('not'),
+      condition: ruleConditionSchema,
+    }),
+  ]),
+);
+
+/** Fourfold's unauthored default (`{}`) matches nothing. */
+export const storedRuleConditionSchema = z.union([
+  ruleConditionSchema,
+  z.object({}).strict(),
+]);
 
 export function isOpenStatus(status: VitaeTaskStatus): status is OpenStatus {
   return (OPEN_STATUSES as readonly string[]).includes(status);

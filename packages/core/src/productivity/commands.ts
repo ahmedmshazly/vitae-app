@@ -7,11 +7,15 @@ import {
   commandEnvelopeSchema,
   dateOnlySchema,
   importanceSchema,
-  quadrantSchema,
+  quadrantOverrideTokenSchema,
   recurrenceSchema,
+  ruleActionSchema,
+  storedRuleConditionSchema,
   vitaePrioritySchema,
   vitaeTaskStatusSchema,
 } from './contracts.js';
+
+export { ruleActionSchema } from './contracts.js';
 
 const provenanceSchema = z.object({
   /** Fourfold source status, stored only as provenance. Never inferred back. */
@@ -32,7 +36,8 @@ const taskFieldsSchema = z.object({
   sensitivity: sensitivitySchema.optional(),
   project_id: z.string().min(1).optional(),
   effort_min: z.number().int().positive().optional(),
-  quadrant_override: quadrantSchema.optional(),
+  /** Write token: a bare quadrant. The handler stamps `set_at`. */
+  quadrant_override: quadrantOverrideTokenSchema.optional(),
   provenance: provenanceSchema.optional(),
 });
 
@@ -106,18 +111,13 @@ export const setRecurrenceCommandSchema = commandEnvelopeSchema.extend({
   }),
 });
 
-export const ruleActionSchema = z.object({
-  field: z.string().min(1).max(120),
-  value: z.unknown(),
-});
-
 export const upsertRuleCommandSchema = commandEnvelopeSchema.extend({
   type: z.literal('upsert_rule'),
   payload: z.object({
     id: z.string().min(1).optional(),
     name: z.string().min(1).max(200),
     statement: z.string().min(1).max(2_000),
-    condition: z.record(z.string(), z.unknown()).default({}),
+    condition: storedRuleConditionSchema.default({}),
     actions: z.array(ruleActionSchema).default([]),
     enabled: z.boolean().default(true),
     sort_order: z.number().nullable().optional(),

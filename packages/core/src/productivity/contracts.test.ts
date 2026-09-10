@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { productivityCommandSchema } from './commands.js';
 import {
   IMPORTANCE,
+  PREDICATE_OPERATORS,
   PRODUCTIVITY_API_FLAG,
   PRODUCTIVITY_ROUTES,
   PRODUCTIVITY_WEB_FLAG,
@@ -13,6 +14,10 @@ import {
   commandEnvelopeSchema,
   importanceSchema,
   isOpenStatus,
+  predicateConditionSchema,
+  quadrantOverrideSchema,
+  ruleActionSchema,
+  ruleConditionSchema,
 } from './contracts.js';
 import {
   analyticsCasesSchema,
@@ -186,6 +191,55 @@ describe('placement and task read models', () => {
     expect(row.open).toBe(true);
     expect(isOpenStatus(row.status)).toBe(true);
   });
+
+  it('treats command override as a bare quadrant and read/placement as { quadrant, set_at }', () => {
+    const written = productivityCommandSchema.parse({
+      version: 1,
+      operation_id: 'op-override',
+      type: 'create_task',
+      payload: { title: 'Call the bank', quadrant_override: 'schedule' },
+    });
+    expect(written.type).toBe('create_task');
+    if (written.type === 'create_task') {
+      expect(written.payload.quadrant_override).toBe('schedule');
+    }
+
+    expect(
+      productivityCommandSchema.safeParse({
+        version: 1,
+        operation_id: 'op-override-object',
+        type: 'create_task',
+        payload: {
+          title: 'Call the bank',
+          quadrant_override: { quadrant: 'schedule', set_at: '2026-09-03' },
+        },
+      }).success,
+    ).toBe(false);
+
+    expect(quadrantOverrideSchema.parse({ quadrant: 'eliminate', set_at: '2026-09-03' })).toEqual({
+      quadrant: 'eliminate',
+      set_at: '2026-09-03',
+    });
+    expect(quadrantOverrideSchema.safeParse('eliminate').success).toBe(false);
+
+    const row = taskReadModelSchema.parse({
+      id: 't1',
+      title: 'Call the bank',
+      status: 'inbox',
+      rev: 1,
+      quadrant_override: { quadrant: 'eliminate', set_at: '2026-09-03' },
+    });
+    expect(row.quadrant_override).toEqual({ quadrant: 'eliminate', set_at: '2026-09-03' });
+    expect(
+      taskReadModelSchema.safeParse({
+        id: 't1',
+        title: 'Call the bank',
+        status: 'inbox',
+        rev: 1,
+        quadrant_override: 'eliminate',
+      }).success,
+    ).toBe(false);
+  });
 });
 
 describe('Fourfold unions are frozen, not invented', () => {
@@ -245,5 +299,49 @@ describe('Fourfold-adapted fixture tables are well-formed', () => {
     expect(analyticsCasesSchema.parse(readJson('analytics-cases.json')).length).toBeGreaterThanOrEqual(
       3,
     );
+  });
+
+  it('rejects an open rule condition and an invented operator', () => {
+    expect(ruleConditionSchema.safeParse({ status: 'inbox' }).success).toBe(false);
+    expect(
+      predicateConditionSchema.safeParse({
+        kind: 'predicate',
+        field: 'status',
+        operator: 'matches',
+        value: 'inbox',
+      }).success,
+    ).toBe(false);
+    expect([...PREDICATE_OPERATORS]).toEqual([
+      'eq',
+      'neq',
+      'is_set',
+      'is_not_set',
+      'contains',
+      'before',
+      'after',
+    ]);
+    expect(ruleActionSchema.safeParse({ field: 'priority', value: { nested: true } }).success).toBe(
+      false,
+    );
+  });
+
+  it('encodes analytics as replay scenarios, not echoed input scores', () => {
+    const rows = analyticsCasesSchema.parse(readJson('analytics-cases.json'));
+    for (const row of rows) {
+      expect(row).not.toHaveProperty('history_completeness');
+      expect(row).not.toHaveProperty('completions');
+      expect(Array.isArray(row.revisions)).toBe(true);
+    }
+    const complete = rows.find((row) => row.id === 'one-completion-complete-history');
+    const sparse = rows.find((row) => row.id === 'sparse-revisions-declared');
+    const unknown = rows.find((row) => row.id === 'unknown-history-not-a-zero-claim');
+    expect(complete?.revisions.some((rev) => rev.diff.completed_at)).toBe(true);
+    expect(complete?.expected).toEqual({ completions: 1, history_completeness: 'complete' });
+    expect(sparse?.revisions).toEqual([
+      expect.objectContaining({ op: 'create', diff: {} }),
+    ]);
+    expect(sparse?.expected.history_completeness).toBe('sparse');
+    expect(unknown?.revisions).toEqual([]);
+    expect(unknown?.expected.history_completeness).toBe('unknown');
   });
 });

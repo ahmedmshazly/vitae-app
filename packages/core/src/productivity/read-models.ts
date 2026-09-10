@@ -8,6 +8,7 @@ import {
   dateOnlySchema,
   historyCompletenessSchema,
   importanceSchema,
+  quadrantOverrideSchema,
   quadrantSchema,
   reasonKeySchema,
   vitaePrioritySchema,
@@ -37,6 +38,8 @@ export const taskReadModelSchema = z.object({
   importance: importanceSchema.optional(),
   sensitivity: sensitivitySchema.optional(),
   project_id: z.string().min(1).optional(),
+  /** Persisted override `{ quadrant, set_at }`. Commands send only the quadrant. */
+  quadrant_override: quadrantOverrideSchema.nullable().optional(),
   /** Fourfold source status. Provenance only; never written back to `status`. */
   source_status: z.string().min(1).optional(),
   /** Derived: status in `{inbox, next, doing}`. Not persisted. */

@@ -3,13 +3,19 @@
  * rows; this task only proves they are well-formed.
  */
 import { z } from 'zod';
+import { REVISION_OPS } from '../types.js';
+import { isoDateTime } from '../schema/envelope.js';
 import {
   dateOnlySchema,
   historyCompletenessSchema,
   importanceSchema,
+  quadrantOverrideSchema,
   quadrantSchema,
   reasonKeySchema,
   recurrenceModeSchema,
+  ruleActionSchema,
+  ruleActionValueSchema,
+  ruleConditionSchema,
   vitaePrioritySchema,
   vitaeTaskStatusSchema,
 } from './contracts.js';
@@ -32,13 +38,7 @@ export const placementCaseSchema = z.object({
     waiting_on: z.string().nullable().optional(),
     waiting_since: optionalDate,
     waiting_patience_days: z.number().int().positive().nullable().optional(),
-    quadrant_override: z
-      .object({
-        quadrant: quadrantSchema,
-        set_at: dateOnlySchema,
-      })
-      .nullable()
-      .optional(),
+    quadrant_override: quadrantOverrideSchema.nullable().optional(),
   }),
   expected: z.object({
     quadrant: quadrantSchema,
@@ -80,13 +80,8 @@ export const rulesCaseSchema = z.object({
   input: z.object({
     rule: z.object({
       enabled: z.boolean(),
-      condition: z.record(z.string(), z.unknown()),
-      actions: z.array(
-        z.object({
-          field: z.string().min(1),
-          value: z.unknown(),
-        }),
-      ),
+      condition: ruleConditionSchema,
+      actions: z.array(ruleActionSchema),
     }),
     item: z.object({
       status: vitaeTaskStatusSchema.optional(),
@@ -96,20 +91,34 @@ export const rulesCaseSchema = z.object({
   }),
   expected: z.object({
     matches: z.boolean(),
-    patch: z.record(z.string(), z.unknown()).optional(),
+    patch: z.record(z.string(), ruleActionValueSchema).optional(),
   }),
 });
 export type RulesCase = z.infer<typeof rulesCaseSchema>;
 
+/**
+ * A revision the analytics replay can read. Completeness is derived from
+ * whether these diffs cover the window, not from a field on the input.
+ */
+export const analyticsRevisionSchema = z.object({
+  rev: z.number().int().positive(),
+  op: z.enum(REVISION_OPS),
+  at: isoDateTime,
+  diff: z.record(z.string(), ruleActionValueSchema),
+});
+
 export const analyticsCaseSchema = z.object({
   id: z.string().min(1),
-  input: z.object({
-    window_start: dateOnlySchema,
-    window_end: dateOnlySchema,
-    time_zone: z.string().min(1),
-    history_completeness: historyCompletenessSchema,
-    completions: z.number().int().nonnegative(),
+  now: dateOnlySchema,
+  window_start: dateOnlySchema,
+  window_end: dateOnlySchema,
+  time_zone: z.string().min(1),
+  item: z.object({
+    id: z.string().min(1),
+    status: vitaeTaskStatusSchema,
+    completed_at: isoDateTime.nullable().optional(),
   }),
+  revisions: z.array(analyticsRevisionSchema),
   expected: z.object({
     completions: z.number().int().nonnegative(),
     history_completeness: historyCompletenessSchema,

@@ -1,35 +1,64 @@
 [
   {
     "id": "one-completion-complete-history",
-    "input": {
-      "window_start": "2026-08-29",
-      "window_end": "2026-09-04",
-      "time_zone": "Africa/Cairo",
-      "history_completeness": "complete",
-      "completions": 1
+    "now": "2026-09-04",
+    "window_start": "2026-08-29",
+    "window_end": "2026-09-04",
+    "time_zone": "Africa/Cairo",
+    "item": {
+      "id": "task-invoice",
+      "status": "done",
+      "completed_at": "2026-09-03T15:00:00.000Z"
     },
+    "revisions": [
+      {
+        "rev": 1,
+        "op": "create",
+        "at": "2026-08-20T09:00:00.000Z",
+        "diff": { "status": "inbox", "completed_at": null }
+      },
+      {
+        "rev": 2,
+        "op": "update",
+        "at": "2026-09-03T15:00:00.000Z",
+        "diff": { "status": "done", "completed_at": "2026-09-03T15:00:00.000Z" }
+      }
+    ],
     "expected": { "completions": 1, "history_completeness": "complete" }
   },
   {
     "id": "sparse-revisions-declared",
-    "input": {
-      "window_start": "2026-08-01",
-      "window_end": "2026-09-04",
-      "time_zone": "Africa/Cairo",
-      "history_completeness": "sparse",
-      "completions": 0
+    "now": "2026-09-04",
+    "window_start": "2026-08-01",
+    "window_end": "2026-09-04",
+    "time_zone": "Africa/Cairo",
+    "item": {
+      "id": "task-imported",
+      "status": "done",
+      "completed_at": "2026-08-15T12:00:00.000Z"
     },
+    "revisions": [
+      {
+        "rev": 1,
+        "op": "create",
+        "at": "2026-08-20T09:00:00.000Z",
+        "diff": {}
+      }
+    ],
     "expected": { "completions": 0, "history_completeness": "sparse" }
   },
   {
     "id": "unknown-history-not-a-zero-claim",
-    "input": {
-      "window_start": "2026-01-01",
-      "window_end": "2026-09-04",
-      "time_zone": "UTC",
-      "history_completeness": "unknown",
-      "completions": 0
+    "now": "2026-09-04",
+    "window_start": "2026-01-01",
+    "window_end": "2026-09-04",
+    "time_zone": "UTC",
+    "item": {
+      "id": "task-orphan",
+      "status": "done",
+      "completed_at": null
     },
+    "revisions": [],
     "expected": { "completions": 0, "history_completeness": "unknown" }
   }
 ]

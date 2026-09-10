@@ -192,10 +192,39 @@ Additional mappings used by commands and fixtures:
 |---|---|---|
 | `follow_up_at` | command `follow_up` / read-model `follow_up` (Task 3) | date-only |
 | `scheduled_at` | `task.scheduled` | date-only today |
-| `quadrant_override` | read-model / command override (Task 3) | reason `placed_by_you` |
+| `quadrant_override` | see Override layering below | reason `placed_by_you` |
 | `quadrant` | derived on the read model | not persisted |
 | `recurrence` | `set_recurrence` payload | RFC 5545 subset + mode |
 | `P0`..`P4` | `p1`..`p4` plus provenance for `P0` | do not add `p0` |
+
+## Override layering
+
+Fourfold distinguishes a capture/command token (a quadrant) from the persisted
+override object. Vitae freezes the same split:
+
+| Surface | Shape | Who stamps `set_at` |
+|---|---|---|
+| Command write token (`create_task` / `update_task` `quadrant_override`) | bare `Quadrant` (`do \| schedule \| delegate \| eliminate`) | The command handler, as a calendar date in the workspace TZ |
+| Persisted / placement input / `TaskReadModel.quadrant_override` | `{ quadrant, set_at }` (`set_at` date-only) | Already stored; placement reads this object |
+
+A command must not send `{ quadrant, set_at }`. A read model or placement
+fixture must not use a bare quadrant. Reason is `placed_by_you`.
+
+## Rule conditions
+
+A stored rule `condition` is Fourfold's closed tree from
+`packages/core/src/rules/condition.ts`: a `predicate` (`kind`, `field`,
+`operator`, optional `value`) or `all` / `any` / `not`. Operators are only
+`eq | neq | is_set | is_not_set | contains | before | after`. An unauthored
+`{}` matches nothing. Action `value` is `string | number | boolean | null |
+{ days: number }` (`{ days }` is the `before` / `after` operand).
+
+## Analytics replay fixtures
+
+Analytics fixture rows are replay scenarios: a window, a current item
+snapshot, and the revisions in that window. `history_completeness` and
+`completions` live only on `expected`, derived from whether those revisions
+carry field-level diffs. They are not input fields to echo.
 
 ## Placement contract (types only)
 
