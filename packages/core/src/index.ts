@@ -11,3 +11,4 @@ export * from './algorithms/index.js';
 export * from './importers/index.js';
 export * from './places/index.js';
 export * from './cloud/individual-plan.js';
+export * from './productivity/index.js';
