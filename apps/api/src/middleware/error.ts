@@ -4,7 +4,7 @@
  * appropriate status codes.
  */
 import type { NextFunction, Request, Response } from 'express';
-import { NotFoundError, ValidationError } from '../db/repository.js';
+import { NotFoundError, RevisionConflictError, ValidationError } from '../db/repository.js';
 import { currentRequestId } from './request-context.js';
 
 export class HttpError extends Error {
@@ -66,6 +66,10 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
   }
   if (err instanceof NotFoundError) {
     res.status(404).json({ error: { code: 'NOT_FOUND', message: err.message, request_id } });
+    return;
+  }
+  if (err instanceof RevisionConflictError) {
+    res.status(409).json({ error: { code: 'CONFLICT', message: err.message, request_id } });
     return;
   }
   if (err instanceof HttpError) {

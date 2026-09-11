@@ -37,6 +37,23 @@ import {
 } from '@vitae/core';
 import { db } from './pg.js';
 import type { Database, TableName } from './schema.js';
+import {
+  automationRulePatchSchema,
+  automationRuleWriteSchema,
+  isRevisionGuardedTable,
+  productivityReceiptWriteSchema,
+  timeEntryPatchSchema,
+  timeEntryWriteSchema,
+  zodIssues,
+  type AutomationRulePatch,
+  type AutomationRuleRecord,
+  type AutomationRuleWrite,
+  type ProductivityReceiptRecord,
+  type ProductivityReceiptWrite,
+  type TimeEntryPatch,
+  type TimeEntryRecord,
+  type TimeEntryWrite,
+} from './productivity-docs.js';
 import { currentSpace, currentWorkspaceId } from './space.js';
 import { bumpWriteGeneration } from './write-signal.js';
 import { newId, nowIso, shallowDiff, stripUndefined } from './util.js';
@@ -67,11 +84,44 @@ export class NotFoundError extends Error {
   }
 }
 
+export class RevisionConflictError extends Error {
+  constructor(message = 'revision conflict') {
+    super(message);
+    this.name = 'RevisionConflictError';
+  }
+}
+
+export class GuardedCollectionError extends Error {
+  constructor(table: string) {
+    super(
+      `${table} cannot be written through generic document helpers; use the repository methods that write a revision`,
+    );
+    this.name = 'GuardedCollectionError';
+  }
+}
+
+export type RevisionSubjectKind =
+  | 'node'
+  | 'edge'
+  | 'atom'
+  | 'target'
+  | 'resume'
+  | 'letter'
+  | 'time_entry'
+  | 'automation_rule'
+  | 'productivity_receipt';
+
+function assertGenericDocWriteAllowed(table: TableName): void {
+  if (isRevisionGuardedTable(table)) throw new GuardedCollectionError(table);
+}
+
 export interface WriteMeta {
   actor?: string;
   op?: RevisionOp;
   source?: string;
 }
+
+export type ProductivityWriteMeta = WriteMeta & { expected_revision?: number };
 
 /** Filters for the generic document accessors: equality on generated columns. */
 export type DocFilter = Record<string, string | number | boolean | null>;
@@ -562,11 +612,263 @@ export class Repository {
     return { counts, total };
   }
 
+  // ── Productivity collections ───────────────────────────────────────────────
+  //
+  // These three tables are revision-guarded: every mutation writes the row and
+  // a revisions snapshot in the same transaction. Generic docPut/docMerge/
+  // docBulkPut refuse the table names so a caller cannot skip that pair.
+
+  async createTimeEntry(input: unknown, meta: WriteMeta = {}): Promise<TimeEntryRecord> {
+    const parsed = timeEntryWriteSchema.safeParse(input);
+    if (!parsed.success) throw new ValidationError('invalid time entry', zodIssues(parsed.error.issues));
+    return this.transaction((tx) => this.stageTimeEntry(tx, parsed.data, meta));
+  }
+
+  async stageTimeEntry(tx: Tx, value: TimeEntryWrite, meta: WriteMeta = {}): Promise<TimeEntryRecord> {
+    const id = value.id ?? newId();
+    const ts = nowIso();
+    const record: TimeEntryRecord = {
+      ...value,
+      id,
+      rev: 1,
+      updated_at: ts,
+    };
+    await tx
+      .insertInto('time_entries')
+      .values({ space: this.space, workspace_id: this.workspaceId, id, data: this.clean(record) })
+      .execute();
+    await this.writeRevision(tx, 'time_entry', id, 1, meta.op ?? 'create', record, undefined, meta.source, meta.actor);
+    return record;
+  }
+
+  async getTimeEntry(
+    id: string,
+    opts: { includeDeleted?: boolean } = {},
+    conn: Db = db,
+  ): Promise<TimeEntryRecord | null> {
+    const row = await conn
+      .selectFrom('time_entries')
+      .select('data')
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
+      .where('id', '=', id)
+      .executeTakeFirst();
+    if (!row) return null;
+    const entry = row.data as TimeEntryRecord;
+    if (entry.deleted_at && !opts.includeDeleted) return null;
+    return entry;
+  }
+
+  async listTimeEntriesByTask(taskId: string): Promise<TimeEntryRecord[]> {
+    const rows = await db
+      .selectFrom('time_entries')
+      .select('data')
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
+      .where('task_id', '=', taskId)
+      .where('deleted_at', 'is', null)
+      .orderBy('started_at', 'desc')
+      .execute();
+    return rows.map((r) => r.data as TimeEntryRecord);
+  }
+
+  async updateTimeEntry(
+    id: string,
+    patch: TimeEntryPatch,
+    meta: ProductivityWriteMeta = {},
+  ): Promise<TimeEntryRecord> {
+    const parsed = timeEntryPatchSchema.safeParse(patch);
+    if (!parsed.success) throw new ValidationError('invalid time entry', zodIssues(parsed.error.issues));
+    return this.transaction(async (tx) => {
+      const before = await this.getTimeEntry(id, { includeDeleted: true }, tx);
+      if (!before) throw new NotFoundError('time entry');
+      this.assertExpectedRevision(before.rev, meta.expected_revision);
+      const merged: TimeEntryRecord = {
+        ...before,
+        ...parsed.data,
+        id: before.id,
+        rev: before.rev + 1,
+        updated_at: nowIso(),
+      };
+      await tx
+        .updateTable('time_entries')
+        .set({ data: this.clean(merged) })
+        .where('space', '=', this.space)
+        .where('workspace_id', '=', this.workspaceId)
+        .where('id', '=', before.id)
+        .execute();
+      const diff = shallowDiff(before as never, merged as never);
+      await this.writeRevision(
+        tx,
+        'time_entry',
+        before.id,
+        merged.rev,
+        meta.op ?? 'update',
+        merged,
+        diff,
+        meta.source ?? 'manual',
+        meta.actor,
+      );
+      return merged;
+    });
+  }
+
+  async createAutomationRule(input: unknown, meta: WriteMeta = {}): Promise<AutomationRuleRecord> {
+    const parsed = automationRuleWriteSchema.safeParse(input);
+    if (!parsed.success) throw new ValidationError('invalid automation rule', zodIssues(parsed.error.issues));
+    return this.transaction((tx) => this.stageAutomationRule(tx, parsed.data, meta));
+  }
+
+  async stageAutomationRule(
+    tx: Tx,
+    value: AutomationRuleWrite,
+    meta: WriteMeta = {},
+  ): Promise<AutomationRuleRecord> {
+    const id = value.id ?? newId();
+    const ts = nowIso();
+    const record: AutomationRuleRecord = {
+      ...value,
+      id,
+      rev: 1,
+      updated_at: ts,
+    };
+    await tx
+      .insertInto('automation_rules')
+      .values({ space: this.space, workspace_id: this.workspaceId, id, data: this.clean(record) })
+      .execute();
+    await this.writeRevision(
+      tx,
+      'automation_rule',
+      id,
+      1,
+      meta.op ?? 'create',
+      record,
+      undefined,
+      meta.source,
+      meta.actor,
+    );
+    return record;
+  }
+
+  async getAutomationRule(
+    id: string,
+    opts: { includeDeleted?: boolean } = {},
+    conn: Db = db,
+  ): Promise<AutomationRuleRecord | null> {
+    const row = await conn
+      .selectFrom('automation_rules')
+      .select('data')
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
+      .where('id', '=', id)
+      .executeTakeFirst();
+    if (!row) return null;
+    const rule = row.data as AutomationRuleRecord;
+    if (rule.deleted_at && !opts.includeDeleted) return null;
+    return rule;
+  }
+
+  async updateAutomationRule(
+    id: string,
+    patch: AutomationRulePatch,
+    meta: ProductivityWriteMeta = {},
+  ): Promise<AutomationRuleRecord> {
+    const parsed = automationRulePatchSchema.safeParse(patch);
+    if (!parsed.success) throw new ValidationError('invalid automation rule', zodIssues(parsed.error.issues));
+    return this.transaction(async (tx) => {
+      const before = await this.getAutomationRule(id, { includeDeleted: true }, tx);
+      if (!before) throw new NotFoundError('automation rule');
+      this.assertExpectedRevision(before.rev, meta.expected_revision);
+      const merged: AutomationRuleRecord = {
+        ...before,
+        ...parsed.data,
+        id: before.id,
+        rev: before.rev + 1,
+        updated_at: nowIso(),
+      };
+      await tx
+        .updateTable('automation_rules')
+        .set({ data: this.clean(merged) })
+        .where('space', '=', this.space)
+        .where('workspace_id', '=', this.workspaceId)
+        .where('id', '=', before.id)
+        .execute();
+      const diff = shallowDiff(before as never, merged as never);
+      await this.writeRevision(
+        tx,
+        'automation_rule',
+        before.id,
+        merged.rev,
+        meta.op ?? 'update',
+        merged,
+        diff,
+        meta.source ?? 'manual',
+        meta.actor,
+      );
+      return merged;
+    });
+  }
+
+  async putProductivityReceipt(input: unknown, meta: WriteMeta = {}): Promise<ProductivityReceiptRecord> {
+    const parsed = productivityReceiptWriteSchema.safeParse(input);
+    if (!parsed.success) throw new ValidationError('invalid productivity receipt', zodIssues(parsed.error.issues));
+    return this.transaction((tx) => this.stageProductivityReceipt(tx, parsed.data, meta));
+  }
+
+  async stageProductivityReceipt(
+    tx: Tx,
+    value: ProductivityReceiptWrite,
+    meta: WriteMeta = {},
+  ): Promise<ProductivityReceiptRecord> {
+    const id = value.id ?? newId();
+    const ts = nowIso();
+    const record: ProductivityReceiptRecord = {
+      ...value,
+      id,
+      result: value.result ?? {},
+      rev: 1,
+      created_at: ts,
+    };
+    await tx
+      .insertInto('productivity_receipts')
+      .values({ space: this.space, workspace_id: this.workspaceId, id, data: this.clean(record) })
+      .execute();
+    await this.writeRevision(
+      tx,
+      'productivity_receipt',
+      id,
+      1,
+      meta.op ?? 'create',
+      record,
+      undefined,
+      meta.source,
+      meta.actor,
+    );
+    return record;
+  }
+
+  async getProductivityReceiptByOperationId(operationId: string): Promise<ProductivityReceiptRecord | null> {
+    const row = await db
+      .selectFrom('productivity_receipts')
+      .select('data')
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
+      .where('operation_id', '=', operationId)
+      .executeTakeFirst();
+    return row ? (row.data as ProductivityReceiptRecord) : null;
+  }
+
+  private assertExpectedRevision(stored: number, expected?: number): void {
+    if (expected !== undefined && expected !== stored) {
+      throw new RevisionConflictError(`expected revision ${expected}, found ${stored}`);
+    }
+  }
+
   // ── Revisions ──────────────────────────────────────────────────────────────
 
   private async writeRevision(
     tx: Tx,
-    subjectKind: 'node' | 'edge' | 'atom' | 'target' | 'resume' | 'letter',
+    subjectKind: RevisionSubjectKind,
     subjectId: string,
     rev: number,
     op: RevisionOp,
@@ -605,7 +907,7 @@ export class Repository {
   async stageRevision(
     tx: Tx,
     args: {
-      kind: 'node' | 'edge' | 'atom' | 'target' | 'resume' | 'letter';
+      kind: RevisionSubjectKind;
       id: string;
       rev: number;
       op: RevisionOp;
@@ -749,6 +1051,7 @@ export class Repository {
     extra: Record<string, string> = {},
     conn: Db = db,
   ): Promise<void> {
+    assertGenericDocWriteAllowed(table);
     await conn
       .insertInto(table)
       .values({ space: this.space, workspace_id: this.workspaceId, id, data: this.clean(data), ...extra } as never)
@@ -772,6 +1075,7 @@ export class Repository {
     patch: Record<string, unknown>,
     conn: Db = db,
   ): Promise<void> {
+    assertGenericDocWriteAllowed(table);
     const clean = JSON.stringify(stripUndefined(patch));
     // Update-then-insert, not INSERT ... ON CONFLICT. Postgres validates the
     // proposed row's NOT NULL constraints *before* it resolves the conflict, so
@@ -846,7 +1150,29 @@ export class Repository {
     rows: ReadonlyArray<{ id: string; data: Record<string, unknown>; extra?: Record<string, string> }>,
     conn: Db = db,
   ): Promise<void> {
+    assertGenericDocWriteAllowed(table);
     if (!rows.length) return;
+    await this.writeDocumentRows(table, rows, conn);
+  }
+
+  /**
+   * Restore-only bulk write. Revisions arrive as their own bundle file, so
+   * this path must not synthesize new ones and must accept the guarded tables.
+   */
+  async restoreDocuments(
+    table: TableName,
+    rows: ReadonlyArray<{ id: string; data: Record<string, unknown>; extra?: Record<string, string> }>,
+    conn: Db = db,
+  ): Promise<void> {
+    if (!rows.length) return;
+    await this.writeDocumentRows(table, rows, conn);
+  }
+
+  private async writeDocumentRows(
+    table: TableName,
+    rows: ReadonlyArray<{ id: string; data: Record<string, unknown>; extra?: Record<string, string> }>,
+    conn: Db = db,
+  ): Promise<void> {
     // Chunked only to keep the parameter count under Postgres' 65535 limit.
     // not the 500-document ceiling Firestore batches had.
     const CHUNK = 500;
