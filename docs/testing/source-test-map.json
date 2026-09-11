@@ -652,6 +652,16 @@
         "apps/api/src/routes/v1/places.integration.test.ts"
       ]
     },
+    "apps/api/src/routes/v1/productivity.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/productivity.integration.test.ts"
+      ]
+    },
     "apps/api/src/routes/v1/reminders.ts": {
       "risk": "medium",
       "layers": [
@@ -873,6 +883,38 @@
         "apps/api/src/__tests__/api.integration.test.ts"
       ],
       "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/services/productivity/commands.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/productivity.integration.test.ts"
+      ]
+    },
+    "apps/api/src/services/productivity/flag.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/services/productivity/flag.test.ts"
+      ]
+    },
+    "apps/api/src/services/productivity/read-models.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit",
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/services/productivity/read-models.test.ts",
+        "apps/api/src/routes/v1/productivity.integration.test.ts"
+      ]
     },
     "apps/api/src/services/profile.ts": {
       "risk": "medium",

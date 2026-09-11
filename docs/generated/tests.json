@@ -201,6 +201,34 @@
       "lines": 12
     },
     {
+      "file": "apps/api/src/db/productivity-collections.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 11,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "demo seed catalogue lockstep",
+        "012-productivity-collections migration",
+        "productivity repository",
+        "productivity export, restore, and retention"
+      ],
+      "subjects": [
+        "../services/retention.js",
+        "./pg.js",
+        "./repository.js",
+        "./schema.js",
+        "./space.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 499
+    },
+    {
       "file": "apps/api/src/db/schema.test.ts",
       "package": "@vitae/api",
       "cases": 13,
@@ -990,6 +1018,34 @@
       "lines": 55
     },
     {
+      "file": "apps/api/src/routes/v1/productivity.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 12,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "productivity routes (flag off)",
+        "productivity routes (flag on)",
+        "productivity entitlement and tenant isolation"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js",
+        "../../cloud/config.js",
+        "../../db/pg.js",
+        "../../env.js",
+        "../../services/export.js",
+        "../../services/productivity/commands.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 407
+    },
+    {
       "file": "apps/api/src/routes/v1/reminders.integration.test.ts",
       "package": "@vitae/api",
       "cases": 2,
@@ -1288,6 +1344,48 @@
       "lines": 269
     },
     {
+      "file": "apps/api/src/services/productivity/flag.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "isProductivityEnabled"
+      ],
+      "subjects": [
+        "./flag.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 30
+    },
+    {
+      "file": "apps/api/src/services/productivity/read-models.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "productivity read models"
+      ],
+      "subjects": [
+        "./read-models.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 45
+    },
+    {
       "file": "apps/api/src/services/restore.integration.test.ts",
       "package": "@vitae/api",
       "cases": 1,
@@ -1553,7 +1651,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 298
+      "lines": 318
     },
     {
       "file": "apps/web/src/components/EntityPicker.test.tsx",
@@ -3024,6 +3122,24 @@
       "lines": 121
     },
     {
+      "file": "apps/web/src/index-html.test.ts",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "apps/web/index.html identity shell"
+      ],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 27
+    },
+    {
       "file": "apps/web/src/lib/accent-palette.test.ts",
       "package": "@vitae/web",
       "cases": 5,
@@ -3162,7 +3278,7 @@
     {
       "file": "apps/web/src/lib/motion.test.ts",
       "package": "@vitae/web",
-      "cases": 31,
+      "cases": 35,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -3170,7 +3286,8 @@
         "motion hooks, preference set to reduce",
         "reduced motion",
         "stagger cap",
-        "easing"
+        "easing",
+        "the JS mirror of the motion tokens"
       ],
       "subjects": [
         "./motion.js"
@@ -3181,7 +3298,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 337
+      "lines": 392
     },
     {
       "file": "apps/web/src/lib/revision-fields.test.ts",
@@ -4656,7 +4773,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 103
+      "lines": 117
     },
     {
       "file": "apps/web/src/routes/reference/EntityObservatoryControls.test.tsx",
@@ -5117,6 +5234,24 @@
       ],
       "run_in_ci": true,
       "lines": 34
+    },
+    {
+      "file": "apps/web/src/styles/theme.test.ts",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "Quiet Tailwind bridge"
+      ],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 39
     },
     {
       "file": "apps/web/src/test/render.test.tsx",
@@ -6984,7 +7119,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 264
+      "lines": 276
     },
     {
       "file": "packages/core/src/forms/subjects.test.ts",
@@ -7214,6 +7349,276 @@
       ],
       "run_in_ci": true,
       "lines": 43
+    },
+    {
+      "file": "packages/core/src/productivity/analytics.test.ts",
+      "package": "@vitae/core",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "projectCompletions fixtures",
+        "replay + analytics reconstruction"
+      ],
+      "subjects": [
+        "./analytics/index.js",
+        "./fixture-schemas.js",
+        "./replay.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 42
+    },
+    {
+      "file": "packages/core/src/productivity/capture.test.ts",
+      "package": "@vitae/core",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "parseCapture fixtures",
+        "parseCapture: Vitae tokens"
+      ],
+      "subjects": [
+        "./capture.js",
+        "./fixture-schemas.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 54
+    },
+    {
+      "file": "packages/core/src/productivity/contracts.test.ts",
+      "package": "@vitae/core",
+      "cases": 16,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "productivity command envelope",
+        "versioned productivity commands",
+        "placement and task read models",
+        "Fourfold unions are frozen, not invented",
+        "Fourfold-adapted fixture tables are well-formed"
+      ],
+      "subjects": [
+        "./commands.js",
+        "./contracts.js",
+        "./fixture-schemas.js",
+        "./read-models.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 348
+    },
+    {
+      "file": "packages/core/src/productivity/dependencies.test.ts",
+      "package": "@vitae/core",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "dependsOnCycle"
+      ],
+      "subjects": [
+        "./dependencies.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 30
+    },
+    {
+      "file": "packages/core/src/productivity/filters.test.ts",
+      "package": "@vitae/core",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "parseProductivityFilter",
+        "filterTasks"
+      ],
+      "subjects": [
+        "../algorithms/filter-grammar.js",
+        "./filters.js",
+        "./read-models.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 65
+    },
+    {
+      "file": "packages/core/src/productivity/legacy-characterization.test.ts",
+      "package": "@vitae/core",
+      "cases": 16,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "legacy taskProps",
+        "legacy project, goal, habit, application props",
+        "legacy reminder and ledger shapes (real core schemas)",
+        "legacy search and export (core types)"
+      ],
+      "subjects": [
+        "../algorithms/filter-grammar.js",
+        "../schema/bundle.js",
+        "../schema/edge-props.js",
+        "../schema/envelope.js",
+        "../schema/node-props.js",
+        "../types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 212
+    },
+    {
+      "file": "packages/core/src/productivity/placement.test.ts",
+      "package": "@vitae/core",
+      "cases": 7,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "placeItem fixtures",
+        "placeItem: calendar dates and precedence"
+      ],
+      "subjects": [
+        "./fixture-schemas.js",
+        "./placement.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 108
+    },
+    {
+      "file": "packages/core/src/productivity/productivity.property.test.ts",
+      "package": "@vitae/core",
+      "cases": 8,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "property: invalid dates rejected",
+        "property: DST calendar due does not shift",
+        "property: recurrence next is strictly after",
+        "property: dependsOnCycle",
+        "property: placement override beats a past due",
+        "property: analytics reconstruction is idempotent"
+      ],
+      "subjects": [
+        "./analytics/index.js",
+        "./calendar.js",
+        "./capture.js",
+        "./dependencies.js",
+        "./placement.js",
+        "./recurrence.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:property",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 194
+    },
+    {
+      "file": "packages/core/src/productivity/recurrence.test.ts",
+      "package": "@vitae/core",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "nextOccurrences fixtures",
+        "recurrence: RFC subset and modes"
+      ],
+      "subjects": [
+        "./fixture-schemas.js",
+        "./recurrence.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 66
+    },
+    {
+      "file": "packages/core/src/productivity/rules.test.ts",
+      "package": "@vitae/core",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "evaluateRule fixtures",
+        "evaluateCondition"
+      ],
+      "subjects": [
+        "./fixture-schemas.js",
+        "./rules.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 56
     },
     {
       "file": "packages/core/src/schema/application-status.test.ts",
@@ -7607,6 +8012,25 @@
       "lines": 254
     },
     {
+      "file": "packages/ui/src/exports.test.ts",
+      "package": "@vitae/ui",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "@vitae/ui exports"
+      ],
+      "subjects": [
+        "../package.json"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 94
+    },
+    {
       "file": "packages/ui/src/feedback.test.tsx",
       "package": "@vitae/ui",
       "cases": 11,
@@ -7701,6 +8125,50 @@
       "lines": 286
     },
     {
+      "file": "packages/ui/src/styles/tokens.test.ts",
+      "package": "@vitae/ui",
+      "cases": 16,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "compatibility aliases",
+        "themes",
+        "reduced motion",
+        "the motion scale",
+        "coarse pointers"
+      ],
+      "subjects": [],
+      "requirements": [],
+      "run_by": [
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 334
+    },
+    {
+      "file": "packages/ui/src/theme-provider.test.tsx",
+      "package": "@vitae/ui",
+      "cases": 19,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "ThemeProvider initial theme",
+        "ThemeProvider changing theme",
+        "ThemeProvider following the system",
+        "ThemeProvider hostile storage",
+        "useTheme"
+      ],
+      "subjects": [
+        "./theme-provider.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 242
+    },
+    {
       "file": "packages/ui/src/toast.test.tsx",
       "package": "@vitae/ui",
       "cases": 26,
@@ -7770,28 +8238,28 @@
     }
   ],
   "summary": {
-    "files": 360,
-    "cases": 2476,
+    "files": 379,
+    "cases": 2623,
     "skipped": 0,
     "todo": 0,
     "by_package": {
-      "@vitae/api": 345,
-      "@vitae/web": 1218,
+      "@vitae/api": 372,
+      "@vitae/web": 1227,
       "@vitae/e2e": 303,
-      "@vitae/core": 377,
+      "@vitae/core": 447,
       "@vitae/testkit": 7,
-      "@vitae/ui": 226
+      "@vitae/ui": 267
     },
     "by_script": {
-      "test": 360,
-      "test:web": 175,
-      "test:api": 65,
+      "test": 379,
+      "test:web": 177,
+      "test:api": 69,
       "test:e2e": 61,
-      "test:unit": 50,
-      "test:coverage": 50,
-      "test:core": 48,
-      "test:mutation": 48,
-      "test:property": 5,
+      "test:unit": 60,
+      "test:coverage": 60,
+      "test:core": 58,
+      "test:mutation": 58,
+      "test:property": 6,
       "test:security": 3,
       "test:a11y": 3,
       "test:contract": 2,
