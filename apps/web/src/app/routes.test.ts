@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ROUTES, WORKSPACE_NAV, hubForPath, isRouteActive } from './routes.js';
+import { ROUTES, WORKSPACE_NAV, hubForPath, isRouteActive, visibleWorkspaceNav } from './routes.js';
 
 describe('workspace route registry', () => {
   it('keeps Today under its canonical private address', () => {
@@ -41,5 +41,16 @@ describe('workspace route registry', () => {
 
   it('exposes every résumé destination in the Career workspace strip', () => {
     expect(WORKSPACE_NAV.career).toContain(ROUTES.resumeTemplates);
+  });
+
+  it('keeps the Today strip as Today, Planner, Ledger until the flag is on', () => {
+    expect(WORKSPACE_NAV.today).toEqual([ROUTES.today, ROUTES.planner, ROUTES.ledger]);
+    expect(visibleWorkspaceNav('today').map((route) => route.path)).toEqual([
+      '/today',
+      '/today/planner',
+      '/today/ledger',
+    ]);
+    expect(ROUTES.tasks.path).toBe('/today/tasks');
+    expect(ROUTES.taskTemplates.path).toBe('/today/task-templates');
   });
 });

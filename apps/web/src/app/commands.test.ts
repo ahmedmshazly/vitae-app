@@ -40,4 +40,26 @@ describe('buildCommands', () => {
     space?.run();
     expect(toggleSpace).toHaveBeenCalledOnce();
   });
+
+  it('keeps every command id unique, including the flagged productivity actions', () => {
+    const cmds = buildCommands({
+      navigate: vi.fn(),
+      openCapture: vi.fn(),
+      openNew: vi.fn(),
+      productivityEnabled: true,
+    });
+    const ids = cmds.map((c) => c.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(ids).toContain('open-tasks');
+    expect(ids.filter((id) => id === 'capture')).toHaveLength(1);
+  });
+
+  it('omits productivity commands when the flag is off', () => {
+    const cmds = buildCommands({
+      navigate: vi.fn(),
+      openCapture: vi.fn(),
+      openNew: vi.fn(),
+    });
+    expect(cmds.some((c) => c.id.startsWith('open-'))).toBe(false);
+  });
 });

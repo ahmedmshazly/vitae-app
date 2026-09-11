@@ -12,6 +12,12 @@ describe('Breadcrumb', () => {
     expect(screen.getByText('Today')).toBeInTheDocument();
   });
 
+  it('names the flagged productivity surfaces under Today', () => {
+    renderWithApp(<Breadcrumb />, { route: '/today/tasks' });
+    expect(screen.getByText('Today')).toBeInTheDocument();
+    expect(screen.getByText('Tasks')).toBeInTheDocument();
+  });
+
   it('uses Ask parent and Who should I call leaf', () => {
     renderWithApp(<Breadcrumb />, { route: '/ask/people' });
     expect(screen.getByText('Ask')).toBeInTheDocument();
