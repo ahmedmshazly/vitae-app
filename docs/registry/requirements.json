@@ -830,6 +830,17 @@
       "reconstruction_note": "Authored 2026-09-11 from ADR 0012. Enforced by apps/api/src/services/productivity/analytics.ts and asserted by docs/PRIVACY.md."
     },
     {
+      "id": "FR-PROD-005",
+      "capability": "CAP-PRODUCTIVITY",
+      "kind": "functional",
+      "title": "Rules and recurrence persist without auto-execution",
+      "statement": "Enabled automation rules are stored and listed but are not evaluated on the command write path. Completing a recurring task does not spawn the next occurrence. Surfaces that create rules or store recurrence must say so, so operators are not promised a scheduler.",
+      "implementation_status": "partial",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-09-11 from the whole-branch final review. evaluateRule and nextOccurrenceAfter exist in @vitae/core and are not called from apps/api. Honesty copy lives on Automation and task-detail recurrence; a rules engine is out of this wave."
+    },
+    {
       "id": "FR-PROV-001",
       "capability": "CAP-PROV",
       "kind": "functional",

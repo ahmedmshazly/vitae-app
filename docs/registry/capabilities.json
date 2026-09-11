@@ -197,7 +197,7 @@
         "apps/api/src/routes/v1/productivity.ts",
         "docs/adr/0013-productivity-routes-and-flag.md"
       ],
-      "note": "Shipped in the repository and covered by tests, but withheld from every default install. The kill switch is unset or any non-truthy value on both flags: the API mount answers 404 and the web hides nav and commands. /today, /today/planner, and /today/ledger stay unchanged. Seed-demo may write productivity records; they stay inert until the flags are on."
+      "note": "Shipped in the repository and covered by tests, but withheld from every default install. The kill switch is unset or any non-truthy value on both flags: the API mount answers 404 and the web hides nav and commands. /today, /today/planner, and /today/ledger stay unchanged. Seed-demo may write productivity records; they stay inert until the flags are on. Enabled automation rules and recurrence records persist (FR-PROD-005); they are not auto-executed, and complete does not spawn the next occurrence."
     },
     {
       "id": "CAP-RESUME",

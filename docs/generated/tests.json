@@ -1063,7 +1063,7 @@
     {
       "file": "apps/api/src/routes/v1/productivity.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 15,
+      "cases": 17,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -1087,7 +1087,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 529
+      "lines": 645
     },
     {
       "file": "apps/api/src/routes/v1/reminders.integration.test.ts",
@@ -3097,7 +3097,7 @@
     {
       "file": "apps/web/src/features/productivity/screens.test.tsx",
       "package": "@vitae/web",
-      "cases": 13,
+      "cases": 14,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -3124,7 +3124,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 367
+      "lines": 400
     },
     {
       "file": "apps/web/src/features/QuickAdd.test.tsx",
@@ -7805,7 +7805,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 348
+      "lines": 362
     },
     {
       "file": "packages/core/src/productivity/dependencies.test.ts",
@@ -8615,12 +8615,12 @@
   ],
   "summary": {
     "files": 394,
-    "cases": 2743,
+    "cases": 2746,
     "skipped": 2,
     "todo": 0,
     "by_package": {
-      "@vitae/api": 398,
-      "@vitae/web": 1272,
+      "@vitae/api": 400,
+      "@vitae/web": 1273,
       "@vitae/e2e": 305,
       "@vitae/core": 494,
       "@vitae/testkit": 7,
@@ -8735,6 +8735,7 @@
       "FR-PROD-002",
       "FR-PROD-003",
       "FR-PROD-004",
+      "FR-PROD-005",
       "FR-PROV-001",
       "FR-RES-001",
       "FR-RES-002",

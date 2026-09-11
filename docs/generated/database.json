@@ -825,21 +825,21 @@
           "file": "apps/api/src/db/repository.ts",
           "method": "insertInto",
           "access": "query-builder",
-          "line": 743,
+          "line": 752,
           "test": false
         },
         {
           "file": "apps/api/src/db/repository.ts",
           "method": "selectFrom",
           "access": "query-builder",
-          "line": 780,
+          "line": 789,
           "test": false
         },
         {
           "file": "apps/api/src/db/repository.ts",
           "method": "updateTable",
           "access": "query-builder",
-          "line": 819,
+          "line": 828,
           "test": false
         },
         {
@@ -2780,7 +2780,7 @@
           "file": "apps/api/src/db/repository.ts",
           "method": "insertInto",
           "access": "query-builder",
-          "line": 1168,
+          "line": 1177,
           "test": false
         },
         {
@@ -3464,14 +3464,14 @@
           "file": "apps/api/src/db/repository.ts",
           "method": "insertInto",
           "access": "query-builder",
-          "line": 861,
+          "line": 870,
           "test": false
         },
         {
           "file": "apps/api/src/db/repository.ts",
           "method": "selectFrom",
           "access": "query-builder",
-          "line": 884,
+          "line": 893,
           "test": false
         },
         {
@@ -3982,14 +3982,14 @@
           "file": "apps/api/src/db/repository.ts",
           "method": "insertInto",
           "access": "query-builder",
-          "line": 1001,
+          "line": 1010,
           "test": false
         },
         {
           "file": "apps/api/src/db/repository.ts",
           "method": "selectFrom",
           "access": "query-builder",
-          "line": 1139,
+          "line": 1148,
           "test": false
         },
         {
@@ -4616,21 +4616,21 @@
           "file": "apps/api/src/db/repository.ts",
           "method": "insertInto",
           "access": "query-builder",
-          "line": 973,
+          "line": 982,
           "test": false
         },
         {
           "file": "apps/api/src/db/repository.ts",
           "method": "selectFrom",
           "access": "query-builder",
-          "line": 909,
+          "line": 918,
           "test": false
         },
         {
           "file": "apps/api/src/db/repository.ts",
           "method": "updateTable",
           "access": "query-builder",
-          "line": 945,
+          "line": 954,
           "test": false
         },
         {
@@ -4792,7 +4792,7 @@
           "file": "apps/api/src/db/repository.ts",
           "method": "updateTable",
           "access": "query-builder",
-          "line": 701,
+          "line": 697,
           "test": false
         },
         {
@@ -5109,7 +5109,7 @@
           "file": "apps/api/src/routes/v1/productivity.integration.test.ts",
           "method": "updateTable",
           "access": "query-builder",
-          "line": 388,
+          "line": 504,
           "test": true
         },
         {

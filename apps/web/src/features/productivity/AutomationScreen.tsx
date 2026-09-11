@@ -67,7 +67,10 @@ export function AutomationScreen() {
 
   return (
     <div className="page prod-page">
-      <PageHeader title="Automation" subtitle="Rules as named sentences. Conditions and actions are text, not a canvas." />
+      <PageHeader
+        title="Automation"
+        subtitle="Rules as named sentences. Enabled rules are stored; they are not auto-executed (FR-PROD-005)."
+      />
       {actions.locked ? (
         <p className="prod-lock" role="status">
           {actions.writeLock}
@@ -109,7 +112,7 @@ export function AutomationScreen() {
           loadingLabel="Loading rules"
           errorTitle="Couldn't load rules"
           emptyTitle="No rules yet"
-          emptyHint="Name a rule and write what it does. The condition and actions stay readable as text."
+          emptyHint="Name a rule and write what it does. Turning it on stores it; it is not auto-executed (FR-PROD-005)."
           emptyGlyph="adjust"
         >
           <ul className="prod-list">

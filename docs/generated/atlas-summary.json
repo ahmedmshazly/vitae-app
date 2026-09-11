@@ -2,15 +2,15 @@
   "by_package": {
     "@vitae/api": {
       "files": 123,
-      "lines": 28587,
+      "lines": 28654,
       "exports": 471,
       "undocumented": 355
     },
     "@vitae/web": {
       "files": 203,
-      "lines": 52724,
-      "exports": 868,
-      "undocumented": 599
+      "lines": 52754,
+      "exports": 869,
+      "undocumented": 600
     },
     "@vitae/config": {
       "files": 1,
@@ -20,9 +20,9 @@
     },
     "@vitae/core": {
       "files": 86,
-      "lines": 15250,
-      "exports": 888,
-      "undocumented": 680
+      "lines": 15265,
+      "exports": 889,
+      "undocumented": 681
     },
     "@vitae/testkit": {
       "files": 5,
@@ -46,9 +46,9 @@
   "by_kind": {
     "module": {
       "files": 104,
-      "lines": 16311,
-      "exports": 642,
-      "undocumented": 428
+      "lines": 16334,
+      "exports": 643,
+      "undocumented": 429
     },
     "migration": {
       "files": 12,
@@ -58,7 +58,7 @@
     },
     "database": {
       "files": 9,
-      "lines": 2459,
+      "lines": 2468,
       "exports": 83,
       "undocumented": 63
     },
@@ -76,7 +76,7 @@
     },
     "contract": {
       "files": 3,
-      "lines": 1302,
+      "lines": 1303,
       "exports": 3,
       "undocumented": 2
     },
@@ -94,13 +94,13 @@
     },
     "service": {
       "files": 31,
-      "lines": 10446,
+      "lines": 10503,
       "exports": 266,
       "undocumented": 189
     },
     "component": {
       "files": 83,
-      "lines": 19833,
+      "lines": 19840,
       "exports": 335,
       "undocumented": 258
     },
@@ -118,9 +118,9 @@
     },
     "schema": {
       "files": 14,
-      "lines": 2889,
-      "exports": 313,
-      "undocumented": 248
+      "lines": 2904,
+      "exports": 314,
+      "undocumented": 249
     },
     "algorithm": {
       "files": 21,
@@ -814,6 +814,7 @@
       "trigrams",
       "tripProps",
       "updateTaskCommandSchema",
+      "updateTimeEntryCommandSchema",
       "upsertRuleCommandSchema",
       "upsertTemplateCommandSchema",
       "usesSkillProps",
@@ -992,9 +993,9 @@
   "summary": {
     "files": 436,
     "test_files": 394,
-    "lines": 101506,
-    "exports": 2406,
-    "undocumented_exports": 1768,
+    "lines": 101618,
+    "exports": 2408,
+    "undocumented_exports": 1770,
     "edges": 2052,
     "untested": 155,
     "no_consumer": [],

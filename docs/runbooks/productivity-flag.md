@@ -52,6 +52,11 @@ This is a local operator procedure, not a committed default-on.
 To leave: apply the kill switch above. Demo records remain in the graph; they
 become inert again.
 
+Enabled automation rules and recurrence records persist when the flags are on
+(FR-PROD-005). They are **not** evaluated on the write path, and completing a
+task does **not** spawn the next occurrence. Do not treat `/today/automation`
+or a stored rrule as a running scheduler.
+
 ## Performance seed
 
 `pnpm seed:productivity-perf` writes 10,000 task nodes. It refuses the default

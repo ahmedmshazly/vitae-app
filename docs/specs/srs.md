@@ -560,7 +560,7 @@ Status: implemented · Evidence: cited by source and by tests · Provenance: rec
 
 `CAP-PRODUCTIVITY` · A default-off task matrix, waiting list, review, private analytics, automation rules, and task templates, gated by VITAE_PRODUCTIVITY_ENABLED and VITE_PUBLIC_PRODUCTIVITY_ENABLED.
 
-**Status: gated.** Shipped in the repository and covered by tests, but withheld from every default install. The kill switch is unset or any non-truthy value on both flags: the API mount answers 404 and the web hides nav and commands. /today, /today/planner, and /today/ledger stay unchanged. Seed-demo may write productivity records; they stay inert until the flags are on.
+**Status: gated.** Shipped in the repository and covered by tests, but withheld from every default install. The kill switch is unset or any non-truthy value on both flags: the API mount answers 404 and the web hides nav and commands. /today, /today/planner, and /today/ledger stay unchanged. Seed-demo may write productivity records; they stay inert until the flags are on. Enabled automation rules and recurrence records persist (FR-PROD-005); they are not auto-executed, and complete does not spawn the next occurrence.
 
 #### FR-PROD-001: Off-by-default dual flag and kill switch
 
@@ -593,6 +593,14 @@ Productivity analytics are computed on read from records plus revisions, declare
 Status: implemented · Evidence: cited by source · Provenance: reconstructed, confirmed
 
 > Authored 2026-09-11 from ADR 0012. Enforced by apps/api/src/services/productivity/analytics.ts and asserted by docs/PRIVACY.md.
+
+#### FR-PROD-005: Rules and recurrence persist without auto-execution
+
+Enabled automation rules are stored and listed but are not evaluated on the command write path. Completing a recurring task does not spawn the next occurrence. Surfaces that create rules or store recurrence must say so, so operators are not promised a scheduler.
+
+Status: partial · Evidence: cited by source · Provenance: reconstructed, confirmed
+
+> Authored 2026-09-11 from the whole-branch final review. evaluateRule and nextOccurrenceAfter exist in @vitae/core and are not called from apps/api. Honesty copy lives on Automation and task-detail recurrence; a rules engine is out of this wave.
 
 #### NFR-PROD-001: Productivity performance budgets fail closed
 
