@@ -112,6 +112,14 @@ describe('form descriptors stay honest against the Zod schemas', () => {
       ['MEMBER_OF', 'person', 'organization'],
       ['REACTED_TO', 'person', 'post'],
       ['ORG_RELATED', 'organization', 'organization'],
+      ['DEPENDS_ON', 'task', 'task'],
+      ['SERVES_GOAL', 'task', 'goal'],
+      ['SERVES_GOAL', 'project', 'goal'],
+      ['WAITING_ON', 'task', 'person'],
+      ['WAITING_ON', 'task', 'organization'],
+      ['FOR', 'task', 'person'],
+      ['FOR', 'task', 'organization'],
+      ['FOR', 'task', 'application'],
     ];
     for (const [type, src, dst] of real) {
       expect(edgeEndpointsAllowed(type, src, dst).ok, `${type}: ${src} → ${dst}`).toBe(true);
@@ -132,6 +140,10 @@ describe('form descriptors stay honest against the Zod schemas', () => {
       ['REPORTS_TO', 'person', 'organization'],
       ['ORG_RELATED', 'person', 'organization'],
       ['ORG_RELATED', 'organization', 'person'],
+      ['DEPENDS_ON', 'task', 'goal'],
+      ['SERVES_GOAL', 'task', 'task'],
+      ['WAITING_ON', 'task', 'task'],
+      ['FOR', 'person', 'task'],
     ];
     for (const [type, src, dst] of nonsense) {
       const result = edgeEndpointsAllowed(type, src, dst);

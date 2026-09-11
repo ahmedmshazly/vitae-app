@@ -55,16 +55,32 @@ describe('legacy taskProps', () => {
     expect(taskProps.safeParse({ status: 'inbox', priority: 'P1' }).success).toBe(false);
   });
 
-  it('does not yet persist target or importance on taskProps (Task 3)', () => {
+  it('still parses a legacy task that omits the new optional productivity keys', () => {
+    expect(taskProps.parse({ status: 'inbox', due: '2026-09-11' })).toEqual({
+      status: 'inbox',
+      due: '2026-09-11',
+    });
+  });
+
+  it('keeps optional target, importance, and other productivity fields when present', () => {
     const parsed = taskProps.parse({
       status: 'inbox',
       due: '2026-09-11',
       target: '2026-09-18',
       importance: 'important',
+      follow_up: '2026-09-20',
+      waiting_patience_days: 7,
+      energy: 'low',
     });
-    expect(parsed).toEqual({ status: 'inbox', due: '2026-09-11' });
-    expect('target' in parsed).toBe(false);
-    expect('importance' in parsed).toBe(false);
+    expect(parsed).toMatchObject({
+      status: 'inbox',
+      due: '2026-09-11',
+      target: '2026-09-18',
+      importance: 'important',
+      follow_up: '2026-09-20',
+      waiting_patience_days: 7,
+      energy: 'low',
+    });
   });
 
   it('keeps unknown keys on taskProps.passthrough() (legacy sparse docs)', () => {
@@ -185,10 +201,11 @@ describe('legacy search and export (core types)', () => {
     expect(result.value.nodes[0]?.type).toBe('task');
   });
 
-  it('has not added productivity edges to EDGE_TYPES yet (Task 3)', () => {
+  it('appends productivity edges without reordering the existing catalog', () => {
     const types = EDGE_TYPES as readonly string[];
-    for (const type of ['DEPENDS_ON', 'SERVES_GOAL', 'WAITING_ON', 'FOR']) {
-      expect(types.includes(type)).toBe(false);
-    }
+    expect(types.indexOf('INTRODUCED')).toBeLessThan(types.indexOf('DEPENDS_ON'));
+    expect(types.slice(-4)).toEqual(['DEPENDS_ON', 'SERVES_GOAL', 'WAITING_ON', 'FOR']);
+    expect(types).toContain('KNOWS');
+    expect(types).toContain('INTRODUCED');
   });
 });

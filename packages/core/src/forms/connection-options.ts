@@ -58,6 +58,10 @@ const GROUP_BY_TYPE: Partial<Record<EdgeType, ConnectionOptionGroup>> = {
   LOCATED_IN: 'Location',
   VISITED: 'Location',
   RELATES_TO: 'Other',
+  DEPENDS_ON: 'Other',
+  SERVES_GOAL: 'Other',
+  WAITING_ON: 'Other',
+  FOR: 'Other',
 };
 
 const GROUP_ORDER: ConnectionOptionGroup[] = [

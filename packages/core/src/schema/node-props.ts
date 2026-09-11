@@ -5,6 +5,12 @@
  * legacy/imported docs with extra or sparse keys keep round-tripping.
  */
 import { z } from 'zod';
+import {
+  energySchema,
+  importanceSchema,
+  quadrantOverrideSchema,
+  recurrenceSchema,
+} from '../productivity/contracts.js';
 import { INTERACTION_KINDS, type NodeType } from '../types.js';
 import { applicationStatusSchema } from './application.js';
 import { isoDate, isoDateTime } from './envelope.js';
@@ -84,6 +90,7 @@ export const projectProps = z.object({
   status: z.enum(['active', 'paused', 'done', 'archived']).optional(),
   url: urlish,
   outcome: z.string().optional(),
+  default_importance: importanceSchema.optional(),
 });
 
 export const repositoryProps = z.object({
@@ -263,6 +270,13 @@ export const taskProps = z.object({
   priority: z.enum(['p1', 'p2', 'p3', 'p4']).optional(),
   effort_min: z.number().int().optional(),
   completed_at: isoDateTime.optional(),
+  target: isoDate.optional(),
+  importance: importanceSchema.optional(),
+  quadrant_override: quadrantOverrideSchema.optional(),
+  follow_up: isoDate.optional(),
+  waiting_patience_days: z.number().int().positive().optional(),
+  recurrence: recurrenceSchema.optional(),
+  energy: energySchema.optional(),
 });
 
 export const ideaProps = z.object({
@@ -367,6 +381,7 @@ export const goalProps = z
     success_criteria: z.string().optional(),
     target_date: isoDate.optional(),
     motivation: z.string().optional(),
+    importance: importanceSchema.optional(),
     key_results: z
       .array(
         z.object({

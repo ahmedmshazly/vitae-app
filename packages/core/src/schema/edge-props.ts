@@ -219,6 +219,10 @@ export const EDGE_PROPS_SCHEMAS = {
   REPORTS_TO: reportsToProps.passthrough(),
   ORG_RELATED: orgRelatedProps.passthrough(),
   INTRODUCED: introducedProps.passthrough(),
+  DEPENDS_ON: emptyProps,
+  SERVES_GOAL: emptyProps,
+  WAITING_ON: emptyProps,
+  FOR: emptyProps,
 } satisfies Record<EdgeType, z.ZodType>;
 
 export function edgePropsSchemaFor(type: EdgeType): z.ZodType {

@@ -15,7 +15,7 @@ import {
   vitaeTaskStatusSchema,
 } from './contracts.js';
 
-export { ruleActionSchema } from './contracts.js';
+export { recurrenceSchema, ruleActionSchema } from './contracts.js';
 
 const provenanceSchema = z.object({
   /** Fourfold source status, stored only as provenance. Never inferred back. */

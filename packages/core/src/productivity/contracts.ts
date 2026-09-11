@@ -13,6 +13,11 @@ export const IMPORTANCE = ['none', 'important', 'critical'] as const;
 export type Importance = (typeof IMPORTANCE)[number];
 export const importanceSchema = z.enum(IMPORTANCE);
 
+/** Fourfold `ENERGY_LEVELS`. Optional on persisted task props. */
+export const ENERGY_LEVELS = ['low', 'medium', 'high'] as const;
+export type EnergyLevel = (typeof ENERGY_LEVELS)[number];
+export const energySchema = z.enum(ENERGY_LEVELS);
+
 /** Classic quadrants. Display names are a later preset, not this union. */
 export const QUADRANTS = ['do', 'schedule', 'delegate', 'eliminate'] as const;
 export type Quadrant = (typeof QUADRANTS)[number];

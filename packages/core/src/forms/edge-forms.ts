@@ -362,6 +362,38 @@ export const EDGE_FORM_DESCRIPTORS: Record<EdgeType, EdgeFormDescriptor> = {
       { key: 'context', label: 'Context', widget: 'text', placeholder: 'conference hallway, a thread, ...' },
     ],
   },
+  DEPENDS_ON: {
+    type: 'DEPENDS_ON',
+    label: 'Depends on',
+    description: 'Task → task that must finish first. Cycle detection is a pure check, not a DB constraint.',
+    srcTypes: ['task'],
+    dstTypes: ['task'],
+    fields: [],
+  },
+  SERVES_GOAL: {
+    type: 'SERVES_GOAL',
+    label: 'Serves goal',
+    description: 'Task or project → the goal it serves.',
+    srcTypes: ['task', 'project'],
+    dstTypes: ['goal'],
+    fields: [],
+  },
+  WAITING_ON: {
+    type: 'WAITING_ON',
+    label: 'Waiting on',
+    description: 'Task → the person or organization it is blocked on.',
+    srcTypes: ['task'],
+    dstTypes: ['person', 'organization'],
+    fields: [],
+  },
+  FOR: {
+    type: 'FOR',
+    label: 'For',
+    description: 'Task → the person, organization, or application it is for.',
+    srcTypes: ['task'],
+    dstTypes: ['person', 'organization', 'application'],
+    fields: [],
+  },
 };
 
 export function edgeFormDescriptor(type: EdgeType): EdgeFormDescriptor {
