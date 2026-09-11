@@ -563,6 +563,14 @@
         },
         "outcome": {
           "type": "string"
+        },
+        "default_importance": {
+          "type": "string",
+          "enum": [
+            "none",
+            "important",
+            "critical"
+          ]
         }
       },
       "create_subject": {
@@ -1773,6 +1781,67 @@
         },
         "completed_at": {
           "type": "datetime"
+        },
+        "target": {
+          "type": "date"
+        },
+        "importance": {
+          "type": "string",
+          "enum": [
+            "none",
+            "important",
+            "critical"
+          ]
+        },
+        "quadrant_override": {
+          "type": "object",
+          "fields": {
+            "quadrant": {
+              "type": "string",
+              "enum": [
+                "do",
+                "schedule",
+                "delegate",
+                "eliminate"
+              ]
+            },
+            "set_at": {
+              "type": "date"
+            }
+          }
+        },
+        "follow_up": {
+          "type": "date"
+        },
+        "waiting_patience_days": {
+          "type": "number"
+        },
+        "recurrence": {
+          "type": "object",
+          "fields": {
+            "rrule": {
+              "type": "string"
+            },
+            "mode": {
+              "type": "string",
+              "enum": [
+                "fixed",
+                "from_completion"
+              ]
+            },
+            "exceptions": {
+              "type": "array",
+              "items": "date"
+            }
+          }
+        },
+        "energy": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
         }
       },
       "create_subject": null,
@@ -1814,6 +1883,14 @@
         },
         "motivation": {
           "type": "string"
+        },
+        "importance": {
+          "type": "string",
+          "enum": [
+            "none",
+            "important",
+            "critical"
+          ]
         },
         "key_results": {
           "type": "array",
@@ -2898,6 +2975,54 @@
           }
         },
         "notes": "The two people connected by an introduction (FR-COMM-003); the warm-path search reads it as a hop."
+      },
+      "DEPENDS_ON": {
+        "label": "Depends on",
+        "src": [
+          "task"
+        ],
+        "dst": [
+          "task"
+        ],
+        "props": {},
+        "notes": "Task → task that must finish first. Cycle detection is a pure check, not a DB constraint."
+      },
+      "SERVES_GOAL": {
+        "label": "Serves goal",
+        "src": [
+          "task",
+          "project"
+        ],
+        "dst": [
+          "goal"
+        ],
+        "props": {},
+        "notes": "Task or project → the goal it serves."
+      },
+      "WAITING_ON": {
+        "label": "Waiting on",
+        "src": [
+          "task"
+        ],
+        "dst": [
+          "person",
+          "organization"
+        ],
+        "props": {},
+        "notes": "Task → the person or organization it is blocked on."
+      },
+      "FOR": {
+        "label": "For",
+        "src": [
+          "task"
+        ],
+        "dst": [
+          "person",
+          "organization",
+          "application"
+        ],
+        "props": {},
+        "notes": "Task → the person, organization, or application it is for."
       }
     },
     "PERSON_RELATIONS": [
