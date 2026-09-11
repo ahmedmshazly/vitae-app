@@ -396,6 +396,13 @@ describe('productivity export, restore, and retention', () => {
     expect(String(shareSafe.files['time_entries.jsonl'])).toContain('te-safe');
     expect(String(shareSafe.files['time_entries.jsonl'])).not.toContain('te-own-sensitive');
     expect(String(shareSafe.files['time_entries.jsonl'])).not.toContain('te-linked-sensitive');
+    expect(String(shareSafe.files['revisions.jsonl'])).toContain('te-safe');
+    expect(String(shareSafe.files['revisions.jsonl'])).not.toContain('te-own-sensitive');
+    expect(String(shareSafe.files['revisions.jsonl'])).not.toContain('te-linked-sensitive');
+    expect(String(shareSafe.files['productivity_receipts.jsonl'])).toBe('');
+    expect(shareSafe.manifest.counts.productivity_receipts).toBe(0);
+    expect(String(shareSafe.files['revisions.jsonl'])).not.toContain('rc-export');
+    expect(String(shareSafe.files['revisions.jsonl'])).not.toContain('productivity_receipt');
 
     const complete = await buildExport({ includeSensitive: true });
     for (const file of ['time_entries.jsonl', 'automation_rules.jsonl', 'productivity_receipts.jsonl'] as const) {
@@ -404,6 +411,10 @@ describe('productivity export, restore, and retention', () => {
     }
     expect(String(complete.files['time_entries.jsonl'])).toContain('te-own-sensitive');
     expect(String(complete.files['time_entries.jsonl'])).toContain('te-linked-sensitive');
+    expect(String(complete.files['revisions.jsonl'])).toContain('te-own-sensitive');
+    expect(String(complete.files['revisions.jsonl'])).toContain('te-linked-sensitive');
+    expect(String(complete.files['productivity_receipts.jsonl'])).toContain('rc-export');
+    expect(String(complete.files['revisions.jsonl'])).toContain('productivity_receipt');
 
     const restored = await restoreBundle(complete.files, { force: true });
     expect(restored.collections.time_entries).toBeGreaterThanOrEqual(3);

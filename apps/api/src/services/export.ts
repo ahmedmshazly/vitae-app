@@ -234,6 +234,12 @@ export async function* exportEntries(
   };
   const edgeIsSensitive = async (row: Row): Promise<boolean> =>
     (await nodeIsSensitive(row.src)) || (await nodeIsSensitive(row.dst));
+  const timeEntryIsExcluded = async (row: Row): Promise<boolean> => {
+    if (includeSensitive) return false;
+    if (row.sensitive === true) return true;
+    return nodeIsSensitive(row.task_id);
+  };
+  const ruleIsExcluded = (row: Row): boolean => !includeSensitive && row.sensitive === true;
   const refersToSensitive = (fields: string[]) => async (_id: string, row: Row) => {
     for (const field of fields) if (await nodeIsSensitive(row[field])) return false;
     return true;
@@ -255,8 +261,23 @@ export async function* exportEntries(
   );
   yield jsonlFile('revisions.jsonl', 'revisions', async (_id, row) => {
     if (includeSensitive) return true;
+    if (row.subject_kind === 'productivity_receipt') return false;
     if (await nodeIsSensitive(row.subject_id)) return false;
     const snapshot = (row.snapshot ?? {}) as Row;
+    if (row.subject_kind === 'time_entry') {
+      const entry =
+        typeof row.subject_id === 'string'
+          ? await repository.getTimeEntry(row.subject_id, { includeDeleted: true })
+          : null;
+      if (await timeEntryIsExcluded((entry ?? snapshot) as Row)) return false;
+    }
+    if (row.subject_kind === 'automation_rule') {
+      const rule =
+        typeof row.subject_id === 'string'
+          ? await repository.getAutomationRule(row.subject_id, { includeDeleted: true })
+          : null;
+      if (ruleIsExcluded((rule ?? snapshot) as Row)) return false;
+    }
     if (await edgeIsSensitive(snapshot)) return false;
     if (await nodeIsSensitive(snapshot.owner_node)) return false;
     return !(await atomIsSensitive(row.subject_id));
@@ -279,17 +300,13 @@ export async function* exportEntries(
     ? jsonlFile('dossiers.jsonl', 'dossiers', () => true)
     : emptyFile('dossiers.jsonl');
   // A time entry inherits sensitivity from its task and may also mark itself.
-  yield jsonlFile('time_entries.jsonl', 'time_entries', async (_id, row) => {
-    if (includeSensitive) return true;
-    if (row.sensitive === true) return false;
-    return !(await nodeIsSensitive(row.task_id));
-  });
-  yield jsonlFile(
-    'automation_rules.jsonl',
-    'automation_rules',
-    (_id, row) => includeSensitive || row.sensitive !== true,
-  );
-  yield jsonlFile('productivity_receipts.jsonl', 'productivity_receipts', () => true);
+  yield jsonlFile('time_entries.jsonl', 'time_entries', async (_id, row) => !(await timeEntryIsExcluded(row)));
+  yield jsonlFile('automation_rules.jsonl', 'automation_rules', (_id, row) => !ruleIsExcluded(row));
+  // Receipts carry command `result` payloads with no sensitivity label, so they
+  // go the way imports go: only into an explicit complete backup.
+  yield includeSensitive
+    ? jsonlFile('productivity_receipts.jsonl', 'productivity_receipts', () => true)
+    : emptyFile('productivity_receipts.jsonl');
   yield jsonlFile('templates.jsonl', 'templates', () => true);
   yield jsonlFile('reminders.jsonl', 'reminders', refersToSensitive(['subject_id']));
   yield jsonlFile('tags.jsonl', 'tags', async (tagId) => {
