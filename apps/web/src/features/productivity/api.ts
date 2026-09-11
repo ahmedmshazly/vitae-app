@@ -4,7 +4,14 @@
  */
 import { useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient, type QueryClient, type QueryKey } from '@tanstack/react-query';
-import type { NodeRecord, ProductivityCommand, TaskReadModel } from '@vitae/core';
+import type {
+  AnalyticsWindowDays,
+  NodeRecord,
+  ProductivityAnalyticsResponse,
+  ProductivityCommand,
+  ReviewPeriod,
+  TaskReadModel,
+} from '@vitae/core';
 import { api, ApiError } from '../../lib/api.js';
 import { useCanWrite, WRITE_LOCK_HINT } from '../../lib/auth.js';
 import { isProductivityEnabled } from '../../lib/productivity-flag.js';
@@ -65,6 +72,7 @@ export type ProductivityTaskPage = { task: TaskReadModel };
 export type ProductivityTimeEntriesPage = { time_entries: ProductivityTimeEntry[] };
 export type ProductivityRulesPage = { rules: ProductivityRule[] };
 export type ProductivityTemplatesPage = { templates: ProductivityTemplate[] };
+export type ProductivityAnalyticsPage = ProductivityAnalyticsResponse;
 
 function assertProductivityEnabled(): void {
   if (!isProductivityEnabled()) {
@@ -101,6 +109,20 @@ export function fetchProductivityRules(): Promise<ProductivityRulesPage> {
 export function fetchProductivityTemplates(): Promise<ProductivityTemplatesPage> {
   assertProductivityEnabled();
   return api.get<ProductivityTemplatesPage>('/productivity/templates');
+}
+
+export function fetchProductivityAnalytics(
+  windowDays: AnalyticsWindowDays = 30,
+): Promise<ProductivityAnalyticsPage> {
+  assertProductivityEnabled();
+  return api.get<ProductivityAnalyticsPage>(`/productivity/analytics?window=${windowDays}`);
+}
+
+export function fetchProductivityReview(
+  period: ReviewPeriod = 'daily',
+): Promise<ProductivityAnalyticsPage> {
+  assertProductivityEnabled();
+  return api.get<ProductivityAnalyticsPage>(`/productivity/review?period=${period}`);
 }
 
 export function postProductivityCommand(
@@ -154,6 +176,22 @@ export function useProductivityTemplates() {
   return useQuery({
     queryKey: productivityKeys.templates(),
     queryFn: fetchProductivityTemplates,
+    enabled: isProductivityEnabled(),
+  });
+}
+
+export function useProductivityAnalytics(windowDays: AnalyticsWindowDays = 30) {
+  return useQuery({
+    queryKey: productivityKeys.analytics(windowDays),
+    queryFn: () => fetchProductivityAnalytics(windowDays),
+    enabled: isProductivityEnabled(),
+  });
+}
+
+export function useProductivityReview(period: ReviewPeriod = 'daily') {
+  return useQuery({
+    queryKey: productivityKeys.review(period),
+    queryFn: () => fetchProductivityReview(period),
     enabled: isProductivityEnabled(),
   });
 }

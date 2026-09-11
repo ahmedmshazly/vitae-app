@@ -5,6 +5,8 @@ import { isProductivityEnabled } from '../../lib/productivity-flag.js';
 import { AutomationScreen } from './AutomationScreen.js';
 import { TasksScreen } from './TasksScreen.js';
 import { TemplatesScreen } from './TemplatesScreen.js';
+import { AnalyticsScreen } from './AnalyticsScreen.js';
+import { ReviewScreen } from './ReviewScreen.js';
 import { WaitingScreen } from './WaitingScreen.js';
 import './productivity.css';
 
@@ -24,7 +26,7 @@ const SCREENS: Record<string, { label: string; glyph: GlyphName }> = {
  * Flagged Today productivity surface.
  * When the flag is off the route still exists (a bookmark is not a 404) and
  * this page must not call `/api/v1/productivity`.
- * Review and Analytics stay stubs until Task 8.
+ * Review and Analytics load private figures when the flag is on.
  */
 export function ProductivityPage() {
   const { pathname } = useLocation();
@@ -51,6 +53,8 @@ export function ProductivityPage() {
 
   if (pathname === ROUTES.tasks.path) return <TasksScreen />;
   if (pathname === ROUTES.waiting.path) return <WaitingScreen />;
+  if (pathname === ROUTES.review.path) return <ReviewScreen />;
+  if (pathname === ROUTES.analytics.path) return <AnalyticsScreen />;
   if (pathname === ROUTES.automation.path) return <AutomationScreen />;
   if (pathname === ROUTES.taskTemplates.path) return <TemplatesScreen />;
 

@@ -60,6 +60,12 @@ function stubShellApis() {
     if (path.startsWith('/productivity/rules')) return { rules: [] };
     if (path.startsWith('/productivity/templates')) return { templates: [] };
     if (path.startsWith('/productivity/time-entries')) return { time_entries: [] };
+    if (path.startsWith('/productivity/analytics')) {
+      return { window: { days: 30, start: '2026-08-13', end: '2026-09-11' }, time_zone: 'UTC', completeness: 'unknown', figures: {} };
+    }
+    if (path.startsWith('/productivity/review')) {
+      return { window: { days: 1, start: '2026-09-11', end: '2026-09-11' }, time_zone: 'UTC', completeness: 'unknown', figures: {}, review: { bullets: [] } };
+    }
     if (path.startsWith('/nodes')) return { nodes: [], edges: [], neighbors: {} };
     return {};
   });
