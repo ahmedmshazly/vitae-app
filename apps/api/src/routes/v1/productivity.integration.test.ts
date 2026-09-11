@@ -5,7 +5,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import jwt from 'jsonwebtoken';
 import request from 'supertest';
-import { PRODUCTIVITY_API_FLAG, PRODUCTIVITY_COLLECTIONS } from '@vitae/core';
+import { addCalendarDays, PRODUCTIVITY_API_FLAG, PRODUCTIVITY_COLLECTIONS } from '@vitae/core';
 import { authHeader, getAuthedApp } from '../../__tests__/helpers/app.js';
 import { env } from '../../env.js';
 import { db } from '../../db/pg.js';
@@ -54,6 +54,13 @@ describe('productivity routes (flag off)', () => {
     expect(posted.status).toBe(404);
     expect(listed.body.error).toMatchObject({ code: 'NOT_FOUND', message: PRODUCTIVITY_NOT_FOUND_MESSAGE });
     expect(posted.body.error).toMatchObject({ code: 'NOT_FOUND', message: PRODUCTIVITY_NOT_FOUND_MESSAGE });
+
+    const analytics = await request(app).get('/api/v1/productivity/analytics').set(authHeader(token));
+    const review = await request(app).get('/api/v1/productivity/review').set(authHeader(token));
+    expect(analytics.status).toBe(404);
+    expect(review.status).toBe(404);
+    expect(analytics.body.error).toMatchObject({ code: 'NOT_FOUND', message: PRODUCTIVITY_NOT_FOUND_MESSAGE });
+    expect(review.body.error).toMatchObject({ code: 'NOT_FOUND', message: PRODUCTIVITY_NOT_FOUND_MESSAGE });
   });
 });
 
@@ -402,5 +409,120 @@ describe('productivity entitlement and tenant isolation', () => {
     expect(hidden.body.error).toMatchObject({ code: 'NOT_FOUND', message: PRODUCTIVITY_NOT_FOUND_MESSAGE });
 
     process.env.VITAE_CLOUD_ENABLED = originalCloud ?? 'false';
+  });
+});
+
+describe('productivity analytics and review', () => {
+  beforeAll(() => {
+    enableProductivity();
+  });
+
+  it('returns figures when the flag is on', async () => {
+    const { app, token } = await getAuthedApp();
+    const created = await request(app)
+      .post('/api/v1/productivity/commands')
+      .set(authHeader(token))
+      .set('x-vitae-tz', 'Africa/Cairo')
+      .send(envelope('create_task', { title: `Analytics public ${Date.now()}`, importance: 'important', due: '2026-09-11' }))
+      .expect(201);
+    const id = created.body.result.task.id as string;
+    await request(app)
+      .post('/api/v1/productivity/commands')
+      .set(authHeader(token))
+      .send(envelope('complete_task', { id }, { expected_revision: created.body.result.task.rev }))
+      .expect(201);
+
+    const analytics = await request(app)
+      .get('/api/v1/productivity/analytics?window=30')
+      .set(authHeader(token))
+      .set('x-vitae-tz', 'Africa/Cairo')
+      .expect(200);
+    expect(analytics.body.window.days).toBe(30);
+    expect(analytics.body.time_zone).toBe('Africa/Cairo');
+    expect(analytics.body.figures.throughput.total).toBeGreaterThanOrEqual(1);
+    expect(analytics.body.figures.quadrant_balance).toMatchObject({
+      do: expect.any(Number),
+      schedule: expect.any(Number),
+      delegate: expect.any(Number),
+      eliminate: expect.any(Number),
+    });
+    expect(analytics.body.review).toBeUndefined();
+
+    const review = await request(app)
+      .get('/api/v1/productivity/review?period=daily')
+      .set(authHeader(token))
+      .set('x-vitae-tz', 'Africa/Cairo')
+      .expect(200);
+    expect(review.body.review.bullets.length).toBeGreaterThan(0);
+    expect(review.body.review.bullets.join('\n')).not.toMatch(/score|shame|slipped/i);
+  });
+
+  it('excludes a sensitive task from counts and from the payload', async () => {
+    const { app, token } = await getAuthedApp();
+    const before = await request(app)
+      .get('/api/v1/productivity/analytics?window=30')
+      .set(authHeader(token))
+      .expect(200);
+    const secretTitle = `Sensitive analytics ${Date.now()}`;
+    const created = await request(app)
+      .post('/api/v1/productivity/commands')
+      .set(authHeader(token))
+      .send(envelope('create_task', { title: secretTitle, sensitivity: 'sensitive', due: '2026-09-11', importance: 'important' }))
+      .expect(201);
+    const id = created.body.result.task.id as string;
+    await request(app)
+      .post('/api/v1/productivity/commands')
+      .set(authHeader(token))
+      .send(envelope('complete_task', { id }, { expected_revision: created.body.result.task.rev }))
+      .expect(201);
+
+    const after = await request(app)
+      .get('/api/v1/productivity/analytics?window=30')
+      .set(authHeader(token))
+      .expect(200);
+    expect(after.body.figures.throughput.total).toBe(before.body.figures.throughput.total);
+    expect(JSON.stringify(after.body)).not.toContain(secretTitle);
+  });
+
+  it('changes the bound between window 30 and window 90', async () => {
+    const { app, token } = await getAuthedApp();
+    const listed = await request(app)
+      .get('/api/v1/productivity/analytics?window=30')
+      .set(authHeader(token))
+      .set('x-vitae-tz', 'UTC')
+      .expect(200);
+    const oldDay = addCalendarDays(listed.body.window.end, -45);
+    const created = await request(app)
+      .post('/api/v1/productivity/commands')
+      .set(authHeader(token))
+      .send(envelope('create_task', { title: `Old completion ${Date.now()}` }))
+      .expect(201);
+    const id = created.body.result.task.id as string;
+    await request(app)
+      .post('/api/v1/productivity/commands')
+      .set(authHeader(token))
+      .send(
+        envelope(
+          'complete_task',
+          { id, completed_at: `${oldDay}T12:00:00.000Z` },
+          { expected_revision: created.body.result.task.rev },
+        ),
+      )
+      .expect(201);
+
+    const window30 = await request(app)
+      .get('/api/v1/productivity/analytics?window=30')
+      .set(authHeader(token))
+      .set('x-vitae-tz', 'UTC')
+      .expect(200);
+    const window90 = await request(app)
+      .get('/api/v1/productivity/analytics?window=90')
+      .set(authHeader(token))
+      .set('x-vitae-tz', 'UTC')
+      .expect(200);
+    expect(window30.body.window.start).not.toBe(window90.body.window.start);
+    expect(window30.body.window.days).toBe(30);
+    expect(window90.body.window.days).toBe(90);
+    expect(window90.body.figures.throughput.total).toBeGreaterThan(window30.body.figures.throughput.total);
   });
 });

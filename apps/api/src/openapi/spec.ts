@@ -715,6 +715,49 @@ function detailedPaths(): PathsObject {
         },
       }),
     },
+    '/productivity/analytics': {
+      get: op('getProductivityAnalytics', 'Private workspace analytics figures (flagged)', {
+        tags: ['productivity'],
+        parameters: [
+          {
+            name: 'window',
+            in: 'query',
+            required: false,
+            schema: { type: 'integer', enum: [30, 90, 365] },
+            description: 'Inclusive calendar-day window. Defaults to 30.',
+          },
+          {
+            name: 'x-vitae-tz',
+            in: 'header',
+            required: false,
+            schema: { type: 'string' },
+            description: 'IANA timezone for day buckets (ADR 0010)',
+          },
+        ],
+        responses: {
+          '200': { description: '{ window, time_zone, completeness, figures }' },
+          '404': errorResponse('Feature disabled or not found'),
+        },
+      }),
+    },
+    '/productivity/review': {
+      get: op('getProductivityReview', 'Factual daily or weekly review (flagged)', {
+        tags: ['productivity'],
+        parameters: [
+          {
+            name: 'period',
+            in: 'query',
+            required: false,
+            schema: { type: 'string', enum: ['daily', 'weekly'] },
+            description: 'Defaults to daily.',
+          },
+        ],
+        responses: {
+          '200': { description: '{ window, time_zone, completeness, figures, review }' },
+          '404': errorResponse('Feature disabled or not found'),
+        },
+      }),
+    },
   };
 }
 

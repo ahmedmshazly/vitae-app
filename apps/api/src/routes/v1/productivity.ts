@@ -12,6 +12,12 @@ import {
   productivityNotFound,
 } from '../../services/productivity/commands.js';
 import { isProductivityEnabled } from '../../services/productivity/flag.js';
+import {
+  buildProductivityAnalytics,
+  parseAnalyticsWindowDays,
+  parseReviewPeriod,
+  reviewWindowDays,
+} from '../../services/productivity/analytics.js';
 import { placeTask, taskReadModels, toTaskReadModel } from '../../services/productivity/read-models.js';
 
 export const productivityRouter: Router = Router();
@@ -24,8 +30,8 @@ productivityRouter.use((req, _res, next) => {
   next();
 });
 
-function readClock(): { now: string; timeZone: string } {
-  return { now: todayIso(), timeZone: currentTimezone() };
+function readClock(): { now: string; timeZone: string; nowInstant: string } {
+  return { now: todayIso(), timeZone: currentTimezone(), nowInstant: new Date().toISOString() };
 }
 
 productivityRouter.get(
@@ -83,6 +89,39 @@ productivityRouter.get(
   '/templates',
   asyncHandler(async (_req, res) => {
     res.json({ templates: await repository.listProductivityTemplates() });
+  }),
+);
+
+productivityRouter.get(
+  '/analytics',
+  asyncHandler(async (req, res) => {
+    const { now, timeZone, nowInstant } = readClock();
+    res.json(
+      await buildProductivityAnalytics({
+        now,
+        timeZone,
+        nowInstant,
+        days: parseAnalyticsWindowDays(req.query.window),
+        includeReview: false,
+      }),
+    );
+  }),
+);
+
+productivityRouter.get(
+  '/review',
+  asyncHandler(async (req, res) => {
+    const { now, timeZone, nowInstant } = readClock();
+    const period = parseReviewPeriod(req.query.period);
+    res.json(
+      await buildProductivityAnalytics({
+        now,
+        timeZone,
+        nowInstant,
+        days: reviewWindowDays(period),
+        includeReview: true,
+      }),
+    );
   }),
 );
 

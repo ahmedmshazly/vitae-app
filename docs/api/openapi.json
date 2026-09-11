@@ -2582,6 +2582,144 @@
         }
       }
     },
+    "/productivity/analytics": {
+      "get": {
+        "operationId": "getProductivityAnalytics",
+        "summary": "Private workspace analytics figures (flagged)",
+        "tags": [
+          "productivity"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "window",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                30,
+                90,
+                365
+              ]
+            },
+            "description": "Inclusive calendar-day window. Defaults to 30."
+          },
+          {
+            "name": "x-vitae-tz",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "IANA timezone for day buckets (ADR 0010)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{ window, time_zone, completeness, figures }"
+          },
+          "401": {
+            "description": "Unauthorized (default-deny)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feature disabled or not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/productivity/review": {
+      "get": {
+        "operationId": "getProductivityReview",
+        "summary": "Factual daily or weekly review (flagged)",
+        "tags": [
+          "productivity"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "daily",
+                "weekly"
+              ]
+            },
+            "description": "Defaults to daily."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{ window, time_zone, completeness, figures, review }"
+          },
+          "401": {
+            "description": "Unauthorized (default-deny)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feature disabled or not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/suggest": {
       "get": {
         "operationId": "stubSuggest",

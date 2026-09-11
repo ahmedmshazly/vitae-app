@@ -1110,6 +1110,43 @@ export class Repository {
     return trails;
   }
 
+  /**
+   * Revisions whose `at` falls in `[from, to]`, served by
+   * `revisions_workspace_at` / `revisions_workspace_kind_at`.
+   */
+  async revisionsInWindow(params: {
+    from: string;
+    to: string;
+    subjectKinds?: readonly RevisionSubjectKind[];
+  }): Promise<Array<Record<string, unknown>>> {
+    let q = db
+      .selectFrom('revisions')
+      .select('data')
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
+      .where('at', '>=', params.from)
+      .where('at', '<=', params.to);
+    if (params.subjectKinds && params.subjectKinds.length > 0) {
+      q = q.where('subject_kind', 'in', [...params.subjectKinds]);
+    }
+    const rows = await q.orderBy('at', 'asc').orderBy('rev', 'asc').execute();
+    return rows.map((r) => r.data as Record<string, unknown>);
+  }
+
+  /** Rev-1 / create rows for subjects whose create instant may sit before the window. */
+  async createRevisionsFor(subjectIds: readonly string[]): Promise<Array<Record<string, unknown>>> {
+    if (subjectIds.length === 0) return [];
+    const rows = await db
+      .selectFrom('revisions')
+      .select('data')
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
+      .where('subject_id', 'in', [...subjectIds])
+      .where('rev', '=', 1)
+      .execute();
+    return rows.map((r) => r.data as Record<string, unknown>);
+  }
+
   // ── Transactions and invalidation ──────────────────────────────────────────
 
   async transaction<T>(fn: (tx: Tx) => Promise<T>): Promise<T> {
