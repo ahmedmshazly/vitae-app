@@ -17,6 +17,7 @@
     "export:bundle": "tsx src/scripts/export-bundle.ts",
     "seed": "tsx src/scripts/seed.ts",
     "seed:demo": "tsx src/scripts/seed-demo.ts",
+    "seed:productivity-perf": "tsx src/scripts/seed-productivity-perf.ts",
     "backfill:subjects": "tsx src/scripts/backfill-subjects.ts",
     "purge": "tsx src/scripts/purge.ts",
     "audit:graph": "tsx src/scripts/audit-graph.ts",

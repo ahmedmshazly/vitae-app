@@ -153,29 +153,59 @@ ensure_emulators() {
   return 1
 }
 
+# compose.yaml pins `container_name: vitae-postgres`. Git worktrees get their
+# own compose project name, so this directory's `docker compose ps` is empty
+# even when that container is healthy on 5433 (started from the main tree).
+# `port_open` then succeeds, `docker compose up` is skipped, and
+# `docker compose exec postgres` loops on "service not running" until the
+# misleading "did not become ready on 5433". Talk to the pinned container
+# when it is running; otherwise start this project's service.
+postgres_container() {
+  if docker inspect -f '{{.State.Running}}' vitae-postgres 2>/dev/null | grep -qx true; then
+    echo vitae-postgres
+    return 0
+  fi
+  return 1
+}
+
+postgres_exec() {
+  local c
+  if c="$(postgres_container)"; then
+    docker exec -i "$c" "$@"
+  else
+    docker compose exec -T postgres "$@"
+  fi
+}
+
 ensure_postgres() {
+  if postgres_exec pg_isready -U vitae -d vitae >/dev/null 2>&1; then
+    echo "Postgres ready on $POSTGRES_PORT."
+    return 0
+  fi
   if ! port_open "$POSTGRES_PORT"; then
     step "Starting local Postgres"
     docker compose up -d postgres
   fi
   for _ in $(seq 1 30); do
-    if docker compose exec -T postgres pg_isready -U vitae -d vitae >/dev/null 2>&1; then
+    if postgres_exec pg_isready -U vitae -d vitae >/dev/null 2>&1; then
       echo "Postgres ready on $POSTGRES_PORT."
       return 0
     fi
     sleep 1
   done
   echo "Postgres did not become ready on $POSTGRES_PORT." >&2
+  docker inspect -f 'vitae-postgres running={{.State.Running}} health={{if .State.Health}}{{.State.Health.Status}}{{end}}' vitae-postgres >&2 || true
+  docker compose ps postgres >&2 || true
   return 1
 }
 
 ensure_e2e_database() {
   ensure_postgres || return 1
   local exists
-  exists="$(docker compose exec -T postgres psql -U vitae -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname = '$E2E_DATABASE_NAME'")"
+  exists="$(postgres_exec psql -U vitae -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname = '$E2E_DATABASE_NAME'")"
   if [ "$exists" != "1" ]; then
     step "Creating isolated E2E database $E2E_DATABASE_NAME"
-    docker compose exec -T postgres psql -U vitae -d postgres -c "CREATE DATABASE \"$E2E_DATABASE_NAME\""
+    postgres_exec psql -U vitae -d postgres -c "CREATE DATABASE \"$E2E_DATABASE_NAME\""
   fi
 }
 
@@ -450,7 +480,7 @@ e2e_cloud() {
   # cannot order ahead of this one's. applyPaddleWebhook drops anything not
   # newer than what it holds, and a leftover future timestamp would make every
   # transition here a silent no-op.
-  docker compose exec -T postgres psql -q -U vitae -d "$E2E_DATABASE_NAME" <<'SQL' >/dev/null || return 1
+  postgres_exec psql -q -U vitae -d "$E2E_DATABASE_NAME" <<'SQL' >/dev/null || return 1
 DELETE FROM billing_events;
 DELETE FROM billing_subscriptions;
 DELETE FROM billing_customers;

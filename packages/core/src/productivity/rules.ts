@@ -49,7 +49,7 @@ export interface RuleItem extends PlacementItem {
   readonly [key: string]: unknown;
 }
 
-export interface RuleContext extends PlacementContext {}
+export type RuleContext = PlacementContext;
 
 export interface StoredRule {
   readonly enabled: boolean;

@@ -904,6 +904,17 @@
         "apps/api/src/services/productivity/flag.test.ts"
       ]
     },
+    "apps/api/src/services/productivity/isolated-database.ts": {
+      "risk": "high",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/services/productivity/isolated-database.test.ts"
+      ],
+      "note": "Refuses the default vitae / vitae_test URLs before the 10k seed or restore drill can write."
+    },
     "apps/api/src/services/productivity/read-models.ts": {
       "risk": "medium",
       "layers": [
