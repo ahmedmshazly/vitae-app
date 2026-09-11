@@ -2,6 +2,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { EmptyState, PageHeader, Section, type GlyphName } from '@vitae/ui';
 import { ROUTES } from '../../app/routes.js';
 import { isProductivityEnabled } from '../../lib/productivity-flag.js';
+import { AutomationScreen } from './AutomationScreen.js';
+import { TasksScreen } from './TasksScreen.js';
+import { TemplatesScreen } from './TemplatesScreen.js';
+import { WaitingScreen } from './WaitingScreen.js';
+import './productivity.css';
 
 const SCREENS: Record<string, { label: string; glyph: GlyphName }> = {
   [ROUTES.tasks.path]: { label: ROUTES.tasks.label, glyph: ROUTES.tasks.glyph },
@@ -16,36 +21,20 @@ const SCREENS: Record<string, { label: string; glyph: GlyphName }> = {
 };
 
 /**
- * Flagged Today productivity surface. Task 7 replaces the ready region.
+ * Flagged Today productivity surface.
  * When the flag is off the route still exists (a bookmark is not a 404) and
  * this page must not call `/api/v1/productivity`.
+ * Review and Analytics stay stubs until Task 8.
  */
 export function ProductivityPage() {
   const { pathname } = useLocation();
-  const screen = SCREENS[pathname] ?? { label: 'Tasks', glyph: 'task' as const };
   const enabled = isProductivityEnabled();
 
-  return (
-    <div className="page">
-      <PageHeader
-        title={screen.label}
-        subtitle={
-          enabled
-            ? 'A workspace for this surface. The matrix and lists land in a later pass.'
-            : 'This surface is not available in this build.'
-        }
-      />
-      {enabled ? (
-        <Section title="Workspace">
-          <div data-productivity-region="ready">
-            <EmptyState
-              glyph={screen.glyph}
-              title={`${screen.label} is ready`}
-              hint="Nothing is listed yet. This region is the slot the matrix and lists will fill."
-            />
-          </div>
-        </Section>
-      ) : (
+  if (!enabled) {
+    const screen = SCREENS[pathname] ?? { label: 'Tasks', glyph: 'task' as const };
+    return (
+      <div className="page">
+        <PageHeader title={screen.label} subtitle="This surface is not available in this build." />
         <EmptyState
           glyph="today"
           title="Not available"
@@ -56,7 +45,35 @@ export function ProductivityPage() {
             </Link>
           }
         />
-      )}
+      </div>
+    );
+  }
+
+  if (pathname === ROUTES.tasks.path) return <TasksScreen />;
+  if (pathname === ROUTES.waiting.path) return <WaitingScreen />;
+  if (pathname === ROUTES.automation.path) return <AutomationScreen />;
+  if (pathname === ROUTES.taskTemplates.path) return <TemplatesScreen />;
+
+  return <ProductivityStubScreen pathname={pathname} />;
+}
+
+export function ProductivityStubScreen({ pathname }: { pathname: string }) {
+  const screen = SCREENS[pathname] ?? { label: 'Tasks', glyph: 'task' as const };
+  return (
+    <div className="page">
+      <PageHeader
+        title={screen.label}
+        subtitle="A workspace for this surface. The matrix and lists land in a later pass."
+      />
+      <Section title="Workspace">
+        <div data-productivity-region="ready">
+          <EmptyState
+            glyph={screen.glyph}
+            title={`${screen.label} is ready`}
+            hint="Nothing is listed yet. This region is the slot the matrix and lists will fill."
+          />
+        </div>
+      </Section>
     </div>
   );
 }

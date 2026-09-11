@@ -1,0 +1,155 @@
+/* Productivity surfaces. Tokens only — no Fourfold shell, no --do on buttons. */
+
+.prod-page {
+  color: var(--ink);
+  background: var(--bg);
+}
+
+.prod-page :focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.prod-capture,
+.prod-create,
+.prod-inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ae-space-3);
+}
+
+.prod-capture .vt-fld,
+.prod-create .vt-fld,
+.prod-inline-form .vt-fld {
+  flex: 1 1 16rem;
+}
+
+.prod-placement,
+.prod-lock,
+.prod-muted,
+.prod-reason {
+  margin: var(--ae-space-2) 0 0;
+  color: var(--ink);
+}
+
+.prod-muted,
+.prod-reason {
+  color: var(--ink-2);
+  font-size: var(--ae-text-sm, var(--t-small));
+}
+
+.prod-lock {
+  margin-bottom: var(--ae-space-3);
+}
+
+.prod-list,
+.prod-quad__list,
+.prod-plain-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.prod-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-2);
+}
+
+.prod-plain-list li,
+.prod-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ae-space-2);
+}
+
+.prod-title-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.prod-title-btn:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+.prod-matrix {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ae-space-4);
+}
+
+.prod-quad {
+  min-height: 8rem;
+  padding: var(--ae-space-3);
+  background: var(--card, var(--ae-surface));
+  border: 1px solid var(--line, var(--ae-border));
+}
+
+.prod-quad--eliminate {
+  border-style: dashed;
+}
+
+.prod-quad__title {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-2);
+  margin: 0 0 var(--ae-space-3);
+  font-size: var(--t-h2);
+  color: var(--ink);
+}
+
+.prod-quad__mark {
+  width: 0.55em;
+  height: 0.55em;
+  flex: 0 0 auto;
+}
+
+.prod-quad--do .prod-quad__mark {
+  background: var(--do);
+}
+
+.prod-quad--schedule .prod-quad__mark {
+  background: var(--sched);
+}
+
+.prod-quad--delegate .prod-quad__mark {
+  background: var(--deleg);
+}
+
+.prod-quad--eliminate .prod-quad__mark {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--elim);
+}
+
+.prod-quad__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-3);
+}
+
+.prod-subhead {
+  margin: 0 0 var(--ae-space-2);
+  font-size: var(--t-ui);
+  color: var(--ink);
+}
+
+@media (max-width: 860px) {
+  .prod-matrix {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prod-page * {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
+}

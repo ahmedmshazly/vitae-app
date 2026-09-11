@@ -55,6 +55,12 @@ function stubShellApis() {
     if (path.startsWith('/status')) return { checks: { database: { ok: true } } };
     if (path.startsWith('/reminders')) return { reminders: [] };
     if (path.startsWith('/views')) return { views: [] };
+    if (path.startsWith('/productivity/tasks')) return { tasks: [] };
+    if (path.startsWith('/productivity/waiting')) return { tasks: [] };
+    if (path.startsWith('/productivity/rules')) return { rules: [] };
+    if (path.startsWith('/productivity/templates')) return { templates: [] };
+    if (path.startsWith('/productivity/time-entries')) return { time_entries: [] };
+    if (path.startsWith('/nodes')) return { nodes: [], edges: [], neighbors: {} };
     return {};
   });
 }
@@ -214,15 +220,15 @@ describe('productivity flag off', () => {
 });
 
 describe('productivity flag on', () => {
-  it('renders the stub heading inside the shell on /today/tasks', async () => {
+  it('renders the tasks screen inside the shell on /today/tasks', async () => {
     flag.enabled = true;
     renderWithApp(<App />, { route: '/today/tasks' });
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Tasks' })).toBeInTheDocument();
-    expect(screen.getByText('Tasks is ready')).toBeInTheDocument();
+    expect(await screen.findByLabelText('Capture a task')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Quick capture' })).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: 'Today workspace' })).toHaveTextContent('Tasks');
-    expect(productivityApiCalls()).toEqual([]);
+    await waitFor(() => expect(productivityApiCalls().length).toBeGreaterThan(0));
   });
 });
 
