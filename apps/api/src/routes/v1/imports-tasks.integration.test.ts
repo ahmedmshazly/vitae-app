@@ -132,6 +132,7 @@ async function purgeFixture(): Promise<void> {
     SECRET_KEY,
     'tasks_json:task:t9-rollback',
     'tasks_json:task:t9-late-child',
+    'tasks_json:task:t9-orphan',
   ]);
   const nodes = await repository.allLiveNodes();
   const mine = nodes.filter(
@@ -365,6 +366,45 @@ describe('task-file imports', () => {
     expect(
       edges.some((e) => e.type === 'RELATES_TO' && e.src === child?.id && e.dst === parent?.id),
     ).toBe(true);
+  }, 90_000);
+
+  it('proposes and writes project_id when a later file attaches an existing task', async () => {
+    const orphanDoc = JSON.stringify({
+      format: 'vitae.tasks',
+      version: 1,
+      projects: [],
+      tasks: [{ id: 't9-orphan', title: 'Task9 orphan', status: 'next' }],
+    });
+    const created = await stage('tasks_json', orphanDoc);
+    expect(created.status).toBe(201);
+    await commitBatch(created.body.batch.id as string);
+    expect((await liveByKey('tasks_json:task:t9-orphan'))?.props.project_id).toBeUndefined();
+
+    if (!(await liveByKey(PROJECT_KEY))) {
+      const seed = await stage('tasks_json', tasksDoc({ includeChild: false }));
+      expect(seed.status).toBe(201);
+      await commitBatch(seed.body.batch.id as string);
+    }
+
+    const attached = await stage(
+      'tasks_json',
+      JSON.stringify({
+        format: 'vitae.tasks',
+        version: 1,
+        projects: [{ id: 't9-admin', title: 'Task9 Admin' }],
+        tasks: [{ id: 't9-orphan', title: 'Task9 orphan', status: 'next', project_id: 't9-admin' }],
+      }),
+    );
+    expect(attached.status).toBe(201);
+    const row = (attached.body.rows as StagedRow[]).find((r) => r.title === 'Task9 orphan')!;
+    expect(row.proposal?.fields.some((f) => f.key === 'props.project_id')).toBe(true);
+    await setRow(attached.body.batch.id as string, row.id, { decision: 'accept' });
+    const result = await commitBatch(attached.body.batch.id as string);
+    expect(result.failed).toBe(0);
+    expect(result.updated).toBe(1);
+    const live = await liveByKey('tasks_json:task:t9-orphan');
+    const project = await liveByKey(PROJECT_KEY);
+    expect(live?.props.project_id).toBe(project?.id);
   }, 90_000);
 
   it('stages Todoist fixture rows as tasks for review', async () => {

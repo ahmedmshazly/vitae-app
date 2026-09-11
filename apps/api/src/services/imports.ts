@@ -1155,8 +1155,11 @@ export async function stageImport(
     };
   });
 
+  const batchId = newId();
+  stampTaskProjectIds(batchId, kind, rows, byIdentityKey);
+
   const batch: ImportBatch = {
-    id: newId(),
+    id: batchId,
     kind,
     detail,
     filename,
@@ -1347,26 +1350,86 @@ async function liveIdByIdentityKeys(keys: readonly string[]): Promise<string | u
  * a live record the source id already names (so a later file can join a
  * project that is already here).
  */
-async function resolveImportedProjectId(
-  batchId: string,
+function findImportedProjectRow(
   row: StagedRow,
   rows: StagedRow[],
-  kind: ImportKind,
-): Promise<string | undefined> {
+): StagedRow | undefined {
   const projectSource = typeof row.payload.project_source_id === 'string' ? row.payload.project_source_id : '';
   const projectName = typeof row.payload.project_name === 'string' ? row.payload.project_name : '';
-  const match = rows.find((candidate) => {
+  return rows.find((candidate) => {
     if (candidate.entity !== 'project') return false;
     if (projectSource && (candidate.ref === projectSource || candidate.payload.source_id === projectSource)) {
       return true;
     }
     return Boolean(projectName && normalizeForMatch(candidate.title) === normalizeForMatch(projectName));
   });
-  if (match) {
-    if (match.proposal) return match.proposal.target_node_id;
-    if (match.decision === 'accept') return resolvedNodeId(batchId, match);
-    return match.dup?.nodeId;
+}
+
+function projectIdFromBatchRow(batchId: string, match: StagedRow): string | undefined {
+  if (match.proposal) return match.proposal.target_node_id;
+  if (match.decision === 'accept') return resolvedNodeId(batchId, match);
+  return match.dup?.nodeId;
+}
+
+/**
+ * Vitae node id of the project this task belongs to, knowable at stage time
+ * so a later file that attaches an existing task can propose `props.project_id`
+ * instead of only writing an ABOUT edge on create.
+ */
+function resolveStagedProjectId(
+  batchId: string,
+  row: StagedRow,
+  rows: StagedRow[],
+  kind: ImportKind,
+  byIdentityKey: Map<string, NodeRecord>,
+): string | undefined {
+  const match = findImportedProjectRow(row, rows);
+  if (match) return projectIdFromBatchRow(batchId, match);
+  const projectSource = typeof row.payload.project_source_id === 'string' ? row.payload.project_source_id : '';
+  if (!projectSource) return undefined;
+  for (const key of projectSourceIdentityKeys(kind, projectSource)) {
+    const hit = byIdentityKey.get(key);
+    if (hit) return hit.id;
   }
+  return undefined;
+}
+
+function stampTaskProjectIds(
+  batchId: string,
+  kind: ImportKind,
+  rows: StagedRow[],
+  byIdentityKey: Map<string, NodeRecord>,
+): void {
+  if (!isTaskFileKind(kind)) return;
+  for (const row of rows) {
+    if (row.entity !== 'task' || typeof row.payload.skip_reason === 'string') continue;
+    const projectId = resolveStagedProjectId(batchId, row, rows, kind, byIdentityKey);
+    if (!projectId) continue;
+    const stated = { ...((row.payload.props as Record<string, unknown> | undefined) ?? {}) };
+    if (stated.project_id === projectId) continue;
+    stated.project_id = projectId;
+    row.payload = { ...row.payload, props: stated };
+    const draft = nodeDraftFor({
+      entity: row.entity,
+      title: row.title,
+      subtitle: row.subtitle,
+      payload: row.payload,
+      identityKeys: row.identity_keys ?? [],
+    });
+    const identity = resolveIdentity(row.identity_keys ?? [], draft, byIdentityKey);
+    if (identity && draft) row.proposal = buildProposal(draft, identity);
+  }
+}
+
+async function resolveImportedProjectId(
+  batchId: string,
+  row: StagedRow,
+  rows: StagedRow[],
+  kind: ImportKind,
+): Promise<string | undefined> {
+  const match = findImportedProjectRow(row, rows);
+  if (match) return projectIdFromBatchRow(batchId, match);
+  const projectSource = typeof row.payload.project_source_id === 'string' ? row.payload.project_source_id : '';
   if (!projectSource) return undefined;
   return liveIdByIdentityKeys(projectSourceIdentityKeys(kind, projectSource));
 }

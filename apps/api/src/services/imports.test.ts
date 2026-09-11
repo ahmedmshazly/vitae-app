@@ -225,6 +225,24 @@ describe('buildProposal', () => {
     expect(proposal.accepted).toEqual(proposal.fields.map((f) => f.key));
     expect(proposal.fields.length).toBeGreaterThan(0);
   });
+
+  it('proposes project_id when a later file attaches an existing task', () => {
+    const stored = buildNodeRecord({
+      type: 'task',
+      title: 'Orphan',
+      props: { status: 'next' },
+      identity_keys: ['tasks_json:task:o1'],
+    });
+    const draft = nodeDraftFor({
+      entity: 'task',
+      title: 'Orphan',
+      subtitle: null,
+      payload: { props: { status: 'next', project_id: 'proj-1' }, notes_md: '' },
+      identityKeys: ['tasks_json:task:o1'],
+    })!;
+    const proposal = buildProposal(draft, { key: 'tasks_json:task:o1', node: stored });
+    expect(proposal.fields).toContainEqual({ key: 'props.project_id', from: undefined, to: 'proj-1' });
+  });
 });
 
 describe('githubLinkNext', () => {
