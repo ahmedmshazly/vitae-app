@@ -7,6 +7,7 @@ import { APPLICATION_STATUSES, type ApplicationStatus } from '../../schema/appli
 import {
   addCalendarDays,
   calendarDateInZone,
+  calendarDaysBetween,
   parseInstant,
   resolveCalendarNow,
 } from '../calendar.js';
@@ -37,6 +38,7 @@ import {
   type UrgencyCreepFigure,
   type WaitingFigure,
   type WorkspaceAnalyticsInput,
+  type WorkspaceRevision,
   type WorkspaceThroughputFigure,
 } from './types.js';
 
@@ -164,8 +166,48 @@ export function projectQuadrantBalance(input: WorkspaceAnalyticsInput): Quadrant
   return { ...figureBase(input, 'complete'), ...counts };
 }
 
+function isUrgentBag(bag: Readonly<Record<string, unknown>>, day: string, timeZone: string): boolean {
+  return isUrgentReason(
+    placeItem(placementItemFromBag(bag), defaultPlacementContext({ now: day, timeZone })).reason,
+  );
+}
+
+/**
+ * First civil day the item was urgent, walking create → as-of.
+ * Created-already-urgent is reported separately so it stays a zero on the figure.
+ */
+function firstUrgentDay(
+  trail: readonly WorkspaceRevision[],
+  input: WorkspaceAnalyticsInput,
+): { createdUrgent: boolean; first: string | null } {
+  const ordered = [...trail].sort((left, right) =>
+    left.rev !== right.rev ? left.rev - right.rev : left.at.localeCompare(right.at),
+  );
+  const created = ordered.find((revision) => revision.op === 'create') ?? ordered[0];
+  if (!created) return { createdUrgent: false, first: null };
+
+  const timeZone = input.time_zone;
+  const createDay = calendarDay(created.at, timeZone);
+  const lastDay = asOfDay(input);
+  let state: Record<string, unknown> = { ...created.diff };
+  if (isUrgentBag(state, createDay, timeZone)) return { createdUrgent: true, first: createDay };
+
+  const span = calendarDaysBetween(createDay, lastDay);
+  if (span < 0) return { createdUrgent: false, first: null };
+
+  let applyIdx = ordered.indexOf(created) + 1;
+  for (let offset = 0; offset <= span; offset += 1) {
+    const day = addCalendarDays(createDay, offset);
+    while (applyIdx < ordered.length && calendarDay(ordered[applyIdx]!.at, timeZone) <= day) {
+      state = { ...state, ...ordered[applyIdx]!.diff };
+      applyIdx += 1;
+    }
+    if (isUrgentBag(state, day, timeZone)) return { createdUrgent: false, first: day };
+  }
+  return { createdUrgent: false, first: null };
+}
+
 export function projectUrgencyCreep(input: WorkspaceAnalyticsInput): UrgencyCreepFigure {
-  const nowCtx = defaultPlacementContext({ now: input.now, timeZone: input.time_zone });
   let count = 0;
   let completeness: HistoryCompleteness = 'complete';
 
@@ -175,14 +217,9 @@ export function projectUrgencyCreep(input: WorkspaceAnalyticsInput): UrgencyCree
     completeness = worseCompleteness(completeness, trailCompleteness);
     if (trailCompleteness !== 'complete') continue;
 
-    const created = trail.find((revision) => revision.op === 'create') ?? trail[0];
-    if (!created) continue;
-    const atCreate = placeItem(
-      placementItemFromBag(created.diff),
-      defaultPlacementContext({ now: calendarDay(created.at, input.time_zone), timeZone: input.time_zone }),
-    );
-    const atNow = placeItem(placementItemFromTask(task), nowCtx);
-    if (!isUrgentReason(atCreate.reason) && isUrgentReason(atNow.reason)) count += 1;
+    const { createdUrgent, first } = firstUrgentDay(trail, input);
+    if (createdUrgent || first === null || !dayInWindow(first, input)) continue;
+    count += 1;
   }
 
   if (input.tasks.length === 0) completeness = 'complete';

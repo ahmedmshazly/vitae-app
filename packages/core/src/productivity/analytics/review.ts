@@ -13,9 +13,11 @@ function countPhrase(count: number, singular: string, plural: string): string {
  * A missing revision cannot become a sentence.
  */
 export function reviewBullets(figures: ProductivityFigures): ProductivityReview {
-  const bullets: string[] = [
-    countPhrase(figures.throughput.total, 'task completed', 'tasks completed'),
-  ];
+  const bullets: string[] = [];
+
+  if (figures.throughput.history_completeness === 'complete') {
+    bullets.push(countPhrase(figures.throughput.total, 'task completed', 'tasks completed'));
+  }
 
   if (figures.waiting.waiting > 0) {
     bullets.push(countPhrase(figures.waiting.waiting, 'task is waiting', 'tasks are waiting'));

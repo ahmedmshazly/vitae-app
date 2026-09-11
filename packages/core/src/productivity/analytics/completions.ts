@@ -34,6 +34,7 @@ export interface CompletionsFigure extends AnalyticsFigure {
 }
 
 function completionInstant(revision: ReplayRevision): string | null {
+  if (revision.inferred) return null;
   const completed = revision.diff.completed_at;
   if (typeof completed === 'string' && completed.length > 0) return completed;
   if (revision.diff.status === 'done') return revision.at;

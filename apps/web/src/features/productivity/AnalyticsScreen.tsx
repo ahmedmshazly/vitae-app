@@ -8,9 +8,21 @@ import { QueryPanel } from './QueryPanel.js';
 
 function completenessCopy(value: string): string {
   if (value === 'sparse') {
-    return 'History for this window is sparse. Older revisions may not include field-level changes, so some counts stay at zero rather than guessing.';
+    return 'History for this window is sparse. Older revisions may not include field-level changes, so some counts are withheld rather than guessed.';
   }
   return 'History for this window is unknown. No revisions were retained, so completions and creep are not measured.';
+}
+
+function throughputRows(figure: ProductivityFigures['throughput']): FigureRow[] {
+  if (figure.history_completeness !== 'complete') return [];
+  if (figure.by_day.length > 0) {
+    return figure.by_day.map((row) => ({
+      key: row.period,
+      cells: [row.period, String(row.count)],
+      value: row.count,
+    }));
+  }
+  return [{ key: 'total', cells: ['Total', String(figure.total)], value: figure.total }];
 }
 
 function quadrantRows(figures: ProductivityFigures): FigureRow[] {
@@ -75,19 +87,13 @@ export function AnalyticsScreen() {
                   },
                 ]}
               />
-              <FigureBlock
-                title="Throughput"
-                columns={['Day', 'Completed']}
-                rows={
-                  figures.throughput.by_day.length > 0
-                    ? figures.throughput.by_day.map((row) => ({
-                        key: row.period,
-                        cells: [row.period, String(row.count)],
-                        value: row.count,
-                      }))
-                    : [{ key: 'total', cells: ['Total', String(figures.throughput.total)], value: figures.throughput.total }]
-                }
-              />
+              {throughputRows(figures.throughput).length > 0 ? (
+                <FigureBlock
+                  title="Throughput"
+                  columns={['Day', 'Completed']}
+                  rows={throughputRows(figures.throughput)}
+                />
+              ) : null}
               <FigureBlock
                 title="Estimates versus actuals"
                 columns={['Task', 'Estimate (min)', 'Actual (sec)']}

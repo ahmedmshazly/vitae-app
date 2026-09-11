@@ -10,6 +10,8 @@ export interface ReplayRevision {
   readonly op: RevisionOp;
   readonly at: string;
   readonly diff: Readonly<Record<string, RuleActionValue>>;
+  /** True when `diff` was inferred from a create snapshot, not a stored field-level write. */
+  readonly inferred?: boolean;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

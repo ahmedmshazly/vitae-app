@@ -198,6 +198,34 @@ describe('projectUrgencyCreep', () => {
     );
     expect(figure).toMatchObject({ count: 0, history_completeness: 'unknown' });
   });
+
+  it('counts only the first urgent instant inside the requested window', () => {
+    const tasks = [task({ id: 'u4', due: '2026-07-20', status: 'next' })];
+    const revisions = [
+      rev('u4', 1, '2026-07-01T09:00:00.000Z', { status: 'inbox' }),
+      rev('u4', 2, '2026-07-20T09:00:00.000Z', { due: '2026-07-20' }),
+    ];
+    const short = projectUrgencyCreep(input({ tasks, revisions }));
+    const long = projectUrgencyCreep(
+      input({
+        window_start: '2026-06-14',
+        tasks,
+        revisions,
+      }),
+    );
+    expect(short.count).toBe(0);
+    expect(long.count).toBe(1);
+  });
+
+  it('does not treat out-of-window calendar aging as creep', () => {
+    const figure = projectUrgencyCreep(
+      input({
+        tasks: [task({ id: 'u5', due: '2026-07-20', status: 'next' })],
+        revisions: [rev('u5', 1, '2026-07-01T09:00:00.000Z', { status: 'inbox', due: '2026-07-20' })],
+      }),
+    );
+    expect(figure.count).toBe(0);
+  });
 });
 
 describe('estimates, time, waiting, habits, goals, edges', () => {
@@ -333,6 +361,16 @@ describe('reviewBullets', () => {
     expect(text).toMatch(/follow-up date is past/);
     expect(text).not.toMatch(/score|shame|slipped/i);
   });
+
+  it('does not state an unmeasured throughput total as a fact', () => {
+    const figures = projectProductivityFigures(
+      input({
+        tasks: [task({ id: 'orphan', status: 'done', completed_at: '2026-09-01T00:00:00.000Z' })],
+      }),
+    );
+    expect(figures.throughput.history_completeness).toBe('unknown');
+    expect(reviewBullets(figures).bullets.join('\n')).not.toMatch(/task completed|tasks completed/);
+  });
 });
 
 describe('flattenAnalyticsDiff', () => {
@@ -351,6 +389,26 @@ describe('flattenAnalyticsDiff', () => {
         at: '2026-08-20T09:00:00.000Z',
         snapshot: { props: { status: 'inbox' } },
       }),
-    ).toMatchObject({ subject_id: 't1', diff: { status: 'inbox' } });
+    ).toMatchObject({ subject_id: 't1', diff: { status: 'inbox' }, inferred: true });
+  });
+
+  it('does not count a snapshot-only create of a done task as a completion', () => {
+    const mapped = toWorkspaceRevision({
+      subject_id: 'imported',
+      rev: 1,
+      op: 'create',
+      at: '2026-08-20T09:00:00.000Z',
+      diff: undefined,
+      snapshot: { props: { status: 'done', completed_at: '2026-08-15T12:00:00.000Z' } },
+    });
+    expect(mapped).not.toBeNull();
+    const figure = projectWorkspaceThroughput(
+      input({
+        tasks: [task({ id: 'imported', status: 'done', completed_at: '2026-08-15T12:00:00.000Z' })],
+        revisions: [mapped!],
+      }),
+    );
+    expect(figure.history_completeness).toBe('sparse');
+    expect(figure.total).toBe(0);
   });
 });

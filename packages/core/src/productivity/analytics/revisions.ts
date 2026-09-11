@@ -1,7 +1,7 @@
 /**
  * Map stored Vitae revisions onto the flattened diffs analytics replay reads.
- * Create rows often store a snapshot and no field-level diff; that snapshot is
- * the create state, not an invented event.
+ * A create snapshot is create *placement* state. It is not field-level history:
+ * an inferred create alone cannot mark a trail `complete` or count a completion.
  */
 import type { RevisionOp } from '../../types.js';
 import { REVISION_OPS } from '../../types.js';
@@ -87,27 +87,41 @@ export function flattenAnalyticsDiff(
   return fromDiff;
 }
 
+export function isInferredCreateDiff(diff: unknown, op?: RevisionOp): boolean {
+  return op === 'create' && Object.keys(flattenStoredDiff(diff)).length === 0;
+}
+
 export function toWorkspaceRevision(raw: StoredRevisionLike): WorkspaceRevision | null {
   if (typeof raw.subject_id !== 'string' || raw.subject_id.length === 0) return null;
   if (typeof raw.rev !== 'number' || !Number.isInteger(raw.rev)) return null;
   if (typeof raw.at !== 'string' || raw.at.length === 0) return null;
   if (!isRevisionOp(raw.op)) return null;
+  const inferred = isInferredCreateDiff(raw.diff, raw.op);
   return {
     subject_id: raw.subject_id,
     rev: raw.rev,
     op: raw.op,
     at: raw.at,
     diff: flattenAnalyticsDiff(raw.diff, raw.snapshot, raw.op),
+    ...(inferred ? { inferred: true } : {}),
   };
 }
 
 export function toReplayRevision(revision: WorkspaceRevision): ReplayRevision {
-  return { rev: revision.rev, op: revision.op, at: revision.at, diff: revision.diff };
+  return {
+    rev: revision.rev,
+    op: revision.op,
+    at: revision.at,
+    diff: revision.diff,
+    ...(revision.inferred ? { inferred: true } : {}),
+  };
 }
 
 export function historyCompletenessOf(revisions: readonly ReplayRevision[]): HistoryCompleteness {
   if (revisions.length === 0) return 'unknown';
-  if (revisions.some((revision) => !revisionHasFieldDiff(revision))) return 'sparse';
+  const stored = revisions.filter((revision) => !revision.inferred);
+  if (stored.length === 0) return 'sparse';
+  if (stored.some((revision) => !revisionHasFieldDiff(revision))) return 'sparse';
   return 'complete';
 }
 

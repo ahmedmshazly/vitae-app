@@ -97,6 +97,31 @@ describe('analytics page', () => {
     renderWithApp(<AnalyticsScreen />, { route: '/today/analytics' });
     expect(mockApi.get).not.toHaveBeenCalled();
   });
+
+  it('does not draw a Total 0 throughput row when history is unmeasured', async () => {
+    mockApi.get.mockImplementation(async (path: string) => {
+      if (String(path).startsWith('/productivity/analytics')) {
+        return payload({
+          completeness: 'unknown',
+          figures: figures({
+            throughput: {
+              history_completeness: 'unknown',
+              window_start: '2026-08-13',
+              window_end: '2026-09-11',
+              time_zone: 'UTC',
+              total: 0,
+              by_day: [],
+            },
+          }),
+        });
+      }
+      return {};
+    });
+    renderWithApp(<AnalyticsScreen />, { route: '/today/analytics' });
+    expect(await screen.findByRole('heading', { level: 1, name: 'Analytics' })).toBeInTheDocument();
+    expect(screen.queryByRole('table', { name: 'Throughput' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Total')).not.toBeInTheDocument();
+  });
 });
 
 describe('review page', () => {
