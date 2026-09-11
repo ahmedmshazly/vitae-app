@@ -43,6 +43,7 @@ export const V1_MOUNT_PREFIXES = [
   '/imports',
   '/duplicates',
   '/retention',
+  '/productivity',
 ] as const;
 
 export type V1MountPrefix = (typeof V1_MOUNT_PREFIXES)[number];

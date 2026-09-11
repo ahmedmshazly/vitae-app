@@ -17,6 +17,7 @@ export const timeEntryWriteSchema = z.object({
   ended_at: isoDateTime.optional(),
   duration_sec: z.number().int().nonnegative().optional(),
   note: z.string().max(10_000).optional(),
+  source: z.string().min(1).max(64).optional(),
   sensitive: z.boolean().optional(),
 });
 export type TimeEntryWrite = z.infer<typeof timeEntryWriteSchema>;
@@ -38,9 +39,11 @@ export type TimeEntryPatch = z.infer<typeof timeEntryPatchSchema>;
 export const automationRuleWriteSchema = z.object({
   id: z.string().min(1).optional(),
   name: z.string().min(1).max(200),
+  statement: z.string().min(1).max(2_000).optional(),
   enabled: z.boolean(),
   condition: storedRuleConditionSchema,
   actions: z.array(ruleActionSchema),
+  sort_order: z.number().nullable().optional(),
   sensitive: z.boolean().optional(),
 });
 export type AutomationRuleWrite = z.infer<typeof automationRuleWriteSchema>;
@@ -75,6 +78,26 @@ export const productivityReceiptRecordSchema = productivityReceiptWriteSchema.ex
   result: z.unknown(),
 });
 export type ProductivityReceiptRecord = z.infer<typeof productivityReceiptRecordSchema>;
+
+export const productivityTemplateWriteSchema = z.object({
+  id: z.string().min(1).optional(),
+  name: z.string().min(1).max(200),
+  description: z.string().max(10_000).optional(),
+  kind: z.enum(['project', 'item']),
+  body: z.record(z.string(), z.unknown()).default({}),
+});
+export type ProductivityTemplateWrite = z.infer<typeof productivityTemplateWriteSchema>;
+
+export const productivityTemplateRecordSchema = productivityTemplateWriteSchema.extend({
+  id: z.string().min(1),
+  rev: z.number().int().positive(),
+  created_at: isoDateTime,
+  updated_at: isoDateTime,
+});
+export type ProductivityTemplateRecord = z.infer<typeof productivityTemplateRecordSchema>;
+
+export const productivityTemplatePatchSchema = productivityTemplateWriteSchema.omit({ id: true }).partial();
+export type ProductivityTemplatePatch = z.infer<typeof productivityTemplatePatchSchema>;
 
 export const REVISION_GUARDED_TABLES = [
   'time_entries',

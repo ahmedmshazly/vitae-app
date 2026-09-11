@@ -120,6 +120,7 @@ export async function restoreBundle(
     if (kind === 'time_entry') return timeEntryIds;
     if (kind === 'automation_rule') return ruleIds;
     if (kind === 'productivity_receipt') return receiptIds;
+    if (kind === 'template') return ids('templates.jsonl');
     return nodeIds;
   };
   for (const row of rows['edges.jsonl']!) {

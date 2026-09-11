@@ -48,6 +48,9 @@
     },
     {
       "name": "applications"
+    },
+    {
+      "name": "productivity"
     }
   ],
   "paths": {
@@ -2099,6 +2102,465 @@
           },
           "409": {
             "description": "The record exists and the file does not, which is what a finalize during a storage outage leaves behind",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/productivity/tasks": {
+      "get": {
+        "operationId": "listProductivityTasks",
+        "summary": "List task nodes with placement (flagged)",
+        "tags": [
+          "productivity"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-vitae-tz",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "IANA timezone for date-only placement (ADR 0010)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task read models with placement.reason"
+          },
+          "401": {
+            "description": "Unauthorized (default-deny)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feature disabled or not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/productivity/tasks/{id}": {
+      "get": {
+        "operationId": "getProductivityTask",
+        "summary": "Task detail with placement (flagged)",
+        "tags": [
+          "productivity"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task read model"
+          },
+          "401": {
+            "description": "Unauthorized (default-deny)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing, not a task, other workspace, or feature disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/productivity/commands": {
+      "post": {
+        "operationId": "postProductivityCommand",
+        "summary": "Execute a versioned productivity command",
+        "tags": [
+          "productivity"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "version",
+                  "operation_id",
+                  "type",
+                  "payload"
+                ],
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "enum": [
+                      1
+                    ]
+                  },
+                  "operation_id": {
+                    "type": "string"
+                  },
+                  "expected_revision": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "create_task",
+                      "update_task",
+                      "complete_task",
+                      "drop_task",
+                      "restore_task",
+                      "reorder_tasks",
+                      "wait_on_task",
+                      "follow_up_task",
+                      "add_time_entry",
+                      "set_recurrence",
+                      "upsert_rule",
+                      "upsert_template"
+                    ]
+                  },
+                  "payload": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Idempotent replay of operation_id"
+          },
+          "201": {
+            "description": "{ replayed: false, result }"
+          },
+          "401": {
+            "description": "Unauthorized (default-deny)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Read-only workspace (same as POST /nodes)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing task or wait target, or feature disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "expected_revision does not match stored rev",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Command body failed productivityCommandSchema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/productivity/waiting": {
+      "get": {
+        "operationId": "listProductivityWaiting",
+        "summary": "Tasks with status=waiting",
+        "tags": [
+          "productivity"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Waiting task read models"
+          },
+          "401": {
+            "description": "Unauthorized (default-deny)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feature disabled or not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/productivity/time-entries": {
+      "get": {
+        "operationId": "listProductivityTimeEntries",
+        "summary": "List time entries, optionally by task_id",
+        "tags": [
+          "productivity"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Time entries"
+          },
+          "401": {
+            "description": "Unauthorized (default-deny)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown task_id, other workspace, or feature disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/productivity/rules": {
+      "get": {
+        "operationId": "listProductivityRules",
+        "summary": "List automation rules",
+        "tags": [
+          "productivity"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Automation rules"
+          },
+          "401": {
+            "description": "Unauthorized (default-deny)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feature disabled or not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/productivity/templates": {
+      "get": {
+        "operationId": "listProductivityTemplates",
+        "summary": "List project/item templates",
+        "tags": [
+          "productivity"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Productivity templates stored on the templates table"
+          },
+          "401": {
+            "description": "Unauthorized (default-deny)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feature disabled or not found",
             "content": {
               "application/json": {
                 "schema": {

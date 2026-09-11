@@ -4,7 +4,12 @@
  * appropriate status codes.
  */
 import type { NextFunction, Request, Response } from 'express';
-import { NotFoundError, RevisionConflictError, ValidationError } from '../db/repository.js';
+import {
+  GuardedCollectionError,
+  NotFoundError,
+  RevisionConflictError,
+  ValidationError,
+} from '../db/repository.js';
 import { currentRequestId } from './request-context.js';
 
 export class HttpError extends Error {
@@ -70,6 +75,10 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
   }
   if (err instanceof RevisionConflictError) {
     res.status(409).json({ error: { code: 'CONFLICT', message: err.message, request_id } });
+    return;
+  }
+  if (err instanceof GuardedCollectionError) {
+    res.status(400).json({ error: { code: 'BAD_REQUEST', message: err.message, request_id } });
     return;
   }
   if (err instanceof HttpError) {

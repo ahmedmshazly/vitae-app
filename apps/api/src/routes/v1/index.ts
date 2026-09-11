@@ -34,6 +34,7 @@ import { duplicatesRouter } from './duplicates.js';
 import { retentionRouter } from './retention.js';
 import { placesRouter } from './places.js';
 import { billingRouter } from './billing.js';
+import { productivityRouter } from './productivity.js';
 
 export const v1Router: Router = Router();
 
@@ -76,3 +77,4 @@ v1Router.use('/correspondence', correspondenceRouter);
 v1Router.use('/imports', importsRouter);
 v1Router.use('/duplicates', duplicatesRouter);
 v1Router.use('/retention', retentionRouter);
+v1Router.use('/productivity', productivityRouter);

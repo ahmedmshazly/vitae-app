@@ -2,17 +2,17 @@
   "generated_by": "scripts/docs/gen-api.mjs",
   "note": "Derived from the Express routers, not from docs/api/openapi.json. Do not edit by hand.",
   "totals": {
-    "endpoints": 153,
-    "mounts": 37,
-    "declared_mount_prefixes": 37,
+    "endpoints": 160,
+    "mounts": 38,
+    "declared_mount_prefixes": 38,
     "public_endpoints": 3,
     "outside_auth_gate": 3,
-    "blocked_when_read_only": 78,
-    "documented_in_openapi": 55,
+    "blocked_when_read_only": 79,
+    "documented_in_openapi": 62,
     "undocumented_in_openapi": 98,
-    "openapi_operations": 61,
+    "openapi_operations": 68,
     "documented_but_not_registered": 6,
-    "endpoints_with_tests": 146,
+    "endpoints_with_tests": 153,
     "endpoints_citing_requirements": 36
   },
   "gates": {
@@ -182,6 +182,12 @@
       "router": "placesRouter",
       "source": "apps/api/src/routes/v1/places.ts",
       "endpoints": 5
+    },
+    {
+      "prefix": "/productivity",
+      "router": "productivityRouter",
+      "source": "apps/api/src/routes/v1/productivity.ts",
+      "endpoints": 7
     },
     {
       "prefix": "/reminders",
@@ -3231,6 +3237,179 @@
         "apps/api/src/routes/v1/places.integration.test.ts"
       ],
       "openapi": false
+    },
+    {
+      "id": "POST /api/v1/productivity/commands",
+      "slug": "post-api-v1-productivity-commands",
+      "method": "POST",
+      "path": "/api/v1/productivity/commands",
+      "express_path": "/api/v1/productivity/commands",
+      "mount": "/productivity",
+      "source": "apps/api/src/routes/v1/productivity.ts:89",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "executeProductivityCommand"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/productivity.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/productivity/rules",
+      "slug": "get-api-v1-productivity-rules",
+      "method": "GET",
+      "path": "/api/v1/productivity/rules",
+      "express_path": "/api/v1/productivity/rules",
+      "mount": "/productivity",
+      "source": "apps/api/src/routes/v1/productivity.ts:75",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/productivity.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/productivity/tasks",
+      "slug": "get-api-v1-productivity-tasks",
+      "method": "GET",
+      "path": "/api/v1/productivity/tasks",
+      "express_path": "/api/v1/productivity/tasks",
+      "mount": "/productivity",
+      "source": "apps/api/src/routes/v1/productivity.ts:31",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "taskReadModels"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/productivity.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/productivity/tasks/{id}",
+      "slug": "get-api-v1-productivity-tasks-id",
+      "method": "GET",
+      "path": "/api/v1/productivity/tasks/{id}",
+      "express_path": "/api/v1/productivity/tasks/:id",
+      "mount": "/productivity",
+      "source": "apps/api/src/routes/v1/productivity.ts:40",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "placeTask",
+        "productivityNotFound",
+        "toTaskReadModel"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/productivity.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/productivity/templates",
+      "slug": "get-api-v1-productivity-templates",
+      "method": "GET",
+      "path": "/api/v1/productivity/templates",
+      "express_path": "/api/v1/productivity/templates",
+      "mount": "/productivity",
+      "source": "apps/api/src/routes/v1/productivity.ts:82",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/productivity.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/productivity/time-entries",
+      "slug": "get-api-v1-productivity-time-entries",
+      "method": "GET",
+      "path": "/api/v1/productivity/time-entries",
+      "express_path": "/api/v1/productivity/time-entries",
+      "mount": "/productivity",
+      "source": "apps/api/src/routes/v1/productivity.ts:62",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "productivityNotFound"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/productivity.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "GET /api/v1/productivity/waiting",
+      "slug": "get-api-v1-productivity-waiting",
+      "method": "GET",
+      "path": "/api/v1/productivity/waiting",
+      "express_path": "/api/v1/productivity/waiting",
+      "mount": "/productivity",
+      "source": "apps/api/src/routes/v1/productivity.ts:52",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "taskReadModels"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/productivity.integration.test.ts"
+      ],
+      "openapi": true
     },
     {
       "id": "GET /api/v1/reminders",

@@ -26,7 +26,7 @@
       "example": {
         "value": "https://aperture.example.com",
         "commented": true,
-        "source": ".env.example:84"
+        "source": ".env.example:87"
       }
     },
     {
@@ -136,7 +136,7 @@
       "example": {
         "value": "true",
         "commented": false,
-        "source": ".env.example:72"
+        "source": ".env.example:75"
       }
     },
     {
@@ -174,7 +174,7 @@
       "example": {
         "value": "2026-07-16",
         "commented": true,
-        "source": ".env.example:139"
+        "source": ".env.example:142"
       }
     },
     {
@@ -267,7 +267,7 @@
       "example": {
         "value": "s3://vitae-backups/prod",
         "commented": true,
-        "source": ".env.example:138"
+        "source": ".env.example:141"
       }
     },
     {
@@ -299,7 +299,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:144"
+        "source": ".env.example:147"
       }
     },
     {
@@ -334,7 +334,7 @@
       "example": {
         "value": "change-me-to-a-shared-secret",
         "commented": false,
-        "source": ".env.example:124"
+        "source": ".env.example:127"
       }
     },
     {
@@ -390,7 +390,7 @@
       "example": {
         "value": "http://localhost:8787",
         "commented": false,
-        "source": ".env.example:119"
+        "source": ".env.example:122"
       }
     },
     {
@@ -442,7 +442,7 @@
       "example": {
         "value": "vitae",
         "commented": false,
-        "source": ".env.example:116"
+        "source": ".env.example:119"
       }
     },
     {
@@ -471,7 +471,7 @@
       "example": {
         "value": "cloudinary://your_key:your_secret@your_cloud",
         "commented": false,
-        "source": ".env.example:114"
+        "source": ".env.example:117"
       }
     },
     {
@@ -503,8 +503,33 @@
       "example": {
         "value": "YES",
         "commented": true,
-        "source": ".env.example:141"
+        "source": ".env.example:144"
       }
+    },
+    {
+      "name": "CONFLICT",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/routes/v1/productivity.integration.test.ts:176",
+      "reads": [],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "computed",
+      "test_only": true,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
     },
     {
       "name": "DATABASE_CA_CERT",
@@ -532,7 +557,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:93"
+        "source": ".env.example:96"
       }
     },
     {
@@ -587,7 +612,7 @@
       "example": {
         "value": "postgresql://vitae:vitae@127.0.0.1:5433/vitae",
         "commented": false,
-        "source": ".env.example:89"
+        "source": ".env.example:92"
       }
     },
     {
@@ -620,7 +645,7 @@
       "example": {
         "value": "docs/.compiled",
         "commented": false,
-        "source": ".env.example:70"
+        "source": ".env.example:73"
       }
     },
     {
@@ -658,7 +683,7 @@
       "example": {
         "value": "1",
         "commented": true,
-        "source": ".env.example:140"
+        "source": ".env.example:143"
       }
     },
     {
@@ -789,7 +814,7 @@
       "example": {
         "value": "127.0.0.1:9099",
         "commented": false,
-        "source": ".env.example:101"
+        "source": ".env.example:104"
       }
     },
     {
@@ -818,7 +843,7 @@
       "example": {
         "value": "vitae-local",
         "commented": false,
-        "source": ".env.example:99"
+        "source": ".env.example:102"
       }
     },
     {
@@ -879,7 +904,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:131"
+        "source": ".env.example:134"
       }
     },
     {
@@ -997,6 +1022,31 @@
       "example": null
     },
     {
+      "name": "NOT_FOUND",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/routes/v1/productivity.integration.test.ts:55",
+      "reads": [],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "computed",
+      "test_only": true,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
       "name": "OUT_DIR",
       "scope": "server",
       "declared_in": null,
@@ -1050,7 +1100,7 @@
       "example": {
         "value": "owner@example.com",
         "commented": false,
-        "source": ".env.example:57"
+        "source": ".env.example:60"
       }
     },
     {
@@ -1081,7 +1131,7 @@
       "example": {
         "value": "pdl_sdbx_apikey_your_server_secret",
         "commented": true,
-        "source": ".env.example:49"
+        "source": ".env.example:52"
       }
     },
     {
@@ -1112,7 +1162,7 @@
       "example": {
         "value": "sandbox",
         "commented": false,
-        "source": ".env.example:48"
+        "source": ".env.example:51"
       }
     },
     {
@@ -1144,7 +1194,7 @@
       "example": {
         "value": "pri_your_annual_price",
         "commented": true,
-        "source": ".env.example:52"
+        "source": ".env.example:55"
       }
     },
     {
@@ -1176,7 +1226,7 @@
       "example": {
         "value": "pri_your_monthly_price",
         "commented": true,
-        "source": ".env.example:51"
+        "source": ".env.example:54"
       }
     },
     {
@@ -1210,7 +1260,7 @@
       "example": {
         "value": "pdl_ntfset_your_webhook_secret",
         "commented": true,
-        "source": ".env.example:50"
+        "source": ".env.example:53"
       }
     },
     {
@@ -1268,7 +1318,7 @@
       "example": {
         "value": "https://app.example.com",
         "commented": true,
-        "source": ".env.example:45"
+        "source": ".env.example:48"
       }
     },
     {
@@ -1297,7 +1347,7 @@
       "example": {
         "value": "change-me-to-a-long-random-string",
         "commented": false,
-        "source": ".env.example:74"
+        "source": ".env.example:77"
       }
     },
     {
@@ -1381,7 +1431,7 @@
       "example": {
         "value": "companion-production",
         "commented": true,
-        "source": ".env.example:82"
+        "source": ".env.example:85"
       }
     },
     {
@@ -1408,6 +1458,31 @@
       ],
       "read_via": "process.env",
       "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VALIDATION",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/routes/v1/productivity.integration.test.ts:107",
+      "reads": [],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "computed",
+      "test_only": true,
       "surface": "deployment",
       "documented": false,
       "example": null
@@ -1941,7 +2016,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:133"
+        "source": ".env.example:136"
       }
     },
     {
@@ -1994,6 +2069,31 @@
       ],
       "read_via": "shell",
       "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_TEST_ADMIN_URL",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/db/productivity-collections.integration.test.ts:25",
+      "reads": [],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": true,
       "surface": "deployment",
       "documented": false,
       "example": null
@@ -2140,7 +2240,7 @@
       "example": {
         "value": "demo-api-key",
         "commented": false,
-        "source": ".env.example:103"
+        "source": ".env.example:106"
       }
     },
     {
@@ -2171,7 +2271,7 @@
       "example": {
         "value": "vitae-local.firebaseapp.com",
         "commented": false,
-        "source": ".env.example:104"
+        "source": ".env.example:107"
       }
     },
     {
@@ -2202,7 +2302,7 @@
       "example": {
         "value": "http://127.0.0.1:9099",
         "commented": false,
-        "source": ".env.example:110"
+        "source": ".env.example:113"
       }
     },
     {
@@ -2233,7 +2333,7 @@
       "example": {
         "value": "vitae-local",
         "commented": false,
-        "source": ".env.example:105"
+        "source": ".env.example:108"
       }
     },
     {
@@ -2264,7 +2364,7 @@
       "example": {
         "value": "true",
         "commented": false,
-        "source": ".env.example:106"
+        "source": ".env.example:109"
       }
     },
     {
@@ -2492,6 +2592,31 @@
       "example": null
     },
     {
+      "name": "WAITING_ON",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/routes/v1/productivity.integration.test.ts:254",
+      "reads": [],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "computed",
+      "test_only": true,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
       "name": "WARMED_MANIFEST_PATH",
       "scope": "server",
       "declared_in": null,
@@ -2565,9 +2690,9 @@
     "Storage: Cloudinary (SRS T5; owner-provided)"
   ],
   "summary": {
-    "total": 87,
+    "total": 92,
     "by_scope": {
-      "server": 55,
+      "server": 60,
       "deploy": 19,
       "web-build": 13
     },
@@ -2575,9 +2700,11 @@
     "validated": 20,
     "server_unvalidated": [
       "BUILDSVC_HOST",
+      "CONFLICT",
       "EXPORT_OUT",
       "GOOGLE_APPLICATION_CREDENTIALS",
       "INCLUDE_SENSITIVE",
+      "NOT_FOUND",
       "PADDLE_API_KEY",
       "PADDLE_ENVIRONMENT",
       "PADDLE_PRICE_CLOUD_ANNUAL",
@@ -2587,10 +2714,13 @@
       "PUBLIC_APP_URL",
       "TEMPLATES_DIR",
       "TZ",
+      "VALIDATION",
       "VITAE_CLOUD_ENABLED",
       "VITAE_SPACE",
+      "VITAE_TEST_ADMIN_URL",
       "VITAE_TEST_STORAGE_DIR",
       "VITEST",
+      "WAITING_ON",
       "WARMED_MANIFEST_PATH"
     ],
     "undocumented": [
@@ -2598,6 +2728,7 @@
       "BACKUP_EXPORT_CMD",
       "BACKUP_MIN_NODES",
       "BUILDSVC_HOST",
+      "CONFLICT",
       "DATABASE_POOL_MAX",
       "EXPORT_OUT",
       "FORCE",
@@ -2605,9 +2736,11 @@
       "INCLUDE_SENSITIVE",
       "KEEP_LOCAL",
       "NODE_ENV",
+      "NOT_FOUND",
       "PORT",
       "TEMPLATES_DIR",
       "TZ",
+      "VALIDATION",
       "VITAE_APP_DIR",
       "VITAE_BRANCH",
       "VITAE_CI_DATABASE_URL",
@@ -2618,12 +2751,15 @@
       "VITAE_KNOWN_HOSTS",
       "VITAE_SPACE",
       "VITAE_SSH_KEY",
+      "VITAE_TEST_ADMIN_URL",
       "VITAE_TEST_STORAGE_DIR",
       "VITEST",
+      "WAITING_ON",
       "WARMED_MANIFEST_PATH"
     ],
     "example_only": [
       "GCLOUD_PROJECT",
+      "VITAE_PRODUCTIVITY_ENABLED",
       "WEB_PORT"
     ],
     "tooling_only": [

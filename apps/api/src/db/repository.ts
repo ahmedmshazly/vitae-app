@@ -42,6 +42,7 @@ import {
   automationRuleWriteSchema,
   isRevisionGuardedTable,
   productivityReceiptWriteSchema,
+  productivityTemplateWriteSchema,
   timeEntryPatchSchema,
   timeEntryWriteSchema,
   zodIssues,
@@ -50,6 +51,8 @@ import {
   type AutomationRuleWrite,
   type ProductivityReceiptRecord,
   type ProductivityReceiptWrite,
+  type ProductivityTemplateRecord,
+  type ProductivityTemplateWrite,
   type TimeEntryPatch,
   type TimeEntryRecord,
   type TimeEntryWrite,
@@ -109,7 +112,8 @@ export type RevisionSubjectKind =
   | 'letter'
   | 'time_entry'
   | 'automation_rule'
-  | 'productivity_receipt';
+  | 'productivity_receipt'
+  | 'template';
 
 function assertGenericDocWriteAllowed(table: TableName): void {
   if (isRevisionGuardedTable(table)) throw new GuardedCollectionError(table);
@@ -186,16 +190,17 @@ export class Repository {
 
   async getNode(
     id: string,
-    opts: { includeDeleted?: boolean } = {},
+    opts: { includeDeleted?: boolean; forUpdate?: boolean } = {},
     conn: Db = db,
   ): Promise<NodeRecord | null> {
-    const row = await conn
+    let q = conn
       .selectFrom('nodes')
       .select('data')
       .where('space', '=', this.space)
       .where('workspace_id', '=', this.workspaceId)
-      .where('id', '=', id)
-      .executeTakeFirst();
+      .where('id', '=', id);
+    if (opts.forUpdate) q = q.forUpdate();
+    const row = await q.executeTakeFirst();
     if (!row) return null;
     const node = row.data as NodeRecord;
     if (node.deleted_at && !opts.includeDeleted) return null;
@@ -659,17 +664,20 @@ export class Repository {
     return entry;
   }
 
-  async listTimeEntriesByTask(taskId: string): Promise<TimeEntryRecord[]> {
-    const rows = await db
+  async listTimeEntries(params: { taskId?: string } = {}): Promise<TimeEntryRecord[]> {
+    let q = db
       .selectFrom('time_entries')
       .select('data')
       .where('space', '=', this.space)
       .where('workspace_id', '=', this.workspaceId)
-      .where('task_id', '=', taskId)
-      .where('deleted_at', 'is', null)
-      .orderBy('started_at', 'desc')
-      .execute();
+      .where('deleted_at', 'is', null);
+    if (params.taskId) q = q.where('task_id', '=', params.taskId);
+    const rows = await q.orderBy('started_at', 'desc').execute();
     return rows.map((r) => r.data as TimeEntryRecord);
+  }
+
+  async listTimeEntriesByTask(taskId: string): Promise<TimeEntryRecord[]> {
+    return this.listTimeEntries({ taskId });
   }
 
   async updateTimeEntry(
@@ -768,45 +776,66 @@ export class Repository {
     return rule;
   }
 
+  async listAutomationRules(): Promise<AutomationRuleRecord[]> {
+    const rows = await db
+      .selectFrom('automation_rules')
+      .select('data')
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
+      .where('deleted_at', 'is', null)
+      .orderBy('updated_at', 'desc')
+      .execute();
+    return rows.map((r) => r.data as AutomationRuleRecord);
+  }
+
   async updateAutomationRule(
     id: string,
     patch: AutomationRulePatch,
     meta: ProductivityWriteMeta = {},
   ): Promise<AutomationRuleRecord> {
-    const parsed = automationRulePatchSchema.safeParse(patch);
-    if (!parsed.success) throw new ValidationError('invalid automation rule', zodIssues(parsed.error.issues));
     return this.transaction(async (tx) => {
       const before = await this.getAutomationRule(id, { includeDeleted: true }, tx);
       if (!before) throw new NotFoundError('automation rule');
-      this.assertExpectedRevision(before.rev, meta.expected_revision);
-      const merged: AutomationRuleRecord = {
-        ...before,
-        ...parsed.data,
-        id: before.id,
-        rev: before.rev + 1,
-        updated_at: nowIso(),
-      };
-      await tx
-        .updateTable('automation_rules')
-        .set({ data: this.clean(merged) })
-        .where('space', '=', this.space)
-        .where('workspace_id', '=', this.workspaceId)
-        .where('id', '=', before.id)
-        .execute();
-      const diff = shallowDiff(before as never, merged as never);
-      await this.writeRevision(
-        tx,
-        'automation_rule',
-        before.id,
-        merged.rev,
-        meta.op ?? 'update',
-        merged,
-        diff,
-        meta.source ?? 'manual',
-        meta.actor,
-      );
-      return merged;
+      return this.stageAutomationRuleUpdate(tx, before, patch, meta);
     });
+  }
+
+  async stageAutomationRuleUpdate(
+    tx: Tx,
+    before: AutomationRuleRecord,
+    patch: AutomationRulePatch,
+    meta: ProductivityWriteMeta = {},
+  ): Promise<AutomationRuleRecord> {
+    const parsed = automationRulePatchSchema.safeParse(patch);
+    if (!parsed.success) throw new ValidationError('invalid automation rule', zodIssues(parsed.error.issues));
+    this.assertExpectedRevision(before.rev, meta.expected_revision);
+    const merged: AutomationRuleRecord = {
+      ...before,
+      ...parsed.data,
+      id: before.id,
+      rev: before.rev + 1,
+      updated_at: nowIso(),
+    };
+    await tx
+      .updateTable('automation_rules')
+      .set({ data: this.clean(merged) })
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
+      .where('id', '=', before.id)
+      .execute();
+    const diff = shallowDiff(before as never, merged as never);
+    await this.writeRevision(
+      tx,
+      'automation_rule',
+      before.id,
+      merged.rev,
+      meta.op ?? 'update',
+      merged,
+      diff,
+      meta.source ?? 'manual',
+      meta.actor,
+    );
+    return merged;
   }
 
   async putProductivityReceipt(input: unknown, meta: WriteMeta = {}): Promise<ProductivityReceiptRecord> {
@@ -847,18 +876,109 @@ export class Repository {
     return record;
   }
 
-  async getProductivityReceiptByOperationId(operationId: string): Promise<ProductivityReceiptRecord | null> {
-    const row = await db
+  async getProductivityReceiptByOperationId(
+    operationId: string,
+    conn: Db = db,
+    opts: { forUpdate?: boolean } = {},
+  ): Promise<ProductivityReceiptRecord | null> {
+    let q = conn
       .selectFrom('productivity_receipts')
       .select('data')
       .where('space', '=', this.space)
       .where('workspace_id', '=', this.workspaceId)
-      .where('operation_id', '=', operationId)
-      .executeTakeFirst();
+      .where('operation_id', '=', operationId);
+    if (opts.forUpdate) q = q.forUpdate();
+    const row = await q.executeTakeFirst();
     return row ? (row.data as ProductivityReceiptRecord) : null;
   }
 
-  private assertExpectedRevision(stored: number, expected?: number): void {
+  isProductivityTemplate(row: unknown): row is ProductivityTemplateRecord {
+    return (
+      typeof row === 'object' &&
+      row !== null &&
+      ((row as ProductivityTemplateRecord).kind === 'project' ||
+        (row as ProductivityTemplateRecord).kind === 'item')
+    );
+  }
+
+  async getProductivityTemplate(
+    id: string,
+    conn: Db = db,
+    opts: { forUpdate?: boolean } = {},
+  ): Promise<ProductivityTemplateRecord | null> {
+    let q = conn
+      .selectFrom('templates')
+      .select('data')
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
+      .where('id', '=', id);
+    if (opts.forUpdate) q = q.forUpdate();
+    const row = await q.executeTakeFirst();
+    if (!row || !this.isProductivityTemplate(row.data)) return null;
+    return row.data;
+  }
+
+  async listProductivityTemplates(): Promise<ProductivityTemplateRecord[]> {
+    const rows = await this.docList<Record<string, unknown>>('templates');
+    return rows.filter((row): row is ProductivityTemplateRecord => this.isProductivityTemplate(row));
+  }
+
+  async stageProductivityTemplate(
+    tx: Tx,
+    value: ProductivityTemplateWrite,
+    meta: ProductivityWriteMeta = {},
+  ): Promise<ProductivityTemplateRecord> {
+    const parsed = productivityTemplateWriteSchema.safeParse(value);
+    if (!parsed.success) throw new ValidationError('invalid template', zodIssues(parsed.error.issues));
+    const id = parsed.data.id ?? newId();
+    const existing = await this.getProductivityTemplate(id, tx, { forUpdate: true });
+    if (existing) {
+      this.assertExpectedRevision(existing.rev, meta.expected_revision);
+      const merged: ProductivityTemplateRecord = {
+        ...existing,
+        ...parsed.data,
+        id: existing.id,
+        rev: existing.rev + 1,
+        created_at: existing.created_at,
+        updated_at: nowIso(),
+      };
+      await tx
+        .updateTable('templates')
+        .set({ data: this.clean(merged) })
+        .where('space', '=', this.space)
+        .where('workspace_id', '=', this.workspaceId)
+        .where('id', '=', existing.id)
+        .execute();
+      await this.writeRevision(
+        tx,
+        'template',
+        existing.id,
+        merged.rev,
+        meta.op ?? 'update',
+        merged,
+        shallowDiff(existing as never, merged as never),
+        meta.source ?? 'manual',
+        meta.actor,
+      );
+      return merged;
+    }
+    const ts = nowIso();
+    const record: ProductivityTemplateRecord = {
+      ...parsed.data,
+      id,
+      rev: 1,
+      created_at: ts,
+      updated_at: ts,
+    };
+    await tx
+      .insertInto('templates')
+      .values({ space: this.space, workspace_id: this.workspaceId, id, data: this.clean(record) })
+      .execute();
+    await this.writeRevision(tx, 'template', id, 1, meta.op ?? 'create', record, undefined, meta.source, meta.actor);
+    return record;
+  }
+
+  assertExpectedRevision(stored: number, expected?: number): void {
     if (expected !== undefined && expected !== stored) {
       throw new RevisionConflictError(`expected revision ${expected}, found ${stored}`);
     }

@@ -603,6 +603,118 @@ function detailedPaths(): PathsObject {
         },
       }),
     },
+    '/productivity/tasks': {
+      get: op('listProductivityTasks', 'List task nodes with placement (flagged)', {
+        tags: ['productivity'],
+        parameters: [
+          {
+            name: 'x-vitae-tz',
+            in: 'header',
+            required: false,
+            schema: { type: 'string' },
+            description: 'IANA timezone for date-only placement (ADR 0010)',
+          },
+        ],
+        responses: {
+          '200': { description: 'Task read models with placement.reason' },
+          '404': errorResponse('Feature disabled or not found'),
+        },
+      }),
+    },
+    '/productivity/tasks/{id}': {
+      get: op('getProductivityTask', 'Task detail with placement (flagged)', {
+        tags: ['productivity'],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': { description: 'Task read model' },
+          '404': errorResponse('Missing, not a task, other workspace, or feature disabled'),
+        },
+      }),
+    },
+    '/productivity/commands': {
+      post: op('postProductivityCommand', 'Execute a versioned productivity command', {
+        tags: ['productivity'],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['version', 'operation_id', 'type', 'payload'],
+                properties: {
+                  version: { type: 'integer', enum: [1] },
+                  operation_id: { type: 'string' },
+                  expected_revision: { type: 'integer', minimum: 0 },
+                  type: {
+                    type: 'string',
+                    enum: [
+                      'create_task',
+                      'update_task',
+                      'complete_task',
+                      'drop_task',
+                      'restore_task',
+                      'reorder_tasks',
+                      'wait_on_task',
+                      'follow_up_task',
+                      'add_time_entry',
+                      'set_recurrence',
+                      'upsert_rule',
+                      'upsert_template',
+                    ],
+                  },
+                  payload: { type: 'object', additionalProperties: true },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': { description: '{ replayed: false, result }' },
+          '200': { description: 'Idempotent replay of operation_id' },
+          '402': errorResponse('Read-only workspace (same as POST /nodes)'),
+          '404': errorResponse('Missing task or wait target, or feature disabled'),
+          '409': errorResponse('expected_revision does not match stored rev'),
+          '422': errorResponse('Command body failed productivityCommandSchema'),
+        },
+      }),
+    },
+    '/productivity/waiting': {
+      get: op('listProductivityWaiting', 'Tasks with status=waiting', {
+        tags: ['productivity'],
+        responses: {
+          '200': { description: 'Waiting task read models' },
+          '404': errorResponse('Feature disabled or not found'),
+        },
+      }),
+    },
+    '/productivity/time-entries': {
+      get: op('listProductivityTimeEntries', 'List time entries, optionally by task_id', {
+        tags: ['productivity'],
+        parameters: [{ name: 'task_id', in: 'query', required: false, schema: { type: 'string' } }],
+        responses: {
+          '200': { description: 'Time entries' },
+          '404': errorResponse('Unknown task_id, other workspace, or feature disabled'),
+        },
+      }),
+    },
+    '/productivity/rules': {
+      get: op('listProductivityRules', 'List automation rules', {
+        tags: ['productivity'],
+        responses: {
+          '200': { description: 'Automation rules' },
+          '404': errorResponse('Feature disabled or not found'),
+        },
+      }),
+    },
+    '/productivity/templates': {
+      get: op('listProductivityTemplates', 'List project/item templates', {
+        tags: ['productivity'],
+        responses: {
+          '200': { description: 'Productivity templates stored on the templates table' },
+          '404': errorResponse('Feature disabled or not found'),
+        },
+      }),
+    },
   };
 }
 
@@ -656,6 +768,7 @@ export function buildOpenApiDocument(): OpenAPIObject {
       { name: 'export' },
       { name: 'dashboard' },
       { name: 'applications' },
+      { name: 'productivity' },
     ],
     paths: {
       ...paths,
