@@ -42,7 +42,7 @@
    accident rather than by intent. */
 .data-import-caution {
   font-size: var(--ae-text-xs);
-  color: var(--ae-warning);
+  color: var(--ink);
 }
 
 .data-import-tally {

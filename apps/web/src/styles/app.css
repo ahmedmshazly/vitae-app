@@ -277,7 +277,7 @@
   font-size: var(--ae-text-xs);
   background: color-mix(in srgb, var(--ae-warning) 12%, transparent);
   border-bottom: 1px solid color-mix(in srgb, var(--ae-warning) 35%, transparent);
-  color: var(--ae-warning);
+  color: var(--ink);
 }
 .demo-banner__dot {
   width: 6px;
@@ -3449,7 +3449,7 @@ button.row {
   gap: var(--ae-space-2);
 }
 .topbar__demo-active {
-  color: var(--ae-warning);
+  color: var(--ink);
   font-weight: 600;
 }
 
@@ -4007,7 +4007,7 @@ select.input {
 .first-run__intro > span {
   display: block;
   margin-bottom: var(--ae-space-2);
-  color: var(--ae-data-person);
+  color: var(--ink-2);
   font-family: var(--ae-font-mono);
   font-size: var(--ae-text-xs);
   letter-spacing: 0.08em;

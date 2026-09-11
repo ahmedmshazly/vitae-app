@@ -31,7 +31,7 @@
   background: var(--ae-surface);
 }
 .dedup-live__warning {
-  color: var(--ae-warning);
+  color: var(--ink);
   font-size: var(--ae-text-xs);
   margin-top: 2px;
 }

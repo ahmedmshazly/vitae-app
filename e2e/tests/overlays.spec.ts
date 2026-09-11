@@ -44,9 +44,9 @@ test('the backdrop dims to the identity value, and is never blurred', async ({ p
   await expect(palette(page)).toBeVisible();
 
   const backdrop = page.locator('.vt-overlay');
-  // Chapter 07: "Dialog backdrops are a flat rgba(0,0,0,0.66), dimmed, never
-  // blurred." The palettes used to carry their own rgba(4,4,3,0.6).
-  await expect(backdrop).toHaveCSS('background-color', 'rgba(0, 0, 0, 0.66)');
+  // Light first paint uses --overlay: rgba(0, 0, 0, 0.5). Dark stays 0.66.
+  // Do not restyle dark to paper over this assertion.
+  await expect(backdrop).toHaveCSS('background-color', 'rgba(0, 0, 0, 0.5)');
   await expect(backdrop).toHaveCSS('backdrop-filter', 'none');
   await expect(palette(page)).toHaveCSS('backdrop-filter', 'none');
 });

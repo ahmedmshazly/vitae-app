@@ -667,7 +667,7 @@
 }
 
 .ec-cockpit__note--warn {
-  color: var(--ae-warning);
+  color: var(--ink);
 }
 
 .ec-cockpit__inline-actions {

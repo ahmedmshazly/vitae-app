@@ -265,15 +265,15 @@
 }
 
 .data-source-ledger__status[data-tone='success'] {
-  color: var(--ae-success);
+  color: var(--ink);
 }
 
 .data-source-ledger__status[data-tone='warning'] {
-  color: var(--ae-warning);
+  color: var(--ink);
 }
 
 .data-source-ledger__status[data-tone='danger'] {
-  color: var(--ae-danger);
+  color: var(--ink);
 }
 
 .data-source-ledger__chevron {
@@ -762,7 +762,7 @@
 }
 
 .data-trash-row[data-urgency='soon'] .data-trash-row__countdown {
-  color: var(--ae-warning);
+  color: var(--ink);
 }
 
 .data-trash-row[data-urgency='due'] .data-trash-row__countdown {

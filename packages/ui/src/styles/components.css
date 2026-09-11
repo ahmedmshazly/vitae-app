@@ -161,17 +161,17 @@ button.vt-chip:focus-visible {
 .vt-chip--success {
   border-color: color-mix(in srgb, var(--ae-success) 35%, transparent);
   background: color-mix(in srgb, var(--ae-success) 8%, transparent);
-  color: var(--ae-success);
+  color: var(--ink);
 }
 .vt-chip--warning {
   border-color: color-mix(in srgb, var(--ae-warning) 35%, transparent);
   background: color-mix(in srgb, var(--ae-warning) 8%, transparent);
-  color: var(--ae-warning);
+  color: var(--ink);
 }
 .vt-chip--danger {
   border-color: color-mix(in srgb, var(--ae-danger) 35%, transparent);
   background: color-mix(in srgb, var(--ae-danger) 8%, transparent);
-  color: var(--ae-danger);
+  color: var(--ink);
 }
 .vt-chip--mono {
   font-family: var(--ae-font-mono);
@@ -553,7 +553,7 @@ button.vt-chip:focus-visible {
   gap: 3px;
 }
 .vt-fld__req {
-  color: var(--ae-warning);
+  color: var(--ink);
 }
 .vt-fld__help {
   font-size: var(--ae-text-xs);
