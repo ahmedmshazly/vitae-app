@@ -680,6 +680,42 @@ export class Repository {
     return this.listTimeEntries({ taskId });
   }
 
+  async stageTimeEntryUpdate(
+    tx: Tx,
+    before: TimeEntryRecord,
+    patch: TimeEntryPatch,
+    meta: ProductivityWriteMeta = {},
+  ): Promise<TimeEntryRecord> {
+    this.assertExpectedRevision(before.rev, meta.expected_revision);
+    const merged: TimeEntryRecord = {
+      ...before,
+      ...patch,
+      id: before.id,
+      rev: before.rev + 1,
+      updated_at: nowIso(),
+    };
+    await tx
+      .updateTable('time_entries')
+      .set({ data: this.clean(merged) })
+      .where('space', '=', this.space)
+      .where('workspace_id', '=', this.workspaceId)
+      .where('id', '=', before.id)
+      .execute();
+    const diff = shallowDiff(before as never, merged as never);
+    await this.writeRevision(
+      tx,
+      'time_entry',
+      before.id,
+      merged.rev,
+      meta.op ?? 'update',
+      merged,
+      diff,
+      meta.source ?? 'manual',
+      meta.actor,
+    );
+    return merged;
+  }
+
   async updateTimeEntry(
     id: string,
     patch: TimeEntryPatch,
@@ -690,34 +726,7 @@ export class Repository {
     return this.transaction(async (tx) => {
       const before = await this.getTimeEntry(id, { includeDeleted: true }, tx);
       if (!before) throw new NotFoundError('time entry');
-      this.assertExpectedRevision(before.rev, meta.expected_revision);
-      const merged: TimeEntryRecord = {
-        ...before,
-        ...parsed.data,
-        id: before.id,
-        rev: before.rev + 1,
-        updated_at: nowIso(),
-      };
-      await tx
-        .updateTable('time_entries')
-        .set({ data: this.clean(merged) })
-        .where('space', '=', this.space)
-        .where('workspace_id', '=', this.workspaceId)
-        .where('id', '=', before.id)
-        .execute();
-      const diff = shallowDiff(before as never, merged as never);
-      await this.writeRevision(
-        tx,
-        'time_entry',
-        before.id,
-        merged.rev,
-        meta.op ?? 'update',
-        merged,
-        diff,
-        meta.source ?? 'manual',
-        meta.actor,
-      );
-      return merged;
+      return this.stageTimeEntryUpdate(tx, before, parsed.data, meta);
     });
   }
 

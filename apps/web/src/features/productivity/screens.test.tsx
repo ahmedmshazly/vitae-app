@@ -184,6 +184,34 @@ describe('waiting', () => {
     expect(row.closest('li')).toHaveTextContent('Waiting');
     expect(row.closest('li')).toHaveTextContent('Follow-up 2026-09-20');
   });
+
+  it('wait then undo sends restore with clear_waiting', async () => {
+    serve({ tasks: [task()] });
+    mockApi.post.mockImplementation(async (_path: string, body: { type: string; payload: { id: string } }) => {
+      if (body.type === 'wait_on_task') {
+        return { replayed: false, result: { task: nodeResult(body.payload.id, 'Write the brief', 'waiting', 2) } };
+      }
+      return { replayed: false, result: { task: nodeResult(body.payload.id, 'Write the brief', 'next', 3) } };
+    });
+    renderWithApp(<TasksScreen />, { route: '/today/tasks' });
+    await screen.findByText('Write the brief');
+    await userEvent.click(screen.getByRole('button', { name: 'Wait' }));
+    await userEvent.type(screen.getByLabelText('Person or organization id'), 'person-sam');
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm wait' }));
+    await waitFor(() => expect(screen.getByText('Waiting')).toBeInTheDocument());
+    await userEvent.click(screen.getByRole('button', { name: 'Undo' }));
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledTimes(2);
+    });
+    const undo = mockApi.post.mock.calls[1]?.[1] as {
+      type: string;
+      expected_revision?: number;
+      payload: { id: string; clear_waiting?: boolean; status?: string };
+    };
+    expect(undo.type).toBe('restore_task');
+    expect(undo.expected_revision).toBe(2);
+    expect(undo.payload).toMatchObject({ id: 'task-1', status: 'next', clear_waiting: true });
+  });
 });
 
 describe('rules and templates', () => {
@@ -213,6 +241,7 @@ describe('rules and templates', () => {
     const body = mockApi.post.mock.calls[0]?.[1] as { type: string; payload: { name: string } };
     expect(body.type).toBe('upsert_rule');
     expect(body.payload.name).toBe('Promote brief');
+    expect(screen.getByText(/Enabled rules are stored; they are not auto-executed/)).toBeInTheDocument();
   });
 
   it('creates a template through upsert_template', async () => {
@@ -337,7 +366,7 @@ describe('timer list', () => {
       replayed: false,
       result: {
         time_entry: {
-          id: 'closed-1',
+          id: 'open-1',
           task_id: 'task-1',
           started_at: started,
           ended_at: '2026-09-11T08:10:00.000Z',
@@ -353,6 +382,10 @@ describe('timer list', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Stop timer' }));
     await waitFor(() => expect(screen.getByText('Timer stopped.')).toBeInTheDocument());
     expect(screen.queryByText(/\(open\)/)).not.toBeInTheDocument();
+    const stop = mockApi.post.mock.calls[0]?.[1] as { type: string; payload: { id: string; ended_at?: string } };
+    expect(stop.type).toBe('update_time_entry');
+    expect(stop.payload.id).toBe('open-1');
+    expect(stop.payload.ended_at).toBeTruthy();
   });
 });
 

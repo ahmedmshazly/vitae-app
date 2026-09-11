@@ -127,6 +127,20 @@ describe('versioned productivity commands', () => {
       },
       {
         version: 1,
+        operation_id: '8b',
+        expected_revision: 3,
+        type: 'update_time_entry',
+        payload: { id: 'te1', ended_at: '2026-09-04T09:30:00.000Z' },
+      },
+      {
+        version: 1,
+        operation_id: '4b',
+        expected_revision: 3,
+        type: 'restore_task',
+        payload: { id: 't1', status: 'next', clear_waiting: true },
+      },
+      {
+        version: 1,
         operation_id: '9',
         expected_revision: 3,
         type: 'set_recurrence',

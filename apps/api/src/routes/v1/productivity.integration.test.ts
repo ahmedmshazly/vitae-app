@@ -261,6 +261,122 @@ describe('productivity routes (flag on)', () => {
     expect((node.body.edges as Array<{ type: string }>).filter((edge) => edge.type === 'WAITING_ON')).toHaveLength(0);
   });
 
+  it('closes an open timer on the same row and does not double-count', async () => {
+    const { app, token } = await getAuthedApp();
+    const created = await request(app)
+      .post('/api/v1/productivity/commands')
+      .set(authHeader(token))
+      .send(envelope('create_task', { title: `Timer close ${Date.now()}` }))
+      .expect(201);
+    const id = created.body.result.task.id as string;
+    const opened = await request(app)
+      .post('/api/v1/productivity/commands')
+      .set(authHeader(token))
+      .send(envelope('add_time_entry', { item_id: id, started_at: '2026-09-11T08:00:00.000Z' }))
+      .expect(201);
+    const entryId = opened.body.result.time_entry.id as string;
+    const closed = await request(app)
+      .post('/api/v1/productivity/commands')
+      .set(authHeader(token))
+      .send(
+        envelope('update_time_entry', {
+          id: entryId,
+          ended_at: '2026-09-11T08:10:00.000Z',
+        }),
+      )
+      .expect(201);
+    expect(closed.body.result.time_entry.id).toBe(entryId);
+    expect(closed.body.result.time_entry.ended_at).toBe('2026-09-11T08:10:00.000Z');
+    expect(closed.body.result.time_entry.duration_sec).toBe(600);
+
+    const listed = await request(app)
+      .get(`/api/v1/productivity/time-entries?task_id=${id}`)
+      .set(authHeader(token))
+      .expect(200);
+    expect(listed.body.time_entries).toHaveLength(1);
+    expect(listed.body.time_entries[0].id).toBe(entryId);
+    expect(listed.body.time_entries[0].ended_at).toBe('2026-09-11T08:10:00.000Z');
+  });
+
+  it('keeps wait_on_task idempotent on src and undoes the edge', async () => {
+    const { app, token } = await getAuthedApp();
+    const created = await request(app)
+      .post('/api/v1/productivity/commands')
+      .set(authHeader(token))
+      .send(envelope('create_task', { title: `Wait undo ${Date.now()}`, status: 'next' }))
+      .expect(201);
+    const id = created.body.result.task.id as string;
+    const personA = await request(app)
+      .post('/api/v1/nodes')
+      .set(authHeader(token))
+      .send({ type: 'person', title: `Wait A ${Date.now()}`, props: {} })
+      .expect(201);
+    const personB = await request(app)
+      .post('/api/v1/nodes')
+      .set(authHeader(token))
+      .send({ type: 'person', title: `Wait B ${Date.now()}`, props: {} })
+      .expect(201);
+
+    const first = await request(app)
+      .post('/api/v1/productivity/commands')
+      .set(authHeader(token))
+      .send(
+        envelope(
+          'wait_on_task',
+          { id, waiting_on_id: personA.body.node.id },
+          { expected_revision: created.body.result.task.rev },
+        ),
+      )
+      .expect(201);
+    const second = await request(app)
+      .post('/api/v1/productivity/commands')
+      .set(authHeader(token))
+      .send(
+        envelope(
+          'wait_on_task',
+          { id, waiting_on_id: personA.body.node.id },
+          { expected_revision: first.body.result.task.rev },
+        ),
+      )
+      .expect(201);
+    expect(second.body.result.edge.id).toBe(first.body.result.edge.id);
+
+    const retarget = await request(app)
+      .post('/api/v1/productivity/commands')
+      .set(authHeader(token))
+      .send(
+        envelope(
+          'wait_on_task',
+          { id, waiting_on_id: personB.body.node.id },
+          { expected_revision: second.body.result.task.rev },
+        ),
+      )
+      .expect(201);
+    expect(retarget.body.result.edge.id).toBe(first.body.result.edge.id);
+    expect(retarget.body.result.edge.dst).toBe(personB.body.node.id);
+
+    await request(app)
+      .post('/api/v1/productivity/commands')
+      .set(authHeader(token))
+      .send(
+        envelope(
+          'restore_task',
+          { id, status: 'next', clear_waiting: true },
+          { expected_revision: retarget.body.result.task.rev },
+        ),
+      )
+      .expect(201);
+
+    const detail = await request(app).get(`/api/v1/productivity/tasks/${id}`).set(authHeader(token)).expect(200);
+    expect(detail.body.task.status).toBe('next');
+    const node = await request(app).get(`/api/v1/nodes/${id}`).set(authHeader(token)).expect(200);
+    expect((node.body.edges as Array<{ type: string }>).filter((edge) => edge.type === 'WAITING_ON')).toHaveLength(0);
+    expect(node.body.node.props.waiting_on).toBeUndefined();
+    expect(node.body.node.props.waiting_since).toBeUndefined();
+    const waiting = await request(app).get('/api/v1/productivity/waiting').set(authHeader(token)).expect(200);
+    expect((waiting.body.tasks as Array<{ id: string }>).some((task) => task.id === id)).toBe(false);
+  });
+
   it('writes a revision for each successful command', async () => {
     const { app, token } = await getAuthedApp();
     const created = await request(app)

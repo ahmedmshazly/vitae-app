@@ -17,6 +17,7 @@ import {
   setRecurrenceCommand,
   templateToCreateCommand,
   updateTaskCommand,
+  updateTimeEntryCommand,
   upsertRuleCommand,
   upsertTemplateCommand,
   waitOnTaskCommand,
@@ -67,7 +68,10 @@ export function useProductivityActions() {
     (task: TaskReadModel, waitingOnId: string) =>
       run(waitOnTaskCommand(task.id, waitingOnId, task.rev), {
         taskId: task.id,
-        spec: { type: 'restore_task', payload: { id: task.id, status: task.status } },
+        spec: {
+          type: 'restore_task',
+          payload: { id: task.id, status: task.status, clear_waiting: true },
+        },
       }),
     [run],
   );
@@ -157,6 +161,11 @@ export function useProductivityActions() {
     [run],
   );
 
+  const updateTimeEntry = useCallback(
+    (entryId: string, endedAt: string) => run(updateTimeEntryCommand(entryId, endedAt)),
+    [run],
+  );
+
   const upsertRule = useCallback(
     (payload: Extract<ProductivityCommand, { type: 'upsert_rule' }>['payload'], expected_revision?: number) =>
       run(upsertRuleCommand(payload, expected_revision)),
@@ -199,6 +208,7 @@ export function useProductivityActions() {
     update,
     setRecurrence,
     addTimeEntry,
+    updateTimeEntry,
     upsertRule,
     upsertTemplate,
     undoLast,

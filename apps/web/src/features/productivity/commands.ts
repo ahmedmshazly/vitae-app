@@ -32,11 +32,16 @@ export function restoreTaskCommand(
   id: string,
   status?: VitaeTaskStatus,
   expected_revision?: number,
+  clear_waiting?: boolean,
 ): ProductivityCommand {
   return {
     ...envelope(expected_revision),
     type: 'restore_task',
-    payload: status ? { id, status } : { id },
+    payload: {
+      id,
+      ...(status ? { status } : {}),
+      ...(clear_waiting ? { clear_waiting: true } : {}),
+    },
   };
 }
 
@@ -93,6 +98,14 @@ export function addTimeEntryCommand(
     ...envelope(),
     type: 'add_time_entry',
     payload: ended_at ? { item_id, started_at, ended_at, source: 'timer' } : { item_id, started_at, source: 'timer' },
+  };
+}
+
+export function updateTimeEntryCommand(id: string, ended_at: string): ProductivityCommand {
+  return {
+    ...envelope(),
+    type: 'update_time_entry',
+    payload: { id, ended_at },
   };
 }
 

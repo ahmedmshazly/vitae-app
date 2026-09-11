@@ -204,7 +204,7 @@ export function TaskDetail({ task, projectTitle, locked, actions, onClose }: Tas
   async function toggleTimer() {
     if (!task) return;
     if (openEntry) {
-      await actions.addTimeEntry(task.id, openEntry.started_at, new Date().toISOString());
+      await actions.updateTimeEntry(openEntry.id, new Date().toISOString());
       return;
     }
     await actions.addTimeEntry(task.id, new Date().toISOString());
@@ -275,7 +275,11 @@ export function TaskDetail({ task, projectTitle, locked, actions, onClose }: Tas
             disabled={locked}
           />
         </Field>
-        <Field label="Recurrence (rrule)" htmlFor="prod-rrule" help="Leave blank to keep the stored recurrence.">
+        <Field
+          label="Recurrence (rrule)"
+          htmlFor="prod-rrule"
+          help="Leave blank to keep the stored recurrence. Completing this task does not spawn the next occurrence (FR-PROD-005)."
+        >
           <Input id="prod-rrule" value={rrule} onChange={(event) => setRrule(event.target.value)} disabled={locked} />
         </Field>
         <Field label="Recurrence mode" htmlFor="prod-mode">

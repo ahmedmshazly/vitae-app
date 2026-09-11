@@ -69,7 +69,11 @@ export const dropTaskCommandSchema = commandEnvelopeSchema.extend({
 
 export const restoreTaskCommandSchema = commandEnvelopeSchema.extend({
   type: z.literal('restore_task'),
-  payload: idPayload.extend({ status: vitaeTaskStatusSchema.optional() }),
+  payload: idPayload.extend({
+    status: vitaeTaskStatusSchema.optional(),
+    /** Compensating wait undo: drop waiting fields and the WAITING_ON edge. */
+    clear_waiting: z.boolean().optional(),
+  }),
 });
 
 export const reorderTasksCommandSchema = commandEnvelopeSchema.extend({
@@ -101,6 +105,16 @@ export const addTimeEntryCommandSchema = commandEnvelopeSchema.extend({
     started_at: isoDateTime,
     ended_at: isoDateTime.optional(),
     source: z.string().min(1).max(64).optional(),
+  }),
+});
+
+export const updateTimeEntryCommandSchema = commandEnvelopeSchema.extend({
+  type: z.literal('update_time_entry'),
+  payload: z.object({
+    id: z.string().min(1),
+    started_at: isoDateTime.optional(),
+    ended_at: isoDateTime.optional(),
+    note: z.string().max(10_000).optional(),
   }),
 });
 
@@ -145,6 +159,7 @@ export const productivityCommandSchema = z.discriminatedUnion('type', [
   waitOnTaskCommandSchema,
   followUpTaskCommandSchema,
   addTimeEntryCommandSchema,
+  updateTimeEntryCommandSchema,
   setRecurrenceCommandSchema,
   upsertRuleCommandSchema,
   upsertTemplateCommandSchema,

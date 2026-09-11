@@ -11,6 +11,7 @@ import {
   productivityCommandSchema,
   propsSchemaFor,
   type EdgeCreateInput,
+  type EdgeRecord,
   type NodeRecord,
   type ProductivityCommand,
   type Quadrant,
@@ -25,7 +26,7 @@ import {
   type Tx,
   type WriteMeta,
 } from '../../db/repository.js';
-import { zodIssues, type AutomationRuleWrite } from '../../db/productivity-docs.js';
+import { zodIssues, type AutomationRuleWrite, type TimeEntryPatch } from '../../db/productivity-docs.js';
 import { todayIso } from '../../db/timezone.js';
 import { nowIso } from '../../db/util.js';
 import { searchIndex } from '../../db/search-index.js';
@@ -135,6 +136,20 @@ function durationSec(startedAt: string, endedAt?: string): number | undefined {
   return Math.max(0, Math.round(ms / 1000));
 }
 
+function liveWaitingOnFrom(edges: readonly EdgeRecord[], src: string): EdgeRecord[] {
+  return edges.filter(
+    (edge) => edge.type === 'WAITING_ON' && edge.src === src && !edge.deleted_at,
+  );
+}
+
+async function dropWaitingOnEdges(tx: Tx, src: string, write: WriteMeta): Promise<void> {
+  const edges = liveWaitingOnFrom(await repository.edgesForNodeTx(tx, src), src);
+  const deletedAt = nowIso();
+  for (const edge of edges) {
+    await repository.stageEdgeUpdate(tx, edge, { deleted_at: deletedAt }, { ...write, op: 'delete' });
+  }
+}
+
 async function applyCommand(tx: Tx, command: ProductivityCommand, actor: string | undefined): Promise<unknown> {
   const write = metaFrom(actor);
 
@@ -172,6 +187,7 @@ async function applyCommand(tx: Tx, command: ProductivityCommand, actor: string 
     }
 
     case 'complete_task': {
+      // FR-PROD-005: stored recurrence is not spawned on complete.
       const before = await requireTask(tx, command.payload.id, { forUpdate: true });
       repository.assertExpectedRevision(before.rev, command.expected_revision);
       const node = await stageTaskProps(
@@ -195,12 +211,19 @@ async function applyCommand(tx: Tx, command: ProductivityCommand, actor: string 
       const before = await requireTask(tx, command.payload.id, { includeDeleted: true, forUpdate: true });
       repository.assertExpectedRevision(before.rev, command.expected_revision);
       const status = command.payload.status ?? (taskStatus(before) === 'dropped' ? 'inbox' : taskStatus(before));
+      const props: Record<string, unknown> = { ...taskProps(before), status };
+      if (command.payload.clear_waiting) {
+        delete props.waiting_on;
+        delete props.waiting_since;
+        delete props.waiting_patience_days;
+        await dropWaitingOnEdges(tx, before.id, write);
+      }
       const node = await repository.stageNodeUpdate(
         tx,
         before,
         {
           deleted_at: null,
-          props: assertTaskProps({ ...taskProps(before), status }),
+          props: assertTaskProps(props),
         },
         { ...write, op: before.deleted_at ? 'restore' : 'update' },
       );
@@ -246,14 +269,27 @@ async function applyCommand(tx: Tx, command: ProductivityCommand, actor: string 
         props.waiting_patience_days = command.payload.waiting_patience_days;
       }
       const node = await stageTaskProps(tx, before, props, {}, write);
-      const edgeInput: EdgeCreateInput = repository.parseEdgeCreate({
-        type: 'WAITING_ON',
-        src: node.id,
-        dst: target.id,
-        props: {},
-        source: 'manual',
-      });
-      const edge = await repository.stageEdge(tx, edgeInput, write);
+      const existing = liveWaitingOnFrom(await repository.edgesForNodeTx(tx, node.id), node.id);
+      const [keep, ...extras] = existing;
+      const deletedAt = nowIso();
+      for (const extra of extras) {
+        await repository.stageEdgeUpdate(tx, extra, { deleted_at: deletedAt }, { ...write, op: 'delete' });
+      }
+      let edge;
+      if (!keep) {
+        const edgeInput: EdgeCreateInput = repository.parseEdgeCreate({
+          type: 'WAITING_ON',
+          src: node.id,
+          dst: target.id,
+          props: {},
+          source: 'manual',
+        });
+        edge = await repository.stageEdge(tx, edgeInput, write);
+      } else if (keep.dst !== target.id) {
+        edge = await repository.stageEdgeUpdate(tx, keep, { dst: target.id }, write);
+      } else {
+        edge = keep;
+      }
       return { task: node, edge };
     }
 
@@ -286,6 +322,26 @@ async function applyCommand(tx: Tx, command: ProductivityCommand, actor: string 
       return { time_entry: entry };
     }
 
+    case 'update_time_entry': {
+      const before = await repository.getTimeEntry(command.payload.id, { includeDeleted: true }, tx);
+      if (!before) productivityNotFound();
+      await requireTask(tx, before.task_id);
+      repository.assertExpectedRevision(before.rev, command.expected_revision);
+      const started_at = command.payload.started_at ?? before.started_at;
+      const ended_at = command.payload.ended_at ?? before.ended_at;
+      const patch: TimeEntryPatch = {
+        started_at,
+        ended_at,
+        duration_sec: durationSec(started_at, ended_at),
+      };
+      if (command.payload.note !== undefined) patch.note = command.payload.note;
+      const entry = await repository.stageTimeEntryUpdate(tx, before, patch, {
+        ...write,
+        expected_revision: command.expected_revision,
+      });
+      return { time_entry: entry };
+    }
+
     case 'set_recurrence': {
       const before = await requireTask(tx, command.payload.id, { forUpdate: true });
       repository.assertExpectedRevision(before.rev, command.expected_revision);
@@ -297,6 +353,7 @@ async function applyCommand(tx: Tx, command: ProductivityCommand, actor: string 
     }
 
     case 'upsert_rule': {
+      // FR-PROD-005: rules persist; evaluateRule is not called on this write path.
       const payload = command.payload;
       const writeValue: AutomationRuleWrite = {
         id: payload.id,

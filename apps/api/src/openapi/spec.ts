@@ -657,6 +657,7 @@ function detailedPaths(): PathsObject {
                       'wait_on_task',
                       'follow_up_task',
                       'add_time_entry',
+                      'update_time_entry',
                       'set_recurrence',
                       'upsert_rule',
                       'upsert_template',
