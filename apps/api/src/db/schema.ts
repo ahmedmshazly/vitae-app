@@ -3,7 +3,7 @@
  *
  * Hand-written rather than generated, deliberately: the API runs TypeScript
  * directly under tsx with no build step, so a codegen step would be the first
- * one, and there are 23 tables of three columns each, which is cheaper to
+ * one, and there are 26 document tables of three columns each, which is cheaper to
  * write than to wire a generator for.
  *
  * Every generated column is `GeneratedAlways`, which makes it a type error to
@@ -121,6 +121,7 @@ export interface RevisionTable extends DocTable {
   subject_id: GeneratedAlways<string | null>;
   subject_kind: GeneratedAlways<string | null>;
   rev: GeneratedAlways<number | null>;
+  at: GeneratedAlways<string | null>;
 }
 
 interface AtomTable extends DocTable {
@@ -166,6 +167,23 @@ interface DossierTable extends DocTable {
   audience: GeneratedAlways<string | null>;
   updated_at: GeneratedAlways<string | null>;
   deleted_at: GeneratedAlways<string | null>;
+}
+interface TimeEntryTable extends DocTable {
+  task_id: GeneratedAlways<string | null>;
+  started_at: GeneratedAlways<string | null>;
+  ended_at: GeneratedAlways<string | null>;
+  updated_at: GeneratedAlways<string | null>;
+  deleted_at: GeneratedAlways<string | null>;
+}
+interface AutomationRuleTable extends DocTable {
+  enabled: GeneratedAlways<boolean | null>;
+  updated_at: GeneratedAlways<string | null>;
+  deleted_at: GeneratedAlways<string | null>;
+}
+interface ProductivityReceiptTable extends DocTable {
+  operation_id: GeneratedAlways<string | null>;
+  command_type: GeneratedAlways<string | null>;
+  created_at: GeneratedAlways<string | null>;
 }
 interface ReminderTable extends DocTable {
   status: GeneratedAlways<string | null>;
@@ -222,6 +240,9 @@ export interface Database {
   resumes: ResumeTable;
   letters: LetterTable;
   dossiers: DossierTable;
+  time_entries: TimeEntryTable;
+  automation_rules: AutomationRuleTable;
+  productivity_receipts: ProductivityReceiptTable;
   templates: DocTable;
   reminders: ReminderTable;
   tags: TagTable;
@@ -251,6 +272,9 @@ export const TABLES = [
   'resumes',
   'letters',
   'dossiers',
+  'time_entries',
+  'automation_rules',
+  'productivity_receipts',
   'templates',
   'reminders',
   'tags',

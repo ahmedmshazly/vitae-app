@@ -120,11 +120,11 @@ export const PRODUCTIVITY_WEB_FLAG = 'VITE_PUBLIC_PRODUCTIVITY_ENABLED';
 /** Named now; added to EDGE_TYPES in Task 3. */
 export const PRODUCTIVITY_EDGE_TYPES = ['DEPENDS_ON', 'SERVES_GOAL', 'WAITING_ON', 'FOR'] as const;
 
-/** Named now; collections land in Task 4. */
+/** Persisted in migration 012 as document tables. */
 export const PRODUCTIVITY_COLLECTIONS = [
   'time_entries',
   'automation_rules',
-  'idempotency_receipts',
+  'productivity_receipts',
 ] as const;
 
 /**
