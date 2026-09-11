@@ -21,7 +21,23 @@ export const importsRouter: Router = Router();
 // parser: a router-local parser runs too late to raise it (FR-010).
 
 const stageSchema = z.object({
-  kind: z.enum(['linkedin', 'contacts', 'calendar', 'bookmarks', 'resume', 'aperture']),
+  kind: z.enum([
+    'linkedin',
+    'contacts',
+    'calendar',
+    'bookmarks',
+    'resume',
+    'aperture',
+    'todoist',
+    'things',
+    'ticktick',
+    'trello',
+    'asana',
+    'notion',
+    'tasks_json',
+    'tasks_csv',
+    'tasks_text',
+  ]),
   filename: z.string().max(300).nullish(),
   content: z.string().min(1),
   mapping: z

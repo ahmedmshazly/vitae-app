@@ -48,6 +48,51 @@ describe('nodeDraftFor', () => {
     ).toBeNull();
   });
 
+  it('writes a task draft from stated props and keeps sensitive', () => {
+    const draft = nodeDraftFor({
+      entity: 'task',
+      title: 'Renew passport',
+      subtitle: null,
+      payload: {
+        type: 'task',
+        props: { status: 'next', due: '2026-09-11', priority: 'p1' },
+        notes_md: 'Bring photos',
+        sensitivity: 'sensitive',
+      },
+      identityKeys: ['asana:task:123'],
+    });
+    expect(draft).toMatchObject({
+      type: 'task',
+      title: 'Renew passport',
+      props: { status: 'next', due: '2026-09-11', priority: 'p1' },
+      notes_md: 'Bring photos',
+      sensitivity: 'sensitive',
+      identity_keys: ['asana:task:123'],
+    });
+  });
+
+  it('writes a project draft', () => {
+    const draft = nodeDraftFor({
+      entity: 'project',
+      title: 'Admin',
+      subtitle: 'project',
+      payload: { type: 'project', props: {}, notes_md: '' },
+      identityKeys: ['project:trello:board1'],
+    });
+    expect(draft).toMatchObject({ type: 'project', title: 'Admin', identity_keys: ['project:trello:board1'] });
+  });
+
+  it('writes no node for a staged skip row', () => {
+    expect(
+      nodeDraftFor({
+        entity: 'task',
+        title: 'section',
+        subtitle: 'section',
+        payload: { skip_reason: 'section' },
+      }),
+    ).toBeNull();
+  });
+
   it('takes a bundle node whole, since its producer already chose the shape', () => {
     const draft = nodeDraftFor({
       entity: 'graph_node',

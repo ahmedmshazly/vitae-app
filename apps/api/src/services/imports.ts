@@ -40,6 +40,25 @@ import {
   parseLinkedInSkills,
   parseNetscapeBookmarks,
   parseVcards,
+  parseAsana,
+  parseNotion,
+  parseTasksCsv,
+  parseTasksJson,
+  parseTasksText,
+  parseThings,
+  parseTickTick,
+  parseTodoist,
+  parseTrello,
+  asanaTaskKey,
+  notionPageKey,
+  taskProjectKey,
+  tasksCsvTaskKey,
+  tasksJsonTaskKey,
+  thingsTaskKey,
+  ticktickTaskKey,
+  todoistTaskKey,
+  trelloCardKey,
+  fatalTaskImportReason,
   patchForFields,
   pickField,
   readField,
@@ -53,6 +72,10 @@ import {
   type FieldChange,
   type NodeRecord,
   type PairScore,
+  type ProjectFileDraft,
+  type TaskFileDraft,
+  type TaskImportContext,
+  type TaskImportResult,
 } from '@vitae/core';
 import { repository } from '../db/repository.js';
 import { newId, nowIso } from '../db/util.js';
@@ -61,8 +84,43 @@ import { getSettings, githubToken, patchSettings } from './settings.js';
 import { fetchWithDeadline } from './http.js';
 import { loadGraph } from './crm.js';
 import { emailDomains, invalidateDuplicateScan, orgNamesByPerson } from './duplicates.js';
+import { currentTimezone } from '../db/timezone.js';
 
-export type ImportKind = 'linkedin' | 'contacts' | 'calendar' | 'bookmarks' | 'resume' | 'aperture';
+export type ImportKind =
+  | 'linkedin'
+  | 'contacts'
+  | 'calendar'
+  | 'bookmarks'
+  | 'resume'
+  | 'aperture'
+  | 'todoist'
+  | 'things'
+  | 'ticktick'
+  | 'trello'
+  | 'asana'
+  | 'notion'
+  | 'tasks_json'
+  | 'tasks_csv'
+  | 'tasks_text';
+
+export const TASK_FILE_KINDS = [
+  'todoist',
+  'things',
+  'ticktick',
+  'trello',
+  'asana',
+  'notion',
+  'tasks_json',
+  'tasks_csv',
+  'tasks_text',
+] as const;
+
+export type TaskFileKind = (typeof TASK_FILE_KINDS)[number];
+
+function isTaskFileKind(kind: ImportKind): kind is TaskFileKind {
+  return (TASK_FILE_KINDS as readonly string[]).includes(kind);
+}
+
 /**
  * `graph_node` is a pre-shaped node from a `vitae.graph.bundle`, the producer
  * has already decided its type and props, so it needs no per-format mapping and
@@ -76,7 +134,9 @@ export type RowEntity =
   | 'event'
   | 'link'
   | 'atom'
-  | 'graph_node';
+  | 'graph_node'
+  | 'task'
+  | 'project';
 
 export interface DupInfo {
   nodeId: string;
@@ -193,6 +253,15 @@ const SOURCE_BY_KIND: Record<ImportKind, string> = {
   bookmarks: 'import_bookmarks',
   resume: 'parse_resume',
   aperture: 'import_aperture',
+  todoist: 'import_todoist',
+  things: 'import_things',
+  ticktick: 'import_ticktick',
+  trello: 'import_trello',
+  asana: 'import_asana',
+  notion: 'import_notion',
+  tasks_json: 'import_tasks_json',
+  tasks_csv: 'import_tasks_csv',
+  tasks_text: 'import_tasks_text',
 };
 
 // ── Parsing to staged rows ────────────────────────────────────────────────────
@@ -211,6 +280,8 @@ interface ParsedRow {
   identityKeys: string[];
   ref?: string | null;
   nodeType?: string | null;
+  /** Named skip: the row is shown for review and never written. */
+  skipReason?: string;
 }
 
 /** Which LinkedIn export file is this? Decided by header shape. */
@@ -238,8 +309,165 @@ function parseContent(
   mapping?: CsvMapping,
 ): { rows: ParsedRow[]; detail: string | null; edges: BundleEdge[] } {
   if (kind === 'aperture') return parseApertureBundle(content);
+  if (isTaskFileKind(kind)) return parseTaskFileContent(kind, content);
   const { rows, detail } = parseNonBundleContent(kind, content, mapping);
   return { rows, detail, edges: [] };
+}
+
+function taskImportContext(): TaskImportContext {
+  return { now: new Date(), timezone: currentTimezone(), weekStartsOn: 1 };
+}
+
+function parseTaskKind(kind: TaskFileKind, content: string, ctx: TaskImportContext): TaskImportResult {
+  switch (kind) {
+    case 'todoist':
+      return parseTodoist(content, ctx);
+    case 'things':
+      return parseThings(content, ctx);
+    case 'ticktick':
+      return parseTickTick(content, ctx);
+    case 'trello':
+      return parseTrello(content, ctx);
+    case 'asana':
+      return parseAsana(content, ctx);
+    case 'notion':
+      return parseNotion(content, ctx);
+    case 'tasks_json':
+      return parseTasksJson(content, ctx);
+    case 'tasks_csv':
+      return parseTasksCsv(content, ctx);
+    case 'tasks_text':
+      return parseTasksText(content, ctx);
+  }
+}
+
+function parseTaskFileContent(
+  kind: TaskFileKind,
+  content: string,
+): { rows: ParsedRow[]; detail: string | null; edges: BundleEdge[] } {
+  const parsed = parseTaskKind(kind, content, taskImportContext());
+  const fatal = fatalTaskImportReason(parsed);
+  if (fatal) {
+    throw new ImportContentError(fatal);
+  }
+
+  const rows: ParsedRow[] = [];
+  const refs = new Set<string>();
+  const takeRef = (preferred: string | undefined, fallback: string): string => {
+    const candidate = (preferred && preferred.trim()) || fallback;
+    let ref = candidate.slice(0, 128);
+    let n = 2;
+    while (refs.has(ref)) {
+      ref = `${candidate.slice(0, 120)}:${n}`;
+      n += 1;
+    }
+    refs.add(ref);
+    return ref;
+  };
+
+  const projectRows = parsed.projects.map((project, index) => {
+    const ref = takeRef(project.source_id, `project:${index + 1}`);
+    return { project, ref, row: projectRow(project, ref) };
+  });
+  const taskRows = parsed.tasks.map((task, index) => {
+    const ref = takeRef(task.source_id, `task:${index + 1}`);
+    return { task, ref, row: taskRow(task, ref) };
+  });
+
+  for (const entry of projectRows) rows.push(entry.row);
+  for (const entry of taskRows) rows.push(entry.row);
+
+  const projectRefBySource = new Map<string, string>();
+  const projectRefByName = new Map<string, string>();
+  for (const entry of projectRows) {
+    if (entry.project.source_id) projectRefBySource.set(entry.project.source_id, entry.ref);
+    projectRefByName.set(normalizeForMatch(entry.project.title), entry.ref);
+  }
+  const taskRefBySource = new Map<string, string>();
+  for (const entry of taskRows) {
+    if (entry.task.source_id) taskRefBySource.set(entry.task.source_id, entry.ref);
+  }
+
+  const edges: BundleEdge[] = [];
+  const addEdge = (type: BundleEdge['type'], src: string | undefined, dst: string | undefined, props: Record<string, unknown> = {}) => {
+    if (!src || !dst) return;
+    edges.push({ type, src, dst, props, notes_md: '', source: 'manual', confidence: 1 });
+  };
+
+  for (const entry of taskRows) {
+    const projectRef =
+      (entry.task.project_source_id ? projectRefBySource.get(entry.task.project_source_id) : undefined) ??
+      (entry.task.project_name ? projectRefByName.get(normalizeForMatch(entry.task.project_name)) : undefined);
+    addEdge('ABOUT', entry.ref, projectRef);
+    addEdge(
+      'RELATES_TO',
+      entry.ref,
+      entry.task.parent_source_id ? taskRefBySource.get(entry.task.parent_source_id) : undefined,
+      { label: 'parent' },
+    );
+    for (const blocker of entry.task.blocked_by_source_ids ?? []) {
+      addEdge('DEPENDS_ON', entry.ref, taskRefBySource.get(blocker));
+    }
+  }
+
+  for (const skip of parsed.skipped) {
+    rows.push({
+      entity: 'task',
+      title: skip.token || skip.reason,
+      subtitle: skip.reason,
+      payload: { skip_reason: skip.reason, token: skip.token ?? null },
+      confidence: 0,
+      identityKeys: [],
+      skipReason: skip.reason,
+    });
+  }
+
+  const skipSummary = parsed.skipped.length > 0 ? `${parsed.skipped.length} skipped` : null;
+  return { rows, detail: skipSummary, edges };
+}
+
+function taskRow(task: TaskFileDraft, ref: string): ParsedRow {
+  return {
+    entity: 'task',
+    title: task.title,
+    subtitle: task.project_name ?? task.props.status ?? null,
+    payload: {
+      type: 'task',
+      title: task.title,
+      props: task.props,
+      notes_md: task.notes_md,
+      ...(task.sensitivity === 'sensitive' ? { sensitivity: 'sensitive' } : {}),
+      source_id: task.source_id ?? null,
+      parent_source_id: task.parent_source_id ?? null,
+      project_source_id: task.project_source_id ?? null,
+      project_name: task.project_name ?? null,
+      blocked_by_source_ids: task.blocked_by_source_ids ?? [],
+    },
+    confidence: 0.95,
+    identityKeys: task.identity_key ? [task.identity_key] : [],
+    ref,
+    nodeType: 'task',
+  };
+}
+
+function projectRow(project: ProjectFileDraft, ref: string): ParsedRow {
+  return {
+    entity: 'project',
+    title: project.title,
+    subtitle: 'project',
+    payload: {
+      type: 'project',
+      title: project.title,
+      props: project.props,
+      notes_md: project.notes_md,
+      ...(project.sensitivity === 'sensitive' ? { sensitivity: 'sensitive' } : {}),
+      source_id: project.source_id ?? null,
+    },
+    confidence: 0.95,
+    identityKeys: project.identity_key ? [project.identity_key] : [],
+    ref,
+    nodeType: 'project',
+  };
 }
 
 /** The upload is readable, but its contents do not satisfy the selected importer. */
@@ -283,7 +511,7 @@ function parseApertureBundle(content: string): { rows: ParsedRow[]; detail: stri
 }
 
 function parseNonBundleContent(
-  kind: Exclude<ImportKind, 'aperture'>,
+  kind: Exclude<ImportKind, 'aperture' | TaskFileKind>,
   content: string,
   mapping?: CsvMapping,
 ): { rows: ParsedRow[]; detail: string | null } {
@@ -602,6 +830,8 @@ const ENTITY_NODE_TYPE: Record<Exclude<RowEntity, 'atom' | 'graph_node'>, string
   skill: 'skill',
   event: 'event',
   link: 'link',
+  task: 'task',
+  project: 'project',
 };
 
 // ── The node a row would write ───────────────────────────────────────────────
@@ -617,6 +847,7 @@ export interface NodeDraft {
   start_date?: string;
   end_date?: string;
   date_precision?: 'day' | 'month' | 'year';
+  sensitivity?: 'normal' | 'sensitive';
 }
 
 /**
@@ -724,6 +955,29 @@ export function nodeDraftFor(row: {
         props: { url: p.url, domain: safeDomain(p.url as string) },
         identity_keys: keys,
         notes_md: '',
+      };
+    case 'task': {
+      if (typeof p.skip_reason === 'string') return null;
+      const stated = (p.props as Record<string, unknown> | undefined) ?? {};
+      return {
+        type: 'task',
+        title: row.title,
+        subtitle: row.subtitle ?? undefined,
+        props: { ...stated },
+        identity_keys: keys,
+        notes_md: typeof p.notes_md === 'string' ? p.notes_md : '',
+        ...(p.sensitivity === 'sensitive' ? { sensitivity: 'sensitive' as const } : {}),
+      };
+    }
+    case 'project':
+      return {
+        type: 'project',
+        title: row.title,
+        subtitle: row.subtitle ?? undefined,
+        props: { ...((p.props as Record<string, unknown> | undefined) ?? {}) },
+        identity_keys: keys,
+        notes_md: typeof p.notes_md === 'string' ? p.notes_md : '',
+        ...(p.sensitivity === 'sensitive' ? { sensitivity: 'sensitive' as const } : {}),
       };
     case 'atom':
       return null;
@@ -869,15 +1123,17 @@ export async function stageImport(
     const draft = nodeDraftFor(r);
     const identity = resolveIdentity(r.identityKeys, draft, byIdentityKey);
     const proposal = identity && draft ? buildProposal(draft, identity) : null;
-    const dup = identity
-      ? identityDup(identity)
-      : r.entity === 'graph_node'
-        ? checkGraphNodeDup(r, byType, personOrgs)
-        : r.entity === 'person'
-          ? checkPersonDup(r, byType.get('person') ?? [], personOrgs)
-          : r.entity === 'atom'
-            ? null
-            : checkSimpleDup(r, byType.get(ENTITY_NODE_TYPE[r.entity]) ?? [], ENTITY_NODE_TYPE[r.entity]);
+    const dup = r.skipReason
+      ? null
+      : identity
+        ? identityDup(identity)
+        : r.entity === 'graph_node'
+          ? checkGraphNodeDup(r, byType, personOrgs)
+          : r.entity === 'person'
+            ? checkPersonDup(r, byType.get('person') ?? [], personOrgs)
+            : r.entity === 'atom'
+              ? null
+              : checkSimpleDup(r, byType.get(ENTITY_NODE_TYPE[r.entity]) ?? [], ENTITY_NODE_TYPE[r.entity]);
     return {
       id: newId(),
       index,
@@ -894,7 +1150,7 @@ export async function stageImport(
       // Probable duplicates default to skip, and so does an update proposal:
       // FR-SYNC-001 is that nothing updates without acceptance, and a default
       // of accept would make a re-import overwrite records on its own.
-      decision: dup?.verdict === 'probable' ? 'skip' : 'accept',
+      decision: r.skipReason || dup?.verdict === 'probable' ? 'skip' : 'accept',
       status: 'staged',
     };
   });
@@ -1045,6 +1301,76 @@ async function findOrCreateOrg(title: string, source: string, sourceRef: string,
  * converges on one document instead of forking, and only a row the source
  * identifies by nothing falls back to an id made from the batch and the row.
  */
+function taskSourceIdentityKey(kind: ImportKind, sourceId: string): string | null {
+  switch (kind) {
+    case 'todoist':
+      return todoistTaskKey(sourceId);
+    case 'things':
+      return thingsTaskKey(sourceId);
+    case 'ticktick':
+      return ticktickTaskKey(sourceId);
+    case 'trello':
+      return trelloCardKey(sourceId);
+    case 'asana':
+      return asanaTaskKey(sourceId);
+    case 'notion':
+      return notionPageKey(sourceId);
+    case 'tasks_json':
+      return tasksJsonTaskKey(sourceId);
+    case 'tasks_csv':
+      return tasksCsvTaskKey(sourceId);
+    default:
+      return null;
+  }
+}
+
+function projectSourceIdentityKeys(kind: ImportKind, sourceId: string): string[] {
+  const systems = kind === 'tasks_json' ? ['tasks_json', 'fourfold'] : [kind];
+  return systems
+    .map((system) => taskProjectKey(system, sourceId))
+    .filter((key): key is string => key !== null);
+}
+
+async function liveIdByIdentityKeys(keys: readonly string[]): Promise<string | undefined> {
+  for (const key of keys) {
+    const hit = await repository.findByIdentityKey(key);
+    if (hit) return hit.id;
+  }
+  return undefined;
+}
+
+/**
+ * Workspace node id of the project this task belongs to.
+ *
+ * The file states a source id or a name, never a Vitae id. Prefer a project
+ * row in this batch (so a first import that creates both can link them), then
+ * a live record the source id already names (so a later file can join a
+ * project that is already here).
+ */
+async function resolveImportedProjectId(
+  batchId: string,
+  row: StagedRow,
+  rows: StagedRow[],
+  kind: ImportKind,
+): Promise<string | undefined> {
+  const projectSource = typeof row.payload.project_source_id === 'string' ? row.payload.project_source_id : '';
+  const projectName = typeof row.payload.project_name === 'string' ? row.payload.project_name : '';
+  const match = rows.find((candidate) => {
+    if (candidate.entity !== 'project') return false;
+    if (projectSource && (candidate.ref === projectSource || candidate.payload.source_id === projectSource)) {
+      return true;
+    }
+    return Boolean(projectName && normalizeForMatch(candidate.title) === normalizeForMatch(projectName));
+  });
+  if (match) {
+    if (match.proposal) return match.proposal.target_node_id;
+    if (match.decision === 'accept') return resolvedNodeId(batchId, match);
+    return match.dup?.nodeId;
+  }
+  if (!projectSource) return undefined;
+  return liveIdByIdentityKeys(projectSourceIdentityKeys(kind, projectSource));
+}
+
 function resolvedNodeId(batchId: string, row: StagedRow): string {
   if (row.proposal) return row.proposal.target_node_id;
   // Rows staged before identity keys were persisted on the row still carry a
@@ -1075,19 +1401,69 @@ function importResultId(batchId: string, rowId: string, suffix: string): string 
  * already in the graph. Only a row skipped with no match at all leaves its
  * edges unresolvable, and those are dropped rather than dangled.
  */
+async function writeImportEdge(
+  id: string,
+  source: string,
+  edge: {
+    type: BundleEdge['type'];
+    src: string;
+    dst: string;
+    props?: Record<string, unknown>;
+    start_date?: string;
+    end_date?: string;
+    is_current?: boolean;
+    confidence?: number;
+  },
+): Promise<boolean> {
+  try {
+    const edgeRecord = await repository.createEdge(
+      {
+        type: edge.type,
+        src: edge.src,
+        dst: edge.dst,
+        props: edge.props ?? {},
+        start_date: edge.start_date,
+        end_date: edge.end_date,
+        is_current: edge.is_current,
+        source,
+        source_ref: id,
+        confidence: edge.confidence ?? 1,
+      },
+      { actor: 'import' },
+      // Keyed on (type, src, dst) and NOT on the batch: an edge of a given
+      // type between two given nodes is one fact, so importing a bundle twice
+      // must converge on the same document instead of laying a second
+      // parallel edge beside the first.
+      { id: bundleEdgeId(edge.type, edge.src, edge.dst) },
+    );
+    // Same tombstone problem as nodes: re-importing after a rollback must
+    // bring the relationship back, not resolve to the soft-deleted edge.
+    if (edgeRecord.deleted_at) await repository.restoreEdge(edgeRecord.id, { actor: 'import' });
+    return true;
+  } catch {
+    // A single rejected edge (endpoint deleted mid-import, type matrix
+    // disallows the pair) must not abort the rest of the graph.
+    return false;
+  }
+}
+
 async function commitBundleEdges(
   id: string,
   rows: StagedRow[],
   source: string,
   failedRowIds: ReadonlySet<string>,
+  kind: ImportKind,
 ): Promise<number> {
   const edges = await loadBundleEdges(id);
-  if (edges.length === 0) return 0;
 
   const refToId = new Map<string, string>();
+  const sourceIdInBatch = new Set<string>();
   for (const row of rows) {
-    if (row.entity !== 'graph_node' || !row.ref) continue;
+    if (!row.ref) continue;
+    if (row.entity !== 'graph_node' && row.entity !== 'task' && row.entity !== 'project') continue;
     if (failedRowIds.has(row.id)) continue;
+    const sourceId = typeof row.payload.source_id === 'string' ? row.payload.source_id : '';
+    if (sourceId) sourceIdInBatch.add(sourceId);
     if (row.decision === 'accept') refToId.set(row.ref, resolvedNodeId(id, row));
     else if (row.dup) refToId.set(row.ref, row.dup.nodeId);
   }
@@ -1097,34 +1473,55 @@ async function commitBundleEdges(
     const src = refToId.get(edge.src);
     const dst = refToId.get(edge.dst);
     if (!src || !dst) continue;
-    try {
-      const edgeRecord = await repository.createEdge(
-        {
-          type: edge.type,
-          src,
-          dst,
-          props: edge.props,
-          start_date: edge.start_date,
-          end_date: edge.end_date,
-          is_current: edge.is_current,
-          source,
-          source_ref: id,
-          confidence: edge.confidence,
-        },
-        { actor: 'import' },
-        // Keyed on (type, src, dst) and NOT on the batch: an edge of a given
-        // type between two given nodes is one fact, so importing a bundle twice
-        // must converge on the same document instead of laying a second
-        // parallel edge beside the first.
-        { id: bundleEdgeId(edge.type, src, dst) },
-      );
-      // Same tombstone problem as nodes: re-importing after a rollback must
-      // bring the relationship back, not resolve to the soft-deleted edge.
-      if (edgeRecord.deleted_at) await repository.restoreEdge(edgeRecord.id, { actor: 'import' });
+    if (
+      await writeImportEdge(id, source, {
+        type: edge.type,
+        src,
+        dst,
+        props: edge.props,
+        start_date: edge.start_date,
+        end_date: edge.end_date,
+        is_current: edge.is_current,
+        confidence: edge.confidence,
+      })
+    ) {
       created++;
-    } catch {
-      // A single rejected edge (endpoint deleted mid-import, type matrix
-      // disallows the pair) must not abort the rest of the graph.
+    }
+  }
+
+  // Parent / project / blocker that the file names by source id, but that
+  // are already in the workspace and not in this batch. In-batch pairs are
+  // already in `edges`; looking them up again would recount the same write.
+  if (!isTaskFileKind(kind)) return created;
+  for (const row of rows) {
+    if (row.entity !== 'task' || !row.ref || failedRowIds.has(row.id)) continue;
+    const src = refToId.get(row.ref);
+    if (!src) continue;
+    const parentSource = typeof row.payload.parent_source_id === 'string' ? row.payload.parent_source_id : '';
+    if (parentSource && !sourceIdInBatch.has(parentSource)) {
+      const parentKey = taskSourceIdentityKey(kind, parentSource);
+      const parentId = parentKey ? await liveIdByIdentityKeys([parentKey]) : undefined;
+      if (parentId && (await writeImportEdge(id, source, { type: 'RELATES_TO', src, dst: parentId, props: { label: 'parent' } }))) {
+        created++;
+      }
+    }
+    const projectSource = typeof row.payload.project_source_id === 'string' ? row.payload.project_source_id : '';
+    if (projectSource && !sourceIdInBatch.has(projectSource)) {
+      const projectId = await liveIdByIdentityKeys(projectSourceIdentityKeys(kind, projectSource));
+      if (projectId && (await writeImportEdge(id, source, { type: 'ABOUT', src, dst: projectId }))) {
+        created++;
+      }
+    }
+    const blockers = Array.isArray(row.payload.blocked_by_source_ids)
+      ? row.payload.blocked_by_source_ids.filter((value): value is string => typeof value === 'string' && value !== '')
+      : [];
+    for (const blocker of blockers) {
+      if (sourceIdInBatch.has(blocker)) continue;
+      const blockerKey = taskSourceIdentityKey(kind, blocker);
+      const blockerId = blockerKey ? await liveIdByIdentityKeys([blockerKey]) : undefined;
+      if (blockerId && (await writeImportEdge(id, source, { type: 'DEPENDS_ON', src, dst: blockerId }))) {
+        created++;
+      }
     }
   }
   return created;
@@ -1310,6 +1707,12 @@ export async function commitImport(id: string): Promise<ImportCommitResult> {
           continue;
         }
 
+        if (draft.type === 'task') {
+          if (draft.props.status === undefined) draft.props.status = 'inbox';
+          const projectId = await resolveImportedProjectId(id, row, rows, batch.kind as ImportKind);
+          if (projectId) draft.props.project_id = projectId;
+        }
+
         // A stable external identity gives a stable document id, so re-importing
         // the same record converges rather than duplicating: createNode returns
         // the existing doc for a known id.
@@ -1413,7 +1816,7 @@ export async function commitImport(id: string): Promise<ImportCommitResult> {
     }
   }
 
-  const edgesCreated = await commitBundleEdges(id, rows, source, failedRowIds);
+  const edgesCreated = await commitBundleEdges(id, rows, source, failedRowIds, batch.kind as ImportKind);
   created += edgesCreated;
 
   // Mark rows committed (only the ones this pass acted on) + batch status.
