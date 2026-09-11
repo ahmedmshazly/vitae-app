@@ -1,0 +1,8 @@
+TYPE,CONTENT,DESCRIPTION,PRIORITY,INDENT,AUTHOR,RESPONSIBLE,DATE,DATE_LANG,TIMEZONE,DURATION,DURATION_UNIT,DEADLINE,DEADLINE_LANG
+task,Renew passport,Bring photos,1,1,Sam (1),,16 Apr 2026,en,UTC,30,minute,18 Apr 2026,en
+section,Travel,,,,,,,en,UTC,,,,
+task,Call the embassy,"Line one
+line two",2,2,,,15 Jan 2026 14:00,en,UTC,,,,
+note,A comment on the call,,,,,,,en,UTC,,,,
+task,Buy milk @errand,,4,1,,,every monday,en,UTC,,,,
+task,,no title,,,,,,,en,UTC,,,,

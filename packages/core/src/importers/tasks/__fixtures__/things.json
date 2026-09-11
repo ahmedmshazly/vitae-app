@@ -1,0 +1,55 @@
+[
+  {
+    "type": "project",
+    "attributes": {
+      "title": "Go Shopping",
+      "notes": "Saturday morning.",
+      "items": [
+        {
+          "type": "to-do",
+          "attributes": {
+            "title": "Bread"
+          }
+        },
+        {
+          "type": "heading",
+          "attributes": {
+            "title": "Fridge"
+          }
+        },
+        {
+          "type": "to-do",
+          "attributes": {
+            "title": "Milk",
+            "deadline": "2026-09-11",
+            "when": "today",
+            "tags": ["Errand"]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "type": "to-do",
+    "attributes": {
+      "title": "Submit report",
+      "deadline": "2026-02-01",
+      "list": "Work",
+      "completed": true,
+      "completion-date": "2026-01-20T10:00:00Z"
+    }
+  },
+  {
+    "type": "to-do",
+    "attributes": {
+      "title": "Someday idea",
+      "when": "someday"
+    }
+  },
+  {
+    "type": "to-do",
+    "attributes": {
+      "title": ""
+    }
+  }
+]

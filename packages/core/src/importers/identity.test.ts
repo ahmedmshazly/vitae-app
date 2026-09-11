@@ -1,12 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import { identityKey } from '../schema/envelope.js';
 import {
+  asanaTaskKey,
   bookmarkUrlKey,
   contactEmailKey,
   icsEventKey,
   githubRepoKey,
   identityKeyFor,
   linkedinProfileKey,
+  notionPageKey,
+  taskProjectKey,
+  tasksCsvTaskKey,
+  tasksJsonTaskKey,
+  thingsTaskKey,
+  ticktickTaskKey,
+  todoistTaskKey,
+  trelloCardKey,
   vcardUidKey,
 } from './identity.js';
 
@@ -140,5 +149,31 @@ describe('githubRepoKey', () => {
     expect(githubRepoKey('owner/name')).toBeNull();
     expect(githubRepoKey('')).toBeNull();
     expect(githubRepoKey(null)).toBeNull();
+  });
+});
+
+describe('task-file identity keys', () => {
+  it('uses the source-stated shapes the Import Hub kinds converge on', () => {
+    expect(todoistTaskKey('123')).toBe('todoist:task:123');
+    expect(thingsTaskKey('6d6b1e34-0e2e-4c2f-9f0a-1f7f0b1f2a3b')).toBe(
+      'things:task:6d6b1e34-0e2e-4c2f-9f0a-1f7f0b1f2a3b',
+    );
+    expect(ticktickTaskKey('t1')).toBe('ticktick:task:t1');
+    expect(trelloCardKey('card1')).toBe('trello:card:card1');
+    expect(asanaTaskKey('123')).toBe('asana:task:123');
+    expect(notionPageKey('page-1')).toBe('notion:page:page-1');
+    expect(tasksJsonTaskKey('i1')).toBe('tasks_json:task:i1');
+    expect(tasksCsvTaskKey('i1')).toBe('tasks_csv:task:i1');
+    expect(taskProjectKey('trello', 'board1')).toBe('project:trello:board1');
+  });
+
+  it('refuses a title, so two tasks that share a name cannot fork into one', () => {
+    expect(todoistTaskKey('Renew passport')).toBeNull();
+    expect(taskProjectKey('todoist', 'Go Shopping')).toBeNull();
+  });
+
+  it('emits keys the envelope accepts', () => {
+    expect(isStorable(asanaTaskKey('1201234567890')!)).toBe(true);
+    expect(isStorable(taskProjectKey('trello', 'board1')!)).toBe(true);
   });
 });

@@ -111,6 +111,15 @@ export const SOURCE_TYPES = [
   'import_bookmarks',
   'parse_resume',
   'import_aperture',
+  'import_todoist',
+  'import_things',
+  'import_ticktick',
+  'import_trello',
+  'import_asana',
+  'import_notion',
+  'import_tasks_json',
+  'import_tasks_csv',
+  'import_tasks_text',
   'system',
 ] as const;
 

@@ -1,0 +1,6 @@
+kind,source_id,parent_source_id,project_source_id,project_name,title,notes,type,importance,priority,due_at,status
+item,i1,,,Home,"Hello, world","line one
+line two",task,none,P1,2026-09-11T00:00:00.000Z,open
+project,p1,,,,Move house,Boxes,,,,,
+item,i2,i1,,Home,Pack kitchen,,,,,,
+item,,,,,,,

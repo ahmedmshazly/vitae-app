@@ -1,0 +1,47 @@
+{
+  "id": "board1",
+  "name": "Move house",
+  "lists": [
+    { "id": "list1", "name": "To do", "closed": false },
+    { "id": "list2", "name": "Done", "closed": false }
+  ],
+  "cards": [
+    {
+      "id": "card1",
+      "name": "Renew passport",
+      "desc": "Bring photos",
+      "idList": "list1",
+      "due": "2026-09-11T12:00:00.000Z",
+      "closed": false,
+      "dueComplete": false,
+      "idChecklists": ["cl1"]
+    },
+    {
+      "id": "card2",
+      "name": "",
+      "desc": "",
+      "idList": "list1",
+      "due": null,
+      "closed": false
+    },
+    {
+      "id": "card3",
+      "name": "Archived card",
+      "desc": "",
+      "idList": "list1",
+      "due": null,
+      "closed": true
+    }
+  ],
+  "checklists": [
+    {
+      "id": "cl1",
+      "idCard": "card1",
+      "name": "Docs",
+      "checkItems": [
+        { "id": "ci1", "name": "Photo", "state": "complete" },
+        { "id": "ci2", "name": "Form", "state": "incomplete" }
+      ]
+    }
+  ]
+}

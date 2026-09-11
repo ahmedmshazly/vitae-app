@@ -115,6 +115,61 @@ export function githubRepoKey(id: number | string | null | undefined): string | 
   return identityKeyFor('github', 'repo', value);
 }
 
+/** `todoist:task:<id>` when the file states a Todoist id. Never a line number. */
+export function todoistTaskKey(id: string | null | undefined): string | null {
+  return identityKeyFor('todoist', 'task', id);
+}
+
+/** `things:task:<uuid>` when Cultured Code states the to-do's id. */
+export function thingsTaskKey(id: string | null | undefined): string | null {
+  return identityKeyFor('things', 'task', id);
+}
+
+/** `ticktick:task:<id>` from the backup's `taskId` column. */
+export function ticktickTaskKey(id: string | null | undefined): string | null {
+  return identityKeyFor('ticktick', 'task', id);
+}
+
+/** `trello:card:<id>` for a card or checklist item the board JSON names. */
+export function trelloCardKey(id: string | null | undefined): string | null {
+  return identityKeyFor('trello', 'card', id);
+}
+
+/** `asana:task:<gid>` from the export's Task ID column. */
+export function asanaTaskKey(id: string | null | undefined): string | null {
+  return identityKeyFor('asana', 'task', id);
+}
+
+/** `notion:page:<id>` when the CSV states a page id. */
+export function notionPageKey(id: string | null | undefined): string | null {
+  return identityKeyFor('notion', 'page', id);
+}
+
+/**
+ * `tasks_json:task:<id>` for a `vitae.tasks` / `fourfold.transfer` item the
+ * document itself numbers. The importer kind is the system, so the same file
+ * re-imported as the same kind converges.
+ */
+export function tasksJsonTaskKey(id: string | null | undefined): string | null {
+  return identityKeyFor('tasks_json', 'task', id);
+}
+
+/** `tasks_csv:task:<id>` when a generic task CSV states a `source_id`. */
+export function tasksCsvTaskKey(id: string | null | undefined): string | null {
+  return identityKeyFor('tasks_csv', 'task', id);
+}
+
+/**
+ * `project:<system>:<id>` when the file states a project id. A project that
+ * is only a name gets no key: names are not identities.
+ */
+export function taskProjectKey(
+  system: string,
+  id: string | null | undefined,
+): string | null {
+  return identityKeyFor('project', system, id);
+}
+
 /**
  * Canonical form of a URL for keying: scheme and host lowercased by `URL`
  * itself, the fragment dropped (it addresses a place inside one page, not a

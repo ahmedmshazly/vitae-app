@@ -277,6 +277,8 @@ export const taskProps = z.object({
   waiting_patience_days: z.number().int().positive().optional(),
   recurrence: recurrenceSchema.optional(),
   energy: energySchema.optional(),
+  /** Workspace node id of the project this task belongs to, when known. */
+  project_id: z.string().min(1).optional(),
 });
 
 export const ideaProps = z.object({
