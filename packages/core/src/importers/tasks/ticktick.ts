@@ -50,7 +50,10 @@ export function parseTickTick(input: string, ctx: TaskImportContext): TaskImport
     const sourceId = cell(row.fields, 'taskId').trim();
     const parentId = cell(row.fields, 'parentId').trim();
     const kind = cell(row.fields, 'Kind').trim().toUpperCase();
-    if (kind === 'NOTE') skipped.push(skip('line', String(row.line), 'unsupported_type', 'NOTE'));
+    if (kind === 'NOTE') {
+      skipped.push(skip('line', String(row.line), 'unsupported_type', 'NOTE'));
+      continue;
+    }
 
     tasks.push(
       taskDraft({
@@ -105,7 +108,7 @@ function ticktickProps(
   if (start !== '') {
     const day = parseCivilDate(start, ctx);
     if (day === null) skipped.push(skip('line', at, 'unparseable_date', start));
-    else props.scheduled = day;
+    else props.target = day;
   }
 
   const repeat = cell(row, 'Repeat').trim();

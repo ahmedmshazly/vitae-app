@@ -144,7 +144,6 @@ function todoistProps(
     } else {
       const day = parseCivilDate(date, ctx);
       if (day === null) skipped.push(skip('line', at, 'unparseable_date', date));
-      else if (due === undefined) due = day;
       else target = day;
     }
   }

@@ -122,7 +122,7 @@ function asanaProps(
   if (start !== '') {
     const day = parseCivilDate(start, ctx);
     if (day === null) skipped.push(skip('line', at, 'unparseable_date', start));
-    else props.scheduled = day;
+    else props.target = day;
   }
   return props as StatedTaskProps;
 }

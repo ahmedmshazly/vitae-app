@@ -6,7 +6,7 @@
 import { thingsTaskKey } from '../identity.js';
 import { parseCivilDate, parseInstantIso } from './date.js';
 import { addNamedProject, taskDraft } from './drafts.js';
-import { appendNote, isUnsupportedStatus, parseVitaeStatus } from './fields.js';
+import { appendNote, isUnsupportedStatus } from './fields.js';
 import { skip } from './skip.js';
 import type {
   ProjectFileDraft,
@@ -185,7 +185,6 @@ function todoFields(
   const when = asString(attributes.when)?.trim();
   if (when === 'someday') {
     extraSkips.push(skip('source_id', at, 'unsupported_status', 'someday'));
-    if (props.status === undefined) props.status = parseVitaeStatus('open');
   } else if (when === 'evening') {
     const day = parseCivilDate('today', ctx);
     if (day !== null) props.target = day;

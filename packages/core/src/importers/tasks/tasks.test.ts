@@ -50,6 +50,8 @@ describe('parseTodoist', () => {
 
     const embassy = result.tasks[1]!;
     expect(embassy.parent_source_id).toBe(passport.source_id);
+    expect(embassy.props.due).toBeUndefined();
+    expect(embassy.props.target).toBe('2026-01-15');
     expect(embassy.notes_md).toContain('Line one\nline two');
     expect(embassy.notes_md).toContain('A comment on the call');
 
@@ -84,6 +86,8 @@ describe('parseThings', () => {
     expect(report?.project_name).toBe('Work');
     expect(result.skipped.some((row) => row.reason === 'heading')).toBe(true);
     expect(result.skipped.some((row) => row.reason === 'unsupported_status')).toBe(true);
+    const someday = result.tasks.find((task) => task.title === 'Someday idea');
+    expect(someday?.props.status).toBeUndefined();
   });
 
   it('names a SQLite export rather than guessing a schema', () => {
@@ -103,10 +107,27 @@ describe('parseTickTick', () => {
     expect(identityKey.safeParse(passport.identity_key).success).toBe(true);
     expect(passport.props.priority).toBe('p1');
     expect(passport.props.due).toBe('2026-09-11');
+    expect(passport.props.target).toBe('2026-09-01');
+    expect(passport.props.scheduled).toBeUndefined();
     expect(passport.props.recurrence?.rrule).toBe('FREQ=WEEKLY;BYDAY=MO');
     const child = result.tasks.find((task) => task.source_id === 't2');
     expect(child?.parent_source_id).toBe('t1');
     expect(child?.title).toBe('A task, with a comma');
+  });
+
+  it('skips a NOTE row instead of writing it as a task', () => {
+    const result = parseTickTick(
+      [
+        'Folder Name,List Name,Title,Kind,taskId',
+        'Home,Admin,A real task,TEXT,t1',
+        'Home,Admin,Shopping list,NOTE,n1',
+      ].join('\n'),
+      CTX,
+    );
+    expect(result.tasks.map((task) => task.title)).toEqual(['A real task']);
+    expect(result.skipped.some((row) => row.reason === 'unsupported_type' && row.token === 'NOTE')).toBe(
+      true,
+    );
   });
 });
 
@@ -138,6 +159,8 @@ describe('parseAsana', () => {
     const passport = result.tasks.find((task) => task.source_id === '123');
     expect(passport?.identity_key).toBe('asana:task:123');
     expect(passport?.props.due).toBe('2026-09-11');
+    expect(passport?.props.target).toBe('2026-09-01');
+    expect(passport?.props.scheduled).toBeUndefined();
     expect(result.skipped.some((row) => row.reason === 'assignee')).toBe(true);
     const kitchen = result.tasks.find((task) => task.source_id === '125');
     expect(kitchen?.parent_source_id).toBe('123');
