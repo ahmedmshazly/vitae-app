@@ -20,6 +20,7 @@
         "restore",
         "seed",
         "seed:demo",
+        "seed:productivity-perf",
         "start",
         "test",
         "tidy:import",
@@ -102,10 +103,10 @@
           "range": "^3.24.1"
         }
       ],
-      "source_files": 119,
-      "test_files": 69,
-      "source_lines": 27375,
-      "exports": 461,
+      "source_files": 123,
+      "test_files": 73,
+      "source_lines": 28587,
+      "exports": 471,
       "dependents": [],
       "imported_by": [],
       "unused_manifest_deps": [],
@@ -190,10 +191,10 @@
           "range": "^3.24.1"
         }
       ],
-      "source_files": 186,
-      "test_files": 177,
-      "source_lines": 49860,
-      "exports": 788,
+      "source_files": 203,
+      "test_files": 184,
+      "source_lines": 52724,
+      "exports": 868,
       "dependents": [],
       "imported_by": [],
       "unused_manifest_deps": [],
@@ -268,10 +269,10 @@
           "range": "^3.24.1"
         }
       ],
-      "source_files": 64,
-      "test_files": 58,
-      "source_lines": 11968,
-      "exports": 681,
+      "source_files": 86,
+      "test_files": 61,
+      "source_lines": 15250,
+      "exports": 888,
       "dependents": [
         "@vitae/api",
         "@vitae/web",
@@ -470,7 +471,7 @@
       "dev_depends_on": [],
       "external_dependencies": [],
       "source_files": 0,
-      "test_files": 61,
+      "test_files": 62,
       "source_lines": 0,
       "exports": 0,
       "dependents": [],
@@ -543,6 +544,12 @@
       ]
     },
     {
+      "file": "apps/api/src/scripts/seed-productivity-perf.ts",
+      "imports": [
+        "../env.js"
+      ]
+    },
+    {
       "file": "apps/api/src/scripts/seed.ts",
       "imports": [
         "../env.js"
@@ -564,6 +571,12 @@
       "file": "apps/web/src/features/map/AtlasCanvas.tsx",
       "imports": [
         "maplibre-gl/dist/maplibre-gl.css"
+      ]
+    },
+    {
+      "file": "apps/web/src/features/productivity/ProductivityStub.tsx",
+      "imports": [
+        "./productivity.css"
       ]
     },
     {
@@ -623,9 +636,9 @@
   ],
   "summary": {
     "packages": 8,
-    "source_files": 393,
-    "test_files": 379,
-    "source_lines": 94148,
+    "source_files": 436,
+    "test_files": 394,
+    "source_lines": 101506,
     "layers": 2,
     "cyclic": [],
     "workspace_typecheck": {

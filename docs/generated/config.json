@@ -26,7 +26,7 @@
       "example": {
         "value": "https://aperture.example.com",
         "commented": true,
-        "source": ".env.example:87"
+        "source": ".env.example:94"
       }
     },
     {
@@ -78,17 +78,17 @@
       "reads": [
         "scripts/ci-local.sh:101",
         "scripts/ci-local.sh:105",
-        "scripts/ci-local.sh:358",
-        "scripts/ci-local.sh:390",
-        "scripts/ci-local.sh:394",
-        "scripts/ci-local.sh:405",
-        "scripts/ci-local.sh:421",
-        "scripts/ci-local.sh:426",
-        "scripts/ci-local.sh:465",
-        "scripts/ci-local.sh:467",
-        "scripts/ci-local.sh:473",
-        "scripts/ci-local.sh:481",
-        "scripts/ci-local.sh:489"
+        "scripts/ci-local.sh:388",
+        "scripts/ci-local.sh:420",
+        "scripts/ci-local.sh:424",
+        "scripts/ci-local.sh:435",
+        "scripts/ci-local.sh:451",
+        "scripts/ci-local.sh:456",
+        "scripts/ci-local.sh:495",
+        "scripts/ci-local.sh:497",
+        "scripts/ci-local.sh:503",
+        "scripts/ci-local.sh:511",
+        "scripts/ci-local.sh:519"
       ],
       "read_by": [
         "deploy"
@@ -136,7 +136,7 @@
       "example": {
         "value": "true",
         "commented": false,
-        "source": ".env.example:75"
+        "source": ".env.example:82"
       }
     },
     {
@@ -174,7 +174,7 @@
       "example": {
         "value": "2026-07-16",
         "commented": true,
-        "source": ".env.example:142"
+        "source": ".env.example:149"
       }
     },
     {
@@ -267,7 +267,7 @@
       "example": {
         "value": "s3://vitae-backups/prod",
         "commented": true,
-        "source": ".env.example:141"
+        "source": ".env.example:148"
       }
     },
     {
@@ -299,7 +299,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:147"
+        "source": ".env.example:154"
       }
     },
     {
@@ -334,7 +334,7 @@
       "example": {
         "value": "change-me-to-a-shared-secret",
         "commented": false,
-        "source": ".env.example:127"
+        "source": ".env.example:134"
       }
     },
     {
@@ -390,7 +390,7 @@
       "example": {
         "value": "http://localhost:8787",
         "commented": false,
-        "source": ".env.example:122"
+        "source": ".env.example:129"
       }
     },
     {
@@ -442,7 +442,7 @@
       "example": {
         "value": "vitae",
         "commented": false,
-        "source": ".env.example:119"
+        "source": ".env.example:126"
       }
     },
     {
@@ -471,12 +471,12 @@
       "example": {
         "value": "cloudinary://your_key:your_secret@your_cloud",
         "commented": false,
-        "source": ".env.example:117"
+        "source": ".env.example:124"
       }
     },
     {
       "name": "CONFIRM",
-      "scope": "deploy",
+      "scope": "server",
       "declared_in": null,
       "validated": false,
       "type": "string",
@@ -488,22 +488,24 @@
       "section": "LaTeX build service (SRS §8.4)",
       "description": null,
       "requirements": [],
-      "source": "scripts/restore-from-s3.sh:22",
+      "source": "apps/api/src/scripts/productivity-restore-drill.ts:120",
       "reads": [
+        "apps/api/src/scripts/productivity-restore-drill.ts:120",
         "scripts/restore-from-s3.sh:101",
         "scripts/restore-from-s3.sh:22"
       ],
       "read_by": [
+        "api",
         "deploy"
       ],
-      "read_via": "shell",
+      "read_via": "process.env",
       "test_only": false,
       "surface": "deployment",
       "documented": true,
       "example": {
         "value": "YES",
         "commented": true,
-        "source": ".env.example:144"
+        "source": ".env.example:151"
       }
     },
     {
@@ -520,7 +522,7 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "apps/api/src/routes/v1/productivity.integration.test.ts:176",
+      "source": "apps/api/src/routes/v1/productivity.integration.test.ts:183",
       "reads": [],
       "read_by": [
         "api"
@@ -557,7 +559,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:96"
+        "source": ".env.example:103"
       }
     },
     {
@@ -603,16 +605,20 @@
       "description": "Postgres, the data plane (ADR 0005). The default points at the local compose service; production supplies the RDS endpoint and is refused at boot if it is still carrying this default (see assertSafeCombination).",
       "requirements": [],
       "source": "packages/config/src/env.ts:78",
-      "reads": [],
-      "read_by": [],
-      "read_via": "declaration-only",
+      "reads": [
+        "apps/api/src/scripts/productivity-restore-drill.ts:117"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
       "test_only": false,
       "surface": "deployment",
       "documented": true,
       "example": {
         "value": "postgresql://vitae:vitae@127.0.0.1:5433/vitae",
         "commented": false,
-        "source": ".env.example:92"
+        "source": ".env.example:99"
       }
     },
     {
@@ -645,7 +651,7 @@
       "example": {
         "value": "docs/.compiled",
         "commented": false,
-        "source": ".env.example:73"
+        "source": ".env.example:80"
       }
     },
     {
@@ -683,7 +689,7 @@
       "example": {
         "value": "1",
         "commented": true,
-        "source": ".env.example:143"
+        "source": ".env.example:150"
       }
     },
     {
@@ -814,7 +820,7 @@
       "example": {
         "value": "127.0.0.1:9099",
         "commented": false,
-        "source": ".env.example:104"
+        "source": ".env.example:111"
       }
     },
     {
@@ -843,7 +849,7 @@
       "example": {
         "value": "vitae-local",
         "commented": false,
-        "source": ".env.example:102"
+        "source": ".env.example:109"
       }
     },
     {
@@ -904,7 +910,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:134"
+        "source": ".env.example:141"
       }
     },
     {
@@ -1100,7 +1106,7 @@
       "example": {
         "value": "owner@example.com",
         "commented": false,
-        "source": ".env.example:60"
+        "source": ".env.example:67"
       }
     },
     {
@@ -1131,7 +1137,7 @@
       "example": {
         "value": "pdl_sdbx_apikey_your_server_secret",
         "commented": true,
-        "source": ".env.example:52"
+        "source": ".env.example:59"
       }
     },
     {
@@ -1162,7 +1168,7 @@
       "example": {
         "value": "sandbox",
         "commented": false,
-        "source": ".env.example:51"
+        "source": ".env.example:58"
       }
     },
     {
@@ -1194,7 +1200,7 @@
       "example": {
         "value": "pri_your_annual_price",
         "commented": true,
-        "source": ".env.example:55"
+        "source": ".env.example:62"
       }
     },
     {
@@ -1226,7 +1232,7 @@
       "example": {
         "value": "pri_your_monthly_price",
         "commented": true,
-        "source": ".env.example:54"
+        "source": ".env.example:61"
       }
     },
     {
@@ -1246,8 +1252,8 @@
       "source": "apps/api/src/cloud/config.ts:47",
       "reads": [
         "apps/api/src/cloud/config.ts:47",
-        "scripts/ci-local.sh:477",
-        "scripts/ci-local.sh:490"
+        "scripts/ci-local.sh:507",
+        "scripts/ci-local.sh:520"
       ],
       "read_by": [
         "api",
@@ -1260,7 +1266,7 @@
       "example": {
         "value": "pdl_ntfset_your_webhook_secret",
         "commented": true,
-        "source": ".env.example:53"
+        "source": ".env.example:60"
       }
     },
     {
@@ -1318,7 +1324,7 @@
       "example": {
         "value": "https://app.example.com",
         "commented": true,
-        "source": ".env.example:48"
+        "source": ".env.example:55"
       }
     },
     {
@@ -1347,7 +1353,7 @@
       "example": {
         "value": "change-me-to-a-long-random-string",
         "commented": false,
-        "source": ".env.example:77"
+        "source": ".env.example:84"
       }
     },
     {
@@ -1431,7 +1437,7 @@
       "example": {
         "value": "companion-production",
         "commented": true,
-        "source": ".env.example:85"
+        "source": ".env.example:92"
       }
     },
     {
@@ -1476,7 +1482,7 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "apps/api/src/routes/v1/productivity.integration.test.ts:107",
+      "source": "apps/api/src/routes/v1/productivity.integration.test.ts:114",
       "reads": [],
       "read_by": [
         "api"
@@ -1542,6 +1548,34 @@
       "example": null
     },
     {
+      "name": "VITAE_BUDGETS_PATH",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/check-productivity-budgets.mjs:20",
+      "reads": [
+        "scripts/check-productivity-budgets.mjs:20",
+        "scripts/check-productivity-budgets.mjs:21"
+      ],
+      "read_by": [
+        "scripts"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "tooling",
+      "documented": false,
+      "example": null
+    },
+    {
       "name": "VITAE_CI_DATABASE_URL",
       "scope": "deploy",
       "declared_in": null,
@@ -1555,9 +1589,9 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/ci-local.sh:304",
+      "source": "scripts/ci-local.sh:334",
       "reads": [
-        "scripts/ci-local.sh:304"
+        "scripts/ci-local.sh:334"
       ],
       "read_by": [
         "deploy"
@@ -1759,10 +1793,10 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/ci-local.sh:418",
+      "source": "scripts/ci-local.sh:448",
       "reads": [
-        "scripts/ci-local.sh:418",
-        "scripts/ci-local.sh:422"
+        "scripts/ci-local.sh:448",
+        "scripts/ci-local.sh:452"
       ],
       "read_by": [
         "deploy"
@@ -1935,6 +1969,118 @@
       "example": null
     },
     {
+      "name": "VITAE_PERF_ADMIN_URL",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/scripts/productivity-restore-drill.ts:22",
+      "reads": [
+        "apps/api/src/scripts/productivity-restore-drill.ts:22",
+        "apps/api/src/scripts/seed-productivity-perf.ts:46"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_PRODUCTIVITY_ENABLED",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Hosted Cloud control plane",
+      "description": "Fourfold productivity command API (`/api/v1/productivity`). Default off. Truthy values: true / 1 / yes. Unset or any other value is the kill switch (API 404). Do not set this true in committed examples, CI, or demo seed. Local enable procedure: docs/runbooks/productivity-flag.md (FR-PROD-001).",
+      "requirements": [],
+      "source": "apps/api/src/routes/v1/imports-tasks.integration.test.ts:173",
+      "reads": [],
+      "read_by": [
+        "api",
+        "e2e"
+      ],
+      "read_via": "process.env",
+      "test_only": true,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "false",
+        "commented": false,
+        "source": ".env.example:48"
+      }
+    },
+    {
+      "name": "VITAE_PRODUCTIVITY_PERF_CONFIRM",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/services/productivity/isolated-database.ts:41",
+      "reads": [
+        "apps/api/src/services/productivity/isolated-database.ts:41"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "computed",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_PRODUCTIVITY_PERF_COUNT",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/scripts/seed-productivity-perf.ts:26",
+      "reads": [
+        "apps/api/src/scripts/seed-productivity-perf.ts:26"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
       "name": "VITAE_REQUIRE_BUDGETS",
       "scope": "server",
       "declared_in": null,
@@ -1948,8 +2094,9 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/check-web-budgets.mjs:41",
+      "source": "scripts/check-productivity-budgets.mjs:23",
       "reads": [
+        "scripts/check-productivity-budgets.mjs:23",
         "scripts/check-web-budgets.mjs:41"
       ],
       "read_by": [
@@ -1989,6 +2136,60 @@
       "example": null
     },
     {
+      "name": "VITAE_RESTORE_DRILL_TARGET",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/scripts/productivity-restore-drill.ts:122",
+      "reads": [
+        "apps/api/src/scripts/productivity-restore-drill.ts:122"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "VITAE_RESTORE_DRILL_TARGET_URL",
+      "scope": "server",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "apps/api/src/scripts/productivity-restore-drill.ts:123",
+      "reads": [
+        "apps/api/src/scripts/productivity-restore-drill.ts:123"
+      ],
+      "read_by": [
+        "api"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
       "name": "VITAE_SECRETS_DIR",
       "scope": "server",
       "declared_in": "serverEnvSchema",
@@ -2016,7 +2217,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:136"
+        "source": ".env.example:143"
       }
     },
     {
@@ -2139,8 +2340,10 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/check-web-budgets.mjs:36",
+      "source": "scripts/check-productivity-budgets.mjs:17",
       "reads": [
+        "scripts/check-productivity-budgets.mjs:17",
+        "scripts/check-productivity-budgets.mjs:18",
         "scripts/check-web-budgets.mjs:36",
         "scripts/check-web-budgets.mjs:37"
       ],
@@ -2240,7 +2443,7 @@
       "example": {
         "value": "demo-api-key",
         "commented": false,
-        "source": ".env.example:106"
+        "source": ".env.example:113"
       }
     },
     {
@@ -2271,7 +2474,7 @@
       "example": {
         "value": "vitae-local.firebaseapp.com",
         "commented": false,
-        "source": ".env.example:107"
+        "source": ".env.example:114"
       }
     },
     {
@@ -2302,7 +2505,7 @@
       "example": {
         "value": "http://127.0.0.1:9099",
         "commented": false,
-        "source": ".env.example:113"
+        "source": ".env.example:120"
       }
     },
     {
@@ -2333,7 +2536,7 @@
       "example": {
         "value": "vitae-local",
         "commented": false,
-        "source": ".env.example:108"
+        "source": ".env.example:115"
       }
     },
     {
@@ -2364,7 +2567,7 @@
       "example": {
         "value": "true",
         "commented": false,
-        "source": ".env.example:109"
+        "source": ".env.example:116"
       }
     },
     {
@@ -2381,7 +2584,7 @@
       "section": "Public Cloud launch gate",
       "description": "Public Paddle client token, scoped to checkout only. Never use an API key here.",
       "requirements": [],
-      "source": "apps/web/src/vite-env.d.ts:16",
+      "source": "apps/web/src/vite-env.d.ts:17",
       "reads": [
         "apps/web/src/lib/paddle.ts:16"
       ],
@@ -2439,7 +2642,7 @@
       "section": "Public Cloud launch gate",
       "description": null,
       "requirements": [],
-      "source": "apps/web/src/vite-env.d.ts:13",
+      "source": "apps/web/src/vite-env.d.ts:14",
       "reads": [],
       "read_by": [],
       "read_via": "declaration-only",
@@ -2466,7 +2669,7 @@
       "section": "Public Cloud launch gate",
       "description": null,
       "requirements": [],
-      "source": "apps/web/src/vite-env.d.ts:14",
+      "source": "apps/web/src/vite-env.d.ts:15",
       "reads": [],
       "read_by": [],
       "read_via": "declaration-only",
@@ -2477,6 +2680,39 @@
         "value": "2026-08-23",
         "commented": true,
         "source": ".env.example:35"
+      }
+    },
+    {
+      "name": "VITE_PUBLIC_PRODUCTIVITY_ENABLED",
+      "scope": "web-build",
+      "declared_in": "ImportMetaEnv",
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": "Hosted Cloud control plane",
+      "description": "Fourfold productivity web surfaces (`/today/tasks` and siblings). Default off. Truthy values: true / 1 / yes. Unset or any other value keeps nav and commands hidden. Bookmarks still resolve behind AuthGate to a short \"not available\" page. Vite bakes this at build time; a kill switch requires a web rebuild.",
+      "requirements": [],
+      "source": "apps/web/src/vite-env.d.ts:11",
+      "reads": [
+        "apps/web/src/lib/productivity-flag.ts:14"
+      ],
+      "read_by": [
+        "api",
+        "e2e",
+        "web"
+      ],
+      "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "false",
+        "commented": false,
+        "source": ".env.example:53"
       }
     },
     {
@@ -2524,7 +2760,7 @@
       "section": "Public Cloud launch gate",
       "description": null,
       "requirements": [],
-      "source": "apps/web/src/vite-env.d.ts:11",
+      "source": "apps/web/src/vite-env.d.ts:12",
       "reads": [],
       "read_by": [],
       "read_via": "declaration-only",
@@ -2551,7 +2787,7 @@
       "section": "Public Cloud launch gate",
       "description": null,
       "requirements": [],
-      "source": "apps/web/src/vite-env.d.ts:12",
+      "source": "apps/web/src/vite-env.d.ts:13",
       "reads": [],
       "read_by": [],
       "read_via": "declaration-only",
@@ -2605,7 +2841,7 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "apps/api/src/routes/v1/productivity.integration.test.ts:254",
+      "source": "apps/api/src/routes/v1/productivity.integration.test.ts:261",
       "reads": [],
       "read_by": [
         "api"
@@ -2690,16 +2926,17 @@
     "Storage: Cloudinary (SRS T5; owner-provided)"
   ],
   "summary": {
-    "total": 92,
+    "total": 100,
     "by_scope": {
-      "server": 60,
-      "deploy": 19,
-      "web-build": 13
+      "server": 68,
+      "deploy": 18,
+      "web-build": 14
     },
-    "declared": 32,
+    "declared": 33,
     "validated": 20,
     "server_unvalidated": [
       "BUILDSVC_HOST",
+      "CONFIRM",
       "CONFLICT",
       "EXPORT_OUT",
       "GOOGLE_APPLICATION_CREDENTIALS",
@@ -2716,6 +2953,12 @@
       "TZ",
       "VALIDATION",
       "VITAE_CLOUD_ENABLED",
+      "VITAE_PERF_ADMIN_URL",
+      "VITAE_PRODUCTIVITY_ENABLED",
+      "VITAE_PRODUCTIVITY_PERF_CONFIRM",
+      "VITAE_PRODUCTIVITY_PERF_COUNT",
+      "VITAE_RESTORE_DRILL_TARGET",
+      "VITAE_RESTORE_DRILL_TARGET_URL",
       "VITAE_SPACE",
       "VITAE_TEST_ADMIN_URL",
       "VITAE_TEST_STORAGE_DIR",
@@ -2749,6 +2992,11 @@
       "VITAE_HOST",
       "VITAE_HOST_KEY_NAME",
       "VITAE_KNOWN_HOSTS",
+      "VITAE_PERF_ADMIN_URL",
+      "VITAE_PRODUCTIVITY_PERF_CONFIRM",
+      "VITAE_PRODUCTIVITY_PERF_COUNT",
+      "VITAE_RESTORE_DRILL_TARGET",
+      "VITAE_RESTORE_DRILL_TARGET_URL",
       "VITAE_SPACE",
       "VITAE_SSH_KEY",
       "VITAE_TEST_ADMIN_URL",
@@ -2759,7 +3007,6 @@
     ],
     "example_only": [
       "GCLOUD_PROJECT",
-      "VITAE_PRODUCTIVITY_ENABLED",
       "WEB_PORT"
     ],
     "tooling_only": [
@@ -2769,6 +3016,7 @@
       "E2E_PADDLE_WEBHOOK_SECRET",
       "OUT_DIR",
       "SHOT_DIR",
+      "VITAE_BUDGETS_PATH",
       "VITAE_CI_MIRROR_ROOT",
       "VITAE_DOCS_ROOT",
       "VITAE_E2E_BROWSERS",

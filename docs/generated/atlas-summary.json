@@ -1,16 +1,16 @@
 {
   "by_package": {
     "@vitae/api": {
-      "files": 119,
-      "lines": 27375,
-      "exports": 461,
-      "undocumented": 346
+      "files": 123,
+      "lines": 28587,
+      "exports": 471,
+      "undocumented": 355
     },
     "@vitae/web": {
-      "files": 186,
-      "lines": 49860,
-      "exports": 788,
-      "undocumented": 526
+      "files": 203,
+      "lines": 52724,
+      "exports": 868,
+      "undocumented": 599
     },
     "@vitae/config": {
       "files": 1,
@@ -19,10 +19,10 @@
       "undocumented": 1
     },
     "@vitae/core": {
-      "files": 64,
-      "lines": 11968,
-      "exports": 681,
-      "undocumented": 491
+      "files": 86,
+      "lines": 15250,
+      "exports": 888,
+      "undocumented": 680
     },
     "@vitae/testkit": {
       "files": 5,
@@ -45,10 +45,10 @@
   },
   "by_kind": {
     "module": {
-      "files": 77,
-      "lines": 11911,
-      "exports": 450,
-      "undocumented": 262
+      "files": 104,
+      "lines": 16311,
+      "exports": 642,
+      "undocumented": 428
     },
     "migration": {
       "files": 12,
@@ -58,15 +58,15 @@
     },
     "database": {
       "files": 9,
-      "lines": 2422,
+      "lines": 2459,
       "exports": 83,
       "undocumented": 63
     },
     "entry": {
-      "files": 10,
-      "lines": 583,
-      "exports": 70,
-      "undocumented": 62
+      "files": 11,
+      "lines": 569,
+      "exports": 147,
+      "undocumented": 141
     },
     "middleware": {
       "files": 6,
@@ -76,49 +76,49 @@
     },
     "contract": {
       "files": 3,
-      "lines": 1259,
+      "lines": 1302,
       "exports": 3,
       "undocumented": 2
     },
     "route": {
       "files": 49,
-      "lines": 9008,
+      "lines": 9064,
       "exports": 229,
       "undocumented": 180
     },
     "script": {
-      "files": 12,
-      "lines": 5931,
+      "files": 14,
+      "lines": 6289,
       "exports": 0,
       "undocumented": 0
     },
     "service": {
-      "files": 29,
-      "lines": 9728,
-      "exports": 256,
-      "undocumented": 180
+      "files": 31,
+      "lines": 10446,
+      "exports": 266,
+      "undocumented": 189
     },
     "component": {
-      "files": 72,
-      "lines": 18177,
-      "exports": 318,
-      "undocumented": 242
+      "files": 83,
+      "lines": 19833,
+      "exports": 335,
+      "undocumented": 258
     },
     "screen": {
       "files": 72,
-      "lines": 26898,
-      "exports": 180,
-      "undocumented": 112
+      "lines": 26999,
+      "exports": 181,
+      "undocumented": 113
     },
     "test-support": {
       "files": 7,
-      "lines": 292,
+      "lines": 293,
       "exports": 8,
       "undocumented": 8
     },
     "schema": {
       "files": 14,
-      "lines": 2887,
+      "lines": 2889,
       "exports": 313,
       "undocumented": 248
     },
@@ -140,19 +140,28 @@
       "APPLICATION_STATUSES",
       "APPLICATION_STATUS_FLOW",
       "AhoCorasick",
+      "AnalyticsApplication",
       "AnalyticsCase",
+      "AnalyticsEdge",
       "AnalyticsFigure",
+      "AnalyticsHabitCheck",
       "AnalyticsItemSnapshot",
+      "AnalyticsNamed",
       "AnalyticsProjectionInput",
+      "AnalyticsTask",
+      "AnalyticsTimeEntry",
+      "AnalyticsWindowDays",
       "ApplicationAttention",
       "ApplicationDetailResponse",
       "ApplicationDossier",
       "ApplicationEntityRef",
+      "ApplicationFunnelFigure",
       "ApplicationInterviewSummary",
       "ApplicationListResponse",
       "ApplicationPostingSummary",
       "ApplicationResumeSummary",
       "ApplicationStageCounts",
+      "ApplicationStageRow",
       "ApplicationStatus",
       "ApplicationSummary",
       "ApplicationTargetSummary",
@@ -174,6 +183,8 @@
       "BrokerTally",
       "BundleEdge",
       "BundleNode",
+      "ByEntityFigure",
+      "ByEntityRow",
       "CADENCE_BY_CLOSENESS",
       "CAREER_NODE_TYPES",
       "CLOUD_INDIVIDUAL_BILLING_PERIODS",
@@ -202,9 +213,11 @@
       "Constants",
       "CorrespondenceProfile",
       "CreateTaskCommand",
+      "CsvColumnMap",
       "DATE_ONLY",
       "DEDUP",
       "DEFAULT_JD_CORPUS",
+      "DEFAULT_TASK_IMPORT_CONTEXT",
       "DEFAULT_URGENCY_WINDOW_DAYS",
       "DEFAULT_WAITING_PATIENCE_DAYS",
       "DOSSIER_AUDIENCES",
@@ -238,7 +251,10 @@
       "EntityMatchInput",
       "EntityMatchResult",
       "EntryGroup",
+      "EstimateRow",
+      "EstimatesFigure",
       "EvidenceItem",
+      "FATAL_TASK_IMPORT_REASONS",
       "FILTER_FIELDS",
       "FOURFOLD_PRIORITIES",
       "FactorChip",
@@ -262,9 +278,13 @@
       "Frequency",
       "FuzzyPlaceHit",
       "GEO",
+      "GoalRow",
+      "GoalsFigure",
       "GraphBundle",
       "GraphEdge",
       "HISTORY_COMPLETENESS",
+      "HabitRow",
+      "HabitsFigure",
       "HistoryCompleteness",
       "IMPORTANCE",
       "INTERACTION_KINDS",
@@ -346,15 +366,20 @@
       "PlacementWaitingOn",
       "PredicateOperator",
       "PrimaryKind",
+      "ProductivityAnalyticsResponse",
       "ProductivityCommand",
+      "ProductivityFigures",
       "ProductivityFilterAst",
       "ProductivityFilterClause",
       "ProductivityFilterField",
       "ProductivityFilterInvalidReason",
+      "ProductivityReview",
       "ProductivityRoute",
       "ProfileEvent",
+      "ProjectFileDraft",
       "QUADRANTS",
       "Quadrant",
+      "QuadrantBalanceFigure",
       "QuadrantOverride",
       "QuadrantOverrideToken",
       "REASON_KEYS",
@@ -379,6 +404,7 @@
       "ResolvedCitation",
       "Resume",
       "ResumeConfig",
+      "ReviewPeriod",
       "RevisionOp",
       "RuleAction",
       "RuleActionValue",
@@ -404,24 +430,35 @@
       "Sensitivity",
       "SkillAlias",
       "SourceType",
+      "StatedTaskProps",
+      "StoredRevisionLike",
       "StoredRule",
       "StreakResult",
       "SubjectDescriptor",
       "SuggestKind",
       "SuggestSource",
+      "TASK_IMPORT_SKIP_REASONS",
       "TIE_STRENGTH",
       "Target",
       "TargetCreateInput",
+      "TaskFileDraft",
+      "TaskImportContext",
+      "TaskImportResult",
+      "TaskImportSkip",
+      "TaskImportSkipReason",
       "TaskReadModel",
       "Template",
       "ThroughputRow",
       "TieInput",
       "TieStatus",
       "TieStrength",
+      "TimeSpentFigure",
+      "TimeSpentRow",
       "TypeFormDescriptor",
       "UNCHANGED_TODAY_ROUTES",
       "UnresolvedRef",
       "UpdateTaskCommand",
+      "UrgencyCreepFigure",
       "VCardContact",
       "VITAE_PRIORITIES",
       "VITAE_TASK_STATUSES",
@@ -430,6 +467,10 @@
       "VitaePriority",
       "VitaeTaskStatus",
       "WHO_TO_CALL_WEIGHTS",
+      "WaitingFigure",
+      "WorkspaceAnalyticsInput",
+      "WorkspaceRevision",
+      "WorkspaceThroughputFigure",
       "aboutProps",
       "accountProps",
       "addCalendarDays",
@@ -455,6 +496,7 @@
       "applicationTargetSummarySchema",
       "applyActions",
       "applyFitStep",
+      "asanaTaskKey",
       "assertDateOnly",
       "assertNoUnresolvedTokens",
       "assetProps",
@@ -485,6 +527,7 @@
       "captureCasesSchema",
       "certificationProps",
       "changedFields",
+      "civilDayInZone",
       "cloudIndividualAnnualSavingsMinorUnits",
       "commandEnvelopeSchema",
       "compareDateOnly",
@@ -532,6 +575,7 @@
       "edgeUpdateEnvelope",
       "educationProps",
       "emphasisSchema",
+      "emptyTaskImport",
       "energySchema",
       "entityTypeForProp",
       "escapeInline",
@@ -544,9 +588,11 @@
       "evaluateRule",
       "eventProps",
       "externalNodeId",
+      "fatalTaskImportReason",
       "fieldTakesSuggestions",
       "filterTasks",
       "findIntroPaths",
+      "flattenAnalyticsDiff",
       "followUpTaskCommandSchema",
       "followsProps",
       "foundedProps",
@@ -559,6 +605,7 @@
       "hasFuture",
       "healthLogProps",
       "highlightProps",
+      "historyCompletenessOf",
       "historyCompletenessSchema",
       "icsEventKey",
       "ideaProps",
@@ -571,9 +618,11 @@
       "interviewProps",
       "introducedProps",
       "introductionTally",
+      "isAnalyticsWindowDays",
       "isApplicationStatus",
       "isCloudIndividualBillingPeriod",
       "isEdgeType",
+      "isFatalTaskImport",
       "isNodeType",
       "isOpenStatus",
       "isOrgRelationKind",
@@ -615,10 +664,15 @@
       "normalizeForMatch",
       "normalizeHeader",
       "normalizePlaceKey",
+      "notionPageKey",
       "orgRelatedProps",
       "orgRelationKindLabel",
       "organizationProps",
+      "overallCompleteness",
+      "parseAnalyticsWindowDays",
+      "parseAsana",
       "parseCapture",
+      "parseCivilDate",
       "parseCsv",
       "parseCsvRecords",
       "parseDateToken",
@@ -633,9 +687,18 @@
       "parseLinkedInPositions",
       "parseLinkedInSkills",
       "parseNetscapeBookmarks",
+      "parseNotion",
       "parseProductivityFilter",
       "parseRRule",
+      "parseReviewPeriod",
       "parseTaskCapture",
+      "parseTasksCsv",
+      "parseTasksJson",
+      "parseTasksText",
+      "parseThings",
+      "parseTickTick",
+      "parseTodoist",
+      "parseTrello",
       "parseVcards",
       "parsedJdSchema",
       "parsedKeywordSchema",
@@ -654,9 +717,20 @@
       "predicateOperatorSchema",
       "productivityCommandSchema",
       "project",
+      "projectApplicationFunnel",
+      "projectByEntity",
       "projectCompletions",
+      "projectEstimatesVsActuals",
+      "projectGoals",
+      "projectHabits",
+      "projectProductivityFigures",
       "projectProps",
+      "projectQuadrantBalance",
       "projectThroughput",
+      "projectTimeSpent",
+      "projectUrgencyCreep",
+      "projectWaiting",
+      "projectWorkspaceThroughput",
       "propsSchemaFor",
       "publicationProps",
       "quadrantOverrideSchema",
@@ -689,6 +763,8 @@
       "restoreTaskCommandSchema",
       "resumeConfigSchema",
       "resumeSchema",
+      "reviewBullets",
+      "reviewWindowDays",
       "revisionHasFieldDiff",
       "roleProps",
       "ruleActionSchema",
@@ -720,12 +796,20 @@
       "talkProps",
       "targetCreateSchema",
       "targetSchema",
+      "taskProjectKey",
       "taskProps",
       "taskReadModelSchema",
+      "tasksCsvTaskKey",
+      "tasksJsonTaskKey",
       "templateSchema",
+      "thingsTaskKey",
+      "ticktickTaskKey",
+      "toWorkspaceRevision",
+      "todoistTaskKey",
       "tokenize",
       "tokenizeQuery",
       "transliterateArabic",
+      "trelloCardKey",
       "trigramSimilarity",
       "trigrams",
       "tripProps",
@@ -743,6 +827,7 @@
       "vitaeTaskStatusSchema",
       "waitOnTaskCommandSchema",
       "whoToCall",
+      "windowBounds",
       "workedOnProps"
     ],
     "@vitae/testkit": [
@@ -905,13 +990,13 @@
     ]
   },
   "summary": {
-    "files": 393,
-    "test_files": 379,
-    "lines": 94148,
-    "exports": 2109,
-    "undocumented_exports": 1497,
-    "edges": 1787,
-    "untested": 141,
+    "files": 436,
+    "test_files": 394,
+    "lines": 101506,
+    "exports": 2406,
+    "undocumented_exports": 1768,
+    "edges": 2052,
+    "untested": 155,
     "no_consumer": [],
     "consumed_only_by_tests": [
       "apps/web/src/components/ListToolbar.tsx",
@@ -923,51 +1008,51 @@
     "most_depended_on": [
       {
         "file": "packages/ui/src/index.ts",
-        "dependents": 119
+        "dependents": 130
       },
       {
         "file": "packages/core/src/index.ts",
-        "dependents": 92
+        "dependents": 106
       },
       {
         "file": "packages/ui/src/components.tsx",
-        "dependents": 91
+        "dependents": 99
       },
       {
         "file": "packages/ui/src/feedback.tsx",
-        "dependents": 76
+        "dependents": 78
       },
       {
         "file": "apps/web/src/lib/api.ts",
-        "dependents": 63
+        "dependents": 67
       },
       {
         "file": "packages/ui/src/overlay.tsx",
-        "dependents": 58
+        "dependents": 67
       },
       {
         "file": "apps/api/src/db/repository.ts",
-        "dependents": 47
+        "dependents": 49
+      },
+      {
+        "file": "packages/ui/src/layout.tsx",
+        "dependents": 48
       },
       {
         "file": "packages/core/src/types.ts",
-        "dependents": 45
+        "dependents": 47
+      },
+      {
+        "file": "packages/ui/src/forms.tsx",
+        "dependents": 44
       },
       {
         "file": "apps/api/src/middleware/error.ts",
         "dependents": 43
       },
       {
-        "file": "packages/ui/src/layout.tsx",
-        "dependents": 40
-      },
-      {
-        "file": "packages/ui/src/forms.tsx",
-        "dependents": 39
-      },
-      {
         "file": "packages/ui/src/glyphs.tsx",
-        "dependents": 38
+        "dependents": 40
       },
       {
         "file": "apps/web/src/features/Toast.tsx",
@@ -975,7 +1060,7 @@
       },
       {
         "file": "packages/core/src/schema/envelope.ts",
-        "dependents": 31
+        "dependents": 33
       },
       {
         "file": "apps/web/src/lib/entity-href.ts",
@@ -989,6 +1074,6 @@
       "@vitae/web → @vitae/core",
       "@vitae/web → @vitae/ui"
     ],
-    "dynamic_edges": 63
+    "dynamic_edges": 72
   }
 }

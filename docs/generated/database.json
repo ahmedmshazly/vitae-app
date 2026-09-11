@@ -282,7 +282,7 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1286,
+          "line": 1746,
           "test": false
         },
         {
@@ -463,21 +463,21 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 1516,
+          "line": 1982,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1520,
+          "line": 1986,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 1513,
+          "line": 1979,
           "test": false
         },
         {
@@ -1963,10 +1963,17 @@
           "access": "declared",
           "line": 77,
           "test": false
+        },
+        {
+          "file": "apps/api/src/services/productivity/analytics.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 117,
+          "test": false
         }
       ],
       "source": "apps/api/src/db/schema.ts:258",
-      "reads": 4,
+      "reads": 5,
       "writes": 5
     },
     {
@@ -2052,21 +2059,21 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docBulkPut",
           "access": "repository",
-          "line": 930,
+          "line": 1189,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docDeleteMany",
           "access": "repository",
-          "line": 835,
+          "line": 1089,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docIdsWhereIn",
           "access": "repository",
-          "line": 834,
+          "line": 1088,
           "test": false
         }
       ],
@@ -2178,28 +2185,28 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docBulkPut",
           "access": "repository",
-          "line": 938,
+          "line": 1197,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 1002,
+          "line": 1261,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docMerge",
           "access": "repository",
-          "line": 1424,
+          "line": 1890,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 964,
+          "line": 1223,
           "test": false
         }
       ],
@@ -2325,6 +2332,20 @@
           "test": true
         },
         {
+          "file": "apps/api/src/routes/v1/imports-tasks.integration.test.ts",
+          "method": "docDeleteMany",
+          "access": "repository",
+          "line": 150,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/routes/v1/imports-tasks.integration.test.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 149,
+          "test": true
+        },
+        {
           "file": "apps/api/src/routes/v1/imports.integration.test.ts",
           "method": "docDeleteMany",
           "access": "repository",
@@ -2356,28 +2377,28 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 975,
+          "line": 1234,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docList",
           "access": "repository",
-          "line": 980,
+          "line": 1239,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docMerge",
           "access": "repository",
-          "line": 1555,
+          "line": 2021,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 922,
+          "line": 1181,
           "test": false
         },
         {
@@ -2759,7 +2780,7 @@
           "file": "apps/api/src/db/repository.ts",
           "method": "insertInto",
           "access": "query-builder",
-          "line": 1131,
+          "line": 1168,
           "test": false
         },
         {
@@ -3457,7 +3478,7 @@
           "file": "apps/api/src/routes/v1/productivity.integration.test.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 195,
+          "line": 202,
           "test": true
         },
         {
@@ -3968,7 +3989,7 @@
           "file": "apps/api/src/db/repository.ts",
           "method": "selectFrom",
           "access": "query-builder",
-          "line": 1097,
+          "line": 1139,
           "test": false
         },
         {
@@ -4234,7 +4255,7 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1399,
+          "line": 1865,
           "test": false
         }
       ],
@@ -4339,14 +4360,14 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1799,
+          "line": 2265,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 1796,
+          "line": 2262,
           "test": false
         }
       ],
@@ -5088,7 +5109,7 @@
           "file": "apps/api/src/routes/v1/productivity.integration.test.ts",
           "method": "updateTable",
           "access": "query-builder",
-          "line": 381,
+          "line": 388,
           "test": true
         },
         {

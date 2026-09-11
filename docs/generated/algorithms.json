@@ -231,10 +231,20 @@
           "file": "packages/core/src/algorithms/capture-grammar.test.ts",
           "symbol": "parseDateToken",
           "test": true
+        },
+        {
+          "file": "packages/core/src/importers/tasks/date.ts",
+          "symbol": "parseDateToken",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/importers/tasks/text.ts",
+          "symbol": "parseDateToken",
+          "test": false
         }
       ],
       "consumer_count": {
-        "product": 4,
+        "product": 6,
         "test": 4
       }
     },
@@ -1919,10 +1929,15 @@
           "file": "packages/core/src/algorithms/streaks.test.ts",
           "symbol": "computeStreak",
           "test": true
+        },
+        {
+          "file": "packages/core/src/productivity/analytics/workspace.ts",
+          "symbol": "computeStreak",
+          "test": false
         }
       ],
       "consumer_count": {
-        "product": 2,
+        "product": 3,
         "test": 1
       }
     },

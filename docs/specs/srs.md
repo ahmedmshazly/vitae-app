@@ -556,6 +556,52 @@ Status: implemented · Evidence: cited by source and by tests · Provenance: rec
 
 > Authored 2026-08-26 as a product decision under ADR 0007 and shipped the same day: the record screen's history rows disclose the stored field diff: a row with changes unfolds, a row without stays a row. The diffs were in the revision rows all along.
 
+### Fourfold productivity
+
+`CAP-PRODUCTIVITY` · A default-off task matrix, waiting list, review, private analytics, automation rules, and task templates, gated by VITAE_PRODUCTIVITY_ENABLED and VITE_PUBLIC_PRODUCTIVITY_ENABLED.
+
+**Status: gated.** Shipped in the repository and covered by tests, but withheld from every default install. The kill switch is unset or any non-truthy value on both flags: the API mount answers 404 and the web hides nav and commands. /today, /today/planner, and /today/ledger stay unchanged. Seed-demo may write productivity records; they stay inert until the flags are on.
+
+#### FR-PROD-001: Off-by-default dual flag and kill switch
+
+The productivity command API and web surfaces stay off unless both VITAE_PRODUCTIVITY_ENABLED and VITE_PUBLIC_PRODUCTIVITY_ENABLED are the tokens true, 1, or yes. Unset or any other value on either flag is the kill switch: the API answers the same 404 as a missing route, and the web hides nav and commands. Committed environment examples remain false.
+
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
+
+> Authored 2026-09-11 from ADR 0013 and the Task 10 hardening plan. Enforced by apps/api/src/services/productivity/flag.ts and apps/web/src/lib/productivity-flag.ts.
+
+#### FR-PROD-002: Workspace-safe route, read, and write gating
+
+When the flags are on, productivity reads and writes stay inside the active workspace and inherit the existing auth, space, and entitlement gates. /today, /today/planner, and /today/ledger do not move. Bookmarks to the gated routes still resolve behind AuthGate to a short not-available page rather than a distinct disabled code.
+
+Status: implemented · Evidence: cited by source · Provenance: reconstructed, confirmed
+
+> Authored 2026-09-11 from ADR 0013. Enforced by apps/api/src/routes/v1/productivity.ts and the web shell nav in apps/web/src/app/Shell.tsx.
+
+#### FR-PROD-003: Backup and restore include productivity collections
+
+A full backup with includeSensitive true must carry time_entries, automation_rules, productivity_receipts, task props, and the DEPENDS_ON, SERVES_GOAL, WAITING_ON, and FOR edges. Share-safe export continues to drop receipts and anything tied to sensitive records. Restore must round-trip those collections on an isolated database.
+
+Status: implemented · Evidence: cited by source · Provenance: reconstructed, confirmed
+
+> Authored 2026-09-11 from the Task 10 plan. Enforced by apps/api/src/services/export.ts and documented in docs/runbooks/restore-drill.md.
+
+#### FR-PROD-004: Private compute-on-read analytics
+
+Productivity analytics are computed on read from records plus revisions, declare history completeness, exclude sensitive records by default, and send no telemetry. Silence is not a zero.
+
+Status: implemented · Evidence: cited by source · Provenance: reconstructed, confirmed
+
+> Authored 2026-09-11 from ADR 0012. Enforced by apps/api/src/services/productivity/analytics.ts and asserted by docs/PRIVACY.md.
+
+#### NFR-PROD-001: Productivity performance budgets fail closed
+
+A 10,000-task performance workspace must stay inside documented budgets for matrix interaction, analytics latency, route chunks, memory, and API query counts on GET /tasks and GET /analytics?window=30. A check that cannot measure a budget must fail rather than only log, unless the environment blocker is recorded and the gate is not claimed passed.
+
+Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
+
+> Authored 2026-09-11 from the Task 10 plan. Enforced by scripts/check-productivity-budgets.mjs against docs/testing/productivity-budgets.json.
+
 ### Resume evidence and tailoring
 
 `CAP-RESUME` · Atoms and variants scored against a parsed job description, selected to a one-page budget, escaped, rendered to LaTeX, compiled, and checked for coverage.

@@ -33,6 +33,12 @@
         "apps/web/src/features/LetterCompilePanel.tsx",
         "apps/web/src/features/LogIntroduction.tsx",
         "apps/web/src/features/map/PlaceResolvePanel.tsx",
+        "apps/web/src/features/productivity/AnalyticsScreen.tsx",
+        "apps/web/src/features/productivity/AutomationScreen.tsx",
+        "apps/web/src/features/productivity/ReviewScreen.tsx",
+        "apps/web/src/features/productivity/TasksScreen.tsx",
+        "apps/web/src/features/productivity/TemplatesScreen.tsx",
+        "apps/web/src/features/productivity/WaitingScreen.tsx",
         "apps/web/src/routes/Ask.tsx",
         "apps/web/src/routes/Atoms.tsx",
         "apps/web/src/routes/Collections.tsx",
@@ -50,7 +56,7 @@
         "apps/web/src/routes/reference/EntityCatalog.tsx",
         "apps/web/src/routes/tailor/PreviewPane.tsx"
       ],
-      "uses": 23,
+      "uses": 29,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/layout.css"
@@ -102,6 +108,12 @@
         "apps/web/src/features/map/AtlasCorridorDock.tsx",
         "apps/web/src/features/map/AtlasDossier.tsx",
         "apps/web/src/features/map/PlaceResolvePanel.tsx",
+        "apps/web/src/features/productivity/AutomationScreen.tsx",
+        "apps/web/src/features/productivity/TaskCard.tsx",
+        "apps/web/src/features/productivity/TaskDetail.tsx",
+        "apps/web/src/features/productivity/TasksScreen.tsx",
+        "apps/web/src/features/productivity/TemplatesScreen.tsx",
+        "apps/web/src/features/productivity/WaitingScreen.tsx",
         "apps/web/src/features/timeline/TimelineReview.tsx",
         "apps/web/src/lib/unsaved-changes.tsx",
         "apps/web/src/routes/Ask.tsx",
@@ -142,7 +154,7 @@
         "apps/web/src/routes/tailor/TargetRail.tsx",
         "packages/ui/src/overlay.tsx"
       ],
-      "uses": 68,
+      "uses": 74,
       "tested": true,
       "styled_in": [],
       "unstyled_classes": []
@@ -165,8 +177,10 @@
       "wraps_radix": [],
       "aria": [],
       "renders_jsx": true,
-      "used_by": [],
-      "uses": 0,
+      "used_by": [
+        "apps/web/src/features/productivity/TaskCard.tsx"
+      ],
+      "uses": 1,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/layout.css"
@@ -382,6 +396,7 @@
         "apps/web/src/features/forms/ConnectionRow.tsx",
         "apps/web/src/features/graph/GraphPeek.tsx",
         "apps/web/src/features/map/AtlasDossier.tsx",
+        "apps/web/src/features/productivity/TaskCard.tsx",
         "apps/web/src/features/timeline/TimelineReview.tsx",
         "apps/web/src/routes/Ask.tsx",
         "apps/web/src/routes/Atoms.tsx",
@@ -415,7 +430,7 @@
         "apps/web/src/routes/tailor/SelectionPane.tsx",
         "apps/web/src/routes/tailor/TargetRail.tsx"
       ],
-      "uses": 45,
+      "uses": 46,
       "tested": false,
       "styled_in": [
         "apps/web/src/styles/resume-paper.css",
@@ -440,9 +455,10 @@
       "aria": [],
       "renders_jsx": true,
       "used_by": [
-        "apps/web/src/features/Composer.tsx"
+        "apps/web/src/features/Composer.tsx",
+        "apps/web/src/features/productivity/TaskCard.tsx"
       ],
-      "uses": 1,
+      "uses": 2,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/layout.css"
@@ -1034,6 +1050,8 @@
         "apps/web/src/features/graph/GraphView.tsx",
         "apps/web/src/features/map/AtlasList.tsx",
         "apps/web/src/features/map/AtlasView.tsx",
+        "apps/web/src/features/productivity/ProductivityStub.tsx",
+        "apps/web/src/features/productivity/QueryPanel.tsx",
         "apps/web/src/features/timeline/TimelineList.tsx",
         "apps/web/src/features/timeline/TimelineReview.tsx",
         "apps/web/src/features/timeline/TimelineView.tsx",
@@ -1074,7 +1092,7 @@
         "apps/web/src/routes/tailor/TargetRail.tsx",
         "apps/web/src/routes/workspaces/Planner.tsx"
       ],
-      "uses": 45,
+      "uses": 47,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/components.css"
@@ -1239,6 +1257,7 @@
         "apps/web/src/features/map/AtlasCanvas.tsx",
         "apps/web/src/features/map/AtlasView.tsx",
         "apps/web/src/features/map/PlaceResolvePanel.tsx",
+        "apps/web/src/features/productivity/QueryPanel.tsx",
         "apps/web/src/features/timeline/TimelineReview.tsx",
         "apps/web/src/features/timeline/TimelineView.tsx",
         "apps/web/src/routes/Ask.tsx",
@@ -1272,7 +1291,7 @@
         "apps/web/src/routes/tailor/TargetRail.tsx",
         "apps/web/src/routes/workspaces/Planner.tsx"
       ],
-      "uses": 43,
+      "uses": 44,
       "tested": true,
       "styled_in": [
         "apps/web/src/styles/explore-workspace.css",
@@ -1443,6 +1462,11 @@
         "apps/web/src/features/forms/EntityForm.tsx",
         "apps/web/src/features/forms/FieldRenderer.tsx",
         "apps/web/src/features/forms/KnowsEditor.tsx",
+        "apps/web/src/features/productivity/AutomationScreen.tsx",
+        "apps/web/src/features/productivity/TaskDetail.tsx",
+        "apps/web/src/features/productivity/TasksScreen.tsx",
+        "apps/web/src/features/productivity/TemplatesScreen.tsx",
+        "apps/web/src/features/productivity/WaitingScreen.tsx",
         "apps/web/src/routes/Atoms.tsx",
         "apps/web/src/routes/Collections.tsx",
         "apps/web/src/routes/Dossiers.tsx",
@@ -1453,7 +1477,7 @@
         "apps/web/src/routes/reference/EntityObservatoryControls.tsx",
         "apps/web/src/routes/tailor/PreviewPane.tsx"
       ],
-      "uses": 19,
+      "uses": 24,
       "tested": false,
       "styled_in": [
         "packages/ui/src/styles/components.css"
@@ -1513,11 +1537,14 @@
         "apps/web/src/features/Composer.tsx",
         "apps/web/src/features/InteractionLogger.tsx",
         "apps/web/src/features/graph/GraphDisplayPrefs.tsx",
+        "apps/web/src/features/productivity/AnalyticsScreen.tsx",
+        "apps/web/src/features/productivity/ReviewScreen.tsx",
+        "apps/web/src/features/productivity/TasksScreen.tsx",
         "apps/web/src/routes/People.tsx",
         "apps/web/src/routes/SearchResults.tsx",
         "apps/web/src/routes/career/ApplicationStatusControl.tsx"
       ],
-      "uses": 8,
+      "uses": 11,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/components.css"
@@ -1813,6 +1840,11 @@
         "apps/web/src/features/forms/SuggestTextInput.tsx",
         "apps/web/src/features/map/AtlasToolbar.tsx",
         "apps/web/src/features/map/PlaceResolvePanel.tsx",
+        "apps/web/src/features/productivity/AutomationScreen.tsx",
+        "apps/web/src/features/productivity/TaskDetail.tsx",
+        "apps/web/src/features/productivity/TasksScreen.tsx",
+        "apps/web/src/features/productivity/TemplatesScreen.tsx",
+        "apps/web/src/features/productivity/WaitingScreen.tsx",
         "apps/web/src/routes/Ask.tsx",
         "apps/web/src/routes/Atoms.tsx",
         "apps/web/src/routes/Collections.tsx",
@@ -1829,7 +1861,7 @@
         "apps/web/src/routes/tailor/PreviewPane.tsx",
         "apps/web/src/routes/tailor/TargetRail.tsx"
       ],
-      "uses": 25,
+      "uses": 30,
       "tested": true,
       "styled_in": [
         "apps/web/src/styles/network.css",
@@ -2242,12 +2274,13 @@
         "apps/web/src/features/LogIntroduction.tsx",
         "apps/web/src/features/forms/AddConnection.tsx",
         "apps/web/src/features/forms/NodeFormDialog.tsx",
+        "apps/web/src/features/productivity/TasksScreen.tsx",
         "apps/web/src/lib/unsaved-changes.tsx",
         "apps/web/src/routes/Collections.tsx",
         "apps/web/src/routes/Duplicates.tsx",
         "apps/web/src/routes/career/ApplicationStatusControl.tsx"
       ],
-      "uses": 10,
+      "uses": 11,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/components.css",
@@ -2440,6 +2473,13 @@
       "aria": [],
       "renders_jsx": true,
       "used_by": [
+        "apps/web/src/features/productivity/AnalyticsScreen.tsx",
+        "apps/web/src/features/productivity/AutomationScreen.tsx",
+        "apps/web/src/features/productivity/ProductivityStub.tsx",
+        "apps/web/src/features/productivity/ReviewScreen.tsx",
+        "apps/web/src/features/productivity/TasksScreen.tsx",
+        "apps/web/src/features/productivity/TemplatesScreen.tsx",
+        "apps/web/src/features/productivity/WaitingScreen.tsx",
         "apps/web/src/routes/Ask.tsx",
         "apps/web/src/routes/Atoms.tsx",
         "apps/web/src/routes/Billing.tsx",
@@ -2474,7 +2514,7 @@
         "apps/web/src/routes/workspaces/Planner.tsx",
         "apps/web/src/routes/workspaces/WorkspaceHomes.tsx"
       ],
-      "uses": 33,
+      "uses": 40,
       "tested": true,
       "styled_in": [
         "apps/web/src/styles/app.css",
@@ -2785,11 +2825,15 @@
       "renders_jsx": true,
       "used_by": [
         "apps/web/src/features/forms/ConnectionRow.tsx",
+        "apps/web/src/features/productivity/AutomationScreen.tsx",
+        "apps/web/src/features/productivity/TaskCard.tsx",
+        "apps/web/src/features/productivity/TemplatesScreen.tsx",
+        "apps/web/src/features/productivity/WaitingScreen.tsx",
         "apps/web/src/routes/SearchResults.tsx",
         "apps/web/src/routes/docs/DocsReference.tsx",
         "apps/web/src/routes/docs/docsContent.ts"
       ],
-      "uses": 4,
+      "uses": 8,
       "tested": true,
       "styled_in": [
         "apps/web/src/styles/app.css",
@@ -2842,6 +2886,10 @@
       ],
       "renders_jsx": true,
       "used_by": [
+        "apps/web/src/features/productivity/FigureBlock.tsx",
+        "apps/web/src/features/productivity/ProductivityStub.tsx",
+        "apps/web/src/features/productivity/ReviewScreen.tsx",
+        "apps/web/src/features/productivity/TasksScreen.tsx",
         "apps/web/src/routes/Ask.tsx",
         "apps/web/src/routes/Atoms.tsx",
         "apps/web/src/routes/Billing.tsx",
@@ -2871,7 +2919,7 @@
         "apps/web/src/routes/career/ApplicationDossier.tsx",
         "apps/web/src/routes/career/CareerOverview.tsx"
       ],
-      "uses": 28,
+      "uses": 32,
       "tested": true,
       "styled_in": [
         "apps/web/src/styles/app.css",
@@ -2990,6 +3038,8 @@
         "apps/web/src/features/forms/EdgeSubEditorRow.tsx",
         "apps/web/src/features/forms/FieldRenderer.tsx",
         "apps/web/src/features/forms/KnowsEditor.tsx",
+        "apps/web/src/features/productivity/TaskDetail.tsx",
+        "apps/web/src/features/productivity/TemplatesScreen.tsx",
         "apps/web/src/routes/Ask.tsx",
         "apps/web/src/routes/Atoms.tsx",
         "apps/web/src/routes/ImportHub.tsx",
@@ -3001,7 +3051,7 @@
         "apps/web/src/routes/tailor/SelectionPane.tsx",
         "apps/web/src/routes/tailor/TargetRail.tsx"
       ],
-      "uses": 17,
+      "uses": 19,
       "tested": true,
       "styled_in": [
         "apps/web/src/styles/data-tools.css",
@@ -3073,13 +3123,14 @@
       "renders_jsx": true,
       "used_by": [
         "apps/web/src/app/Shell.tsx",
+        "apps/web/src/features/productivity/TaskDetail.tsx",
         "apps/web/src/routes/Atoms.tsx",
         "apps/web/src/routes/Dossiers.tsx",
         "apps/web/src/routes/Letters.tsx",
         "apps/web/src/routes/Outputs.tsx",
         "apps/web/src/routes/marketing/Chrome.tsx"
       ],
-      "uses": 6,
+      "uses": 7,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/components.css",
@@ -3218,6 +3269,7 @@
         "apps/web/src/features/graph/GraphView.tsx",
         "apps/web/src/features/map/AtlasView.tsx",
         "apps/web/src/features/map/PlaceResolvePanel.tsx",
+        "apps/web/src/features/productivity/QueryPanel.tsx",
         "apps/web/src/features/timeline/TimelineView.tsx",
         "apps/web/src/routes/Ask.tsx",
         "apps/web/src/routes/Billing.tsx",
@@ -3246,7 +3298,7 @@
         "apps/web/src/routes/tailor/TargetRail.tsx",
         "apps/web/src/routes/workspaces/Planner.tsx"
       ],
-      "uses": 33,
+      "uses": 34,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/components.css"
@@ -3371,10 +3423,11 @@
         "apps/web/src/features/LogIntroduction.tsx",
         "apps/web/src/features/forms/AddConnection.tsx",
         "apps/web/src/features/graph/GraphDisplayPrefs.tsx",
+        "apps/web/src/features/productivity/TaskDetail.tsx",
         "apps/web/src/routes/Atoms.tsx",
         "apps/web/src/routes/career/ApplicationStatusControl.tsx"
       ],
-      "uses": 6,
+      "uses": 7,
       "tested": true,
       "styled_in": [
         "packages/ui/src/styles/layout.css"
@@ -3759,6 +3812,8 @@
         "apps/web/src/features/DossierClaimForm.tsx",
         "apps/web/src/features/forms/EntityForm.tsx",
         "apps/web/src/features/forms/FieldRenderer.tsx",
+        "apps/web/src/features/productivity/AutomationScreen.tsx",
+        "apps/web/src/features/productivity/TemplatesScreen.tsx",
         "apps/web/src/routes/Atoms.tsx",
         "apps/web/src/routes/ImportHub.tsx",
         "apps/web/src/routes/Letters.tsx",
@@ -3766,7 +3821,7 @@
         "apps/web/src/routes/tailor/PreviewPane.tsx",
         "apps/web/src/routes/tailor/TargetRail.tsx"
       ],
-      "uses": 10,
+      "uses": 12,
       "tested": false,
       "styled_in": [
         "apps/web/src/styles/data-tools.css",
@@ -4195,7 +4250,6 @@
       "ThemeProvider"
     ],
     "unused": [
-      "Card",
       "Combobox",
       "HelpTip",
       "Toast"

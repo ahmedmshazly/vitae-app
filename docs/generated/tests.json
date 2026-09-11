@@ -821,6 +821,26 @@
       "lines": 151
     },
     {
+      "file": "apps/api/src/routes/v1/imports-tasks.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 10,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "task-file imports"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 417
+    },
+    {
       "file": "apps/api/src/routes/v1/imports.integration.test.ts",
       "package": "@vitae/api",
       "cases": 9,
@@ -1018,15 +1038,39 @@
       "lines": 55
     },
     {
+      "file": "apps/api/src/routes/v1/productivity-budgets.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "productivity API query budgets"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js",
+        "@vitae/core"
+      ],
+      "requirements": [
+        "NFR-PROD-001"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 67
+    },
+    {
       "file": "apps/api/src/routes/v1/productivity.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 12,
+      "cases": 15,
       "skipped": 0,
       "todo": 0,
       "suites": [
         "productivity routes (flag off)",
         "productivity routes (flag on)",
-        "productivity entitlement and tenant isolation"
+        "productivity entitlement and tenant isolation",
+        "productivity analytics and review"
       ],
       "subjects": [
         "../../__tests__/helpers/app.js",
@@ -1043,7 +1087,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 407
+      "lines": 529
     },
     {
       "file": "apps/api/src/routes/v1/reminders.integration.test.ts",
@@ -1295,7 +1339,7 @@
     {
       "file": "apps/api/src/services/imports.test.ts",
       "package": "@vitae/api",
-      "cases": 15,
+      "cases": 19,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -1318,7 +1362,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 217
+      "lines": 280
     },
     {
       "file": "apps/api/src/services/letters.test.ts",
@@ -1344,9 +1388,29 @@
       "lines": 269
     },
     {
+      "file": "apps/api/src/services/productivity/analytics.test.ts",
+      "package": "@vitae/api",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "productivity analytics query tokens"
+      ],
+      "subjects": [
+        "./analytics.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 14
+    },
+    {
       "file": "apps/api/src/services/productivity/flag.test.ts",
       "package": "@vitae/api",
-      "cases": 2,
+      "cases": 3,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -1356,13 +1420,35 @@
         "./flag.js",
         "@vitae/core"
       ],
+      "requirements": [
+        "FR-PROD-001"
+      ],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 35
+    },
+    {
+      "file": "apps/api/src/services/productivity/isolated-database.test.ts",
+      "package": "@vitae/api",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "isolated productivity database guard"
+      ],
+      "subjects": [
+        "./isolated-database.js"
+      ],
       "requirements": [],
       "run_by": [
         "test:api",
         "test"
       ],
       "run_in_ci": true,
-      "lines": 30
+      "lines": 50
     },
     {
       "file": "apps/api/src/services/productivity/read-models.test.ts",
@@ -1552,7 +1638,7 @@
     {
       "file": "apps/web/src/app/Breadcrumb.test.tsx",
       "package": "@vitae/web",
-      "cases": 4,
+      "cases": 5,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -1567,12 +1653,12 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 34
+      "lines": 40
     },
     {
       "file": "apps/web/src/app/commands.test.ts",
       "package": "@vitae/web",
-      "cases": 3,
+      "cases": 5,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -1588,12 +1674,12 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 44
+      "lines": 66
     },
     {
       "file": "apps/web/src/app/routes.test.ts",
       "package": "@vitae/web",
-      "cases": 6,
+      "cases": 7,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -1608,7 +1694,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 46
+      "lines": 57
     },
     {
       "file": "apps/web/src/app/Shell.test.tsx",
@@ -2891,6 +2977,156 @@
       "lines": 122
     },
     {
+      "file": "apps/web/src/features/productivity/analytics-review.test.tsx",
+      "package": "@vitae/web",
+      "cases": 4,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "analytics page",
+        "review page"
+      ],
+      "subjects": [
+        "./AnalyticsScreen.js",
+        "./ReviewScreen.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 145
+    },
+    {
+      "file": "apps/web/src/features/productivity/api.test.tsx",
+      "package": "@vitae/web",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "useProductivityCommand",
+        "compensatingCommand"
+      ],
+      "subjects": [
+        "../../lib/api.js",
+        "./api.js",
+        "./query-keys.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 199
+    },
+    {
+      "file": "apps/web/src/features/productivity/model.test.ts",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "reasonSentence",
+        "visibleTimeEntries"
+      ],
+      "subjects": [
+        "./model.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 37
+    },
+    {
+      "file": "apps/web/src/features/productivity/productivity.a11y.test.tsx",
+      "package": "@vitae/web",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "productivity a11y"
+      ],
+      "subjects": [
+        "./TasksScreen.js",
+        "./WaitingScreen.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test:a11y",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 60
+    },
+    {
+      "file": "apps/web/src/features/productivity/routes.test.tsx",
+      "package": "@vitae/web",
+      "cases": 9,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "productivity route registry",
+        "productivity commands",
+        "productivity flag off",
+        "productivity flag on",
+        "productivity auth gating"
+      ],
+      "subjects": [
+        "../../App.js",
+        "../../app/Shell.js",
+        "../../app/commands.js",
+        "../../app/routes.js",
+        "./ProductivityStub.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 252
+    },
+    {
+      "file": "apps/web/src/features/productivity/screens.test.tsx",
+      "package": "@vitae/web",
+      "cases": 13,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "tasks matrix and list",
+        "complete undo and conflict",
+        "waiting",
+        "rules and templates",
+        "query states",
+        "task detail save recurrence and focus",
+        "timer list",
+        "unused within helper"
+      ],
+      "subjects": [
+        "../../lib/api.js",
+        "./AutomationScreen.js",
+        "./TasksScreen.js",
+        "./TemplatesScreen.js",
+        "./WaitingScreen.js",
+        "@vitae/core"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 367
+    },
+    {
       "file": "apps/web/src/features/QuickAdd.test.tsx",
       "package": "@vitae/web",
       "cases": 2,
@@ -3164,7 +3400,7 @@
     {
       "file": "apps/web/src/lib/entity-href.test.ts",
       "package": "@vitae/web",
-      "cases": 3,
+      "cases": 4,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -3181,7 +3417,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 27
+      "lines": 41
     },
     {
       "file": "apps/web/src/lib/format-date.test.ts",
@@ -3299,6 +3535,26 @@
       ],
       "run_in_ci": true,
       "lines": 392
+    },
+    {
+      "file": "apps/web/src/lib/productivity-flag.test.ts",
+      "package": "@vitae/web",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "isProductivityEnabled"
+      ],
+      "subjects": [
+        "./productivity-flag.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:web",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 20
     },
     {
       "file": "apps/web/src/lib/revision-fields.test.ts",
@@ -4177,11 +4433,12 @@
     {
       "file": "apps/web/src/routes/ImportHub.test.ts",
       "package": "@vitae/web",
-      "cases": 8,
+      "cases": 9,
       "skipped": 0,
       "todo": 0,
       "suites": [
         "sourceStatus",
+        "task-file importers",
         "commitAction"
       ],
       "subjects": [
@@ -4193,7 +4450,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 80
+      "lines": 96
     },
     {
       "file": "apps/web/src/routes/Intros.test.ts",
@@ -6091,6 +6348,24 @@
       "lines": 192
     },
     {
+      "file": "e2e/tests/productivity.spec.ts",
+      "package": "@vitae/e2e",
+      "cases": 2,
+      "skipped": 2,
+      "todo": 0,
+      "suites": [],
+      "subjects": [
+        "./helpers/auth"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:e2e",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 65
+    },
+    {
       "file": "e2e/tests/record.spec.ts",
       "package": "@vitae/e2e",
       "cases": 7,
@@ -7225,7 +7500,7 @@
     {
       "file": "packages/core/src/importers/identity.test.ts",
       "package": "@vitae/core",
-      "cases": 22,
+      "cases": 25,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -7235,7 +7510,8 @@
         "icsEventKey",
         "linkedinProfileKey",
         "bookmarkUrlKey",
-        "githubRepoKey"
+        "githubRepoKey",
+        "task-file identity keys"
       ],
       "subjects": [
         "../schema/envelope.js",
@@ -7250,7 +7526,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 145
+      "lines": 180
     },
     {
       "file": "packages/core/src/importers/linkedin.test.ts",
@@ -7301,6 +7577,49 @@
       ],
       "run_in_ci": true,
       "lines": 48
+    },
+    {
+      "file": "packages/core/src/importers/tasks/tasks.test.ts",
+      "package": "@vitae/core",
+      "cases": 22,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "parseCivilDate timezone conversion",
+        "parseTodoist",
+        "parseThings",
+        "parseTickTick",
+        "parseTrello",
+        "parseAsana",
+        "parseNotion",
+        "parseTasksJson",
+        "parseTasksCsv",
+        "parseTasksText"
+      ],
+      "subjects": [
+        "../../schema/envelope.js",
+        "./asana.js",
+        "./csv.js",
+        "./date.js",
+        "./json.js",
+        "./notion.js",
+        "./text.js",
+        "./things.js",
+        "./ticktick.js",
+        "./todoist.js",
+        "./trello.js",
+        "./types.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 335
     },
     {
       "file": "packages/core/src/importers/vcard.test.ts",
@@ -7375,6 +7694,63 @@
       ],
       "run_in_ci": true,
       "lines": 42
+    },
+    {
+      "file": "packages/core/src/productivity/analytics/workspace.test.ts",
+      "package": "@vitae/core",
+      "cases": 20,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "windowBounds",
+        "projectProductivityFigures",
+        "projectUrgencyCreep",
+        "estimates, time, waiting, habits, goals, edges",
+        "reviewBullets",
+        "flattenAnalyticsDiff"
+      ],
+      "subjects": [
+        "./review.js",
+        "./revisions.js",
+        "./types.js",
+        "./workspace.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 415
+    },
+    {
+      "file": "packages/core/src/productivity/budgets.test.ts",
+      "package": "@vitae/core",
+      "cases": 2,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "productivity 10k budgets"
+      ],
+      "subjects": [
+        "./index.js"
+      ],
+      "requirements": [
+        "NFR-PROD-001"
+      ],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:performance",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 86
     },
     {
       "file": "packages/core/src/productivity/capture.test.ts",
@@ -8238,33 +8614,34 @@
     }
   ],
   "summary": {
-    "files": 379,
-    "cases": 2623,
-    "skipped": 0,
+    "files": 394,
+    "cases": 2743,
+    "skipped": 2,
     "todo": 0,
     "by_package": {
-      "@vitae/api": 372,
-      "@vitae/web": 1227,
-      "@vitae/e2e": 303,
-      "@vitae/core": 447,
+      "@vitae/api": 398,
+      "@vitae/web": 1272,
+      "@vitae/e2e": 305,
+      "@vitae/core": 494,
       "@vitae/testkit": 7,
       "@vitae/ui": 267
     },
     "by_script": {
-      "test": 379,
-      "test:web": 177,
-      "test:api": 69,
-      "test:e2e": 61,
-      "test:unit": 60,
-      "test:coverage": 60,
-      "test:core": 58,
-      "test:mutation": 58,
+      "test": 394,
+      "test:web": 184,
+      "test:api": 73,
+      "test:unit": 63,
+      "test:coverage": 63,
+      "test:e2e": 62,
+      "test:core": 61,
+      "test:mutation": 61,
       "test:property": 6,
+      "test:a11y": 4,
       "test:security": 3,
-      "test:a11y": 3,
       "test:contract": 2,
       "test:resilience": 2,
-      "test:visual": 1
+      "test:visual": 1,
+      "test:performance": 1
     },
     "unreachable": [],
     "ci_scripts": [
@@ -8304,8 +8681,10 @@
       "e2e/tests/helpers/fixtures.ts",
       "e2e/tests/helpers/toast.ts"
     ],
-    "with_skips": [],
-    "requirements_proven": 38,
+    "with_skips": [
+      "e2e/tests/productivity.spec.ts (2)"
+    ],
+    "requirements_proven": 40,
     "requirements_unproven": [
       "FR-004",
       "FR-005",
@@ -8353,6 +8732,9 @@
       "FR-ORG-005",
       "FR-ORG-007",
       "FR-ORG-008",
+      "FR-PROD-002",
+      "FR-PROD-003",
+      "FR-PROD-004",
       "FR-PROV-001",
       "FR-RES-001",
       "FR-RES-002",
