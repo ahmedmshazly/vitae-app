@@ -1058,7 +1058,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 67
+      "lines": 79
     },
     {
       "file": "apps/api/src/routes/v1/productivity.integration.test.ts",
@@ -7750,7 +7750,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 86
+      "lines": 102
     },
     {
       "file": "packages/core/src/productivity/capture.test.ts",

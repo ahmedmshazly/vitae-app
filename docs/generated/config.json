@@ -1561,10 +1561,10 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/check-productivity-budgets.mjs:20",
+      "source": "scripts/check-productivity-budgets.mjs:22",
       "reads": [
-        "scripts/check-productivity-budgets.mjs:20",
-        "scripts/check-productivity-budgets.mjs:21"
+        "scripts/check-productivity-budgets.mjs:22",
+        "scripts/check-productivity-budgets.mjs:23"
       ],
       "read_by": [
         "scripts"
@@ -2094,9 +2094,8 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/check-productivity-budgets.mjs:23",
+      "source": "scripts/check-web-budgets.mjs:41",
       "reads": [
-        "scripts/check-productivity-budgets.mjs:23",
         "scripts/check-web-budgets.mjs:41"
       ],
       "read_by": [
@@ -2340,10 +2339,10 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/check-productivity-budgets.mjs:17",
+      "source": "scripts/check-productivity-budgets.mjs:19",
       "reads": [
-        "scripts/check-productivity-budgets.mjs:17",
-        "scripts/check-productivity-budgets.mjs:18",
+        "scripts/check-productivity-budgets.mjs:19",
+        "scripts/check-productivity-budgets.mjs:20",
         "scripts/check-web-budgets.mjs:36",
         "scripts/check-web-budgets.mjs:37"
       ],

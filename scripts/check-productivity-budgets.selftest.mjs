@@ -97,22 +97,13 @@ check('a production bundle without a productivity chunk fails closed', {
   expect: ['no production JS chunk name matches'],
 });
 
-check('a missing bundle warns rather than failing', {
-  chunks: null,
-  budgets: required,
-}, {
-  exit: 0,
-  expect: ['warn:', 'missing (run web build first)'],
-});
-
-check('a missing bundle fails when the build is required', {
+check('a missing bundle fails closed', {
   chunks: null,
   budgets: required,
 }, {
   exit: 1,
-  env: { VITAE_REQUIRE_BUDGETS: 'true' },
-  expect: ['missing (run web build first)'],
-  reject: ['warn:'],
+  expect: ['productivity budgets failed', 'missing (run web build first)'],
+  reject: ['warn:', 'productivity budgets: ok'],
 });
 
 if (failures) {

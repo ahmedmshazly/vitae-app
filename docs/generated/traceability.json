@@ -20,7 +20,7 @@
   },
   "totals": {
     "registered": 136,
-    "citations": 948,
+    "citations": 949,
     "implemented_and_tested": 37,
     "implemented_untested": 58,
     "tested_only": 3,
@@ -2298,7 +2298,8 @@
       "sources": [
         "apps/api/src/scripts/seed-productivity-perf.ts:2",
         "apps/api/src/services/productivity/isolated-database.ts:2",
-        "scripts/check-productivity-budgets.mjs:3"
+        "scripts/check-productivity-budgets.mjs:3",
+        "scripts/check-productivity-budgets.mjs:11"
       ],
       "tests": [
         "apps/api/src/routes/v1/productivity-budgets.integration.test.ts:2",

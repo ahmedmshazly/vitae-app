@@ -43,7 +43,7 @@ pnpm e2e               # full stack + seed assumed running (Chromium; includes v
 pnpm test:visual       # landing + sign-in screenshot contracts (stack must be up)
 pnpm test:security     # auth/CSP + HTTP hardening (needs Postgres for hardening)
 pnpm test:resilience   # buildsvc offline + readiness fail-closed
-pnpm test:performance  # web bundle budgets (warns if dist missing)
+pnpm test:performance  # web bundle budgets (warn if dist missing) + productivity chunk/matrix/query budgets (missing dist fails)
 pnpm test:all          # map + prose + public-data + unit + web + a11y + budgets
 ```
 

@@ -8,7 +8,9 @@
  * by colocated tests that read this file — a log without a failing check is a
  * defect.
  *
- * VITAE_WEB_ROOT / VITAE_BUDGETS_PATH point the gate at a fixture tree.
+ * Missing apps/web/dist/assets fails (NFR-PROD-001). There is no warn-and-pass
+ * hatch: a log without a failing check is a defect. VITAE_WEB_ROOT /
+ * VITAE_BUDGETS_PATH point the gate at a fixture tree.
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -20,7 +22,6 @@ const root = process.env.VITAE_WEB_ROOT
 const budgetPath = process.env.VITAE_BUDGETS_PATH
   ? resolve(process.env.VITAE_BUDGETS_PATH)
   : join(root, 'docs/testing/productivity-budgets.json');
-const requireBudgets = process.env.VITAE_REQUIRE_BUDGETS === 'true';
 
 if (!existsSync(budgetPath)) {
   console.error('missing docs/testing/productivity-budgets.json');
@@ -45,9 +46,7 @@ if (missing.length) {
 const failures = [];
 const dist = join(root, 'apps/web/dist/assets');
 if (!existsSync(dist)) {
-  const msg = 'productivity budgets: apps/web/dist/assets missing (run web build first)';
-  if (requireBudgets) failures.push(msg);
-  else console.warn(`warn: ${msg}`);
+  failures.push('productivity budgets: apps/web/dist/assets missing (run web build first)');
 } else {
   const files = readdirSync(dist).filter((f) => f.endsWith('.js'));
   const sizes = files

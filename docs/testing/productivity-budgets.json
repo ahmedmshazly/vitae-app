@@ -5,5 +5,5 @@
   "memoryMb": 128,
   "tasksQueryCount": 16,
   "analyticsQueryCount": 24,
-  "notes": "NFR-PROD-001. Matrix and memory are measured in-process over 10,000 synthetic placeItem calls. Analytics p95 is the same 10k projection (compute-on-read, no I/O). Route chunks are any production JS asset whose name contains productivity. Query counts are API integration ceilings for GET /tasks and GET /analytics?window=30 including auth/workspace overhead. A check that exceeds a number exits non-zero."
+  "notes": "NFR-PROD-001. Matrix and memory: in-process 10,000 synthetic placeItem calls. Analytics p95: 20 in-process projectProductivityFigures runs over those 10k tasks (compute-on-read, no I/O, empty revisions). Route chunks: production JS whose name matches /productivity/i; missing dist fails. Query counts: GET /tasks and GET /analytics?window=30 on the API integration database, including auth/workspace overhead; the spy must observe at least one query. seed:productivity-perf is a throwaway fixture, not these measurements. A check that exceeds a number exits non-zero."
 }

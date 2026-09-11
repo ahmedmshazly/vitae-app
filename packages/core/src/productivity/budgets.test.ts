@@ -42,6 +42,14 @@ function syntheticTasks(count: number) {
   }));
 }
 
+const ANALYTICS_SAMPLES = 20;
+
+function percentile(samples: number[], p: number): number {
+  const sorted = [...samples].sort((a, b) => a - b);
+  const rank = Math.ceil(p * sorted.length) - 1;
+  return sorted[Math.max(0, rank)] ?? 0;
+}
+
 describe('productivity 10k budgets', () => {
   it('places 10,000 items inside the matrix and memory budgets', () => {
     const ctx = defaultPlacementContext({ now: '2026-09-11', timeZone: 'UTC' });
@@ -61,8 +69,7 @@ describe('productivity 10k budgets', () => {
 
   it('projects 10,000-task analytics inside the p95 budget', () => {
     const tasks = syntheticTasks(10_000);
-    const start = performance.now();
-    const figures = projectProductivityFigures({
+    const input = {
       now: '2026-09-11',
       now_instant: '2026-09-11T12:00:00.000Z',
       window_start: '2026-08-13',
@@ -77,9 +84,18 @@ describe('productivity 10k budgets', () => {
       entities: [],
       edges: [],
       applications: [],
-    });
-    const ms = performance.now() - start;
-    expect(figures.quadrant_balance).toBeDefined();
-    expect(ms, `analytics ${ms.toFixed(1)}ms`).toBeLessThanOrEqual(budgets.analyticsP95Ms);
+    };
+    const samples: number[] = [];
+    let last: ReturnType<typeof projectProductivityFigures> | undefined;
+    for (let i = 0; i < ANALYTICS_SAMPLES; i += 1) {
+      const start = performance.now();
+      last = projectProductivityFigures(input);
+      samples.push(performance.now() - start);
+    }
+    const p95 = percentile(samples, 0.95);
+    expect(last?.quadrant_balance).toBeDefined();
+    expect(p95, `analytics p95 ${p95.toFixed(1)}ms over ${ANALYTICS_SAMPLES} runs`).toBeLessThanOrEqual(
+      budgets.analyticsP95Ms,
+    );
   });
 });

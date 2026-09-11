@@ -596,11 +596,11 @@ Status: implemented · Evidence: cited by source · Provenance: reconstructed, c
 
 #### NFR-PROD-001: Productivity performance budgets fail closed
 
-A 10,000-task performance workspace must stay inside documented budgets for matrix interaction, analytics latency, route chunks, memory, and API query counts on GET /tasks and GET /analytics?window=30. A check that cannot measure a budget must fail rather than only log, unless the environment blocker is recorded and the gate is not claimed passed.
+Matrix interaction, compute-on-read analytics p95, and heap delta are gated in-process over 10,000 synthetic task projections. Route chunks are gated on production JS assets whose names match productivity. Query-count ceilings for GET /tasks and GET /analytics?window=30 are gated on the API integration database (count does not grow with row cardinality). The isolated 10k seed is a throwaway fixture, not the CI measurement target; HTTP latency against that seed is not a CI gate. A check that cannot measure a budget must fail rather than only log.
 
 Status: implemented · Evidence: cited by source and by tests · Provenance: reconstructed, confirmed
 
-> Authored 2026-09-11 from the Task 10 plan. Enforced by scripts/check-productivity-budgets.mjs against docs/testing/productivity-budgets.json.
+> Authored 2026-09-11 from the Task 10 plan; restated 2026-09-11 after review so the NFR names the proxies the gates actually measure. Enforced by packages/core/src/productivity/budgets.test.ts, apps/api/src/routes/v1/productivity-budgets.integration.test.ts, and scripts/check-productivity-budgets.mjs against docs/testing/productivity-budgets.json.
 
 ### Resume evidence and tailoring
 
