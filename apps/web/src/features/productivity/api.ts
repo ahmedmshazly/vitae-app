@@ -158,8 +158,16 @@ export function useProductivityTemplates() {
   });
 }
 
+function maxTaskRevision(tasks: NodeRecord[] | undefined): number | undefined {
+  if (!tasks?.length) return undefined;
+  const revs = tasks.map((row) => row.rev).filter((rev): rev is number => typeof rev === 'number');
+  return revs.length ? Math.max(...revs) : undefined;
+}
+
 export function revisionFromResult(result: ProductivityCommandResult): number | undefined {
   if (result.task && typeof result.task.rev === 'number') return result.task.rev;
+  const fromTasks = maxTaskRevision(result.tasks);
+  if (fromTasks !== undefined) return fromTasks;
   if (result.rule && typeof result.rule.rev === 'number') return result.rule.rev;
   if (result.template && typeof result.template.rev === 'number') return result.template.rev;
   if (result.time_entry && typeof result.time_entry.rev === 'number') return result.time_entry.rev;

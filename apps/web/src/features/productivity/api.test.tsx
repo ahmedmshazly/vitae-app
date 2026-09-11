@@ -145,10 +145,14 @@ describe('useProductivityCommand', () => {
         .catch(() => undefined);
     });
 
+    await waitFor(() => {
+      expect(queryClient.getQueryData<ProductivityTasksPage>(productivityKeys.tasks())?.tasks[0]?.status).toBe(
+        'next',
+      );
+    });
     expect(result.current.conflict).toBeNull();
-    expect(String(result.current.writeLock ?? result.current.error)).toMatch(/read-only|PAYMENT_REQUIRED|paused/i);
-    const list = queryClient.getQueryData<ProductivityTasksPage>(productivityKeys.tasks());
-    expect(list?.tasks[0]?.status).toBe('next');
+    expect(result.current.isError).toBe(true);
+    expect(result.current.error).toMatchObject({ status: 402, code: 'PAYMENT_REQUIRED' });
   });
 });
 
@@ -169,5 +173,26 @@ describe('compensatingCommand', () => {
     expect(undo.expected_revision).toBe(4);
     expect(undo.operation_id).toBe('op-undo');
     expect(revisionFromResult(last)).toBe(4);
+  });
+
+  it('reads a number from a reorder-shaped result that only has tasks', () => {
+    const last: ProductivityCommandResult = {
+      ordered_ids: ['task-a', 'task-b'],
+      tasks: [
+        { id: 'task-a', type: 'task', title: 'A', props: {}, rev: 2 } as never,
+        { id: 'task-b', type: 'task', title: 'B', props: {}, rev: 5 } as never,
+      ],
+    };
+    expect(revisionFromResult(last)).toBe(5);
+    const undo = compensatingCommand(
+      {
+        version: 1,
+        operation_id: 'op-unreorder',
+        type: 'reorder_tasks',
+        payload: { ordered_ids: ['task-b', 'task-a'] },
+      },
+      last,
+    );
+    expect(undo.expected_revision).toBe(5);
   });
 });
