@@ -160,6 +160,17 @@
       ],
       "note": "The complete-backup round trip truncates and restores every bundle collection, dossiers among them, so the table and its tenancy wiring are exercised there."
     },
+    "apps/api/src/db/migrations/012-productivity-collections.ts": {
+      "risk": "high",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/db/productivity-collections.integration.test.ts"
+      ],
+      "note": "Migration 012 is the suite that creates the three guarded collections and their revision indexes."
+    },
     "apps/api/src/db/pg.ts": {
       "risk": "medium",
       "layers": [
@@ -170,6 +181,19 @@
         "apps/api/src/__tests__/api.integration.test.ts"
       ],
       "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/db/productivity-docs.ts": {
+      "risk": "high",
+      "layers": [
+        "integration",
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/db/productivity-collections.integration.test.ts",
+        "apps/api/src/routes/v1/productivity.integration.test.ts"
+      ],
+      "note": "Write-boundary schemas imported by the repository and command handler."
     },
     "apps/api/src/db/repository.ts": {
       "risk": "medium",
@@ -458,6 +482,16 @@
         "apps/api/src/routes/v1/composer.integration.test.ts"
       ]
     },
+    "apps/api/src/routes/v1/correspondence.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/correspondence.integration.test.ts"
+      ]
+    },
     "apps/api/src/routes/v1/dashboard.ts": {
       "risk": "medium",
       "layers": [
@@ -540,26 +574,6 @@
         "apps/api/src/routes/v1/favors.integration.test.ts"
       ]
     },
-    "apps/api/src/routes/v1/correspondence.ts": {
-      "risk": "medium",
-      "layers": [
-        "integration"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/api/src/routes/v1/correspondence.integration.test.ts"
-      ]
-    },
-    "apps/api/src/routes/v1/ledger.ts": {
-      "risk": "medium",
-      "layers": [
-        "integration"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/api/src/routes/v1/ledger.integration.test.ts"
-      ]
-    },
     "apps/api/src/routes/v1/habits.ts": {
       "risk": "medium",
       "layers": [
@@ -599,6 +613,16 @@
       "status": "covered",
       "tests": [
         "apps/api/src/routes/v1/intros.integration.test.ts"
+      ]
+    },
+    "apps/api/src/routes/v1/ledger.ts": {
+      "risk": "medium",
+      "layers": [
+        "integration"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/ledger.integration.test.ts"
       ]
     },
     "apps/api/src/routes/v1/letters.ts": {
@@ -1088,17 +1112,6 @@
         "apps/web/src/app/Breadcrumb.test.tsx"
       ]
     },
-    "apps/web/src/app/Shell.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "e2e"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/web/src/app/Shell.test.tsx"
-      ]
-    },
     "apps/web/src/app/commands.ts": {
       "risk": "medium",
       "layers": [
@@ -1119,6 +1132,17 @@
       "status": "deferred",
       "tests": [
         "apps/web/src/app/routes.test.ts"
+      ]
+    },
+    "apps/web/src/app/Shell.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/app/Shell.test.tsx"
       ]
     },
     "apps/web/src/components/EntityPicker.tsx": {
@@ -1193,70 +1217,6 @@
       "status": "covered",
       "tests": [
         "apps/web/src/features/FirstRun.test.tsx"
-      ]
-    },
-    "apps/web/src/features/GettingStarted.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "e2e"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/web/src/features/GettingStarted.test.tsx"
-      ]
-    },
-    "apps/web/src/features/InteractionLogger.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "e2e"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/web/src/features/InteractionLogger.test.tsx"
-      ]
-    },
-    "apps/web/src/features/QuickAdd.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "e2e"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/web/src/features/QuickAdd.test.tsx"
-      ]
-    },
-    "apps/web/src/features/QuickSwitcher.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "a11y"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/web/src/features/QuickSwitcher.test.tsx"
-      ]
-    },
-    "apps/web/src/features/RemindersDrawer.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "e2e"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/web/src/features/RemindersDrawer.test.tsx"
-      ]
-    },
-    "apps/web/src/features/Toast.tsx": {
-      "risk": "medium",
-      "layers": [
-        "unit"
-      ],
-      "tests": [
-        "apps/web/src/features/Toast.test.tsx"
       ]
     },
     "apps/web/src/features/forms/AddConnection.tsx": {
@@ -1394,6 +1354,39 @@
         "apps/web/src/features/forms/SuggestTextInput.test.tsx"
       ]
     },
+    "apps/web/src/features/GettingStarted.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/GettingStarted.test.tsx"
+      ]
+    },
+    "apps/web/src/features/graph/constants.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/graph/constants.test.ts"
+      ]
+    },
+    "apps/web/src/features/graph/displayPrefs.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/graph/displayPrefs.test.ts"
+      ]
+    },
     "apps/web/src/features/graph/GraphCanvas.tsx": {
       "risk": "medium",
       "layers": [
@@ -1469,28 +1462,6 @@
       "tests": [],
       "exclude_reason": "WebGL/canvas or view orchestrator: covered by Playwright explore specs (graph/atlas/timeline/exploration); component mount deferred in jsdom."
     },
-    "apps/web/src/features/graph/constants.ts": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "e2e"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/web/src/features/graph/constants.test.ts"
-      ]
-    },
-    "apps/web/src/features/graph/displayPrefs.ts": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "e2e"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/web/src/features/graph/displayPrefs.test.ts"
-      ]
-    },
     "apps/web/src/features/graph/types.ts": {
       "risk": "medium",
       "layers": [
@@ -1511,6 +1482,17 @@
       "status": "deferred",
       "tests": [],
       "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/InteractionLogger.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/InteractionLogger.test.tsx"
+      ]
     },
     "apps/web/src/features/map/AtlasCanvas.tsx": {
       "risk": "medium",
@@ -1584,27 +1566,6 @@
       "tests": [],
       "exclude_reason": "WebGL/canvas or view orchestrator: covered by Playwright explore specs (graph/atlas/timeline/exploration); component mount deferred in jsdom."
     },
-    "apps/web/src/features/map/PlaceResolvePanel.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "e2e"
-      ],
-      "status": "deferred",
-      "tests": [
-        "apps/web/src/features/map/PlaceResolvePanel.states.test.tsx"
-      ]
-    },
-    "apps/web/src/features/map/UnmappedDock.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "e2e"
-      ],
-      "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
-    },
     "apps/web/src/features/map/corridors.ts": {
       "risk": "medium",
       "layers": [
@@ -1634,6 +1595,17 @@
         "apps/web/src/features/map/geo.test.ts"
       ]
     },
+    "apps/web/src/features/map/PlaceResolvePanel.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/web/src/features/map/PlaceResolvePanel.states.test.tsx"
+      ]
+    },
     "apps/web/src/features/map/types.ts": {
       "risk": "medium",
       "layers": [
@@ -1643,6 +1615,206 @@
       "status": "deferred",
       "tests": [],
       "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/map/UnmappedDock.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/productivity/AnalyticsScreen.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/productivity/analytics-review.test.tsx"
+      ]
+    },
+    "apps/web/src/features/productivity/AutomationScreen.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/productivity/screens.test.tsx"
+      ]
+    },
+    "apps/web/src/features/productivity/commands.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/productivity/screens.test.tsx"
+      ],
+      "note": "Envelopes are sent through useProductivityActions in the screen suite."
+    },
+    "apps/web/src/features/productivity/FigureBlock.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/productivity/analytics-review.test.tsx"
+      ],
+      "note": "Rendered by AnalyticsScreen; the throughput table and chart are the FigureBlock."
+    },
+    "apps/web/src/features/productivity/ProductivityStub.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/productivity/routes.test.tsx"
+      ]
+    },
+    "apps/web/src/features/productivity/query-keys.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/productivity/api.test.tsx"
+      ]
+    },
+    "apps/web/src/features/productivity/QueryPanel.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/productivity/screens.test.tsx",
+        "apps/web/src/features/productivity/productivity.a11y.test.tsx",
+        "apps/web/src/features/productivity/analytics-review.test.tsx"
+      ]
+    },
+    "apps/web/src/features/productivity/ReviewScreen.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/productivity/analytics-review.test.tsx"
+      ]
+    },
+    "apps/web/src/features/productivity/TaskCard.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/productivity/screens.test.tsx"
+      ]
+    },
+    "apps/web/src/features/productivity/TaskDetail.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/productivity/screens.test.tsx"
+      ]
+    },
+    "apps/web/src/features/productivity/TasksScreen.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/productivity/screens.test.tsx",
+        "apps/web/src/features/productivity/productivity.a11y.test.tsx"
+      ]
+    },
+    "apps/web/src/features/productivity/TemplatesScreen.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/productivity/screens.test.tsx"
+      ]
+    },
+    "apps/web/src/features/productivity/use-productivity-actions.ts": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/productivity/screens.test.tsx"
+      ]
+    },
+    "apps/web/src/features/productivity/WaitingScreen.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/productivity/screens.test.tsx",
+        "apps/web/src/features/productivity/productivity.a11y.test.tsx"
+      ]
+    },
+    "apps/web/src/features/QuickAdd.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/QuickAdd.test.tsx"
+      ]
+    },
+    "apps/web/src/features/QuickSwitcher.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "a11y"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/QuickSwitcher.test.tsx"
+      ]
+    },
+    "apps/web/src/features/RemindersDrawer.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/RemindersDrawer.test.tsx"
+      ]
+    },
+    "apps/web/src/features/timeline/displayPrefs.ts": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/features/timeline/displayPrefs.test.ts"
+      ]
     },
     "apps/web/src/features/timeline/TimelineCanvas.tsx": {
       "risk": "medium",
@@ -1696,17 +1868,6 @@
       "tests": [],
       "exclude_reason": "WebGL/canvas or view orchestrator: covered by Playwright explore specs (graph/atlas/timeline/exploration); component mount deferred in jsdom."
     },
-    "apps/web/src/features/timeline/displayPrefs.ts": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "e2e"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/web/src/features/timeline/displayPrefs.test.ts"
-      ]
-    },
     "apps/web/src/features/timeline/types.ts": {
       "risk": "medium",
       "layers": [
@@ -1716,6 +1877,15 @@
       "status": "deferred",
       "tests": [],
       "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/features/Toast.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/features/Toast.test.tsx"
+      ]
     },
     "apps/web/src/lib/api.ts": {
       "risk": "medium",
@@ -1843,6 +2013,30 @@
         "apps/web/src/routes/Browse.states.test.tsx"
       ]
     },
+    "apps/web/src/routes/career/application-view.ts": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/career/CareerOverview.test.tsx",
+        "apps/web/src/routes/career/ApplicationDossier.test.tsx"
+      ],
+      "note": "The register, runway, attention, and filtered-empty derivations it owns are asserted through both host screens."
+    },
+    "apps/web/src/routes/career/ApplicationActions.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/web/src/routes/career/CareerOverview.test.tsx",
+        "apps/web/src/routes/career/ApplicationDossier.test.tsx"
+      ],
+      "note": "Both buttons mount inside their host screens, but the create and edit flows themselves are not asserted."
+    },
     "apps/web/src/routes/Collections.tsx": {
       "risk": "medium",
       "layers": [
@@ -1862,6 +2056,42 @@
         "apps/web/src/routes/Dashboard.test.tsx",
         "apps/web/src/routes/Dashboard.queue.test.ts"
       ]
+    },
+    "apps/web/src/routes/docs/DocsApp.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "a11y"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/docs/DocsApp.states.test.tsx"
+      ],
+      "note": "The suite mounts this component directly, without Shell or a session, which is the property the route exists to hold: manifest loading, failure, retry, and the no-such-page state are all asserted against the real component tree."
+    },
+    "apps/web/src/routes/docs/DocsChrome.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "a11y"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/docs/DocsApp.states.test.tsx"
+      ],
+      "note": "Nav expansion, aria-current, breadcrumb depth, the table of contents threshold, reading-order links and hover prefetch are asserted through the mounted surface rather than in isolation, because each of them is derived from the route."
+    },
+    "apps/web/src/routes/docs/DocsPage.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "a11y"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/docs/DocsApp.states.test.tsx"
+      ],
+      "note": "Covers the split between manifest and page content: the header survives a failed prose fetch, hash arrival waits for the prose, focus moves to the new title, and the supersession banner renders from the page body."
     },
     "apps/web/src/routes/Duplicates.tsx": {
       "risk": "medium",
@@ -1929,159 +2159,6 @@
       "tests": [],
       "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
     },
-    "apps/web/src/routes/Org.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "e2e"
-      ],
-      "status": "deferred",
-      "tests": [
-        "apps/web/src/routes/Org.states.test.tsx",
-        "apps/web/src/routes/Org.test.tsx"
-      ]
-    },
-    "apps/web/src/routes/Orgs.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "a11y"
-      ],
-      "tests": [
-        "apps/web/src/routes/Orgs.test.tsx",
-        "apps/web/src/routes/Orgs.a11y.test.tsx"
-      ],
-      "status": "covered"
-    },
-    "apps/web/src/routes/Outputs.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "e2e"
-      ],
-      "status": "deferred",
-      "tests": [
-        "apps/web/src/routes/Outputs.states.test.tsx"
-      ]
-    },
-    "apps/web/src/routes/People.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "a11y"
-      ],
-      "tests": [
-        "apps/web/src/routes/People.test.tsx",
-        "apps/web/src/routes/People.a11y.test.tsx"
-      ],
-      "status": "covered"
-    },
-    "apps/web/src/routes/Person.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "e2e"
-      ],
-      "status": "deferred",
-      "tests": [
-        "apps/web/src/routes/Person.log.test.ts",
-        "apps/web/src/routes/Person.states.test.tsx",
-        "apps/web/src/routes/Person.test.tsx"
-      ]
-    },
-    "apps/web/src/routes/Record.tsx": {
-      "risk": "medium",
-      "layers": [
-        "unit"
-      ],
-      "tests": [
-        "apps/web/src/routes/Record.test.ts"
-      ]
-    },
-    "apps/web/src/routes/Repositories.tsx": {
-      "risk": "medium",
-      "layers": [
-        "unit"
-      ],
-      "tests": [
-        "apps/web/src/routes/Repositories.test.ts"
-      ]
-    },
-    "apps/web/src/routes/ResumeHub.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "e2e"
-      ],
-      "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
-    },
-    "apps/web/src/routes/SearchResults.tsx": {
-      "risk": "medium",
-      "layers": [
-        "unit",
-        "component"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/web/src/routes/SearchResults.test.ts",
-        "apps/web/src/routes/SearchResults.states.test.tsx"
-      ]
-    },
-    "apps/web/src/routes/Settings.tsx": {
-      "risk": "medium",
-      "layers": [
-        "unit",
-        "component",
-        "a11y"
-      ],
-      "tests": [
-        "apps/web/src/routes/Settings.test.ts",
-        "apps/web/src/routes/Settings.states.test.tsx",
-        "apps/web/src/routes/Settings.a11y.test.tsx"
-      ]
-    },
-    "apps/web/src/routes/SignIn.tsx": {
-      "risk": "medium",
-      "layers": [
-        "unit"
-      ],
-      "tests": [
-        "apps/web/src/routes/SignIn.test.tsx"
-      ]
-    },
-    "apps/web/src/routes/Templates.tsx": {
-      "risk": "medium",
-      "layers": [
-        "unit"
-      ],
-      "tests": [
-        "apps/web/src/routes/Templates.test.ts"
-      ]
-    },
-    "apps/web/src/routes/Timeline.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "e2e"
-      ],
-      "status": "deferred",
-      "tests": [],
-      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
-    },
-    "apps/web/src/routes/Trash.tsx": {
-      "risk": "medium",
-      "layers": [
-        "unit",
-        "component"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/web/src/routes/Trash.test.ts",
-        "apps/web/src/routes/Trash.states.test.tsx"
-      ]
-    },
     "apps/web/src/routes/marketing/CareerEvidence.tsx": {
       "risk": "medium",
       "layers": [
@@ -2089,66 +2166,6 @@
       ],
       "status": "deferred",
       "exclude_reason": "Marketing page composed for the Cloud release and shipped without a suite. Its plan figures come from CLOUD_PLAN, which MarketingContent.test.ts covers; the page structure, links, and states are unproven."
-    },
-    "apps/web/src/routes/career/ApplicationActions.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component"
-      ],
-      "status": "deferred",
-      "tests": [
-        "apps/web/src/routes/career/CareerOverview.test.tsx",
-        "apps/web/src/routes/career/ApplicationDossier.test.tsx"
-      ],
-      "note": "Both buttons mount inside their host screens, but the create and edit flows themselves are not asserted."
-    },
-    "apps/web/src/routes/career/application-view.ts": {
-      "risk": "medium",
-      "layers": [
-        "component"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/web/src/routes/career/CareerOverview.test.tsx",
-        "apps/web/src/routes/career/ApplicationDossier.test.tsx"
-      ],
-      "note": "The register, runway, attention, and filtered-empty derivations it owns are asserted through both host screens."
-    },
-    "apps/web/src/routes/docs/DocsApp.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "a11y"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/web/src/routes/docs/DocsApp.states.test.tsx"
-      ],
-      "note": "The suite mounts this component directly, without Shell or a session, which is the property the route exists to hold: manifest loading, failure, retry, and the no-such-page state are all asserted against the real component tree."
-    },
-    "apps/web/src/routes/docs/DocsChrome.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "a11y"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/web/src/routes/docs/DocsApp.states.test.tsx"
-      ],
-      "note": "Nav expansion, aria-current, breadcrumb depth, the table of contents threshold, reading-order links and hover prefetch are asserted through the mounted surface rather than in isolation, because each of them is derived from the route."
-    },
-    "apps/web/src/routes/docs/DocsPage.tsx": {
-      "risk": "medium",
-      "layers": [
-        "component",
-        "a11y"
-      ],
-      "status": "covered",
-      "tests": [
-        "apps/web/src/routes/docs/DocsApp.states.test.tsx"
-      ],
-      "note": "Covers the split between manifest and page content: the header survives a failed prose fetch, hash arrival waits for the prose, focus moves to the new title, and the supersession banner renders from the page body."
     },
     "apps/web/src/routes/marketing/Chrome.tsx": {
       "risk": "medium",
@@ -2221,6 +2238,75 @@
       "status": "deferred",
       "exclude_reason": "Marketing page composed for the Cloud release and shipped without a suite. Its plan figures come from CLOUD_PLAN, which MarketingContent.test.ts covers; the page structure, links, and states are unproven."
     },
+    "apps/web/src/routes/Org.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/web/src/routes/Org.states.test.tsx",
+        "apps/web/src/routes/Org.test.tsx"
+      ]
+    },
+    "apps/web/src/routes/Orgs.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "a11y"
+      ],
+      "tests": [
+        "apps/web/src/routes/Orgs.test.tsx",
+        "apps/web/src/routes/Orgs.a11y.test.tsx"
+      ],
+      "status": "covered"
+    },
+    "apps/web/src/routes/Outputs.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/web/src/routes/Outputs.states.test.tsx"
+      ]
+    },
+    "apps/web/src/routes/People.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "a11y"
+      ],
+      "tests": [
+        "apps/web/src/routes/People.test.tsx",
+        "apps/web/src/routes/People.a11y.test.tsx"
+      ],
+      "status": "covered"
+    },
+    "apps/web/src/routes/Person.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [
+        "apps/web/src/routes/Person.log.test.ts",
+        "apps/web/src/routes/Person.states.test.tsx",
+        "apps/web/src/routes/Person.test.tsx"
+      ]
+    },
+    "apps/web/src/routes/Record.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/Record.test.ts"
+      ]
+    },
     "apps/web/src/routes/reference/EntityCatalog.tsx": {
       "risk": "medium",
       "layers": [
@@ -2250,6 +2336,15 @@
       "status": "deferred",
       "tests": [
         "apps/web/src/routes/reference/EntityCatalogDetails.states.test.tsx"
+      ]
+    },
+    "apps/web/src/routes/reference/entityCatalogModel.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/reference/entityCatalogModel.test.ts"
       ]
     },
     "apps/web/src/routes/reference/EntityCatalogOverview.tsx": {
@@ -2306,6 +2401,15 @@
         "apps/web/src/routes/reference/EntityObservatoryMatrix.states.test.tsx"
       ]
     },
+    "apps/web/src/routes/reference/entityObservatoryModel.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/reference/entityObservatoryModel.test.ts"
+      ]
+    },
     "apps/web/src/routes/reference/EntityObservatorySnapshot.tsx": {
       "risk": "medium",
       "layers": [
@@ -2316,22 +2420,57 @@
       "tests": [],
       "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
     },
-    "apps/web/src/routes/reference/entityCatalogModel.ts": {
+    "apps/web/src/routes/Repositories.tsx": {
       "risk": "medium",
       "layers": [
         "unit"
       ],
       "tests": [
-        "apps/web/src/routes/reference/entityCatalogModel.test.ts"
+        "apps/web/src/routes/Repositories.test.ts"
       ]
     },
-    "apps/web/src/routes/reference/entityObservatoryModel.ts": {
+    "apps/web/src/routes/ResumeHub.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/SearchResults.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit",
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/SearchResults.test.ts",
+        "apps/web/src/routes/SearchResults.states.test.tsx"
+      ]
+    },
+    "apps/web/src/routes/Settings.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit",
+        "component",
+        "a11y"
+      ],
+      "tests": [
+        "apps/web/src/routes/Settings.test.ts",
+        "apps/web/src/routes/Settings.states.test.tsx",
+        "apps/web/src/routes/Settings.a11y.test.tsx"
+      ]
+    },
+    "apps/web/src/routes/SignIn.tsx": {
       "risk": "medium",
       "layers": [
         "unit"
       ],
       "tests": [
-        "apps/web/src/routes/reference/entityObservatoryModel.test.ts"
+        "apps/web/src/routes/SignIn.test.tsx"
       ]
     },
     "apps/web/src/routes/tailor/DocumentPane.tsx": {
@@ -2403,6 +2542,47 @@
       "status": "deferred",
       "tests": [],
       "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/Templates.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/routes/Templates.test.ts"
+      ]
+    },
+    "apps/web/src/routes/Timeline.tsx": {
+      "risk": "medium",
+      "layers": [
+        "component",
+        "e2e"
+      ],
+      "status": "deferred",
+      "tests": [],
+      "exclude_reason": "Deferred web coverage: component and/or e2e ownership in a later wave."
+    },
+    "apps/web/src/routes/Trash.tsx": {
+      "risk": "medium",
+      "layers": [
+        "unit",
+        "component"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/web/src/routes/Trash.test.ts",
+        "apps/web/src/routes/Trash.states.test.tsx"
+      ]
+    },
+    "apps/web/src/test/render.tsx": {
+      "risk": "low",
+      "layers": [
+        "unit"
+      ],
+      "tests": [
+        "apps/web/src/test/render.test.tsx"
+      ],
+      "status": "covered"
     },
     "packages/core/src/algorithms/aho-corasick.ts": {
       "risk": "medium",
@@ -2668,6 +2848,166 @@
         "packages/core/src/importers/netscape-bookmarks.test.ts"
       ]
     },
+    "packages/core/src/importers/tasks/asana.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/importers/tasks/tasks.test.ts"
+      ]
+    },
+    "packages/core/src/importers/tasks/csv-table.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/importers/tasks/tasks.test.ts"
+      ]
+    },
+    "packages/core/src/importers/tasks/csv.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/importers/tasks/tasks.test.ts"
+      ]
+    },
+    "packages/core/src/importers/tasks/date.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/importers/tasks/tasks.test.ts"
+      ]
+    },
+    "packages/core/src/importers/tasks/drafts.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/importers/tasks/tasks.test.ts"
+      ]
+    },
+    "packages/core/src/importers/tasks/fields.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/importers/tasks/tasks.test.ts"
+      ]
+    },
+    "packages/core/src/importers/tasks/json.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/importers/tasks/tasks.test.ts"
+      ]
+    },
+    "packages/core/src/importers/tasks/mapped-row.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/importers/tasks/tasks.test.ts"
+      ]
+    },
+    "packages/core/src/importers/tasks/notion.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/importers/tasks/tasks.test.ts"
+      ]
+    },
+    "packages/core/src/importers/tasks/skip.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/importers/tasks/tasks.test.ts"
+      ]
+    },
+    "packages/core/src/importers/tasks/text.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/importers/tasks/tasks.test.ts"
+      ]
+    },
+    "packages/core/src/importers/tasks/things.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/importers/tasks/tasks.test.ts"
+      ]
+    },
+    "packages/core/src/importers/tasks/ticktick.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/importers/tasks/tasks.test.ts"
+      ]
+    },
+    "packages/core/src/importers/tasks/todoist.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/importers/tasks/tasks.test.ts"
+      ]
+    },
+    "packages/core/src/importers/tasks/trello.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/importers/tasks/tasks.test.ts"
+      ]
+    },
+    "packages/core/src/importers/tasks/types.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/importers/tasks/tasks.test.ts"
+      ]
+    },
     "packages/core/src/importers/vcard.ts": {
       "risk": "medium",
       "layers": [
@@ -2675,6 +3015,105 @@
       ],
       "tests": [
         "packages/core/src/importers/vcard.test.ts"
+      ]
+    },
+    "packages/core/src/productivity/analytics/completions.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/productivity/analytics.test.ts"
+      ]
+    },
+    "packages/core/src/productivity/analytics/review.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/productivity/analytics/workspace.test.ts"
+      ]
+    },
+    "packages/core/src/productivity/analytics/revisions.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/productivity/analytics/workspace.test.ts"
+      ]
+    },
+    "packages/core/src/productivity/analytics/types.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/productivity/analytics/workspace.test.ts",
+        "packages/core/src/productivity/analytics.test.ts"
+      ]
+    },
+    "packages/core/src/productivity/calendar.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/productivity/productivity.property.test.ts",
+        "packages/core/src/productivity/placement.test.ts",
+        "packages/core/src/productivity/recurrence.test.ts"
+      ]
+    },
+    "packages/core/src/productivity/commands.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/productivity/contracts.test.ts"
+      ]
+    },
+    "packages/core/src/productivity/fixture-schemas.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/productivity/contracts.test.ts",
+        "packages/core/src/productivity/analytics.test.ts",
+        "packages/core/src/productivity/rules.test.ts",
+        "packages/core/src/productivity/capture.test.ts",
+        "packages/core/src/productivity/recurrence.test.ts",
+        "packages/core/src/productivity/placement.test.ts"
+      ]
+    },
+    "packages/core/src/productivity/read-models.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/productivity/contracts.test.ts",
+        "packages/core/src/productivity/filters.test.ts"
+      ]
+    },
+    "packages/core/src/productivity/replay.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "packages/core/src/productivity/analytics.test.ts"
       ]
     },
     "packages/core/src/schema/bundle.ts": {
@@ -2748,16 +3187,6 @@
         "packages/core/src/schema/validate.test.ts"
       ],
       "note": "Type catalogs covered by descriptor and validation loops."
-    },
-    "apps/web/src/test/render.tsx": {
-      "risk": "low",
-      "layers": [
-        "unit"
-      ],
-      "tests": [
-        "apps/web/src/test/render.test.tsx"
-      ],
-      "status": "covered"
     }
   }
 }
