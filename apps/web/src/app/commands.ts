@@ -22,6 +22,8 @@ export interface CommandDeps {
   openNew: () => void;
   toggleSpace?: () => void;
   space?: 'real' | 'demo';
+  /** When false (default), the six productivity destinations stay off the palette. */
+  productivityEnabled?: boolean;
 }
 
 /** Build the action list from the handlers the Shell owns. */
@@ -31,6 +33,7 @@ export function buildCommands({
   openNew,
   toggleSpace,
   space,
+  productivityEnabled = false,
 }: CommandDeps): CommandAction[] {
   const go = (to: string) => () => navigate(to);
   return [
@@ -82,6 +85,52 @@ export function buildCommands({
       keywords: 'changed history revisions activity what happened audit',
       run: go(ROUTES.ledger.path),
     },
+    ...(productivityEnabled
+      ? [
+          {
+            id: 'open-tasks',
+            label: 'Open Tasks',
+            glyph: ROUTES.tasks.glyph,
+            keywords: 'matrix inbox next doing eisenhower productivity',
+            run: go(ROUTES.tasks.path),
+          },
+          {
+            id: 'open-waiting',
+            label: 'Open Waiting',
+            glyph: ROUTES.waiting.glyph,
+            keywords: 'blocked follow-up waiting on productivity',
+            run: go(ROUTES.waiting.path),
+          },
+          {
+            id: 'open-review',
+            label: 'Open Review',
+            glyph: ROUTES.review.glyph,
+            keywords: 'weekly inbox triage productivity',
+            run: go(ROUTES.review.path),
+          },
+          {
+            id: 'open-analytics',
+            label: 'Open Analytics',
+            glyph: ROUTES.analytics.glyph,
+            keywords: 'stats figures history productivity',
+            run: go(ROUTES.analytics.path),
+          },
+          {
+            id: 'open-automation',
+            label: 'Open Automation',
+            glyph: ROUTES.automation.glyph,
+            keywords: 'rules if then productivity',
+            run: go(ROUTES.automation.path),
+          },
+          {
+            id: 'open-task-templates',
+            label: 'Open Task templates',
+            glyph: ROUTES.taskTemplates.glyph,
+            keywords: 'project item template productivity',
+            run: go(ROUTES.taskTemplates.path),
+          },
+        ]
+      : []),
     {
       id: 'correspondence',
       label: 'Open Correspondence',

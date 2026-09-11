@@ -20,7 +20,8 @@ import { QuickSwitcher } from '../features/QuickSwitcher.js';
 import { RemindersDrawer } from '../features/RemindersDrawer.js';
 import { NewEntityMenu } from '../features/forms/NewEntityMenu.js';
 import { useRoute } from '../lib/motion.js';
-import { HUBS, ROUTES, WORKSPACE_NAV, hubForPath, isRouteActive, type HubEntry } from './routes.js';
+import { isProductivityEnabled } from '../lib/productivity-flag.js';
+import { HUBS, ROUTES, hubForPath, isRouteActive, visibleWorkspaceNav, type HubEntry } from './routes.js';
 import { buildCommands } from './commands.js';
 import { Breadcrumb, crumbFor } from './Breadcrumb.js';
 import { entityHref } from '../lib/entity-href.js';
@@ -124,9 +125,11 @@ export function Shell({ children }: { children: ReactNode }) {
       : activeHub;
   // Billing is a real workspace destination only when the hosted plane is on;
   // a self-hosted install redirects it to Settings, so the strip omits it.
-  const localRoutes = (hasActiveHub ? WORKSPACE_NAV[activeHubId] : []).filter(
-    (route) => cloudEnabled || route.path !== '/settings/billing',
-  );
+  // Productivity destinations stay off the strip until the public flag is on.
+  const productivityEnabled = isProductivityEnabled();
+  const localRoutes = hasActiveHub
+    ? visibleWorkspaceNav(activeHubId, { cloudEnabled, productivityEnabled })
+    : [];
 
   const crumb = crumbFor(pathname);
   const routeAnnouncement = crumb.parent ? `${crumb.parent}, ${crumb.leaf}` : crumb.leaf;
@@ -556,6 +559,7 @@ export function Shell({ children }: { children: ReactNode }) {
               openNew: () => setNewMenu(true),
               toggleSpace,
               space,
+              productivityEnabled,
             })}
             onPick={(id, type) => {
               setSwitcher(false);

@@ -18,6 +18,13 @@ function crumbFor(pathname: string): Crumb {
   const exact: Record<string, Crumb> = {
     [ROUTES.today.path]: { parent: '', leaf: 'Today', glyph: 'today' },
     [ROUTES.planner.path]: { parent: 'Today', leaf: 'Planner', glyph: 'calendar' },
+    [ROUTES.ledger.path]: { parent: 'Today', leaf: 'Ledger', glyph: 'journal' },
+    [ROUTES.tasks.path]: { parent: 'Today', leaf: 'Tasks', glyph: 'task' },
+    [ROUTES.waiting.path]: { parent: 'Today', leaf: 'Waiting', glyph: 'bell' },
+    [ROUTES.review.path]: { parent: 'Today', leaf: 'Review', glyph: 'check' },
+    [ROUTES.analytics.path]: { parent: 'Today', leaf: 'Analytics', glyph: 'graph' },
+    [ROUTES.automation.path]: { parent: 'Today', leaf: 'Automation', glyph: 'adjust' },
+    [ROUTES.taskTemplates.path]: { parent: 'Today', leaf: 'Task templates', glyph: 'adjust' },
     [ROUTES.network.path]: { parent: '', leaf: 'Network', glyph: 'person' },
     [ROUTES.correspondence.path]: { parent: 'Network', leaf: 'Correspondence', glyph: 'interaction' },
     [ROUTES.people.path]: { parent: 'Network', leaf: 'People', glyph: 'person' },

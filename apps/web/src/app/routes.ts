@@ -29,6 +29,17 @@ export const ROUTES = {
   today: { path: '/today', label: 'Today', glyph: 'today', hub: 'today', end: true },
   planner: { path: '/today/planner', label: 'Planner', glyph: 'calendar', hub: 'today' },
   ledger: { path: '/today/ledger', label: 'Ledger', glyph: 'journal', hub: 'today' },
+  tasks: { path: '/today/tasks', label: 'Tasks', glyph: 'task', hub: 'today' },
+  waiting: { path: '/today/waiting', label: 'Waiting', glyph: 'bell', hub: 'today' },
+  review: { path: '/today/review', label: 'Review', glyph: 'check', hub: 'today' },
+  analytics: { path: '/today/analytics', label: 'Analytics', glyph: 'graph', hub: 'today' },
+  automation: { path: '/today/automation', label: 'Automation', glyph: 'adjust', hub: 'today' },
+  taskTemplates: {
+    path: '/today/task-templates',
+    label: 'Task templates',
+    glyph: 'adjust',
+    hub: 'today',
+  },
 
   network: { path: '/network', label: 'Network', glyph: 'person', hub: 'network', end: true },
   correspondence: {
@@ -165,6 +176,19 @@ export const HUBS: HubEntry[] = [
   { ...ROUTES.settings, id: 'settings', description: 'Identity and system controls' },
 ];
 
+/**
+ * Flagged Today extras. Always registered on `ROUTES` so a bookmark is not a
+ * silent 404; the shell and command palette omit them unless the web flag is on.
+ */
+export const PRODUCTIVITY_TODAY_NAV: RouteEntry[] = [
+  ROUTES.tasks,
+  ROUTES.waiting,
+  ROUTES.review,
+  ROUTES.analytics,
+  ROUTES.automation,
+  ROUTES.taskTemplates,
+];
+
 export const WORKSPACE_NAV: Record<HubId, RouteEntry[]> = {
   today: [ROUTES.today, ROUTES.planner, ROUTES.ledger],
   network: [
@@ -254,4 +278,16 @@ export function isRouteActive(pathname: string, route: RouteEntry, search = ''):
   }
   if (route.end) return pathname === path;
   return pathname === path || pathname.startsWith(`${path}/`);
+}
+
+/** Strip the shell actually paints: billing only on Cloud, productivity only when flagged. */
+export function visibleWorkspaceNav(
+  hub: HubId,
+  opts: { cloudEnabled?: boolean; productivityEnabled?: boolean } = {},
+): RouteEntry[] {
+  const { cloudEnabled = false, productivityEnabled = false } = opts;
+  const extra = hub === 'today' && productivityEnabled ? PRODUCTIVITY_TODAY_NAV : [];
+  return [...WORKSPACE_NAV[hub], ...extra].filter(
+    (route) => cloudEnabled || route.path !== ROUTES.settingsBilling.path,
+  );
 }

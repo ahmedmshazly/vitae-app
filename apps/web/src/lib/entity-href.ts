@@ -1,4 +1,5 @@
 import { isNodeType, type NodeType } from '@vitae/core';
+import { isProductivityEnabled } from './productivity-flag.js';
 
 /** Detail page for a node, people/orgs keep Network dossiers; everything else is `/n/:id`. */
 export function entityHref(type: string, id: string): string {
@@ -17,6 +18,7 @@ export function entityListHref(type: string): string {
   if (type === 'organization') return '/network/organizations';
   if (type === 'application') return '/career/applications';
   if (type === 'repository') return '/data/sources/github';
+  if (type === 'task' && isProductivityEnabled()) return '/today/tasks';
   if (isNodeType(type)) return `/browse/${type as NodeType}`;
   return '/explore/library';
 }

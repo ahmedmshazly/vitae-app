@@ -8,6 +8,7 @@ interface ImportMetaEnv {
   readonly VITE_FIREBASE_USE_EMULATOR: string;
   readonly VITE_PUBLIC_REPOSITORY_URL?: string;
   readonly VITE_PUBLIC_CLOUD_ENABLED?: string;
+  readonly VITE_PUBLIC_PRODUCTIVITY_ENABLED?: string;
   readonly VITE_PUBLIC_SITE_URL?: string;
   readonly VITE_PUBLIC_SUPPORT_EMAIL?: string;
   readonly VITE_PUBLIC_LEGAL_ENTITY_NAME?: string;

@@ -64,6 +64,10 @@ const ExportPage = lazyNamed(() => import('./routes/ExportPage.js'), 'ExportPage
 const NotFound = lazyNamed(() => import('./routes/NotFound.js'), 'NotFound');
 const Planner = lazyNamed(() => import('./routes/workspaces/Planner.js'), 'Planner');
 const Ledger = lazyNamed(() => import('./routes/Ledger.js'), 'Ledger');
+const ProductivityPage = lazyNamed(
+  () => import('./features/productivity/ProductivityStub.js'),
+  'ProductivityPage',
+);
 const Correspondence = lazyNamed(() => import('./routes/Correspondence.js'), 'Correspondence');
 const NetworkHome = lazyNamed(() => import('./routes/workspaces/WorkspaceHomes.js'), 'NetworkHome');
 const ExploreHome = lazyNamed(() => import('./routes/workspaces/WorkspaceHomes.js'), 'ExploreHome');
@@ -363,6 +367,12 @@ function AuthedApp() {
                     mounted below so bookmarks and shared record links survive. */}
                 <Route path="/today/planner" element={<Planner />} />
                 <Route path="/today/ledger" element={<Ledger />} />
+                <Route path="/today/tasks" element={<ProductivityPage />} />
+                <Route path="/today/waiting" element={<ProductivityPage />} />
+                <Route path="/today/review" element={<ProductivityPage />} />
+                <Route path="/today/analytics" element={<ProductivityPage />} />
+                <Route path="/today/automation" element={<ProductivityPage />} />
+                <Route path="/today/task-templates" element={<ProductivityPage />} />
                 <Route path="/network" element={<NetworkHome />} />
                 <Route path="/network/correspondence" element={<Correspondence />} />
                 <Route path="/network/people" element={<People />} />

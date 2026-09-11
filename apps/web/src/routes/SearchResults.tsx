@@ -55,6 +55,7 @@ const GROUPS: Array<{ key: string; label: string; types: string[] }> = [
   { key: 'links', label: 'Links', types: ['link'] },
   { key: 'documents', label: 'Documents', types: ['document', 'media_item'] },
   { key: 'interactions', label: 'Interactions', types: ['interaction'] },
+  { key: 'tasks', label: 'Tasks', types: ['task'] },
 ];
 const OTHER = { key: 'other', label: 'Everything else' };
 
