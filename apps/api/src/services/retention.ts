@@ -47,6 +47,7 @@ const DEPENDENTS_OF_SUBJECT = [
 
 const DEPENDENTS_OF_NODE = [
   ['habit_checks', 'habit_id'],
+  ['time_entries', 'task_id'],
   ['merges', 'keep_id'],
   ['merges', 'drop_id'],
   ['dedup_dismissals', 'a'],
@@ -68,13 +69,16 @@ export async function purgeExpiredTrash(
   const days = opts.retentionDays ?? TRASH_RETENTION_DAYS;
   const cutoff = cutoffIso(days);
 
-  const [expiredNodes, expiredEdges, expiredAtoms, abandonedImports, pendingBlobGc] = await Promise.all([
-    repository.nodesDeletedBefore(cutoff),
-    repository.edgesDeletedBefore(cutoff),
-    repository.docIdsOlderThan('atoms', 'deleted_at', cutoff),
-    repository.docQuery<{ id: string; created_at?: string }>('imports', { status: 'staged' }),
-    repository.docQuery<{ id: string; storage_key?: string; mime?: string }>('attachments', { gc_pending: true }),
-  ]);
+  const [expiredNodes, expiredEdges, expiredAtoms, expiredTimeEntries, expiredRules, abandonedImports, pendingBlobGc] =
+    await Promise.all([
+      repository.nodesDeletedBefore(cutoff),
+      repository.edgesDeletedBefore(cutoff),
+      repository.docIdsOlderThan('atoms', 'deleted_at', cutoff),
+      repository.docIdsOlderThan('time_entries', 'deleted_at', cutoff),
+      repository.docIdsOlderThan('automation_rules', 'deleted_at', cutoff),
+      repository.docQuery<{ id: string; created_at?: string }>('imports', { status: 'staged' }),
+      repository.docQuery<{ id: string; storage_key?: string; mime?: string }>('attachments', { gc_pending: true }),
+    ]);
 
   const nodeIds = expiredNodes.map((n) => n.id);
   const edgeIds = new Set(expiredEdges.map((e) => e.id));
@@ -90,7 +94,9 @@ export async function purgeExpiredTrash(
   const atomIds = [
     ...new Set([...expiredAtoms, ...(await repository.docIdsWhereIn('atoms', 'owner_node', nodeIds))]),
   ];
-  const subjectIds = [...nodeIds, ...edgeIds, ...atomIds];
+  const nodeTimeEntries = await repository.docIdsWhereIn('time_entries', 'task_id', nodeIds);
+  const productivityIds = [...new Set([...expiredTimeEntries, ...expiredRules, ...nodeTimeEntries])];
+  const subjectIds = [...nodeIds, ...edgeIds, ...atomIds, ...productivityIds];
 
   const staleImportIds = abandonedImports
     .filter((row) => String(row.created_at ?? '') < cutoff)
@@ -159,6 +165,8 @@ export async function purgeExpiredTrash(
   for (const { table, ids } of dependents) await repository.docDeleteMany(table, ids);
   await repository.docDeleteMany('attachments', attachmentIds.filter((id) => !failedAttachments.has(id)));
   await repository.docDeleteMany('atoms', atomIds);
+  await repository.docDeleteMany('time_entries', expiredTimeEntries);
+  await repository.docDeleteMany('automation_rules', expiredRules);
   await repository.purgeEdges([...edgeIds]);
   await repository.purgeNodes(nodeIds);
   // ON DELETE CASCADE removes import_rows and import_raw_chunks with the parent,

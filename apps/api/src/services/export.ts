@@ -61,6 +61,10 @@ export const BUNDLE_COLLECTIONS: ReadonlyArray<{ file: string; table: TableName;
   { file: 'letters.jsonl', table: 'letters', optional: true },
   // Optional: added in migration 011 (FR-DOS-001). Older backups omit this file.
   { file: 'dossiers.jsonl', table: 'dossiers', optional: true },
+  // Optional: added in migration 012. Older backups omit these files.
+  { file: 'time_entries.jsonl', table: 'time_entries', optional: true },
+  { file: 'automation_rules.jsonl', table: 'automation_rules', optional: true },
+  { file: 'productivity_receipts.jsonl', table: 'productivity_receipts', optional: true },
   { file: 'templates.jsonl', table: 'templates' },
   { file: 'reminders.jsonl', table: 'reminders' },
   { file: 'tags.jsonl', table: 'tags' },
@@ -274,6 +278,18 @@ export async function* exportEntries(
   yield includeSensitive
     ? jsonlFile('dossiers.jsonl', 'dossiers', () => true)
     : emptyFile('dossiers.jsonl');
+  // A time entry inherits sensitivity from its task and may also mark itself.
+  yield jsonlFile('time_entries.jsonl', 'time_entries', async (_id, row) => {
+    if (includeSensitive) return true;
+    if (row.sensitive === true) return false;
+    return !(await nodeIsSensitive(row.task_id));
+  });
+  yield jsonlFile(
+    'automation_rules.jsonl',
+    'automation_rules',
+    (_id, row) => includeSensitive || row.sensitive !== true,
+  );
+  yield jsonlFile('productivity_receipts.jsonl', 'productivity_receipts', () => true);
   yield jsonlFile('templates.jsonl', 'templates', () => true);
   yield jsonlFile('reminders.jsonl', 'reminders', refersToSensitive(['subject_id']));
   yield jsonlFile('tags.jsonl', 'tags', async (tagId) => {

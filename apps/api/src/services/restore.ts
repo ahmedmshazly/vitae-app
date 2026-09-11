@@ -8,6 +8,7 @@
  * write into a non-empty database unless explicitly forced.
  */
 import { createHash } from 'node:crypto';
+import { isRevisionGuardedTable } from '../db/productivity-docs.js';
 import { repository } from '../db/repository.js';
 import { BUNDLE_COLLECTIONS, BUNDLE_SUBCOLLECTIONS, type ExportManifest } from './export.js';
 import { storage } from './storage/cloudinary.js';
@@ -102,6 +103,9 @@ export async function restoreBundle(
   const importIds = ids('imports.jsonl');
   const resumeIds = ids('resumes.jsonl');
   const letterIds = ids('letters.jsonl');
+  const timeEntryIds = ids('time_entries.jsonl');
+  const ruleIds = ids('automation_rules.jsonl');
+  const receiptIds = ids('productivity_receipts.jsonl');
   const requireRef = (file: string, row: Record<string, unknown>, field: string, allowed: Set<string>): void => {
     const value = row[field];
     if (typeof value === 'string' && value && !allowed.has(value)) {
@@ -113,6 +117,9 @@ export async function restoreBundle(
     if (kind === 'atom') return atomIds;
     if (kind === 'resume') return resumeIds;
     if (kind === 'letter') return letterIds;
+    if (kind === 'time_entry') return timeEntryIds;
+    if (kind === 'automation_rule') return ruleIds;
+    if (kind === 'productivity_receipt') return receiptIds;
     return nodeIds;
   };
   for (const row of rows['edges.jsonl']!) {
@@ -158,6 +165,11 @@ export async function restoreBundle(
     // failed disaster drill.
     for (const row of rows['dossiers.jsonl']) {
       requireRef('dossiers.jsonl', row, 'subject_node', nodeIds);
+    }
+  }
+  if (rows['time_entries.jsonl']) {
+    for (const row of rows['time_entries.jsonl']) {
+      requireRef('time_entries.jsonl', row, 'task_id', nodeIds);
     }
   }
   for (const file of ['import_rows.jsonl', 'import_raw_chunks.jsonl']) {
@@ -211,7 +223,11 @@ export async function restoreBundle(
       }
       return { id: docId, data };
     });
-    await repository.docBulkPut(spec.table, toWrite);
+    if (isRevisionGuardedTable(spec.table)) {
+      await repository.restoreDocuments(spec.table, toWrite);
+    } else {
+      await repository.docBulkPut(spec.table, toWrite);
+    }
 
     collections[spec.file.replace(/\.jsonl$/, '')] = collectionRows.length;
     total += collectionRows.length;

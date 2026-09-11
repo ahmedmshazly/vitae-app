@@ -1,6 +1,6 @@
 /**
  * Seed the DEMO data space with a fourteen-year working life for "Jordan Kim",
- * a software and data engineer. All 34 node types, all 29 edge types, and every
+ * a software and data engineer. All 34 node types, all 33 edge types, and every
  * product surface has enough in it to be read rather than merely rendered: a
  * career from a 2012 technician job to a graduate research assistantship, a
  * network of sixty-odd people across twenty-five organisations, years of dated
@@ -1391,8 +1391,8 @@ async function main() {
 
   const task = async (title: string, status: string, due?: string, priority = 'p2') =>
     repository.createNode({ type: 'task', title, props: { status, priority, ...(due ? { due } : {}) }, source: 'manual' });
-  await task('Prepare Aurora technical interview', 'doing', dateAgo(-3), 'p1');
-  await task('Send Priya the reference form', 'next', dateAgo(-7));
+  const auroraPrep = await task('Prepare Aurora technical interview', 'doing', dateAgo(-3), 'p1');
+  const priyaForm = await task('Send Priya the reference form', 'next', dateAgo(-7));
   await task('Calibrate résumé atoms for data-engineering roles', 'next');
   await task('Renew AWS certification', 'inbox', dateAgo(-60), 'p3');
 
@@ -1409,6 +1409,30 @@ async function main() {
     source: 'manual',
   });
   await repository.createEdge({ type: 'RELATES_TO', src: goalPub.id, dst: pubRl.id, props: { label: 'evidence' }, source: 'manual' });
+  await repository.createEdge({ type: 'DEPENDS_ON', src: auroraPrep.id, dst: priyaForm.id, source: 'manual' });
+  await repository.createEdge({ type: 'SERVES_GOAL', src: auroraPrep.id, dst: goalPub.id, source: 'manual' });
+  await repository.createEdge({ type: 'WAITING_ON', src: priyaForm.id, dst: priya, source: 'manual' });
+  await repository.createEdge({ type: 'FOR', src: auroraPrep.id, dst: app.id, source: 'manual' });
+
+  const prepStarted = daysAgo(1);
+  await repository.createTimeEntry({
+    task_id: auroraPrep.id,
+    started_at: prepStarted,
+    ended_at: new Date(Date.parse(prepStarted) + 3_600_000).toISOString(),
+    duration_sec: 3600,
+    note: 'Interview prep block',
+  });
+  await repository.createAutomationRule({
+    name: 'Flag overdue interview prep',
+    enabled: true,
+    condition: { kind: 'predicate', field: 'status', operator: 'eq', value: 'doing' },
+    actions: [{ field: 'priority', value: 'p1' }],
+  });
+  await repository.putProductivityReceipt({
+    operation_id: 'demo-seed-add-time-entry',
+    command_type: 'add_time_entry',
+    result: { seeded: true, task_id: auroraPrep.id },
+  });
 
   const habit = async (title: string, checkedDays: number[]) => {
     const h = await repository.createNode({ type: 'habit', title, props: { cadence: 'daily', active: true, target_per_period: 1 }, source: 'manual' });
@@ -3660,7 +3684,7 @@ Requirements
   const byType = new Map<string, number>();
   for (const node of liveNodes) byType.set(node.type, (byType.get(node.type) ?? 0) + 1);
   const docCounts: Array<[string, number]> = [];
-  for (const table of ['atoms', 'atom_variants', 'atom_skills', 'targets', 'resumes', 'letters', 'dossiers', 'revisions', 'tags', 'taggings', 'reminders', 'imports', 'import_rows', 'saved_views', 'habit_checks'] as const) {
+  for (const table of ['atoms', 'atom_variants', 'atom_skills', 'targets', 'resumes', 'letters', 'dossiers', 'time_entries', 'automation_rules', 'productivity_receipts', 'revisions', 'tags', 'taggings', 'reminders', 'imports', 'import_rows', 'saved_views', 'habit_checks'] as const) {
     docCounts.push([table, await repository.docCount(table)]);
   }
   console.log(`\n✓ Demo seed complete: ${counts.nodes} nodes, ${counts.edges} edges (demo_* collections).`);
