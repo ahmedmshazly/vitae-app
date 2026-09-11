@@ -3,27 +3,21 @@
  *
  * Does not replace `parseFilterQuery` in `@vitae/core` algorithms. Field
  * names follow the compatibility map (`due`, `target`, Vitae statuses).
+ * Only fields `TaskReadModel` can satisfy are accepted; a `field:value`
+ * token the matcher cannot honour is invalid, not a silent miss.
  */
 import { tokenizeQuery } from '../algorithms/filter-grammar.js';
 import { DATE_ONLY, isValidDateOnly } from './calendar.js';
-import {
-  ENERGY_LEVELS,
-  IMPORTANCE,
-  QUADRANTS,
-  VITAE_PRIORITIES,
-  VITAE_TASK_STATUSES,
-} from './contracts.js';
+import { IMPORTANCE, QUADRANTS, VITAE_PRIORITIES, VITAE_TASK_STATUSES } from './contracts.js';
 import type { TaskReadModel } from './read-models.js';
 
+/** Closed set: every member has a `clauseMatches` arm that can return true. */
 export const PRODUCTIVITY_FILTER_FIELDS = [
   'status',
   'importance',
   'priority',
-  'energy',
   'quadrant',
   'project',
-  'entity',
-  'tag',
   'has',
   'is',
   'due_before',
@@ -36,6 +30,7 @@ export type ProductivityFilterField = (typeof PRODUCTIVITY_FILTER_FIELDS)[number
 
 export const PRODUCTIVITY_FILTER_INVALID_REASONS = [
   'empty_value',
+  'unknown_field',
   'unknown_value',
   'invalid_date',
 ] as const;
@@ -55,12 +50,11 @@ export interface ProductivityFilterAst {
 }
 
 const FIELD_SET = new Set<string>(PRODUCTIVITY_FILTER_FIELDS);
-const HAS_VALUES = new Set(['due', 'target', 'follow_up', 'recurrence', 'notes']);
+const HAS_VALUES = new Set(['due', 'target', 'follow_up']);
 const IS_VALUES = new Set(['waiting', 'dropped', 'open', 'placed']);
 const STATUS_SET = new Set<string>(VITAE_TASK_STATUSES);
 const PRIORITY_SET = new Set<string>(VITAE_PRIORITIES);
 const IMPORTANCE_SET = new Set<string>(IMPORTANCE);
-const ENERGY_SET = new Set<string>(ENERGY_LEVELS);
 const QUADRANT_SET = new Set<string>(QUADRANTS);
 
 function validate(field: ProductivityFilterField, value: string): ProductivityFilterInvalidReason | null {
@@ -72,8 +66,6 @@ function validate(field: ProductivityFilterField, value: string): ProductivityFi
       return PRIORITY_SET.has(value.toLowerCase()) ? null : 'unknown_value';
     case 'importance':
       return IMPORTANCE_SET.has(value.toLowerCase()) ? null : 'unknown_value';
-    case 'energy':
-      return ENERGY_SET.has(value.toLowerCase()) ? null : 'unknown_value';
     case 'quadrant':
       return QUADRANT_SET.has(value.toLowerCase()) ? null : 'unknown_value';
     case 'has':
@@ -86,8 +78,6 @@ function validate(field: ProductivityFilterField, value: string): ProductivityFi
     case 'target_after':
       return DATE_ONLY.test(value) && isValidDateOnly(value) ? null : 'invalid_date';
     case 'project':
-    case 'entity':
-    case 'tag':
       return null;
   }
 }
@@ -112,10 +102,11 @@ export function parseProductivityFilter(query: string): ProductivityFilterAst {
           clauses.push({ field: typed, value, raw: token });
         } else {
           invalid.push({ raw: token, reason });
-          if (value !== '') textParts.push(value);
         }
         continue;
       }
+      invalid.push({ raw: token, reason: 'unknown_field' });
+      continue;
     }
     textParts.push(token.replace(/^"|"$/g, ''));
   }
@@ -138,16 +129,10 @@ function clauseMatches(task: TaskReadModel, clause: ProductivityFilterClause): b
       return (task.importance ?? '').toLowerCase() === value;
     case 'priority':
       return (task.priority ?? '').toLowerCase() === value;
-    case 'energy':
-      return false;
     case 'quadrant':
       return (task.placement?.quadrant ?? task.quadrant ?? '') === value;
     case 'project':
       return (task.project_id ?? '').toLowerCase() === value;
-    case 'entity':
-      return false;
-    case 'tag':
-      return false;
     case 'has':
       if (value === 'due') return isSet(task.due);
       if (value === 'target') return isSet(task.target);
@@ -171,6 +156,7 @@ function clauseMatches(task: TaskReadModel, clause: ProductivityFilterClause): b
 }
 
 export function matchTask(task: TaskReadModel, ast: ProductivityFilterAst): boolean {
+  if (ast.invalid.length > 0) return false;
   if (!ast.clauses.every((clause) => clauseMatches(task, clause))) return false;
   if (ast.text === '') return true;
   return task.title.toLowerCase().includes(ast.text.toLowerCase());

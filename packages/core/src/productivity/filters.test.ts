@@ -34,6 +34,22 @@ describe('parseProductivityFilter', () => {
     expect(ast.clauses).toEqual([]);
     expect(ast.invalid[0]?.reason).toBe('invalid_date');
   });
+
+  it('rejects fields the task read model cannot satisfy', () => {
+    for (const query of ['energy:low', 'entity:sam', 'tag:work'] as const) {
+      const ast = parseProductivityFilter(query);
+      expect(ast.clauses).toEqual([]);
+      expect(ast.invalid).toEqual([{ raw: query, reason: 'unknown_field' }]);
+    }
+  });
+
+  it('rejects has values the task read model cannot satisfy', () => {
+    for (const query of ['has:recurrence', 'has:notes'] as const) {
+      const ast = parseProductivityFilter(query);
+      expect(ast.clauses).toEqual([]);
+      expect(ast.invalid).toEqual([{ raw: query, reason: 'unknown_value' }]);
+    }
+  });
 });
 
 describe('filterTasks', () => {
@@ -42,5 +58,7 @@ describe('filterTasks', () => {
     expect(filterTasks([inbox, waiting], 'is:waiting').map((task) => task.id)).toEqual(['t2']);
     expect(filterTasks([inbox, waiting], 'passport').map((task) => task.id)).toEqual(['t1']);
     expect(filterTasks([inbox, waiting], 'due_before:2026-09-20').map((task) => task.id)).toEqual(['t1']);
+    expect(filterTasks([inbox, waiting], 'has:due').map((task) => task.id)).toEqual(['t1']);
+    expect(filterTasks([inbox, waiting], 'energy:low')).toEqual([]);
   });
 });
