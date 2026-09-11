@@ -68,6 +68,7 @@ export const recurrenceCaseSchema = z.object({
     from: dateOnlySchema,
     count: z.number().int().positive(),
     exceptions: z.array(dateOnlySchema).default([]),
+    lastCompletedAt: dateOnlySchema.optional(),
   }),
   expected: z.object({
     dates: z.array(dateOnlySchema),
