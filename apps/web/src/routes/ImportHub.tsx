@@ -74,7 +74,34 @@ interface SettingsResp {
   github: { configured: boolean; lastSyncAt: string | null };
 }
 
-type Kind = 'linkedin' | 'contacts' | 'calendar' | 'bookmarks' | 'resume' | 'aperture';
+type Kind =
+  | 'linkedin'
+  | 'contacts'
+  | 'calendar'
+  | 'bookmarks'
+  | 'resume'
+  | 'aperture'
+  | 'todoist'
+  | 'things'
+  | 'ticktick'
+  | 'trello'
+  | 'asana'
+  | 'notion'
+  | 'tasks_json'
+  | 'tasks_csv'
+  | 'tasks_text';
+
+export const TASK_FILE_IMPORTER_KINDS = [
+  'todoist',
+  'things',
+  'ticktick',
+  'trello',
+  'asana',
+  'notion',
+  'tasks_json',
+  'tasks_csv',
+  'tasks_text',
+] as const;
 
 const IMPORTERS: Array<{
   kind: Kind | 'github';
@@ -129,6 +156,68 @@ const IMPORTERS: Array<{
     name: 'Aperture bundle',
     desc: 'Scraped people, posts and companies as linked records',
     accept: '.json',
+  },
+  {
+    kind: 'todoist',
+    glyph: 'task',
+    name: 'Todoist',
+    desc: 'Project CSV export — tasks and subtasks',
+    accept: '.csv,.txt',
+  },
+  {
+    kind: 'things',
+    glyph: 'task',
+    name: 'Things',
+    desc: 'Things JSON or things:///json URL',
+    accept: '.json,.txt',
+  },
+  {
+    kind: 'ticktick',
+    glyph: 'task',
+    name: 'TickTick',
+    desc: 'Account backup CSV',
+    accept: '.csv,.txt',
+  },
+  {
+    kind: 'trello',
+    glyph: 'project',
+    name: 'Trello',
+    desc: 'Board JSON export',
+    accept: '.json',
+  },
+  {
+    kind: 'asana',
+    glyph: 'task',
+    name: 'Asana',
+    desc: 'Project CSV export',
+    accept: '.csv,.txt',
+  },
+  {
+    kind: 'notion',
+    glyph: 'document',
+    name: 'Notion',
+    desc: 'Database CSV export',
+    accept: '.csv,.txt',
+  },
+  {
+    kind: 'tasks_json',
+    glyph: 'task',
+    name: 'Tasks JSON',
+    desc: 'vitae.tasks or fourfold.transfer document',
+    accept: '.json',
+  },
+  {
+    kind: 'tasks_csv',
+    glyph: 'task',
+    name: 'Tasks CSV',
+    desc: 'Generic task CSV with a title column',
+    accept: '.csv,.txt',
+  },
+  {
+    kind: 'tasks_text',
+    glyph: 'task',
+    name: 'Tasks text',
+    desc: 'One task per line, capture-style tokens',
   },
 ];
 
@@ -293,7 +382,8 @@ export function ImportHub() {
       githubSync.mutate();
       return;
     }
-    if (kind === 'resume') {
+    if (kind === 'resume' || kind === 'tasks_text') {
+      setPendingKind(kind);
       setPasteOpen(true);
       return;
     }
@@ -672,7 +762,9 @@ export function ImportHub() {
                       ? `Sync GitHub: ${st.label}`
                       : im.kind === 'resume'
                         ? `Open résumé disassembly: ${st.label}`
-                        : `Import ${im.name}: ${st.label}`
+                        : im.kind === 'tasks_text'
+                          ? `Open tasks text: ${st.label}`
+                          : `Import ${im.name}: ${st.label}`
                   }
                 >
                   <Mono className="data-ledger-index" aria-hidden>
@@ -703,17 +795,25 @@ export function ImportHub() {
       </Section>
 
       {pasteOpen && (
-        <Section title="Résumé disassembly">
+        <Section title={pendingKind === 'tasks_text' ? 'Tasks text' : 'Résumé disassembly'}>
           <div className="data-stage-editor">
             <p className="m-0 mb-3 text-sm text-ink-soft">
-              Paste résumé text. Substantial lines become candidate atoms; assign each to a role or
-              project, then commit.
+              {pendingKind === 'tasks_text'
+                ? 'Paste one task per line. Capture tokens (!p1, #project, due fri) become fields; review before commit.'
+                : 'Paste résumé text. Substantial lines become candidate atoms; assign each to a role or project, then commit.'}
             </p>
-            <Field label="Résumé text" htmlFor={`${pasteIds}-text`}>
+            <Field
+              label={pendingKind === 'tasks_text' ? 'Task list' : 'Résumé text'}
+              htmlFor={`${pasteIds}-text`}
+            >
               <Textarea
                 id={`${pasteIds}-text`}
                 rows={10}
-                placeholder="Paste your résumé text here..."
+                placeholder={
+                  pendingKind === 'tasks_text'
+                    ? 'Renew passport !p1 due 2026-09-11'
+                    : 'Paste your résumé text here...'
+                }
                 value={pasteText}
                 onChange={(e) => setPasteText(e.target.value)}
               />
@@ -722,9 +822,9 @@ export function ImportHub() {
               <Button
                 variant="primary"
                 disabled={!pasteText.trim() || stage.isPending}
-                onClick={() => stage.mutate({ kind: 'resume', content: pasteText })}
+                onClick={() => stage.mutate({ kind: pendingKind, content: pasteText })}
               >
-                {stage.isPending ? 'Staging...' : 'Disassemble'}
+                {stage.isPending ? 'Staging...' : pendingKind === 'tasks_text' ? 'Stage' : 'Disassemble'}
               </Button>
               <Button onClick={() => setPasteOpen(false)}>Cancel</Button>
             </div>

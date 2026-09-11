@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { commitAction, sourceStatus, type Batch } from './ImportHub.js';
+import { commitAction, sourceStatus, TASK_FILE_IMPORTER_KINDS, type Batch } from './ImportHub.js';
 
 function batch(over: Partial<Batch> & Pick<Batch, 'kind' | 'status'>): Batch {
   return {
@@ -51,6 +51,22 @@ describe('sourceStatus', () => {
       label: 'ready',
       tone: 'muted',
     });
+  });
+});
+
+describe('task-file importers', () => {
+  it('lists the nine task-file kinds on the existing hub', () => {
+    expect([...TASK_FILE_IMPORTER_KINDS]).toEqual([
+      'todoist',
+      'things',
+      'ticktick',
+      'trello',
+      'asana',
+      'notion',
+      'tasks_json',
+      'tasks_csv',
+      'tasks_text',
+    ]);
   });
 });
 
