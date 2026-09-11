@@ -29,6 +29,7 @@ canonical registered spellings; the register itself is
 | Ops                  | /status health page; Cloudinary storage adapter; Tectonic build service w/ graceful fallback                                                                                                   | FR-SET-006, NFR-SEC-002/003      |
 | Provenance & history | Source+confidence chips across surfaces, the source reference on the record header, the Ledger feed under Today, and field-level diffs in record history                                        | FR-PROV-001, FR-PROV-002, FR-PROV-003 |
 | Correspondence       | Dormant-but-once-strong ties ranked for reactivation by the tie-strength kernel re-read over each tie's history, with factor chips and the considered count; the per-person profile (reciprocity, per-direction reply latency, unanswered inbound, contact days) from operator-stated directions; recorded introductions (the INTRODUCED edge) feeding brokers, warm-path hops, and the favor ledger, kept apart from free-text met-via credits | FR-COMM-002, FR-COMM-001, FR-COMM-003 |
+| Productivity         | Fourfold task matrix, waiting, review, private analytics, automation, and task templates, shipped behind `VITAE_PRODUCTIVITY_ENABLED` and `VITE_PUBLIC_PRODUCTIVITY_ENABLED` (both default off). `/today`, planner, and ledger unchanged. Kill switch: unset either flag. | FR-PROD-001, FR-PROD-002, FR-PROD-003, FR-PROD-004, NFR-PROD-001 |
 
 ## The algorithms (the "science"): all unit-tested
 

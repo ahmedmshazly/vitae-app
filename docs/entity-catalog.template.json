@@ -1842,6 +1842,10 @@
             "medium",
             "high"
           ]
+        },
+        "project_id": {
+          "type": "string",
+          "note": "Workspace node id of the project this task belongs to, when known."
         }
       },
       "create_subject": null,

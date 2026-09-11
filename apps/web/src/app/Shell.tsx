@@ -125,7 +125,7 @@ export function Shell({ children }: { children: ReactNode }) {
       : activeHub;
   // Billing is a real workspace destination only when the hosted plane is on;
   // a self-hosted install redirects it to Settings, so the strip omits it.
-  // Productivity destinations stay off the strip until the public flag is on.
+  // Productivity destinations stay off the strip until the public flag is on (FR-PROD-002).
   const productivityEnabled = isProductivityEnabled();
   const localRoutes = hasActiveHub
     ? visibleWorkspaceNav(activeHubId, { cloudEnabled, productivityEnabled })

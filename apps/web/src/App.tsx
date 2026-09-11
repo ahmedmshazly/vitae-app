@@ -367,6 +367,7 @@ function AuthedApp() {
                     mounted below so bookmarks and shared record links survive. */}
                 <Route path="/today/planner" element={<Planner />} />
                 <Route path="/today/ledger" element={<Ledger />} />
+                {/* Gated Fourfold surfaces (FR-PROD-001). Off until VITE_PUBLIC_PRODUCTIVITY_ENABLED. Today, planner, and ledger stay above and do not move. */}
                 <Route path="/today/tasks" element={<ProductivityPage />} />
                 <Route path="/today/waiting" element={<ProductivityPage />} />
                 <Route path="/today/review" element={<ProductivityPage />} />

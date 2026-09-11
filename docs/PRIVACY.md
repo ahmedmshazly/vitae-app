@@ -16,6 +16,17 @@ person. Use the demo space when reproducing an issue.
 The project provides local export and restore tooling. Test a restore against a
 non-production database before relying on it for recovery.
 
+## Productivity analytics
+
+When `VITAE_PRODUCTIVITY_ENABLED` is on, `/api/v1/productivity/analytics` and
+`/today/analytics` compute figures on read from the operator's own records and
+revisions (FR-PROD-004, ADR 0012). That is not product telemetry: nothing about
+placement, completion, or time spent leaves the workspace, and no analytics
+client is embedded. Sensitive records are excluded by default. A share-safe
+export also drops `productivity_receipts` and anything that references a
+sensitive node. A sparse or unknown history is declared as such; silence is
+not a zero.
+
 ## Hosted Cloud status
 
 The source project does not currently operate a public hosted data service or

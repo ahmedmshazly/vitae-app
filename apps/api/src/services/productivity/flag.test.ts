@@ -12,6 +12,11 @@ describe('isProductivityEnabled', () => {
     else process.env[FLAG] = original;
   });
 
+  it('treats unset as the FR-PROD-001 kill switch', () => {
+    const env: NodeJS.ProcessEnv = {};
+    expect(isProductivityEnabled(env)).toBe(false);
+  });
+
   it('is false when unset or not an allowed token', () => {
     const env: NodeJS.ProcessEnv = {};
     expect(isProductivityEnabled(env)).toBe(false);

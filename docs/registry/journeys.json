@@ -127,6 +127,20 @@
         "e2e/tests/journeys.spec.ts"
       ],
       "note": "Also asserted at the API level by apps/api/src/__tests__/api.integration.test.ts, which records the soft-delete and restore operations."
+    },
+    {
+      "id": "J9",
+      "title": "Work the productivity matrix",
+      "statement": "With both productivity flags on, the operator opens Tasks, captures a task into a quadrant, completes it, and sees the completion survive reload. Waiting, Review, Analytics, Automation, and Task templates are reachable from the Today strip. With either flag off, the API answers 404 and the web hides the destinations.",
+      "status": "partial",
+      "capabilities": [
+        "CAP-PRODUCTIVITY"
+      ],
+      "target": "The matrix walk completes without a second source of truth, and the kill switch hides the surface without a distinct disabled code.",
+      "e2e": [
+        "e2e/tests/productivity.spec.ts"
+      ],
+      "note": "The browser walk is named in e2e/tests/productivity.spec.ts and skips when either flag is off, which is the default. Flag-off API 404 and web no-fetch are covered by integration and component tests rather than this spec, which is why the journey stays partial."
     }
   ]
 }

@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import { signIn } from './helpers/auth';
 
 /**
+ * J9 — Work the productivity matrix.
  * Productivity journey. Both flags must be on in the running API and web build:
  *
  *   VITAE_PRODUCTIVITY_ENABLED=true
@@ -24,13 +25,18 @@ function flagsOn(): boolean {
 }
 
 test.describe('productivity matrix', () => {
+  // Default-off kill switch: J9 must not fail the e2e gate while flags stay false.
+  // eslint-disable-next-line playwright/no-skipped-test -- flags-off skip is the documented default
   test.skip(!flagsOn(), 'Requires VITAE_PRODUCTIVITY_ENABLED and VITE_PUBLIC_PRODUCTIVITY_ENABLED');
 
   test('create appears in a quadrant, complete survives reload', async ({ page }) => {
     await signIn(page);
     await page.goto('/today/tasks');
 
+    // Vite bakes the public flag at build time; process env alone is not enough.
+    // eslint-disable-next-line playwright/no-conditional-in-test -- skip when the running web build still has the flag off
     if (await page.getByText('Not available').isVisible()) {
+      // eslint-disable-next-line playwright/no-skipped-test -- skip when the running web build still has the flag off
       test.skip(true, 'Running web build has VITE_PUBLIC_PRODUCTIVITY_ENABLED off');
     }
 

@@ -36,7 +36,7 @@ hundreds of call sites still name `--ae-*` tokens, and every one is aliased onto
 the new system until migrated. A script fails the build on several patterns the
 older identities asked for.
 
-See [`docs/design/IDENTITY.md`](../../design/IDENTITY.md) for the cheap-to-load
+See `docs/design/IDENTITY.md` for the cheap-to-load
 extract; where this page and that file disagree on current values, the token
 file renders.
 

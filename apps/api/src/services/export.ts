@@ -61,7 +61,7 @@ export const BUNDLE_COLLECTIONS: ReadonlyArray<{ file: string; table: TableName;
   { file: 'letters.jsonl', table: 'letters', optional: true },
   // Optional: added in migration 011 (FR-DOS-001). Older backups omit this file.
   { file: 'dossiers.jsonl', table: 'dossiers', optional: true },
-  // Optional: added in migration 012. Older backups omit these files.
+  // Optional: added in migration 012 (FR-PROD-003). Older backups omit these files.
   { file: 'time_entries.jsonl', table: 'time_entries', optional: true },
   { file: 'automation_rules.jsonl', table: 'automation_rules', optional: true },
   { file: 'productivity_receipts.jsonl', table: 'productivity_receipts', optional: true },

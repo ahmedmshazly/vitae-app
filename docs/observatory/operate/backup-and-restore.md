@@ -245,7 +245,12 @@ The drill exports, verifies every checksum and count against the manifest,
 opens the human-readable vault tree to confirm records are legible without this
 software at all, restores into a fresh empty database, and then compares the
 restored instance's manifest counts against the bundle's and spot-checks a few
-real queries - a search, a person page, a résumé output.
+real queries - a search, a person page, a résumé output. A full backup ZIP also
+carries `time_entries.jsonl`, `automation_rules.jsonl`, and
+`productivity_receipts.jsonl`, plus the `DEPENDS_ON`, `SERVES_GOAL`,
+`WAITING_ON`, and `FOR` edges (FR-PROD-003). Share-safe export still empties
+receipts and drops anything tied to a sensitive record. Run that half of the
+drill on a throwaway database, never the everyday `vitae` URL.
 
 `docs/runbooks/postgres-restore.md` applies in an emergency, and is the one to
 reach for when the question is "how do I get the database back". It carries the

@@ -1,8 +1,9 @@
 /**
- * Default-off API gate for the productivity vertical slice (ADR 0013).
+ * Default-off API gate for the productivity vertical slice (ADR 0013, FR-PROD-001).
  *
  * Read on every request so tests can toggle the env var without rebooting the
  * process. A distinct disabled code would advertise that the mount exists.
+ * Unset or any value other than true / 1 / yes is the kill switch.
  */
 import { PRODUCTIVITY_API_FLAG } from '@vitae/core';
 

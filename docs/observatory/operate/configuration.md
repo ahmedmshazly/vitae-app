@@ -23,8 +23,9 @@ sources:
   - deploy/.env.example
   - firebase.json
   - docs/runbooks/run-emulators.md
-requirements: [FR-015, FR-027, FR-004]
-covers: [runbook:docs/runbooks/run-emulators.md]
+  - docs/runbooks/productivity-flag.md
+requirements: [FR-015, FR-027, FR-004, FR-PROD-001]
+covers: [runbook:docs/runbooks/run-emulators.md, runbook:docs/runbooks/productivity-flag.md]
 related: [OPS-DEPLOY, OPS-SECRETS, OPS-INCIDENT, OPS-MIGRATE]
 ---
 
@@ -201,6 +202,27 @@ Billing credentials are read only when the endpoint that needs them is invoked,
 so a local or test run makes no accidental provider traffic. Turning either on
 is a launch decision governed by `docs/CLOUD-LAUNCH.md`, not a configuration
 change.
+
+### The two productivity flags are separate, and both are closed
+
+Fourfold productivity is held shut by two independent flags that do different
+jobs, both defaulting to off (FR-PROD-001). Neither is on in a default build,
+and committed `.env.example` stays `false`.
+
+`VITAE_PRODUCTIVITY_ENABLED` is read on every API request. Unset or any value
+other than `true` / `1` / `yes` makes `/api/v1/productivity` answer 404 with
+the same envelope as a missing task. That is the kill switch for writes and
+reads.
+
+`VITE_PUBLIC_PRODUCTIVITY_ENABLED` is a web **build** value. Unset or any
+non-truthy token keeps Tasks, Waiting, Review, Analytics, Automation, and Task
+templates out of the Today strip and the palette. Bookmarks still resolve
+behind AuthGate to a short "Not available" page and must not fetch the API.
+Changing it requires a rebuild, not only an API restart.
+
+`/today`, `/today/planner`, and `/today/ledger` do not move. Import Hub task
+kinds are not gated. The local enable procedure — demo space first, then the
+operator workspace — is `docs/runbooks/productivity-flag.md`.
 
 ### The documentation corpus has to be pointed at
 

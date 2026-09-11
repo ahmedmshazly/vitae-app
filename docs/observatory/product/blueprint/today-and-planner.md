@@ -77,3 +77,15 @@ for deletes extended to all writes.
 Acceptance: filterable by operation and source; an import batch groups as one
 expandable entry; every entry's diff matches the stored revision exactly;
 empty state distinguishes "no changes yet" from a failed load (NFR-REL-004).
+
+## Gated productivity screens — ADD, under Today
+
+**Verdict: ADD - delivered behind flags** at `/today/tasks`, `/today/waiting`,
+`/today/review`, `/today/analytics`, `/today/automation`, and
+`/today/task-templates` (FR-PROD-001, FR-PROD-002). They stay off the Today
+strip until `VITE_PUBLIC_PRODUCTIVITY_ENABLED` is on. The three screens above
+do not move.
+
+Personas: an operator who asked for the Fourfold matrix. Acceptance: flag off
+hides nav and commands and 404s the API; flag on shows the six destinations
+without changing Today, Planner, or the Ledger.

@@ -152,6 +152,8 @@ recoverable hour into a restore.
 | Records are missing with no schema change | Retention purge, a forced restore, or a deletion | [Backup and restore](backup-and-restore.md) |
 | A credential may have been exposed | - | [Secrets and rotation](secrets-and-rotation.md), rotate before investigating |
 | The last backup is old or absent | The scheduled job stopped and nothing said so | [Backup and restore](backup-and-restore.md) |
+| Productivity routes appeared for an operator who did not opt in | A flag was left on in the API env or the web build | Kill switch in [Configuration](configuration.md) and `docs/runbooks/productivity-flag.md`: unset both flags, restart the API, rebuild the web app |
+| Productivity analytics look like product telemetry | They are not. Figures are private compute-on-read | [What Vitae does not do](../product/boundaries.md); ADR 0012. There is no outbound analytics client |
 
 ## Data loss
 

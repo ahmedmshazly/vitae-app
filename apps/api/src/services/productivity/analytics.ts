@@ -1,7 +1,7 @@
 /**
- * Private productivity analytics read model. Computed on read (ADR 0012).
- * Sensitive records are dropped before they reach a figure. No cache in v1;
- * a later memo would compare `writeGeneration()`.
+ * Private productivity analytics read model. Computed on read (ADR 0012, FR-PROD-004).
+ * Sensitive records are dropped before they reach a figure. No telemetry.
+ * No cache in v1; a later memo would compare `writeGeneration()`.
  */
 import {
   addCalendarDays,

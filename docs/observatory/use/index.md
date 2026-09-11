@@ -22,7 +22,9 @@ know what a node is, not that you have any records yet.
 
 Everything here describes behaviour that exists in the code today. Where a
 screen only appears under a configuration flag, the page says so rather than
-describing it as though everyone has it.
+describing it as though everyone has it. The productivity destinations under
+Today are the current example: they exist in the repository and stay hidden
+until both flags are on.
 
 ## The pages
 

@@ -34,7 +34,7 @@ of a registry is a second source that will disagree with the first.
 
 ## What the register contains
 
-Sixteen capabilities, of which fifteen are implemented and one is gated. The
+Seventeen capabilities, of which fifteen are implemented and two are gated. The
 register's own vocabulary is precise about what those words claim: *implemented*
 means enforced by shipped code and reachable by someone running a self-hosted
 install; *gated* means shipped in the repository but withheld from the public
@@ -47,7 +47,7 @@ a flat list.
 | Group | Capabilities | What the group is |
 | --- | --- | --- |
 | Substrate | `CAP-FOUNDATION`, `CAP-AUTH`, `CAP-DATA-CORE` | The toolchain, the request gate, and the typed graph everything else is written into |
-| Working the graph | `CAP-CAPTURE`, `CAP-ORGANIZE`, `CAP-SEARCH`, `CAP-RELATIONSHIPS`, `CAP-EXPLORE`, `CAP-IMPORT`, `CAP-IDENTITY` | Getting records in, keeping them findable and correct, and reading them back |
+| Working the graph | `CAP-CAPTURE`, `CAP-ORGANIZE`, `CAP-SEARCH`, `CAP-RELATIONSHIPS`, `CAP-EXPLORE`, `CAP-IMPORT`, `CAP-IDENTITY`, `CAP-PRODUCTIVITY` | Getting records in, keeping them findable and correct, and reading them back |
 | Career output | `CAP-RESUME`, `CAP-CAREER`, `CAP-EXPORT` | Turning the graph into documents, applications and portable bundles |
 | Around the edges | `CAP-OPERATE`, `CAP-PLATFORM`, `CAP-CLOUD` | Running an instance, the constraints that hold across every screen, and the hosted control plane |
 
@@ -58,16 +58,20 @@ that keep the graph read once per view. Without a row of its own, that behaviour
 would be attributed to whichever feature last touched it and would lose its
 evidence the moment that feature changed.
 
-`CAP-CLOUD` is the single gated row, and the only one whose closure is a product
-decision rather than an implementation state. [What Vitae does not do](boundaries.md)
-covers what it is and is not.
+`CAP-CLOUD` and `CAP-PRODUCTIVITY` are the gated rows. Cloud's closure is a
+product decision rather than an implementation state.
+[What Vitae does not do](boundaries.md) covers what hosted Cloud is and is not.
+Productivity is shipped behind `VITAE_PRODUCTIVITY_ENABLED` and
+`VITE_PUBLIC_PRODUCTIVITY_ENABLED`; both stay off until an operator turns them
+on locally. [Configuration and its failure modes](../operate/configuration.md)
+names the kill switch.
 
 ## How a capability reaches requirements, code and tests
 
 The spine has three links, and each one is a different kind of statement.
 
 1. **Capability to requirement.** Every requirement in
-   `docs/registry/requirements.json` names exactly one capability, and all 99 of
+   `docs/registry/requirements.json` names exactly one capability, and all of
    them do. This link is curated: a person decided the requirement belongs there.
 2. **Requirement to file.** `docs/generated/traceability.json` scans 780 tracked
    files, finds every file that writes a requirement's identifier, and records
@@ -137,10 +141,12 @@ the pipeline overview and the application dossier are shipped, reachable
 features with no requirement identifier anywhere in the code that names them.
 
 **One capability has no roadmap row.** `CAP-CLOUD` was added to the register from
-shipped code rather than recovered from `docs/ROADMAP.md` like the other fifteen,
-because the hosted control plane shipped without ever appearing on the roadmap.
-That is recorded as `DOC-D-011` in the [documentation inventory](../meta/index.md),
-along with the missing architecture decision record it implies.
+shipped code rather than recovered from `docs/ROADMAP.md` like the other
+capabilities, because the hosted control plane shipped without ever appearing on
+the roadmap. That is recorded as `DOC-D-011` in the
+[documentation inventory](../meta/index.md), along with the missing architecture
+decision record it implies. `CAP-PRODUCTIVITY` does have a roadmap row and stays
+gated.
 
 **The `surfaces` field is not machine-checked.** Each row lists the routes
 through which its capability is reached. Seven of the entries used to name

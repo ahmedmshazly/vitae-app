@@ -69,7 +69,9 @@ pnpm test:visual
 
 `seed` and `seed:demo` truncate before they write. They are meant for a scratch
 database; point `DATABASE_URL` somewhere disposable, or use `ci-local.sh`, which
-keeps its own.
+keeps its own. `seed:productivity-perf` writes 10,000 task nodes and refuses
+the default `vitae` / `vitae_test` databases; it needs a dedicated
+`DATABASE_URL` and `VITAE_PRODUCTIVITY_PERF_CONFIRM=YES`.
 
 ## Artifacts
 

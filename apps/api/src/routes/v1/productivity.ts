@@ -1,6 +1,7 @@
 /**
- * Flagged `/api/v1/productivity` command API. Writes go through commands;
- * reads attach `placeItem` placement. Does not replace `/nodes` or `/today`.
+ * Flagged `/api/v1/productivity` command API (FR-PROD-002). Writes go through
+ * commands; reads attach `placeItem` placement. Does not replace `/nodes` or
+ * `/today`. Flag off is a neutral 404 (FR-PROD-001).
  */
 import { Router } from 'express';
 import { asyncHandler, HttpError } from '../../middleware/error.js';

@@ -17,9 +17,12 @@ from its own export. This drill proves it.
    durable collection (`nodes`, `edges`, `revisions`, `atoms`, `atom_variants`,
    `atom_skills`, `targets`, `resumes`, `templates`, `reminders`, `tags`,
    `taggings`, `attachments`, `merges`, `imports`, `saved_views`, `meta`,
-   `habit_checks`, `dedup_dismissals`), `manifest.json`, and a `vault/`
-   Markdown tree. Every JSONL line carries `_doc_id`: the original document
-   identity.
+   `habit_checks`, `dedup_dismissals`, `time_entries`, `automation_rules`,
+   `productivity_receipts`), `manifest.json`, and a `vault/` Markdown tree.
+   Every JSONL line carries `_doc_id`: the original document identity.
+   Productivity collections and the `DEPENDS_ON`, `SERVES_GOAL`, `WAITING_ON`,
+   and `FOR` edges are part of a full backup (FR-PROD-003). Share-safe export
+   still drops `productivity_receipts` and anything tied to sensitive records.
 
    Privileged local CLI (same ZIP shape, always sensitive-inclusive unless
    `--share-safe`):
@@ -45,7 +48,17 @@ from its own export. This drill proves it.
    before writing, and refuses a non-empty target without `--force`.
 5. **Assert.** Compare `/api/v1/export/manifest` counts on the restored
    instance against the bundle's `manifest.json`, and spot-check canonical
-   queries (search, a person page, a résumé output).
+   queries (search, a person page, a résumé output). For a productivity
+   workspace, also confirm `time_entries`, `automation_rules`,
+   `productivity_receipts`, task props (`due` / `target` / `importance` /
+   `recurrence`), and the new edges survived.
+
+   Use a throwaway database, never the worktree's everyday `vitae` URL:
+
+   ```sh
+   DATABASE_URL=postgresql://vitae:vitae@127.0.0.1:5433/vitae_prod_drill \
+     CONFIRM=YES pnpm --filter @vitae/api exec tsx src/scripts/productivity-restore-drill.ts
+   ```
 
 Never replay `nodes.jsonl` through `POST /nodes` as a restore path: node
 creation assigns new IDs and would orphan every edge.

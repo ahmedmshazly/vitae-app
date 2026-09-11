@@ -41,7 +41,7 @@ snapshot.
 | E2E | `pnpm test:e2e` | Full stack business journeys |
 | Visual | `pnpm test:visual` | Screenshot baselines for stable surfaces |
 | Security | `pnpm test:security` | Authz, injection, HMAC, header/CORS contracts |
-| Performance | `pnpm test:performance` | Load + browser budgets |
+| Performance | `pnpm test:performance` | Web bundle size plus productivity matrix / analytics / chunk / query budgets |
 | Resilience | `pnpm test:resilience` | Fault injection and recovery |
 | Coverage aggregate | `pnpm test:coverage` | V8 LCOV/HTML with package thresholds |
 | Test prose | `pnpm test:prose` | AST check on titles/comments (allow-listed fixtures) |

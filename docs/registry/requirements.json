@@ -786,6 +786,50 @@
       "reconstruction_note": "The only citation is the identity-integrity row of docs/ROADMAP.md:22, so the statement is that row restated as a requirement rather than recovered from code. The behavior is implemented: the candidate queue and merge live in apps/api/src/routes/v1/duplicates.ts, and the scoring in packages/core/src/algorithms/dedup.ts. Neither cites the identifier, which is why the attribution is recorded here instead of being inferred silently."
     },
     {
+      "id": "FR-PROD-001",
+      "capability": "CAP-PRODUCTIVITY",
+      "kind": "functional",
+      "title": "Off-by-default dual flag and kill switch",
+      "statement": "The productivity command API and web surfaces stay off unless both VITAE_PRODUCTIVITY_ENABLED and VITE_PUBLIC_PRODUCTIVITY_ENABLED are the tokens true, 1, or yes. Unset or any other value on either flag is the kill switch: the API answers the same 404 as a missing route, and the web hides nav and commands. Committed environment examples remain false.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-09-11 from ADR 0013 and the Task 10 hardening plan. Enforced by apps/api/src/services/productivity/flag.ts and apps/web/src/lib/productivity-flag.ts."
+    },
+    {
+      "id": "FR-PROD-002",
+      "capability": "CAP-PRODUCTIVITY",
+      "kind": "functional",
+      "title": "Workspace-safe route, read, and write gating",
+      "statement": "When the flags are on, productivity reads and writes stay inside the active workspace and inherit the existing auth, space, and entitlement gates. /today, /today/planner, and /today/ledger do not move. Bookmarks to the gated routes still resolve behind AuthGate to a short not-available page rather than a distinct disabled code.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-09-11 from ADR 0013. Enforced by apps/api/src/routes/v1/productivity.ts and the web shell nav in apps/web/src/app/Shell.tsx."
+    },
+    {
+      "id": "FR-PROD-003",
+      "capability": "CAP-PRODUCTIVITY",
+      "kind": "functional",
+      "title": "Backup and restore include productivity collections",
+      "statement": "A full backup with includeSensitive true must carry time_entries, automation_rules, productivity_receipts, task props, and the DEPENDS_ON, SERVES_GOAL, WAITING_ON, and FOR edges. Share-safe export continues to drop receipts and anything tied to sensitive records. Restore must round-trip those collections on an isolated database.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-09-11 from the Task 10 plan. Enforced by apps/api/src/services/export.ts and documented in docs/runbooks/restore-drill.md."
+    },
+    {
+      "id": "FR-PROD-004",
+      "capability": "CAP-PRODUCTIVITY",
+      "kind": "functional",
+      "title": "Private compute-on-read analytics",
+      "statement": "Productivity analytics are computed on read from records plus revisions, declare history completeness, exclude sensitive records by default, and send no telemetry. Silence is not a zero.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-09-11 from ADR 0012. Enforced by apps/api/src/services/productivity/analytics.ts and asserted by docs/PRIVACY.md."
+    },
+    {
       "id": "FR-PROV-001",
       "capability": "CAP-PROV",
       "kind": "functional",
@@ -1333,6 +1377,17 @@
       "definition_provenance": "reconstructed",
       "review": "confirmed",
       "reconstruction_note": "Authored 2026-08-26 as a product decision under ADR 0007, generalizing what FR-CON-006 and FR-RES-007 each state for one surface into the rule every future surface is held to. Enforced today by the factor-chip decompositions across the ask, intros, tailor, and dashboard surfaces."
+    },
+    {
+      "id": "NFR-PROD-001",
+      "capability": "CAP-PRODUCTIVITY",
+      "kind": "non-functional",
+      "title": "Productivity performance budgets fail closed",
+      "statement": "A 10,000-task performance workspace must stay inside documented budgets for matrix interaction, analytics latency, route chunks, memory, and API query counts on GET /tasks and GET /analytics?window=30. A check that cannot measure a budget must fail rather than only log, unless the environment blocker is recorded and the gate is not claimed passed.",
+      "implementation_status": "implemented",
+      "definition_provenance": "reconstructed",
+      "review": "confirmed",
+      "reconstruction_note": "Authored 2026-09-11 from the Task 10 plan. Enforced by scripts/check-productivity-budgets.mjs against docs/testing/productivity-budgets.json."
     },
     {
       "id": "NFR-REL-003",

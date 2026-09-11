@@ -15,6 +15,8 @@ sources:
   - apps/web/src/routes/workspaces/WorkspaceHomes.tsx
   - apps/web/src/routes/workspaces/Planner.tsx
   - apps/web/src/routes/Dashboard.tsx
+  - apps/web/src/features/productivity/ProductivityStub.tsx
+  - apps/web/src/lib/productivity-flag.ts
   - apps/web/src/routes/People.tsx
   - apps/web/src/routes/Person.tsx
   - apps/web/src/routes/Orgs.tsx
@@ -130,8 +132,14 @@ covers:
   - route:/status
   - route:/timeline
   - route:/today
+  - route:/today/analytics
+  - route:/today/automation
   - route:/today/ledger
   - route:/today/planner
+  - route:/today/review
+  - route:/today/task-templates
+  - route:/today/tasks
+  - route:/today/waiting
   - route:/tour
   - route:/trash
   - route:/welcome
@@ -300,6 +308,13 @@ session and offers the way back.
 | --- | --- |
 | Today | `/today` |
 | Planner | `/today/planner` |
+| Ledger | `/today/ledger` |
+| Tasks | `/today/tasks` |
+| Waiting | `/today/waiting` |
+| Review | `/today/review` |
+| Analytics | `/today/analytics` |
+| Automation | `/today/automation` |
+| Task templates | `/today/task-templates` |
 
 **Today** is the agenda. It answers what needs you now, and it is ordered by
 that question rather than by category: one prioritised queue, **Needs you**,
@@ -331,6 +346,35 @@ source it came from - labelled from its own stored snapshot, so a deleted
 record still shows the name it had. Older pages load on request. Its empty
 state is *"No changes yet"*, and a failed load says so rather than posing as
 an empty history.
+
+The six screens below appear only when `VITE_PUBLIC_PRODUCTIVITY_ENABLED` is
+on in the web build. They do not replace Today, Planner, or the Ledger. With
+the public flag off, a bookmark still opens behind the sign-in gate and shows
+*"Not available"* without fetching `/productivity`. Turning the surface on is
+a local operator step, not a committed default; see
+`docs/runbooks/productivity-flag.md`.
+
+**Tasks** is the matrix. Open work is placed into Do, Schedule, Delegate, and
+Eliminate from dates and importance the operator already stored. Capture,
+complete, wait, and reorder happen here. Empty quadrants say so rather than
+drawing a blank grid.
+
+**Waiting** is the list of tasks whose status is waiting, with who they wait
+on. It is not the reconnect lane.
+
+**Review** is a period walk over the same private figures Analytics shows:
+what closed, what slipped, what stayed waiting. Completeness
+(`complete` / `sparse` / `unknown`) is part of the page, not a footnote.
+
+**Analytics** is compute-on-read over this workspace. It is not product
+telemetry. Sensitive titles stay out. A missing history is declared, not
+drawn as zero.
+
+**Automation** is the rule list: a named condition and the actions it would
+take. Rules do not leave the workspace.
+
+**Task templates** are reusable project or item shapes on the existing
+templates table. They are not résumé templates.
 
 The signed-in root, `/`, is not an application screen, but it now recognises
 you. The public root reads a synchronous session hint - set only when a

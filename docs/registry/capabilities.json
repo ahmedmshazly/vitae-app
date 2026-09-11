@@ -1,6 +1,6 @@
 {
   "$schema": "./schema/capabilities.schema.json",
-  "note": "Curated capability map. Capability rows are recovered from docs/ROADMAP.md, which is the only document that groups requirement identifiers by product area, and reconciled against shipped code. CAP-CLOUD has no ROADMAP row: the hosted control plane shipped without an entry, which is recorded as DOC-D-011 in docs/observatory/meta/coverage-and-contradictions.md.",
+  "note": "Curated capability map. Capability rows are recovered from docs/ROADMAP.md, which is the only document that groups requirement identifiers by product area, and reconciled against shipped code. CAP-CLOUD has no ROADMAP row: the hosted control plane shipped without an entry, which is recorded as DOC-D-011 in docs/observatory/meta/coverage-and-contradictions.md. CAP-PRODUCTIVITY is the second gated row: shipped behind VITAE_PRODUCTIVITY_ENABLED and VITE_PUBLIC_PRODUCTIVITY_ENABLED, both default off.",
   "status_vocabulary": {
     "implemented": "Enforced by shipped code in this repository and reachable by a user of a self-hosted install.",
     "gated": "Shipped in this repository but withheld from the public surface by a build or provisioning gate.",
@@ -177,6 +177,27 @@
         "docs/ROADMAP.md"
       ],
       "note": "Registered as intent under ADR 0007 and shipped in the same cycle. The source-and-confidence chip predated the capability as a design-system primitive; the Ledger feed, the field-level history diffs, and the source reference on the record are what the capability added."
+    },
+    {
+      "id": "CAP-PRODUCTIVITY",
+      "title": "Fourfold productivity",
+      "summary": "A default-off task matrix, waiting list, review, private analytics, automation rules, and task templates, gated by VITAE_PRODUCTIVITY_ENABLED and VITE_PUBLIC_PRODUCTIVITY_ENABLED.",
+      "status": "gated",
+      "surfaces": [
+        "/today/tasks",
+        "/today/waiting",
+        "/today/review",
+        "/today/analytics",
+        "/today/automation",
+        "/today/task-templates"
+      ],
+      "evidence": [
+        "apps/api/src/services/productivity/flag.ts",
+        "apps/web/src/lib/productivity-flag.ts",
+        "apps/api/src/routes/v1/productivity.ts",
+        "docs/adr/0013-productivity-routes-and-flag.md"
+      ],
+      "note": "Shipped in the repository and covered by tests, but withheld from every default install. The kill switch is unset or any non-truthy value on both flags: the API mount answers 404 and the web hides nav and commands. /today, /today/planner, and /today/ledger stay unchanged. Seed-demo may write productivity records; they stay inert until the flags are on."
     },
     {
       "id": "CAP-RESUME",
