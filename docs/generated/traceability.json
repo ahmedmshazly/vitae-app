@@ -2,8 +2,8 @@
   "generated_by": "scripts/docs/gen-traceability.mjs",
   "note": "Generated. Do not edit by hand; run `pnpm docs:gen`. Each row joins a requirement in docs/registry/requirements.json to every tracked file that cites its identifier. Citations are split three ways because they are not equal evidence: a citation in production source shows the behavior exists, a citation in a test shows it is protected, and a citation in a document shows only that somebody wrote it down.",
   "scan": {
-    "files_scanned": 946,
-    "files_citing": 244,
+    "files_scanned": 1000,
+    "files_citing": 242,
     "excluded": {
       "self_referential": [
         "/^docs\\/registry\\//",
@@ -20,11 +20,11 @@
   },
   "totals": {
     "registered": 131,
-    "citations": 920,
+    "citations": 918,
     "implemented_and_tested": 35,
-    "implemented_untested": 57,
+    "implemented_untested": 55,
     "tested_only": 3,
-    "documents_only": 36,
+    "documents_only": 38,
     "uncited": 0,
     "unregistered_identifiers": 0,
     "capabilities": 19,
@@ -37,7 +37,7 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-and-tested",
       "sources": [
-        "apps/api/src/services/restore.ts:137",
+        "apps/api/src/services/restore.ts:145",
         "apps/api/src/services/storage/memory.ts:14",
         "apps/web/src/routes/ExportPage.tsx:53"
       ],
@@ -65,7 +65,7 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-and-tested",
       "sources": [
-        "apps/api/src/db/repository.ts:603",
+        "apps/api/src/db/repository.ts:1025",
         "apps/api/src/routes/v1/composer.ts:82",
         "apps/api/src/routes/v1/interactions.ts:17",
         "apps/api/src/services/capture.ts:6",
@@ -139,7 +139,7 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-untested",
       "sources": [
-        "apps/api/src/db/repository.ts:525",
+        "apps/api/src/db/repository.ts:580",
         "apps/api/src/routes/v1/status.ts:14"
       ],
       "tests": [],
@@ -213,7 +213,7 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-untested",
       "sources": [
-        "apps/api/src/services/export.ts:219"
+        "apps/api/src/services/export.ts:223"
       ],
       "tests": [],
       "documents": []
@@ -225,7 +225,7 @@
       "evidence": "implemented-and-tested",
       "sources": [
         "apps/api/src/app.ts:19",
-        "apps/api/src/middleware/error.ts:32",
+        "apps/api/src/middleware/error.ts:37",
         "apps/api/src/routes/v1/imports.ts:21"
       ],
       "tests": [
@@ -554,7 +554,7 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-untested",
       "sources": [
-        "apps/api/src/db/repository.ts:541",
+        "apps/api/src/db/repository.ts:596",
         "apps/api/src/routes/v1/nodes.ts:78"
       ],
       "tests": [],
@@ -839,7 +839,7 @@
       ],
       "documents": [
         "docs/ROADMAP.md:31",
-        "docs/entity-catalog.template.json:2900",
+        "docs/entity-catalog.template.json:2977",
         "docs/observatory/architecture/career-graph.md:74",
         "docs/observatory/product/blueprint/network.md:64",
         "docs/observatory/product/blueprint/network.md:92",
@@ -945,8 +945,8 @@
         "apps/api/src/routes/v1/ask.ts:13",
         "apps/web/src/routes/Ask.tsx:2",
         "packages/core/src/algorithms/who-to-call.ts:6",
-        "packages/ui/src/components.tsx:151",
-        "packages/ui/src/components.tsx:254"
+        "packages/ui/src/components.tsx:152",
+        "packages/ui/src/components.tsx:255"
       ],
       "tests": [
         "packages/core/src/algorithms/who-to-call.test.ts:48"
@@ -1308,7 +1308,7 @@
       "definition_provenance": "reconstructed",
       "evidence": "implemented-and-tested",
       "sources": [
-        "apps/api/src/db/repository.ts:623",
+        "apps/api/src/db/repository.ts:1045",
         "apps/api/src/routes/v1/ledger.ts:8",
         "apps/web/src/routes/Ledger.tsx:59"
       ],
@@ -1496,7 +1496,7 @@
         "apps/api/src/routes/v1/resumes.ts:137",
         "packages/core/src/algorithms/line-model.ts:2",
         "packages/core/src/algorithms/line-model.ts:46",
-        "packages/ui/src/components.tsx:298",
+        "packages/ui/src/components.tsx:299",
         "services/buildsvc/src/calibrate.ts:2"
       ],
       "tests": [
@@ -2028,10 +2028,8 @@
       "capability": "CAP-PLATFORM",
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
-      "evidence": "implemented-untested",
-      "sources": [
-        "packages/ui/src/styles/base.css:123"
-      ],
+      "evidence": "documents-only",
+      "sources": [],
       "tests": [],
       "documents": [
         "docs/observatory/design/accessibility.md:20",
@@ -2354,13 +2352,11 @@
       "capability": "CAP-PLATFORM",
       "implementation_status": "implemented",
       "definition_provenance": "reconstructed",
-      "evidence": "implemented-untested",
-      "sources": [
-        "packages/ui/src/styles/tokens.css:2"
-      ],
+      "evidence": "documents-only",
+      "sources": [],
       "tests": [],
       "documents": [
-        "docs/observatory/design/identity.md:19",
+        "docs/observatory/design/identity.md:20",
         "docs/observatory/design/tokens.md:16"
       ]
     },
@@ -3836,14 +3832,8 @@
     "packages/ui/src/overlay.tsx": [
       "FR-022"
     ],
-    "packages/ui/src/styles/base.css": [
-      "NFR-A11Y-001"
-    ],
     "packages/ui/src/styles/components.css": [
       "FR-CAP-002"
-    ],
-    "packages/ui/src/styles/tokens.css": [
-      "INT-3"
     ],
     "scripts/check-workflow.mjs": [
       "FR-016"

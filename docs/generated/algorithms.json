@@ -1077,11 +1077,26 @@
           "file": "packages/core/src/algorithms/metamorphic.test.ts",
           "symbol": "parseFilterQuery",
           "test": true
+        },
+        {
+          "file": "packages/core/src/productivity/filters.test.ts",
+          "symbol": "parseFilterQuery",
+          "test": true
+        },
+        {
+          "file": "packages/core/src/productivity/filters.ts",
+          "symbol": "tokenizeQuery",
+          "test": false
+        },
+        {
+          "file": "packages/core/src/productivity/legacy-characterization.test.ts",
+          "symbol": "parseFilterQuery",
+          "test": true
         }
       ],
       "consumer_count": {
-        "product": 4,
-        "test": 11
+        "product": 5,
+        "test": 13
       }
     },
     {

@@ -60,7 +60,7 @@
     {
       "name": "Button",
       "module": "components.tsx",
-      "source": "packages/ui/src/components.tsx:41",
+      "source": "packages/ui/src/components.tsx:42",
       "section": "Button",
       "doc": "Ref-forwarding so it can anchor Radix triggers (Dropdown/Popover asChild).",
       "props": [],
@@ -176,9 +176,9 @@
     {
       "name": "ChargeRing",
       "module": "components.tsx",
-      "source": "packages/ui/src/components.tsx:362",
+      "source": "packages/ui/src/components.tsx:363",
       "section": "ChargeRing (reconnect lane: \"relationship charge\", reference arc())",
-      "doc": "Circular arc showing 1 − quiet/cadence: full = fresh, empty = overdue. Magnitude, so it is a sequential scale: one hue (the accent) stepping down in opacity, never a hue ramp. The three off-token blues and browns this used to fade through read as *categories* rather than as less-of-the-same, and none of them were tokens. The arc length carries the value on its own, the caller is still expected to print the number beside it.",
+      "doc": "Circular arc showing 1 − quiet/cadence: full = fresh, empty = overdue. Magnitude, so it is a sequential scale: one hue (Delegate yellow) stepping down in opacity, never a hue ramp. The three off-token blues and browns this used to fade through read as *categories* rather than as less-of-the-same, and none of them were tokens. The arc length carries the value on its own, the caller is still expected to print the number beside it.",
       "props": [
         {
           "name": "quiet",
@@ -307,7 +307,7 @@
     {
       "name": "Chip",
       "module": "components.tsx",
-      "source": "packages/ui/src/components.tsx:63",
+      "source": "packages/ui/src/components.tsx:64",
       "section": "Chip",
       "doc": null,
       "props": [
@@ -452,7 +452,7 @@
     {
       "name": "ClosenessDots",
       "module": "components.tsx",
-      "source": "packages/ui/src/components.tsx:480",
+      "source": "packages/ui/src/components.tsx:476",
       "section": "ClosenessDots (1-5 declared closeness)",
       "doc": "Closeness as a row of dots. The dots used to carry the whole reading in one colour channel, with the number itself only in a `title` on a span, which is not a reliable place to put anything. The dots are decoration now and the value is stated in text: visible where there is room for it, and spoken either way.",
       "props": [
@@ -916,7 +916,7 @@
     {
       "name": "DotGrid",
       "module": "components.tsx",
-      "source": "packages/ui/src/components.tsx:439",
+      "source": "packages/ui/src/components.tsx:440",
       "section": "DotGrid (habit streaks: 30-day grid)",
       "doc": null,
       "props": [
@@ -946,7 +946,7 @@
         }
       ],
       "defaults": {
-        "color": "'var(--ae-accent)'",
+        "color": "'var(--deleg)'",
         "recentWindow": "12"
       },
       "classes": [
@@ -1084,7 +1084,7 @@
     {
       "name": "EntityGlyph",
       "module": "components.tsx",
-      "source": "packages/ui/src/components.tsx:208",
+      "source": "packages/ui/src/components.tsx:209",
       "section": "Entity glyph tile",
       "doc": null,
       "props": [
@@ -1283,7 +1283,7 @@
     {
       "name": "FactorBar",
       "module": "components.tsx",
-      "source": "packages/ui/src/components.tsx:273",
+      "source": "packages/ui/src/components.tsx:274",
       "section": "FactorBar (score decomposition, FR-CON-006)",
       "doc": null,
       "props": [
@@ -1330,7 +1330,7 @@
     {
       "name": "FactorChip",
       "module": "components.tsx",
-      "source": "packages/ui/src/components.tsx:157",
+      "source": "packages/ui/src/components.tsx:158",
       "section": "Factor chip (score decomposition, explainability, FR-CON-006)",
       "doc": null,
       "props": [
@@ -1465,7 +1465,7 @@
     {
       "name": "FilterGroup",
       "module": "components.tsx",
-      "source": "packages/ui/src/components.tsx:111",
+      "source": "packages/ui/src/components.tsx:112",
       "section": "FilterGroup",
       "doc": null,
       "props": [
@@ -1840,7 +1840,7 @@
     {
       "name": "Kbd",
       "module": "components.tsx",
-      "source": "packages/ui/src/components.tsx:171",
+      "source": "packages/ui/src/components.tsx:172",
       "section": "Kbd",
       "doc": null,
       "props": [
@@ -1876,9 +1876,9 @@
     {
       "name": "LogoHorizontal",
       "module": "brand.tsx",
-      "source": "packages/ui/src/brand.tsx:55",
+      "source": "packages/ui/src/brand.tsx:91",
       "section": null,
-      "doc": "Horizontal lockup: mark + \"Vitae\" wordmark (IBM Plex Mono 500, caps, 0.26em tracking, the .u-display treatment). Wordmark is real text so it uses the self-hosted font and stays crisp at any density.",
+      "doc": "Horizontal lockup: mark + \"Vitae\" wordmark (Archivo Black, caps, -0.035em tracking, the .u-display treatment). Wordmark is real text so it uses the self-hosted face and stays crisp at any density.",
       "props": [
         {
           "name": "markSize",
@@ -1897,10 +1897,17 @@
           "type": "CSSProperties",
           "optional": true,
           "doc": null
+        },
+        {
+          "name": "variant",
+          "type": "'primary' | 'secondary' | 'inherit'",
+          "optional": true,
+          "doc": null
         }
       ],
       "defaults": {
-        "markSize": "28"
+        "markSize": "28",
+        "variant": "'primary'"
       },
       "classes": [],
       "wraps_radix": [],
@@ -1919,9 +1926,9 @@
     {
       "name": "LogoMark",
       "module": "brand.tsx",
-      "source": "packages/ui/src/brand.tsx:25",
+      "source": "packages/ui/src/brand.tsx:54",
       "section": null,
-      "doc": "The primary mark. One ink, never coloured, stretched, or rotated.",
+      "doc": "The primary mark. Never stretched, sheared, or rotated.",
       "props": [
         {
           "name": "size",
@@ -1946,10 +1953,17 @@
           "type": "string",
           "optional": true,
           "doc": null
+        },
+        {
+          "name": "variant",
+          "type": "'primary' | 'secondary' | 'inherit'",
+          "optional": true,
+          "doc": "Colour variant: 'primary' (yellow/deleg) | 'secondary' (ink) | 'inherit' (currentColor)"
         }
       ],
       "defaults": {
-        "size": "28"
+        "size": "28",
+        "variant": "'primary'"
       },
       "classes": [],
       "wraps_radix": [],
@@ -1969,9 +1983,9 @@
     {
       "name": "LogoStacked",
       "module": "brand.tsx",
-      "source": "packages/ui/src/brand.tsx:73",
+      "source": "packages/ui/src/brand.tsx:114",
       "section": null,
-      "doc": "Stacked lockup for sign-in / empty states. Achromatic like everything else.",
+      "doc": "Stacked lockup for sign-in / empty states.",
       "props": [
         {
           "name": "markSize",
@@ -1990,10 +2004,17 @@
           "type": "CSSProperties",
           "optional": true,
           "doc": null
+        },
+        {
+          "name": "variant",
+          "type": "'primary' | 'secondary' | 'inherit'",
+          "optional": true,
+          "doc": null
         }
       ],
       "defaults": {
-        "markSize": "56"
+        "markSize": "56",
+        "variant": "'primary'"
       },
       "classes": [],
       "wraps_radix": [],
@@ -2084,7 +2105,7 @@
     {
       "name": "Meter",
       "module": "components.tsx",
-      "source": "packages/ui/src/components.tsx:304",
+      "source": "packages/ui/src/components.tsx:305",
       "section": "Meter (résumé page-fill, FR-RES-009)",
       "doc": null,
       "props": [
@@ -2295,7 +2316,7 @@
     {
       "name": "Mono",
       "module": "components.tsx",
-      "source": "packages/ui/src/components.tsx:185",
+      "source": "packages/ui/src/components.tsx:186",
       "section": "Mono value",
       "doc": "Monospace, tabular text, the identity's face for data. Spreads the rest of its props onto the span. It used to accept only `children`, `className` and `style`, so a caller adding `role=\"status\"` or an `aria-label` had it silently dropped, the same trap Select had, and the reason `Input` and `Textarea` spread theirs. A primitive that quietly discards an accessibility attribute is worse than one that refuses it.",
       "props": [
@@ -2545,7 +2566,7 @@
     {
       "name": "ProvenanceChip",
       "module": "components.tsx",
-      "source": "packages/ui/src/components.tsx:140",
+      "source": "packages/ui/src/components.tsx:141",
       "section": "Provenance chip (SRS §4.2 provenance, design DNA)",
       "doc": null,
       "props": [
@@ -3274,7 +3295,7 @@
     {
       "name": "Spinner",
       "module": "components.tsx",
-      "source": "packages/ui/src/components.tsx:340",
+      "source": "packages/ui/src/components.tsx:341",
       "section": "Spinner",
       "doc": null,
       "props": [],
@@ -3467,7 +3488,7 @@
     {
       "name": "StrengthBar",
       "module": "components.tsx",
-      "source": "packages/ui/src/components.tsx:238",
+      "source": "packages/ui/src/components.tsx:239",
       "section": "StrengthBar",
       "doc": null,
       "props": [
@@ -3509,7 +3530,7 @@
     {
       "name": "StrengthDonut",
       "module": "components.tsx",
-      "source": "packages/ui/src/components.tsx:400",
+      "source": "packages/ui/src/components.tsx:401",
       "section": "StrengthDonut (person page, strength with decomposition ring)",
       "doc": null,
       "props": [
@@ -3755,6 +3776,33 @@
       "unstyled_classes": []
     },
     {
+      "name": "ThemeProvider",
+      "module": "theme-provider.tsx",
+      "source": "packages/ui/src/theme-provider.tsx:87",
+      "section": null,
+      "doc": null,
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "optional": false,
+          "doc": null
+        }
+      ],
+      "defaults": {},
+      "classes": [],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": true,
+      "used_by": [
+        "apps/web/src/main.tsx"
+      ],
+      "uses": 1,
+      "tested": true,
+      "styled_in": [],
+      "unstyled_classes": []
+    },
+    {
       "name": "Toast",
       "module": "toast.tsx",
       "source": "packages/ui/src/toast.tsx:172",
@@ -3992,7 +4040,7 @@
     {
       "name": "useAnimatedNumber",
       "module": "use-animated-number.ts",
-      "source": "packages/ui/src/use-animated-number.ts:165",
+      "source": "packages/ui/src/use-animated-number.ts:170",
       "section": null,
       "doc": "The value to render right now, easing toward `target` whenever `target` changes. Returns `target` verbatim on first render, under reduced motion, where the document reports no --ae-dur, and anywhere requestAnimationFrame is missing: a value appearing is not a value changing, and there is nothing to report.",
       "props": [],
@@ -4042,6 +4090,22 @@
         "packages/ui/src/use-animated-number.ts"
       ],
       "uses": 2,
+      "tested": true
+    },
+    {
+      "name": "useTheme",
+      "module": "theme-provider.tsx",
+      "source": "packages/ui/src/theme-provider.tsx:137",
+      "section": null,
+      "doc": null,
+      "props": [],
+      "defaults": {},
+      "classes": [],
+      "wraps_radix": [],
+      "aria": [],
+      "renders_jsx": false,
+      "used_by": [],
+      "uses": 0,
       "tested": true
     },
     {
@@ -4096,8 +4160,8 @@
     }
   ],
   "summary": {
-    "components": 60,
-    "hooks": 4,
+    "components": 61,
+    "hooks": 5,
     "modules": {
       "layout.tsx": 9,
       "components.tsx": 16,
@@ -4107,9 +4171,10 @@
       "feedback.tsx": 6,
       "glyphs.tsx": 1,
       "brand.tsx": 3,
+      "theme-provider.tsx": 1,
       "toast.tsx": 2
     },
-    "with_props": 47,
+    "with_props": 48,
     "radix_backed": [
       "Checkbox",
       "Combobox",
@@ -4126,7 +4191,8 @@
     ],
     "undocumented": [
       "Combobox",
-      "Glyph"
+      "Glyph",
+      "ThemeProvider"
     ],
     "unused": [
       "Card",

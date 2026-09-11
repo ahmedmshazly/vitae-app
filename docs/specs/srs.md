@@ -1020,7 +1020,7 @@ Status: implemented · Evidence: cited by source · Provenance: reconstructed, n
 
 Every element that can receive keyboard focus must show a focus indicator that meets WCAG 2.1 AA, and the indicator must survive a forced-colors display mode. The indicator is defined once for the whole product rather than per component, so a new control cannot ship without one.
 
-Status: implemented · Evidence: cited by source · Provenance: reconstructed, needs-review
+Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, needs-review
 
 > Recovered from packages/ui/src/styles/base.css:123, its only citation in the repository, which reads "Visible focus everywhere (WCAG 2.1 AA: NFR-A11Y-001)" above a bare :focus-visible rule that replaces the user-agent outline with var(--ae-focus-ring), defined at packages/ui/src/styles/tokens.css:131 as a two-pixel background halo and a two-pixel accent ring. The word "everywhere" and the unqualified selector are the evidence for the scope; the @media (forced-colors: active) block at base.css:151, which restores an outline because a box-shadow is discarded in that mode, is the evidence that the indicator was required to survive rather than merely to exist. Like NFR-MNT-002, this identifier was missed by an earlier pass of this register, but for a different reason: the citation reader's family pattern could not spell A11Y, so the citation was unreadable rather than unread. See the FAMILY constant in scripts/docs/lib/citations.mjs.
 
@@ -1108,7 +1108,7 @@ Status: implemented · Evidence: cited by source · Provenance: reconstructed, n
 
 Every colour, dimension and type decision in the interface resolves to a single declared token set. No screen defines its own palette, so a change to the identity is a change in one file rather than a search across the app.
 
-Status: implemented · Evidence: cited by source · Provenance: reconstructed, needs-review
+Status: implemented · Evidence: cited by documents only · Provenance: reconstructed, needs-review
 
 > Recovered from packages/ui/src/styles/tokens.css:2, which names the identifier and calls the file the single authoritative palette. The same header records the 2026-08 Quiet identity and its standing bans, which scripts/check-brand-bans.mjs enforces.
 

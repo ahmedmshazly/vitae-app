@@ -102,10 +102,10 @@
           "range": "^3.24.1"
         }
       ],
-      "source_files": 113,
-      "test_files": 65,
-      "source_lines": 25780,
-      "exports": 413,
+      "source_files": 119,
+      "test_files": 69,
+      "source_lines": 27375,
+      "exports": 461,
       "dependents": [],
       "imported_by": [],
       "unused_manifest_deps": [],
@@ -140,26 +140,6 @@
         {
           "name": "@antv/g6",
           "range": "5.1.1"
-        },
-        {
-          "name": "@fontsource-variable/instrument-sans",
-          "range": "^5.2.8"
-        },
-        {
-          "name": "@fontsource/ibm-plex-mono",
-          "range": "^5.2.7"
-        },
-        {
-          "name": "@fontsource/ibm-plex-sans",
-          "range": "^5.2.8"
-        },
-        {
-          "name": "@fontsource/source-serif-4",
-          "range": "^5.2.9"
-        },
-        {
-          "name": "@fontsource/space-grotesk",
-          "range": "^5.2.10"
         },
         {
           "name": "@hookform/resolvers",
@@ -211,9 +191,9 @@
         }
       ],
       "source_files": 186,
-      "test_files": 175,
-      "source_lines": 49781,
-      "exports": 783,
+      "test_files": 177,
+      "source_lines": 49860,
+      "exports": 788,
       "dependents": [],
       "imported_by": [],
       "unused_manifest_deps": [],
@@ -288,10 +268,10 @@
           "range": "^3.24.1"
         }
       ],
-      "source_files": 50,
-      "test_files": 48,
-      "source_lines": 9535,
-      "exports": 493,
+      "source_files": 64,
+      "test_files": 58,
+      "source_lines": 11968,
+      "exports": 681,
       "dependents": [
         "@vitae/api",
         "@vitae/web",
@@ -359,6 +339,7 @@
         ".": "./src/index.ts",
         "./styles/tokens.css": "./src/styles/tokens.css",
         "./styles/base.css": "./src/styles/base.css",
+        "./styles/motion.css": "./src/styles/motion.css",
         "./styles/components.css": "./src/styles/components.css",
         "./styles/layout.css": "./src/styles/layout.css",
         "./styles/toast.css": "./src/styles/toast.css"
@@ -415,10 +396,10 @@
           "range": "^3.3.1"
         }
       ],
-      "source_files": 15,
-      "test_files": 9,
-      "source_lines": 3801,
-      "exports": 156,
+      "source_files": 16,
+      "test_files": 12,
+      "source_lines": 3994,
+      "exports": 161,
       "dependents": [
         "@vitae/web"
       ],
@@ -588,20 +569,10 @@
     {
       "file": "apps/web/src/main.tsx",
       "imports": [
-        "@fontsource-variable/instrument-sans",
-        "@fontsource/ibm-plex-sans/400.css",
-        "@fontsource/ibm-plex-sans/500.css",
-        "@fontsource/ibm-plex-sans/600.css",
-        "@fontsource/ibm-plex-sans/700.css",
-        "@fontsource/ibm-plex-mono/400.css",
-        "@fontsource/ibm-plex-mono/500.css",
-        "@fontsource/ibm-plex-mono/600.css",
-        "@fontsource/source-serif-4/400.css",
-        "@fontsource/source-serif-4/600.css",
-        "@fontsource/source-serif-4/400-italic.css",
         "./styles/theme.css",
         "@vitae/ui/styles/tokens.css",
         "@vitae/ui/styles/base.css",
+        "@vitae/ui/styles/motion.css",
         "@vitae/ui/styles/components.css",
         "@vitae/ui/styles/layout.css",
         "@vitae/ui/styles/toast.css",
@@ -652,9 +623,9 @@
   ],
   "summary": {
     "packages": 8,
-    "source_files": 372,
-    "test_files": 360,
-    "source_lines": 89848,
+    "source_files": 393,
+    "test_files": 379,
+    "source_lines": 94148,
     "layers": 2,
     "cyclic": [],
     "workspace_typecheck": {

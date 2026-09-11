@@ -53,7 +53,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:142"
+          "source": "apps/api/src/db/schema.ts:143"
         },
         {
           "name": "skill_id",
@@ -63,7 +63,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:143"
+          "source": "apps/api/src/db/schema.ts:144"
         }
       ],
       "requirements": [],
@@ -114,7 +114,7 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 2433,
+          "line": 2457,
           "test": false
         },
         {
@@ -139,7 +139,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:220",
+      "source": "apps/api/src/db/schema.ts:238",
       "reads": 5,
       "writes": 5
     },
@@ -196,7 +196,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:132"
+          "source": "apps/api/src/db/schema.ts:133"
         }
       ],
       "requirements": [],
@@ -247,14 +247,14 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docList",
           "access": "repository",
-          "line": 3630,
+          "line": 3654,
           "test": false
         },
         {
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 2429,
+          "line": 2453,
           "test": false
         },
         {
@@ -300,7 +300,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:219",
+      "source": "apps/api/src/db/schema.ts:237",
       "reads": 8,
       "writes": 6
     },
@@ -357,7 +357,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:127"
+          "source": "apps/api/src/db/schema.ts:128"
         },
         {
           "name": "source_ref",
@@ -367,7 +367,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:128"
+          "source": "apps/api/src/db/schema.ts:129"
         },
         {
           "name": "deleted_at",
@@ -377,7 +377,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:129"
+          "source": "apps/api/src/db/schema.ts:130"
         }
       ],
       "requirements": [],
@@ -428,7 +428,7 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 2415,
+          "line": 2439,
           "test": false
         },
         {
@@ -449,7 +449,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 228,
+          "line": 232,
           "test": false
         },
         {
@@ -498,25 +498,25 @@
           "file": "apps/api/src/services/retention.ts",
           "method": "docDeleteMany",
           "access": "repository",
-          "line": 161,
+          "line": 167,
           "test": false
         },
         {
           "file": "apps/api/src/services/retention.ts",
           "method": "docIdsOlderThan",
           "access": "repository",
-          "line": 74,
+          "line": 76,
           "test": false
         },
         {
           "file": "apps/api/src/services/retention.ts",
           "method": "docIdsWhereIn",
           "access": "repository",
-          "line": 91,
+          "line": 95,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:218",
+      "source": "apps/api/src/db/schema.ts:236",
       "reads": 13,
       "writes": 6
     },
@@ -573,7 +573,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:183"
+          "source": "apps/api/src/db/schema.ts:201"
         },
         {
           "name": "gc_pending",
@@ -583,7 +583,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:184"
+          "source": "apps/api/src/db/schema.ts:202"
         }
       ],
       "requirements": [],
@@ -648,7 +648,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 68,
+          "line": 72,
           "test": false
         },
         {
@@ -669,48 +669,204 @@
           "file": "apps/api/src/services/restore.ts",
           "method": "docMerge",
           "access": "repository",
-          "line": 268,
+          "line": 285,
           "test": false
         },
         {
           "file": "apps/api/src/services/retention.ts",
           "method": "docDeleteMany",
           "access": "repository",
-          "line": 160,
+          "line": 166,
           "test": false
         },
         {
           "file": "apps/api/src/services/retention.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 135,
+          "line": 141,
           "test": false
         },
         {
           "file": "apps/api/src/services/retention.ts",
           "method": "docIdsWhereIn",
           "access": "repository",
-          "line": 112,
+          "line": 118,
           "test": false
         },
         {
           "file": "apps/api/src/services/retention.ts",
           "method": "docMerge",
           "access": "repository",
-          "line": 148,
+          "line": 154,
           "test": false
         },
         {
           "file": "apps/api/src/services/retention.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 138,
+          "line": 144,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:229",
+      "source": "apps/api/src/db/schema.ts:250",
       "reads": 7,
       "writes": 7
+    },
+    {
+      "name": "automation_rules",
+      "interface": "AutomationRuleTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "enabled",
+          "type": "GeneratedAlways<boolean | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:179"
+        },
+        {
+          "name": "updated_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:180"
+        },
+        {
+          "name": "deleted_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:181"
+        }
+      ],
+      "requirements": [],
+      "created_in": "012-productivity-collections",
+      "altered_in": [],
+      "indexes": [
+        {
+          "name": "automation_rules_live_updated",
+          "table": "automation_rules",
+          "unique": false,
+          "partial": true,
+          "method": "btree",
+          "definition": "CREATE INDEX automation_rules_live_updated ON automation_rules (workspace_id, space, updated_at DESC) WHERE deleted_at IS NULL",
+          "migration": "012-productivity-collections",
+          "source": "apps/api/src/db/migrations/012-productivity-collections.ts:61"
+        },
+        {
+          "name": "automation_rules_workspace_id_idx",
+          "table": "automation_rules",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX automation_rules_workspace_id_idx ON automation_rules (workspace_id)",
+          "migration": "012-productivity-collections",
+          "source": "apps/api/src/db/migrations/012-productivity-collections.ts:60"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/db/productivity-collections.integration.test.ts",
+          "method": "docMerge",
+          "access": "repository",
+          "line": 343,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 743,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 780,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "updateTable",
+          "access": "query-builder",
+          "line": 819,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 66,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docDeleteMany",
+          "access": "repository",
+          "line": 169,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docIdsOlderThan",
+          "access": "repository",
+          "line": 78,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:244",
+      "reads": 3,
+      "writes": 4
     },
     {
       "name": "billing_customers",
@@ -813,7 +969,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:211",
+      "source": "apps/api/src/db/schema.ts:229",
       "reads": 2,
       "writes": 2
     },
@@ -924,7 +1080,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:213",
+      "source": "apps/api/src/db/schema.ts:231",
       "reads": 0,
       "writes": 2
     },
@@ -1084,7 +1240,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:212",
+      "source": "apps/api/src/db/schema.ts:230",
       "reads": 2,
       "writes": 1
     },
@@ -1141,7 +1297,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:191"
+          "source": "apps/api/src/db/schema.ts:209"
         }
       ],
       "requirements": [],
@@ -1199,11 +1355,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 77,
+          "line": 81,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:239",
+      "source": "apps/api/src/db/schema.ts:260",
       "reads": 3,
       "writes": 3
     },
@@ -1260,7 +1416,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:138"
+          "source": "apps/api/src/db/schema.ts:139"
         },
         {
           "name": "b",
@@ -1270,7 +1426,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:139"
+          "source": "apps/api/src/db/schema.ts:140"
         }
       ],
       "requirements": [],
@@ -1322,11 +1478,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 74,
+          "line": 78,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:238",
+      "source": "apps/api/src/db/schema.ts:259",
       "reads": 2,
       "writes": 2
     },
@@ -1383,7 +1539,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:165"
+          "source": "apps/api/src/db/schema.ts:166"
         },
         {
           "name": "audience",
@@ -1393,7 +1549,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:166"
+          "source": "apps/api/src/db/schema.ts:167"
         },
         {
           "name": "updated_at",
@@ -1403,7 +1559,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:167"
+          "source": "apps/api/src/db/schema.ts:168"
         },
         {
           "name": "deleted_at",
@@ -1413,7 +1569,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:168"
+          "source": "apps/api/src/db/schema.ts:169"
         }
       ],
       "requirements": [],
@@ -1456,7 +1612,7 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 3137,
+          "line": 3161,
           "test": false
         },
         {
@@ -1488,7 +1644,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:224",
+      "source": "apps/api/src/db/schema.ts:242",
       "reads": 3,
       "writes": 3
     },
@@ -1632,35 +1788,35 @@
           "file": "apps/api/src/db/repository.ts",
           "method": "deleteFrom",
           "access": "query-builder",
-          "line": 503,
+          "line": 558,
           "test": false
         },
         {
           "file": "apps/api/src/db/repository.ts",
           "method": "insertInto",
           "access": "query-builder",
-          "line": 372,
+          "line": 427,
           "test": false
         },
         {
           "file": "apps/api/src/db/repository.ts",
           "method": "selectFrom",
           "access": "query-builder",
-          "line": 532,
+          "line": 587,
           "test": false
         },
         {
           "file": "apps/api/src/db/repository.ts",
           "method": "updateTable",
           "access": "query-builder",
-          "line": 437,
+          "line": 492,
           "test": false
         },
         {
           "file": "apps/api/src/services/export.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 365,
+          "line": 398,
           "test": false
         },
         {
@@ -1671,7 +1827,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:216",
+      "source": "apps/api/src/db/schema.ts:234",
       "reads": 3,
       "writes": 4
     },
@@ -1728,7 +1884,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:135"
+          "source": "apps/api/src/db/schema.ts:136"
         }
       ],
       "requirements": [],
@@ -1791,7 +1947,7 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1975,
+          "line": 1999,
           "test": false
         },
         {
@@ -1805,11 +1961,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 73,
+          "line": 77,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:237",
+      "source": "apps/api/src/db/schema.ts:258",
       "reads": 4,
       "writes": 5
     },
@@ -1866,7 +2022,7 @@
           "optional": false,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:199"
+          "source": "apps/api/src/db/schema.ts:217"
         }
       ],
       "requirements": [],
@@ -1914,7 +2070,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:233",
+      "source": "apps/api/src/db/schema.ts:254",
       "reads": 3,
       "writes": 4
     },
@@ -1971,7 +2127,7 @@
           "optional": false,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:199"
+          "source": "apps/api/src/db/schema.ts:217"
         }
       ],
       "requirements": [],
@@ -2015,7 +2171,7 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 3321,
+          "line": 3345,
           "test": false
         },
         {
@@ -2047,7 +2203,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:232",
+      "source": "apps/api/src/db/schema.ts:253",
       "reads": 4,
       "writes": 5
     },
@@ -2104,7 +2260,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:194"
+          "source": "apps/api/src/db/schema.ts:212"
         },
         {
           "name": "created_at",
@@ -2114,7 +2270,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:195"
+          "source": "apps/api/src/db/schema.ts:213"
         }
       ],
       "requirements": [],
@@ -2186,14 +2342,14 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 3299,
+          "line": 3323,
           "test": false
         },
         {
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 70,
+          "line": 74,
           "test": false
         },
         {
@@ -2228,18 +2384,18 @@
           "file": "apps/api/src/services/retention.ts",
           "method": "docDeleteMany",
           "access": "repository",
-          "line": 166,
+          "line": 174,
           "test": false
         },
         {
           "file": "apps/api/src/services/retention.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 75,
+          "line": 79,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:231",
+      "source": "apps/api/src/db/schema.ts:252",
       "reads": 4,
       "writes": 5
     },
@@ -2296,7 +2452,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:158"
+          "source": "apps/api/src/db/schema.ts:159"
         },
         {
           "name": "resume_id",
@@ -2306,7 +2462,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:159"
+          "source": "apps/api/src/db/schema.ts:160"
         },
         {
           "name": "status",
@@ -2316,7 +2472,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:160"
+          "source": "apps/api/src/db/schema.ts:161"
         },
         {
           "name": "updated_at",
@@ -2326,7 +2482,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:161"
+          "source": "apps/api/src/db/schema.ts:162"
         },
         {
           "name": "deleted_at",
@@ -2336,7 +2492,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:162"
+          "source": "apps/api/src/db/schema.ts:163"
         }
       ],
       "requirements": [],
@@ -2393,7 +2549,7 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 3061,
+          "line": 3085,
           "test": false
         },
         {
@@ -2425,7 +2581,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:223",
+      "source": "apps/api/src/db/schema.ts:241",
       "reads": 3,
       "writes": 3
     },
@@ -2482,7 +2638,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:187"
+          "source": "apps/api/src/db/schema.ts:205"
         },
         {
           "name": "drop_id",
@@ -2492,7 +2648,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:188"
+          "source": "apps/api/src/db/schema.ts:206"
         }
       ],
       "requirements": [],
@@ -2536,11 +2692,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 69,
+          "line": 73,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:230",
+      "source": "apps/api/src/db/schema.ts:251",
       "reads": 3,
       "writes": 3
     },
@@ -2603,7 +2759,7 @@
           "file": "apps/api/src/db/repository.ts",
           "method": "insertInto",
           "access": "query-builder",
-          "line": 709,
+          "line": 1131,
           "test": false
         },
         {
@@ -2687,14 +2843,14 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docMerge",
           "access": "repository",
-          "line": 2734,
+          "line": 2758,
           "test": false
         },
         {
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 2726,
+          "line": 2750,
           "test": false
         },
         {
@@ -2722,7 +2878,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 72,
+          "line": 76,
           "test": false
         },
         {
@@ -2754,7 +2910,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:235",
+      "source": "apps/api/src/db/schema.ts:256",
       "reads": 8,
       "writes": 12
     },
@@ -2811,7 +2967,7 @@
           "optional": false,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:202"
+          "source": "apps/api/src/db/schema.ts:220"
         },
         {
           "name": "run_id",
@@ -2821,7 +2977,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:203"
+          "source": "apps/api/src/db/schema.ts:221"
         }
       ],
       "requirements": [],
@@ -2909,7 +3065,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:236",
+      "source": "apps/api/src/db/schema.ts:257",
       "reads": 4,
       "writes": 5
     },
@@ -3110,28 +3266,28 @@
           "file": "apps/api/src/db/repository.ts",
           "method": "deleteFrom",
           "access": "query-builder",
-          "line": 514,
+          "line": 569,
           "test": false
         },
         {
           "file": "apps/api/src/db/repository.ts",
           "method": "insertInto",
           "access": "query-builder",
-          "line": 129,
+          "line": 183,
           "test": false
         },
         {
           "file": "apps/api/src/db/repository.ts",
           "method": "selectFrom",
           "access": "query-builder",
-          "line": 545,
+          "line": 600,
           "test": false
         },
         {
           "file": "apps/api/src/db/repository.ts",
           "method": "updateTable",
           "access": "query-builder",
-          "line": 181,
+          "line": 236,
           "test": false
         },
         {
@@ -3170,9 +3326,151 @@
           "test": true
         }
       ],
-      "source": "apps/api/src/db/schema.ts:215",
+      "source": "apps/api/src/db/schema.ts:233",
       "reads": 2,
       "writes": 4
+    },
+    {
+      "name": "productivity_receipts",
+      "interface": "ProductivityReceiptTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "operation_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:184"
+        },
+        {
+          "name": "command_type",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:185"
+        },
+        {
+          "name": "created_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:186"
+        }
+      ],
+      "requirements": [],
+      "created_in": "012-productivity-collections",
+      "altered_in": [],
+      "indexes": [
+        {
+          "name": "productivity_receipts_operation",
+          "table": "productivity_receipts",
+          "unique": true,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE UNIQUE INDEX productivity_receipts_operation ON productivity_receipts (workspace_id, operation_id)",
+          "migration": "012-productivity-collections",
+          "source": "apps/api/src/db/migrations/012-productivity-collections.ts:86"
+        },
+        {
+          "name": "productivity_receipts_workspace_id_idx",
+          "table": "productivity_receipts",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX productivity_receipts_workspace_id_idx ON productivity_receipts (workspace_id)",
+          "migration": "012-productivity-collections",
+          "source": "apps/api/src/db/migrations/012-productivity-collections.ts:85"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/db/productivity-collections.integration.test.ts",
+          "method": "docBulkPut",
+          "access": "repository",
+          "line": 347,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 861,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 884,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/routes/v1/productivity.integration.test.ts",
+          "method": "docQuery",
+          "access": "repository",
+          "line": 195,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 67,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:245",
+      "reads": 2,
+      "writes": 2
     },
     {
       "name": "reminders",
@@ -3227,7 +3525,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:171"
+          "source": "apps/api/src/db/schema.ts:189"
         },
         {
           "name": "due_on",
@@ -3237,7 +3535,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:172"
+          "source": "apps/api/src/db/schema.ts:190"
         },
         {
           "name": "subject_id",
@@ -3247,7 +3545,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:173"
+          "source": "apps/api/src/db/schema.ts:191"
         }
       ],
       "requirements": [],
@@ -3298,7 +3596,7 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 3255,
+          "line": 3279,
           "test": false
         },
         {
@@ -3312,11 +3610,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 65,
+          "line": 69,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:226",
+      "source": "apps/api/src/db/schema.ts:247",
       "reads": 3,
       "writes": 6
     },
@@ -3373,7 +3671,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:151"
+          "source": "apps/api/src/db/schema.ts:152"
         },
         {
           "name": "template_key",
@@ -3383,7 +3681,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:152"
+          "source": "apps/api/src/db/schema.ts:153"
         },
         {
           "name": "status",
@@ -3393,7 +3691,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:153"
+          "source": "apps/api/src/db/schema.ts:154"
         },
         {
           "name": "created_at",
@@ -3403,7 +3701,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:154"
+          "source": "apps/api/src/db/schema.ts:155"
         },
         {
           "name": "deleted_at",
@@ -3413,7 +3711,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:155"
+          "source": "apps/api/src/db/schema.ts:156"
         }
       ],
       "requirements": [],
@@ -3513,14 +3811,14 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docList",
           "access": "repository",
-          "line": 3584,
+          "line": 3608,
           "test": false
         },
         {
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 3015,
+          "line": 3039,
           "test": false
         },
         {
@@ -3538,7 +3836,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:222",
+      "source": "apps/api/src/db/schema.ts:240",
       "reads": 7,
       "writes": 4
     },
@@ -3616,6 +3914,16 @@
           "doc": null,
           "inherited_from": null,
           "source": "apps/api/src/db/schema.ts:123"
+        },
+        {
+          "name": "at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:124"
         }
       ],
       "requirements": [],
@@ -3623,36 +3931,58 @@
       "altered_in": [
         "007-cloud-control-plane",
         "009-workspace-primary-keys",
-        "010-legacy-space-default-workspace"
+        "010-legacy-space-default-workspace",
+        "012-productivity-collections"
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "name": "revisions_workspace_at",
+          "table": "revisions",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX revisions_workspace_at ON revisions (workspace_id, at DESC)",
+          "migration": "012-productivity-collections",
+          "source": "apps/api/src/db/migrations/012-productivity-collections.ts:100"
+        },
+        {
+          "name": "revisions_workspace_kind_at",
+          "table": "revisions",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX revisions_workspace_kind_at ON revisions (workspace_id, subject_kind, at DESC)",
+          "migration": "012-productivity-collections",
+          "source": "apps/api/src/db/migrations/012-productivity-collections.ts:104"
+        }
+      ],
       "queried_by": [
         {
           "file": "apps/api/src/db/repository.ts",
           "method": "insertInto",
           "access": "query-builder",
-          "line": 579,
+          "line": 1001,
           "test": false
         },
         {
           "file": "apps/api/src/db/repository.ts",
           "method": "selectFrom",
           "access": "query-builder",
-          "line": 675,
+          "line": 1097,
           "test": false
         },
         {
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docList",
           "access": "repository",
-          "line": 3453,
+          "line": 3477,
           "test": false
         },
         {
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 3475,
+          "line": 3499,
           "test": false
         },
         {
@@ -3666,18 +3996,18 @@
           "file": "apps/api/src/services/retention.ts",
           "method": "docDeleteMany",
           "access": "repository",
-          "line": 158,
+          "line": 164,
           "test": false
         },
         {
           "file": "apps/api/src/services/retention.ts",
           "method": "docIdsWhereIn",
           "access": "repository",
-          "line": 111,
+          "line": 117,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:217",
+      "source": "apps/api/src/db/schema.ts:235",
       "reads": 4,
       "writes": 4
     },
@@ -3782,18 +4112,18 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 2710,
+          "line": 2734,
           "test": false
         },
         {
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 71,
+          "line": 75,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:234",
+      "source": "apps/api/src/db/schema.ts:255",
       "reads": 3,
       "writes": 4
     },
@@ -3850,7 +4180,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:179"
+          "source": "apps/api/src/db/schema.ts:197"
         },
         {
           "name": "subject_id",
@@ -3860,7 +4190,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:180"
+          "source": "apps/api/src/db/schema.ts:198"
         }
       ],
       "requirements": [],
@@ -3876,7 +4206,7 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 3232,
+          "line": 3256,
           "test": false
         },
         {
@@ -3890,14 +4220,14 @@
           "file": "apps/api/src/services/export.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 281,
+          "line": 314,
           "test": false
         },
         {
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 67,
+          "line": 71,
           "test": false
         },
         {
@@ -3908,7 +4238,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:228",
+      "source": "apps/api/src/db/schema.ts:249",
       "reads": 2,
       "writes": 4
     },
@@ -3965,7 +4295,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:176"
+          "source": "apps/api/src/db/schema.ts:194"
         }
       ],
       "requirements": [],
@@ -3981,7 +4311,7 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 3221,
+          "line": 3245,
           "test": false
         },
         {
@@ -4002,7 +4332,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 66,
+          "line": 70,
           "test": false
         },
         {
@@ -4020,7 +4350,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:227",
+      "source": "apps/api/src/db/schema.ts:248",
       "reads": 3,
       "writes": 4
     },
@@ -4077,7 +4407,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:146"
+          "source": "apps/api/src/db/schema.ts:147"
         },
         {
           "name": "updated_at",
@@ -4087,7 +4417,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:147"
+          "source": "apps/api/src/db/schema.ts:148"
         },
         {
           "name": "deleted_at",
@@ -4097,7 +4427,7 @@
           "optional": true,
           "doc": null,
           "inherited_from": null,
-          "source": "apps/api/src/db/schema.ts:148"
+          "source": "apps/api/src/db/schema.ts:149"
         }
       ],
       "requirements": [],
@@ -4156,14 +4486,14 @@
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docList",
           "access": "repository",
-          "line": 3583,
+          "line": 3607,
           "test": false
         },
         {
           "file": "apps/api/src/scripts/seed-demo.ts",
           "method": "docMerge",
           "access": "repository",
-          "line": 2982,
+          "line": 3006,
           "test": false
         },
         {
@@ -4202,7 +4532,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:221",
+      "source": "apps/api/src/db/schema.ts:239",
       "reads": 7,
       "writes": 4
     },
@@ -4262,16 +4592,220 @@
       "indexes": [],
       "queried_by": [
         {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 973,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 909,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "updateTable",
+          "access": "query-builder",
+          "line": 945,
+          "test": false
+        },
+        {
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 64,
+          "line": 68,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:225",
-      "reads": 1,
-      "writes": 1
+      "source": "apps/api/src/db/schema.ts:246",
+      "reads": 2,
+      "writes": 3
+    },
+    {
+      "name": "time_entries",
+      "interface": "TimeEntryTable",
+      "description": null,
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": "DocTable",
+          "source": "apps/api/src/db/schema.ts:26"
+        },
+        {
+          "name": "task_id",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:172"
+        },
+        {
+          "name": "started_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:173"
+        },
+        {
+          "name": "ended_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:174"
+        },
+        {
+          "name": "updated_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:175"
+        },
+        {
+          "name": "deleted_at",
+          "type": "GeneratedAlways<string | null>",
+          "writable": false,
+          "generated": true,
+          "optional": true,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:176"
+        }
+      ],
+      "requirements": [],
+      "created_in": "012-productivity-collections",
+      "altered_in": [],
+      "indexes": [
+        {
+          "name": "time_entries_live_task_started",
+          "table": "time_entries",
+          "unique": false,
+          "partial": true,
+          "method": "btree",
+          "definition": "CREATE INDEX time_entries_live_task_started ON time_entries (workspace_id, space, task_id, started_at DESC) WHERE deleted_at IS NULL",
+          "migration": "012-productivity-collections",
+          "source": "apps/api/src/db/migrations/012-productivity-collections.ts:36"
+        },
+        {
+          "name": "time_entries_workspace_id_idx",
+          "table": "time_entries",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX time_entries_workspace_id_idx ON time_entries (workspace_id)",
+          "migration": "012-productivity-collections",
+          "source": "apps/api/src/db/migrations/012-productivity-collections.ts:35"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/db/productivity-collections.integration.test.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 340,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 641,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "selectFrom",
+          "access": "query-builder",
+          "line": 668,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/db/repository.ts",
+          "method": "updateTable",
+          "access": "query-builder",
+          "line": 701,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 65,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docDeleteMany",
+          "access": "repository",
+          "line": 168,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docIdsOlderThan",
+          "access": "repository",
+          "line": 77,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/retention.ts",
+          "method": "docIdsWhereIn",
+          "access": "repository",
+          "line": 97,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:243",
+      "reads": 4,
+      "writes": 4
     },
     {
       "name": "users",
@@ -4370,7 +4904,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:207",
+      "source": "apps/api/src/db/schema.ts:225",
       "reads": 1,
       "writes": 1
     },
@@ -4454,7 +4988,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:214",
+      "source": "apps/api/src/db/schema.ts:232",
       "reads": 0,
       "writes": 1
     },
@@ -4551,6 +5085,13 @@
           "test": true
         },
         {
+          "file": "apps/api/src/routes/v1/productivity.integration.test.ts",
+          "method": "updateTable",
+          "access": "query-builder",
+          "line": 381,
+          "test": true
+        },
+        {
           "file": "apps/api/src/services/control-plane.ts",
           "method": "insertInto",
           "access": "query-builder",
@@ -4572,7 +5113,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:210",
+      "source": "apps/api/src/db/schema.ts:228",
       "reads": 2,
       "writes": 2
     },
@@ -4646,7 +5187,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:209",
+      "source": "apps/api/src/db/schema.ts:227",
       "reads": 0,
       "writes": 1
     },
@@ -4729,6 +5270,20 @@
           "test": false
         },
         {
+          "file": "apps/api/src/db/productivity-collections.integration.test.ts",
+          "method": "deleteFrom",
+          "access": "query-builder",
+          "line": 42,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/db/productivity-collections.integration.test.ts",
+          "method": "insertInto",
+          "access": "query-builder",
+          "line": 65,
+          "test": true
+        },
+        {
           "file": "apps/api/src/routes/v1/cloud.integration.test.ts",
           "method": "insertInto",
           "access": "query-builder",
@@ -4757,7 +5312,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:208",
+      "source": "apps/api/src/db/schema.ts:226",
       "reads": 2,
       "writes": 2
     }
@@ -5064,9 +5619,56 @@
       ],
       "extensions": [],
       "reversible": true
+    },
+    {
+      "id": "012-productivity-collections",
+      "file": "apps/api/src/db/migrations/012-productivity-collections.ts",
+      "title": "Productivity collections (time entries, automation rules, execution receipts) plus revision indexes for bounded 30/90/365-day replay.",
+      "description": "Productivity collections (time entries, automation rules, execution receipts) plus revision indexes for bounded 30/90/365-day replay. Table shape copies `011-dossiers.ts`: `space`, `workspace_id` defaulting to `workspace-legacy-real` with a workspaces FK and the shared `vitae_default_workspace_from_space` trigger, `id`, `data jsonb`, generated columns from `data`, and `PRIMARY KEY (workspace_id, id)`. `revisions_subject` is `(space, subject_id, rev)` and cannot serve a workspace-scoped time window. Generated `at` plus the two workspace/time indexes let a 30/90/365-day scan use the index instead of reading the table.",
+      "requirements": [],
+      "creates": [
+        "automation_rules",
+        "productivity_receipts",
+        "time_entries"
+      ],
+      "alters": [
+        "revisions"
+      ],
+      "indexes": [
+        "time_entries_workspace_id_idx",
+        "time_entries_live_task_started",
+        "automation_rules_workspace_id_idx",
+        "automation_rules_live_updated",
+        "productivity_receipts_workspace_id_idx",
+        "productivity_receipts_operation",
+        "revisions_workspace_at",
+        "revisions_workspace_kind_at"
+      ],
+      "extensions": [],
+      "reversible": true
     }
   ],
   "indexes": [
+    {
+      "name": "automation_rules_live_updated",
+      "table": "automation_rules",
+      "unique": false,
+      "partial": true,
+      "method": "btree",
+      "definition": "CREATE INDEX automation_rules_live_updated ON automation_rules (workspace_id, space, updated_at DESC) WHERE deleted_at IS NULL",
+      "migration": "012-productivity-collections",
+      "source": "apps/api/src/db/migrations/012-productivity-collections.ts:61"
+    },
+    {
+      "name": "automation_rules_workspace_id_idx",
+      "table": "automation_rules",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX automation_rules_workspace_id_idx ON automation_rules (workspace_id)",
+      "migration": "012-productivity-collections",
+      "source": "apps/api/src/db/migrations/012-productivity-collections.ts:60"
+    },
     {
       "name": "billing_customers_provider_customer",
       "table": "billing_customers",
@@ -5308,6 +5910,26 @@
       "source": "apps/api/src/db/migrations/001-initial-schema.ts:110"
     },
     {
+      "name": "productivity_receipts_operation",
+      "table": "productivity_receipts",
+      "unique": true,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE UNIQUE INDEX productivity_receipts_operation ON productivity_receipts (workspace_id, operation_id)",
+      "migration": "012-productivity-collections",
+      "source": "apps/api/src/db/migrations/012-productivity-collections.ts:86"
+    },
+    {
+      "name": "productivity_receipts_workspace_id_idx",
+      "table": "productivity_receipts",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX productivity_receipts_workspace_id_idx ON productivity_receipts (workspace_id)",
+      "migration": "012-productivity-collections",
+      "source": "apps/api/src/db/migrations/012-productivity-collections.ts:85"
+    },
+    {
       "name": "resumes_live_created",
       "table": "resumes",
       "unique": false,
@@ -5348,6 +5970,26 @@
       "source": "apps/api/src/db/migrations/005-resume-workspace-indexes.ts:34"
     },
     {
+      "name": "revisions_workspace_at",
+      "table": "revisions",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX revisions_workspace_at ON revisions (workspace_id, at DESC)",
+      "migration": "012-productivity-collections",
+      "source": "apps/api/src/db/migrations/012-productivity-collections.ts:100"
+    },
+    {
+      "name": "revisions_workspace_kind_at",
+      "table": "revisions",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX revisions_workspace_kind_at ON revisions (workspace_id, subject_kind, at DESC)",
+      "migration": "012-productivity-collections",
+      "source": "apps/api/src/db/migrations/012-productivity-collections.ts:104"
+    },
+    {
       "name": "targets_live_updated",
       "table": "targets",
       "unique": false,
@@ -5366,6 +6008,26 @@
       "definition": "CREATE INDEX targets_status_updated ON targets (space, status, updated_at DESC)",
       "migration": "005-resume-workspace-indexes",
       "source": "apps/api/src/db/migrations/005-resume-workspace-indexes.ts:15"
+    },
+    {
+      "name": "time_entries_live_task_started",
+      "table": "time_entries",
+      "unique": false,
+      "partial": true,
+      "method": "btree",
+      "definition": "CREATE INDEX time_entries_live_task_started ON time_entries (workspace_id, space, task_id, started_at DESC) WHERE deleted_at IS NULL",
+      "migration": "012-productivity-collections",
+      "source": "apps/api/src/db/migrations/012-productivity-collections.ts:36"
+    },
+    {
+      "name": "time_entries_workspace_id_idx",
+      "table": "time_entries",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX time_entries_workspace_id_idx ON time_entries (workspace_id)",
+      "migration": "012-productivity-collections",
+      "source": "apps/api/src/db/migrations/012-productivity-collections.ts:35"
     },
     {
       "name": "users_email_lower",
@@ -5399,11 +6061,11 @@
     }
   ],
   "summary": {
-    "tables": 33,
-    "columns": 207,
-    "indexes": 33,
-    "partial_indexes": 12,
-    "migrations": 11,
+    "tables": 36,
+    "columns": 231,
+    "indexes": 41,
+    "partial_indexes": 14,
+    "migrations": 12,
     "irreversible": [],
     "extensions": [
       "pg_trgm"
