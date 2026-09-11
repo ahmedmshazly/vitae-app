@@ -144,8 +144,11 @@ export function useProductivityActions() {
   );
 
   const setRecurrence = useCallback(
-    (task: TaskReadModel, recurrence: Parameters<typeof setRecurrenceCommand>[1]) =>
-      run(setRecurrenceCommand(task.id, recurrence, task.rev)),
+    (
+      task: TaskReadModel,
+      recurrence: Parameters<typeof setRecurrenceCommand>[1],
+      expected_revision?: number,
+    ) => run(setRecurrenceCommand(task.id, recurrence, expected_revision ?? task.rev)),
     [run],
   );
 

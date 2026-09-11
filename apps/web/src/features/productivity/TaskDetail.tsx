@@ -9,7 +9,8 @@ import {
 } from '@vitae/ui';
 import type { Importance, Recurrence, TaskReadModel, VitaePriority } from '@vitae/core';
 import { ApiError, api } from '../../lib/api.js';
-import { useProductivityTimeEntries } from './api.js';
+import { revisionFromResult, useProductivityTimeEntries } from './api.js';
+import { visibleTimeEntries } from './model.js';
 import type { useProductivityActions } from './use-productivity-actions.js';
 
 interface EdgeLite {
@@ -60,6 +61,7 @@ export function TaskDetail({ task, projectTitle, locked, actions, onClose }: Tas
   const [importance, setImportance] = useState<string | undefined>();
   const [rrule, setRrule] = useState('');
   const [mode, setMode] = useState<string>('fixed');
+  const [loadedRecurrence, setLoadedRecurrence] = useState({ rrule: '', mode: 'fixed' });
   const [depends, setDepends] = useState<Array<{ edgeId: string; id: string; title: string }>>([]);
   const [depId, setDepId] = useState('');
   const [depError, setDepError] = useState<string | null>(null);
@@ -75,6 +77,7 @@ export function TaskDetail({ task, projectTitle, locked, actions, onClose }: Tas
     setImportance(task.importance);
     setRrule('');
     setMode('fixed');
+    setLoadedRecurrence({ rrule: '', mode: 'fixed' });
     setDepends([]);
     setDepError(null);
     let cancelled = false;
@@ -83,10 +86,13 @@ export function TaskDetail({ task, projectTitle, locked, actions, onClose }: Tas
       .then((page) => {
         if (cancelled) return;
         const recurrence = page.node.props?.recurrence as Recurrence | undefined;
-        if (recurrence?.rrule) {
-          setRrule(recurrence.rrule);
-          setMode(recurrence.mode);
-        }
+        const loaded = {
+          rrule: recurrence?.rrule ?? '',
+          mode: recurrence?.mode === 'from_completion' ? 'from_completion' : 'fixed',
+        };
+        setLoadedRecurrence(loaded);
+        setRrule(loaded.rrule);
+        setMode(loaded.mode);
         setDepends(
           page.edges
             .filter((edge) => edge.type === 'DEPENDS_ON' && edge.src === task.id)
@@ -110,16 +116,31 @@ export function TaskDetail({ task, projectTitle, locked, actions, onClose }: Tas
     };
   }, [task]);
 
-  if (!task) return null;
-
-  const listed = entries.data?.time_entries ?? [];
-  const closedStarts = new Set(listed.filter((entry) => entry.ended_at).map((entry) => entry.started_at));
-  const openEntry = listed.find((entry) => !entry.ended_at && !closedStarts.has(entry.started_at));
+  const listed = visibleTimeEntries(entries.data?.time_entries ?? []);
+  const openEntry = listed.find((entry) => !entry.ended_at);
   const running = Boolean(openEntry);
+
+  function restoreOpener(id: string | undefined) {
+    if (!id) return;
+    const opener = document.getElementById(`prod-open-task-${id}`);
+    if (opener instanceof HTMLElement) opener.focus();
+  }
+
+  function closeDetail() {
+    const id = task?.id;
+    onClose();
+    queueMicrotask(() => restoreOpener(id));
+    window.setTimeout(() => restoreOpener(id), 0);
+  }
 
   async function save() {
     if (!task) return;
-    await actions.update(task, {
+    const nextRrule = rrule.trim();
+    const nextMode = mode === 'from_completion' ? 'from_completion' : 'fixed';
+    const recurrenceChanged =
+      nextRrule !== loadedRecurrence.rrule.trim() || nextMode !== loadedRecurrence.mode;
+
+    const outcome = await actions.update(task, {
       title: title.trim() || task.title,
       due: due || undefined,
       target: target || undefined,
@@ -127,13 +148,20 @@ export function TaskDetail({ task, projectTitle, locked, actions, onClose }: Tas
       priority: priority as VitaePriority | undefined,
       importance: importance as Importance | undefined,
     });
-    if (rrule.trim()) {
-      await actions.setRecurrence(task, {
-        rrule: rrule.trim(),
-        mode: mode === 'from_completion' ? 'from_completion' : 'fixed',
+    if (!outcome) return;
+
+    if (!recurrenceChanged || !nextRrule) return;
+    const expectedRevision = revisionFromResult(outcome.result);
+    if (expectedRevision === undefined) return;
+    await actions.setRecurrence(
+      task,
+      {
+        rrule: nextRrule,
+        mode: nextMode,
         exceptions: [],
-      });
-    }
+      },
+      expectedRevision,
+    );
   }
 
   async function addDependency() {
@@ -184,18 +212,18 @@ export function TaskDetail({ task, projectTitle, locked, actions, onClose }: Tas
 
   return (
     <Sheet
-      open
+      open={task != null}
       onOpenChange={(open) => {
-        if (!open) onClose();
+        if (!open) closeDetail();
       }}
-      title={task.title}
+      title={task?.title ?? 'Task'}
       wide
       footer={
         <>
-          <Button type="button" onClick={onClose}>
+          <Button type="button" onClick={closeDetail}>
             Close
           </Button>
-          <Button type="button" variant="primary" disabled={locked} onClick={() => void save()}>
+          <Button type="button" variant="primary" disabled={locked || !task} onClick={() => void save()}>
             Save
           </Button>
         </>
@@ -297,9 +325,9 @@ export function TaskDetail({ task, projectTitle, locked, actions, onClose }: Tas
           <Button type="button" disabled={locked} onClick={() => void toggleTimer()}>
             {running ? 'Stop timer' : 'Start timer'}
           </Button>
-          {(entries.data?.time_entries ?? []).length > 0 ? (
+          {listed.length > 0 ? (
             <ul className="prod-plain-list">
-              {(entries.data?.time_entries ?? []).map((entry) => (
+              {listed.map((entry) => (
                 <li key={entry.id}>
                   {entry.started_at}
                   {entry.ended_at ? ` → ${entry.ended_at}` : ' (open)'}

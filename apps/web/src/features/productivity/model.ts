@@ -108,6 +108,16 @@ export function placementCopy(task: TaskReadModel): string {
   return reasonSentence(reason, params);
 }
 
+/** Drop an open timer row once a closed sibling shares its started_at. */
+export function visibleTimeEntries<T extends { started_at: string; ended_at?: string }>(
+  entries: readonly T[],
+): T[] {
+  const closedStarts = new Set(
+    entries.filter((entry) => entry.ended_at).map((entry) => entry.started_at),
+  );
+  return entries.filter((entry) => entry.ended_at || !closedStarts.has(entry.started_at));
+}
+
 export function todayDateOnly(now: Date = new Date()): string {
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');

@@ -61,6 +61,8 @@ function serve(replies: {
   waiting?: TaskReadModel[];
   rules?: unknown[];
   templates?: unknown[];
+  time_entries?: Array<{ id: string; task_id: string; started_at: string; ended_at?: string; rev: number; updated_at: string }>;
+  node?: { props?: Record<string, unknown> };
 } = {}) {
   mockApi.get.mockImplementation(async (path: string) => {
     const url = String(path);
@@ -68,8 +70,11 @@ function serve(replies: {
     if (url.startsWith('/productivity/waiting')) return { tasks: replies.waiting ?? [] };
     if (url.startsWith('/productivity/rules')) return { rules: replies.rules ?? [] };
     if (url.startsWith('/productivity/templates')) return { templates: replies.templates ?? [] };
-    if (url.startsWith('/productivity/time-entries')) return { time_entries: [] };
+    if (url.startsWith('/productivity/time-entries')) return { time_entries: replies.time_entries ?? [] };
     if (url.startsWith('/views')) return { views: [] };
+    if (url.startsWith('/nodes/')) {
+      return { node: { id: 'task-1', props: replies.node?.props ?? {} }, edges: [], neighbors: {} };
+    }
     if (url.startsWith('/nodes')) return { nodes: [], edges: [], neighbors: {} };
     return {};
   });
@@ -246,6 +251,108 @@ describe('query states', () => {
     renderWithApp(<TasksScreen />, { route: '/today/tasks' });
     expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't load tasks");
     expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
+  });
+});
+
+describe('task detail save recurrence and focus', () => {
+  it('saves title plus rrule without posting set_recurrence at the stale rev', async () => {
+    serve({ tasks: [task()] });
+    mockApi.post.mockImplementation(async (_path: string, body: { type: string; payload: { id?: string; patch?: { title?: string } } }) => {
+      if (body.type === 'update_task') {
+        return {
+          replayed: false,
+          result: { task: nodeResult(body.payload.id ?? 'task-1', body.payload.patch?.title ?? 'Renamed', 'next', 2) },
+        };
+      }
+      return {
+        replayed: false,
+        result: { task: nodeResult('task-1', 'Renamed', 'next', 3) },
+      };
+    });
+    renderWithApp(<TasksScreen />, { route: '/today/tasks' });
+    await userEvent.click(await screen.findByRole('button', { name: 'Write the brief' }));
+    const titleField = await screen.findByLabelText('Title');
+    await userEvent.clear(titleField);
+    await userEvent.type(titleField, 'Renamed');
+    await userEvent.type(screen.getByLabelText('Recurrence (rrule)'), 'FREQ=WEEKLY');
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(mockApi.post.mock.calls.length).toBeGreaterThanOrEqual(2));
+    const posted = mockApi.post.mock.calls.map((call) => call[1] as { type: string; expected_revision?: number });
+    expect(posted[0]?.type).toBe('update_task');
+    expect(posted[0]?.expected_revision).toBe(1);
+    const recur = posted.find((row) => row.type === 'set_recurrence');
+    expect(recur).toBeDefined();
+    expect(recur?.expected_revision).toBe(2);
+    expect(recur?.expected_revision).not.toBe(1);
+  });
+
+  it('skips set_recurrence when the rrule did not change', async () => {
+    serve({
+      tasks: [task()],
+      node: { props: { recurrence: { rrule: 'FREQ=DAILY', mode: 'fixed', exceptions: [] } } },
+    });
+    mockApi.post.mockResolvedValue({
+      replayed: false,
+      result: { task: nodeResult('task-1', 'Renamed', 'next', 2) },
+    });
+    renderWithApp(<TasksScreen />, { route: '/today/tasks' });
+    await userEvent.click(await screen.findByRole('button', { name: 'Write the brief' }));
+    const titleField = await screen.findByLabelText('Title');
+    await waitFor(() => expect(screen.getByLabelText('Recurrence (rrule)')).toHaveValue('FREQ=DAILY'));
+    await userEvent.clear(titleField);
+    await userEvent.type(titleField, 'Renamed');
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(mockApi.post).toHaveBeenCalled());
+    const posted = mockApi.post.mock.calls.map((call) => (call[1] as { type: string }).type);
+    expect(posted).toEqual(['update_task']);
+  });
+
+  it('returns focus to the title button that opened the sheet', async () => {
+    serve({ tasks: [task()] });
+    renderWithApp(<TasksScreen />, { route: '/today/tasks' });
+    const opener = await screen.findByRole('button', { name: 'Write the brief' });
+    await userEvent.click(opener);
+    const dialog = await screen.findByRole('dialog', { name: 'Write the brief' });
+    await userEvent.click(within(dialog).getByText('Close'));
+    await waitFor(() => expect(document.activeElement).toBe(opener));
+  });
+});
+
+describe('timer list', () => {
+  it('does not list a superseded open row after stop', async () => {
+    const started = '2026-09-11T08:00:00.000Z';
+    serve({
+      tasks: [task()],
+      time_entries: [
+        {
+          id: 'open-1',
+          task_id: 'task-1',
+          started_at: started,
+          rev: 1,
+          updated_at: started,
+        },
+      ],
+    });
+    mockApi.post.mockResolvedValue({
+      replayed: false,
+      result: {
+        time_entry: {
+          id: 'closed-1',
+          task_id: 'task-1',
+          started_at: started,
+          ended_at: '2026-09-11T08:10:00.000Z',
+          rev: 2,
+          updated_at: '2026-09-11T08:10:00.000Z',
+        },
+      },
+    });
+    renderWithApp(<TasksScreen />, { route: '/today/tasks' });
+    await userEvent.click(await screen.findByRole('button', { name: 'Write the brief' }));
+    await screen.findByText('Timer running.');
+    expect(screen.getByText(/\(open\)/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Stop timer' }));
+    await waitFor(() => expect(screen.getByText('Timer stopped.')).toBeInTheDocument());
+    expect(screen.queryByText(/\(open\)/)).not.toBeInTheDocument();
   });
 });
 

@@ -86,7 +86,12 @@ export function TaskCard({
         interactive
         selected={selected}
         title={
-          <button type="button" className="prod-title-btn" onClick={() => onSelect(task.id)}>
+          <button
+            type="button"
+            id={`prod-open-task-${task.id}`}
+            className="prod-title-btn"
+            onClick={() => onSelect(task.id)}
+          >
             {task.title}
           </button>
         }
@@ -102,7 +107,12 @@ export function TaskCard({
       interactive
       className="prod-card"
       title={
-        <button type="button" className="prod-title-btn" onClick={() => onSelect(task.id)}>
+        <button
+          type="button"
+          id={`prod-open-task-${task.id}`}
+          className="prod-title-btn"
+          onClick={() => onSelect(task.id)}
+        >
           {task.title}
         </button>
       }
