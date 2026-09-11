@@ -192,12 +192,11 @@ export async function buildProductivityAnalytics(args: {
   };
 
   const figures = projectProductivityFigures(input);
-  const response: ProductivityAnalyticsResponse = {
+  return {
     window: { days: args.days, start: window_start, end: window_end },
     time_zone: args.timeZone,
     completeness: overallCompleteness(figures),
     figures,
+    ...(args.includeReview ? { review: reviewBullets(figures) } : {}),
   };
-  if (args.includeReview) response.review = reviewBullets(figures);
-  return response;
 }
