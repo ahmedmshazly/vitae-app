@@ -80,6 +80,8 @@ export interface ComboboxProps {
    * is announced as "edit blank". Match the visible label when there is one.
    */
   label: string;
+  /** Optional distinct listbox name when the input and result set need different wording. */
+  listLabel?: string;
   items: ComboboxItem[];
   /** The current text. Owned by the caller, this component never edits it. */
   query: string;
@@ -110,16 +112,27 @@ export interface ComboboxProps {
   side?: 'top' | 'bottom';
   align?: 'start' | 'center' | 'end';
   className?: string;
+  /** Route-scoped presentation hooks for a portalled popup. */
+  panelClassName?: string;
+  listClassName?: string;
+  optionClassName?: string;
+  /** Content rendered immediately before the input inside its anchor. */
+  inputBefore?: ReactNode;
+  /** Additional input styling for composed controls such as tag fields. */
+  inputClassName?: string;
   inputRef?: Ref<HTMLInputElement>;
   /**
    * Runs before the built-in key handling. Call `preventDefault()` to take a
    * key over entirely (a tag input claiming Backspace, say).
    */
   onInputKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
+  /** Called without changing the primitive's selection or dismissal rules. */
+  onInputBlur?: () => void;
 }
 
 export function Combobox({
   label,
+  listLabel,
   items,
   query,
   onQueryChange,
@@ -142,8 +155,14 @@ export function Combobox({
   side = 'bottom',
   align = 'start',
   className,
+  panelClassName,
+  listClassName,
+  optionClassName,
+  inputBefore,
+  inputClassName,
   inputRef,
   onInputKeyDown,
+  onInputBlur,
 }: ComboboxProps) {
   const [selfOpen, setSelfOpen] = useState(false);
   // The current option is remembered by value, never by slot. A caller that
@@ -175,7 +194,8 @@ export function Combobox({
   if (active !== null && activeIndex < 0) setActive(null);
 
   const typed = query.trim().length > 0;
-  const showEmpty = emptyMessage != null && !loading && error == null && items.length === 0 && typed;
+  const showEmpty =
+    emptyMessage != null && !loading && error == null && items.length === 0 && typed;
   const hasContent = items.length > 0 || error != null || Boolean(loading) || showEmpty;
   const isOpen = openProp ?? selfOpen;
   /** The popup is only "expanded" when it has something to show. */
@@ -308,10 +328,17 @@ export function Combobox({
     <div ref={rootRef} className={cn('vt-cbx', className)}>
       <RadixPopover.Root open={expanded} onOpenChange={setOpen}>
         <RadixPopover.Anchor className="vt-cbx__anchor">
+          {inputBefore}
           <input
             ref={inputRef}
             id={inputId}
-            className={cn('vt-inp', 'vt-cbx__input', mono && 'u-mono', invalid && 'vt-inp--invalid')}
+            className={cn(
+              'vt-inp',
+              'vt-cbx__input',
+              mono && 'u-mono',
+              invalid && 'vt-inp--invalid',
+              inputClassName,
+            )}
             role="combobox"
             aria-label={label}
             aria-expanded={expanded}
@@ -338,6 +365,7 @@ export function Combobox({
               if (openOnFocus) setOpen(true);
             }}
             onKeyDown={handleKeyDown}
+            onBlur={onInputBlur}
           />
         </RadixPopover.Anchor>
 
@@ -355,7 +383,7 @@ export function Combobox({
             // needs it. Passing undefined wins the Slot merge, which is why
             // the rendered attributes are asserted in the test.
             tabIndex={undefined}
-            className="vt-cbx__panel"
+            className={cn('vt-cbx__panel', panelClassName)}
             side={side}
             align={align}
             sideOffset={4}
@@ -387,8 +415,8 @@ export function Combobox({
               ref={listRef}
               id={listboxId}
               role="listbox"
-              aria-label={label}
-              className="vt-cbx__list"
+              aria-label={listLabel ?? label}
+              className={cn('vt-cbx__list', listClassName)}
             >
               {items.map((item, index) => {
                 const on = index === activeIndex;
@@ -403,6 +431,7 @@ export function Combobox({
                     aria-disabled={item.disabled || undefined}
                     className={cn(
                       'vt-cbx__opt',
+                      optionClassName,
                       on && 'vt-cbx__opt--on',
                       item.kind === 'create' && 'vt-cbx__opt--create',
                       item.disabled && 'vt-cbx__opt--disabled',
@@ -414,14 +443,17 @@ export function Combobox({
                     onMouseDown={(event) => event.preventDefault()}
                     onClick={() => select(item)}
                   >
-                    {item.glyph ?? (item.kind === 'create' ? <Glyph name="plus" size={14} /> : null)}
+                    {item.glyph ??
+                      (item.kind === 'create' ? <Glyph name="plus" size={14} /> : null)}
                     <span className="vt-cbx__opt-text">
                       <span className="vt-cbx__opt-label">{item.label}</span>
                       {item.description && (
                         <span className="vt-cbx__opt-desc">{item.description}</span>
                       )}
                     </span>
-                    {item.meta != null && <span className="vt-cbx__opt-meta u-mono">{item.meta}</span>}
+                    {item.meta != null && (
+                      <span className="vt-cbx__opt-meta u-mono">{item.meta}</span>
+                    )}
                     {/* Glyph and word, never the tone alone. */}
                     {item.disabled && (
                       <span className="vt-cbx__opt-flag">
@@ -429,7 +461,9 @@ export function Combobox({
                         {item.disabledReason ?? 'Unavailable'}
                       </span>
                     )}
-                    {chosen && <Glyph name="check" size={14} aria-hidden={false} title="Selected" />}
+                    {chosen && (
+                      <Glyph name="check" size={14} aria-hidden={false} title="Selected" />
+                    )}
                   </div>
                 );
               })}

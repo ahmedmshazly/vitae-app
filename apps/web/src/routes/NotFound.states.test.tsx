@@ -47,6 +47,12 @@ describe('NotFound states', () => {
     expect(screen.queryByText('closest match to that address')).not.toBeInTheDocument();
   });
 
+  it('does not offer a false workspace match for a lookalike compatibility URL', () => {
+    renderWithApp(<NotFound />, { route: '/resume-builder' });
+
+    expect(screen.queryByText('closest match to that address')).not.toBeInTheDocument();
+  });
+
   it('makes the way out a link rather than a control nested inside one', () => {
     renderWithApp(<NotFound />, { route: '/wombat' });
 

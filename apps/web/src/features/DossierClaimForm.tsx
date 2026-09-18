@@ -11,7 +11,7 @@
  * the picker offers, whether an atom may be cited at all, and how many records
  * one entry takes are read off the grammar the server sent.
  */
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Banner, Button, Chip, Field, Select, Textarea } from '@vitae/ui';
 import type { DossierSectionGrammar } from '@vitae/core';
@@ -50,6 +50,7 @@ export function DossierClaimForm({
   sectionFull,
   busy,
   onAdd,
+  onDraftChange,
 }: {
   section: DossierSectionGrammar;
   /** The section already holds every entry its grammar allows. */
@@ -57,11 +58,19 @@ export function DossierClaimForm({
   busy: boolean;
   /** Resolves true once the entry is stored, which is when the draft clears. */
   onAdd: (draft: ClaimDraft) => Promise<boolean>;
+  onDraftChange?: (sectionId: string, dirty: boolean) => void;
 }) {
   const ids = useId();
   const [text, setText] = useState('');
   const [cites, setCites] = useState<PickedCitation[]>([]);
   const [atomId, setAtomId] = useState<string | undefined>(undefined);
+  const [submitting, setSubmitting] = useState(false);
+  const flight = useRef(false);
+  const dirty = Boolean(text || cites.length || atomId);
+  useEffect(() => {
+    onDraftChange?.(section.id, dirty);
+  }, [onDraftChange, section.id, dirty]);
+  useEffect(() => () => onDraftChange?.(section.id, false), [onDraftChange, section.id]);
 
   // Only fetched for a section whose grammar admits atoms. Asking for them
   // everywhere would put a picker on screens where citing one is a violation.
@@ -72,11 +81,13 @@ export function DossierClaimForm({
   });
   const atoms = (atomsQuery.data?.atoms ?? []).filter((atom) => !atom.deleted_at);
 
-  const max = section.maxCitationsPerClaim;
-  const atCitationCap = max !== null && cites.length >= max;
-  const canSubmit = text.trim().length > 0 && !busy && !sectionFull;
+  const max = Math.min(section.maxCitationsPerClaim ?? 12, 12);
+  const atCitationCap = cites.length >= max;
+  const disabled = busy || submitting || sectionFull;
+  const canSubmit = text.trim().length > 0 && !disabled && !sectionFull;
 
   function addCitation(citation: PickedCitation) {
+    if (disabled || atCitationCap) return;
     setCites((current) =>
       current.some((c) => c.kind === citation.kind && c.id === citation.id)
         ? current
@@ -85,18 +96,26 @@ export function DossierClaimForm({
   }
 
   async function submit() {
-    const added = await onAdd({ text: text.trim(), cites });
-    if (!added) return;
-    setText('');
-    setCites([]);
-    setAtomId(undefined);
+    if (flight.current || !canSubmit) return;
+    flight.current = true;
+    setSubmitting(true);
+    try {
+      const added = await onAdd({ text: text.trim(), cites });
+      if (!added) return;
+      setText('');
+      setCites([]);
+      setAtomId(undefined);
+    } finally {
+      flight.current = false;
+      setSubmitting(false);
+    }
   }
 
   // Grouped and named. Every section on the page carries one of these forms, so
   // without the legend a screen reader meets several controls called "the
   // sentence this entry asserts" with nothing to say which section they write
   // into.
-  if (sectionFull) {
+  if (sectionFull && !dirty) {
     return (
       <fieldset className="entity-form__section">
         <legend className="entity-form__legend">Add an entry to {section.heading}</legend>
@@ -108,8 +127,17 @@ export function DossierClaimForm({
   }
 
   return (
-    <fieldset className="entity-form__section flex flex-col gap-3">
+    <fieldset
+      className="entity-form__section dossier-claim-form flex flex-col gap-3"
+      disabled={disabled}
+    >
       <legend className="entity-form__legend">Add an entry to {section.heading}</legend>
+      {sectionFull && (
+        <p role="status">
+          This section is now full. Your draft is kept here; remove an existing entry before adding
+          it.
+        </p>
+      )}
       <Field
         label="The sentence this entry asserts"
         htmlFor={`${ids}-text`}
@@ -155,6 +183,7 @@ export function DossierClaimForm({
           </p>
         ) : (
           <EntityPicker
+            allowCreate={false}
             types={admittedTypes(section)}
             placeholder="Search the records this entry rests on..."
             excludeIds={cites.filter((c) => c.kind === 'node').map((c) => c.id)}
@@ -233,7 +262,7 @@ export function DossierClaimForm({
           disabled={!canSubmit}
           onClick={() => void submit()}
         >
-          {busy ? 'Saving...' : 'Add this entry'}
+          {submitting ? 'Saving...' : 'Add this entry'}
         </Button>
       </div>
     </fieldset>

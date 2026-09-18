@@ -69,6 +69,7 @@ export interface BulkBarProps {
   onClear: () => void;
   /** The actions themselves, usually one or two `Button`s. */
   children?: ReactNode;
+  busy?: boolean;
 }
 
 /**
@@ -86,6 +87,7 @@ export function BulkBar({
   onToggleAll,
   onClear,
   children,
+  busy = false,
 }: BulkBarProps) {
   const enter = useEnter();
   const exit = useExit();
@@ -96,7 +98,7 @@ export function BulkBar({
   const announcement = count > 0 ? `${count} ${word} selected` : '';
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key !== 'Escape') return;
+    if (event.key !== 'Escape' || busy) return;
     event.stopPropagation();
     onClear();
   }
@@ -123,6 +125,7 @@ export function BulkBar({
               <Checkbox
                 checked={allSelected ?? false}
                 onChange={onToggleAll}
+                disabled={busy}
                 label="Select all"
               />
             )}
@@ -133,7 +136,7 @@ export function BulkBar({
               <Mono>{count}</Mono> {word} selected
             </span>
             {children}
-            <Button size="sm" glyph="close" onClick={onClear}>
+            <Button size="sm" glyph="close" onClick={onClear} disabled={busy}>
               Clear
             </Button>
           </motion.div>

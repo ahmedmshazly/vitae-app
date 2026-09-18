@@ -36,6 +36,8 @@ describe('GraphPathfinder', () => {
         toId={null}
         toTitle={null}
         onPickTo={() => {}}
+        onPickFrom={() => {}}
+        onResetFrom={() => {}}
         onClearTo={() => {}}
         selfId="self"
       />,
@@ -54,6 +56,8 @@ describe('GraphPathfinder', () => {
         toId="p2"
         toTitle="Grace"
         onPickTo={() => {}}
+        onPickFrom={() => {}}
+        onResetFrom={() => {}}
         onClearTo={onClearTo}
         selfId="self"
       />,

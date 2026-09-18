@@ -23,7 +23,17 @@ function dashboard(over: Partial<Data> = {}): Data {
     resumes: 0,
     focus: { tasks: [], goals: [] },
     upcoming: [],
-    setup: { self: true, github: true, people: true, interactions: true, atoms: true, resume: true, done: 6, total: 6 },
+    knowledge: { pending: 0, conflicts: 0, coverageComplete: false },
+    setup: {
+      self: true,
+      github: true,
+      people: true,
+      interactions: true,
+      atoms: true,
+      resume: true,
+      done: 6,
+      total: 6,
+    },
     insights: {
       momentum: { score: 0, hint: '', factors: [] },
       funnel: {},
@@ -51,7 +61,15 @@ describe('buildQueue', () => {
           { id: 'r2', note: 'a week late', due_on: '2026-07-31', subject_id: 's2' },
         ],
         focus: {
-          tasks: [{ id: 't1', title: 'three days late', due: '2026-08-04', priority: null, status: 'inbox' }],
+          tasks: [
+            {
+              id: 't1',
+              title: 'three days late',
+              due: '2026-08-04',
+              priority: null,
+              status: 'inbox',
+            },
+          ],
           goals: [],
         },
       }),
@@ -81,8 +99,20 @@ describe('buildQueue', () => {
     const queue = buildQueue(
       dashboard({
         upcoming: [
-          { id: 'a1', type: 'application', title: 'closes in 5 days', date: '2026-08-12', label: 'deadline' },
-          { id: 'a2', type: 'application', title: 'closes in 5 weeks', date: '2026-09-11', label: 'deadline' },
+          {
+            id: 'a1',
+            type: 'application',
+            title: 'closes in 5 days',
+            date: '2026-08-12',
+            label: 'deadline',
+          },
+          {
+            id: 'a2',
+            type: 'application',
+            title: 'closes in 5 weeks',
+            date: '2026-09-11',
+            label: 'deadline',
+          },
         ],
       }),
     );
@@ -94,7 +124,13 @@ describe('buildQueue', () => {
       dashboard({
         upcoming: [
           { id: 'e1', type: 'event', title: 'a talk', date: '2026-08-08', label: 'event' },
-          { id: 'n1', type: 'role', title: 'started here', date: '2026-08-07', label: '3y ago today' },
+          {
+            id: 'n1',
+            type: 'role',
+            title: 'started here',
+            date: '2026-08-07',
+            label: '3y ago today',
+          },
         ],
       }),
     );
@@ -105,7 +141,12 @@ describe('buildQueue', () => {
     const queue = buildQueue(
       dashboard({
         reminders: [{ id: 'r1', note: 'ping Sam', due_on: '2026-08-07', subject_id: 's1' }],
-        focus: { tasks: [{ id: 't1', title: 'a task', due: '2026-08-07', priority: null, status: 'inbox' }], goals: [] },
+        focus: {
+          tasks: [
+            { id: 't1', title: 'a task', due: '2026-08-07', priority: null, status: 'inbox' },
+          ],
+          goals: [],
+        },
       }),
     );
     expect(queue.find((q) => q.title === 'ping Sam')?.reminderId).toBe('r1');

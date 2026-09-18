@@ -13,10 +13,73 @@ import { toast } from './helpers/toast';
 
 const DASHBOARD = '**/api/v1/dashboard';
 
+test('long records and partial summary data remain readable at every viewport', async ({ page }, testInfo) => {
+  test.setTimeout(90_000);
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
+  await page.route(DASHBOARD, async (route) => {
+    const response = await route.fetch();
+    const data = await response.json();
+    data.reminders = [{ id: 'long-reminder', note: 'Follow up on the community research partnership and confirm the next interview schedule with the whole team', due_on: new Date().toISOString().slice(0, 10) }];
+    data.habits = [{ id: 'long-habit', title: 'Read and annotate one research paper before checking messages', grid: Array(14).fill(false), checkedToday: false, streak: 0 }];
+    data.pipeline = [{ id: 'long-application', title: 'Senior product designer — community research and accessible public services', status: 'interview' }];
+    data.focus.goals = [{ id: 'long-goal', title: 'Build a sustainable weekly practice for documenting research findings and sharing useful evidence', progress: 0.42, keyResults: 3 }];
+    data.recent = [{ id: 'long-record', type: 'document', title: 'Notes from the regional community workshop: decisions, unresolved questions, and the next round of interviews', source: null }];
+    data.insights.relationships = { total: 0, healthy: 0, drifting: 0 };
+    data.insights.skills = { total: 0, covered: 0 };
+    await route.fulfill({ response, json: data });
+  });
+  await signIn(page);
+  for (const width of [1440, 834, 390]) {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
+    await page.getByRole('heading', { name: 'Today', exact: true }).scrollIntoViewIfNeeded();
+    const note = page.getByText('Follow up on the community research partnership', { exact: false });
+    expect(await note.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+    await page.screenshot({ path: testInfo.outputPath(`today-long-${width}.png`), animations: 'disabled' });
+    const summary = page.getByRole('region', { name: 'How things stand', exact: true });
+    await summary.scrollIntoViewIfNeeded();
+    await expect(summary.getByText('No relationships indexed yet.')).toBeVisible();
+    await expect(summary.getByText('No skills to compare yet.')).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await expectNoA11yViolations(page, '#main-content');
+    await page.screenshot({ path: testInfo.outputPath(`today-summary-${width}.png`), animations: 'disabled' });
+  }
+  expect(errors).toEqual([]);
+});
+
 /** The queue region, the Getting-started checklist is a list of <li> too. */
 function queue(page: Page) {
   return page.getByRole('region', { name: /^Needs you/ });
 }
+
+test('Today keeps setup discoverable without placing completed steps before the agenda', async ({ page }, testInfo) => {
+  test.setTimeout(90_000);
+  await signIn(page);
+  const setup = page.getByRole('region', { name: 'Getting started', exact: true });
+  await setup.scrollIntoViewIfNeeded();
+  const summary = setup.getByText('All setup steps', { exact: true });
+  await expect(setup.getByRole('link', { name: /Set up your profile/ })).toBeHidden();
+  await summary.click();
+  await expect(setup.getByRole('link', { name: /Set up your profile/ })).toBeVisible();
+  await summary.click();
+  await setup.getByRole('button', { name: 'Dismiss setup checklist' }).click();
+  await expect(setup).toBeHidden();
+  await page.getByRole('button', { name: 'Show setup checklist' }).click();
+  await expect(setup).toBeVisible();
+  await expectNoA11yViolations(page, '#today-setup');
+  await page.getByRole('button', { name: 'Score details' }).click();
+  const score = page.getByRole('dialog', { name: 'What drives momentum', exact: true });
+  await expect(score).toBeVisible();
+  await expectNoA11yViolations(page, '.vt-popover');
+  await page.keyboard.press('Escape');
+  for (const width of [1440, 834, 390]) {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
+    await page.getByRole('heading', { name: 'Today', exact: true }).scrollIntoViewIfNeeded();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({ path: testInfo.outputPath(`today-${width}.png`), animations: 'disabled' });
+  }
+});
 
 test('the queue leads the page and counts itself in the summary', async ({ page }) => {
   await signIn(page);
@@ -111,12 +174,10 @@ test('row controls keep a 32px target and a visible focus ring', async ({ page }
   const done = queue(page).getByRole('button', { name: 'Done' }).first();
   const box = (await done.boundingBox())!;
 
-  // The ink is 26px by design; the target is grown to the identity's 32x32
-  // minimum with a pseudo-element so no existing screen relaid out.
-  expect(box.height).toBeLessThan(32);
+  expect(box.height).toBeGreaterThanOrEqual(32);
   const hit = await page.evaluate(
     ({ x, y }) => document.elementFromPoint(x, y)?.closest('button')?.textContent?.trim() ?? null,
-    { x: box.x + box.width / 2, y: box.y - 2 },
+    { x: box.x + box.width / 2, y: box.y + 2 },
   );
   expect(hit).toBe('Done');
 
@@ -181,12 +242,17 @@ test('empty state distinguishes an empty queue from no habits and nobody driftin
   });
   await page.reload();
 
-  await expect(page.getByText('Nothing needs you today')).toBeVisible();
+  await expect(page.getByText('No outstanding agenda items')).toBeVisible();
   await expect(page.getByText('No habits tracked')).toBeVisible();
-  await expect(page.getByText('No one is drifting')).toBeVisible();
+  await expect(page.getByText('No reconnect suggestions')).toBeVisible();
   // The header summary agrees with the queue rather than reporting a stale count.
-  await expect(page.getByText('Nothing needs you', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('Your agenda is clear', { exact: false }).first()).toBeVisible();
 
   // Empty states swap in different markup than the populated scan covers.
   await expectNoA11yViolations(page);
+  await page.getByRole('button', { name: 'Track a habit' }).click();
+  const habitForm = page.getByRole('dialog', { name: 'New habit', exact: true });
+  await expect(habitForm).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(habitForm).toBeHidden();
 });

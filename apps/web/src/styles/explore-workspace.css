@@ -534,6 +534,205 @@
   }
 }
 
+/* Life map is its own instrument. The atlas chrome intentionally stays inside
+   this route so its plum / orchid world does not leak into timeline or atlas. */
+.page--lifemap {
+  --lifemap-night: #171622;
+  --lifemap-slate: #242132;
+  --lifemap-pearl: #f5f0f7;
+  --lifemap-orchid: #baa4ed;
+  --lifemap-sea: #7cc9c1;
+  --lifemap-apricot: #f0b385;
+  --lifemap-line: color-mix(in srgb, var(--lifemap-orchid) 32%, transparent);
+}
+
+[data-theme='light'] .page--lifemap {
+  --lifemap-night: #f5f0f7;
+  --lifemap-slate: #e9e2ed;
+  --lifemap-pearl: #171622;
+  --lifemap-orchid: #6e56bd;
+  --lifemap-sea: #247b76;
+  --lifemap-apricot: #a95928;
+}
+
+[data-theme='hc'] .page--lifemap {
+  --lifemap-night: #050509;
+  --lifemap-slate: #11101a;
+  --lifemap-pearl: #ffffff;
+  --lifemap-orchid: #e4d8ff;
+  --lifemap-sea: #a5fff5;
+  --lifemap-apricot: #ffd0a4;
+  --lifemap-line: #ffffff;
+}
+
+.page--lifemap .lifemap__atlashead {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ae-space-4);
+  padding: var(--ae-space-3) var(--ae-space-5);
+  color: var(--lifemap-pearl);
+  background: var(--lifemap-night);
+  border-bottom: 1px solid var(--lifemap-line);
+}
+
+.page--lifemap .lifemap__kicker,
+.page--lifemap .discovery__eyebrow {
+  margin: 0 0 2px;
+  color: var(--lifemap-sea);
+  font: 600 10px/1.2 var(--ae-font-mono);
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.page--lifemap .lifemap__title {
+  margin: 0;
+  color: var(--lifemap-pearl);
+  font-family: var(--ae-font-sans);
+  font-size: 22px;
+  letter-spacing: -.04em;
+}
+
+.page--lifemap .lifemap__hint {
+  max-width: 550px;
+  margin: 2px 0 0;
+  color: color-mix(in srgb, var(--lifemap-pearl) 70%, transparent);
+  font-size: 12px;
+}
+
+.page--lifemap .lifemap__headtools { display: flex; align-items: center; gap: var(--ae-space-2); }
+.page--lifemap .graph__tool { border-color: var(--lifemap-line); }
+.page--lifemap .graph__tool--accent { background: var(--lifemap-orchid); color: var(--lifemap-night); border-color: var(--lifemap-orchid); }
+
+.lifemap__controls { position: relative; }
+.lifemap__controls > summary {
+  min-height: var(--ae-hit-target);
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--ae-space-3);
+  border: 1px solid var(--lifemap-line);
+  cursor: pointer;
+  list-style: none;
+  font: 600 12px var(--ae-font-sans);
+}
+.lifemap__controls > summary::-webkit-details-marker { display: none; }
+.lifemap__controls > div {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(520px, 86vw);
+  padding: var(--ae-space-3);
+  color: var(--ae-fg);
+  background: var(--ae-surface);
+  border: 1px solid var(--ae-border-strong);
+  box-shadow: 0 18px 50px rgba(23, 22, 34, .22);
+}
+.lifemap__controls section { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px 0; }
+.lifemap__controls section + section { border-top: 1px solid var(--ae-border); }
+.lifemap__controls section > span { min-width: 92px; color: var(--ae-muted); font: 11px var(--ae-font-mono); }
+.lifemap__controls button { padding: 5px 8px; border: 1px solid var(--ae-border); background: transparent; color: inherit; font-size: 11px; cursor: pointer; }
+.lifemap__controls button.is-active { border-color: var(--lifemap-orchid); background: color-mix(in srgb, var(--lifemap-orchid) 18%, transparent); }
+
+.page--lifemap .graph__panel--lifemap { background: var(--lifemap-slate); border-top: 0; }
+.page--lifemap .graph__panel--lifemap canvas { background: var(--lifemap-slate); }
+
+/* The map's first frame needs a short orientation, not a drawer full of
+   computed terminology. This card disappears as soon as a record is selected
+   and never blocks the centre of the canvas. */
+.lifemap__mapguide {
+  position: absolute;
+  z-index: 3;
+  top: var(--ae-space-4);
+  left: var(--ae-space-4);
+  display: grid;
+  max-width: 286px;
+  gap: 4px;
+  padding: var(--ae-space-3) var(--ae-space-4);
+  color: var(--lifemap-pearl);
+  background: color-mix(in srgb, var(--lifemap-night) 90%, transparent);
+  border-left: 3px solid var(--lifemap-sea);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .16);
+  backdrop-filter: blur(10px);
+}
+.lifemap__mapguide-kicker { color: var(--lifemap-sea); font: 600 10px var(--ae-font-mono); letter-spacing: .09em; text-transform: uppercase; }
+.lifemap__mapguide strong { font: 600 15px/1.2 var(--ae-font-sans); letter-spacing: -.02em; }
+.lifemap__mapguide > span:not(.lifemap__mapguide-kicker) { color: color-mix(in srgb, var(--lifemap-pearl) 70%, transparent); font: 11px var(--ae-font-mono); }
+.lifemap__mapguide p { margin: 5px 0 2px; color: color-mix(in srgb, var(--lifemap-pearl) 82%, transparent); font-size: 12px; line-height: 1.45; }
+.lifemap__mapguide button { width: fit-content; padding: 4px 0; border: 0; border-bottom: 1px solid var(--lifemap-sea); color: var(--lifemap-sea); background: transparent; font: 600 12px var(--ae-font-sans); cursor: pointer; }
+
+.discovery {
+  position: absolute;
+  z-index: 4;
+  top: var(--ae-space-3);
+  left: var(--ae-space-3);
+  width: min(385px, calc(100% - var(--ae-space-6)));
+  max-height: calc(100% - var(--ae-space-6));
+  overflow: auto;
+  color: var(--lifemap-pearl);
+  background: color-mix(in srgb, var(--lifemap-night) 94%, transparent);
+  border: 1px solid var(--lifemap-line);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, .24);
+  backdrop-filter: blur(14px);
+}
+.discovery__head, .discovery__detailhead { display: flex; align-items: start; justify-content: space-between; gap: var(--ae-space-3); }
+.discovery__head { padding: var(--ae-space-4) var(--ae-space-4) var(--ae-space-2); }
+.discovery h2, .discovery h3 { margin: 0; color: var(--lifemap-pearl); font-family: var(--ae-font-sans); letter-spacing: -.035em; }
+.discovery h2 { font-size: 20px; }.discovery h3 { font-size: 16px; }
+.discovery__close { border: 0; background: transparent; color: var(--lifemap-pearl); font-size: 24px; line-height: 1; cursor: pointer; }
+.discovery__totals, .discovery__meta, .discovery__subline, .discovery__types, .discovery__representatives, .discovery__notice { font: 11px/1.45 var(--ae-font-mono); }
+.discovery__totals { margin: 0; padding: 0 var(--ae-space-4) var(--ae-space-3); color: color-mix(in srgb, var(--lifemap-pearl) 64%, transparent); }
+.discovery__tabs { display: grid; grid-template-columns: repeat(3, 1fr); border-block: 1px solid var(--lifemap-line); }
+.discovery__tabs button { min-height: 38px; border: 0; border-right: 1px solid var(--lifemap-line); background: transparent; color: color-mix(in srgb, var(--lifemap-pearl) 70%, transparent); font: 600 11px var(--ae-font-sans); cursor: pointer; }
+.discovery__tabs button:last-child { border-right: 0; }.discovery__tabs button.is-active { color: var(--lifemap-night); background: var(--lifemap-orchid); }
+.discovery__body { padding: var(--ae-space-3); }.discovery__explain, .discovery__state { margin: 0 0 var(--ae-space-3); color: color-mix(in srgb, var(--lifemap-pearl) 73%, transparent); font-size: 12px; line-height: 1.5; }
+.discovery__row { width: 100%; display: grid; gap: 2px; padding: var(--ae-space-3) 0; border: 0; border-bottom: 1px solid color-mix(in srgb, var(--lifemap-orchid) 17%, transparent); background: transparent; color: inherit; text-align: left; cursor: pointer; }
+.discovery__row:hover, .discovery__row.is-selected { margin-inline: calc(var(--ae-space-2) * -1); width: calc(100% + var(--ae-space-4)); padding-inline: var(--ae-space-2); background: color-mix(in srgb, var(--lifemap-orchid) 13%, transparent); }
+.discovery__rowtitle { color: var(--lifemap-pearl); font: 600 14px var(--ae-font-sans); }.discovery__meta { color: var(--lifemap-sea); }.discovery__subline { overflow: hidden; color: color-mix(in srgb, var(--lifemap-pearl) 56%, transparent); text-overflow: ellipsis; white-space: nowrap; }
+.discovery__component { display: grid; gap: 5px; padding: var(--ae-space-3) 0; border-bottom: 1px solid var(--lifemap-line); font-size: 12px; }.discovery__component > span { color: var(--lifemap-sea); font: 10px var(--ae-font-mono); }.discovery__component button { margin: 0 6px 5px 0; padding: 4px 6px; border: 1px solid var(--lifemap-line); background: transparent; color: var(--lifemap-pearl); font-size: 11px; cursor: pointer; }
+.discovery__detail { margin-top: var(--ae-space-4); padding-top: var(--ae-space-3); border-top: 1px solid var(--lifemap-line); }.discovery__detailhead > span { color: var(--lifemap-sea); font: 10px var(--ae-font-mono); }.discovery__connections { display: grid; margin: var(--ae-space-3) 0; }.discovery__connections button, .discovery__relationship { display: flex; justify-content: space-between; gap: var(--ae-space-2); padding: 8px 0; border: 0; border-bottom: 1px solid color-mix(in srgb, var(--lifemap-orchid) 17%, transparent); background: transparent; color: var(--lifemap-pearl); text-align: left; font-size: 12px; cursor: pointer; }.discovery__connections button span:last-child, .discovery__relationship span:last-child { color: var(--lifemap-sea); font: 10px var(--ae-font-mono); }.discovery__members { display: grid; max-height: 240px; overflow: auto; }.discovery__members a { display: flex; justify-content: space-between; padding: 7px 0; color: var(--lifemap-pearl); border-bottom: 1px solid color-mix(in srgb, var(--lifemap-orchid) 12%, transparent); font-size: 12px; text-decoration: none; }.discovery__members a span { color: var(--lifemap-sea); font: 10px var(--ae-font-mono); }.discovery__notice { color: var(--lifemap-apricot); }
+
+/* Keep navigation gestures visible and reserve the long-lived controls for
+   the things people use while looking around. Everything else remains one
+   click away, so a laptop-width map does not become a clipped button strip. */
+.page--lifemap .graph__tools--lifemap {
+  left: auto;
+  right: var(--ae-space-4);
+  width: auto;
+  max-width: calc(100% - var(--ae-space-8));
+  flex-wrap: nowrap;
+  overflow: visible;
+  align-items: center;
+  border: 1px solid var(--lifemap-line);
+  border-radius: var(--ae-radius-md);
+  background: color-mix(in srgb, var(--lifemap-night) 88%, transparent);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .18);
+  backdrop-filter: blur(10px);
+}
+.page--lifemap .graph__tools--lifemap .graph__tool { min-height: 34px; padding: 5px 9px; color: var(--lifemap-pearl); background: transparent; border-color: transparent; }
+.page--lifemap .graph__tools--lifemap .graph__tool:hover { background: color-mix(in srgb, var(--lifemap-orchid) 16%, transparent); border-color: var(--lifemap-line); }
+.page--lifemap .graph__tools--lifemap .graph__tool--zoom { min-width: 34px; padding-inline: 0; color: var(--lifemap-sea); font-size: 17px; line-height: 1; }
+.lifemap__canvascontrols { position: relative; }
+.lifemap__canvascontrols > summary { min-height: 34px; display: inline-flex; align-items: center; padding: 0 8px; color: var(--lifemap-pearl); cursor: pointer; font: 12px var(--ae-font-mono); list-style: none; }
+.lifemap__canvascontrols > summary::-webkit-details-marker { display: none; }
+.lifemap__canvascontrols > div { position: absolute; right: 0; bottom: calc(100% + 8px); display: grid; min-width: 190px; padding: 6px; background: var(--lifemap-night); border: 1px solid var(--lifemap-line); box-shadow: 0 12px 34px rgba(0, 0, 0, .26); }
+.lifemap__canvascontrols button, .lifemap__canvascontrols a { min-height: 34px; padding: 6px 8px; border: 0; color: var(--lifemap-pearl); background: transparent; font: 12px var(--ae-font-sans); text-align: left; text-decoration: none; cursor: pointer; }
+.lifemap__canvascontrols button:hover, .lifemap__canvascontrols a:hover { background: color-mix(in srgb, var(--lifemap-orchid) 16%, transparent); }
+.lifemap__canvascontrols button:disabled { color: color-mix(in srgb, var(--lifemap-pearl) 35%, transparent); cursor: default; }
+
+@media (max-width: 760px) {
+  .page--lifemap .lifemap__atlashead { align-items: flex-start; padding: var(--ae-space-3); }.page--lifemap .lifemap__hint { display: none; }.page--lifemap .lifemap__headtools { flex-wrap: wrap; justify-content: flex-end; }.page--lifemap .lifemap__headtools > .graph__tool:not(.graph__tool--accent) { display: none; }
+  .discovery { top: auto; bottom: 0; left: 0; width: 100%; max-height: min(58%, 500px); border-inline: 0; border-bottom: 0; }.discovery__head { padding-top: var(--ae-space-3); }
+  .lifemap__mapguide { top: var(--ae-space-3); left: var(--ae-space-3); max-width: min(280px, calc(100% - var(--ae-space-6))); }.page--lifemap .graph__tools--lifemap { right: var(--ae-space-2); max-width: calc(100% - var(--ae-space-4)); }.page--lifemap .graph__tools--lifemap .lifemap__prefs, .page--lifemap .graph__tools--lifemap > .graph__tool:not(.graph__tool--zoom) { display: none; }
+}
+
+@media (prefers-contrast: more) {
+  .page--lifemap { --lifemap-night: #0a0910; --lifemap-slate: #171622; --lifemap-pearl: #fffaff; --lifemap-orchid: #d3c3ff; --lifemap-sea: #9df5ea; }
+  .discovery, .page--lifemap .lifemap__atlashead { border-color: var(--lifemap-pearl); }
+}
+
 /* Tiles come from a third-party host. When they fail the panel says so in
    words and offers the tile-free twin, rather than staying blank and busy. */
 .atlas__failure {

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { EmptyState, InfoPopover, Mono, PageHeader, RegisterRule } from '@vitae/ui';
+import { Button, EmptyState, InfoPopover, Mono, PageHeader, RegisterRule } from '@vitae/ui';
 import { api } from '../../lib/api.js';
 import { TargetRail } from './TargetRail.js';
 import { SelectionPane } from './SelectionPane.js';
@@ -76,19 +76,36 @@ export function Tailor() {
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'failed'>('idle');
   const [scoringFailed, setScoringFailed] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // A delayed save can complete after a newer one. Only the newest attempt is
+  // allowed to describe the visible save state, otherwise a stale failure can
+  // overwrite a successful save and make the recovery control misleading.
+  const saveAttempt = useRef(0);
+  const saveDraft = (id: string, nextDraft: Draft) => {
+    const attempt = ++saveAttempt.current;
+    setSaveState('saving');
+    void api
+      .patch(`/targets/${id}/draft`, { draft: nextDraft })
+      .then(() => {
+        if (attempt === saveAttempt.current) setSaveState('saved');
+      })
+      .catch(() => {
+        if (attempt === saveAttempt.current) setSaveState('failed');
+      });
+  };
+
   useEffect(() => {
-    if (!targetId) return;
+    if (!targetId) {
+      saveAttempt.current += 1;
+      setSaveState('idle');
+      return;
+    }
     if (skipSave.current) {
       skipSave.current = false;
       return;
     }
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
-      setSaveState('saving');
-      void api
-        .patch(`/targets/${targetId}/draft`, { draft })
-        .then(() => setSaveState('saved'))
-        .catch(() => setSaveState('failed'));
+      saveDraft(targetId, draft);
     }, 800);
     return () => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
@@ -205,10 +222,20 @@ export function Tailor() {
           // The header promises "everything you change is autosaved", so the
           // header is where it has to say when that stops being true.
           saveState === 'failed' ? (
-            <span role="alert" className="text-sm text-danger">
-              <strong className="font-semibold">Not saving.</strong> Your last changes are only in
-              this tab.
-            </span>
+            <div role="alert" className="flex items-center gap-2 text-sm text-danger">
+              <span>
+                <strong className="font-semibold">Not saving.</strong> Your last changes are only in
+                this tab.
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-danger"
+                onClick={() => targetId && saveDraft(targetId, draft)}
+              >
+                Retry save
+              </Button>
+            </div>
           ) : saveState === 'saving' ? (
             <Mono className="text-xs text-muted">saving...</Mono>
           ) : saveState === 'saved' ? (

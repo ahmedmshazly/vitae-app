@@ -23,9 +23,9 @@ describe('entity observatory model', () => {
     const focused = buildOrbitScene(base);
     expect(focused.edges.length).toBeGreaterThan(0);
     expect(focused.edges.length).toBeLessThan(88);
-    expect(
-      focused.edges.every((edge) => focused.visibleRelationIds.has(edge.relationId)),
-    ).toBe(true);
+    expect(focused.edges.every((edge) => focused.visibleRelationIds.has(edge.relationId))).toBe(
+      true,
+    );
   });
 
   it('aggregates route corridors in bundled overview mode', () => {
@@ -63,7 +63,12 @@ describe('entity observatory model', () => {
     const state = cloneObservatoryState(DEFAULT_OBSERVATORY_STATE);
     state.lens = 'matrix';
     const matrix = buildObservatoryMatrix(state);
-    expect(matrix.entities).toHaveLength(35);
+    // Area and Opportunity are first-class catalog entities, so the matrix
+    // must grow with the schema rather than silently omitting them.
+    expect(matrix.entities).toHaveLength(37);
+    expect(matrix.entities.map((entity) => entity.label)).toEqual(
+      expect.arrayContaining(['area', 'opportunity']),
+    );
     expect(
       matrix.cells
         .get('entity:repository|entity:project')

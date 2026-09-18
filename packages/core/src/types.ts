@@ -26,6 +26,10 @@ export const CAREER_NODE_TYPES = [
 
 /** Life-core node types (SRS §4.3.13-21). */
 export const LIFE_NODE_TYPES = [
+  /** Ongoing responsibility, such as Health, Family, or Community. */
+  'area',
+  /** A possibility that has not become a specialized job application. */
+  'opportunity',
   'event',
   'interaction',
   'task',
@@ -96,12 +100,16 @@ export const EDGE_TYPES = [
   'SERVES_GOAL',
   'WAITING_ON',
   'FOR',
+  'IN_AREA',
+  'PARTICIPATES_IN',
+  'AFFILIATED_WITH',
 ] as const;
 
 export type EdgeType = (typeof EDGE_TYPES)[number];
 
 /** Provenance sources (SRS §4.2 `source`). */
 export const SOURCE_TYPES = [
+  'import_gmail',
   'manual',
   'import_linkedin',
   'import_github',

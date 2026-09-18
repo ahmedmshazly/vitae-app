@@ -33,6 +33,7 @@ import { NodeFormDialog } from '../features/forms/NodeFormDialog.js';
 import { BulkUnlinkBar, BulkUnlinkConfirm, useBulkEdgeDelete } from '../features/BulkEdgeDelete.js';
 import { SelectAllRow, useVisibleSelection } from '../features/BulkNodeDelete.js';
 import { useToast } from '../features/Toast.js';
+import { EntityEvidence } from '../features/EntityEvidence.js';
 
 interface NodeFull {
   id: string;
@@ -48,6 +49,8 @@ interface NodeFull {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+  /** Sensitive records must not disclose their contents merely by opening a URL. */
+  sensitivity?: 'normal' | 'sensitive';
 }
 interface Edge {
   id: string;
@@ -86,6 +89,18 @@ export function shownProps(props: Record<string, unknown>): Array<[string, unkno
   );
 }
 
+/** Health and account records remain private even when legacy imports lack a sensitivity bit. */
+export function isSensitiveRecord(node: Pick<NodeFull, 'type' | 'sensitivity'>): boolean {
+  return node.sensitivity === 'sensitive' || node.type === 'health_log' || node.type === 'account';
+}
+
+/** Imported data is not allowed to turn a credential-shaped value into dossier copy. */
+export function isUnsafePropertyKey(key: string): boolean {
+  return /(?:^|[_-])(password|passphrase|secret|token|credential|api[_-]?key|access[_-]?key|private[_-]?key)(?:$|[_-])/i.test(
+    key,
+  );
+}
+
 /**
  * One tick per revision, oldest to newest, active = the one being viewed ,
  * which for this page is always the latest. This is the brand book's worked
@@ -118,11 +133,19 @@ export function Record() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { flash } = useToast();
+  const [sensitiveDetailsVisible, setSensitiveDetailsVisible] = useState(false);
   useEffect(() => {
-    if (id) rememberViewed(id);
+    if (id) {
+      rememberViewed(id);
+      // A route change must not carry the prior record's reveal choice into a
+      // different private record.
+      setSensitiveDetailsVisible(false);
+    }
   }, [id]);
   const [editing, setEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [addingConn, setAddingConn] = useState(false);
   const bulk = useBulkEdgeDelete();
   const { data, isLoading, isError, error, refetch } = useQuery({
@@ -166,11 +189,24 @@ export function Record() {
 
   const { node, neighbors } = data;
   const props = shownProps(node.props);
+  const sensitive = isSensitiveRecord(node);
+  const showDetails = !sensitive || sensitiveDetailsVisible;
 
   async function del() {
-    await api.del(`/nodes/${id}`);
-    await qc.invalidateQueries();
-    navigate('/data/trash');
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await api.del(`/nodes/${id}`);
+      await qc.invalidateQueries();
+      navigate('/data/trash');
+    } catch (err) {
+      // Keep the destructive confirmation in place: closing it on a failed
+      // request makes retry feel like it succeeded, while the record is still
+      // present. The same action becomes the explicit recovery path.
+      setDeleteError(err instanceof Error ? err.message : "Couldn't move this record to Trash.");
+    } finally {
+      setDeleting(false);
+    }
   }
 
   async function togglePin() {
@@ -193,16 +229,25 @@ export function Record() {
   return (
     <div className="page">
       <PageHeader
-        title={node.title}
+        title={showDetails ? node.title : `Sensitive ${node.type.replace(/_/g, ' ')} record`}
         subtitle={
           <>
             <span className="capitalize">{node.type.replace(/_/g, ' ')}</span>
-            {node.subtitle && ` · ${node.subtitle}`}
+            {showDetails && node.subtitle && ` · ${node.subtitle}`}
             {node.deleted_at && ' · in trash'}
           </>
         }
         actions={
           <>
+            {sensitive && (
+              <Button
+                size="sm"
+                aria-expanded={sensitiveDetailsVisible}
+                onClick={() => setSensitiveDetailsVisible((visible) => !visible)}
+              >
+                {sensitiveDetailsVisible ? 'Hide sensitive details' : 'Reveal sensitive details'}
+              </Button>
+            )}
             <ProvenanceChip source={node.source} confidence={node.confidence} />
             {node.source_ref && (
               // The reference completes the provenance story (FR-PROV-001):
@@ -252,6 +297,13 @@ export function Record() {
         }
       />
 
+      {sensitive && !showDetails && (
+        <p className="mb-6 max-w-2xl border-l-2 border-hairline pl-3 text-sm text-muted">
+          <strong className="text-ink">Sensitive details are hidden on entry.</strong> Reveal this
+          record only when it is safe to view its properties, notes, history, and evidence.
+        </p>
+      )}
+
       {editing && isNodeType(node.type) && (
         <NodeFormDialog open onOpenChange={setEditing} type={node.type} nodeId={node.id} />
       )}
@@ -264,15 +316,29 @@ export function Record() {
       />
       <ConfirmDialog
         open={confirmDelete}
-        onOpenChange={setConfirmDelete}
+        onOpenChange={(open) => {
+          setConfirmDelete(open);
+          if (!open) setDeleteError(null);
+        }}
         title={`Move '${node.title}' to trash?`}
-        body="It stays recoverable from Trash for 30 days; connections are preserved."
-        confirmLabel="Move to trash"
+        body={
+          <>
+            <p>It stays recoverable from Trash for 30 days; connections are preserved.</p>
+            {deleteError && (
+              <p role="alert" className="text-sm text-danger">
+                <strong className="font-semibold">Couldn’t move this record to Trash.</strong>{' '}
+                {deleteError}
+              </p>
+            )}
+          </>
+        }
+        confirmLabel={deleting ? 'Moving...' : 'Move to trash'}
         destructive
         onConfirm={() => {
-          setConfirmDelete(false);
           void del();
         }}
+        busy={deleting}
+        initialFocus="cancel"
       />
       <BulkUnlinkConfirm
         open={bulk.confirmUnlink}
@@ -287,7 +353,11 @@ export function Record() {
       <div className="grid gap-x-8 lg:grid-cols-2">
         <div>
           <Section title="Properties" meta={props.length || undefined}>
-            {props.length === 0 ? (
+            {!showDetails ? (
+              <p className="text-sm text-muted">
+                Properties are hidden until you reveal this record.
+              </p>
+            ) : props.length === 0 ? (
               <p className="text-sm text-muted">
                 Nothing recorded yet. Use Edit to fill in what this {node.type.replace(/_/g, ' ')}{' '}
                 is.
@@ -299,7 +369,7 @@ export function Record() {
                     {/* Storage keys are not labels: `tech_stack` was shown as-is. */}
                     <dt className="text-sm text-muted">{humanizeKey(k)}</dt>
                     <dd className="m-0 min-w-0">
-                      <Mono className="block break-words text-sm text-ink">{formatVal(v)}</Mono>
+                      <Mono className="block break-words text-sm text-ink">{formatVal(v, k)}</Mono>
                     </dd>
                   </div>
                 ))}
@@ -308,7 +378,9 @@ export function Record() {
           </Section>
 
           <Section title="Notes">
-            {node.notes_md ? (
+            {!showDetails ? (
+              <p className="text-sm text-muted">Notes are hidden until you reveal this record.</p>
+            ) : node.notes_md ? (
               <p className="whitespace-pre-wrap text-ink-soft">{node.notes_md}</p>
             ) : (
               <p className="text-sm text-muted">
@@ -327,6 +399,7 @@ export function Record() {
                 <>
                   <BulkUnlinkBar
                     selectedCount={bulk.selectedCount}
+                    busy={bulk.busy}
                     onClear={bulk.clear}
                     onUnlink={() => bulk.setConfirmUnlink(true)}
                   />
@@ -348,6 +421,7 @@ export function Record() {
                 {!node.deleted_at && (
                   <SelectAllRow
                     allSelected={allVisibleSelected}
+                    disabled={bulk.busy}
                     onToggle={() => bulk.toggleAll(edgeIds, allVisibleSelected)}
                   />
                 )}
@@ -358,6 +432,7 @@ export function Record() {
                     nodeId={node.id}
                     neighbors={neighbors}
                     selected={bulk.isSelected(e.id)}
+                    busy={bulk.busy}
                     onToggleSelect={node.deleted_at ? undefined : () => bulk.toggleOne(e.id)}
                   />
                 ))}
@@ -366,7 +441,9 @@ export function Record() {
           </Section>
 
           <Section title="History" meta={revisions.length || undefined}>
-            {revs.isError ? (
+            {!showDetails ? (
+              <p className="text-sm text-muted">History is hidden until you reveal this record.</p>
+            ) : revs.isError ? (
               <p role="alert" className="text-sm text-danger">
                 <strong className="font-semibold">Couldn't load the history.</strong> The record
                 itself is fine.
@@ -412,10 +489,12 @@ export function Record() {
                                 <dd className="m-0">
                                   {change.from != null && change.from !== '' && (
                                     <>
-                                      <s className="text-faint">{formatVal(change.from)}</s>{' '}
+                                      <s className="text-faint">
+                                        {formatVal(change.from, field)}
+                                      </s>{' '}
                                     </>
                                   )}
-                                  <span>{formatVal(change.to)}</span>
+                                  <span>{formatVal(change.to, field)}</span>
                                 </dd>
                               </Fragment>
                             ))}
@@ -430,15 +509,36 @@ export function Record() {
               </ul>
             )}
           </Section>
+          {showDetails ? (
+            <EntityEvidence entityId={node.id} />
+          ) : (
+            <Section title="Evidence">
+              <p className="text-sm text-muted">Evidence is hidden until you reveal this record.</p>
+            </Section>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function formatVal(v: unknown): string {
-  if (Array.isArray(v))
-    return v.map((x) => (typeof x === 'object' ? JSON.stringify(x) : String(x))).join(', ');
-  if (typeof v === 'object') return JSON.stringify(v);
+export function formatVal(v: unknown, propertyKey?: string): string {
+  if (propertyKey && isUnsafePropertyKey(propertyKey)) {
+    return 'Redacted: credentials are never displayed.';
+  }
+  // A record property is often structured (money, a list of contact methods,
+  // or a row-based form field). JSON is storage syntax, not dossier copy: it
+  // makes useful values hard to scan and exposes a misleading implementation
+  // detail. Keep every key visible and recurse so nested credential-shaped
+  // imports remain redacted.
+  if (Array.isArray(v)) return v.map((x) => formatVal(x)).join(' · ');
+  if (typeof v === 'object' && v !== null) {
+    const entries = Object.entries(v as Record<string, unknown>);
+    if (entries.length === 0) return 'Not recorded';
+    return entries
+      .map(([key, value]) => `${humanizeKey(key)}: ${formatVal(value, key)}`)
+      .join(' · ');
+  }
+  if (typeof v === 'boolean') return v ? 'Yes' : 'No';
   return String(v);
 }

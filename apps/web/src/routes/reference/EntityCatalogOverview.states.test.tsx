@@ -29,7 +29,7 @@ const TOKENS = readFileSync(join(HERE, '../../../../../packages/ui/src/styles/to
  *
  * The `--ae-*` names are compatibility aliases now: each is declared as a
  * `var()` onto one of the new tokens, so reading a single declaration finds
- * the string `var(--bg)` where this test wants `#f2f0ea`. Only the light
+ * the string `var(--bg)` where this test wants `#f7f4ed`. Only the light
  * theme's `:root` values are followed, which is the theme the exported sheet
  * is pinned to; `TOKENS.match` finds the first declaration in the file and the
  * light block is first by construction.

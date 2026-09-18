@@ -2,7 +2,8 @@
  * Shell chrome smoke: primary nav Today link and Capture control.
  */
 import './../test/api-mock.js';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockApi, resetMockApi } from '../test/api-mock.js';
 import { createTestAuth, renderWithApp } from '../test/render.js';
@@ -30,6 +31,28 @@ beforeEach(() => {
 });
 
 describe('Shell', () => {
+  it('labels the all-reminders badge as open, not due today', async () => {
+    mockApi.get.mockImplementation(async (path: string) => path.startsWith('/reminders')
+      ? { reminders: [{ id: 'future', note: 'Next month', due_on: '2030-12-01' }] }
+      : { checks: { database: { ok: true } } });
+    renderWithApp(<Shell><div>main</div></Shell>);
+    expect(await screen.findByRole('button', { name: 'Reminders, 1 open' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /1 due/ })).not.toBeInTheDocument();
+  });
+  it('does not claim typing or already handled keys for the new-record shortcut', async () => {
+    renderWithApp(
+      <Shell>
+        <select aria-label="Task state"><option>New</option><option>Done</option></select>
+        <button type="button" onKeyDown={(event) => event.preventDefault()}>Local shortcut</button>
+      </Shell>,
+      { route: '/today' },
+    );
+    const nativeKey = new KeyboardEvent('keydown', { key: 'n', bubbles: true, cancelable: true });
+    screen.getByLabelText('Task state').dispatchEvent(nativeKey);
+    expect(nativeKey.defaultPrevented).toBe(false);
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Local shortcut' }), { key: 'n' });
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+  });
   it('renders Today in the primary nav and a Capture control', async () => {
     renderWithApp(
       <Shell>
@@ -47,6 +70,68 @@ describe('Shell', () => {
     expect(screen.getAllByRole('link', { name: /Today/i }).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByRole('button', { name: 'Quick capture' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Reminders' })).toBeInTheDocument();
+  });
+
+  it('offers system and three explicit appearance modes and identifies the current choice', async () => {
+    const user = userEvent.setup();
+    renderWithApp(
+      <Shell>
+        <div>main</div>
+      </Shell>,
+      { route: '/' },
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Appearance: System' }));
+
+    const menu = screen.getByRole('menu', { name: 'Appearance' });
+    expect(within(menu).getByRole('menuitemradio', { name: /^system/i })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
+    expect(within(menu).getByRole('menuitemradio', { name: /dark/i })).toHaveAttribute(
+      'aria-checked',
+      'false',
+    );
+    expect(within(menu).getByRole('menuitemradio', { name: /high contrast/i })).toBeInTheDocument();
+  });
+
+  it('changes appearance with the keyboard and persists the explicit choice', async () => {
+    const user = userEvent.setup();
+    renderWithApp(
+      <Shell>
+        <div>main</div>
+      </Shell>,
+      { route: '/' },
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Appearance: System' }));
+    const dark = screen.getByRole('menuitemradio', { name: /dark/i });
+    act(() => dark.focus());
+    await user.keyboard('{Enter}');
+
+    await waitFor(() => expect(document.documentElement).toHaveAttribute('data-theme', 'dark'));
+    expect(localStorage.getItem('vitae.theme')).toBe('dark');
+  });
+
+  it('supports roving appearance-menu navigation without relying on a pointer', async () => {
+    const user = userEvent.setup();
+    renderWithApp(
+      <Shell>
+        <div>main</div>
+      </Shell>,
+      { route: '/' },
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Appearance: System' }));
+    act(() => screen.getByRole('menuitemradio', { name: /^light/i }).focus());
+    await user.keyboard('{End}');
+    expect(screen.getByRole('menuitemradio', { name: /high contrast/i })).toHaveFocus();
+    await user.keyboard('{Home}');
+    expect(screen.getByRole('menuitemradio', { name: /^system/i })).toHaveFocus();
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('menuitemradio', { name: /^light/i })).toHaveFocus();
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('menuitemradio', { name: /dark/i })).toHaveFocus();
   });
 
   it('keeps a live region mounted before there is anything to announce', async () => {
@@ -105,7 +190,87 @@ describe('Shell', () => {
     // tab stop. It was already set and nothing ever focused it.
     const main = document.getElementById('main-content');
     expect(main).not.toBeNull();
+    expect(main).toHaveRole('main');
     expect(main).toHaveAttribute('tabindex', '-1');
+  });
+
+  it('puts the skip link before shell controls and points it at the main landmark', async () => {
+    const user = userEvent.setup();
+    renderWithApp(
+      <Shell>
+        <div>main</div>
+      </Shell>,
+      { route: '/today' },
+    );
+
+    await user.tab();
+    const skip = screen.getByRole('link', { name: 'Skip to content' });
+    expect(skip).toHaveFocus();
+    expect(skip).toHaveAttribute('href', '#main-content');
+    expect(screen.getByRole('main')).toHaveAttribute('id', 'main-content');
+  });
+
+  it('moves focus and announces the destination after primary navigation', async () => {
+    const user = userEvent.setup();
+    const { container } = renderWithApp(
+      <Shell>
+        <div>main</div>
+      </Shell>,
+      { route: '/today' },
+    );
+
+    await user.click(screen.getAllByRole('link', { name: 'Network' })[0]!);
+
+    await waitFor(() => expect(screen.getByRole('main')).toHaveFocus());
+    expect(container.querySelector('[aria-live="polite"]')).toHaveTextContent('Network');
+    expect(document.title).toBe('Network · Vitae');
+  });
+
+  it('opens the mobile More sheet as a named dialog and restores focus on Escape', async () => {
+    const user = userEvent.setup();
+    renderWithApp(
+      <Shell>
+        <div>main</div>
+      </Shell>,
+      { route: '/today' },
+    );
+
+    const more = screen.getByRole('button', { name: 'More destinations' });
+    await user.click(more);
+
+    const sheet = await screen.findByRole('dialog', { name: 'Vitae workspaces' });
+    expect(more).toHaveAttribute('aria-expanded', 'true');
+    expect(within(sheet).getByRole('link', { name: /Data/ })).toHaveAttribute('href', '/data');
+    expect(within(sheet).getByRole('link', { name: /Help/ })).toHaveAttribute('href', '/help');
+
+    await user.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog', { name: 'Vitae workspaces' })).toBeNull(),
+    );
+    await waitFor(() => expect(more).toHaveFocus());
+    expect(more).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('lets a More-sheet destination keep the route focus handoff', async () => {
+    const user = userEvent.setup();
+    renderWithApp(
+      <Shell>
+        <div>main</div>
+      </Shell>,
+      { route: '/today' },
+    );
+
+    await user.click(screen.getByRole('button', { name: 'More destinations' }));
+    await user.click(
+      (await screen.findByRole('dialog', { name: 'Vitae workspaces' })).querySelector(
+        'a[href="/data"]',
+      )!,
+    );
+
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog', { name: 'Vitae workspaces' })).toBeNull(),
+    );
+    await waitFor(() => expect(screen.getByRole('main')).toHaveFocus());
   });
 });
 

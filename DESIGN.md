@@ -6,14 +6,14 @@ This document records the interface that is implemented now. Product truth remai
 
 ## Identity
 
-Vitae is a **Living Ledger / Quiet Observatory** (concept seed `7fdb9c86`): a private body of
-evidence that can be read through relationship, career, time, place, and custody lenses. It should
-feel like a precise instrument at rest, not a feed or a generic dashboard.
+Vitae is a **Living Ledger / Calm field notebook**: a private body of evidence that can be read
+through relationship, career, time, place, and custody lenses. It should feel like a precise
+working register at rest, not a feed or a generic dashboard.
 
-The visual thesis is matte near-black fields, bone-white ink, one-pixel ruling, open registers,
-pinned traces, and restrained semantic colour. The interaction thesis is equally important:
-orient the user, expose the evidence, make the next action clear, and keep capture available
-without breaking the flow.
+The visual thesis is mineral paper workspace, crisp folio surfaces, graphite ink, one-pixel
+ruling, open registers, and restrained brass/cobalt semantic colour. The interaction thesis is
+equally important: orient the user, expose the evidence, make the next action clear, and keep
+capture available without breaking the flow.
 
 Two composition rules are deliberate:
 
@@ -25,41 +25,41 @@ Two composition rules are deliberate:
 
 ## Visual foundation
 
-`packages/ui/src/styles/tokens.css` is the palette and geometry authority. Chrome is achromatic;
-paper white is the action accent, so colour remains available for state and data meaning.
+`packages/ui/src/styles/tokens.css` is the palette and geometry authority. Light mode is the
+product default: paper carries the workspace, white folio carries documents and controls, and
+colour remains reserved for meaning rather than decoration. Dark and high-contrast modes redeclare
+the same surface, outcome, and visualization contracts independently.
 
 | Role                     | Token                                       | Value / use                                               |
 | ------------------------ | ------------------------------------------- | --------------------------------------------------------- |
-| Frame                    | `--ae-rail`                                 | `#0a0a0a`                                                 |
-| Canvas                   | `--ae-bg`                                   | `#0f0f0f`                                                 |
-| Surface                  | `--ae-surface`                              | `#151515`                                                 |
-| Raised                   | `--ae-surface-raised`                       | `#1c1c1c`                                                 |
-| Overlay                  | `--ae-surface-overlay`                      | `#232323`                                                 |
-| Recessed register        | `--ae-surface-sunken`                       | `#0d0d0d`                                                 |
-| Hairline / strong rule   | `--ae-border`, `--ae-border-strong`         | `#2b2b2b`, `#3f3f3f`                                      |
-| Control boundary         | `--ae-border-control`                       | `#727271`; use when a border alone defines a control      |
-| Strong / body / soft ink | `--ae-fg-strong`, `--ae-fg`, `--ae-fg-soft` | `#fafaf8`, `#e8e8e6`, `#c9c9c6`                           |
-| Muted / faint ink        | `--ae-muted`, `--ae-faint`                  | `#a3a3a0`, `#8f8f8c`; faint is the contrast floor         |
-| Action accent            | `--ae-accent`, `--ae-accent-ink`            | paper white on near-black; there is no default accent hue |
+| Paper workspace          | `--ae-rail`, `--ae-bg`                      | `#F7F4ED`                                                 |
+| Parchment register       | `--ae-surface-raised`                       | `#ECE7DC`                                                 |
+| Folio surface            | `--ae-surface`, `--ae-surface-overlay`      | `#FFFFFF`                                                 |
+| Graphite / margin ink    | `--ae-fg`, `--ae-muted`                     | `#20231F`, `#68685F`                                      |
+| Ruled containment        | `--ae-border`, `--ae-border-strong`         | `#CBC5B8`; use one-pixel rules, not card shadow           |
+| Primary action           | `--ae-accent`, `--ae-accent-ink`            | brass `#C28A17` with graphite ink                         |
+| Scheduled / live         | `--ae-accent-2`, `--ae-trace-live`          | cobalt `#285BA7`                                          |
+| Do / destructive urgency | `--do`, `--ae-danger`                       | accessible red `#B7352B`                                  |
 
-Outcome colours are `success #7eb795`, `warning #c8a344`, `danger #e17263`, `info #9a9484`, and
-celebratory `ember #c98a3d`. Danger does not fill routine destructive controls; only the final
-confirmation inside a dialog may use a filled danger button. Every outcome also needs a word,
-glyph, shape, or pattern; colour is never the only signal.
+Brass is primary action, cobalt is scheduled/live state, red is Do/destructive urgency, and
+Eliminate remains neutral and dashed. Outcome colours are separately tokenized per theme. Danger
+does not fill routine destructive controls; only the final confirmation inside a dialog may use a
+filled danger button. Every outcome also needs a word, glyph, shape, or pattern; colour is never
+the only signal.
 
 Workspace ink is a semantic trace through otherwise neutral chrome:
 
 | Workspace | Ink                                |
 | --------- | ---------------------------------- |
-| Today     | paper white (`--ae-fg-strong`)     |
-| Network   | person / relationship, `#1f9c86`   |
-| Career    | work, `#b08a18`                    |
-| Explore   | place, `#6e8fd0`                   |
-| Data      | event / custody process, `#c8503f` |
-| Settings  | soft neutral ink, `#c9c9c6`        |
+| Today     | graphite (`--ae-fg-strong`)        |
+| Network   | person / relationship, `#237A70`   |
+| Career    | work, `#9C6C12`                    |
+| Explore   | place, `#285BA7`                   |
+| Data      | event / custody process, `#B7352B` |
+| Settings  | margin ink, `#68685F`              |
 
-Stable data roles are person `#1f9c86`, work `#b08a18`, place `#6e8fd0`, event `#c8503f`, idea
-`#a87bc0`, practice `#7e9b3a`, media `#d4649b`, and other `#c56a2a`. Workspace-home action tones
+Stable data roles are person `#237A70`, work `#9C6C12`, place `#285BA7`, event `#B7352B`, idea
+`#79579C`, practice `#57752D`, media `#A64B73`, and other `#A65C25`. Workspace-home action tones
 reuse those roles: relationship → person, career → work, time → event, place → place, and data →
 media. Generic visualizations use the same eight slots in fixed order. A ninth series becomes
 "Other" or gains a second encoding; do not generate or cycle hues.
@@ -75,18 +75,20 @@ previews use containment and ruling rather than elevation.
 
 ## Typography
 
-- Instrument Sans Variable is the primary UI and prose face. The final app layer renders page
-  titles in normal case at a responsive `27–38px`, medium weight, with tight tracking.
-- IBM Plex Mono carries data, dates, counts, provenance, keyboard hints, stage numbers, register
-  labels, and compact uppercase section labels. The `--ae-font-display` token also resolves to this
-  mono face, but it is for headings, not clickable controls or small body copy.
-- App section and card headings are compact mono labels; page titles remain visibly larger and
-  sans. Do not collapse those two levels into one treatment.
-- Source Serif 4 is an editorial exception used by the public manifesto body and quotations.
+- Space Grotesk is the primary UI and reading face. Page titles are normal case, medium weight,
+  and tight enough to feel like a document heading rather than a campaign headline.
+- Space Mono carries data, dates, counts, provenance, keyboard hints, stage numbers, register
+  labels, and compact uppercase section labels.
+- Archivo Black is reserved for high-impact public display moments. Do not use it for ordinary app
+  headings, controls, or body copy.
+- The margin-note signature is structural rather than decorative: short mono labels, provenance
+  and dates at the edge of a record, and ruled registers make the product recognisable without
+  textures, gradients, or card-heavy chrome.
 - The body default is `14px / 1.55`; nothing renders below `11px`.
 
-All fonts are bundled through `@fontsource` imports in `apps/web/src/main.tsx`. There is no external
-runtime font or font-CDN dependency. Keep system fallbacks, but do not add a network-loaded font.
+All fonts are bundled through the self-hosted `@font-face` rules in
+`packages/ui/src/styles/base.css`. There is no external runtime font or font-CDN dependency. Keep
+system fallbacks, but do not add a network-loaded font.
 
 ## Shell and navigation hierarchy
 
@@ -95,8 +97,10 @@ The authenticated shell has four persistent levels:
 1. The primary rail contains the Vitae mark, global find (`⌘P`), the six workspace hubs (Today,
    Network, Career, Explore, Data, Settings), the primary Capture action (`⌘K`), Help, system
    status, and the user-controlled collapse button.
-2. The top bar contains the breadcrumb, a second global command/search affordance, demo-space
-   control, structured-new and Capture actions, reminders, and sign-out.
+2. The top bar contains the breadcrumb, a second global command/search affordance, appearance
+   menu (Light, Dark, High contrast), demo-space control, structured-new and Capture actions,
+   reminders, and sign-out. An appearance selection is explicit and persisted; before that, the
+   document follows the operating system’s dark/high-contrast preference.
 3. The workspace strip names the current workspace and exposes only its local destinations. Explore
    may append saved views; system health sits at the far edge where space permits.
 4. The routed content region changes while the shell stays still. Navigation updates the document
@@ -133,7 +137,7 @@ workspace strip and no rail, so it must supply its own heading and its own way b
 
 ## Workspace and screen composition
 
-Network, Explore, Data, and Settings share `WorkspaceHome`: eyebrow, `PageHeader`, a ruled workflow
+Explore, Data, and Settings share `WorkspaceHome`: eyebrow, `PageHeader`, a ruled workflow
 trace, a short editorial purpose statement, one dominant numbered lead destination, then an ordered
 ruled index. The trace names the sequence **Orient → Inspect → Decide → Act**, with Orient current
 on entry. The lead is deliberately larger than the remaining destinations. At narrower widths the
@@ -142,6 +146,13 @@ statement stops being sticky and the composition becomes one column.
 Today and Career are intentional exceptions. Today opens directly on the daily agenda. Career opens
 on an application runway with a ruled summary, next moves, five meaningful pipeline lanes, and
 outcomes. Do not force either into the generic workspace-home template merely for symmetry.
+
+Network is also a deliberate exception: People and Organizations lead as a two-column
+directory, with Add person as the primary action opening the existing guarded person form.
+Four secondary discovery links and brief guidance for new users follow the directory.
+One-pixel ruling and the incumbent paper/graphite palette retain the register character;
+on mobile the directory stacks into a single ruled column. Preserve this directory-first
+hierarchy when extending Network home.
 
 Common screen grammar:
 

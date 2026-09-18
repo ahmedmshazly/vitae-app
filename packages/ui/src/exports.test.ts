@@ -8,11 +8,8 @@
  * the kind of break that is cheapest to catch on this side of the boundary.
  *
  * The reverse direction is deliberately not asserted here. `src/styles`
- * currently holds one sheet nobody can import — `combobox.css`, which
- * `combobox.tsx` names as where its animation lives and which no export or
- * import reaches — and making that pass means wiring the sheet into the app,
- * not editing this list. Turning that into a red test would only get it
- * silenced.
+ * currently holds the combobox sheet, which is imported by the application
+ * alongside the rest of the shared primitives.
  */
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -37,6 +34,7 @@ describe('@vitae/ui exports', () => {
       './styles/components.css',
       './styles/layout.css',
       './styles/toast.css',
+      './styles/combobox.css',
     ]) {
       expect(exportMap, `${subpath} is no longer exported`).toHaveProperty(subpath);
     }
@@ -62,6 +60,7 @@ describe('@vitae/ui exports', () => {
       'components.css',
       'layout.css',
       'toast.css',
+      'combobox.css',
     ];
     const missing = imported.filter((name) => !targets.has(`./src/styles/${name}`));
     expect(missing).toEqual([]);
@@ -90,4 +89,3 @@ describe('@vitae/ui exports', () => {
     expect(new Set(hashes).size).toBe(4);
   });
 });
-

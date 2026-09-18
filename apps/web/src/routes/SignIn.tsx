@@ -11,7 +11,7 @@
  */
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Button, Glyph, LogoStacked, RegisterRule, Skeleton } from '@vitae/ui';
+import { Button, Glyph, LogoHorizontal, RegisterRule, Skeleton } from '@vitae/ui';
 import { useAuth } from '../lib/auth.js';
 
 /** Which way in is mid-flight. A single shared flag made the developer button
@@ -20,7 +20,7 @@ import { useAuth } from '../lib/auth.js';
 type Pending = 'google' | 'dev' | null;
 
 export function SignIn() {
-  const { signInDev, signInGoogle, devLoginEnabled, googleEnabled, cloudEnabled, accountError } =
+  const { signInDev, signInGoogle, devLoginEnabled, googleEnabled, cloudEnabled, localInstall, accountError } =
     useAuth();
   const { pathname } = useLocation();
   const isSignup = pathname === '/signup';
@@ -47,7 +47,7 @@ export function SignIn() {
       ) : (
         <>
           <div className="signin__door-head">
-            <h2 className="u-display text-md text-ink-strong">
+            <h2 className="signin__title">
               {cloudEnabled && isSignup ? 'Start your 14-day trial' : 'Sign in'}
             </h2>
             <p className="signin__door-copy">
@@ -55,13 +55,16 @@ export function SignIn() {
                 ? cloudEnabled
                   ? 'Use a verified Google account. Vitae prepares one private workspace and does not ask for a card to begin.'
                   : 'Use the Google account configured as the owner of this instance.'
-                : 'Use the local developer shortcut enabled for this build.'}
+                : localInstall
+                  ? 'Open the private workspace on this computer.'
+                  : 'Use the local developer shortcut enabled for this build.'}
             </p>
           </div>
 
           <div className="signin__providers" aria-busy={pending !== null}>
             {googleEnabled && (
               <Button
+                aria-describedby="signin-access-note"
                 variant="primary"
                 size="lg"
                 className="w-full justify-center"
@@ -75,30 +78,48 @@ export function SignIn() {
 
             {devLoginEnabled && (
               <Button
+                aria-describedby="signin-access-note"
                 variant={googleEnabled ? 'default' : 'primary'}
                 size="lg"
                 className="w-full justify-center"
                 disabled={pending !== null}
                 onClick={() => void run('dev', signInDev)}
               >
-                {pending === 'dev' ? 'Signing in...' : 'Developer sign-in'}
+                {pending === 'dev'
+                  ? 'Signing in...'
+                  : localInstall
+                    ? 'Continue as owner'
+                    : 'Developer sign-in'}
                 {/* Inherit the button's own foreground rather than --ae-muted.
                     That token is documented at 7.6:1 against the application's
                     dark ground; on this button's near-white fill it measures
                     2.41:1, which axe reports as a serious contrast failure. */}
-                <span
-                  aria-hidden="true"
-                  className="rounded-sm border border-strong px-1 font-mono text-xs"
-                >
-                  DEV
-                </span>
+                {!localInstall && (
+                  <span
+                    aria-hidden="true"
+                    className="rounded-sm border border-strong px-1 font-mono text-xs"
+                  >
+                    DEV
+                  </span>
+                )}
               </Button>
             )}
           </div>
 
+          <p role="status" aria-live="polite" aria-atomic="true" className="u-visually-hidden">
+            {pending === 'google'
+              ? 'Google sign-in is in progress.'
+              : pending === 'dev'
+                ? localInstall
+                  ? 'Owner sign-in is in progress.'
+                  : 'Developer sign-in is in progress.'
+                : ''}
+          </p>
+
           {/* Never colour alone: the tone carries a glyph and the word "Failed". */}
           {(error || accountError) && (
             <p
+              id="signin-error"
               role="alert"
               aria-live="assertive"
               className="signin__error flex items-start gap-2 text-sm text-danger"
@@ -108,15 +129,20 @@ export function SignIn() {
                 <strong className="font-semibold">
                   {error ? 'Sign-in failed.' : 'Workspace setup needs attention.'}
                 </strong>{' '}
-                {error ?? accountError}
+                {error ?? accountError}{' '}
+                <span>Try the sign-in method again.</span>
               </span>
             </p>
           )}
 
-          <p className="signin__access-note">
+          <p id="signin-access-note" className="signin__access-note">
             {cloudEnabled
               ? "One private workspace. Your account never selects or shares another person's records."
-              : 'This is a single-owner system. Verified accounts that do not match the configured owner email are denied.'}
+              : localInstall
+                ? 'Anyone with access to this computer can continue as owner.'
+                : googleEnabled
+                  ? 'This is a single-owner system. Verified accounts that do not match the configured owner email are denied.'
+                  : 'Developer access is enabled for this local build.'}
           </p>
         </>
       )}
@@ -134,7 +160,7 @@ export function SignInSplash() {
   return (
     <SignInLayout>
       <div className="signin__door-head">
-        <h2 className="u-display text-md text-ink-strong">Sign in</h2>
+        <h2 className="signin__title">Sign in</h2>
         <p className="signin__door-copy">Checking this browser for an existing session.</p>
       </div>
       <div className="signin__providers" role="status" aria-label="Checking your session">
@@ -150,7 +176,7 @@ function NoWayIn() {
   return (
     <>
       <div className="signin__door-head">
-        <h2 className="u-display text-md text-ink-strong">No way in</h2>
+        <h2 className="signin__title">Sign-in unavailable</h2>
         <p className="signin__door-copy">This build cannot authenticate an account yet.</p>
       </div>
       <p role="alert" className="flex items-start gap-2 text-sm text-danger">
@@ -183,18 +209,15 @@ function SignInLayout({ children }: { children: React.ReactNode }) {
           36ch block inside it just moves the void from one side to the other. */}
       <section className="signin__identity flex flex-col justify-center gap-6 p-6 lg:items-center lg:p-12">
         <div className="signin__identity-inner max-w-[42rem]">
-          <LogoStacked markSize={56} style={{ alignItems: 'flex-start' }} />
+          <LogoHorizontal markSize={40} />
           {/* A sign-in screen has nothing true to encode, so the rule carries
               no ticks. Faking them is worse than having none. */}
           <div className="signin__register mt-6">
             <RegisterRule />
           </div>
-          <h1 className="signin__claim">
-            Turn the career you have lived into the next role you can reach.
-          </h1>
+          <h1 className="signin__claim">Your career, connected.</h1>
           <p className="signin__identity-copy">
-            Vitae keeps the people, work evidence, and next decisions behind a considered career
-            move connected in a private record you can inspect and export.
+            Keep your relationships, work, and evidence together. Pick up where you left off.
           </p>
           <ol className="signin__ledger" aria-label="How Vitae turns memory into action">
             <li>
@@ -203,11 +226,11 @@ function SignInLayout({ children }: { children: React.ReactNode }) {
             </li>
             <li>
               <span>Connect</span>
-              <strong>Typed records with provenance</strong>
+              <strong>People, work, and the evidence behind them</strong>
             </li>
             <li>
               <span>Act</span>
-              <strong>Reconnect, rank, compile, export</strong>
+              <strong>Follow up, prepare documents, take the next step</strong>
             </li>
           </ol>
         </div>
@@ -219,7 +242,7 @@ function SignInLayout({ children }: { children: React.ReactNode }) {
           <span className="signin__instance">
             {cloudEnabled
               ? 'Private workspace · evidence first · exportable'
-              : 'Single-owner · self-hosted · default-deny'}
+              : 'Your records · your workspace'}
           </span>
           <br />
           {cloudEnabled ? (

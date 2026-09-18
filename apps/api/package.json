@@ -21,7 +21,8 @@
     "backfill:subjects": "tsx src/scripts/backfill-subjects.ts",
     "purge": "tsx src/scripts/purge.ts",
     "audit:graph": "tsx src/scripts/audit-graph.ts",
-    "tidy:import": "tsx src/scripts/tidy-import.ts"
+    "tidy:import": "tsx src/scripts/tidy-import.ts",
+    "import:gmail": "tsx src/scripts/import-gmail-sqlite.ts"
   },
   "dependencies": {
     "@vitae/config": "workspace:*",
@@ -34,6 +35,8 @@
     "express": "^4.21.2",
     "firebase-admin": "^13.0.2",
     "flexsearch": "^0.7.43",
+    "graphology": "^0.26.0",
+    "graphology-communities-louvain": "^2.0.2",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "kysely": "^0.29.4",

@@ -54,6 +54,229 @@
     }
   ],
   "paths": {
+    "/graph/discovery": {
+      "get": {
+        "operationId": "getGraphDiscovery",
+        "summary": "Analyze communities, bridges, and disconnected records across the live workspace",
+        "tags": [
+          "graph"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Community discovery overview",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraphDiscovery"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (default-deny)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/graph/discovery/community/{communityId}": {
+      "get": {
+        "operationId": "getGraphCommunity",
+        "summary": "Read a page of community members and a bounded graph scene",
+        "tags": [
+          "graph"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "communityId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 250
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Community detail"
+          },
+          "401": {
+            "description": "Unauthorized (default-deny)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Community not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/graph/discovery/connection": {
+      "get": {
+        "operationId": "getGraphCommunityConnection",
+        "summary": "Read the recorded relationships joining two communities",
+        "tags": [
+          "graph"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 250
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Supporting relationships"
+          },
+          "400": {
+            "description": "Both community IDs are required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (default-deny)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Community connection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/dev-login": {
       "post": {
         "operationId": "authDevLogin",
@@ -232,6 +455,76 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AuthMeResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/objects": {
+      "get": {
+        "operationId": "getStoredObject",
+        "summary": "Download a privately stored object by key",
+        "tags": [
+          "objects"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Storage key returned at upload time."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Object bytes"
+          },
+          "400": {
+            "description": "Missing or invalid object key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (default-deny)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Object not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -2721,6 +3014,45 @@
         }
       }
     },
+    "/knowledge": {
+      "get": {
+        "operationId": "stubKnowledge",
+        "summary": "/knowledge mount",
+        "tags": [
+          "knowledge"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized (default-deny)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/suggest": {
       "get": {
         "operationId": "stubSuggest",
@@ -3384,45 +3716,6 @@
         }
       }
     },
-    "/graph": {
-      "get": {
-        "operationId": "stubGraph",
-        "summary": "/graph mount",
-        "tags": [
-          "graph"
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized (default-deny)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/timeline": {
       "get": {
         "operationId": "stubTimeline",
@@ -3977,7 +4270,8 @@
           "workspace",
           "self",
           "cloudEnabled",
-          "devLoginEnabled"
+          "devLoginEnabled",
+          "localInstall"
         ],
         "properties": {
           "user": {
@@ -4016,6 +4310,50 @@
           },
           "devLoginEnabled": {
             "type": "boolean"
+          },
+          "localInstall": {
+            "type": "boolean",
+            "description": "True when this process is a loopback-bound personal production install."
+          }
+        }
+      },
+      "GraphDiscovery": {
+        "type": "object",
+        "required": [
+          "totals",
+          "communities",
+          "bridges",
+          "disconnected",
+          "explanation"
+        ],
+        "properties": {
+          "totals": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Whole-workspace record, relationship, community and component counts."
+          },
+          "communities": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "bridges": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "disconnected": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "explanation": {
+            "type": "string"
           }
         }
       },
@@ -4398,6 +4736,7 @@
           "source": {
             "type": "string",
             "enum": [
+              "import_gmail",
               "manual",
               "import_linkedin",
               "import_github",
@@ -4559,6 +4898,7 @@
           "source": {
             "type": "string",
             "enum": [
+              "import_gmail",
               "manual",
               "import_linkedin",
               "import_github",

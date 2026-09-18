@@ -1,4 +1,4 @@
-import { StatusTrace } from '@vitae/ui';
+import { Checkbox, Popover, StatusTrace } from '@vitae/ui';
 import type { TimelineDisplayPrefs } from './displayPrefs.js';
 import { ALL_LANES, type BrushRange, type TimelineViewMode, type TimelineZoom } from './types.js';
 
@@ -11,6 +11,7 @@ export interface TimelineToolbarProps {
   onPatchPrefs: (p: Partial<TimelineDisplayPrefs>) => void;
   prefsOpen: boolean;
   onTogglePrefs: () => void;
+  onClosePrefs: () => void;
   onResetPrefs: () => void;
   onToday: () => void;
   onFit: () => void;
@@ -31,6 +32,7 @@ export function TimelineToolbar({
   onPatchPrefs,
   prefsOpen,
   onTogglePrefs,
+  onClosePrefs,
   onResetPrefs,
   onToday,
   onFit,
@@ -95,7 +97,7 @@ export function TimelineToolbar({
 
       <div className="explore-control-band">
         <span className="explore-control-band__label">Scale</span>
-        <div className="lifemap__row" aria-label="Zoom">
+        <div className="lifemap__row" role="group" aria-label="Zoom">
           {ZOOMS.map((z) => (
             <button
               key={z}
@@ -118,7 +120,7 @@ export function TimelineToolbar({
 
       <div className="explore-control-band explore-control-band--lanes">
         <span className="explore-control-band__label">Evidence lanes</span>
-        <div className="lifemap__row" aria-label="Lanes">
+        <div className="lifemap__row" role="group" aria-label="Lanes">
           {ALL_LANES.map((lane) => {
             const on = prefs.activeLanes.includes(lane);
             // At least one lane has to stay on. That was enforced by silently
@@ -146,50 +148,41 @@ export function TimelineToolbar({
             );
           })}
           <div className="lifemap__prefs">
-            <button
-              type="button"
-              className={`graph__tool${prefsOpen ? ' graph__tool--accent' : ''}`}
-              aria-expanded={prefsOpen}
-              onClick={onTogglePrefs}
+            <Popover
+              open={prefsOpen}
+              onOpenChange={(open) => (open ? onTogglePrefs() : onClosePrefs())}
+              align="end"
+              trigger={
+                <button
+                  type="button"
+                  className={`graph__tool${prefsOpen ? ' graph__tool--accent' : ''}`}
+                >
+                  Display
+                </button>
+              }
             >
-              Display
-            </button>
-            {prefsOpen && (
-              <div
-                className="lifemap__prefspanel tl__prefspanel"
-                role="dialog"
-                aria-label="Timeline display"
-              >
+              <div className="tl__prefspanel" aria-label="Timeline display">
                 <div className="lifemap__prefshead">
                   <span className="lifemap__grouplabel">Display</span>
                   <button type="button" className="lifemap__prefsreset" onClick={onResetPrefs}>
                     Reset
                   </button>
                 </div>
-                <label className="lifemap__prefsrow">
-                  <input
-                    type="checkbox"
-                    checked={prefs.showSubtitles}
-                    onChange={(e) => onPatchPrefs({ showSubtitles: e.target.checked })}
-                  />
-                  <span>Show subtitles on bars</span>
-                </label>
-                <label className="lifemap__prefsrow">
-                  <input
-                    type="checkbox"
-                    checked={prefs.showMoments}
-                    onChange={(e) => onPatchPrefs({ showMoments: e.target.checked })}
-                  />
-                  <span>Show moment diamonds</span>
-                </label>
-                <label className="lifemap__prefsrow">
-                  <input
-                    type="checkbox"
-                    checked={prefs.stickyLabels}
-                    onChange={(e) => onPatchPrefs({ stickyLabels: e.target.checked })}
-                  />
-                  <span>Sticky lane labels</span>
-                </label>
+                <Checkbox
+                  checked={prefs.showSubtitles}
+                  onChange={(showSubtitles) => onPatchPrefs({ showSubtitles })}
+                  label="Show subtitles on bars"
+                />
+                <Checkbox
+                  checked={prefs.showMoments}
+                  onChange={(showMoments) => onPatchPrefs({ showMoments })}
+                  label="Show moment diamonds"
+                />
+                <Checkbox
+                  checked={prefs.stickyLabels}
+                  onChange={(stickyLabels) => onPatchPrefs({ stickyLabels })}
+                  label="Sticky lane labels"
+                />
                 <div className="lifemap__prefslabels">
                   <span className="lifemap__grouplabel">Density</span>
                   <div className="lifemap__modes">
@@ -210,7 +203,7 @@ export function TimelineToolbar({
                   </div>
                 </div>
               </div>
-            )}
+            </Popover>
           </div>
         </div>
       </div>

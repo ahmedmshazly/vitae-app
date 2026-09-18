@@ -79,7 +79,8 @@ async function main(): Promise<void> {
   // ── duplicate relationships ───────────────────────────────────────────────
   const edgeKeys = new Map<string, string[]>();
   for (const e of edges) {
-    const k = `${e.type}|${e.src}|${e.dst}`;
+    // Repeated relationship episodes are legitimate when their periods differ.
+    const k = `${e.type}|${e.src}|${e.dst}|${e.start_date ?? ''}|${e.end_date ?? ''}`;
     edgeKeys.set(k, [...(edgeKeys.get(k) ?? []), e.id]);
   }
   for (const [k, ids] of edgeKeys) {

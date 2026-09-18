@@ -55,8 +55,7 @@ const PRESENCE = {
   unknown: {
     word: 'never existed',
     tone: 'danger' as const,
-    detail:
-      'No record has ever carried this id, so there is nothing here for a reader to follow.',
+    detail: 'No record has ever carried this id, so there is nothing here for a reader to follow.',
   },
 };
 
@@ -91,6 +90,7 @@ export function DossierAppendix({
           <li
             key={appendixKey(record)}
             id={appendixEntryId(idPrefix, position)}
+            tabIndex={-1}
             className="border-b border-hairline py-3 last:border-b-0"
           >
             <div className="flex flex-wrap items-center gap-2">
@@ -105,7 +105,9 @@ export function DossierAppendix({
               ) : (
                 <span className="row__title">{label}</span>
               )}
-              <Chip mono>{record.kind === 'atom' ? 'atom' : typeLabel(record.type ?? 'record')}</Chip>
+              <Chip mono>
+                {record.kind === 'atom' ? 'atom' : typeLabel(record.type ?? 'record')}
+              </Chip>
               <Chip tone={presence.tone}>{presence.word}</Chip>
               <Mono className="ml-auto text-xs text-muted">{record.id}</Mono>
             </div>

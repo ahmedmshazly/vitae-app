@@ -32,11 +32,25 @@ import { fileURLToPath } from 'node:url';
 import { cloudEnabled, LEGACY_WORKSPACE_ID } from '../cloud/config.js';
 import { currentWorkspaceId } from '../db/space.js';
 
-export type SecretName = 'github_pat';
+export type SecretName = 'github_pat' | 'gemini_api_key';
 
-const ENV_VAR: Record<SecretName, string> = {
-  github_pat: 'GITHUB_PAT',
+/** Canonical name first. Later names are accepted aliases (GEMENI_* in .env). */
+const ENV_VARS: Record<SecretName, readonly string[]> = {
+  github_pat: ['GITHUB_PAT'],
+  gemini_api_key: ['GEMINI_API_KEY', 'GEMENI_API_KEY'],
 };
+
+function envValue(name: SecretName): string | undefined {
+  for (const key of ENV_VARS[name]) {
+    const value = process.env[key];
+    if (value) return value;
+  }
+  return undefined;
+}
+
+function envNameInUse(name: SecretName): string | undefined {
+  return ENV_VARS[name].find((key) => Boolean(process.env[key]));
+}
 
 export type SecretSource = 'env' | 'file' | 'none';
 
@@ -70,14 +84,14 @@ export class SecretStoreError extends Error {
 /** Where a secret would be read from, without reading it. */
 export function secretSource(name: SecretName): SecretSource {
   if (!canUseInstallationSecret()) return 'none';
-  if (process.env[ENV_VAR[name]]) return 'env';
+  if (envValue(name)) return 'env';
   if (existsSync(secretPath(name))) return 'file';
   return 'none';
 }
 
 export function getSecret(name: SecretName): string | null {
   if (!canUseInstallationSecret()) return null;
-  const fromEnv = process.env[ENV_VAR[name]];
+  const fromEnv = envValue(name);
   if (fromEnv) return fromEnv.trim();
   const path = secretPath(name);
   if (!existsSync(path)) return null;
@@ -92,11 +106,16 @@ export function getSecret(name: SecretName): string | null {
  */
 export function setSecret(name: SecretName, value: string): void {
   if (!canUseInstallationSecret()) {
-    throw new SecretStoreError('Workspace-scoped GitHub connections are not configured for this Cloud deployment.');
-  }
-  if (process.env[ENV_VAR[name]]) {
     throw new SecretStoreError(
-      `${ENV_VAR[name]} is provided by the deployment's secret manager, rotate it there, not through the API.`,
+      name === 'github_pat'
+        ? 'Workspace-scoped GitHub connections are not configured for this Cloud deployment.'
+        : 'Workspace-scoped Gemini connections are not configured for this Cloud deployment.',
+    );
+  }
+  const injected = envNameInUse(name);
+  if (injected) {
+    throw new SecretStoreError(
+      `${injected} is provided by the deployment's secret manager, rotate it there, not through the API.`,
     );
   }
   const dir = secretsDir();

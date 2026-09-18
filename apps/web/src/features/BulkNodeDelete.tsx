@@ -20,7 +20,7 @@
  *   so the two that did not move to trash could not be re-targeted. Failures
  *   stay staged and the toast is an error.
  */
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button, Checkbox, ConfirmDialog } from '@vitae/ui';
@@ -43,12 +43,15 @@ export function useBulkNodeDelete(opts?: {
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const inFlight = useRef(false);
+  const canWrite = useCanWrite();
   const qc = useQueryClient();
   const { flash } = useToast();
 
   const selectedCount = selected.size;
 
   const toggleOne = useCallback((id: string) => {
+    if (inFlight.current) return;
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -58,6 +61,7 @@ export function useBulkNodeDelete(opts?: {
   }, []);
 
   const toggleAll = useCallback((ids: string[], allSelected: boolean) => {
+    if (inFlight.current) return;
     setSelected((prev) => {
       const next = new Set(prev);
       if (allSelected) {
@@ -69,11 +73,21 @@ export function useBulkNodeDelete(opts?: {
     });
   }, []);
 
-  const clear = useCallback(() => setSelected(new Set()), []);
+  const clear = useCallback(() => {
+    if (!inFlight.current) setSelected(new Set());
+  }, []);
+  const changeConfirmation = useCallback((open: boolean) => {
+    if (!inFlight.current) setConfirmDelete(open);
+  }, []);
 
   const deleteSelected = useCallback(async () => {
     const ids = [...selected];
-    if (ids.length === 0) return;
+    if (ids.length === 0 || inFlight.current) return;
+    if (!canWrite) {
+      flash(WRITE_LOCK_HINT, { variant: 'error' });
+      return;
+    }
+    inFlight.current = true;
     setDeleting(true);
     try {
       const results = await Promise.allSettled(ids.map((id) => api.del(`/nodes/${id}`)));
@@ -83,7 +97,9 @@ export function useBulkNodeDelete(opts?: {
       // whole cache flips every mounted QueryBoundary to refreshing at once and
       // re-fires the lazy graph and map queries, so one row delete reads as the
       // whole app reloading.
-      await Promise.all(AFFECTED_KEYS.map((queryKey) => qc.invalidateQueries({ queryKey: [...queryKey] })));
+      await Promise.all(
+        AFFECTED_KEYS.map((queryKey) => qc.invalidateQueries({ queryKey: [...queryKey] })),
+      );
       // Keep the failures staged. Clearing them too means the records that did
       // not move have to be found by hand again.
       setSelected(new Set(failedIds));
@@ -93,17 +109,18 @@ export function useBulkNodeDelete(opts?: {
           variant: 'error',
         });
     } finally {
+      inFlight.current = false;
       setDeleting(false);
       setConfirmDelete(false);
     }
-  }, [selected, qc, flash, noun, nouns]);
+  }, [selected, qc, flash, noun, nouns, canWrite]);
 
   return {
     selected,
     selectedCount,
     deleting,
     confirmDelete,
-    setConfirmDelete,
+    setConfirmDelete: changeConfirmation,
     toggleOne,
     toggleAll,
     clear,
@@ -130,6 +147,8 @@ export function BulkDeleteBar({
   nouns,
   allSelected,
   onToggleAll,
+  busy = false,
+  actionLabel = 'Delete',
 }: {
   selectedCount: number;
   onClear: () => void;
@@ -139,6 +158,8 @@ export function BulkDeleteBar({
   /** Pass both to put select-all in the bar itself. */
   allSelected?: boolean;
   onToggleAll?: () => void;
+  busy?: boolean;
+  actionLabel?: string;
 }) {
   const canWrite = useCanWrite();
   if (typeof document === 'undefined') return null;
@@ -150,16 +171,17 @@ export function BulkDeleteBar({
       allSelected={allSelected}
       onToggleAll={onToggleAll}
       onClear={onClear}
+      busy={busy}
     >
       <Button
         variant="danger"
         size="sm"
         glyph="trash"
         onClick={onDelete}
-        disabled={!canWrite}
+        disabled={!canWrite || busy}
         title={canWrite ? undefined : WRITE_LOCK_HINT}
       >
-        Delete
+        {busy ? 'Moving to trash…' : actionLabel}
       </Button>
     </BulkBar>,
     document.body,
@@ -195,9 +217,23 @@ export function BulkDeleteConfirm({
       open={open}
       onOpenChange={onOpenChange}
       title={title}
-      body="They stay recoverable from Trash for 30 days; connections are preserved."
+      body={
+        <>
+          <p>They stay recoverable from Trash for 30 days; connections are preserved.</p>
+          {selectedCount > 1 && (
+            <ul>
+              {titles.slice(0, 5).map((name, index) => (
+                <li key={index}>{name}</li>
+              ))}
+              {selectedCount > 5 && <li>And {selectedCount - 5} more selected records</li>}
+            </ul>
+          )}
+          {busy && <p role="status">Moving selected records to Trash…</p>}
+        </>
+      }
       confirmLabel={selectedCount === 1 ? 'Move to trash' : `Move ${selectedCount} to trash`}
       destructive
+      initialFocus="cancel"
       busy={busy}
       onConfirm={onConfirm}
     />
@@ -213,15 +249,18 @@ export function SelectCheckbox({
   checked,
   label,
   onToggle,
+  disabled,
 }: {
   checked: boolean;
   label: string;
   onToggle: () => void;
+  disabled?: boolean;
 }) {
   return (
     <Checkbox
       checked={checked}
       onChange={onToggle}
+      disabled={disabled}
       label={<span className="u-visually-hidden">{label}</span>}
     />
   );
@@ -238,15 +277,18 @@ export function SelectCheckbox({
 export function SelectAllRow({
   allSelected,
   onToggle,
+  disabled,
 }: {
   allSelected: boolean;
   onToggle: () => void;
+  disabled?: boolean;
 }) {
   return (
     <div className="row people__selectrow">
       <Checkbox
         checked={allSelected}
         onChange={onToggle}
+        disabled={disabled}
         label={allSelected ? 'Deselect all visible' : 'Select all visible'}
       />
     </div>

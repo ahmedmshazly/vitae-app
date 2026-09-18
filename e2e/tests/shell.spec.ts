@@ -18,7 +18,7 @@ const hubs = [
   { label: 'Settings', description: 'Identity and system controls', href: '/settings' },
 ] as const;
 
-test('desktop rail keeps every workspace reachable when compacted', async ({ page }) => {
+test('desktop rail keeps every workspace reachable when compacted', async ({ page }, testInfo) => {
   await signIn(page);
   const rail = page.getByRole('navigation', { name: 'Primary' }).first();
 
@@ -50,9 +50,10 @@ test('desktop rail keeps every workspace reachable when compacted', async ({ pag
   await page.getByRole('button', { name: 'Expand sidebar' }).click();
   await expect(page.getByRole('button', { name: 'Collapse sidebar' })).toBeVisible();
   await expect(rail.getByText('Relationships and reach', { exact: true })).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('shell-desktop.png'), fullPage: true });
 });
 
-test('rail automatically compacts in the 701-1080px tablet band', async ({ page }) => {
+test('rail automatically compacts in the 701-1080px tablet band', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 900, height: 800 });
   await signIn(page);
   const rail = page.getByRole('navigation', { name: 'Primary' }).first();
@@ -62,6 +63,7 @@ test('rail automatically compacts in the 701-1080px tablet band', async ({ page 
   await expect(rail.getByRole('link', { name: 'Network', exact: true })).toBeVisible();
   await expect(rail.getByText('Relationships and reach', { exact: true })).toBeHidden();
   await expect(page.getByRole('button', { name: /collapse sidebar|expand sidebar/i })).toBeHidden();
+  await page.screenshot({ path: testInfo.outputPath('shell-tablet.png'), fullPage: true });
 
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(rail.getByText('Relationships and reach', { exact: true })).toBeVisible();
@@ -163,17 +165,23 @@ test('a canonical deep link retains its hub and local navigation context', async
 
 test('mobile dock, capture, search, and More sheet keep every workspace reachable', async ({
   page,
-}) => {
+}, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await signIn(page);
 
   await expect(page.locator('nav.rail')).toBeHidden();
+  const stage = await page.locator('.shell__stage').boundingBox();
+  expect(stage!.width).toBeGreaterThanOrEqual(389);
+  await page.screenshot({ path: testInfo.outputPath('shell-mobile.png'), fullPage: true });
 
   const search = page.getByRole('button', { name: 'Search records or run a command' });
   const capture = page.getByRole('button', { name: 'Quick capture' });
   const reminders = page.getByRole('button', { name: /reminders/i });
   const signOut = page.getByRole('button', { name: 'Sign out' });
   for (const action of [search, capture, reminders, signOut]) await expect(action).toBeVisible();
+  const captureBounds = await capture.boundingBox();
+  const slotBounds = await page.locator('.mobile-dock__capture-slot').boundingBox();
+  expect(Math.abs(captureBounds!.x + captureBounds!.width / 2 - slotBounds!.x - slotBounds!.width / 2)).toBeLessThan(2);
 
   await search.click();
   await expect(page.getByLabel('Command or record search')).toBeVisible();

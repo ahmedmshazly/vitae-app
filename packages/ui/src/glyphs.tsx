@@ -218,6 +218,7 @@ export function Glyph({
 
 /** Map every node type to its glyph (SRS §4.3). */
 export const NODE_GLYPH: Record<string, GlyphName> = {
+  area: 'goal', opportunity: 'application',
   person: 'person', organization: 'org', role: 'role', project: 'project',
   repository: 'repository', skill: 'skill', education: 'education',
   certification: 'certification', course: 'education', publication: 'publication', talk: 'talk',

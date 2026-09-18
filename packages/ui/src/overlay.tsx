@@ -3,7 +3,15 @@
  * free). Animation is CSS-only via data-state attributes at --ae-dur/--ae-ease
  * so this package carries no animation runtime.
  */
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  type ReactNode,
+  type RefObject,
+} from 'react';
 import * as RadixDialog from '@radix-ui/react-dialog';
 import * as RadixDropdown from '@radix-ui/react-dropdown-menu';
 import * as RadixPopover from '@radix-ui/react-popover';
@@ -23,6 +31,8 @@ export interface ModalProps {
   footer?: ReactNode;
   /** Extra content beside the title (chips, provenance). */
   titleAccessory?: ReactNode;
+  initialFocusRef?: RefObject<HTMLElement | null>;
+  returnFocusRef?: RefObject<HTMLElement | null>;
 }
 export function Modal({
   open,
@@ -33,18 +43,42 @@ export function Modal({
   children,
   footer,
   titleAccessory,
+  initialFocusRef,
+  returnFocusRef,
 }: ModalProps) {
+  const opener = useRef<HTMLElement | null>(null);
+  const openedAt = useRef('');
+  useLayoutEffect(() => {
+    if (open) {
+      opener.current = document.activeElement as HTMLElement | null;
+      openedAt.current = window.location.pathname + window.location.search;
+    }
+  }, [open]);
+  const restoreFocus = useCallback(() => {
+    // Route navigation owns focus in the destination. A delayed Radix close
+    // must not pull it back to a persistent shell button from the old page.
+    if (openedAt.current !== window.location.pathname + window.location.search) return;
+    const element = returnFocusRef?.current ?? opener.current;
+    if (element?.isConnected) element.focus();
+  }, [returnFocusRef]);
+  useEffect(() => () => restoreFocus(), [restoreFocus]);
   return (
     <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
       <RadixDialog.Portal>
         <RadixDialog.Overlay className="vt-overlay" />
         <RadixDialog.Content
           className={cn('vt-modal', size !== 'md' && `vt-modal--${size}`)}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            restoreFocus();
+          }}
           onOpenAutoFocus={(e) => {
             // Focus the first form control rather than the close button.
-            const el = (e.currentTarget as HTMLElement | null)?.querySelector<HTMLElement>(
-              'input, textarea, select, [role="combobox"]',
-            );
+            const el =
+              initialFocusRef?.current ??
+              (e.currentTarget as HTMLElement | null)?.querySelector<HTMLElement>(
+                'input:not(:disabled), textarea:not(:disabled), select:not(:disabled), [role="combobox"]:not(:disabled):not([aria-disabled="true"])',
+              );
             if (el) {
               e.preventDefault();
               el.focus();
@@ -61,12 +95,14 @@ export function Modal({
             </RadixDialog.Close>
           </div>
           {description ? (
-            <RadixDialog.Description className="vt-modal__desc">{description}</RadixDialog.Description>
+            <RadixDialog.Description className="vt-modal__desc">
+              {description}
+            </RadixDialog.Description>
           ) : (
             // Radix warns without a description; provide an empty one.
             <RadixDialog.Description className="u-visually-hidden">{title}</RadixDialog.Description>
           )}
-          <div className="vt-modal__body">{children}</div>
+          <div className="vt-modal__body" tabIndex={0} role="region" aria-label="Dialog content">{children}</div>
           {footer && <div className="vt-modal__foot">{footer}</div>}
         </RadixDialog.Content>
       </RadixDialog.Portal>
@@ -99,13 +135,21 @@ export interface CommandOverlayProps {
   /** Extra class on the panel (e.g. 'overlay--wide'). */
   className?: string;
 }
-export function CommandOverlay({ open, onOpenChange, title, description, children, className }: CommandOverlayProps) {
+export function CommandOverlay({
+  open,
+  onOpenChange,
+  title,
+  description,
+  children,
+  className,
+}: CommandOverlayProps) {
   // Radix restores focus from the Content's unmount cleanup. Every caller
   // conditionally renders the whole palette (`{open && <QuickAdd/>}`) so the
   // Root is torn down in the same commit that closes it, and focus landed on
   // <body>: keyboard users lost their place, despite this component's docblock
   // promising otherwise. Remembering the opener here survives the unmount.
   const opener = useRef<HTMLElement | null>(null);
+  const openedAt = useRef('');
   // A layout effect, not a passive one. The Content's own focus effect is a
   // child of this component, so it runs first among the passive effects, and
   // both callers mount the palette already open. A passive effect here would
@@ -114,10 +158,12 @@ export function CommandOverlay({ open, onOpenChange, title, description, childre
   // effects all run before any passive effect, so this reads the real opener.
   useLayoutEffect(() => {
     if (!open) return;
+    openedAt.current = window.location.pathname + window.location.search;
     const el = document.activeElement as HTMLElement | null;
     if (el && !el.closest('.vt-palette')) opener.current = el;
   }, [open]);
   const restore = useCallback(() => {
+    if (openedAt.current !== window.location.pathname + window.location.search) return;
     const el = opener.current;
     if (el?.isConnected) el.focus();
   }, []);
@@ -142,7 +188,9 @@ export function CommandOverlay({ open, onOpenChange, title, description, childre
           }}
           onOpenAutoFocus={(e) => {
             // Focus the palette's own input, not the first button in the list.
-            const el = (e.currentTarget as HTMLElement | null)?.querySelector<HTMLElement>('input, textarea');
+            const el = (e.currentTarget as HTMLElement | null)?.querySelector<HTMLElement>(
+              'input, textarea',
+            );
             if (el) {
               e.preventDefault();
               el.focus();
@@ -150,7 +198,9 @@ export function CommandOverlay({ open, onOpenChange, title, description, childre
           }}
         >
           <RadixDialog.Title className="u-visually-hidden">{title}</RadixDialog.Title>
-          <RadixDialog.Description className="u-visually-hidden">{description ?? title}</RadixDialog.Description>
+          <RadixDialog.Description className="u-visually-hidden">
+            {description ?? title}
+          </RadixDialog.Description>
           {children}
         </RadixDialog.Content>
       </RadixDialog.Portal>
@@ -201,6 +251,15 @@ export interface ConfirmDialogProps {
   destructive?: boolean;
   onConfirm: () => void;
   busy?: boolean;
+  /** Allow a harmless dismiss action (for example, Stay here) during a save. */
+  cancelDisabled?: boolean;
+  /**
+   * Which answer receives focus when the dialog opens. Prefer the safe
+   * cancellation path where confirming would discard unsaved work. A
+   * destructive confirmation may opt into confirm focus only when that is
+   * genuinely the expected, deliberate next step.
+   */
+  initialFocus?: 'cancel' | 'confirm';
 }
 export function ConfirmDialog({
   open,
@@ -212,22 +271,29 @@ export function ConfirmDialog({
   destructive,
   onConfirm,
   busy,
+  cancelDisabled = busy,
+  initialFocus = 'confirm',
 }: ConfirmDialogProps) {
+  const cancelRef = useRef<HTMLButtonElement>(null);
+  const confirmRef = useRef<HTMLButtonElement>(null);
   return (
     <Modal
       open={open}
       onOpenChange={onOpenChange}
       title={title}
       size="sm"
+      initialFocusRef={initialFocus === 'cancel' ? cancelRef : confirmRef}
       footer={
         <>
-          <Button onClick={() => onOpenChange(false)}>{cancelLabel}</Button>
+          <Button ref={cancelRef} disabled={cancelDisabled} onClick={() => onOpenChange(false)}>
+            {cancelLabel}
+          </Button>
           <Button
             variant={destructive ? 'danger' : 'primary'}
             className={destructive ? 'vt-btn--danger-fill' : undefined}
             onClick={onConfirm}
             disabled={busy}
-            autoFocus
+            ref={confirmRef}
           >
             {confirmLabel}
           </Button>
@@ -283,7 +349,15 @@ export interface MenuProps {
   /** Lay groups out side-by-side (wide catalogs like the 28-type picker). */
   columns?: boolean;
 }
-export function Menu({ trigger, groups, onSelect, open, onOpenChange, align = 'end', columns }: MenuProps) {
+export function Menu({
+  trigger,
+  groups,
+  onSelect,
+  open,
+  onOpenChange,
+  align = 'end',
+  columns,
+}: MenuProps) {
   return (
     <RadixDropdown.Root open={open} onOpenChange={onOpenChange}>
       <RadixDropdown.Trigger asChild>{trigger}</RadixDropdown.Trigger>
@@ -295,7 +369,9 @@ export function Menu({ trigger, groups, onSelect, open, onOpenChange, align = 'e
         >
           {groups.map((g, gi) => (
             <div key={g.label ?? gi} className="vt-menu__group">
-              {g.label && <RadixDropdown.Label className="vt-menu__label">{g.label}</RadixDropdown.Label>}
+              {g.label && (
+                <RadixDropdown.Label className="vt-menu__label">{g.label}</RadixDropdown.Label>
+              )}
               {g.items.map((item) => (
                 <RadixDropdown.Item
                   key={item.key}
@@ -323,13 +399,29 @@ export interface PopoverProps {
   side?: 'top' | 'bottom' | 'left' | 'right';
   align?: 'start' | 'center' | 'end';
   wide?: boolean;
+  label?: string;
 }
-export function Popover({ open, onOpenChange, trigger, children, side = 'bottom', align = 'start', wide }: PopoverProps) {
+export function Popover({
+  open,
+  onOpenChange,
+  trigger,
+  children,
+  side = 'bottom',
+  align = 'start',
+  wide,
+  label,
+}: PopoverProps) {
   return (
     <RadixPopover.Root open={open} onOpenChange={onOpenChange}>
       <RadixPopover.Trigger asChild>{trigger}</RadixPopover.Trigger>
       <RadixPopover.Portal>
-        <RadixPopover.Content className={cn('vt-popover', wide && 'vt-popover--wide')} side={side} align={align} sideOffset={6}>
+        <RadixPopover.Content
+          className={cn('vt-popover', wide && 'vt-popover--wide')}
+          aria-label={label}
+          side={side}
+          align={align}
+          sideOffset={6}
+        >
           {children}
         </RadixPopover.Content>
       </RadixPopover.Portal>
@@ -376,10 +468,16 @@ export interface InfoPopoverProps {
   /** Trigger label; defaults to a "How this works" pill. */
   triggerLabel?: string;
 }
-export function InfoPopover({ title, children, shortcuts, triggerLabel = 'How this works' }: InfoPopoverProps) {
+export function InfoPopover({
+  title,
+  children,
+  shortcuts,
+  triggerLabel = 'How this works',
+}: InfoPopoverProps) {
   return (
     <Popover
       wide
+      label={title}
       trigger={
         <button type="button" className="vt-info-trigger">
           <span aria-hidden>?</span>
@@ -495,7 +593,11 @@ export function RegisterRule({ ticks, activeIndex, label }: RegisterRuleProps) {
   if (!ticks?.length) return <div className="vt-register" aria-hidden />;
   const active = activeIndex != null ? ticks[activeIndex] : undefined;
   return (
-    <div className="vt-register" role="img" aria-label={label && active ? `${label}: ${active.label}` : label}>
+    <div
+      className="vt-register"
+      role="img"
+      aria-label={label && active ? `${label}: ${active.label}` : label}
+    >
       {ticks.map((t, i) => (
         <i
           // Keyed by position, not label: ticks never reorder, and labels are

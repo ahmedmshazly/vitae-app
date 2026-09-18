@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useReducedMotion } from 'motion/react';
-import { EmptyState, ErrorState, SkeletonRows, StatusTrace } from '@vitae/ui';
+import { EmptyState, ErrorState, SkeletonRows, StatusTrace, useTheme } from '@vitae/ui';
 import { api } from '../../lib/api.js';
 import { todayIso } from '../../lib/dates.js';
 import { entityHref } from '../../lib/entity-href.js';
@@ -34,7 +34,8 @@ export function TimelineView() {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const reducedMotion = useReducedMotion() ?? false;
-  const palette = useMemo<GraphPalette>(() => readGraphPalette(), []);
+  const { resolvedTheme } = useTheme();
+  const palette = useMemo<GraphPalette>(() => readGraphPalette(), [resolvedTheme]);
   const [prefs, patchPrefs, resetPrefs] = useTimelineDisplayPrefs();
   const [prefsOpen, setPrefsOpen] = useState(false);
   const [zoom, setZoom] = useState<TimelineZoom>(() => parseZoom(params.get('zoom')));
@@ -225,6 +226,7 @@ export function TimelineView() {
         onPatchPrefs={patchPrefs}
         prefsOpen={prefsOpen}
         onTogglePrefs={() => setPrefsOpen((o) => !o)}
+        onClosePrefs={() => setPrefsOpen(false)}
         onResetPrefs={resetPrefs}
         onToday={jumpToday}
         onFit={fitCareer}

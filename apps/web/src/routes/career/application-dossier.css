@@ -1,0 +1,82 @@
+.application-dossier {
+  overflow-wrap: anywhere;
+}
+
+.application-dossier-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.75fr);
+  gap: var(--space-6);
+}
+
+.application-next-move {
+  margin-block-end: var(--space-6);
+  padding-block: var(--space-5);
+  border-block: 1px solid var(--ae-border);
+}
+
+.application-next-move .vt-status-trace__label {
+  color: var(--ae-fg);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.vt-modal:has(.application-correction-fields) .vt-modal__title,
+body:has(.application-dossier) .vt-modal:has(.entity-form) .vt-modal__title {
+  font-family: var(--ae-font-sans);
+  font-weight: 600;
+}
+
+.application-context {
+  min-width: 0;
+  border-inline-start: 1px solid var(--ae-border);
+  padding-inline-start: var(--space-5);
+}
+
+.application-record-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  text-underline-offset: 3px;
+}
+
+.application-refresh {
+  margin-block-end: var(--space-5);
+}
+
+.application-working-notes {
+  max-width: 72ch;
+  white-space: pre-wrap;
+}
+
+.application-interview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.application-correction-fields {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+@media (max-width: 1080px) {
+  .application-dossier-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .application-context {
+    border-inline-start: 0;
+    border-block-start: 1px solid var(--ae-border);
+    padding-inline-start: 0;
+    padding-block-start: var(--space-5);
+  }
+}
+
+@media (pointer: coarse) {
+  .application-record-link {
+    min-height: 44px;
+  }
+}

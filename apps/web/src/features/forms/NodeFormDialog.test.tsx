@@ -16,6 +16,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NodeFormDialog } from './NodeFormDialog.js';
 import { ToastProvider } from '../Toast.js';
+import * as connectionSaves from './save-connections.js';
 
 const get = vi.fn();
 const post = vi.fn();
@@ -35,13 +36,16 @@ function Harness({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={qc}>
       <ToastProvider>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>{children}</MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          {children}
+        </MemoryRouter>
       </ToastProvider>
     </QueryClientProvider>
   );
 }
 
 beforeEach(() => {
+  vi.restoreAllMocks();
   get.mockReset();
   post.mockReset();
   patch.mockReset();
@@ -50,6 +54,114 @@ beforeEach(() => {
   // them to something harmless so each test only stubs what it cares about.
   get.mockResolvedValue({ user: null, node: null, edges: [], neighbors: {} });
   post.mockResolvedValue({ fingerprint: 'f', candidates: [] });
+});
+
+it('qualifies a placeholder birthday year and preserves its unknown-year status on save', async () => {
+  get.mockImplementation(async (path: string) =>
+    path === '/nodes/p1'
+      ? {
+          node: {
+            id: 'p1',
+            type: 'person',
+            title: 'Fictional person',
+            props: { birthday: '2000-02-29', year_known: false },
+            notes_md: '',
+          },
+          edges: [],
+          neighbors: {},
+        }
+      : { values: [], nodes: [] },
+  );
+  patch.mockResolvedValue({});
+  const user = userEvent.setup();
+  render(
+    <Harness>
+      <NodeFormDialog open onOpenChange={() => {}} type="person" nodeId="p1" />
+    </Harness>,
+  );
+  expect(await screen.findByText(/Birth year is not recorded/)).toBeVisible();
+  await user.click(screen.getByRole('button', { name: 'Save changes' }));
+  await waitFor(() =>
+    expect(patch).toHaveBeenCalledWith(
+      '/nodes/p1',
+      expect.objectContaining({
+        props: expect.objectContaining({ birthday: '2000-02-29', year_known: false }),
+      }),
+    ),
+  );
+});
+
+it('does not warn when an untouched form is dismissed after field focus', async () => {
+  const user = userEvent.setup();
+  const onOpenChange = vi.fn();
+  render(
+    <Harness>
+      <NodeFormDialog open onOpenChange={onOpenChange} type="person" />
+    </Harness>,
+  );
+  await user.tab();
+  await user.click(screen.getByRole('button', { name: 'Cancel' }));
+  expect(onOpenChange).toHaveBeenCalledWith(false);
+  expect(screen.queryByRole('dialog', { name: 'Discard changes?' })).not.toBeInTheDocument();
+});
+
+it('protects a changed draft and returns focus to the form after keeping it', async () => {
+  const user = userEvent.setup();
+  const onOpenChange = vi.fn();
+  render(
+    <Harness>
+      <NodeFormDialog open onOpenChange={onOpenChange} type="person" />
+    </Harness>,
+  );
+  await user.type(screen.getByLabelText(/Full name/), 'Draft person');
+  await user.click(screen.getByRole('button', { name: 'Cancel' }));
+  expect(screen.getByRole('dialog', { name: 'Discard changes?' })).toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: /Keep editing/ }));
+  await waitFor(() =>
+    expect(screen.queryByRole('dialog', { name: 'Discard changes?' })).not.toBeInTheDocument(),
+  );
+  expect(screen.getByLabelText(/Full name/)).toHaveValue('Draft person');
+  expect(onOpenChange).not.toHaveBeenCalledWith(false);
+});
+
+it('locks the submitted draft while saving and retries the same partially saved node', async () => {
+  const user = userEvent.setup();
+  const onOpenChange = vi.fn();
+  let rejectConnections!: (error: Error) => void;
+  vi.spyOn(connectionSaves, 'saveConnections')
+    .mockImplementationOnce(
+      () =>
+        new Promise((_, reject) => {
+          rejectConnections = reject;
+        }),
+    )
+    .mockResolvedValueOnce();
+  post.mockImplementation((path: string) =>
+    Promise.resolve(
+      path === '/nodes' ? { node: { id: 'created-once' } } : { fingerprint: 'f', candidates: [] },
+    ),
+  );
+  render(
+    <Harness>
+      <NodeFormDialog open onOpenChange={onOpenChange} type="person" onSaved={vi.fn()} />
+    </Harness>,
+  );
+  const title = screen.getByLabelText(/Full name/);
+  await user.type(title, 'One record');
+  await user.click(screen.getByRole('button', { name: /^Create person/ }));
+  await waitFor(() => expect(title).toBeDisabled());
+  expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+  await user.keyboard('{Escape}');
+  expect(onOpenChange).not.toHaveBeenCalledWith(false);
+  rejectConnections(new Error('Connection service unavailable'));
+  await screen.findByText(/Retry to finish this same record/);
+  await user.click(screen.getByRole('button', { name: /^Create person/ }));
+  await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
+  expect(post.mock.calls.filter(([path]) => path === '/nodes')).toHaveLength(1);
+  expect(patch).toHaveBeenCalledWith(
+    '/nodes/created-once',
+    expect.objectContaining({ title: 'One record' }),
+  );
 });
 
 describe('NodeFormDialog, loading an edit', () => {
@@ -93,6 +205,7 @@ describe('NodeFormDialog, a rejected save', () => {
     // alert" would silently pass on a validation message instead.
     const alert = (await screen.findByText(/Couldn't save\./)).closest('[role="alert"]')!;
     expect(alert).toHaveTextContent('The graph is read-only right now.');
+    await waitFor(() => expect(alert).toHaveFocus());
     expect(post).toHaveBeenCalledWith('/nodes', expect.objectContaining({ type: 'person' }));
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
     expect(title).toHaveValue('A rejected idea');
@@ -116,6 +229,28 @@ describe('NodeFormDialog, a rejected save', () => {
     await user.click(submit);
     await screen.findByText(/Couldn't save\./);
     await waitFor(() => expect(submit).toBeEnabled());
+  });
+
+  it('clears a stale save failure when the draft changes', async () => {
+    const user = userEvent.setup();
+    post.mockImplementation((path: string) =>
+      path === '/nodes'
+        ? Promise.reject(new Error('The graph is read-only right now.'))
+        : Promise.resolve({ fingerprint: 'f', candidates: [] }),
+    );
+    render(
+      <Harness>
+        <NodeFormDialog open onOpenChange={vi.fn()} type="person" />
+      </Harness>,
+    );
+
+    const title = document.querySelector('#ef-title') as HTMLElement;
+    await user.type(title, 'Retry me');
+    await user.click(screen.getByRole('button', { name: /^Create person/ }));
+    expect(await screen.findByText(/Couldn't save\./)).toBeInTheDocument();
+
+    await user.type(title, '!');
+    await waitFor(() => expect(screen.queryByText(/Couldn't save\./)).not.toBeInTheDocument());
   });
 });
 
@@ -168,5 +303,47 @@ describe('NodeFormDialog, editing an application', () => {
     expect(screen.getByRole('option', { name: 'Offer' })).toBeInTheDocument();
     expect(screen.queryByRole('option', { name: 'Draft' })).not.toBeInTheDocument();
     expect(screen.getByText(/Correct status on the dossier/)).toBeInTheDocument();
+  });
+});
+
+describe('NodeFormDialog, creating a job posting', () => {
+  it('serializes the posting fields and keeps the posting URL distinct from an application URL', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    post.mockImplementation((path: string) => {
+      if (path === '/nodes') return Promise.resolve({ node: { id: 'posting-1' } });
+      return Promise.resolve({ fingerprint: 'posting-fingerprint', candidates: [] });
+    });
+
+    render(
+      <Harness>
+        <NodeFormDialog open onOpenChange={onOpenChange} type="job_posting" />
+      </Harness>,
+    );
+
+    await user.type(
+      document.querySelector('#ef-title') as HTMLElement,
+      'Staff engineer @ Northstar',
+    );
+    await user.type(screen.getByRole('combobox', { name: 'Company' }), 'Northstar');
+    await user.type(screen.getByRole('combobox', { name: 'Role title' }), 'Staff engineer');
+    await user.type(
+      screen.getByRole('textbox', { name: 'Posting URL' }),
+      'https://northstar.example/careers/staff-engineer',
+    );
+    await user.click(screen.getByRole('button', { name: /^Create job posting/ }));
+
+    await waitFor(() =>
+      expect(post).toHaveBeenCalledWith('/nodes', {
+        type: 'job_posting',
+        title: 'Staff engineer @ Northstar',
+        props: {
+          company: 'Northstar',
+          role_title: 'Staff engineer',
+          url: 'https://northstar.example/careers/staff-engineer',
+        },
+      }),
+    );
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 });

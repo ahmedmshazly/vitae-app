@@ -242,14 +242,13 @@ describe('DossierEditor states', () => {
     await screen.findByRole('heading', { name: '2026 promotion packet' });
 
     await userEvent.click(screen.getByRole('button', { name: 'Remove entry 1 from Scope' }));
+    await userEvent.click(screen.getByRole('button', { name: /^Remove entry$/ }));
 
+    expect(await screen.findByText('This dossier was changed somewhere else')).toBeInTheDocument();
     expect(
-      await screen.findByText('This dossier was changed somewhere else'),
+      screen.getAllByText(/dossier was modified elsewhere, reload and retry/)[0],
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(/dossier was modified elsewhere, reload and retry/),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Reload it' })).toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toHaveTextContent('reload the dossier before trying again');
   });
 });
 

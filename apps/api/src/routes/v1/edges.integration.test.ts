@@ -118,6 +118,40 @@ describe('POST/GET/DELETE /api/v1/edges', () => {
     expect(res.status).toBeLessThan(500);
   });
 
+  it('rejects a semantically invalid pair instead of accepting a relationship the picker cannot represent', async () => {
+    const { app, token } = await getAuthedApp();
+    const person = await request(app)
+      .post('/api/v1/nodes')
+      .set(authHeader(token))
+      .send(buildNodeCreate({ type: 'person', title: 'Invalid Pair Person' }));
+    const organization = await request(app)
+      .post('/api/v1/nodes')
+      .set(authHeader(token))
+      .send(buildNodeCreate({ type: 'organization', title: 'Invalid Pair Organization' }));
+
+    const res = await request(app)
+      .post('/api/v1/edges')
+      .set(authHeader(token))
+      .send(
+        buildEdgeCreate({
+          type: 'KNOWS',
+          src: person.body.node.id,
+          dst: organization.body.node.id,
+        }),
+      );
+
+    expect(res.status).toBe(422);
+    expect(res.body.error.message).toBe('invalid edge');
+    expect(res.body.error.details).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          path: 'type',
+          message: expect.stringMatching(/KNOWS cannot point to a organization node/),
+        }),
+      ]),
+    );
+  });
+
   it('keeps demo-space edges out of the real graph', async () => {
     const { app, token } = await getAuthedApp();
     const headers = { ...authHeader(token), 'x-vitae-space': 'demo' };

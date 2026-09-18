@@ -12,8 +12,8 @@
  * picker shows each audience's sections and what each one is for. Those come
  * from `/dossiers/audiences`; this file knows none of them.
  */
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useRef, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Banner,
@@ -35,6 +35,9 @@ import { api } from '../lib/api.js';
 import { useSelfPerson } from '../features/forms/SubjectPicker.js';
 import { audiencePhrase, useDossierAudiences } from '../features/DossierGrammar.js';
 import { useToast } from '../features/Toast.js';
+import { useCanWrite, WRITE_LOCK_HINT } from '../lib/auth.js';
+import { useUnsavedChanges } from '../lib/unsaved-changes.js';
+import './dossiers.css';
 
 function claimCount(dossier: Dossier): number {
   return dossier.sections.reduce((total, section) => total + section.claims.length, 0);
@@ -44,6 +47,11 @@ export function Dossiers() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { flash } = useToast();
+  const canWrite = useCanWrite();
+  const [params, setParams] = useSearchParams();
+  const search = params.get('q') ?? '';
+  const selectedAudience = params.get('audience') ?? '';
+  const flight = useRef(false);
   const self = useSelfPerson();
   const [createOpen, setCreateOpen] = useState(false);
   const [audience, setAudience] = useState<DossierAudience | null>(null);
@@ -63,9 +71,35 @@ export function Dossiers() {
   });
   const audiences = useDossierAudiences();
   const rows = dossiers.data?.dossiers ?? [];
+  const visible = rows.filter(
+    (row) =>
+      row.title.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()) &&
+      (!selectedAudience || row.audience === selectedAudience),
+  );
+  const filtered = Boolean(search || selectedAudience);
+  function filter(key: string, value: string) {
+    setParams(
+      (previous) => {
+        const next = new URLSearchParams(previous);
+        if (value) next.set(key, value);
+        else next.delete(key);
+        return next;
+      },
+      { replace: true },
+    );
+  }
+  function clearFilters() {
+    setParams((previous) => {
+      const next = new URLSearchParams(previous);
+      next.delete('q');
+      next.delete('audience');
+      return next;
+    });
+  }
 
   const create = useMutation({
     mutationFn: async () => {
+      if (!canWrite) throw new Error(WRITE_LOCK_HINT);
       if (!selfId) throw new Error('There is no self record to make a dossier about.');
       if (!audience) throw new Error('Choose the audience this dossier is written for.');
       if (!title.trim()) throw new Error('Give this dossier a title.');
@@ -74,6 +108,7 @@ export function Dossiers() {
       if (Boolean(from) !== Boolean(to)) {
         throw new Error('A window needs both a start and an end, or neither.');
       }
+      if (from && to && from > to) throw new Error('Window end must be on or after window start.');
       return api.post<{ dossier: Dossier }>('/dossiers', {
         subject_node: selfId,
         audience,
@@ -92,8 +127,27 @@ export function Dossiers() {
       setFormError(error instanceof Error ? error.message : 'The dossier was not created.');
     },
   });
+  const guard = useUnsavedChanges(
+    createOpen && Boolean(title || audience || from || to || create.isPending),
+    {
+      busy: create.isPending,
+      onClose: () => setCreateOpen(false),
+    },
+  );
+  async function submit() {
+    if (flight.current || !canWrite) return;
+    flight.current = true;
+    try {
+      await create.mutateAsync();
+    } catch {
+      /* The draft and local error stay visible. */
+    } finally {
+      flight.current = false;
+    }
+  }
 
   function startCreate() {
+    if (!canWrite) return;
     setAudience(null);
     setTitle('');
     setFrom('');
@@ -103,7 +157,7 @@ export function Dossiers() {
   }
 
   return (
-    <div className="page">
+    <div className="page dossier-page">
       <PageHeader
         title="Dossiers"
         subtitle="A named selection of evidence about one person, compiled into a document whose every sentence resolves to the records behind it."
@@ -111,20 +165,81 @@ export function Dossiers() {
           <InfoPopover title="What a dossier is">
             <p>
               A dossier holds claims, and every claim names the records it rests on. Compiling one
-              produces the document and a provenance appendix in which each cited record is
-              resolved back to its source, its confidence and its full revision trail. Nothing is
-              inferred, summarised or generated: a dossier asserts only what you wrote and pointed
-              at.
+              produces the document and a provenance appendix in which each cited record is resolved
+              back to its source, its confidence and its full revision trail. Nothing is inferred,
+              summarised or generated: a dossier asserts only what you wrote and pointed at.
             </p>
           </InfoPopover>
         }
         actions={
-          <Button variant="primary" glyph="plus" onClick={startCreate} disabled={!selfId}>
+          <Button
+            variant="primary"
+            glyph="plus"
+            onClick={startCreate}
+            disabled={!selfId || !canWrite}
+          >
             New dossier
           </Button>
         }
       />
       <RegisterRule />
+      {!canWrite && <p role="status">{WRITE_LOCK_HINT}</p>}
+      {dossiers.isError && dossiers.data && (
+        <Banner
+          tone="warning"
+          title="Dossiers could not refresh"
+          action={<Button onClick={() => void dossiers.refetch()}>Retry refresh</Button>}
+        >
+          Your last loaded dossiers remain below.
+        </Banner>
+      )}
+      {me && dossiers.data && (
+        <div className="dossier-list-tools">
+          <Field label="Find a dossier" htmlFor="dossier-search">
+            <Input
+              id="dossier-search"
+              type="search"
+              value={search}
+              placeholder="Search by title…"
+              onChange={(event) => filter('q', event.target.value)}
+            />
+          </Field>
+          <Field label="Filter by audience" htmlFor="dossier-filter-audience">
+            <select
+              className="vt-inp"
+              id="dossier-filter-audience"
+              value={selectedAudience}
+              onChange={(event) => filter('audience', event.target.value)}
+            >
+              <option value="">All audiences</option>
+              {[
+                ...new Set([
+                  ...rows.map((row) => row.audience),
+                  ...(audiences.data ?? []).map((entry) => entry.audience),
+                  ...(selectedAudience ? [selectedAudience] : []),
+                ]),
+              ].map((value) => (
+                <option key={value} value={value}>
+                  {audiencePhrase(value as DossierAudience)}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Button disabled={dossiers.isFetching} onClick={() => void dossiers.refetch()}>
+            {dossiers.isFetching ? 'Refreshing…' : 'Refresh dossiers'}
+          </Button>
+          <p className="dossier-list-count">
+            <Mono>
+              {visible.length} shown · {rows.length} loaded
+            </Mono>
+            {filtered && (
+              <Button size="sm" onClick={clearFilters}>
+                Clear filters
+              </Button>
+            )}
+          </p>
+        </div>
+      )}
 
       {self.isError ? (
         <ErrorState
@@ -147,7 +262,7 @@ export function Dossiers() {
             </Link>
           }
         />
-      ) : dossiers.isError ? (
+      ) : dossiers.isError && !dossiers.data ? (
         <ErrorState
           title="Couldn't load your dossiers"
           detail={(dossiers.error as Error | null)?.message}
@@ -163,22 +278,25 @@ export function Dossiers() {
           title="No dossiers yet"
           hint="Pick the audience a document is written for, and its sections tell you what evidence it wants."
           action={
-            <Button variant="primary" onClick={startCreate}>
+            <Button variant="primary" onClick={startCreate} disabled={!canWrite}>
               New dossier
             </Button>
           }
         />
+      ) : visible.length === 0 ? (
+        <EmptyState
+          title="No matching dossiers"
+          hint="Try another title or audience."
+          action={<Button onClick={clearFilters}>Show all dossiers</Button>}
+        />
       ) : (
         // Newest first is the server's ordering, on updated_at. A dossier you
         // touched a minute ago is the one you came back for.
-        <ul className="m-0 list-none p-0" aria-label="Dossiers, most recently changed first">
-          {rows.map((dossier) => {
+        <ul className="dossier-register" aria-label="Dossiers, most recently changed first">
+          {visible.map((dossier) => {
             const claims = claimCount(dossier);
             return (
-              <li
-                key={dossier.id}
-                className="row flex min-h-9 flex-wrap items-center gap-3 border-b border-hairline py-2 last:border-b-0"
-              >
+              <li key={dossier.id} className="dossier-register__row">
                 <div className="row__main">
                   <div className="row__title">
                     <Link to={`/career/dossiers/${dossier.id}`}>{dossier.title}</Link>
@@ -187,7 +305,9 @@ export function Dossiers() {
                     about {me.title} · {dossier.sections.length}{' '}
                     {dossier.sections.length === 1 ? 'section' : 'sections'} · {claims}{' '}
                     {claims === 1 ? 'entry' : 'entries'} · changed{' '}
-                    <Mono>{dossier.updated_at.slice(0, 10)}</Mono>
+                    <time dateTime={dossier.updated_at}>
+                      <Mono>{dossier.updated_at.slice(0, 10)}</Mono>
+                    </time>
                   </div>
                 </div>
                 <Chip>{audiencePhrase(dossier.audience)}</Chip>
@@ -199,29 +319,34 @@ export function Dossiers() {
 
       <Sheet
         open={createOpen}
-        onOpenChange={(open) => !open && setCreateOpen(false)}
+        onOpenChange={guard.onOpenChange}
         title="New dossier"
         wide
         footer={
           <>
-            <Button variant="ghost" onClick={() => setCreateOpen(false)}>
+            <Button variant="ghost" disabled={create.isPending} onClick={guard.requestClose}>
               Cancel
             </Button>
             <span className="flex-1" />
             <Button
               variant="primary"
-              disabled={create.isPending || !audience || !title.trim()}
-              onClick={() => create.mutate()}
+              disabled={!canWrite || create.isPending || !audience || !title.trim()}
+              onClick={() => void submit()}
             >
               {create.isPending ? 'Creating...' : 'Create dossier'}
             </Button>
           </>
         }
       >
-        <div className="flex flex-col gap-4">
+        <fieldset className="dossier-create" disabled={!canWrite || create.isPending}>
+          <legend className="sr-only">Dossier details</legend>
           {formError && (
-            <Banner tone="danger" title="This dossier was not created">
+            <Banner tone="danger" title="Creation could not be confirmed">
               {formError}
+              <p>
+                Your draft is kept. If the request failed after sending, check your dossier list
+                before trying again.
+              </p>
             </Banner>
           )}
 
@@ -230,6 +355,8 @@ export function Dossiers() {
               id="dossier-new-title"
               placeholder="What this packet is for..."
               value={title}
+              maxLength={160}
+              required
               onChange={(e) => setTitle(e.target.value)}
             />
           </Field>
@@ -253,7 +380,10 @@ export function Dossiers() {
                 const phrase = audiencePhrase(entry.audience);
                 const sectionsId = `dossier-audience-${entry.audience}-sections`;
                 return (
-                  <div key={entry.audience} className="border-b border-hairline py-3 last:border-b-0">
+                  <div
+                    key={entry.audience}
+                    className="border-b border-hairline py-3 last:border-b-0"
+                  >
                     <div className="flex items-center gap-2">
                       <input
                         type="radio"
@@ -314,8 +444,9 @@ export function Dossiers() {
               onChange={(e) => setTo(e.target.value)}
             />
           </Field>
-        </div>
+        </fieldset>
       </Sheet>
+      {guard.prompt}
     </div>
   );
 }

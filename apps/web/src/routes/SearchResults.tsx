@@ -85,7 +85,9 @@ export const SEARCH_GRAMMAR: Array<{ field: string; example: string; means: stri
 export function rowSubtitle(h: Hit): string {
   if (h.subtitle) return h.subtitle;
   const props = h.props ?? {};
-  const parts = [props.headline, props.city, props.role].filter((v): v is string => typeof v === 'string' && !!v);
+  const parts = [props.headline, props.city, props.role].filter(
+    (v): v is string => typeof v === 'string' && !!v,
+  );
   return parts.length > 0 ? parts.join(' · ') : typeLabel(h.type);
 }
 
@@ -95,11 +97,22 @@ export function SearchResults() {
   const [params, setParams] = useSearchParams();
   const q = params.get('q')?.trim() ?? '';
   const [draft, setDraft] = useState(q);
-  const [kind, setKind] = useState<string>('all');
+  // A narrowed result set is a view, not momentary decoration. Keeping it in
+  // the address means a colleague can open the same lens, and Back restores
+  // the result set rather than only the words in the field.
+  const kind = params.get('kind') ?? 'all';
   const inputRef = useRef<HTMLInputElement>(null);
   // What we last wrote into the URL ourselves, so the two effects below can
   // tell "the user is typing" from "something else navigated us here".
   const pushed = useRef(q);
+
+  function writeSearch(nextQuery: string, nextKind = kind, replace = false) {
+    const next = new URLSearchParams();
+    const normalizedQuery = nextQuery.trim();
+    if (normalizedQuery) next.set('q', normalizedQuery);
+    if (nextKind !== 'all') next.set('kind', nextKind);
+    setParams(next, { replace });
+  }
 
   // Typing rewrites the URL rather than component state. The grammar's own
   // contract is that a query round-trips through a URL (FR-ORG-005); a search
@@ -111,10 +124,10 @@ export function SearchResults() {
     if (next === pushed.current) return;
     const t = setTimeout(() => {
       pushed.current = next;
-      setParams(next ? { q: next } : {}, { replace: true });
+      writeSearch(next, kind, true);
     }, 250);
     return () => clearTimeout(t);
-  }, [draft, setParams]);
+  }, [draft, kind, setParams]);
 
   // ...and the URL is the source of truth on the way back in: a link into
   // /search?q=... or the back button has to land in the input too.
@@ -129,7 +142,7 @@ export function SearchResults() {
     const v = next.trim();
     pushed.current = v;
     setDraft(v);
-    setParams(v ? { q: v } : {}, { replace: true });
+    writeSearch(v, kind, true);
     inputRef.current?.focus();
   }
 
@@ -168,6 +181,19 @@ export function SearchResults() {
   const activeKind = kinds.some((k) => k.key === kind) ? kind : 'all';
   const shown = activeKind === 'all' ? hits : hits.filter((h) => groupOf(h.type) === activeKind);
 
+  // A saved link may outlive a type's last matching record. Degrade to the
+  // complete result set and repair the URL; leaving a dead `kind=` behind
+  // would make the address claim a narrowing that the page no longer applies.
+  useEffect(() => {
+    if (q && search.data && !search.isFetching && kind !== 'all' && activeKind === 'all') {
+      writeSearch(q, 'all', true);
+    }
+  }, [activeKind, kind, q, search.data, search.isFetching]);
+
+  function changeKind(nextKind: string) {
+    writeSearch(q, nextKind);
+  }
+
   const ast = search.data?.ast;
 
   // Relevance is only meaningful relative to the best match in the set, and
@@ -191,13 +217,15 @@ export function SearchResults() {
         help={
           <InfoPopover title="How these results are ordered">
             <p>
-              Free text is scored against titles, notes and documents; the strongest match leads. The bar on each row is
-              that row's score as a share of the top one, so a row at 1.00 is the best match and a set of rows all
-              near 1.00 is a tie you will have to break yourself.
+              Free text is scored against titles, notes and documents; the strongest match leads.
+              The bar on each row is that row's score as a share of the top one, so a row at 1.00 is
+              the best match and a set of rows all near 1.00 is a tie you will have to break
+              yourself.
             </p>
             <p>
-              A query made only of filters has nothing to score, so it shows no bars, the clauses did the work. Each row
-              also names where the record came from, which is usually what tells two same-named records apart.
+              A query made only of filters has nothing to score, so it shows no bars, the clauses
+              did the work. Each row also names where the record came from, which is usually what
+              tells two same-named records apart.
             </p>
           </InfoPopover>
         }
@@ -318,7 +346,12 @@ export function SearchResults() {
           meta={search.data ? shown.length : undefined}
           actions={
             kinds.length > 2 && (
-              <FilterGroup label="Narrow results by kind" options={kinds} value={activeKind} onChange={setKind} />
+              <FilterGroup
+                label="Narrow results by kind"
+                options={kinds}
+                value={activeKind}
+                onChange={changeKind}
+              />
             )
           }
         >
@@ -369,7 +402,9 @@ export function SearchResults() {
                       what tells a Sarah Chen you typed from a Sarah Chen a vCard
                       brought in. */}
                   <ProvenanceChip source={h.source} confidence={h.confidence} />
-                  {top > 0 && <StrengthBar value={h._score / top} label="Relevance, share of the top match" />}
+                  {top > 0 && (
+                    <StrengthBar value={h._score / top} label="Relevance, share of the top match" />
+                  )}
                 </Row>
               ))}
             </ul>

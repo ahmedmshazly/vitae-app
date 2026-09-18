@@ -1,11 +1,13 @@
 import '../../test/api-mock.js';
 import { Route, Routes } from 'react-router-dom';
-import { screen, within } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { ApplicationDetailResponse } from '@vitae/core';
 import { mockApi, resetMockApi } from '../../test/api-mock.js';
 import { renderWithApp } from '../../test/render.js';
 import { ApplicationDossier } from './ApplicationDossier.js';
+import { ApiError } from '../../lib/api.js';
 
 const response: ApplicationDetailResponse = {
   application: {
@@ -131,5 +133,82 @@ describe('Application dossier', () => {
     renderDossier();
     expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't load this application");
     expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
+  });
+
+  it('keeps cached evidence visible on refresh failure and enables writes after recovery', async () => {
+    const user = userEvent.setup();
+    mockApi.get.mockResolvedValue(response);
+    const { queryClient } = renderDossier();
+    await screen.findByRole('heading', { name: 'Staff Engineer' });
+    mockApi.get.mockRejectedValue(new Error('Connection interrupted'));
+    await act(async () => {
+      await queryClient.invalidateQueries({ queryKey: ['application', 'application-1'] });
+    });
+    expect(await screen.findByText('Application refresh failed')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Staff Engineer' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Edit application' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Correct status' })).toBeDisabled();
+    expect(screen.getByRole('link', { name: /Referred by Amina Khalil/ })).toBeInTheDocument();
+    mockApi.get.mockResolvedValue(response);
+    await user.click(screen.getByRole('button', { name: 'Retry refresh' }));
+    await screen.findByRole('button', { name: 'Correct status' });
+    expect(await screen.findByRole('button', { name: 'Edit application' })).toBeEnabled();
+  });
+
+  it('does not retain cached evidence after the server reports a missing application', async () => {
+    mockApi.get.mockResolvedValue(response);
+    const { queryClient } = renderDossier();
+    await screen.findByRole('heading', { name: 'Staff Engineer' });
+    mockApi.get.mockRejectedValue(new ApiError(404, 'NOT_FOUND', 'This application was removed.'));
+    await act(async () => {
+      await queryClient.invalidateQueries({ queryKey: ['application', 'application-1'] });
+    });
+    expect(await screen.findByText('Application not found')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Staff Engineer' })).not.toBeInTheDocument();
+  });
+
+  it('includes interview time and timezone, with a direct editor for the linked interview', async () => {
+    const user = userEvent.setup();
+    mockApi.get.mockImplementation(async (path) =>
+      path === '/applications/application-1'
+        ? response
+        : {
+            node: {
+              id: 'interview-1',
+              type: 'interview',
+              title: 'Architecture interview',
+              props: { round: 'Architecture' },
+              notes_md: '',
+            },
+            edges: [],
+            neighbors: {},
+            values: [],
+          },
+    );
+    renderDossier();
+    await screen.findByRole('heading', { name: 'Staff Engineer' });
+    expect(
+      screen.getByText(new RegExp(`\\(${Intl.DateTimeFormat().resolvedOptions().timeZone}\\)`)),
+    ).toHaveTextContent(/\d{1,2}:\d{2}/);
+    await user.click(screen.getByRole('button', { name: 'Edit interview: Architecture' }));
+    expect(await screen.findByRole('dialog', { name: 'Edit interview' })).toBeInTheDocument();
+    expect(mockApi.get).toHaveBeenCalledWith('/nodes/interview-1');
+  });
+
+  it('makes the empty interview loop actionable without hiding the context register', async () => {
+    mockApi.get.mockResolvedValue({
+      application: {
+        ...response.application,
+        interviews: [],
+        notes_md: null,
+        organization: null,
+        referred_by: null,
+      },
+    });
+    renderDossier();
+    expect(await screen.findByRole('button', { name: 'Link an interview' })).toBeInTheDocument();
+    expect(screen.getByText('Company not linked')).toBeInTheDocument();
+    expect(screen.getByText('No referrer linked')).toBeInTheDocument();
+    expect(screen.getByText(/No working notes yet/)).toBeInTheDocument();
   });
 });

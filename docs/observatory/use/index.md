@@ -28,15 +28,16 @@ until both flags are on.
 
 ## The pages
 
-| Page | The question it answers |
-| --- | --- |
-| [Your first hour in Vitae](getting-started.md) | I have just signed in. What do I actually do? |
-| [Every screen, and what it is for](screens.md) | What is this screen, and why does it exist? |
-| [Capturing people, work and evidence](build-your-graph.md) | How do facts get into the graph, and how do they connect? |
-| [Producing a résumé](write-a-resume.md) | How does a job description become a compiled one-page PDF? |
-| [Tracking applications](track-applications.md) | How do I keep an active job search straight? |
-| [Getting data in and out](import-and-export.md) | How do I import a source, and how do I leave with everything? |
-| [When something does not work](troubleshooting.md) | The screen is showing me a failure. What does it mean? |
+| Page                                                       | The question it answers                                             |
+| ---------------------------------------------------------- | ------------------------------------------------------------------- |
+| [Your first hour in Vitae](getting-started.md)             | I have just signed in. What do I actually do?                       |
+| [Every screen, and what it is for](screens.md)             | What is this screen, and why does it exist?                         |
+| [Capturing people, work and evidence](build-your-graph.md) | How do facts get into the graph, and how do they connect?           |
+| [Producing a résumé](write-a-resume.md)                    | How does a job description become a compiled one-page PDF?          |
+| [Tracking applications](track-applications.md)             | How do I keep an active job search straight?                        |
+| [Getting data in and out](import-and-export.md)            | How do I import a source, and how do I leave with everything?       |
+| [Reviewing source knowledge](review-knowledge.md)          | What did a source support, and how do I accept or reject it safely? |
+| [When something does not work](troubleshooting.md)         | The screen is showing me a failure. What does it mean?              |
 
 Read the first hour first. After that the four task pages are independent and
 the screen reference is looked up rather than read through.
@@ -73,7 +74,7 @@ It does not enumerate endpoints, configuration keys, database tables or design
 tokens. Those are generated from source and indexed elsewhere; prose that
 repeats them goes stale the first time someone renames one.
 
-It also does not explain *why* the product is shaped the way it is. That
+It also does not explain _why_ the product is shaped the way it is. That
 argument belongs to [the product section](../product/index.md), and the rules
 that keep these pages honest belong to
 [About these documents](../meta/index.md).

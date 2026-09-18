@@ -132,6 +132,13 @@ export const ROUTES = {
 
   data: { path: '/data', label: 'Data', glyph: 'capture', hub: 'data', end: true },
   import: { path: '/data/imports', label: 'Imports', glyph: 'capture', hub: 'data' },
+  knowledge: {
+    path: '/data/knowledge',
+    label: 'Knowledge review',
+    shortLabel: 'Review',
+    glyph: 'document',
+    hub: 'data',
+  },
   duplicates: {
     path: '/data/identity',
     label: 'Identity audit',
@@ -140,6 +147,7 @@ export const ROUTES = {
     hub: 'data',
   },
   repositories: { path: '/data/sources/github', label: 'GitHub', glyph: 'repository', hub: 'data' },
+  gemini: { path: '/data/sources/gemini', label: 'Gemini', glyph: 'idea', hub: 'data' },
   export: { path: '/data/exports', label: 'Exports', glyph: 'export', hub: 'data' },
   trash: { path: '/data/trash', label: 'Trash', glyph: 'trash', hub: 'data' },
 
@@ -217,8 +225,10 @@ export const WORKSPACE_NAV: Record<HubId, RouteEntry[]> = {
   data: [
     ROUTES.data,
     ROUTES.import,
+    ROUTES.knowledge,
     ROUTES.duplicates,
     ROUTES.repositories,
+    ROUTES.gemini,
     ROUTES.export,
     ROUTES.trash,
   ],
@@ -233,38 +243,49 @@ export const WORKSPACE_NAV: Record<HubId, RouteEntry[]> = {
   ],
 };
 
+/** A route root only owns itself and slash-delimited descendants.
+ *
+ * This is intentionally narrower than `startsWith`: a typo such as
+ * `/resume-builder` is not a Career address, and `/todayish` is not Today.
+ * The 404 uses this result to offer a likely workspace, so an over-broad
+ * prefix would turn an unknown route into an unsupported recommendation.
+ */
+function ownsPath(pathname: string, root: string) {
+  return pathname === root || pathname.startsWith(`${root}/`);
+}
+
 /** Resolve both canonical paths and every supported compatibility URL. */
 export function hubForPath(pathname: string): HubId | null {
-  if (pathname === '/today' || pathname.startsWith('/today/')) return 'today';
+  if (ownsPath(pathname, '/today')) return 'today';
   if (
-    pathname.startsWith('/network') ||
-    pathname.startsWith('/people') ||
-    pathname.startsWith('/orgs') ||
-    pathname.startsWith('/ask') ||
-    pathname.startsWith('/intros')
+    ownsPath(pathname, '/network') ||
+    ownsPath(pathname, '/people') ||
+    ownsPath(pathname, '/orgs') ||
+    ownsPath(pathname, '/ask') ||
+    ownsPath(pathname, '/intros')
   )
     return 'network';
-  if (pathname.startsWith('/career') || pathname.startsWith('/resume')) return 'career';
+  if (ownsPath(pathname, '/career') || ownsPath(pathname, '/resume')) return 'career';
   if (
-    pathname.startsWith('/explore') ||
-    pathname.startsWith('/collections') ||
-    pathname.startsWith('/search') ||
-    pathname.startsWith('/browse') ||
+    ownsPath(pathname, '/explore') ||
+    ownsPath(pathname, '/collections') ||
+    ownsPath(pathname, '/search') ||
+    ownsPath(pathname, '/browse') ||
     pathname.startsWith('/n/') ||
-    pathname.startsWith('/graph') ||
-    pathname.startsWith('/timeline') ||
-    pathname.startsWith('/map')
+    ownsPath(pathname, '/graph') ||
+    ownsPath(pathname, '/timeline') ||
+    ownsPath(pathname, '/map')
   )
     return 'explore';
   if (
-    pathname.startsWith('/data') ||
-    pathname.startsWith('/import') ||
-    pathname.startsWith('/repositories') ||
-    pathname.startsWith('/export') ||
-    pathname.startsWith('/trash')
+    ownsPath(pathname, '/data') ||
+    ownsPath(pathname, '/import') ||
+    ownsPath(pathname, '/repositories') ||
+    ownsPath(pathname, '/export') ||
+    ownsPath(pathname, '/trash')
   )
     return 'data';
-  if (pathname.startsWith('/settings')) return 'settings';
+  if (ownsPath(pathname, '/settings')) return 'settings';
   return null;
 }
 

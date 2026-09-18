@@ -3,6 +3,7 @@ import { Reorder } from 'motion/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Checkbox, Chip, EmptyState, Meter, Mono, Select, StatusTrace } from '@vitae/ui';
 import { api } from '../../lib/api.js';
+import { useReorder } from '../../lib/motion.js';
 import { ScoreBreakdown } from './ScoreBreakdown.js';
 import type { AtomScore, AtomView, Draft, TailorResult } from './types.js';
 import { defaultVariantText } from './types.js';
@@ -135,6 +136,10 @@ export function SelectionPane({
   onRunAuto,
 }: Props) {
   const queryClient = useQueryClient();
+  // Drag order is a layout change. Keep the motion system as the only source
+  // of its timing so an OS reduced-motion preference makes this movement
+  // instant instead of leaving Tailor as an animated exception.
+  const reorderTransition = useReorder();
   const atomsById = useMemo(() => new Map(atoms.map((a) => [a.id, a])), [atoms]);
   const scoreChip = (id: string) => {
     const score = scoreById.get(id);
@@ -242,7 +247,12 @@ export function SelectionPane({
                     const pinnedHere = draft.pins.includes(id) || a?.pinned;
                     const name = rowName(id, e.ownerId);
                     return (
-                      <Reorder.Item key={id} value={id} className="list-none">
+                      <Reorder.Item
+                        key={id}
+                        value={id}
+                        className="list-none"
+                        transition={reorderTransition}
+                      >
                         <div className={ROW}>
                           <span className={HANDLE} aria-hidden>
                             ⋮⋮
@@ -415,7 +425,12 @@ export function SelectionPane({
               const a = atomsById.get(id)!;
               const name = `${a.owner_title} bullet`;
               return (
-                <Reorder.Item key={id} value={id} className="list-none">
+                <Reorder.Item
+                  key={id}
+                  value={id}
+                  className="list-none"
+                  transition={reorderTransition}
+                >
                   <div className={ROW}>
                     <span className={HANDLE} aria-hidden>
                       ⋮⋮

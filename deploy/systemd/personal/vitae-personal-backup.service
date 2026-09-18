@@ -1,0 +1,18 @@
+[Unit]
+Description=Vitae personal full-export backup to disk
+Documentation=file://@VITAE_APP_DIR@/docs/runbooks/personal-local.md
+
+[Service]
+Type=oneshot
+WorkingDirectory=@VITAE_APP_DIR@
+Environment=BACKUP_DIR=@BACKUP_DIR@
+Environment=BACKUP_KEEP_DAYS=14
+Environment=BACKUP_MIN_NODES=1
+Environment="BACKUP_EXPORT_CMD=docker compose -f deploy/compose.personal.yml --env-file deploy/.env.personal run --rm --no-deps -e EXPORT_OUT -v /tmp:/tmp api ./node_modules/.bin/tsx src/scripts/export-bundle.ts"
+ExecStart=@VITAE_APP_DIR@/scripts/backup-local.sh
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+
+[Install]
+WantedBy=default.target

@@ -115,6 +115,13 @@
   color: var(--ae-fg);
   overflow-wrap: anywhere;
 }
+.vt-toast__error {
+  margin: var(--ae-space-1) 0 0;
+  color: var(--ae-danger);
+  font-size: var(--ae-text-sm);
+  line-height: var(--ae-leading-normal);
+  overflow-wrap: anywhere;
+}
 
 /* Colour is a redundant signal after the glyph shape and status word. */
 .vt-toast--error {
@@ -155,6 +162,11 @@
 .vt-toast__action:hover {
   background: var(--ae-surface-raised);
   border-color: var(--ae-accent);
+}
+.vt-toast__action[aria-disabled='true'],
+.vt-toast__x:disabled {
+  cursor: wait;
+  opacity: 0.65;
 }
 .vt-toast__x {
   display: inline-flex;

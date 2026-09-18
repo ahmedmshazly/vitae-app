@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import type { NodeType } from '@vitae/core';
 import { Inline } from '@vitae/ui';
 import { EntityPicker, type PickedEntity } from '../../components/EntityPicker.js';
@@ -11,6 +11,8 @@ export interface GraphPathfinderProps {
   toId: string | null;
   toTitle: string | null;
   onPickTo: (entity: PickedEntity) => void;
+  onPickFrom: (entity: PickedEntity) => void;
+  onResetFrom: () => void;
   onClearTo: () => void;
   selfId: string | null;
   /**
@@ -30,11 +32,14 @@ export function GraphPathfinder({
   toId,
   toTitle,
   onPickTo,
+  onPickFrom,
+  onResetFrom,
   onClearTo,
   selfId,
   destinationTypes = DEFAULT_DESTINATION_TYPES,
 }: GraphPathfinderProps) {
   const ids = useId();
+  const [changingFrom, setChangingFrom] = useState(false);
   const fromLabelId = `${ids}-from`;
   const toLabelId = `${ids}-to`;
 
@@ -44,17 +49,51 @@ export function GraphPathfinder({
         <span className="lifemap__endpointlabel" id={fromLabelId}>
           From
         </span>
-        <span className="lifemap__endpointvalue">{fromTitle || fromId || 'Self'}</span>
-        {/* This used to be guarded on `fromId !== selfId`, which GraphView can
-            never make true, so the one sentence explaining why From has no
-            control was dead code. People clicked it and nothing happened. */}
+        {selfId && fromId !== selfId ? (
+          <Inline gap={2} align="center">
+            <span className="lifemap__endpointvalue">{fromTitle || fromId}</span>
+            <button
+              type="button"
+              className="graph__tool"
+              onClick={() => {
+                setChangingFrom(false);
+                onResetFrom();
+              }}
+            >
+              Use self
+            </button>
+          </Inline>
+        ) : changingFrom ? (
+          <>
+            <EntityPicker
+              types={destinationTypes as NodeType[]}
+              onPick={(entity) => {
+                setChangingFrom(false);
+                onPickFrom(entity);
+              }}
+              placeholder="Search a starting record..."
+            />
+            <button type="button" className="graph__tool" onClick={() => setChangingFrom(false)}>
+              Keep self
+            </button>
+          </>
+        ) : (
+          <Inline gap={2} align="center">
+            <span className="lifemap__endpointvalue">{fromTitle || fromId || 'Self'}</span>
+            <button type="button" className="graph__tool" onClick={() => setChangingFrom(true)}>
+              Change origin
+            </button>
+          </Inline>
+        )}
         <span className="u-faint text-xs block">
-          {selfId && fromId === selfId
-            ? 'Paths always start from you'
-            : 'Starting from the focused record'}
+          Paths always start from you until you choose another record.
         </span>
       </div>
-      <div className="lifemap__endpoint lifemap__endpoint--to" role="group" aria-labelledby={toLabelId}>
+      <div
+        className="lifemap__endpoint lifemap__endpoint--to"
+        role="group"
+        aria-labelledby={toLabelId}
+      >
         <span className="lifemap__endpointlabel" id={toLabelId}>
           To
         </span>

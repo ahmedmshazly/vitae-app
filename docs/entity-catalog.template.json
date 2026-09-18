@@ -1,7 +1,7 @@
 {
   "format": "vitae.entity.catalog",
   "schema_version": 1,
-  "description": "Structural template of every Vitae '+ New' entity (NODE_TYPES) and how entities may relate via EDGE_TYPES. Hand-maintained mirror of packages/core schemas and form descriptors (synced 2026-07-29), not a runtime import format (see vitae.graph.bundle/1 for that).",
+  "description": "Structural template of every Vitae '+ New' entity (NODE_TYPES) and how entities may relate via EDGE_TYPES. Hand-maintained mirror of packages/core schemas and form descriptors (synced 2026-09-12), not a runtime import format (see vitae.graph.bundle/2 for evidence-aware transfer).",
   "sources": {
     "types": "packages/core/src/types.ts",
     "node_envelope": "packages/core/src/schema/envelope.ts",
@@ -49,35 +49,25 @@
     },
     {
       "label": "Job search",
-      "types": [
-        "job_posting",
-        "application",
-        "interview",
-        "reference"
-      ]
+      "types": ["job_posting", "application", "interview", "reference"]
     },
     {
       "label": "Life",
       "types": [
+        "area",
         "event",
         "interaction",
         "task",
         "goal",
         "habit",
         "journal_entry",
-        "idea"
+        "idea",
+        "opportunity"
       ]
     },
     {
       "label": "Long tail",
-      "types": [
-        "location",
-        "trip",
-        "asset",
-        "health_log",
-        "account",
-        "subscription"
-      ]
+      "types": ["location", "trip", "asset", "health_log", "account", "subscription"]
     }
   ],
   "node_envelope": {
@@ -126,11 +116,7 @@
       },
       "date_precision": {
         "type": "string",
-        "enum": [
-          "day",
-          "month",
-          "year"
-        ],
+        "enum": ["day", "month", "year"],
         "default": "day"
       },
       "status": {
@@ -145,10 +131,7 @@
       },
       "sensitivity": {
         "type": "string",
-        "enum": [
-          "normal",
-          "sensitive"
-        ],
+        "enum": ["normal", "sensitive"],
         "default": "normal"
       },
       "source": {
@@ -156,6 +139,7 @@
         "default": "manual",
         "enum": [
           "manual",
+          "import_gmail",
           "import_linkedin",
           "import_github",
           "import_vcard",
@@ -231,6 +215,12 @@
         "type": "string",
         "required": true,
         "note": "destination node id"
+      },
+      "identity_keys": {
+        "type": "array",
+        "items": "string",
+        "default": [],
+        "note": "durable relationship episode identifiers; dates remain part of fallback identity"
       },
       "props": {
         "type": "object",
@@ -367,34 +357,25 @@
         {
           "edge": "USES_SKILL",
           "direction": "out",
-          "targets": [
-            "skill"
-          ],
+          "targets": ["skill"],
           "cardinality": "many"
         },
         {
           "edge": "WORKED_ON",
           "direction": "out",
-          "targets": [
-            "project"
-          ],
+          "targets": ["project"],
           "cardinality": "many"
         },
         {
           "edge": "MEMBER_OF",
           "direction": "out",
-          "targets": [
-            "organization"
-          ],
+          "targets": ["organization"],
           "cardinality": "many"
         },
         {
           "edge": "FOLLOWS",
           "direction": "out",
-          "targets": [
-            "organization",
-            "person"
-          ],
+          "targets": ["organization", "person"],
           "cardinality": "many"
         }
       ],
@@ -405,13 +386,7 @@
       "props": {
         "kind": {
           "type": "string",
-          "enum": [
-            "company",
-            "university",
-            "community",
-            "nonprofit",
-            "team"
-          ]
+          "enum": ["company", "university", "community", "nonprofit", "team"]
         },
         "domain": {
           "type": "string"
@@ -446,14 +421,7 @@
         "employment_type": {
           "type": "string",
           "required": true,
-          "enum": [
-            "full_time",
-            "part_time",
-            "intern",
-            "contract",
-            "freelance",
-            "volunteer"
-          ]
+          "enum": ["full_time", "part_time", "intern", "contract", "freelance", "volunteer"]
         },
         "team": {
           "type": "string"
@@ -474,11 +442,7 @@
         },
         "location_mode": {
           "type": "string",
-          "enum": [
-            "onsite",
-            "hybrid",
-            "remote"
-          ]
+          "enum": ["onsite", "hybrid", "remote"]
         },
         "city": {
           "type": "string"
@@ -518,17 +482,13 @@
         {
           "edge": "ROLE_AT",
           "direction": "out",
-          "targets": [
-            "organization"
-          ],
+          "targets": ["organization"],
           "cardinality": "one"
         },
         {
           "edge": "USES_SKILL",
           "direction": "out",
-          "targets": [
-            "skill"
-          ],
+          "targets": ["skill"],
           "cardinality": "many"
         }
       ]
@@ -539,24 +499,14 @@
       "props": {
         "kind": {
           "type": "string",
-          "enum": [
-            "work",
-            "personal",
-            "research",
-            "oss"
-          ]
+          "enum": ["work", "personal", "research", "oss"]
         },
         "my_role": {
           "type": "string"
         },
         "status": {
           "type": "string",
-          "enum": [
-            "active",
-            "paused",
-            "done",
-            "archived"
-          ]
+          "enum": ["active", "paused", "done", "archived"]
         },
         "url": {
           "type": "url"
@@ -566,11 +516,7 @@
         },
         "default_importance": {
           "type": "string",
-          "enum": [
-            "none",
-            "important",
-            "critical"
-          ]
+          "enum": ["none", "important", "critical"]
         }
       },
       "create_subject": {
@@ -584,26 +530,19 @@
         {
           "edge": "PART_OF",
           "direction": "out",
-          "targets": [
-            "role",
-            "organization"
-          ],
+          "targets": ["role", "organization"],
           "cardinality": "one"
         },
         {
           "edge": "USES_SKILL",
           "direction": "out",
-          "targets": [
-            "skill"
-          ],
+          "targets": ["skill"],
           "cardinality": "many"
         },
         {
           "edge": "WORKED_ON",
           "direction": "in",
-          "targets": [
-            "person"
-          ],
+          "targets": ["person"],
           "cardinality": "many",
           "label": "Collaborators"
         }
@@ -632,12 +571,7 @@
         },
         "proficiency": {
           "type": "string",
-          "enum": [
-            "learning",
-            "working",
-            "proficient",
-            "expert"
-          ]
+          "enum": ["learning", "working", "proficient", "expert"]
         },
         "years_estimate": {
           "type": "number"
@@ -691,9 +625,7 @@
         {
           "edge": "RELATES_TO",
           "direction": "out",
-          "targets": [
-            "organization"
-          ],
+          "targets": ["organization"],
           "cardinality": "one",
           "label": "Institution"
         }
@@ -716,10 +648,7 @@
         },
         "status": {
           "type": "string",
-          "enum": [
-            "valid",
-            "expired"
-          ]
+          "enum": ["valid", "expired"]
         }
       },
       "create_subject": {
@@ -733,9 +662,7 @@
         {
           "edge": "RELATES_TO",
           "direction": "out",
-          "targets": [
-            "organization"
-          ],
+          "targets": ["organization"],
           "cardinality": "one",
           "label": "Issuer"
         }
@@ -756,12 +683,7 @@
         },
         "format": {
           "type": "string",
-          "enum": [
-            "self_paced",
-            "cohort",
-            "in_person",
-            "bootcamp"
-          ]
+          "enum": ["self_paced", "cohort", "in_person", "bootcamp"]
         },
         "hours": {
           "type": "number",
@@ -775,12 +697,7 @@
         },
         "course_status": {
           "type": "string",
-          "enum": [
-            "enrolled",
-            "in_progress",
-            "completed",
-            "dropped"
-          ]
+          "enum": ["enrolled", "in_progress", "completed", "dropped"]
         },
         "started_on": {
           "type": "date"
@@ -809,18 +726,14 @@
         {
           "edge": "RELATES_TO",
           "direction": "out",
-          "targets": [
-            "organization"
-          ],
+          "targets": ["organization"],
           "cardinality": "one",
           "label": "Provider"
         },
         {
           "edge": "USES_SKILL",
           "direction": "out",
-          "targets": [
-            "skill"
-          ],
+          "targets": ["skill"],
           "cardinality": "many"
         }
       ]
@@ -830,12 +743,7 @@
       "props": {
         "level": {
           "type": "string",
-          "enum": [
-            "team",
-            "org",
-            "national",
-            "international"
-          ]
+          "enum": ["team", "org", "national", "international"]
         },
         "award_for": {
           "type": "string"
@@ -861,9 +769,7 @@
         {
           "edge": "RELATES_TO",
           "direction": "out",
-          "targets": [
-            "organization"
-          ],
+          "targets": ["organization"],
           "cardinality": "one",
           "label": "Issuer"
         }
@@ -874,12 +780,7 @@
       "props": {
         "post_kind": {
           "type": "string",
-          "enum": [
-            "post",
-            "article",
-            "comment",
-            "share"
-          ],
+          "enum": ["post", "article", "comment", "share"],
           "default": "post"
         },
         "text": {
@@ -937,9 +838,7 @@
         {
           "edge": "REACTED_TO",
           "direction": "in",
-          "targets": [
-            "person"
-          ],
+          "targets": ["person"],
           "cardinality": "many"
         }
       ]
@@ -949,15 +848,7 @@
       "props": {
         "pub_type": {
           "type": "string",
-          "enum": [
-            "journal",
-            "conference",
-            "workshop",
-            "preprint",
-            "blog",
-            "thesis",
-            "patent"
-          ]
+          "enum": ["journal", "conference", "workshop", "preprint", "blog", "thesis", "patent"]
         },
         "venue": {
           "type": "string"
@@ -999,9 +890,7 @@
         {
           "edge": "AUTHORED",
           "direction": "in",
-          "targets": [
-            "person"
-          ],
+          "targets": ["person"],
           "cardinality": "many",
           "label": "Co-authors"
         }
@@ -1012,14 +901,7 @@
       "props": {
         "talk_type": {
           "type": "string",
-          "enum": [
-            "conference",
-            "meetup",
-            "guest_lecture",
-            "podcast",
-            "webinar",
-            "workshop"
-          ]
+          "enum": ["conference", "meetup", "guest_lecture", "podcast", "webinar", "workshop"]
         },
         "event_name": {
           "type": "string"
@@ -1060,9 +942,7 @@
         {
           "edge": "LOCATED_IN",
           "direction": "out",
-          "targets": [
-            "location"
-          ],
+          "targets": ["location"],
           "cardinality": "one"
         }
       ]
@@ -1072,11 +952,7 @@
       "props": {
         "host": {
           "type": "string",
-          "enum": [
-            "github",
-            "gitlab",
-            "self"
-          ],
+          "enum": ["github", "gitlab", "self"],
           "default": "github"
         },
         "full_name": {
@@ -1133,9 +1009,7 @@
         {
           "edge": "USES_SKILL",
           "direction": "out",
-          "targets": [
-            "skill"
-          ],
+          "targets": ["skill"],
           "cardinality": "many"
         }
       ]
@@ -1164,11 +1038,7 @@
         },
         "read_status": {
           "type": "string",
-          "enum": [
-            "unread",
-            "read",
-            "reference"
-          ],
+          "enum": ["unread", "read", "reference"],
           "default": "unread"
         }
       },
@@ -1177,9 +1047,7 @@
         {
           "edge": "SHARED_BY",
           "direction": "out",
-          "targets": [
-            "person"
-          ],
+          "targets": ["person"],
           "cardinality": "one"
         },
         {
@@ -1196,15 +1064,7 @@
         "doc_kind": {
           "type": "string",
           "required": true,
-          "enum": [
-            "contract",
-            "transcript",
-            "certificate",
-            "statement",
-            "paper",
-            "manual",
-            "other"
-          ]
+          "enum": ["contract", "transcript", "certificate", "statement", "paper", "manual", "other"]
         },
         "issued_on": {
           "type": "date"
@@ -1231,15 +1091,7 @@
       "props": {
         "media_kind": {
           "type": "string",
-          "enum": [
-            "book",
-            "paper",
-            "article",
-            "course",
-            "film",
-            "podcast",
-            "video"
-          ]
+          "enum": ["book", "paper", "article", "course", "film", "podcast", "video"]
         },
         "creator": {
           "type": "string"
@@ -1258,12 +1110,7 @@
         },
         "consumption_status": {
           "type": "string",
-          "enum": [
-            "want",
-            "in_progress",
-            "done",
-            "abandoned"
-          ]
+          "enum": ["want", "in_progress", "done", "abandoned"]
         },
         "started_on": {
           "type": "date"
@@ -1285,9 +1132,7 @@
         {
           "edge": "SHARED_BY",
           "direction": "out",
-          "targets": [
-            "person"
-          ],
+          "targets": ["person"],
           "cardinality": "one",
           "label": "Recommended by"
         }
@@ -1313,11 +1158,7 @@
         {
           "edge": "ABOUT",
           "direction": "out",
-          "targets": [
-            "media_item",
-            "link",
-            "publication"
-          ],
+          "targets": ["media_item", "link", "publication"],
           "cardinality": "one",
           "label": "Source"
         }
@@ -1338,21 +1179,11 @@
         },
         "location_mode": {
           "type": "string",
-          "enum": [
-            "onsite",
-            "hybrid",
-            "remote"
-          ]
+          "enum": ["onsite", "hybrid", "remote"]
         },
         "employment_type": {
           "type": "string",
-          "enum": [
-            "full_time",
-            "part_time",
-            "intern",
-            "contract",
-            "freelance"
-          ]
+          "enum": ["full_time", "part_time", "intern", "contract", "freelance"]
         },
         "url": {
           "type": "url"
@@ -1368,13 +1199,7 @@
         },
         "posting_status": {
           "type": "string",
-          "enum": [
-            "watching",
-            "interested",
-            "applied",
-            "closed",
-            "passed"
-          ]
+          "enum": ["watching", "interested", "applied", "closed", "passed"]
         },
         "source": {
           "type": "string"
@@ -1385,9 +1210,7 @@
         {
           "edge": "APPLIED_TO",
           "direction": "out",
-          "targets": [
-            "organization"
-          ],
+          "targets": ["organization"],
           "cardinality": "one"
         }
       ]
@@ -1427,20 +1250,11 @@
         },
         "channel": {
           "type": "string",
-          "enum": [
-            "referral",
-            "cold",
-            "recruiter",
-            "inbound"
-          ]
+          "enum": ["referral", "cold", "recruiter", "inbound"]
         },
         "location_mode": {
           "type": "string",
-          "enum": [
-            "onsite",
-            "hybrid",
-            "remote"
-          ]
+          "enum": ["onsite", "hybrid", "remote"]
         },
         "salary_range": {
           "type": "string"
@@ -1460,25 +1274,19 @@
         {
           "edge": "APPLIED_TO",
           "direction": "out",
-          "targets": [
-            "organization"
-          ],
+          "targets": ["organization"],
           "cardinality": "one"
         },
         {
           "edge": "REFERRED_BY",
           "direction": "out",
-          "targets": [
-            "person"
-          ],
+          "targets": ["person"],
           "cardinality": "one"
         },
         {
           "edge": "INTERVIEW_FOR",
           "direction": "in",
-          "targets": [
-            "interview"
-          ],
+          "targets": ["interview"],
           "cardinality": "many"
         }
       ]
@@ -1495,13 +1303,7 @@
         },
         "format": {
           "type": "string",
-          "enum": [
-            "phone",
-            "video",
-            "onsite",
-            "take_home",
-            "panel"
-          ]
+          "enum": ["phone", "video", "onsite", "take_home", "panel"]
         },
         "scheduled_at": {
           "type": "datetime"
@@ -1520,13 +1322,7 @@
         },
         "outcome": {
           "type": "string",
-          "enum": [
-            "scheduled",
-            "passed",
-            "failed",
-            "pending",
-            "cancelled"
-          ]
+          "enum": ["scheduled", "passed", "failed", "pending", "cancelled"]
         },
         "reflection": {
           "type": "string"
@@ -1537,18 +1333,13 @@
         {
           "edge": "INTERVIEW_FOR",
           "direction": "out",
-          "targets": [
-            "application",
-            "job_posting"
-          ],
+          "targets": ["application", "job_posting"],
           "cardinality": "one"
         },
         {
           "edge": "WITH",
           "direction": "out",
-          "targets": [
-            "person"
-          ],
+          "targets": ["person"],
           "cardinality": "many"
         }
       ]
@@ -1561,12 +1352,7 @@
         },
         "reference_type": {
           "type": "string",
-          "enum": [
-            "professional",
-            "academic",
-            "personal",
-            "character"
-          ]
+          "enum": ["professional", "academic", "personal", "character"]
         },
         "blurb": {
           "type": "string"
@@ -1599,21 +1385,71 @@
       },
       "form_edges": []
     },
+    "area": {
+      "group": "Life",
+      "props": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "health",
+            "family",
+            "home",
+            "career",
+            "learning",
+            "finance",
+            "community",
+            "creative",
+            "other"
+          ]
+        },
+        "area_status": {
+          "type": "string",
+          "enum": ["active", "paused", "archived"],
+          "default": "active"
+        },
+        "standard": { "type": "string" },
+        "review_cadence_days": { "type": "number", "min": 1 }
+      },
+      "create_subject": null,
+      "form_edges": []
+    },
+    "opportunity": {
+      "group": "Life",
+      "props": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "collaboration",
+            "grant",
+            "speaking",
+            "job",
+            "volunteer",
+            "learning",
+            "investment",
+            "other"
+          ]
+        },
+        "opportunity_status": {
+          "type": "string",
+          "enum": ["possible", "considering", "pursuing", "won", "declined", "closed"],
+          "default": "possible"
+        },
+        "next_step": { "type": "string" },
+        "next_step_date": { "type": "date" },
+        "deadline": { "type": "date" },
+        "url": { "type": "url" },
+        "value": { "type": "string" }
+      },
+      "create_subject": null,
+      "form_edges": []
+    },
     "event": {
       "group": "Life",
       "props": {
         "kind": {
           "type": "string",
           "required": true,
-          "enum": [
-            "conference",
-            "meetup",
-            "hackathon",
-            "party",
-            "wedding",
-            "class",
-            "appointment"
-          ]
+          "enum": ["conference", "meetup", "hackathon", "party", "wedding", "class", "appointment"]
         },
         "venue": {
           "type": "string"
@@ -1639,17 +1475,13 @@
         {
           "edge": "ATTENDED",
           "direction": "in",
-          "targets": [
-            "person"
-          ],
+          "targets": ["person"],
           "cardinality": "many"
         },
         {
           "edge": "LOCATED_IN",
           "direction": "out",
-          "targets": [
-            "location"
-          ],
+          "targets": ["location"],
           "cardinality": "one"
         }
       ]
@@ -1681,19 +1513,11 @@
         },
         "initiated_by": {
           "type": "string",
-          "enum": [
-            "me",
-            "them"
-          ]
+          "enum": ["me", "them"]
         },
         "sentiment": {
           "type": "string",
-          "enum": [
-            "great",
-            "good",
-            "neutral",
-            "tense"
-          ]
+          "enum": ["great", "good", "neutral", "tense"]
         },
         "note": {
           "type": "string"
@@ -1732,9 +1556,7 @@
         {
           "edge": "WITH",
           "direction": "out",
-          "targets": [
-            "person"
-          ],
+          "targets": ["person"],
           "cardinality": "many"
         },
         {
@@ -1752,14 +1574,7 @@
         "status": {
           "type": "string",
           "required": true,
-          "enum": [
-            "inbox",
-            "next",
-            "doing",
-            "waiting",
-            "done",
-            "dropped"
-          ]
+          "enum": ["inbox", "next", "doing", "waiting", "done", "dropped"]
         },
         "due": {
           "type": "date"
@@ -1769,12 +1584,7 @@
         },
         "priority": {
           "type": "string",
-          "enum": [
-            "p1",
-            "p2",
-            "p3",
-            "p4"
-          ]
+          "enum": ["p1", "p2", "p3", "p4"]
         },
         "effort_min": {
           "type": "number"
@@ -1787,23 +1597,14 @@
         },
         "importance": {
           "type": "string",
-          "enum": [
-            "none",
-            "important",
-            "critical"
-          ]
+          "enum": ["none", "important", "critical"]
         },
         "quadrant_override": {
           "type": "object",
           "fields": {
             "quadrant": {
               "type": "string",
-              "enum": [
-                "do",
-                "schedule",
-                "delegate",
-                "eliminate"
-              ]
+              "enum": ["do", "schedule", "delegate", "eliminate"]
             },
             "set_at": {
               "type": "date"
@@ -1824,10 +1625,7 @@
             },
             "mode": {
               "type": "string",
-              "enum": [
-                "fixed",
-                "from_completion"
-              ]
+              "enum": ["fixed", "from_completion"]
             },
             "exceptions": {
               "type": "array",
@@ -1837,11 +1635,7 @@
         },
         "energy": {
           "type": "string",
-          "enum": [
-            "low",
-            "medium",
-            "high"
-          ]
+          "enum": ["low", "medium", "high"]
         },
         "project_id": {
           "type": "string",
@@ -1863,21 +1657,11 @@
       "props": {
         "horizon": {
           "type": "string",
-          "enum": [
-            "month",
-            "quarter",
-            "year",
-            "life"
-          ]
+          "enum": ["month", "quarter", "year", "life"]
         },
         "goal_status": {
           "type": "string",
-          "enum": [
-            "active",
-            "paused",
-            "achieved",
-            "abandoned"
-          ]
+          "enum": ["active", "paused", "achieved", "abandoned"]
         },
         "success_criteria": {
           "type": "string"
@@ -1890,11 +1674,7 @@
         },
         "importance": {
           "type": "string",
-          "enum": [
-            "none",
-            "important",
-            "critical"
-          ]
+          "enum": ["none", "important", "critical"]
         },
         "key_results": {
           "type": "array",
@@ -1927,11 +1707,7 @@
         {
           "edge": "RELATES_TO",
           "direction": "in",
-          "targets": [
-            "project",
-            "habit",
-            "task"
-          ],
+          "targets": ["project", "habit", "task"],
           "cardinality": "many",
           "label": "Supported by"
         }
@@ -1942,11 +1718,7 @@
       "props": {
         "cadence": {
           "type": "string",
-          "enum": [
-            "daily",
-            "weekly",
-            "monthly"
-          ]
+          "enum": ["daily", "weekly", "monthly"]
         },
         "target_per_period": {
           "type": "number",
@@ -1976,9 +1748,7 @@
         {
           "edge": "RELATES_TO",
           "direction": "out",
-          "targets": [
-            "goal"
-          ],
+          "targets": ["goal"],
           "cardinality": "one",
           "label": "Supports goal"
         }
@@ -2015,13 +1785,7 @@
         "status": {
           "type": "string",
           "required": true,
-          "enum": [
-            "spark",
-            "explored",
-            "building",
-            "shipped",
-            "discarded"
-          ]
+          "enum": ["spark", "explored", "building", "shipped", "discarded"]
         },
         "one_liner": {
           "type": "string"
@@ -2036,12 +1800,7 @@
         },
         "effort_guess": {
           "type": "string",
-          "enum": [
-            "hours",
-            "days",
-            "weeks",
-            "months"
-          ]
+          "enum": ["hours", "days", "weeks", "months"]
         },
         "next_experiment": {
           "type": "string"
@@ -2062,13 +1821,7 @@
       "props": {
         "kind": {
           "type": "string",
-          "enum": [
-            "country",
-            "region",
-            "city",
-            "venue",
-            "address"
-          ]
+          "enum": ["country", "region", "city", "venue", "address"]
         },
         "lat": {
           "type": "number",
@@ -2104,13 +1857,7 @@
       "props": {
         "purpose": {
           "type": "string",
-          "enum": [
-            "work",
-            "conference",
-            "vacation",
-            "family",
-            "relocation"
-          ]
+          "enum": ["work", "conference", "vacation", "family", "relocation"]
         },
         "destination": {
           "type": "string"
@@ -2140,17 +1887,13 @@
         {
           "edge": "VISITED",
           "direction": "out",
-          "targets": [
-            "location"
-          ],
+          "targets": ["location"],
           "cardinality": "many"
         },
         {
           "edge": "WITH",
           "direction": "out",
-          "targets": [
-            "person"
-          ],
+          "targets": ["person"],
           "cardinality": "many"
         }
       ]
@@ -2160,14 +1903,7 @@
       "props": {
         "category": {
           "type": "string",
-          "enum": [
-            "electronics",
-            "furniture",
-            "vehicle",
-            "instrument",
-            "appliance",
-            "other"
-          ]
+          "enum": ["electronics", "furniture", "vehicle", "instrument", "appliance", "other"]
         },
         "vendor": {
           "type": "string"
@@ -2197,12 +1933,7 @@
         },
         "asset_status": {
           "type": "string",
-          "enum": [
-            "owned",
-            "sold",
-            "gifted",
-            "broken"
-          ]
+          "enum": ["owned", "sold", "gifted", "broken"]
         }
       },
       "create_subject": null,
@@ -2214,15 +1945,7 @@
       "props": {
         "metric": {
           "type": "string",
-          "enum": [
-            "weight",
-            "sleep_h",
-            "workout",
-            "illness",
-            "checkup",
-            "mood",
-            "custom"
-          ]
+          "enum": ["weight", "sleep_h", "workout", "illness", "checkup", "mood", "custom"]
         },
         "custom_metric": {
           "type": "string"
@@ -2248,12 +1971,7 @@
       "props": {
         "kind": {
           "type": "string",
-          "enum": [
-            "financial",
-            "utility",
-            "subscription",
-            "online"
-          ]
+          "enum": ["financial", "utility", "subscription", "online"]
         },
         "service": {
           "type": "string"
@@ -2279,10 +1997,7 @@
             },
             "period": {
               "type": "string",
-              "enum": [
-                "monthly",
-                "yearly"
-              ]
+              "enum": ["monthly", "yearly"]
             }
           }
         },
@@ -2291,10 +2006,7 @@
         },
         "account_status": {
           "type": "string",
-          "enum": [
-            "active",
-            "closed"
-          ]
+          "enum": ["active", "closed"]
         }
       },
       "create_subject": null,
@@ -2308,14 +2020,7 @@
         },
         "category": {
           "type": "string",
-          "enum": [
-            "software",
-            "media",
-            "utility",
-            "membership",
-            "cloud",
-            "other"
-          ]
+          "enum": ["software", "media", "utility", "membership", "cloud", "other"]
         },
         "plan": {
           "type": "string"
@@ -2331,11 +2036,7 @@
             },
             "period": {
               "type": "string",
-              "enum": [
-                "monthly",
-                "yearly",
-                "weekly"
-              ]
+              "enum": ["monthly", "yearly", "weekly"]
             }
           }
         },
@@ -2347,12 +2048,7 @@
         },
         "sub_status": {
           "type": "string",
-          "enum": [
-            "active",
-            "trial",
-            "paused",
-            "cancelled"
-          ]
+          "enum": ["active", "trial", "paused", "cancelled"]
         },
         "url": {
           "type": "url"
@@ -2365,14 +2061,37 @@
   "relations": {
     "description": "Canonical EDGE_TYPES with allowed src→dst endpoints (edgeEndpointsAllowed). '*' means any node type. PART_OF uses an explicit pair allow-list. PERSON_RELATIONS / ORG_RELATION_KINDS are enums for KNOWS.relation and ORG_RELATED.kind.",
     "edges": {
+      "IN_AREA": {
+        "label": "In life area",
+        "src": [
+          "goal",
+          "project",
+          "task",
+          "habit",
+          "event",
+          "account",
+          "subscription",
+          "opportunity"
+        ],
+        "dst": ["area"],
+        "props": { "primary": { "type": "boolean" } }
+      },
+      "PARTICIPATES_IN": {
+        "label": "Participates in",
+        "src": ["person", "organization"],
+        "dst": ["project", "event", "opportunity"],
+        "props": { "role": { "type": "string" } }
+      },
+      "AFFILIATED_WITH": {
+        "label": "Affiliated with",
+        "src": ["person"],
+        "dst": ["organization"],
+        "props": { "role": { "type": "string" } }
+      },
       "KNOWS": {
         "label": "Knows",
-        "src": [
-          "person"
-        ],
-        "dst": [
-          "person"
-        ],
+        "src": ["person"],
+        "dst": ["person"],
         "props": {
           "relation": {
             "type": "string",
@@ -2415,10 +2134,7 @@
                 "direction": {
                   "type": "string",
                   "required": true,
-                  "enum": [
-                    "owed_to_me",
-                    "owed_by_me"
-                  ]
+                  "enum": ["owed_to_me", "owed_by_me"]
                 },
                 "what": {
                   "type": "string",
@@ -2458,22 +2174,14 @@
       },
       "HELD": {
         "label": "Held role",
-        "src": [
-          "person"
-        ],
-        "dst": [
-          "role"
-        ],
+        "src": ["person"],
+        "dst": ["role"],
         "props": {}
       },
       "ROLE_AT": {
         "label": "Role at org",
-        "src": [
-          "role"
-        ],
-        "dst": [
-          "organization"
-        ],
+        "src": ["role"],
+        "dst": ["organization"],
         "props": {
           "department": {
             "type": "string"
@@ -2482,46 +2190,25 @@
       },
       "WORKED_ON": {
         "label": "Worked on",
-        "src": [
-          "person"
-        ],
-        "dst": [
-          "project"
-        ],
+        "src": ["person"],
+        "dst": ["project"],
         "props": {
           "my_role": {
             "type": "string"
           },
           "involvement": {
             "type": "string",
-            "enum": [
-              "led",
-              "core",
-              "contributor",
-              "advisor"
-            ]
+            "enum": ["led", "core", "contributor", "advisor"]
           }
         }
       },
       "PART_OF": {
         "label": "Part of",
         "allowed_pairs": [
-          [
-            "repository",
-            "project"
-          ],
-          [
-            "education",
-            "organization"
-          ],
-          [
-            "project",
-            "role"
-          ],
-          [
-            "project",
-            "organization"
-          ]
+          ["repository", "project"],
+          ["education", "organization"],
+          ["project", "role"],
+          ["project", "organization"]
         ],
         "props": {
           "context": {
@@ -2531,31 +2218,16 @@
       },
       "USES_SKILL": {
         "label": "Uses skill",
-        "src": [
-          "person",
-          "role",
-          "project",
-          "repository"
-        ],
-        "dst": [
-          "skill"
-        ],
+        "src": ["person", "role", "project", "repository"],
+        "dst": ["skill"],
         "props": {
           "level": {
             "type": "string",
-            "enum": [
-              "learning",
-              "working",
-              "proficient",
-              "expert"
-            ]
+            "enum": ["learning", "working", "proficient", "expert"]
           },
           "centrality": {
             "type": "string",
-            "enum": [
-              "core",
-              "supporting"
-            ]
+            "enum": ["core", "supporting"]
           },
           "evidence_note": {
             "type": "string"
@@ -2564,23 +2236,12 @@
       },
       "ATTENDED": {
         "label": "Attended",
-        "src": [
-          "person"
-        ],
-        "dst": [
-          "event",
-          "education"
-        ],
+        "src": ["person"],
+        "dst": ["event", "education"],
         "props": {
           "role": {
             "type": "string",
-            "enum": [
-              "attendee",
-              "speaker",
-              "organizer",
-              "volunteer",
-              "student"
-            ]
+            "enum": ["attendee", "speaker", "organizer", "volunteer", "student"]
           }
         },
         "notes": "For school/programs prefer STUDIED_AT; ATTENDED still allows education."
@@ -2588,9 +2249,7 @@
       "WITH": {
         "label": "With",
         "src": "*",
-        "dst": [
-          "person"
-        ],
+        "dst": ["person"],
         "props": {}
       },
       "ABOUT": {
@@ -2609,77 +2268,46 @@
         "props": {
           "relevance": {
             "type": "string",
-            "enum": [
-              "primary",
-              "mention"
-            ],
+            "enum": ["primary", "mention"],
             "default": "primary"
           }
         }
       },
       "AUTHORED": {
         "label": "Authored",
-        "src": [
-          "person"
-        ],
-        "dst": [
-          "publication",
-          "talk",
-          "repository",
-          "media_item",
-          "post"
-        ],
+        "src": ["person"],
+        "dst": ["publication", "talk", "repository", "media_item", "post"],
         "props": {
           "author_position": {
             "type": "number"
           },
           "weight": {
             "type": "string",
-            "enum": [
-              "sole",
-              "lead",
-              "co"
-            ]
+            "enum": ["sole", "lead", "co"]
           }
         }
       },
       "EARNED": {
         "label": "Earned credential",
-        "src": [
-          "person"
-        ],
-        "dst": [
-          "education",
-          "certification",
-          "award"
-        ],
+        "src": ["person"],
+        "dst": ["education", "certification", "award"],
         "props": {}
       },
       "LOCATED_IN": {
         "label": "Located in",
         "src": "*",
-        "dst": [
-          "location"
-        ],
+        "dst": ["location"],
         "props": {
           "precision": {
             "type": "string",
-            "enum": [
-              "exact",
-              "approximate"
-            ]
+            "enum": ["exact", "approximate"]
           }
         }
       },
       "VISITED": {
         "label": "Visited",
-        "src": [
-          "trip",
-          "person"
-        ],
-        "dst": [
-          "location"
-        ],
+        "src": ["trip", "person"],
+        "dst": ["location"],
         "props": {
           "nights": {
             "type": "number",
@@ -2700,13 +2328,8 @@
       },
       "SHARED_BY": {
         "label": "Shared by",
-        "src": [
-          "link",
-          "media_item"
-        ],
-        "dst": [
-          "person"
-        ],
+        "src": ["link", "media_item"],
+        "dst": ["person"],
         "props": {
           "shared_on": {
             "type": "date"
@@ -2718,35 +2341,22 @@
       },
       "REFERRED_BY": {
         "label": "Referred by",
-        "src": [
-          "application"
-        ],
-        "dst": [
-          "person"
-        ],
+        "src": ["application"],
+        "dst": ["person"],
         "props": {
           "asked_on": {
             "type": "date"
           },
           "outcome": {
             "type": "string",
-            "enum": [
-              "agreed",
-              "declined",
-              "pending"
-            ]
+            "enum": ["agreed", "declined", "pending"]
           }
         }
       },
       "APPLIED_TO": {
         "label": "Applied to",
-        "src": [
-          "application",
-          "job_posting"
-        ],
-        "dst": [
-          "organization"
-        ],
+        "src": ["application", "job_posting"],
+        "dst": ["organization"],
         "props": {}
       },
       "RELATES_TO": {
@@ -2762,13 +2372,8 @@
       },
       "COMPLETED": {
         "label": "Completed course",
-        "src": [
-          "person"
-        ],
-        "dst": [
-          "course",
-          "education"
-        ],
+        "src": ["person"],
+        "dst": ["course", "education"],
         "props": {
           "completed_on": {
             "type": "date"
@@ -2780,16 +2385,8 @@
       },
       "RECOMMENDS": {
         "label": "Recommends",
-        "src": [
-          "person",
-          "reference"
-        ],
-        "dst": [
-          "person",
-          "application",
-          "organization",
-          "reference"
-        ],
+        "src": ["person", "reference"],
+        "dst": ["person", "application", "organization", "reference"],
         "props": {
           "relationship": {
             "type": "string"
@@ -2803,13 +2400,8 @@
       },
       "INTERVIEW_FOR": {
         "label": "Interview for",
-        "src": [
-          "interview"
-        ],
-        "dst": [
-          "application",
-          "job_posting"
-        ],
+        "src": ["interview"],
+        "dst": ["application", "job_posting"],
         "props": {
           "round_no": {
             "type": "number",
@@ -2819,23 +2411,12 @@
       },
       "REACTED_TO": {
         "label": "Reacted to",
-        "src": [
-          "person"
-        ],
-        "dst": [
-          "post"
-        ],
+        "src": ["person"],
+        "dst": ["post"],
         "props": {
           "reaction_kind": {
             "type": "string",
-            "enum": [
-              "like",
-              "celebrate",
-              "support",
-              "love",
-              "insightful",
-              "funny"
-            ]
+            "enum": ["like", "celebrate", "support", "love", "insightful", "funny"]
           },
           "reacted_on": {
             "type": "date"
@@ -2844,12 +2425,8 @@
       },
       "MEMBER_OF": {
         "label": "Member of",
-        "src": [
-          "person"
-        ],
-        "dst": [
-          "organization"
-        ],
+        "src": ["person"],
+        "dst": ["organization"],
         "props": {
           "role": {
             "type": "string"
@@ -2861,13 +2438,8 @@
       },
       "FOLLOWS": {
         "label": "Follows",
-        "src": [
-          "person"
-        ],
-        "dst": [
-          "organization",
-          "person"
-        ],
+        "src": ["person"],
+        "dst": ["organization", "person"],
         "props": {
           "followed_on": {
             "type": "date"
@@ -2877,13 +2449,8 @@
       },
       "STUDIED_AT": {
         "label": "Studied at",
-        "src": [
-          "person"
-        ],
-        "dst": [
-          "organization",
-          "education"
-        ],
+        "src": ["person"],
+        "dst": ["organization", "education"],
         "props": {
           "degree": {
             "type": "string"
@@ -2902,20 +2469,12 @@
       },
       "FOUNDED": {
         "label": "Founded",
-        "src": [
-          "person"
-        ],
-        "dst": [
-          "organization"
-        ],
+        "src": ["person"],
+        "dst": ["organization"],
         "props": {
           "role": {
             "type": "string",
-            "enum": [
-              "founder",
-              "co_founder",
-              "founding_member"
-            ]
+            "enum": ["founder", "co_founder", "founding_member"]
           },
           "since": {
             "type": "date"
@@ -2924,12 +2483,8 @@
       },
       "REPORTS_TO": {
         "label": "Reports to",
-        "src": [
-          "person"
-        ],
-        "dst": [
-          "person"
-        ],
+        "src": ["person"],
+        "dst": ["person"],
         "props": {
           "title": {
             "type": "string",
@@ -2940,12 +2495,8 @@
       },
       "ORG_RELATED": {
         "label": "Related org",
-        "src": [
-          "organization"
-        ],
-        "dst": [
-          "organization"
-        ],
+        "src": ["organization"],
+        "dst": ["organization"],
         "props": {
           "kind": {
             "type": "string",
@@ -2960,12 +2511,8 @@
       },
       "INTRODUCED": {
         "label": "Introduced",
-        "src": [
-          "person"
-        ],
-        "dst": [
-          "person"
-        ],
+        "src": ["person"],
+        "dst": ["person"],
         "props": {
           "via": {
             "type": "string",
@@ -2982,49 +2529,29 @@
       },
       "DEPENDS_ON": {
         "label": "Depends on",
-        "src": [
-          "task"
-        ],
-        "dst": [
-          "task"
-        ],
+        "src": ["task"],
+        "dst": ["task"],
         "props": {},
         "notes": "Task → task that must finish first. Cycle detection is a pure check, not a DB constraint."
       },
       "SERVES_GOAL": {
         "label": "Serves goal",
-        "src": [
-          "task",
-          "project"
-        ],
-        "dst": [
-          "goal"
-        ],
+        "src": ["task", "project"],
+        "dst": ["goal"],
         "props": {},
         "notes": "Task or project → the goal it serves."
       },
       "WAITING_ON": {
         "label": "Waiting on",
-        "src": [
-          "task"
-        ],
-        "dst": [
-          "person",
-          "organization"
-        ],
+        "src": ["task"],
+        "dst": ["person", "organization"],
         "props": {},
         "notes": "Task → the person or organization it is blocked on."
       },
       "FOR": {
         "label": "For",
-        "src": [
-          "task"
-        ],
-        "dst": [
-          "person",
-          "organization",
-          "application"
-        ],
+        "src": ["task"],
+        "dst": ["person", "organization", "application"],
         "props": {},
         "notes": "Task → the person, organization, or application it is for."
       }

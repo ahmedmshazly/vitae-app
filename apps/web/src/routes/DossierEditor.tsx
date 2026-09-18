@@ -19,7 +19,7 @@
  * limits arrive from `/dossiers/audiences`, so a rule changed on the server is
  * a rule changed on this form.
  */
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -44,10 +44,7 @@ import {
   appendixKey,
   type CitedRecord,
 } from '../features/DossierAppendix.js';
-import {
-  DossierClaimForm,
-  type ClaimDraft,
-} from '../features/DossierClaimForm.js';
+import { DossierClaimForm, type ClaimDraft } from '../features/DossierClaimForm.js';
 import {
   admitsSentence,
   audiencePhrase,
@@ -59,6 +56,9 @@ import {
   withClaimRemoved,
 } from '../features/DossierGrammar.js';
 import { useToast } from '../features/Toast.js';
+import { useCanWrite, WRITE_LOCK_HINT } from '../lib/auth.js';
+import { useUnsavedChanges } from '../lib/unsaved-changes.js';
+import './dossiers.css';
 
 interface CompiledClaim {
   id: string;
@@ -93,10 +93,53 @@ const APPENDIX_PREFIX = 'dossier';
 
 export function DossierEditor() {
   const { id = '' } = useParams();
+  return <DossierEditorPage key={id} id={id} />;
+}
+
+function DossierEditorPage({ id }: { id: string }) {
+  // Moving within this document does not discard a draft. Handle its citation
+  // and contents anchors before the shared navigation guard sees a departure.
+  useEffect(() => {
+    const jump = (event: MouseEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      )
+        return;
+      const anchor =
+        event.target instanceof Element
+          ? event.target.closest<HTMLAnchorElement>('.dossier-editor a[href^="#"]')
+          : null;
+      const target = anchor?.getAttribute('href')?.slice(1);
+      const destination = target ? document.getElementById(target) : null;
+      if (!destination) return;
+      event.preventDefault();
+      destination.scrollIntoView({ block: 'start' });
+      destination.focus({ preventScroll: true });
+    };
+    document.addEventListener('click', jump, true);
+    return () => document.removeEventListener('click', jump, true);
+  }, []);
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { flash } = useToast();
+  const canWrite = useCanWrite();
+  const flight = useRef(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [removeEntry, setRemoveEntry] = useState<{ grammarId: string; claimId: string } | null>(
+    null,
+  );
+  const [dirtySections, setDirtySections] = useState<Record<string, boolean>>({});
+  const onDraftChange = useCallback((sectionId: string, dirty: boolean) => {
+    setDirtySections((previous) =>
+      previous[sectionId] === dirty ? previous : { ...previous, [sectionId]: dirty },
+    );
+  }, []);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [conflict, setConflict] = useState<string | null>(null);
 
@@ -139,6 +182,7 @@ export function DossierEditor() {
 
   const save = useMutation({
     mutationFn: (sections: DossierSection[]) => {
+      if (!canWrite) throw new Error(WRITE_LOCK_HINT);
       if (!dossier) throw new Error('This dossier is not loaded yet.');
       // expected_rev makes a concurrent edit a refusal rather than a silent
       // overwrite of whatever the other window had already stored.
@@ -152,6 +196,7 @@ export function DossierEditor() {
       setConflict(null);
       await qc.invalidateQueries({ queryKey: ['dossier', id] });
       await qc.invalidateQueries({ queryKey: ['dossiers'] });
+      setRemoveEntry(null);
     },
     onError: (error) => {
       if (error instanceof ApiError && error.status === 409) {
@@ -165,7 +210,10 @@ export function DossierEditor() {
   });
 
   const remove = useMutation({
-    mutationFn: () => api.del<{ dossier: Dossier }>(`/dossiers/${id}`),
+    mutationFn: () => {
+      if (!canWrite) throw new Error(WRITE_LOCK_HINT);
+      return api.del<{ dossier: Dossier }>(`/dossiers/${id}`);
+    },
     onSuccess: async () => {
       setConfirmDelete(false);
       await qc.invalidateQueries({ queryKey: ['dossiers'] });
@@ -173,13 +221,30 @@ export function DossierEditor() {
       navigate('/career/dossiers');
     },
     onError: (error) => {
-      setConfirmDelete(false);
-      setSaveError(error instanceof Error ? error.message : 'The dossier was not deleted.');
+      setDeleteError(error instanceof Error ? error.message : 'The dossier was not deleted.');
     },
   });
+  const busy = save.isPending || remove.isPending;
+  const locked = !canWrite || busy || compile.isFetching || compile.isError;
+  const draftGuard = useUnsavedChanges(Object.values(dirtySections).some(Boolean) || busy, {
+    busy,
+  });
+  async function deleteDossier() {
+    if (flight.current || locked) return;
+    flight.current = true;
+    setDeleteError(null);
+    try {
+      await remove.mutateAsync();
+    } catch {
+      /* Error remains in the confirmation. */
+    } finally {
+      flight.current = false;
+    }
+  }
 
   async function addClaim(grammarId: string, draft: ClaimDraft): Promise<boolean> {
-    if (!dossier) return false;
+    if (!dossier || locked || flight.current) return false;
+    flight.current = true;
     const claim = {
       id: newClaimId(),
       text: draft.text,
@@ -193,12 +258,23 @@ export function DossierEditor() {
       // Reported by the mutation's onError, above the form, with the draft
       // still in it so nothing the operator typed is lost.
       return false;
+    } finally {
+      flight.current = false;
     }
   }
 
-  function removeClaim(grammarId: string, claimId: string) {
-    if (!dossier) return;
-    save.mutate(withClaimRemoved(dossier.sections, grammarId, claimId));
+  async function removeClaim() {
+    if (!dossier || !removeEntry || locked || flight.current) return;
+    flight.current = true;
+    try {
+      await save.mutateAsync(
+        withClaimRemoved(dossier.sections, removeEntry.grammarId, removeEntry.claimId),
+      );
+    } catch {
+      /* Keep the entry and confirmation when the save fails. */
+    } finally {
+      flight.current = false;
+    }
   }
 
   const notFound = compile.error instanceof ApiError && compile.error.status === 404;
@@ -215,7 +291,7 @@ export function DossierEditor() {
     );
   }
 
-  if (compile.isError || !compiled || !dossier) {
+  if (!compiled || !dossier || notFound) {
     return (
       <div className="page">
         <PageHeader title="Dossier" />
@@ -243,7 +319,10 @@ export function DossierEditor() {
   );
 
   return (
-    <div className="page">
+    <div className="page dossier-page dossier-editor">
+      <Link className="dossier-back" to="/career/dossiers">
+        Back to dossiers
+      </Link>
       <PageHeader
         title={dossier.title}
         subtitle={
@@ -268,27 +347,70 @@ export function DossierEditor() {
         help={
           <InfoPopover title="How this compiles">
             <p>
-              Sections come out in the order this audience's grammar declares, and every citation
-              is resolved against the live graph each time the document is asked for, so nothing
-              here is a copy that can go stale. The appendix prints each cited record once, in the
-              order it was first cited, with its source, its confidence and its revision trail.
+              Sections come out in the order this audience's grammar declares, and every citation is
+              resolved against the live graph each time the document is asked for, so nothing here
+              is a copy that can go stale. The appendix prints each cited record once, in the order
+              it was first cited, with its source, its confidence and its revision trail.
             </p>
           </InfoPopover>
         }
         actions={
-          <Button variant="danger" onClick={() => setConfirmDelete(true)} disabled={remove.isPending}>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setDeleteError(null);
+              setConfirmDelete(true);
+            }}
+            disabled={locked}
+          >
             {remove.isPending ? 'Deleting...' : 'Delete'}
           </Button>
         }
       />
       <RegisterRule />
+      {!canWrite && <p role="status">{WRITE_LOCK_HINT}</p>}
+      <nav className="dossier-contents" aria-label="Dossier contents">
+        <a href="#dossier-work">
+          Work to do <Mono>{compiled.violations.length}</Mono>
+        </a>
+        <a href="#dossier-selection">Edit selection</a>
+        <a href="#dossier-document">Compiled document</a>
+        <a href="#dossier-provenance">
+          Provenance <Mono>{compiled.appendix.length}</Mono>
+        </a>
+        <Button
+          size="sm"
+          disabled={busy || compile.isFetching}
+          onClick={() => void compile.refetch()}
+        >
+          {compile.isFetching ? 'Refreshing…' : 'Refresh dossier'}
+        </Button>
+      </nav>
+      {compile.isError && (
+        <Banner
+          tone="warning"
+          title="Dossier could not refresh"
+          action={
+            <Button disabled={compile.isFetching} onClick={() => void compile.refetch()}>
+              Retry refresh
+            </Button>
+          }
+        >
+          The last loaded document and your drafts remain below. Refresh before making another
+          change.
+        </Banner>
+      )}
 
       {conflict && (
         <Banner
           tone="danger"
           title="This dossier was changed somewhere else"
           action={
-            <Button size="sm" onClick={() => void compile.refetch()}>
+            <Button
+              size="sm"
+              disabled={busy || compile.isFetching}
+              onClick={() => void compile.refetch()}
+            >
               Reload it
             </Button>
           }
@@ -297,18 +419,24 @@ export function DossierEditor() {
         </Banner>
       )}
       {saveError && (
-        <Banner tone="danger" title="That change was not stored">
+        <Banner tone="danger" title="That change could not be confirmed">
           {saveError}
+          <p>
+            Your draft is kept. Refresh the dossier to check its saved state before trying again.
+          </p>
         </Banner>
       )}
 
+      <div id="dossier-work" className="dossier-anchor" tabIndex={-1} />
       <Section title="Work to do" meta={compiled.violations.length}>
         {compiled.violations.length === 0 ? (
-          <EmptyState
-            glyph="check"
-            title="This dossier satisfies its grammar"
-            hint="Every section this audience requires is present, every entry is within its limits, and every cited record resolves."
-          />
+          <div className="dossier-ready">
+            <strong>This dossier satisfies its grammar</strong>
+            <p>
+              Every section this audience requires is present, every entry is within its limits, and
+              every cited record resolves.
+            </p>
+          </div>
         ) : (
           <>
             {/* Warning, not danger, and the sentence says which of the two kinds
@@ -344,8 +472,18 @@ export function DossierEditor() {
         )}
       </Section>
 
+      <div id="dossier-selection" className="dossier-anchor" tabIndex={-1} />
       <Section title="The selection" meta={dossier.sections.length}>
-        {audiences.isError ? (
+        {audiences.isError && (
+          <Banner
+            tone="warning"
+            title="Section rules could not refresh"
+            action={<Button onClick={() => void audiences.refetch()}>Retry sections</Button>}
+          >
+            Your saved document remains available. Refresh the rules before adding entries.
+          </Banner>
+        )}
+        {audiences.isError && !audiences.data ? (
           // The form is grammar-driven and there is no local copy to fall back
           // on, by design. The compiled view below still renders, because it
           // carries its own headings from the server.
@@ -376,7 +514,7 @@ export function DossierEditor() {
             );
             const full = section.maxClaims !== null && claims.length >= section.maxClaims;
             return (
-              <div key={section.id} className="mb-6 border-b border-hairline pb-5 last:border-b-0">
+              <div key={section.id} className="dossier-selection-section">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="m-0 text-sm font-semibold text-ink-strong">{section.heading}</h3>
                   <Chip>{section.required ? 'required' : 'optional'}</Chip>
@@ -392,14 +530,20 @@ export function DossierEditor() {
                 {claims.length === 0 ? (
                   <p className="mt-2 text-sm text-muted">Nothing in this section yet.</p>
                 ) : (
-                  <ol className="m-0 mt-2 list-none p-0" aria-label={`Entries under ${section.heading}`}>
+                  <ol
+                    className="m-0 mt-2 list-none p-0"
+                    aria-label={`Entries under ${section.heading}`}
+                  >
                     {claims.map((claim, index) => {
                       const resolved = compiledSection?.claims.find(
                         (candidate) => candidate.id === claim.id,
                       );
                       const claimViolations = violationsByClaim.get(claim.id) ?? [];
                       return (
-                        <li key={claim.id} className="border-b border-hairline py-2 last:border-b-0">
+                        <li
+                          key={claim.id}
+                          className="border-b border-hairline py-2 last:border-b-0"
+                        >
                           <div className="flex flex-wrap items-start gap-3">
                             <Mono className="text-muted">{index + 1}.</Mono>
                             <p className="m-0 flex-1">{claim.text}</p>
@@ -407,8 +551,11 @@ export function DossierEditor() {
                               size="sm"
                               variant="ghost"
                               aria-label={`Remove entry ${index + 1} from ${section.heading}`}
-                              disabled={save.isPending}
-                              onClick={() => removeClaim(section.id, claim.id)}
+                              disabled={locked}
+                              onClick={() => {
+                                setSaveError(null);
+                                setRemoveEntry({ grammarId: section.id, claimId: claim.id });
+                              }}
                             >
                               Remove
                             </Button>
@@ -446,7 +593,8 @@ export function DossierEditor() {
                   <DossierClaimForm
                     section={section}
                     sectionFull={full}
-                    busy={save.isPending}
+                    busy={locked || audiences.isError}
+                    onDraftChange={onDraftChange}
                     onAdd={(draft) => addClaim(section.id, draft)}
                   />
                 </div>
@@ -456,51 +604,58 @@ export function DossierEditor() {
         )}
       </Section>
 
-      <Section title="The compiled document" meta={compiled.sections.length}>
-        {compiled.sections.length === 0 ? (
-          <EmptyState
-            glyph="document"
-            title="Nothing to compile yet"
-            hint="A section with entries in it appears here, in the order this audience's grammar declares."
-          />
-        ) : (
-          compiled.sections.map((section) => (
-            <article key={section.grammar_id} className="mb-5">
-              <h3 className="m-0 text-sm font-semibold text-ink-strong">{section.heading}</h3>
-              <p className="mt-1 text-sm text-muted">{section.purpose}</p>
-              <ol className="m-0 mt-2 list-none p-0" aria-label={`${section.heading}, as compiled`}>
-                {section.claims.map((claim, index) => (
-                  <li key={claim.id} className="py-2">
-                    <span className="flex flex-wrap items-start gap-2">
-                      <Mono className="text-muted">{index + 1}.</Mono>
-                      <span className="flex-1">
-                        {claim.text}{' '}
-                        {claim.cites.map((record) => {
-                          const position = appendixPosition.get(appendixKey(record));
-                          if (!position) return null;
-                          return (
-                            // The marker is the whole promise of the format: it
-                            // leads to the record, not to a footnote about it.
-                            <a
-                              key={appendixKey(record)}
-                              className="u-mono"
-                              href={`#${appendixEntryId(APPENDIX_PREFIX, position)}`}
-                              aria-label={`Appendix entry ${position}, ${record.label ?? record.id}`}
-                            >
-                              [{position}]
-                            </a>
-                          );
-                        })}
+      <div id="dossier-document" className="dossier-anchor" tabIndex={-1} />
+      <div className="dossier-document">
+        <Section title="The compiled document" meta={compiled.sections.length}>
+          {compiled.sections.length === 0 ? (
+            <EmptyState
+              glyph="document"
+              title="Nothing to compile yet"
+              hint="A section with entries in it appears here, in the order this audience's grammar declares."
+            />
+          ) : (
+            compiled.sections.map((section) => (
+              <article key={section.grammar_id} className="mb-5">
+                <h3 className="m-0 text-sm font-semibold text-ink-strong">{section.heading}</h3>
+                <p className="mt-1 text-sm text-muted">{section.purpose}</p>
+                <ol
+                  className="m-0 mt-2 list-none p-0"
+                  aria-label={`${section.heading}, as compiled`}
+                >
+                  {section.claims.map((claim, index) => (
+                    <li key={claim.id} className="py-2">
+                      <span className="flex flex-wrap items-start gap-2">
+                        <Mono className="text-muted">{index + 1}.</Mono>
+                        <span className="flex-1">
+                          {claim.text}{' '}
+                          {claim.cites.map((record) => {
+                            const position = appendixPosition.get(appendixKey(record));
+                            if (!position) return null;
+                            return (
+                              // The marker is the whole promise of the format: it
+                              // leads to the record, not to a footnote about it.
+                              <a
+                                key={appendixKey(record)}
+                                className="u-mono"
+                                href={`#${appendixEntryId(APPENDIX_PREFIX, position)}`}
+                                aria-label={`Appendix entry ${position}, ${record.label ?? record.id}`}
+                              >
+                                [{position}]
+                              </a>
+                            );
+                          })}
+                        </span>
                       </span>
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            </article>
-          ))
-        )}
-      </Section>
+                    </li>
+                  ))}
+                </ol>
+              </article>
+            ))
+          )}
+        </Section>
+      </div>
 
+      <div id="dossier-provenance" className="dossier-anchor" tabIndex={-1} />
       <Section title="Provenance appendix" meta={compiled.appendix.length}>
         {compiled.appendix.length === 0 ? (
           <EmptyState
@@ -515,14 +670,52 @@ export function DossierEditor() {
 
       <ConfirmDialog
         open={confirmDelete}
-        onOpenChange={(open) => !open && setConfirmDelete(false)}
+        onOpenChange={(open) => {
+          if (!open && !remove.isPending) setConfirmDelete(false);
+        }}
         title="Delete this dossier?"
-        body="The selection is removed from your list. The records it cited are untouched."
+        body={
+          <div className="dossier-delete-copy">
+            <p>
+              The selection is removed from your list. The records it cited are untouched. Any
+              unsaved entries in this dossier are discarded.
+            </p>
+            {deleteError && <p role="alert">{deleteError}</p>}
+          </div>
+        }
         confirmLabel="Delete this dossier"
         destructive
+        initialFocus="cancel"
         busy={remove.isPending}
-        onConfirm={() => remove.mutate()}
+        onConfirm={() => void deleteDossier()}
       />
+      <ConfirmDialog
+        open={Boolean(removeEntry)}
+        onOpenChange={(open) => {
+          if (!open && !save.isPending) setRemoveEntry(null);
+        }}
+        title="Remove this entry?"
+        body={
+          <div className="dossier-delete-copy">
+            <p>
+              This removes the entry and its citations from the selection. The cited records stay in
+              your graph.
+            </p>
+            {saveError && <p role="alert">{saveError}</p>}
+            {conflict && (
+              <p role="alert">
+                {conflict} Close this dialog and reload the dossier before trying again.
+              </p>
+            )}
+          </div>
+        }
+        confirmLabel="Remove entry"
+        destructive
+        initialFocus="cancel"
+        busy={save.isPending}
+        onConfirm={() => void removeClaim()}
+      />
+      {draftGuard.prompt}
     </div>
   );
 }

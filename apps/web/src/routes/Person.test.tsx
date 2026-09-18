@@ -34,7 +34,7 @@ const summary = {
     cadenceTargetDays: 60,
     metVia: 'Babbage',
     topics: ['mathematics'],
-    edgeId: null,
+    edgeId: 'relationship-1',
     doNotPing: false,
     metOn: null,
     knowsProps: {},
@@ -82,7 +82,7 @@ describe('person relationship dossier', () => {
     ).toBeInTheDocument();
     expect(within(alert).getByText('strength service unavailable')).toBeInTheDocument();
     expect(screen.queryByText('No relationship signal yet')).not.toBeInTheDocument();
-    expect(screen.getByText('Unavailable')).toBeInTheDocument();
+    expect(screen.getAllByText('Unavailable').length).toBeGreaterThan(0);
   });
 
   it('gives favor capture specific pending and success feedback', async () => {

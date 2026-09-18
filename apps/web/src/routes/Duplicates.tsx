@@ -4,6 +4,7 @@ import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/rea
 import {
   Button,
   Chip,
+  ConfirmDialog,
   EmptyState,
   ErrorState,
   Glyph,
@@ -118,6 +119,7 @@ export function clusterHeading(cluster: Pick<DupCluster, 'members' | 'type'>): s
 /** Resolve candidate duplicates with evidence; merge without fear. */
 export function Duplicates() {
   const [audit, setAudit] = useState<DupCluster | null>(null);
+  const [aliasToRemove, setAliasToRemove] = useState<DedupAlias | null>(null);
   const qc = useQueryClient();
   const { flash } = useToast();
 
@@ -173,6 +175,7 @@ export function Duplicates() {
   const removeAlias = useMutation({
     mutationFn: (id: string) => api.del(`/duplicates/aliases/${id}`),
     onSuccess: () => {
+      setAliasToRemove(null);
       void qc.invalidateQueries({ queryKey: ['dedup-aliases'] });
       flash('Learned alias removed');
     },
@@ -339,6 +342,27 @@ export function Duplicates() {
           />
         ) : null}
       </div>
+
+      <ConfirmDialog
+        open={Boolean(aliasToRemove)}
+        onOpenChange={(open) => {
+          if (!open) setAliasToRemove(null);
+        }}
+        title={`Forget alias ${aliasToRemove?.alias ?? ''}?`}
+        body={
+          <p>
+            This removes the learned alternate identity from future matching. The canonical record
+            stays unchanged, but this alias cannot be restored automatically.
+          </p>
+        }
+        confirmLabel={removeAlias.isPending ? 'Forgetting...' : 'Forget alias'}
+        destructive
+        busy={removeAlias.isPending}
+        initialFocus="cancel"
+        onConfirm={() => {
+          if (aliasToRemove) removeAlias.mutate(aliasToRemove.id);
+        }}
+      />
 
       {/* This gate used to wrap all three Sections, so one failed scan also
           erased merge history and learned aliases, taking the Undo for an
@@ -549,7 +573,7 @@ export function Duplicates() {
                 <Button
                   size="sm"
                   disabled={removeAlias.isPending}
-                  onClick={() => removeAlias.mutate(alias.id)}
+                  onClick={() => setAliasToRemove(alias)}
                   aria-label={`Forget alias ${alias.alias}`}
                 >
                   {removeAlias.isPending && removeAlias.variables === alias.id
@@ -685,6 +709,12 @@ function ClusterAudit({
   const remainingDrops = included.filter(
     (record) => record.node.id !== keepId && !consolidated.includes(record.node.id),
   );
+  // A partial run has already written the canonical snapshot and at least one
+  // merge. Retrying with a different survivor (or a different field source)
+  // would make the audit describe a result that can no longer be undone as a
+  // single, coherent decision. Keep the reviewed snapshot stable until the
+  // remaining records are resolved.
+  const auditLocked = consolidated.length > 0;
 
   const consolidate = useMutation({
     mutationFn: async (): Promise<MergeOutcome> => {
@@ -827,7 +857,7 @@ function ClusterAudit({
         <StatusTrace
           tone="danger"
           label={`Merged ${consolidate.data.merged.length} of ${consolidate.data.total}. ${consolidate.data.blocked.title} was not merged`}
-          detail={consolidate.data.blocked.reason}
+          detail={`${consolidate.data.blocked.reason} The selected survivor and field choices are locked while you retry the remaining record.`}
         />
       ) : null}
 
@@ -860,6 +890,7 @@ function ClusterAudit({
                   type="checkbox"
                   checked={includedIds.has(member.id)}
                   aria-label={`Include ${member.title} in this merge`}
+                  disabled={auditLocked}
                   onChange={() => toggleIncluded(member.id)}
                 />
                 <div>
@@ -903,6 +934,7 @@ function ClusterAudit({
               className={`dedup-audit__survivor${keepId === record.node.id ? ' is-selected' : ''}`}
               aria-pressed={keepId === record.node.id}
               aria-label={`Keep ${record.node.title} as survivor`}
+              disabled={auditLocked}
               onClick={() => setKeepId(record.node.id)}
             >
               <span>
@@ -954,6 +986,7 @@ function ClusterAudit({
                         className={selected ? 'is-selected' : ''}
                         aria-pressed={selected}
                         aria-label={`Use ${record.node.title} for ${field.label}`}
+                        disabled={auditLocked}
                         onClick={() =>
                           setFieldSource((current) => ({ ...current, [field.key]: record.node.id }))
                         }

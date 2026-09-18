@@ -2,17 +2,17 @@
   "generated_by": "scripts/docs/gen-api.mjs",
   "note": "Derived from the Express routers, not from docs/api/openapi.json. Do not edit by hand.",
   "totals": {
-    "endpoints": 162,
-    "mounts": 38,
-    "declared_mount_prefixes": 38,
+    "endpoints": 174,
+    "mounts": 40,
+    "declared_mount_prefixes": 40,
     "public_endpoints": 3,
     "outside_auth_gate": 3,
-    "blocked_when_read_only": 79,
-    "documented_in_openapi": 64,
-    "undocumented_in_openapi": 98,
-    "openapi_operations": 70,
+    "blocked_when_read_only": 86,
+    "documented_in_openapi": 66,
+    "undocumented_in_openapi": 108,
+    "openapi_operations": 72,
     "documented_but_not_registered": 6,
-    "endpoints_with_tests": 155,
+    "endpoints_with_tests": 166,
     "endpoints_citing_requirements": 36
   },
   "gates": {
@@ -136,6 +136,12 @@
       "endpoints": 2
     },
     {
+      "prefix": "/knowledge",
+      "router": "knowledgeRouter",
+      "source": "apps/api/src/routes/v1/knowledge.ts",
+      "endpoints": 11
+    },
+    {
       "prefix": "/ledger",
       "router": "ledgerRouter",
       "source": "apps/api/src/routes/v1/ledger.ts",
@@ -158,6 +164,12 @@
       "router": "nodesRouter",
       "source": "apps/api/src/routes/v1/nodes.ts",
       "endpoints": 9
+    },
+    {
+      "prefix": "/objects",
+      "router": "objectsRouter",
+      "source": "apps/api/src/routes/v1/objects.ts",
+      "endpoints": 1
     },
     {
       "prefix": "/orgs",
@@ -692,7 +704,7 @@
       "path": "/api/v1/auth/bootstrap",
       "express_path": "/api/v1/auth/bootstrap",
       "mount": "/auth",
-      "source": "apps/api/src/routes/v1/auth.ts:84",
+      "source": "apps/api/src/routes/v1/auth.ts:101",
       "summary": "Idempotent Cloud enrollment. Auth has already verified a Firebase UID; this endpoint is deliberately not public even though `/me` is, because it creates a private workspace and starts a trial.",
       "requirements": [],
       "request_schemas": [],
@@ -731,7 +743,7 @@
       "path": "/api/v1/auth/dev-login",
       "express_path": "/api/v1/auth/dev-login",
       "mount": "/auth",
-      "source": "apps/api/src/routes/v1/auth.ts:45",
+      "source": "apps/api/src/routes/v1/auth.ts:57",
       "summary": "Developer sign-in shortcut (SRS FR-SET-001, behind AUTH_ENABLE_DEV_LOGIN).",
       "requirements": [
         "FR-SET-001"
@@ -765,7 +777,7 @@
       "path": "/api/v1/auth/logout",
       "express_path": "/api/v1/auth/logout",
       "mount": "/auth",
-      "source": "apps/api/src/routes/v1/auth.ts:68",
+      "source": "apps/api/src/routes/v1/auth.ts:85",
       "summary": null,
       "requirements": [],
       "request_schemas": [],
@@ -788,7 +800,7 @@
       "path": "/api/v1/auth/me",
       "express_path": "/api/v1/auth/me",
       "mount": "/auth",
-      "source": "apps/api/src/routes/v1/auth.ts:116",
+      "source": "apps/api/src/routes/v1/auth.ts:133",
       "summary": "Who am I (the gate has already verified the token). `self` is the `is_self` person node subject pickers use for \"That's me\". Memoised per data space. Null when signed out or before self exists.",
       "requirements": [],
       "request_schemas": [],
@@ -1041,7 +1053,7 @@
       "path": "/api/v1/dashboard",
       "express_path": "/api/v1/dashboard",
       "mount": "/dashboard",
-      "source": "apps/api/src/routes/v1/dashboard.ts:20",
+      "source": "apps/api/src/routes/v1/dashboard.ts:21",
       "summary": "Dashboard \"Today\" aggregate (SRS FR-VIS-004). One call, several widgets.",
       "requirements": [
         "FR-004",
@@ -1054,6 +1066,7 @@
         "buildOwnerIndex",
         "getSelf",
         "githubToken",
+        "knowledgeSummary",
         "loadGraph",
         "loadScorableAtoms",
         "ownableFrom",
@@ -2279,6 +2292,295 @@
       "openapi": false
     },
     {
+      "id": "GET /api/v1/knowledge",
+      "slug": "get-api-v1-knowledge",
+      "method": "GET",
+      "path": "/api/v1/knowledge",
+      "express_path": "/api/v1/knowledge",
+      "mount": "/knowledge",
+      "source": "apps/api/src/routes/v1/knowledge.ts:20",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "knowledgeSummary",
+        "listKnowledge"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/knowledge.integration.test.ts"
+      ],
+      "openapi": true
+    },
+    {
+      "id": "POST /api/v1/knowledge/assertions",
+      "slug": "post-api-v1-knowledge-assertions",
+      "method": "POST",
+      "path": "/api/v1/knowledge/assertions",
+      "express_path": "/api/v1/knowledge/assertions",
+      "mount": "/knowledge",
+      "source": "apps/api/src/routes/v1/knowledge.ts:67",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "putAssertion"
+      ],
+      "success_status": 201,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/knowledge.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/knowledge/assertions/{id}/decision",
+      "slug": "post-api-v1-knowledge-assertions-id-decision",
+      "method": "POST",
+      "path": "/api/v1/knowledge/assertions/{id}/decision",
+      "express_path": "/api/v1/knowledge/assertions/:id/decision",
+      "mount": "/knowledge",
+      "source": "apps/api/src/routes/v1/knowledge.ts:77",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [
+        "z"
+      ],
+      "services": [
+        "decideAssertion"
+      ],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 400,
+          "code": "VALIDATION_ERROR"
+        },
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/knowledge.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/knowledge/entities/{id}/evidence",
+      "slug": "get-api-v1-knowledge-entities-id-evidence",
+      "method": "GET",
+      "path": "/api/v1/knowledge/entities/{id}/evidence",
+      "express_path": "/api/v1/knowledge/entities/:id/evidence",
+      "mount": "/knowledge",
+      "source": "apps/api/src/routes/v1/knowledge.ts:73",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "evidenceFor"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/knowledge.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/knowledge/identities",
+      "slug": "post-api-v1-knowledge-identities",
+      "method": "POST",
+      "path": "/api/v1/knowledge/identities",
+      "express_path": "/api/v1/knowledge/identities",
+      "mount": "/knowledge",
+      "source": "apps/api/src/routes/v1/knowledge.ts:61",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "putSourceIdentity"
+      ],
+      "success_status": 201,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/knowledge.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/knowledge/records",
+      "slug": "get-api-v1-knowledge-records",
+      "method": "GET",
+      "path": "/api/v1/knowledge/records",
+      "express_path": "/api/v1/knowledge/records",
+      "mount": "/knowledge",
+      "source": "apps/api/src/routes/v1/knowledge.ts:45",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [
+        "z"
+      ],
+      "services": [
+        "listSourceRecords"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/knowledge.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/knowledge/records",
+      "slug": "post-api-v1-knowledge-records",
+      "method": "POST",
+      "path": "/api/v1/knowledge/records",
+      "express_path": "/api/v1/knowledge/records",
+      "mount": "/knowledge",
+      "source": "apps/api/src/routes/v1/knowledge.ts:39",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "putSourceRecord"
+      ],
+      "success_status": 201,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/knowledge.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/knowledge/runs",
+      "slug": "post-api-v1-knowledge-runs",
+      "method": "POST",
+      "path": "/api/v1/knowledge/runs",
+      "express_path": "/api/v1/knowledge/runs",
+      "mount": "/knowledge",
+      "source": "apps/api/src/routes/v1/knowledge.ts:35",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "putRun"
+      ],
+      "success_status": 201,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/knowledge.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/knowledge/runs/{id}/rollback",
+      "slug": "post-api-v1-knowledge-runs-id-rollback",
+      "method": "POST",
+      "path": "/api/v1/knowledge/runs/{id}/rollback",
+      "express_path": "/api/v1/knowledge/runs/:id/rollback",
+      "mount": "/knowledge",
+      "source": "apps/api/src/routes/v1/knowledge.ts:92",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "rollbackRun"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/knowledge.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "POST /api/v1/knowledge/sources",
+      "slug": "post-api-v1-knowledge-sources",
+      "method": "POST",
+      "path": "/api/v1/knowledge/sources",
+      "express_path": "/api/v1/knowledge/sources",
+      "mount": "/knowledge",
+      "source": "apps/api/src/routes/v1/knowledge.ts:31",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "putSource"
+      ],
+      "success_status": 201,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "blocked-when-read-only",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/knowledge.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
+      "id": "GET /api/v1/knowledge/summary",
+      "slug": "get-api-v1-knowledge-summary",
+      "method": "GET",
+      "path": "/api/v1/knowledge/summary",
+      "express_path": "/api/v1/knowledge/summary",
+      "mount": "/knowledge",
+      "source": "apps/api/src/routes/v1/knowledge.ts:27",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [
+        "knowledgeSummary"
+      ],
+      "success_status": 200,
+      "errors": [],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [
+        "apps/api/src/routes/v1/knowledge.integration.test.ts"
+      ],
+      "openapi": false
+    },
+    {
       "id": "GET /api/v1/ledger",
       "slug": "get-api-v1-ledger",
       "method": "GET",
@@ -2834,6 +3136,32 @@
         "apps/api/src/routes/v1/nodes.integration.test.ts"
       ],
       "openapi": false
+    },
+    {
+      "id": "GET /api/v1/objects",
+      "slug": "get-api-v1-objects",
+      "method": "GET",
+      "path": "/api/v1/objects",
+      "express_path": "/api/v1/objects",
+      "mount": "/objects",
+      "source": "apps/api/src/routes/v1/objects.ts:19",
+      "summary": null,
+      "requirements": [],
+      "request_schemas": [],
+      "services": [],
+      "success_status": 200,
+      "errors": [
+        {
+          "status": 404,
+          "code": "NOT_FOUND"
+        }
+      ],
+      "auth": "authenticated",
+      "entitlement": "read-always-allowed",
+      "handler": null,
+      "handler_source": null,
+      "tests": [],
+      "openapi": true
     },
     {
       "id": "GET /api/v1/orgs",
@@ -4825,6 +5153,16 @@
     "DELETE /api/v1/interactions/{id}",
     "GET /api/v1/intros/paths",
     "GET /api/v1/intros/targets",
+    "POST /api/v1/knowledge/assertions",
+    "POST /api/v1/knowledge/assertions/{id}/decision",
+    "GET /api/v1/knowledge/entities/{id}/evidence",
+    "POST /api/v1/knowledge/identities",
+    "GET /api/v1/knowledge/records",
+    "POST /api/v1/knowledge/records",
+    "POST /api/v1/knowledge/runs",
+    "POST /api/v1/knowledge/runs/{id}/rollback",
+    "POST /api/v1/knowledge/sources",
+    "GET /api/v1/knowledge/summary",
     "GET /api/v1/letters",
     "POST /api/v1/letters",
     "DELETE /api/v1/letters/{id}",

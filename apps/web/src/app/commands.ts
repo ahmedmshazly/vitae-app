@@ -37,17 +37,6 @@ export function buildCommands({
 }: CommandDeps): CommandAction[] {
   const go = (to: string) => () => navigate(to);
   return [
-    ...(toggleSpace
-      ? [
-          {
-            id: 'toggle-space',
-            label: space === 'demo' ? 'Switch to my real data' : 'Switch to demo data',
-            glyph: 'adjust' as GlyphName,
-            keywords: 'demo sample real space mode view toggle',
-            run: toggleSpace,
-          },
-        ]
-      : []),
     {
       id: 'new-record',
       label: 'New record...',
@@ -216,6 +205,13 @@ export function buildCommands({
       run: go(ROUTES.repositories.path),
     },
     {
+      id: 'gemini',
+      label: 'Go to Gemini',
+      glyph: ROUTES.gemini.glyph,
+      keywords: 'gemini gemeni google ai api key project connect',
+      run: go(ROUTES.gemini.path),
+    },
+    {
       id: 'ask',
       label: 'Who should I contact?',
       glyph: ROUTES.askPeople.glyph,
@@ -299,6 +295,17 @@ export function buildCommands({
       keywords: 'guide reference keyboard capture grammar',
       run: go('/help'),
     },
+    ...(toggleSpace
+      ? [
+          {
+            id: 'toggle-space',
+            label: space === 'demo' ? 'Switch to my real data' : 'Switch to demo data',
+            glyph: 'adjust' as GlyphName,
+            keywords: 'demo sample real space mode view toggle',
+            run: toggleSpace,
+          },
+        ]
+      : []),
   ];
 }
 

@@ -30,7 +30,7 @@ const MOVES: Array<{ keys: string[]; title: string; body: string }> = [
   {
     keys: ['n'],
     title: 'Create any record',
-    body: 'Structured forms cover all 34 record types, with provenance and inline connections.',
+    body: 'Use New to add a person, project, or other record with a guided form and related records.',
   },
   {
     keys: ['⌘', 'P'],
@@ -44,10 +44,9 @@ export function FirstRun({ onDone }: { onDone: () => void }) {
     <Modal open onOpenChange={(o) => !o && onDone()} title="Welcome to Vitae" size="sm">
       <div className="flex flex-col gap-4">
         <div className="first-run__intro">
-          <span>Private · deterministic · yours</span>
           <p>
-            Your life and career become useful one verified connection at a time. These three moves
-            are enough to begin.
+            Start with a person you know or a piece of work you want to remember. Capture, New,
+            and Search are always available in your workspace.
           </p>
         </div>
 

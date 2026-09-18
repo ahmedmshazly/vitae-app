@@ -21,7 +21,10 @@ beforeEach(() => {
 
 describe('Composer', () => {
   it('fills the draft textarea from a successful preview', async () => {
-    mockApi.post.mockResolvedValueOnce({ body: 'Hello Ada, catching up.', facts: ['met via conference'] });
+    mockApi.post.mockResolvedValueOnce({
+      body: 'Hello Ada, catching up.',
+      facts: ['met via conference'],
+    });
     renderWithApp(<Composer ctx={ctx} onClose={vi.fn()} />);
 
     expect(await screen.findByLabelText('Draft message')).toHaveValue('Hello Ada, catching up.');
@@ -50,7 +53,10 @@ describe('Composer', () => {
     renderWithApp(<Composer ctx={ctx} onClose={onClose} />);
     await screen.findByLabelText('Draft message');
 
-    await user.click(screen.getByRole('button', { name: 'Send & log' }));
+    await user.click(
+      screen.getByRole('checkbox', { name: 'I have sent this message outside Vitae' }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Log outreach & follow-up' }));
     await waitFor(() => {
       expect(mockApi.post).toHaveBeenCalledWith(
         '/composer/send',

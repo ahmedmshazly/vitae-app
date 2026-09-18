@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { CommandOverlay, EntityGlyph, Glyph, Kbd, Mono, Skeleton } from '@vitae/ui';
+import { Button, CommandOverlay, EntityGlyph, Glyph, Kbd, Mono, Skeleton } from '@vitae/ui';
 import { api } from '../lib/api.js';
 import { matchCommand, type CommandAction } from '../app/commands.js';
 
@@ -54,18 +54,19 @@ export function QuickSwitcher({
 
   const search = useQuery({
     queryKey: ['switch', debounced],
-    queryFn: () => api.get<{ results: SwitchHit[] }>(`/search/switch?q=${encodeURIComponent(debounced)}`),
+    queryFn: () =>
+      api.get<{ results: SwitchHit[] }>(`/search/switch?q=${encodeURIComponent(debounced)}`),
     enabled: debounced.length > 0,
   });
-  const hits = debounced ? (search.data?.results ?? []) : [];
+  const currentQuery = q === debounced;
+  const hits = currentQuery && debounced ? (search.data?.results ?? []) : [];
 
   // One flat selection index across actions then record hits. Only a new query
   // sends the selection back to the top, keying this on the option count too
   // meant a late-arriving action re-homed the row the user had just arrowed to.
   const optionCount = shownActions.length + hits.length;
-  useEffect(() => setActive(0), [debounced]);
   useEffect(() => {
-    setActive((a) => (optionCount === 0 ? 0 : Math.min(a, optionCount - 1)));
+    setActive((a) => Math.max(0, Math.min(a, optionCount - 1)));
   }, [optionCount]);
 
   // Keep the highlighted option in view when arrowing past the fold.
@@ -89,8 +90,11 @@ export function QuickSwitcher({
 
   // Searching is only worth announcing once the actions lane has nothing left
   // to show, otherwise the list is already full and a skeleton just flickers.
-  const searching = search.isFetching && hits.length === 0;
-  const noMatch = Boolean(debounced) && !search.isFetching && optionCount === 0;
+  const searching = Boolean(q) && (!currentQuery || search.isFetching) && hits.length === 0;
+  // A failed record search is not evidence that there were no matches. Keep
+  // the recovery message honest, especially when the command lane is empty.
+  const noMatch =
+    Boolean(q) && currentQuery && !search.isFetching && !search.isError && optionCount === 0;
 
   return (
     <CommandOverlay
@@ -103,21 +107,33 @@ export function QuickSwitcher({
         className="vt-palette__input"
         placeholder="Search commands and records"
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => {
+          setValue(e.target.value);
+          setActive(0);
+        }}
         role="combobox"
         aria-expanded={optionCount > 0}
-        aria-controls={LISTBOX_ID}
+        aria-controls={optionCount > 0 ? LISTBOX_ID : undefined}
         aria-activedescendant={optionCount > 0 ? optionId(active) : undefined}
         aria-autocomplete="list"
         aria-label="Command or record search"
         onKeyDown={(e) => {
+          if (e.nativeEvent.isComposing) return;
           if (e.key === 'ArrowDown') {
             e.preventDefault();
-            setActive((a) => Math.min(a + 1, optionCount - 1));
+            setActive((a) => Math.max(0, Math.min(a + 1, optionCount - 1)));
           }
           if (e.key === 'ArrowUp') {
             e.preventDefault();
             setActive((a) => Math.max(a - 1, 0));
+          }
+          if (e.key === 'Home') {
+            e.preventDefault();
+            setActive(0);
+          }
+          if (e.key === 'End') {
+            e.preventDefault();
+            setActive(Math.max(optionCount - 1, 0));
           }
           if (e.key === 'Enter') {
             e.preventDefault();
@@ -127,16 +143,19 @@ export function QuickSwitcher({
         }}
       />
 
-      {search.isError && (
+      {currentQuery && search.isError && (
         <div role="alert" className="flex items-center gap-2 px-4 py-3 text-sm text-danger">
           <Glyph name="close" size={14} />
           <span>
-            <strong className="font-semibold">Search failed.</strong> Commands still work, keep typing to retry.
+            <strong className="font-semibold">Search failed.</strong> Commands still work.
           </span>
+          <Button size="sm" disabled={search.isFetching} onClick={() => void search.refetch()}>
+            {search.isFetching ? 'Retrying...' : 'Retry search'}
+          </Button>
         </div>
       )}
 
-      {searching && (
+      {searching && shownActions.length === 0 && (
         <div className="flex flex-col gap-2 px-4 py-3" role="status" aria-label="Searching">
           <Skeleton height={14} width="45%" />
           <Skeleton height={14} width="30%" />
@@ -145,20 +164,35 @@ export function QuickSwitcher({
 
       {noMatch && (
         <p className="px-4 py-4 text-sm text-muted">
-          No command or record matches <span className="font-mono text-ink-soft">{debounced}</span>. Try fewer
-          characters, or capture it with ⌘K.
+          No command or record matches <span className="font-mono text-ink-soft">{debounced}</span>.
+          Try a shorter name or a different keyword.
         </p>
       )}
 
       {optionCount > 0 && (
-        <div className="vt-palette__list" id={LISTBOX_ID} role="listbox" aria-label="Results" ref={listRef}>
+        <div
+          className="vt-palette__list"
+          id={LISTBOX_ID}
+          role="listbox"
+          aria-label="Results"
+          ref={listRef}
+        >
           {shownActions.length > 0 && (
             <div className="vt-palette__group" role="presentation">
               Actions
             </div>
           )}
           {shownActions.map((a, i) => (
-            <PaletteRow key={a.id} index={i} active={active} onActivate={setActive} onPick={() => { onClose(); a.run(); }}>
+            <PaletteRow
+              key={a.id}
+              index={i}
+              active={active}
+              onActivate={setActive}
+              onPick={() => {
+                onClose();
+                a.run();
+              }}
+            >
               <Glyph name={a.glyph ?? 'dot'} size={16} />
               <span className="min-w-0 flex-1 truncate">{a.label}</span>
               {a.hint && <Kbd>{a.hint}</Kbd>}
@@ -184,7 +218,9 @@ export function QuickSwitcher({
                   <span className="block truncate">{h.title}</span>
                   {/* Two records can share a title; without the subtitle the
                       list offers a choice it gives no way to make. */}
-                  {h.subtitle && <span className="block truncate text-sm text-muted">{h.subtitle}</span>}
+                  {h.subtitle && (
+                    <span className="block truncate text-sm text-muted">{h.subtitle}</span>
+                  )}
                 </span>
                 {/* --ae-faint is 4.48:1 on --ae-accent-bg, which the active
                     row uses, accent-bg (#262626) is the lightest surface in

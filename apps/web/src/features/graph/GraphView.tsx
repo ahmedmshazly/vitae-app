@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useReducedMotion } from 'motion/react';
 import { edgeDisplayLabel } from '@vitae/core';
 import type { ForceGraphMethods } from 'react-force-graph-2d';
-import { EmptyState, ErrorState, SkeletonRows } from '@vitae/ui';
+import { EmptyState, ErrorState, SkeletonRows, useTheme } from '@vitae/ui';
 import { api } from '../../lib/api.js';
 import { useToast } from '../Toast.js';
 import { entityHref } from '../../lib/entity-href.js';
@@ -20,12 +20,15 @@ import { useGraphDisplayPrefs } from './displayPrefs.js';
 import { GraphPathfinder, trailAfterJump } from './GraphPathfinder.js';
 import { FocusBreadcrumb, GraphPeek, PathStory, type PeekLink } from './GraphPeek.js';
 import { ConnectedList, GraphSearch } from './GraphSearch.js';
-import { GraphToolbar } from './GraphToolbar.js';
+import { GraphDiscoveryPanel, type DiscoveryTab } from './GraphDiscoveryPanel.js';
 import type {
   FgLink,
   FgNode,
   FocusTrailHop,
   GraphData,
+  GraphDiscovery,
+  CommunityDetail,
+  CommunityConnectionDetail,
   GraphLens,
   GraphMode,
   GraphPathResult,
@@ -39,13 +42,20 @@ function edgeUndirectedKey(a: string, b: string): string {
 }
 
 export function GraphView() {
-  const [params] = useSearchParams();
+  const [params, setSearchParams] = useSearchParams();
   const focusParam = params.get('focus') ?? undefined;
+  const discoveryTab = (params.get('discovery') as DiscoveryTab | null) ?? 'communities';
+  const selectedCommunityId = params.get('community');
+  const selectedBridgeId = params.get('bridge');
   const navigate = useNavigate();
   const reducedMotion = useReducedMotion() ?? false;
   const { flash } = useToast();
+  const { resolvedTheme } = useTheme();
 
-  const [depth, setDepth] = useState(2);
+  // Start close to the current record. A two-hop view is useful once someone
+  // has their bearings, but it is a poor first frame: one person can turn it
+  // into a wall of dots before the map has explained itself.
+  const [depth, setDepth] = useState(1);
   const [activeTypes, setActiveTypes] = useState<Set<string>>(() => new Set(DEFAULT_ACTIVE_TYPES));
   const [lens, setLens] = useState<GraphLens>('neighborhood');
   const [mode, setMode] = useState<GraphMode>('explore');
@@ -59,11 +69,20 @@ export function GraphView() {
   const [displayPrefs, patchDisplayPrefs, resetDisplayPrefs] = useGraphDisplayPrefs();
   const [trail, setTrail] = useState<FocusTrailHop[]>([]);
   const [pathTo, setPathTo] = useState<{ id: string; title: string } | null>(null);
+  const [pathFrom, setPathFrom] = useState<{ id: string; title: string } | null>(null);
+  // Discovery is a workspace-wide directory. It should be available without
+  // covering the map people arrived to explore. A shared discovery URL still
+  // opens it directly.
+  const [discoveryOpen, setDiscoveryOpen] = useState(() =>
+    Boolean(selectedCommunityId || selectedBridgeId),
+  );
+  const [memberOffset, setMemberOffset] = useState(0);
+  const [showAllNeighbors, setShowAllNeighbors] = useState(false);
 
   const fgRef = useRef<ForceGraphMethods<FgNode, FgLink> | undefined>(undefined);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState({ w: 960, h: 560 });
-  const palette = useMemo<GraphPalette>(() => readGraphPalette(), []);
+  const palette = useMemo<GraphPalette>(() => readGraphPalette(resolvedTheme), [resolvedTheme]);
 
   const typesKey = useMemo(() => [...activeTypes].sort().join(','), [activeTypes]);
 
@@ -77,10 +96,37 @@ export function GraphView() {
     },
   });
 
+  const discoveryQuery = useQuery({
+    queryKey: ['graph-discovery'],
+    queryFn: () => api.get<GraphDiscovery>('/graph/discovery'),
+    staleTime: 30_000,
+  });
+
+  const communityQuery = useQuery({
+    queryKey: ['graph-community', selectedCommunityId, memberOffset],
+    queryFn: () =>
+      api.get<CommunityDetail>(
+        `/graph/discovery/community/${encodeURIComponent(selectedCommunityId!)}?offset=${memberOffset}&limit=100`,
+      ),
+    enabled: Boolean(selectedCommunityId),
+    placeholderData: (previous) => previous,
+  });
+
+  const connectionPair = params.get('connection')?.split('|') ?? [];
+  const connectionQuery = useQuery({
+    queryKey: ['graph-community-connection', connectionPair[0], connectionPair[1]],
+    queryFn: () =>
+      api.get<CommunityConnectionDetail>(
+        `/graph/discovery/connection?from=${encodeURIComponent(connectionPair[0]!)}&to=${encodeURIComponent(connectionPair[1]!)}`,
+      ),
+    enabled: connectionPair.length === 2,
+    placeholderData: (previous) => previous,
+  });
+
   const selfNode = useMemo(() => data?.nodes.find((n) => n.isSelf) ?? null, [data]);
   const focusTitle = useMemo(() => data?.nodes.find((n) => n.id === data.focus)?.title, [data]);
-  const pathFromId = selfNode?.id ?? data?.focus ?? null;
-  const pathFromTitle = selfNode?.title ?? trail[0]?.title ?? 'Self';
+  const pathFromId = pathFrom?.id ?? selfNode?.id ?? data?.focus ?? null;
+  const pathFromTitle = pathFrom?.title ?? selfNode?.title ?? trail[0]?.title ?? 'Self';
 
   const {
     data: pathData,
@@ -117,6 +163,14 @@ export function GraphView() {
     });
   }, [data?.focus, data?.nodes]);
 
+  useEffect(() => {
+    if (selectedCommunityId || selectedBridgeId) setDiscoveryOpen(true);
+  }, [selectedBridgeId, selectedCommunityId]);
+
+  useEffect(() => {
+    setShowAllNeighbors(false);
+  }, [focusParam]);
+
   const typeGroups = useMemo(() => {
     const present = new Set(data?.nodes.map((n) => n.type) ?? []);
     // Always offer defaults even before load so chrome is stable.
@@ -140,22 +194,61 @@ export function GraphView() {
     }
   }, [lens, edgeTypesInPayload, activeEdgeTypes.size]);
 
-  const view = useMemo(() => {
+  const baseView = useMemo(() => {
+    const selectedCommunity = discoveryQuery.data?.communities.find(
+      (item) => item.id === selectedCommunityId,
+    );
+    if (selectedCommunity && !communityQuery.isLoading && communityQuery.data) {
+      const nodes: FgNode[] = communityQuery.data.members.map((n) => ({
+        ...n,
+        isSelf: false,
+        hop: 0,
+        kind: 'record',
+        x: ((hashStr(n.id) % 1000) / 1000 - 0.5) * 600,
+        y: ((hashStr(`${n.id}y`) % 1000) / 1000 - 0.5) * 400,
+      }));
+      const links: FgLink[] = communityQuery.data.relationships.map((e) => ({
+        source: e.src,
+        target: e.dst,
+        type: e.type,
+        relation: e.relation,
+        kind: e.kind,
+      }));
+      return { nodes, links, neighbors: buildNeighbors(links) };
+    }
     if (!data) return null;
     const visible = new Set(
       data.nodes
         .filter((n) => n.isSelf || n.id === data.focus || activeTypes.has(n.type))
         .map((n) => n.id),
     );
-    const nodes: FgNode[] = data.nodes
-      .filter((n) => visible.has(n.id))
+    const candidateNodes = data.nodes.filter((n) => visible.has(n.id));
+    // A person with a rich life can have dozens of first-degree records. Start
+    // with a readable slice led by the strongest structural signals; the full
+    // neighborhood is one explicit action away and remains searchable.
+    const shouldStartSmall =
+      !showAllNeighbors && depth === 1 && lens === 'neighborhood' && candidateNodes.length > 22;
+    const displayIds = shouldStartSmall
+      ? new Set(
+          [...candidateNodes]
+            .sort((a, b) => {
+              const aAnchor = a.isSelf || a.id === data.focus ? 1 : 0;
+              const bAnchor = b.isSelf || b.id === data.focus ? 1 : 0;
+              return bAnchor - aAnchor || b.degree - a.degree || a.title.localeCompare(b.title);
+            })
+            .slice(0, 22)
+            .map((node) => node.id),
+        )
+      : visible;
+    const nodes: FgNode[] = candidateNodes
+      .filter((n) => displayIds.has(n.id))
       .map((n) => {
         const r1 = (hashStr(n.id) % 1000) / 1000;
         const r2 = (hashStr(`${n.id}y`) % 1000) / 1000;
         return { ...n, x: (r1 - 0.5) * 600, y: (r2 - 0.5) * 400 };
       });
 
-    let edges = data.edges.filter((e) => visible.has(e.src) && visible.has(e.dst));
+    let edges = data.edges.filter((e) => displayIds.has(e.src) && displayIds.has(e.dst));
     if (lens === 'edgeKinds' && activeEdgeTypes.size > 0) {
       edges = edges.filter((e) => activeEdgeTypes.has(e.type));
       const keep = new Set<string>();
@@ -187,7 +280,18 @@ export function GraphView() {
       kind: e.kind,
     }));
     return { nodes, links, neighbors: buildNeighbors(links) };
-  }, [data, activeTypes, lens, activeEdgeTypes]);
+  }, [
+    data,
+    activeTypes,
+    lens,
+    activeEdgeTypes,
+    discoveryQuery.data,
+    selectedCommunityId,
+    communityQuery.data,
+    communityQuery.isLoading,
+    showAllNeighbors,
+    depth,
+  ]);
 
   const pathNodeIds = useMemo(() => {
     if (mode !== 'path' || !pathData?.found) return new Set<string>();
@@ -198,6 +302,41 @@ export function GraphView() {
     if (mode !== 'path' || !pathData?.found) return new Set<string>();
     return new Set(pathData.edges.map((e) => edgeUndirectedKey(e.src, e.dst)));
   }, [mode, pathData]);
+
+  // A path can legitimately travel outside the current neighbourhood or a
+  // selected community. Keep its returned records in the scene so the route
+  // remains visible instead of highlighting invisible IDs.
+  const view = useMemo(() => {
+    if (!baseView || mode !== 'path' || !pathData?.found) return baseView;
+    const known = new Set(baseView.nodes.map((node) => node.id));
+    const nodes = [...baseView.nodes];
+    for (const [index, hop] of pathData.hops.entries()) {
+      if (!known.has(hop.nodeId)) {
+        nodes.push({
+          id: hop.nodeId,
+          title: hop.title,
+          type: hop.type,
+          isSelf: hop.nodeId === selfNode?.id,
+          degree: 0,
+          hop: index,
+          kind: 'record',
+          x: ((hashStr(hop.nodeId) % 1000) / 1000 - 0.5) * 600,
+          y: ((hashStr(`${hop.nodeId}y`) % 1000) / 1000 - 0.5) * 400,
+        });
+      }
+    }
+    const linkKeys = new Set(
+      baseView.links.map((edge) =>
+        edgeUndirectedKey(linkEndId(edge.source), linkEndId(edge.target)),
+      ),
+    );
+    const links = [...baseView.links];
+    for (const edge of pathData.edges) {
+      const key = edgeUndirectedKey(edge.src, edge.dst);
+      if (!linkKeys.has(key)) links.push({ source: edge.src, target: edge.dst, type: edge.type });
+    }
+    return { nodes, links, neighbors: buildNeighbors(links) };
+  }, [baseView, mode, pathData, selfNode?.id]);
 
   const selectAndFly = useCallback(
     (node: FgNode | GNode) => {
@@ -340,47 +479,125 @@ export function GraphView() {
               ? 'Relationship kinds become the active filter'
               : 'Explore the neighborhood, select to inspect, or open the underlying record';
 
+  const updateDiscovery = (changes: Record<string, string | null>) => {
+    const next = new URLSearchParams(params);
+    for (const [key, value] of Object.entries(changes)) {
+      if (value) next.set(key, value);
+      else next.delete(key);
+    }
+    setSearchParams(next);
+  };
+
+  const selectCommunity = (id: string) => {
+    setMemberOffset(0);
+    setSelected(null);
+    setDiscoveryOpen(true);
+    updateDiscovery({ discovery: 'communities', community: id, bridge: null, connection: null });
+  };
+
+  const zoomMap = (amount: number) => {
+    const graph = fgRef.current;
+    if (!graph) return;
+    graph.zoom(Math.min(5, Math.max(0.55, graph.zoom() + amount)), reducedMotion ? 0 : 180);
+  };
+
+  const resetMapView = () => {
+    fgRef.current?.zoomToFit(reducedMotion ? 0 : 260, 34);
+  };
+
   return (
     <div className="page page--lifemap">
-      <GraphToolbar
-        mode={mode}
-        onMode={(m) => {
-          setMode(m);
-          if (m === 'path' && !pathTo && selected && !selected.isSelf) {
-            setPathTo({ id: selected.id, title: selected.title });
-          }
-        }}
-        lens={lens}
-        onLens={setLens}
-        typeGroups={typeGroups}
-        activeTypes={activeTypes}
-        onToggleType={(t) =>
-          setActiveTypes((prev) => {
-            const next = new Set(prev);
-            if (next.has(t)) next.delete(t);
-            else next.add(t);
-            return next;
-          })
-        }
-        edgeTypes={edgeTypesInPayload}
-        activeEdgeTypes={activeEdgeTypes}
-        onToggleEdgeType={(t) =>
-          setActiveEdgeTypes((prev) => {
-            const next = new Set(prev);
-            if (next.has(t)) next.delete(t);
-            else next.add(t);
-            return next;
-          })
-        }
-        depth={depth}
-        truncated={Boolean(data?.truncated)}
-        palette={palette}
-        modeHint={modeHint}
-        nodeCount={view?.nodes.length}
-        connectionCount={view?.links.length}
-        focusTitle={focusTitle}
-        busy={isLoading}
-      />
+      <header className="lifemap__atlashead">
+        <div>
+          <p className="lifemap__kicker">Constellation atlas</p>
+          <h1 className="lifemap__title">Life map</h1>
+          <p className="lifemap__hint">{modeHint}</p>
+        </div>
+        <div className="lifemap__headtools">
+          <button
+            type="button"
+            className="graph__tool graph__tool--accent"
+            onClick={() => setDiscoveryOpen((value) => !value)}
+            aria-expanded={discoveryOpen}
+          >
+            {discoveryOpen ? 'Hide discoveries' : 'Discover patterns'}
+          </button>
+          <button type="button" className="graph__tool" onClick={() => setSearchOpen(true)}>
+            Find · ⌘F
+          </button>
+          <button
+            type="button"
+            className={`graph__tool${mode === 'path' ? ' graph__tool--accent' : ''}`}
+            aria-pressed={mode === 'path'}
+            onClick={() => setMode((value) => (value === 'path' ? 'explore' : 'path'))}
+          >
+            Path
+          </button>
+          <details className="lifemap__controls">
+            <summary>Map controls</summary>
+            <div>
+              <section aria-label="Map lens">
+                <span>Lens</span>
+                {['neighborhood', 'hubs', 'career', 'strength', 'edgeKinds'].map((item) => (
+                  <button
+                    type="button"
+                    key={item}
+                    className={lens === item ? 'is-active' : undefined}
+                    aria-pressed={lens === item}
+                    onClick={() => setLens(item as GraphLens)}
+                  >
+                    {item === 'edgeKinds' ? 'Kinds' : item}
+                  </button>
+                ))}
+              </section>
+              <section aria-label="Record filters">
+                <span>Records</span>
+                {typeGroups
+                  .flatMap((group) => group.types)
+                  .map((type) => (
+                    <button
+                      type="button"
+                      key={type}
+                      className={activeTypes.has(type) ? 'is-active' : undefined}
+                      aria-pressed={activeTypes.has(type)}
+                      onClick={() =>
+                        setActiveTypes((previous) => {
+                          const next = new Set(previous);
+                          next.has(type) ? next.delete(type) : next.add(type);
+                          return next;
+                        })
+                      }
+                    >
+                      {type}
+                    </button>
+                  ))}
+              </section>
+              {lens === 'edgeKinds' && (
+                <section aria-label="Relationship filters">
+                  <span>Relationships</span>
+                  {edgeTypesInPayload.map((type) => (
+                    <button
+                      type="button"
+                      key={type}
+                      className={activeEdgeTypes.has(type) ? 'is-active' : undefined}
+                      aria-pressed={activeEdgeTypes.has(type)}
+                      onClick={() =>
+                        setActiveEdgeTypes((previous) => {
+                          const next = new Set(previous);
+                          next.has(type) ? next.delete(type) : next.add(type);
+                          return next;
+                        })
+                      }
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </section>
+              )}
+            </div>
+          </details>
+        </div>
+      </header>
 
       <FocusBreadcrumb
         trail={trail}
@@ -399,6 +616,8 @@ export function GraphView() {
           toTitle={pathTo?.title ?? null}
           selfId={selfNode?.id ?? null}
           onPickTo={(e) => setPathTo({ id: e.id, title: e.title })}
+          onPickFrom={(e) => setPathFrom({ id: e.id, title: e.title })}
+          onResetFrom={() => setPathFrom(null)}
           onClearTo={() => setPathTo(null)}
         />
       )}
@@ -495,10 +714,12 @@ export function GraphView() {
 
         <GraphSearch
           open={searchOpen}
-          nodes={view?.nodes ?? []}
+          nodes={data?.nodes ?? view?.nodes ?? []}
           onClose={() => setSearchOpen(false)}
           onPick={(n) => {
-            selectAndFly(n);
+            const visibleNode = view?.nodes.find((node) => node.id === n.id);
+            if (visibleNode) selectAndFly(visibleNode);
+            else makeFocus(n);
             // In path mode, clicking a node on the canvas set the target but
             // picking the same node from ⌘F did not, so the only route that
             // works without a mouse was the one that could not finish a path.
@@ -506,7 +727,7 @@ export function GraphView() {
           }}
         />
 
-        {selected && (
+        {selected && selected.kind !== 'community' && (
           <GraphPeek
             selected={selected as FgNode}
             links={peekLinks}
@@ -532,6 +753,81 @@ export function GraphView() {
           />
         )}
 
+        <GraphDiscoveryPanel
+          open={discoveryOpen}
+          tab={discoveryTab}
+          discovery={discoveryQuery.data}
+          loading={discoveryQuery.isLoading}
+          failed={discoveryQuery.isError}
+          selectedCommunityId={selectedCommunityId}
+          selectedBridgeId={selectedBridgeId}
+          communityDetail={communityQuery.data}
+          connectionDetail={connectionQuery.data}
+          onClose={() => {
+            setDiscoveryOpen(false);
+            updateDiscovery({ community: null, bridge: null, connection: null });
+          }}
+          onTab={(tab) => updateDiscovery({ discovery: tab, bridge: null, connection: null })}
+          onCommunity={(community) => selectCommunity(community.id)}
+          onBridge={(id) => {
+            const bridge = discoveryQuery.data?.bridges.find((item) => item.id === id);
+            if (!bridge) return;
+            updateDiscovery({
+              discovery: 'bridges',
+              bridge: id,
+              community: null,
+              connection: null,
+            });
+            const inScene = view?.nodes.find((node) => node.id === bridge.id);
+            if (inScene) selectAndFly(inScene);
+            else
+              navigate(
+                `/explore/graph?focus=${encodeURIComponent(id)}&discovery=bridges&bridge=${encodeURIComponent(id)}`,
+              );
+          }}
+          onConnection={(from, to) =>
+            updateDiscovery({
+              discovery: 'communities',
+              community: from,
+              connection: `${from}|${to}`,
+            })
+          }
+          onRecord={(id) =>
+            navigate(`/explore/graph?focus=${encodeURIComponent(id)}&discovery=${discoveryTab}`)
+          }
+          onRetry={() => void discoveryQuery.refetch()}
+          onLoadMoreMembers={() => setMemberOffset((offset) => offset + 100)}
+        />
+
+        {!discoveryOpen && !selected && view && (
+          <div className="lifemap__mapguide" aria-label="Map instructions">
+            <span className="lifemap__mapguide-kicker">Current view</span>
+            <strong>{focusTitle ?? 'Your connected records'}</strong>
+            <span>
+              {view.nodes.length}
+              {data && !selectedCommunityId && view.nodes.length < data.nodes.length
+                ? ` of ${data.nodes.length}`
+                : ''}{' '}
+              nearby records · {view.links.length} relationships
+            </span>
+            <p>
+              Drag to look around. Hover for a name. Select any record to see its relationships.
+            </p>
+            {data &&
+            !selectedCommunityId &&
+            view.nodes.length < data.nodes.length &&
+            !showAllNeighbors ? (
+              <button type="button" onClick={() => setShowAllNeighbors(true)}>
+                Show all nearby records
+              </button>
+            ) : (
+              <button type="button" onClick={() => setDiscoveryOpen(true)}>
+                See workspace patterns
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="lifemap__connectedwrap">
           <ConnectedList
             open={listOpen}
@@ -552,69 +848,83 @@ export function GraphView() {
           />
           <button
             type="button"
+            className="graph__tool graph__tool--zoom"
+            onClick={() => zoomMap(-0.35)}
+            aria-label="Zoom out"
+          >
+            −
+          </button>
+          <button type="button" className="graph__tool" onClick={resetMapView}>
+            Center map
+          </button>
+          <button
+            type="button"
+            className="graph__tool graph__tool--zoom"
+            onClick={() => zoomMap(0.35)}
+            aria-label="Zoom in"
+          >
+            +
+          </button>
+          <button
+            type="button"
             className="graph__tool"
             onClick={() => setListOpen((o) => !o)}
             aria-pressed={listOpen}
           >
-            {listOpen ? 'Hide list' : 'Connected list'}
+            {listOpen ? 'Hide list' : 'List'}
           </button>
-          <button
-            type="button"
-            className="graph__tool graph__tool--accent"
-            disabled={depth >= 4}
-            onClick={() => setDepth((d) => Math.min(d + 1, 4))}
-          >
-            Expand more +
-          </button>
-          <button
-            type="button"
-            className="graph__tool"
-            disabled={depth <= 1}
-            onClick={() => setDepth((d) => Math.max(d - 1, 1))}
-          >
-            Shallower −
-          </button>
-          <button
-            type="button"
-            className="graph__tool"
-            onClick={() => fgRef.current?.zoomToFit(reducedMotion ? 0 : 400, 60)}
-          >
-            Fit map
-          </button>
-          <button
-            type="button"
-            className="graph__tool"
-            onClick={focusSelection}
-            disabled={!selected}
-          >
-            Focus selection
-          </button>
-          <button
-            type="button"
-            className="graph__tool"
-            aria-pressed={paused}
-            onClick={() => {
-              setPaused((p) => {
-                const next = !p;
-                if (next) fgRef.current?.pauseAnimation();
-                else fgRef.current?.resumeAnimation();
-                return next;
-              });
-            }}
-          >
-            {paused ? 'Resume layout' : 'Pause layout'}
-          </button>
-          <button type="button" className="graph__tool" onClick={exportPng}>
-            Export PNG
-          </button>
-          <button type="button" className="graph__tool" onClick={() => setSearchOpen(true)}>
-            Find · ⌘F
-          </button>
-          {focusParam && (
-            <Link className="graph__tool" to="/explore/graph">
-              Reset focus
-            </Link>
-          )}
+          <details className="lifemap__canvascontrols">
+            <summary>More</summary>
+            <div>
+              <button
+                type="button"
+                disabled={depth >= 4}
+                onClick={() => setDepth((d) => Math.min(d + 1, 4))}
+              >
+                Show one more step
+              </button>
+              <button
+                type="button"
+                disabled={depth <= 1}
+                onClick={() => setDepth((d) => Math.max(d - 1, 1))}
+              >
+                Show fewer records
+              </button>
+              {data &&
+                view &&
+                !selectedCommunityId &&
+                view.nodes.length < data.nodes.length &&
+                !showAllNeighbors && (
+                  <button type="button" onClick={() => setShowAllNeighbors(true)}>
+                    Show all nearby records
+                  </button>
+                )}
+              <button type="button" onClick={focusSelection} disabled={!selected}>
+                Focus selection
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setPaused((p) => {
+                    const next = !p;
+                    if (next) fgRef.current?.pauseAnimation();
+                    else fgRef.current?.resumeAnimation();
+                    return next;
+                  });
+                }}
+                aria-pressed={paused}
+              >
+                {paused ? 'Resume layout' : 'Pause layout'}
+              </button>
+              <button type="button" onClick={exportPng}>
+                Export PNG
+              </button>
+              <button type="button" onClick={() => setSearchOpen(true)}>
+                Find a record
+              </button>
+              {focusParam && <Link to="/explore/graph">Reset focus</Link>}
+            </div>
+          </details>
         </div>
       </div>
     </div>

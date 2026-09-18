@@ -1,4 +1,5 @@
 import '../../test/api-mock.js';
+import type { ComponentProps } from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -7,6 +8,36 @@ import { renderWithApp } from '../../test/render.js';
 import { SelectionPane } from './SelectionPane.js';
 import { defaultDraft } from './types.js';
 import type { AtomScore, AtomView, Draft, TailorResult } from './types.js';
+
+// Keep the route test focused on the contract it owns: Tailor forwards the
+// shared motion transition to every draggable item. The motion module itself
+// verifies that this transition follows the operating-system preference.
+vi.mock('motion/react', () => ({
+  Reorder: {
+    Group: ({
+      children,
+      onReorder: _onReorder,
+      values: _values,
+      axis: _axis,
+      ...props
+    }: ComponentProps<'ul'> & { onReorder?: unknown; values?: unknown; axis?: unknown }) => (
+      <ul {...props}>{children}</ul>
+    ),
+    Item: ({
+      children,
+      transition,
+      ...props
+    }: ComponentProps<'li'> & { transition?: { duration?: number } }) => (
+      <li data-reorder-duration={transition?.duration} {...props}>
+        {children}
+      </li>
+    ),
+  },
+}));
+
+vi.mock('../../lib/motion.js', () => ({
+  useReorder: () => ({ duration: 0 }),
+}));
 
 function atom(over: Partial<AtomView> = {}): AtomView {
   return {
@@ -95,6 +126,14 @@ describe('SelectionPane', () => {
     expect(pin).toHaveAttribute('aria-pressed', 'false');
     await user.click(pin);
     expect(onDraft).toHaveBeenCalledWith({ atomOrder: undefined, pins: ['atom-1'] });
+  });
+
+  it('uses the shared zero-duration transition for draggable rows', () => {
+    renderPane({ tailorResult: result() });
+    expect(screen.getByText('Cut p99 latency by 40%.').closest('li')).toHaveAttribute(
+      'data-reorder-duration',
+      '0',
+    );
   });
 
   it('drops a pin when the same atom is excluded', async () => {

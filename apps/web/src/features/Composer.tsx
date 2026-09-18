@@ -1,21 +1,25 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Banner,
   Button,
+  Checkbox,
   Chip,
   ChipGroup,
+  ConfirmDialog,
   ErrorState,
   Field,
   FilterGroup,
-  Inline,
   Modal,
   SkeletonText,
-  Spread,
   StatusTrace,
   Textarea,
 } from '@vitae/ui';
 import { api } from '../lib/api.js';
+import { useCanWrite, WRITE_LOCK_HINT } from '../lib/auth.js';
+import { entityHref } from '../lib/entity-href.js';
+import { useUnsavedChanges } from '../lib/unsaved-changes.js';
 import { useToast } from './Toast.js';
 
 export interface ComposerContext {
@@ -28,42 +32,37 @@ export interface ComposerContext {
   targetOrgName?: string;
   roleTitle?: string;
 }
-
 const TONES = ['warm', 'direct', 'formal'] as const;
 type Tone = (typeof TONES)[number];
-
 interface Draft {
   body: string;
   facts: string[];
 }
 
-/**
- * Outreach composer (reference P: composer). Deterministic drafts assembled
- * server-side from live relationship facts; tone switch regenerates unless
- * the body has been hand-edited.
- *
- * FR-022/FR-023: a real Modal, with the tone switch exposed as a labelled radio
- * group and the draft body as a labelled textarea.
- */
-export function Composer({ ctx, onClose }: { ctx: ComposerContext; onClose: () => void }) {
+/** A changed recipient or target owns a fresh session, including outstanding requests. */
+export function Composer(props: { ctx: ComposerContext; onClose: () => void }) {
+  return <ComposerSession key={JSON.stringify(props.ctx)} {...props} />;
+}
+
+function ComposerSession({ ctx, onClose }: { ctx: ComposerContext; onClose: () => void }) {
   const ids = useId();
+  const canWrite = useCanWrite();
   const [tone, setTone] = useState<Tone>('warm');
+  const [draftTone, setDraftTone] = useState<Tone>('warm');
   const [body, setBody] = useState('');
   const [facts, setFacts] = useState<string[]>([]);
   const [edited, setEdited] = useState(false);
+  const [hasDraft, setHasDraft] = useState(false);
+  const [sentOutside, setSentOutside] = useState(false);
+  const [confirmRegenerate, setConfirmRegenerate] = useState(false);
   const qc = useQueryClient();
   const { flash } = useToast();
-
-  /**
-   * Which draft request is the live one. Two POSTs used to race: flipping tone
-   * mid-fetch let whichever resolved last win, so a warm draft could land
-   * under a formal pill. A superseded request now resolves to null and writes
-   * nothing.
-   */
   const ticket = useRef(0);
+  const logging = useRef(false);
+  const logErrorRef = useRef<HTMLDivElement>(null);
 
   const draftM = useMutation({
-    mutationFn: async (t: Tone): Promise<Draft | null> => {
+    mutationFn: async (t: Tone): Promise<(Draft & { tone: Tone }) | null> => {
       const mine = ++ticket.current;
       try {
         const res = await api.post<Draft>('/composer/draft', {
@@ -74,10 +73,16 @@ export function Composer({ ctx, onClose }: { ctx: ComposerContext; onClose: () =
           targetOrgId: ctx.targetOrgId,
           roleTitle: ctx.roleTitle,
         });
-        return mine === ticket.current ? res : null;
+        if (
+          typeof res.body !== 'string' ||
+          !res.body.trim() ||
+          !Array.isArray(res.facts) ||
+          res.facts.some((fact) => typeof fact !== 'string')
+        ) {
+          throw new Error('The draft was incomplete. Try generating it again.');
+        }
+        return mine === ticket.current ? { ...res, tone: t } : null;
       } catch (err) {
-        // A failure the user has already moved past is not their failure to
-        // read. Only the live request may report one.
         if (mine !== ticket.current) return null;
         throw err;
       }
@@ -86,58 +91,69 @@ export function Composer({ ctx, onClose }: { ctx: ComposerContext; onClose: () =
       if (!res) return;
       setBody(res.body);
       setFacts(res.facts);
+      setDraftTone(res.tone);
       setEdited(false);
+      setHasDraft(true);
+      setSentOutside(false);
     },
+    // The persistent local error owns recovery; suppress the global fallback toast.
+    onError: () => {},
   });
-
-  /**
-   * Every control that describes the draft resets with the request, not after
-   * it. A new context replaces the composer in place without unmounting it, so
-   * a tone pill and an edited flag left behind would describe the previous
-   * recipient's message, and the evidence chips would cite a draft that is no
-   * longer on screen.
-   */
   function generate(t: Tone) {
+    if (logging.current) return;
     setTone(t);
-    setEdited(false);
-    setFacts([]);
     draftM.mutate(t);
   }
-
-  // Keyed on who and what is being asked, not on `generate`, which is a new
-  // function every render.
+  const requestDraft = draftM.mutate;
   useEffect(() => {
-    generate('warm');
-  }, [ctx.personId, ctx.kind]);
+    requestDraft('warm');
+    return () => {
+      ticket.current += 1;
+    };
+  }, [requestDraft]);
 
   function pickTone(t: Tone) {
+    if (logging.current) return;
     setTone(t);
     if (!edited) generate(t);
   }
 
-  const sendM = useMutation({
-    mutationFn: () =>
-      api.post('/composer/send', {
-        personId: ctx.personId,
-        kind: ctx.kind,
-        channel: ctx.channel ?? 'email',
-        body,
-      }),
-    onSuccess: async () => {
-      onClose();
-      flash(`Queued ${ctx.channel ?? 'email'} to ${ctx.personName} · logged as outreach`);
-      await qc.invalidateQueries();
+  // This endpoint logs only. It has no delivery or idempotency contract.
+  const logM = useMutation({
+    mutationFn: (submission: { personId: string; kind: string; channel: string; body: string }) =>
+      api.post('/composer/send', submission),
+    onSuccess: () => {
+      guard.forceClose();
+      flash(`Outreach to ${ctx.personName} logged · follow-up set for seven days`);
+      void qc.invalidateQueries();
     },
-    onError: (err) =>
-      flash(err instanceof Error ? `Send failed: ${err.message}` : 'Send failed', {
-        variant: 'error',
-      }),
+    onError: () => {}, // Report uncertainty next to the draft, not in a second toast.
+    onSettled: () => {
+      logging.current = false;
+    },
   });
-
+  useEffect(() => {
+    if (logM.isError) logErrorRef.current?.focus();
+  }, [logM.isError]);
+  const guard = useUnsavedChanges(edited || logM.isPending || logM.isError, {
+    onClose,
+    busy: logM.isPending,
+    body: logM.isError
+      ? 'Logging was not confirmed and may already exist. Closing discards this local draft; it does not remove a saved interaction.'
+      : 'Your edits are only in this draft. Copy them before leaving, or keep editing.',
+  });
+  const drafting = draftM.isPending || draftM.status === 'idle';
+  const draftError = draftM.isError
+    ? (draftM.error instanceof Error && draftM.error.message.trim()) ||
+      'The draft could not be generated. Try again.'
+    : null;
+  const blocked = drafting || !body.trim() || !hasDraft;
+  function logOutreach() {
+    if (logging.current || blocked || !canWrite || !sentOutside) return;
+    logging.current = true;
+    logM.mutate({ personId: ctx.personId, kind: ctx.kind, channel: ctx.channel ?? 'email', body });
+  }
   function copyDraft() {
-    // The optional chain used to short-circuit the whole expression, so where
-    // there is no clipboard neither handler ever attached and Copy was a
-    // silent no-op. Check for the API before reaching for it.
     if (!navigator.clipboard) {
       flash('Clipboard is not available here, select the draft and copy it manually.', {
         variant: 'error',
@@ -152,115 +168,167 @@ export function Composer({ ctx, onClose }: { ctx: ComposerContext; onClose: () =
       );
   }
 
-  // `idle` is the single commit between mount and the first request. Reading it
-  // as drafting keeps the skeleton in place instead of flashing an empty box.
-  const drafting = draftM.isPending || draftM.status === 'idle';
-  const draftError = draftM.isError ? ((draftM.error as Error | null)?.message ?? null) : null;
-  const sendError = sendM.isError ? ((sendM.error as Error | null)?.message ?? null) : null;
-  const blocked = drafting || draftError !== null || !body.trim();
-
   return (
-    <Modal
-      open
-      onOpenChange={(o) => !o && onClose()}
-      title={`Draft ${ctx.kind} · ask ${ctx.personName}${ctx.targetOrgName ? ` → ${ctx.targetOrgName}` : ''}`}
-      description="A draft assembled from your real relationship history. Edit it before sending, it is a starting point, not a send button."
-      size="lg"
-      // Was three chips whose selected state was an inline border colour, two
-      // of whose three declarations named tokens that do not exist. FilterGroup
-      // carries the state in aria-pressed and in a real pressed style.
-      titleAccessory={
-        <FilterGroup
-          label="Tone"
-          options={TONES.map((t) => ({ key: t, label: t }))}
-          value={tone}
-          onChange={pickTone}
-        />
-      }
-      footer={
-        <Spread className="w-full">
-          <Inline>
+    <>
+      <Modal
+        open
+        onOpenChange={(open) => {
+          if (!logging.current) guard.onOpenChange(open);
+        }}
+        title={`Draft ${ctx.kind} · ${ctx.personName}`}
+        description="Vitae does not send messages. Copy and send outside Vitae, then log outreach here with a seven-day follow-up."
+        size="lg"
+        footer={
+          <div className="outreach-composer__footer">
             <Button
               variant="ghost"
-              size="sm"
-              disabled={drafting}
-              onClick={() => generate(tone)}
+              disabled={drafting || logM.isPending}
+              onClick={() => (edited ? setConfirmRegenerate(true) : generate(tone))}
             >
               {drafting ? 'Regenerating...' : 'Regenerate'}
             </Button>
-            {edited && (
-              <span className="text-xs text-faint">edited, tone switch won&apos;t overwrite</span>
-            )}
-          </Inline>
-          <Inline>
-            <Button variant="ghost" disabled={blocked} onClick={copyDraft}>
-              Copy
-            </Button>
-            <Button
-              variant="primary"
-              disabled={blocked || sendM.isPending}
-              onClick={() => sendM.mutate()}
-            >
-              {sendM.isPending ? 'Queuing...' : 'Send & log'}
-            </Button>
-          </Inline>
-        </Spread>
-      }
-    >
-      {/* A failed send is the one failure that costs the user their typing, so
-          it stays on the surface that holds the text rather than living only
-          in a toast that has already gone. */}
-      {sendError && (
-        <Banner
-          tone="danger"
-          title="This message was not sent"
-          action={
-            <Button size="sm" disabled={sendM.isPending} onClick={() => sendM.mutate()}>
-              {sendM.isPending ? 'Sending...' : 'Try again'}
-            </Button>
-          }
-        >
-          {sendError} Your draft is still here, nothing was logged.
-        </Banner>
-      )}
-
-      {facts.length > 0 && (
-        <ChipGroup className="mb-3">
-          {facts.map((f) => (
-            <Chip key={f} mono>
-              {f}
-            </Chip>
-          ))}
-        </ChipGroup>
-      )}
-
-      {draftError ? (
-        <ErrorState
-          title="Couldn't draft that message"
-          detail={draftError}
-          onRetry={() => generate(tone)}
-        />
-      ) : drafting ? (
-        // A skeleton in the shape of the draft, not a spinner in the middle of
-        // a large empty modal. The trace above it is what says out loud that
-        // the wait is deliberate: the skeleton itself is aria-hidden.
-        <div aria-busy="true">
-          <StatusTrace tone="live" label="Assembling the draft" detail={`${tone} tone`} />
-          <SkeletonText lines={6} />
+            <div className="outreach-composer__actions">
+              <Button variant="ghost" disabled={blocked} onClick={copyDraft}>
+                Copy
+              </Button>
+              <Button
+                variant="primary"
+                disabled={blocked || logM.isPending || !canWrite || !sentOutside}
+                title={!canWrite ? WRITE_LOCK_HINT : undefined}
+                onClick={logOutreach}
+              >
+                {logM.isPending
+                  ? 'Logging…'
+                  : logM.isError
+                    ? 'Retry logging'
+                    : 'Log outreach & follow-up'}
+              </Button>
+            </div>
+          </div>
+        }
+      >
+        <div className="outreach-composer">
+          {ctx.targetOrgName && (
+            <p className="outreach-composer__context">
+              Request context: <strong>{ctx.targetOrgName}</strong>. Check that the draft names the
+              right organization and request.
+            </p>
+          )}
+          <fieldset className="outreach-composer__tones" disabled={logM.isPending}>
+            <FilterGroup
+              label="Tone"
+              options={TONES.map((t) => ({ key: t, label: t }))}
+              value={tone}
+              onChange={pickTone}
+            />
+          </fieldset>
+          {edited && (
+            <p className="outreach-composer__hint" role="status">
+              Your edits are retained. Regenerate to apply {tone} tone.
+            </p>
+          )}
+          {!edited && hasDraft && tone !== draftTone && (
+            <p className="outreach-composer__hint">
+              Showing the last {draftTone} draft until a new one is ready.
+            </p>
+          )}
+          {logM.isError && (
+            <div ref={logErrorRef} tabIndex={-1}>
+              <Banner tone="danger" title="Outreach logging was not confirmed">
+                {(logM.error instanceof Error && logM.error.message.trim()) ||
+                  'The request did not return a confirmation.'}{' '}
+                Your draft is still here. Check the profile before retrying: the outreach may
+                already be logged, and retrying can create a duplicate.{' '}
+                <Link to={entityHref('person', ctx.personId)}>Check profile</Link>
+              </Banner>
+            </div>
+          )}
+          {draftError &&
+            (hasDraft ? (
+              <Banner
+                tone="danger"
+                title="Couldn't regenerate the draft"
+                action={
+                  <Button
+                    size="sm"
+                    disabled={drafting || logM.isPending}
+                    onClick={() => generate(tone)}
+                  >
+                    Try again
+                  </Button>
+                }
+              >
+                {draftError} Your previous draft is still available below.
+              </Banner>
+            ) : (
+              <ErrorState
+                title="Couldn't draft that message"
+                detail={draftError}
+                onRetry={() => generate(tone)}
+                retrying={drafting}
+              />
+            ))}
+          {drafting && (
+            <div aria-busy="true">
+              <StatusTrace tone="live" label="Assembling the draft" detail={`${tone} tone`} />
+              {!hasDraft && <SkeletonText lines={6} />}
+            </div>
+          )}
+          {hasDraft && (
+            <>
+              {facts.length > 0 && (
+                <div>
+                  <p className="outreach-composer__hint">Recorded context used in this draft</p>
+                  <ChipGroup>
+                    {facts.map((fact, i) => (
+                      <Chip key={i}>{fact}</Chip>
+                    ))}
+                  </ChipGroup>
+                </div>
+              )}
+              <Field label="Draft message" htmlFor={`${ids}-body`}>
+                <Textarea
+                  id={`${ids}-body`}
+                  rows={9}
+                  value={body}
+                  disabled={drafting || logM.isPending}
+                  onChange={(event) => {
+                    setBody(event.target.value);
+                    setEdited(true);
+                    setSentOutside(false);
+                  }}
+                />
+              </Field>
+              <Checkbox
+                checked={sentOutside}
+                onChange={setSentOutside}
+                disabled={drafting || logM.isPending || !canWrite}
+                align="start"
+                label="I have sent this message outside Vitae"
+              />
+              {!canWrite && (
+                <p role="status" className="outreach-composer__hint">
+                  {WRITE_LOCK_HINT} You can still edit and copy this draft.
+                </p>
+              )}
+            </>
+          )}
         </div>
-      ) : (
-        <Field label="Draft message" htmlFor={`${ids}-body`}>
-          <Textarea
-            id={`${ids}-body`}
-            rows={9}
-            value={body}
-            onChange={(e) => {
-              setBody(e.target.value);
-              setEdited(true);
-            }}
-          />
-        </Field>
-      )}
-    </Modal>
+      </Modal>
+      {guard.prompt}
+      <ConfirmDialog
+        open={confirmRegenerate}
+        onOpenChange={setConfirmRegenerate}
+        title="Replace your edited draft?"
+        body="A new draft will replace your edits. If generation fails, your current text will be kept."
+        confirmLabel="Replace draft"
+        cancelLabel="Keep editing"
+        initialFocus="cancel"
+        onConfirm={() => {
+          setConfirmRegenerate(false);
+          generate(tone);
+        }}
+      />
+    </>
   );
 }

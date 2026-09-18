@@ -9,6 +9,7 @@ import { env } from '../../env.js';
 import { currentWorkspaceId } from '../../db/space.js';
 import type { StorageAdapter, StoredObject } from './adapter.js';
 import { sharedMemoryStorage } from './memory.js';
+import { FilesystemStorage } from './filesystem.js';
 
 // The SDK auto-reads CLOUDINARY_URL from process.env; make it explicit + private.
 let configured = false;
@@ -95,4 +96,12 @@ export class CloudinaryStorage implements StorageAdapter {
 export const storage: StorageAdapter =
   env.NODE_ENV === 'test' || process.env.VITEST === 'true'
     ? sharedMemoryStorage()
-    : new CloudinaryStorage();
+    : env.CLOUDINARY_URL
+      ? new CloudinaryStorage()
+      : env.VITAE_LOCAL_INSTALL && env.VITAE_STORAGE_DIR
+        ? new FilesystemStorage(env.VITAE_STORAGE_DIR, {
+            folder: env.CLOUDINARY_FOLDER,
+            publicOrigin: env.WEB_ORIGIN.split(',')[0]?.trim(),
+            workspaceId: currentWorkspaceId,
+          })
+        : new CloudinaryStorage();

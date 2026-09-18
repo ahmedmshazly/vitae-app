@@ -49,6 +49,15 @@ export interface ExportBundle {
  * the rest are listed here with their sensitive-node reference field, if any.
  */
 export const BUNDLE_COLLECTIONS: ReadonlyArray<{ file: string; table: TableName; optional?: boolean }> = [
+  // Knowledge layer. Optional so every schema-3 backup created before the
+  // whole-life upgrade remains restorable.
+  { file: 'knowledge_sources.jsonl', table: 'knowledge_sources', optional: true },
+  { file: 'knowledge_runs.jsonl', table: 'knowledge_runs', optional: true },
+  { file: 'source_records.jsonl', table: 'source_records', optional: true },
+  { file: 'source_identities.jsonl', table: 'source_identities', optional: true },
+  { file: 'evidence_assertions.jsonl', table: 'evidence_assertions', optional: true },
+  { file: 'reconciliation_decisions.jsonl', table: 'reconciliation_decisions', optional: true },
+  { file: 'entity_redirects.jsonl', table: 'entity_redirects', optional: true },
   { file: 'nodes.jsonl', table: 'nodes' },
   { file: 'edges.jsonl', table: 'edges' },
   { file: 'atoms.jsonl', table: 'atoms' },
@@ -143,12 +152,18 @@ function safeSlug(node: NodeRecord): string {
 
 /** Secrets must never travel in a data bundle, whatever the source doc holds. */
 function scrubMetaRow(row: Row): Row {
-  const github = row.github as Row | undefined;
+  let next = row;
+  const github = next.github as Row | undefined;
   if (github && 'pat' in github) {
     const { pat: _pat, ...rest } = github;
-    return { ...row, github: rest };
+    next = { ...next, github: rest };
   }
-  return row;
+  const gemini = next.gemini as Row | undefined;
+  if (gemini && ('apiKey' in gemini || 'api_key' in gemini)) {
+    const { apiKey: _apiKey, api_key: _api_key, ...rest } = gemini;
+    next = { ...next, gemini: rest };
+  }
+  return next;
 }
 
 /**

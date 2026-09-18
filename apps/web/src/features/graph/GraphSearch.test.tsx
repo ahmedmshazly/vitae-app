@@ -24,11 +24,14 @@ describe('GraphSearch', () => {
     await waitFor(() => expect(input).toHaveFocus());
     await user.type(input, 'zzz');
     expect(screen.getByRole('status')).toHaveTextContent('No matches in view');
-    expect(input).toHaveAttribute('aria-expanded', 'false');
+    // The explicit empty-result recovery is visible in the popup, so the
+    // combobox truthfully remains expanded rather than pretending no popup exists.
+    expect(input).toHaveAttribute('aria-expanded', 'true');
 
     await user.clear(input);
     await user.type(input, 'Ada');
     expect(screen.getByRole('option', { name: /Ada Lovelace/ })).toBeInTheDocument();
+    await user.keyboard('{ArrowDown}');
     await user.keyboard('{Enter}');
     expect(onPick).toHaveBeenCalledWith(expect.objectContaining({ id: '1' }));
     expect(onClose).toHaveBeenCalled();

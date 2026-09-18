@@ -16,6 +16,8 @@ describe('/api/v1/auth', () => {
     const res = await request(app).get('/api/v1/auth/me');
     expect(res.status).toBe(200);
     expect(res.body.user).toBeNull();
+    expect(res.body).toHaveProperty('localInstall');
+    expect(res.headers['cache-control']).toBe('private, no-store');
   });
 
   it('returns the owner on /me with a bearer token', async () => {
@@ -32,6 +34,7 @@ describe('/api/v1/auth', () => {
     expect(res.status).toBe(200);
     // Emulator/test path echoes the token for supertest (no cookie jar).
     expect(typeof res.body.token === 'string' || res.body.user?.via === 'dev').toBe(true);
+    expect(res.headers['cache-control']).toBe('private, no-store');
   });
 
   it('clears the session cookie on logout', async () => {
@@ -45,5 +48,6 @@ describe('/api/v1/auth', () => {
     expect(cleared, 'logout must emit a matching Set-Cookie').toBeTruthy();
     expect(cleared).toMatch(/HttpOnly/i);
     expect(cleared).toMatch(/SameSite=Lax/i);
+    expect(res.headers['cache-control']).toBe('private, no-store');
   });
 });

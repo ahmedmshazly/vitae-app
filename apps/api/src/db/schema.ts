@@ -222,6 +222,13 @@ interface MetaRunTable extends DocTable {
 }
 
 export interface Database {
+  knowledge_sources: DocTable;
+  knowledge_runs: DocTable;
+  source_records: DocTable;
+  source_identities: DocTable;
+  evidence_assertions: DocTable;
+  reconciliation_decisions: DocTable;
+  entity_redirects: DocTable;
   users: UserTable;
   workspaces: WorkspaceTable;
   workspace_members: WorkspaceMemberTable;
@@ -262,6 +269,13 @@ export interface Database {
 
 /** Table names as a runtime list, used by the test truncation helper. */
 export const TABLES = [
+  'knowledge_sources',
+  'knowledge_runs',
+  'source_records',
+  'source_identities',
+  'evidence_assertions',
+  'reconciliation_decisions',
+  'entity_redirects',
   'nodes',
   'edges',
   'revisions',

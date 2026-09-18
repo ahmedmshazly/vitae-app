@@ -58,7 +58,9 @@ const DocsApp = lazy(() => import('./routes/docs/DocsApp.js'));
 const Timeline = lazyNamed(() => import('./routes/Timeline.js'), 'Timeline');
 const MapView = lazyNamed(() => import('./routes/MapView.js'), 'MapView');
 const ImportHub = lazyNamed(() => import('./routes/ImportHub.js'), 'ImportHub');
+const Knowledge = lazyNamed(() => import('./routes/Knowledge.js'), 'Knowledge');
 const Repositories = lazyNamed(() => import('./routes/Repositories.js'), 'Repositories');
+const Gemini = lazyNamed(() => import('./routes/Gemini.js'), 'Gemini');
 const Duplicates = lazyNamed(() => import('./routes/Duplicates.js'), 'Duplicates');
 const ExportPage = lazyNamed(() => import('./routes/ExportPage.js'), 'ExportPage');
 const NotFound = lazyNamed(() => import('./routes/NotFound.js'), 'NotFound');
@@ -399,8 +401,10 @@ function AuthedApp() {
                 <Route path="/explore/atlas" element={<MapView />} />
                 <Route path="/data" element={<DataHome />} />
                 <Route path="/data/imports" element={<ImportHub />} />
+                <Route path="/data/knowledge" element={<Knowledge />} />
                 <Route path="/data/identity" element={<Duplicates />} />
                 <Route path="/data/sources/github" element={<Repositories />} />
+                <Route path="/data/sources/gemini" element={<Gemini />} />
                 <Route path="/data/exports" element={<ExportPage />} />
                 <Route path="/data/trash" element={<Trash />} />
                 <Route path="/settings" element={<SettingsHome />} />

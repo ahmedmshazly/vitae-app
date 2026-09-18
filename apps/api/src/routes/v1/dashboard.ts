@@ -8,6 +8,8 @@ import { getSelf } from '../../services/self.js';
 import { buildOwnerIndex, ownableFrom } from '../../services/subjects.js';
 import { githubToken } from '../../services/settings.js';
 import { loadScorableAtoms } from '../../services/resume.js';
+import { knowledgeSummary } from '../../services/knowledge.js';
+import { openReminders } from '../../services/reminders.js';
 
 export const dashboardRouter: Router = Router();
 
@@ -23,16 +25,22 @@ dashboardRouter.get(
     const today = todayIso(); // FR-025: the user's calendar date, not UTC's
     // FR-102: load the graph and atoms once; reconnectLane and loadScorableAtoms
     // reuse that snapshot instead of each reloading the full graph.
-    const [graph, remindersSnap, resumesSnap, checksSnap, atomsSnap] = await Promise.all([
-      loadGraph(),
-      repository.docQuery<Record<string, unknown>>('reminders', { status: 'open' }),
-      repository.docList('resumes'),
-      repository.docList('habit_checks'),
-      repository.docList('atoms'),
-    ]);
+    const [graph, remindersSnap, resumesSnap, checksSnap, atomsSnap, knowledge] = await Promise.all(
+      [
+        loadGraph(),
+        openReminders(today),
+        repository.docList('resumes'),
+        repository.docList('habit_checks'),
+        repository.docList('atoms'),
+        knowledgeSummary(),
+      ],
+    );
     const nodes = [...graph.nodes.values()];
     const edges = graph.edges;
-    const [lane, scorable] = await Promise.all([reconnectLane(graph), loadScorableAtoms(atomsSnap)]);
+    const [lane, scorable] = await Promise.all([
+      reconnectLane(graph),
+      loadScorableAtoms(atomsSnap),
+    ]);
 
     const reminders = remindersSnap.filter((r) => (r.due_on as string) <= today);
     const applications = nodes.filter((n) => n.type === 'application');
@@ -40,7 +48,13 @@ dashboardRouter.get(
       .filter((n) => n.type !== 'interaction')
       .sort((a, b) => b.created_at.localeCompare(a.created_at))
       .slice(0, 8)
-      .map((n) => ({ id: n.id, type: n.type, title: n.title, created_at: n.created_at, source: n.source }));
+      .map((n) => ({
+        id: n.id,
+        type: n.type,
+        title: n.title,
+        created_at: n.created_at,
+        source: n.source,
+      }));
 
     const byType: Record<string, number> = {};
     for (const n of nodes) byType[n.type] = (byType[n.type] ?? 0) + 1;
@@ -50,7 +64,9 @@ dashboardRouter.get(
     // rather than a single figure that silently means neither.
     const ownerIndex = buildOwnerIndex(ownableFrom(graph));
     const self = await getSelf();
-    const mineIds = self ? (ownerIndex.recordsOf.get(self.id) ?? new Set<string>()) : new Set<string>();
+    const mineIds = self
+      ? (ownerIndex.recordsOf.get(self.id) ?? new Set<string>())
+      : new Set<string>();
     const mineByType: Record<string, number> = {};
     for (const n of nodes) {
       if (mineIds.has(n.id)) mineByType[n.type] = (mineByType[n.type] ?? 0) + 1;
@@ -62,7 +78,9 @@ dashboardRouter.get(
     ).length;
 
     // Application pipeline counts by stage (props.stage, falling back to props.status).
-    const pipelineCounts: Record<string, number> = Object.fromEntries(PIPELINE_STAGES.map((s) => [s, 0]));
+    const pipelineCounts: Record<string, number> = Object.fromEntries(
+      PIPELINE_STAGES.map((s) => [s, 0]),
+    );
     for (const a of applications) {
       const p = a.props as Record<string, unknown>;
       const stage = String(p.stage ?? p.status ?? '').toLowerCase();
@@ -79,16 +97,32 @@ dashboardRouter.get(
     const habits = habitNodes.map((h) => {
       const dates = checksByHabit.get(h.id) ?? [];
       const s = computeStreak(dates, today);
-      return { id: h.id, title: h.title, streak: s.current, grid: s.grid, checkedToday: dates.includes(today) };
+      return {
+        id: h.id,
+        title: h.title,
+        streak: s.current,
+        grid: s.grid,
+        checkedToday: dates.includes(today),
+      };
     });
 
     // ── Focus: open tasks + goals with key-result progress ──────────────────
     const OPEN_TASK = (s: string) => s !== 'done' && s !== 'dropped';
     const tasks = nodes
-      .filter((n) => n.type === 'task' && OPEN_TASK(String((n.props as Record<string, unknown>).status ?? 'inbox')))
+      .filter(
+        (n) =>
+          n.type === 'task' &&
+          OPEN_TASK(String((n.props as Record<string, unknown>).status ?? 'inbox')),
+      )
       .map((n) => {
         const p = n.props as Record<string, unknown>;
-        return { id: n.id, title: n.title, due: (p.due as string) ?? null, priority: (p.priority as string) ?? null, status: (p.status as string) ?? 'inbox' };
+        return {
+          id: n.id,
+          title: n.title,
+          due: (p.due as string) ?? null,
+          priority: (p.priority as string) ?? null,
+          status: (p.status as string) ?? 'inbox',
+        };
       })
       .sort((a, b) => (a.due ?? '9999').localeCompare(b.due ?? '9999'))
       .slice(0, 6);
@@ -99,12 +133,15 @@ dashboardRouter.get(
         return n.type === 'goal' && st !== 'achieved' && st !== 'abandoned';
       })
       .map((n) => {
-        const krs = ((n.props as Record<string, unknown>).key_results as Array<Record<string, unknown>>) ?? [];
+        const krs =
+          ((n.props as Record<string, unknown>).key_results as Array<Record<string, unknown>>) ??
+          [];
         const parts = krs.map((k) => {
           if (k.done === true) return 1;
           const target = Number(k.target);
           const current = Number(k.current);
-          if (Number.isFinite(target) && target > 0 && Number.isFinite(current)) return Math.max(0, Math.min(1, current / target));
+          if (Number.isFinite(target) && target > 0 && Number.isFinite(current))
+            return Math.max(0, Math.min(1, current / target));
           return 0;
         });
         const progress = parts.length ? parts.reduce((a, b) => a + b, 0) / parts.length : 0;
@@ -113,7 +150,13 @@ dashboardRouter.get(
       .slice(0, 4);
 
     // ── Upcoming & on-this-day (next 30 days + anniversaries today) ──────────
-    const upcoming: Array<{ id: string; type: string; title: string; date: string; label: string }> = [];
+    const upcoming: Array<{
+      id: string;
+      type: string;
+      title: string;
+      date: string;
+      label: string;
+    }> = [];
     const within = (d: string | undefined, max = 30) => {
       if (!d) return false;
       const n = calendarDaysBetween(today, d.slice(0, 10));
@@ -121,21 +164,62 @@ dashboardRouter.get(
     };
     for (const n of nodes) {
       const p = n.props as Record<string, unknown>;
-      if (n.type === 'event' && within(p.starts_at as string)) upcoming.push({ id: n.id, type: n.type, title: n.title, date: (p.starts_at as string).slice(0, 10), label: 'event' });
-      else if (n.type === 'trip' && within(n.start_date ?? undefined)) upcoming.push({ id: n.id, type: n.type, title: n.title, date: n.start_date!, label: 'trip' });
-      else if (n.type === 'application' && within(p.deadline as string)) upcoming.push({ id: n.id, type: n.type, title: n.title, date: p.deadline as string, label: 'deadline' });
-      else if (n.type === 'job_posting' && within(p.deadline as string)) upcoming.push({ id: n.id, type: n.type, title: n.title, date: p.deadline as string, label: 'deadline' });
+      if (n.type === 'event' && within(p.starts_at as string))
+        upcoming.push({
+          id: n.id,
+          type: n.type,
+          title: n.title,
+          date: (p.starts_at as string).slice(0, 10),
+          label: 'event',
+        });
+      else if (n.type === 'trip' && within(n.start_date ?? undefined))
+        upcoming.push({
+          id: n.id,
+          type: n.type,
+          title: n.title,
+          date: n.start_date!,
+          label: 'trip',
+        });
+      else if (n.type === 'application' && within(p.deadline as string))
+        upcoming.push({
+          id: n.id,
+          type: n.type,
+          title: n.title,
+          date: p.deadline as string,
+          label: 'deadline',
+        });
+      else if (n.type === 'job_posting' && within(p.deadline as string))
+        upcoming.push({
+          id: n.id,
+          type: n.type,
+          title: n.title,
+          date: p.deadline as string,
+          label: 'deadline',
+        });
       // Anniversaries, a dated milestone whose month/day is today, in a past year.
-      if (n.start_date && n.start_date.length >= 10 && n.start_date.slice(5, 10) === today.slice(5, 10) && n.start_date.slice(0, 4) < today.slice(0, 4)) {
+      if (
+        n.start_date &&
+        n.start_date.length >= 10 &&
+        n.start_date.slice(5, 10) === today.slice(5, 10) &&
+        n.start_date.slice(0, 4) < today.slice(0, 4)
+      ) {
         const years = Number(today.slice(0, 4)) - Number(n.start_date.slice(0, 4));
-        upcoming.push({ id: n.id, type: n.type, title: n.title, date: today, label: `${years}y ago today` });
+        upcoming.push({
+          id: n.id,
+          type: n.type,
+          title: n.title,
+          date: today,
+          label: `${years}y ago today`,
+        });
       }
     }
     upcoming.sort((a, b) => a.date.localeCompare(b.date));
 
     // ── Setup progress (drives the getting-started checklist) ────────────────
     const setup = {
-      self: nodes.some((n) => n.type === 'person' && (n.props as Record<string, unknown>).is_self === true),
+      self: nodes.some(
+        (n) => n.type === 'person' && (n.props as Record<string, unknown>).is_self === true,
+      ),
       github: Boolean(githubToken()), // FR-004: the credential lives in the secret store
 
       people: peopleCount >= 1,
@@ -163,37 +247,77 @@ dashboardRouter.get(
       ),
     );
     const factors = [
-      { key: 'habits', label: 'Habits today', pct: Math.round(factorScores.habits * 100), weight: MOMENTUM_WEIGHTS.habits, detail: `${habitsDone}/${habitsTotal} done` },
-      { key: 'reconnect', label: 'Relationship health', pct: Math.round(factorScores.reconnect * 100), weight: MOMENTUM_WEIGHTS.reconnect, detail: `${drifting} drifting` },
-      { key: 'reminders', label: 'Reminder pressure', pct: Math.round(factorScores.reminders * 100), weight: MOMENTUM_WEIGHTS.reminders, detail: `${reminders.length} due` },
-      { key: 'capture', label: 'Capture recency', pct: Math.round(factorScores.capture * 100), weight: MOMENTUM_WEIGHTS.capture, detail: recent.length > 0 ? 'active' : 'quiet' },
+      {
+        key: 'habits',
+        label: 'Habits today',
+        pct: Math.round(factorScores.habits * 100),
+        weight: MOMENTUM_WEIGHTS.habits,
+        detail: `${habitsDone}/${habitsTotal} done`,
+      },
+      {
+        key: 'reconnect',
+        label: 'Relationship health',
+        pct: Math.round(factorScores.reconnect * 100),
+        weight: MOMENTUM_WEIGHTS.reconnect,
+        detail: `${drifting} drifting`,
+      },
+      {
+        key: 'reminders',
+        label: 'Reminder pressure',
+        pct: Math.round(factorScores.reminders * 100),
+        weight: MOMENTUM_WEIGHTS.reminders,
+        detail: `${reminders.length} due`,
+      },
+      {
+        key: 'capture',
+        label: 'Capture recency',
+        pct: Math.round(factorScores.capture * 100),
+        weight: MOMENTUM_WEIGHTS.capture,
+        detail: recent.length > 0 ? 'active' : 'quiet',
+      },
     ];
     const habitsLeft = habitsTotal - habitsDone;
     // Specific beats clever, and nothing in the product glows any more.
     let hint = 'Nothing outstanding.';
     if (habitsLeft > 0) hint = `${habitsLeft} habit${habitsLeft > 1 ? 's' : ''} to go today.`;
-    else if (drifting > 0) hint = `${drifting} ${drifting > 1 ? 'people are' : 'person is'} drifting, reach out.`;
-    else if (reminders.length > 0) hint = `${reminders.length} reminder${reminders.length > 1 ? 's' : ''} due.`;
+    else if (drifting > 0)
+      hint = `${drifting} ${drifting > 1 ? 'people are' : 'person is'} drifting, reach out.`;
+    else if (reminders.length > 0)
+      hint = `${reminders.length} reminder${reminders.length > 1 ? 's' : ''} due.`;
 
     const skillIds = new Set(nodes.filter((n) => n.type === 'skill').map((n) => n.id));
     const coveredSkills = new Set<string>();
-    for (const a of scorable) for (const s of a.skill_ids) if (skillIds.has(s)) coveredSkills.add(s);
+    for (const a of scorable)
+      for (const s of a.skill_ids) if (skillIds.has(s)) coveredSkills.add(s);
 
     res.json({
       reminders,
       reconnect: lane.slice(0, 8),
-      pipeline: applications.map((a) => ({ id: a.id, title: a.title, status: (a.props as Record<string, unknown>).status })),
+      pipeline: applications.map((a) => ({
+        id: a.id,
+        title: a.title,
+        status: (a.props as Record<string, unknown>).status,
+      })),
       pipelineCounts,
       habits,
       recent,
       resumes: resumesSnap.length,
       focus: { tasks, goals },
       upcoming: upcoming.slice(0, 6),
+      knowledge: {
+        pending: knowledge.pending,
+        conflicts: knowledge.conflicts,
+        coverageComplete: knowledge.sources > 0 && knowledge.runs > 0,
+      },
       setup: { ...setup, done: setupDone, total: 6 },
       insights: {
         momentum: { score: momentumScore, hint, factors },
         funnel: pipelineCounts,
-        relationships: { total: relationshipsTotal, healthy: relationshipsTotal - drifting, drifting },
+        relationships: {
+          total: relationshipsTotal,
+          healthy: relationshipsTotal - drifting,
+          drifting,
+        },
         skills: { total: skillIds.size, covered: coveredSkills.size },
       },
       stats: { nodes: nodes.length, byType, mineByType },

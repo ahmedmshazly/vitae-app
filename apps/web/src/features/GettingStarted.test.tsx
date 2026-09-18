@@ -19,17 +19,21 @@ const partial: SetupState = {
 };
 
 describe('GettingStarted', () => {
-  it('shows progress and links for incomplete steps', () => {
+  it('shows the next step and reveals the full checklist on request', async () => {
+    const user = userEvent.setup();
     renderWithApp(<GettingStarted setup={partial} onDismiss={vi.fn()} />);
     expect(screen.getByText('1/6')).toBeInTheDocument();
     expect(screen.getByRole('progressbar', { name: 'Setup progress' })).toHaveAttribute(
       'aria-valuenow',
       '17',
     );
-    expect(screen.getByRole('link', { name: /Add someone you know/ })).toHaveAttribute(
+    expect(screen.getAllByRole('link', { name: /Add someone you know/ })[0]).toHaveAttribute(
       'href',
       '/network/people',
     );
+    expect(screen.getByText('All setup steps').closest('details')).not.toHaveAttribute('open');
+    await user.click(screen.getByText('All setup steps'));
+    expect(screen.getByText('All setup steps').closest('details')).toHaveAttribute('open');
     expect(screen.getByRole('link', { name: /Set up your profile/ })).toBeInTheDocument();
   });
 
@@ -37,7 +41,7 @@ describe('GettingStarted', () => {
     const user = userEvent.setup();
     const onDismiss = vi.fn();
     renderWithApp(<GettingStarted setup={partial} onDismiss={onDismiss} />);
-    await user.click(screen.getByRole('button', { name: 'Dismiss' }));
+    await user.click(screen.getByRole('button', { name: 'Dismiss setup checklist' }));
     expect(onDismiss).toHaveBeenCalledOnce();
   });
 });

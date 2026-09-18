@@ -17,7 +17,7 @@
  * touch screen the unlink control could not be reached at all, and on a mouse
  * every row reflowed as the pointer crossed it. `Row` keeps actions in flow.
  */
-import { useId, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -27,16 +27,24 @@ import {
   EntityGlyph,
   Field,
   Inline,
-  Popover,
+  Modal,
   Row,
   StatusTrace,
 } from '@vitae/ui';
-import { EDGE_FORM_DESCRIPTORS, edgeDisplayLabel, isEdgeType } from '@vitae/core';
+import {
+  EDGE_FORM_DESCRIPTORS,
+  edgeDisplayLabel,
+  edgePropsSchemaFor,
+  isEdgeType,
+} from '@vitae/core';
 import { api } from '../../lib/api.js';
 import { entityHref } from '../../lib/entity-href.js';
 import { useToast } from '../Toast.js';
 import { InlinePropInput } from './EdgeSubEditorRow.js';
 import { SelectCheckbox } from '../BulkNodeDelete.js';
+import { useUnsavedChanges } from '../../lib/unsaved-changes.js';
+import { useCanWrite, WRITE_LOCK_HINT } from '../../lib/auth.js';
+import { refreshConnections } from '../../lib/refresh-connections.js';
 
 export interface ConnectionEdge {
   id: string;
@@ -57,6 +65,7 @@ export function ConnectionRow({
   neighbors,
   selected,
   onToggleSelect,
+  busy = false,
   as = 'div',
 }: {
   edge: ConnectionEdge;
@@ -64,14 +73,19 @@ export function ConnectionRow({
   neighbors: Record<string, { id: string; type: string; title: string }>;
   selected?: boolean;
   onToggleSelect?: () => void;
+  busy?: boolean;
   /** Pass `li` when the caller wraps the connections in a real `ul`. */
   as?: 'div' | 'li';
 }) {
   const qc = useQueryClient();
   const { flash } = useToast();
+  const canWrite = useCanWrite();
+  const flight = useRef(false);
   const [confirmUnlink, setConfirmUnlink] = useState(false);
   const [propsOpen, setPropsOpen] = useState(false);
   const [draft, setDraft] = useState<Record<string, unknown>>(edge.props);
+  const [initial, setInitial] = useState<Record<string, unknown>>(edge.props);
+  const [validation, setValidation] = useState<string | null>(null);
   const ids = useId();
 
   const otherId = edge.src === nodeId ? edge.dst : edge.src;
@@ -85,6 +99,11 @@ export function ConnectionRow({
   const descriptor = isEdgeType(edge.type) ? EDGE_FORM_DESCRIPTORS[edge.type] : undefined;
   const editableFields = (descriptor?.fields ?? []).filter((f) => f.widget !== 'object-list');
   const formTitleId = `${ids}-props-title`;
+  const ownProps = (props: Record<string, unknown>) =>
+    Object.fromEntries(editableFields.map((field) => [field.key, props[field.key]]));
+  const dirty = propsOpen && JSON.stringify(ownProps(initial)) !== JSON.stringify(ownProps(draft));
+  const conflict =
+    propsOpen && JSON.stringify(ownProps(initial)) !== JSON.stringify(ownProps(edge.props));
 
   // No local onError on either: the query client's MutationCache already
   // announces every failure once, and a second flash here would say the same
@@ -93,25 +112,62 @@ export function ConnectionRow({
   const unlink = useMutation({
     mutationFn: () => api.del(`/edges/${edge.id}`),
     onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: ['node'] });
+      await refreshConnections(qc);
       setConfirmUnlink(false);
       flash(`Unlinked ${otherTitle}`, {
         undo: async () => {
           await api.post(`/edges/${edge.id}/restore`);
-          await qc.invalidateQueries({ queryKey: ['node'] });
+          await refreshConnections(qc);
         },
       });
     },
   });
 
   const saveProps = useMutation({
-    mutationFn: () => api.patch(`/edges/${edge.id}`, { props: { ...edge.props, ...draft } }),
+    mutationFn: (props: Record<string, unknown>) => api.patch(`/edges/${edge.id}`, { props }),
     onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: ['node'] });
-      setPropsOpen(false);
+      await refreshConnections(qc);
+      guard.forceClose();
       flash('Connection updated');
     },
   });
+  const pending = saveProps.isPending || unlink.isPending || busy;
+  const guard = useUnsavedChanges(dirty || saveProps.isPending, {
+    onClose: () => setPropsOpen(false),
+    busy: saveProps.isPending,
+  });
+  async function submit(kind: 'save' | 'unlink') {
+    if (flight.current || pending || !canWrite) return;
+    if (kind === 'save' && conflict) return;
+    const props = {
+      ...edge.props,
+      ...ownProps(draft),
+      ...(edge.type === 'KNOWS'
+        ? { last_interaction_at: edge.props.last_interaction_at ?? undefined }
+        : {}),
+    };
+    if (kind === 'save' && isEdgeType(edge.type)) {
+      const parsed = edgePropsSchemaFor(edge.type).safeParse(props);
+      if (!parsed.success) {
+        setValidation(
+          parsed.error.issues
+            .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
+            .join(' · '),
+        );
+        return;
+      }
+    }
+    setValidation(null);
+    flight.current = true;
+    try {
+      if (kind === 'save') await saveProps.mutateAsync(props);
+      else await unlink.mutateAsync();
+    } catch {
+      /* Mutation state retains the inline error. */
+    } finally {
+      flight.current = false;
+    }
+  }
 
   return (
     <Row
@@ -126,6 +182,7 @@ export function ConnectionRow({
               checked={!!selected}
               label={`Select connection to ${otherTitle}`}
               onToggle={onToggleSelect}
+              disabled={pending || !canWrite}
             />
           )}
           <Chip tone="accent" mono>
@@ -139,60 +196,91 @@ export function ConnectionRow({
       actions={
         <>
           {editableFields.length > 0 && (
-            <Popover
-              open={propsOpen}
-              onOpenChange={(o) => {
-                setPropsOpen(o);
-                if (o) {
+            <>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                glyph="edit"
+                aria-label={`Edit ${label} properties`}
+                disabled={pending || !canWrite}
+                onClick={() => {
+                  setPropsOpen(true);
                   setDraft(edge.props);
+                  setInitial(edge.props);
+                  setValidation(null);
                   saveProps.reset();
+                }}
+              />
+              <Modal
+                open={propsOpen}
+                onOpenChange={guard.onOpenChange}
+                title={`Edit ${label} properties`}
+                description={`Update the relationship with ${otherTitle}.`}
+                size="sm"
+                footer={
+                  <>
+                    <Button type="button" disabled={pending} onClick={guard.requestClose}>
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="primary"
+                      disabled={pending || conflict || !canWrite}
+                      onClick={() => void submit('save')}
+                    >
+                      {saveProps.isPending ? 'Saving...' : 'Save'}
+                    </Button>
+                  </>
                 }
-              }}
-              trigger={
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  glyph="edit"
-                  aria-label={`Edit ${label} properties`}
-                />
-              }
-            >
-              {/* The fields come from EdgeSubEditorRow, whose controls this
+              >
+                {/* The fields come from EdgeSubEditorRow, whose controls this
                   component cannot name, so the group carries the edge it
                   belongs to and the visible line is what names the group. */}
-              <div className="edge-props-form" role="group" aria-labelledby={formTitleId}>
-                <p id={formTitleId} className="text-xs text-ink-soft">
-                  {label}: {otherTitle}
-                </p>
-                {editableFields.map((f) => (
-                  <Field key={f.key} label={f.label}>
-                    <InlinePropInput
-                      field={f}
-                      ownerType={edge.type}
-                      value={draft[f.key]}
-                      onChange={(v) => setDraft((d) => ({ ...d, [f.key]: v }))}
-                    />
-                  </Field>
-                ))}
-                {saveProps.isError && (
-                  <StatusTrace
-                    tone="danger"
-                    label="Not saved"
-                    detail={reason(saveProps.error, 'The connection is unchanged. Try again.')}
-                  />
-                )}
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="primary"
-                  disabled={saveProps.isPending}
-                  onClick={() => saveProps.mutate()}
+                <fieldset
+                  className="edge-props-form"
+                  aria-labelledby={formTitleId}
+                  disabled={pending || !canWrite}
+                  style={{ minWidth: 0, border: 0, padding: 0, margin: 0 }}
                 >
-                  {saveProps.isPending ? 'Saving...' : 'Save'}
-                </Button>
-              </div>
-            </Popover>
+                  <p id={formTitleId} className="text-xs text-ink-soft">
+                    {label}: {otherTitle}
+                  </p>
+                  {!canWrite && <p role="status">{WRITE_LOCK_HINT} Your draft is still here.</p>}
+                  {editableFields.map((f) => (
+                    <Field key={f.key} label={f.label}>
+                      <InlinePropInput
+                        field={f}
+                        ownerType={edge.type}
+                        value={draft[f.key]}
+                        onChange={(v) => setDraft((d) => ({ ...d, [f.key]: v }))}
+                      />
+                    </Field>
+                  ))}
+                  {saveProps.isError && (
+                    <StatusTrace
+                      tone="danger"
+                      label="Not saved"
+                      detail={reason(saveProps.error, 'The connection is unchanged. Try again.')}
+                    />
+                  )}
+                  {validation && (
+                    <StatusTrace
+                      tone="danger"
+                      label="Check connection details"
+                      detail={validation}
+                    />
+                  )}
+                  {conflict && (
+                    <StatusTrace
+                      tone="warning"
+                      label="Connection changed"
+                      detail="Your draft is still here. Cancel and reopen to use the latest connection details."
+                    />
+                  )}
+                </fieldset>
+              </Modal>
+            </>
           )}
           <Button
             type="button"
@@ -200,9 +288,14 @@ export function ConnectionRow({
             variant="ghost"
             glyph="close"
             aria-label={`Unlink ${otherTitle}`}
+            disabled={pending || !canWrite}
+            title={canWrite ? undefined : WRITE_LOCK_HINT}
             onClick={() => {
-              unlink.reset();
-              setConfirmUnlink(true);
+              guard.attempt(() => {
+                setPropsOpen(false);
+                unlink.reset();
+                setConfirmUnlink(true);
+              });
             }}
           />
         </>
@@ -210,7 +303,9 @@ export function ConnectionRow({
     >
       <ConfirmDialog
         open={confirmUnlink}
-        onOpenChange={setConfirmUnlink}
+        onOpenChange={(open) => {
+          if (!unlink.isPending) setConfirmUnlink(open);
+        }}
         title={`Unlink ${other?.title ?? 'this record'}?`}
         body={
           <>
@@ -228,8 +323,10 @@ export function ConnectionRow({
         confirmLabel={unlink.isPending ? 'Unlinking...' : 'Unlink'}
         destructive
         busy={unlink.isPending}
-        onConfirm={() => unlink.mutate()}
+        initialFocus="cancel"
+        onConfirm={() => void submit('unlink')}
       />
+      {guard.prompt}
     </Row>
   );
 }

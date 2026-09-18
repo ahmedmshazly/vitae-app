@@ -16,6 +16,7 @@ import '@vitae/ui/styles/motion.css';
 import '@vitae/ui/styles/components.css';
 import '@vitae/ui/styles/layout.css';
 import '@vitae/ui/styles/toast.css';
+import '@vitae/ui/styles/combobox.css';
 
 // App styles
 import './styles/app.css';

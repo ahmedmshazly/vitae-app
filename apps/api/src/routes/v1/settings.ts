@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { asyncHandler, HttpError } from '../../middleware/error.js';
 import { getSettings, patchSettings, publicSettings } from '../../services/settings.js';
-import { deleteSecret, SecretStoreError, setSecret } from '../../services/secrets.js';
+import { deleteSecret, secretSource, SecretStoreError, setSecret } from '../../services/secrets.js';
 
 export const settingsRouter: Router = Router();
 
@@ -74,6 +74,45 @@ settingsRouter.delete(
   asyncHandler(async (_req, res) => {
     deleteSecret('github_pat');
     await patchSettings({ github: { etag: null, lastSyncAt: null } });
+    res.json({ ok: true, configured: false });
+  }),
+);
+
+/**
+ * Write-only Gemini key. Same custody as the GitHub PAT: secret store only,
+ * never application data. Env-injected keys (GEMINI_API_KEY or GEMENI_API_KEY)
+ * make the store read-only.
+ */
+settingsRouter.post(
+  '/gemini',
+  asyncHandler(async (req, res) => {
+    const apiKey = String(req.body?.apiKey ?? '').trim();
+    const project = String(req.body?.project ?? '').trim();
+    if (!apiKey) throw new HttpError(400, 'BAD_REQUEST', 'apiKey is required.');
+    try {
+      setSecret('gemini_api_key', apiKey);
+    } catch (err) {
+      if (err instanceof SecretStoreError) throw new HttpError(409, 'SECRET_READ_ONLY', err.message);
+      throw err;
+    }
+    const next = await patchSettings({ gemini: { project: project || null } });
+    res.json({ ok: true, configured: true, project: publicSettings(next).gemini.project });
+  }),
+);
+
+/** Disconnect Gemini: drop the file-backed credential. Env-injected keys stay. */
+settingsRouter.delete(
+  '/gemini',
+  asyncHandler(async (_req, res) => {
+    if (secretSource('gemini_api_key') === 'env') {
+      throw new HttpError(
+        409,
+        'SECRET_READ_ONLY',
+        'Gemini is provided by the environment, unset GEMINI_API_KEY or GEMENI_API_KEY there, not through the API.',
+      );
+    }
+    deleteSecret('gemini_api_key');
+    await patchSettings({ gemini: { project: null } });
     res.json({ ok: true, configured: false });
   }),
 );

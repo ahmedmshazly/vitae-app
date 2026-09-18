@@ -13,6 +13,23 @@ const node = (id: string, over: Partial<InteractionNode> = {}): InteractionNode 
 });
 
 describe('toInteractionLog', () => {
+  it('sorts actual instants across UTC offsets and retains historical dates before the epoch', () => {
+    const log = toInteractionLog([
+      node('early', { props: { occurred_at: '2026-08-02T01:00:00+03:00' } }),
+      node('late', { props: { occurred_at: '2026-08-01T23:00:00Z' } }),
+      node('undated'),
+      node('historic', { created_at: '1960-01-01T00:00:00Z' }),
+    ]);
+    expect(log.map((entry) => entry.id)).toEqual(['late', 'early', 'historic', 'undated']);
+  });
+  it('falls back from invalid occurred dates and leaves fully invalid dates undated', () => {
+    expect(
+      toInteractionLog([
+        node('invalid', { props: { occurred_at: 'bad' }, created_at: 'also bad' }),
+        node('fallback', { props: { occurred_at: 'bad' }, created_at: '2026-01-01T00:00:00Z' }),
+      ]).map((entry) => entry.at),
+    ).toEqual(['2026-01-01T00:00:00Z', '']);
+  });
   it('orders by when it happened, not by edge insertion order', () => {
     const log = toInteractionLog([
       node('a', { props: { occurred_at: '2026-01-01T00:00:00Z' } }),
@@ -42,6 +59,18 @@ describe('toInteractionLog', () => {
 
 describe('interactionTicks', () => {
   const at = (iso: string, kind = 'coffee') => ({ id: iso, title: 't', kind, at: iso });
+  it('excludes invalid dates and orders valid ticks before applying the cap', () => {
+    const result = interactionTicks([
+      at('bad'),
+      at('2026-08-01T00:00:00Z'),
+      at('2026-08-02T00:00:00Z'),
+      at(''),
+    ]);
+    expect(result.ticks).toHaveLength(2);
+    expect(result.ticks.every((tick) => Number.isFinite(tick.at))).toBe(true);
+    expect(result.ticks[1].label).toContain('2026-08-02');
+    expect(result.index).toBe(1);
+  });
 
   it('places ticks by date, so clustering is visible rather than averaged away', () => {
     // Three in one week, then a long silence, then one today.

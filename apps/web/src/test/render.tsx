@@ -9,6 +9,7 @@ import { MemoryRouter, type MemoryRouterProps } from 'react-router-dom';
 import type { ReactElement, ReactNode } from 'react';
 import { ToastProvider } from '../features/Toast.js';
 import type { WorkspaceAccess } from '../lib/auth.js';
+import { ThemeProvider } from '@vitae/ui';
 
 export type TestAuth = {
   user: { email: string; via: 'google' | 'dev' } | null;
@@ -21,6 +22,7 @@ export type TestAuth = {
   // Cloud mode carries a workspace and its access state on the same context.
   // Both default to the self-hosted shape, where there is no workspace at all.
   cloudEnabled: boolean;
+  localInstall: boolean;
   workspace: WorkspaceAccess | null;
 };
 
@@ -45,6 +47,7 @@ export function createTestAuth(over: Partial<TestAuth> = {}): TestAuth {
     devLoginEnabled: true,
     googleEnabled: true,
     cloudEnabled: false,
+    localInstall: false,
     workspace: null,
     ...over,
   };
@@ -77,6 +80,7 @@ export function renderWithApp(
       </MemoryRouter>
     );
     if (withToast) tree = <ToastProvider>{tree}</ToastProvider>;
+    tree = <ThemeProvider>{tree}</ThemeProvider>;
     tree = <QueryClientProvider client={queryClient}>{tree}</QueryClientProvider>;
     return wrapper ? wrapper({ children: tree }) : <>{tree}</>;
   }

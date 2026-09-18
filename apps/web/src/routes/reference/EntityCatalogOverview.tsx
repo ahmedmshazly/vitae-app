@@ -29,19 +29,19 @@ const OFFSET_Y = VIEW_HEIGHT / 2;
  * Several of these now coincide, because the `--ae-*` names are compatibility
  * aliases and the new palette has fewer surfaces than Quiet did: entity and
  * relation nodes are both `--bg-2`. Shape and the 1.4px stroke are what
- * separate them, which was already true when the two fills were `#1c1c1c` and
- * `#262626`.
+ * separate them, which keeps the exported register clear without adding
+ * decorative colour.
  */
 export const OVERVIEW_INK = {
-  '--ae-bg': '#f2f0ea',
+  '--ae-bg': '#f7f4ed',
   '--ae-surface': '#ffffff',
-  '--ae-surface-raised': '#e9e6de',
-  '--ae-accent-bg': '#e9e6de',
-  '--ae-border-strong': '#d6d2c8',
-  '--ae-border-control': '#d6d2c8',
-  '--ae-fg': '#0b0b0d',
-  '--ae-fg-soft': '#5b584f',
-  '--ae-fg-strong': '#0b0b0d',
+  '--ae-surface-raised': '#ece7dc',
+  '--ae-accent-bg': '#ece7dc',
+  '--ae-border-strong': '#cbc5b8',
+  '--ae-border-control': '#cbc5b8',
+  '--ae-fg': '#20231f',
+  '--ae-fg-soft': '#68685f',
+  '--ae-fg-strong': '#20231f',
 } as const;
 
 /**

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useReducedMotion } from 'motion/react';
-import { EmptyState, ErrorState, SkeletonRows, StatusTrace } from '@vitae/ui';
+import { EmptyState, ErrorState, SkeletonRows, StatusTrace, useTheme } from '@vitae/ui';
 import { useToast } from '../Toast.js';
 import { api } from '../../lib/api.js';
 import { readGraphPalette, type GraphPalette } from '../../lib/graph-palette.js';
@@ -54,7 +54,8 @@ export function AtlasView() {
   const { flash } = useToast();
   const [params, setParams] = useSearchParams();
   const reducedMotion = useReducedMotion() ?? false;
-  const palette = useMemo<GraphPalette>(() => readGraphPalette(), []);
+  const { resolvedTheme } = useTheme();
+  const palette = useMemo<GraphPalette>(() => readGraphPalette(), [resolvedTheme]);
   const [prefs, patchPrefs, resetPrefs] = useAtlasDisplayPrefs();
   const [prefsOpen, setPrefsOpen] = useState(false);
   const [mode, setMode] = useState<AtlasViewMode>('atlas');
@@ -141,6 +142,23 @@ export function AtlasView() {
     () => (selectedCity ? (data?.cities.find((c) => c.city === selectedCity) ?? null) : null),
     [data, selectedCity],
   );
+
+  // A shared Atlas link can outlive its evidence: records may be archived or
+  // filtered out after the link was copied. Leaving the unknown `city` or
+  // `trip` in the URL makes the toolbar describe an inspector that never
+  // appears. Recover the surviving part of the link and say exactly why the
+  // selection changed instead of treating it as an empty map.
+  useEffect(() => {
+    if (!data || !selectedTripId || selectedTrip) return;
+    setSelectedTripId(null);
+    flash('That trip is no longer available. The map link was updated.', { variant: 'status' });
+  }, [data, flash, selectedTrip, selectedTripId]);
+
+  useEffect(() => {
+    if (!data || !selectedCity || selectedEntry) return;
+    setSelectedCity(null);
+    flash('That place is no longer available. The map link was updated.', { variant: 'status' });
+  }, [data, flash, selectedCity, selectedEntry]);
 
   const tripsHere = useMemo(() => {
     if (!selectedCity || !data) return [];

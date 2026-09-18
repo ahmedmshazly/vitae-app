@@ -14,6 +14,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, useAnimationControls } from 'motion/react';
 import {
   Button,
+  Banner,
   ChargeRing,
   Chip,
   DotGrid,
@@ -41,6 +42,9 @@ import {
   type SetupState,
 } from '../features/GettingStarted.js';
 import { entityHref } from '../lib/entity-href.js';
+import { useCanWrite, WRITE_LOCK_HINT } from '../lib/auth.js';
+import { useHabitCheck } from '../features/useHabitCheck.js';
+import { NodeFormDialog } from '../features/forms/NodeFormDialog.js';
 
 interface MomentumFactor {
   key: string;
@@ -51,7 +55,7 @@ interface MomentumFactor {
 }
 
 interface Dashboard {
-  reminders: Array<{ id: string; note: string; due_on: string; subject_id: string }>;
+  reminders: Array<{ id: string; note: string; due_on: string; subject_id?: string }>;
   reconnect: Array<{
     person: { id: string; title: string; props?: Record<string, unknown> };
     priority: number;
@@ -80,6 +84,7 @@ interface Dashboard {
     goals: Array<{ id: string; title: string; progress: number; keyResults: number }>;
   };
   upcoming: Array<{ id: string; type: string; title: string; date: string; label: string }>;
+  knowledge: { pending: number; conflicts: number; coverageComplete: boolean };
   setup: SetupState;
   insights: {
     momentum: { score: number; hint: string; factors: MomentumFactor[] };
@@ -115,7 +120,7 @@ interface QueueItem {
   glyph?: GlyphName;
   kind: string;
   title: string;
-  href: string;
+  href?: string;
   /** Days past due; negative is still ahead. This is the sort key. */
   overdueBy: number;
   /** The status in words, never a colour on its own. */
@@ -139,6 +144,26 @@ function dueLabel(days: number): string {
 export function buildQueue(data: Dashboard): QueueItem[] {
   const items: QueueItem[] = [];
 
+  // Older servers and cached payloads predate the knowledge summary. Its
+  // absence means no review lane is available, not that the whole agenda is
+  // unreadable.
+  const reviews = (data.knowledge?.pending ?? 0) + (data.knowledge?.conflicts ?? 0);
+  if (reviews > 0) {
+    items.push({
+      key: 'knowledge:review',
+      type: 'document',
+      glyph: 'filter',
+      kind: 'Review',
+      title: `${reviews} knowledge ${reviews === 1 ? 'assertion' : 'assertions'} need a decision`,
+      href: '/data/knowledge',
+      overdueBy: 0,
+      when:
+        (data.knowledge?.conflicts ?? 0) > 0
+          ? `${data.knowledge?.conflicts} conflicts`
+          : 'ready to review',
+    });
+  }
+
   for (const r of data.reminders) {
     const late = -daysUntil(r.due_on);
     items.push({
@@ -146,8 +171,8 @@ export function buildQueue(data: Dashboard): QueueItem[] {
       type: 'reminder',
       glyph: 'bell',
       kind: 'Reminder',
-      title: r.note,
-      href: `/n/${r.subject_id}`,
+      title: r.note || 'Untitled reminder',
+      href: r.subject_id ? `/n/${r.subject_id}` : undefined,
       overdueBy: late,
       when: dueLabel(late),
       reminderId: r.id,
@@ -215,6 +240,7 @@ export function Dashboard() {
     queryFn: () => api.get<Dashboard>('/dashboard'),
   });
   const [logTarget, setLogTarget] = useState<{ id: string; name: string } | null>(null);
+  const [newHabit, setNewHabit] = useState(false);
   const [dismissedInit, persistDismiss] = useGettingStartedDismissed();
   const [gsDismissed, setGsDismissed] = useState(dismissedInit);
   const dismissGs = () => {
@@ -223,60 +249,35 @@ export function Dashboard() {
   };
   const qc = useQueryClient();
   const { flash } = useToast();
+  const canWrite = useCanWrite();
   const today = todayIso();
   const week = useMemo(() => weekTicks(today), [today]);
 
-  const toggleHabit = useMutation({
-    mutationFn: (habitId: string) => api.post(`/habits/${habitId}/toggle`, {}),
-    // Optimistic: flip today's check instantly, roll back on error.
-    onMutate: async (habitId: string) => {
-      await qc.cancelQueries({ queryKey: ['dashboard'] });
-      const prev = qc.getQueryData<Dashboard>(['dashboard']);
-      if (prev) {
-        qc.setQueryData<Dashboard>(['dashboard'], {
-          ...prev,
-          habits: prev.habits.map((h) =>
-            h.id === habitId
-              ? {
-                  ...h,
-                  checkedToday: !h.checkedToday,
-                  grid: [...h.grid.slice(0, -1), !h.checkedToday],
-                }
-              : h,
-          ),
-        });
-      }
-      return { prev };
-    },
-    onError: (err, _id, ctx) => {
-      if (ctx?.prev) qc.setQueryData(['dashboard'], ctx.prev);
-      // The tick sliding back is a change, not an explanation. Owning an
-      // onError opts this mutation out of the app's error toast, so say why
-      // here or the failure passes as a misclick.
-      flash(err instanceof Error ? err.message : 'That habit could not be marked.', {
-        variant: 'error',
-      });
-    },
-    onSettled: () => void qc.invalidateQueries({ queryKey: ['dashboard'] }),
-  });
+  const habitCheck = useHabitCheck();
+
+  async function refreshReminders() {
+    await Promise.all([
+      qc.invalidateQueries({ queryKey: ['dashboard'] }),
+      qc.invalidateQueries({ queryKey: ['reminders'] }),
+    ]);
+  }
 
   const completeReminder = useMutation({
     mutationFn: (id: string) => api.post(`/reminders/${id}/done`, {}),
-    onSuccess: (_result, id) => {
-      void qc.invalidateQueries({ queryKey: ['dashboard'] });
-      void qc.invalidateQueries({ queryKey: ['reminders'] });
+    onSuccess: async (_result, id) => {
+      await refreshReminders();
       // Undo is a real reopen call, not a client-side rewind.
-      flash('Done', {
+      flash('Reminder marked done.', {
+        variant: 'success',
         undo: async () => {
           await api.post(`/reminders/${id}/reopen`, {});
-          void qc.invalidateQueries({ queryKey: ['dashboard'] });
-          void qc.invalidateQueries({ queryKey: ['reminders'] });
+          await refreshReminders();
         },
       });
     },
   });
 
-  if (isError) {
+  if (isError && !data) {
     return (
       <div className="page">
         <PageHeader title="Today" />
@@ -306,7 +307,7 @@ export function Dashboard() {
   const drifting = data.insights.relationships.drifting;
 
   return (
-    <div className="page">
+    <div className="page today-page">
       <PageHeader
         title="Today"
         subtitle={
@@ -315,99 +316,163 @@ export function Dashboard() {
             {' · '}
             {queue.length > 0
               ? `${queue.length} ${queue.length === 1 ? 'thing needs' : 'things need'} you`
-              : 'Nothing needs you'}
-            {drifting > 0 && ` · ${drifting} drifting`}
+              : 'Your agenda is clear'}
+            {drifting > 0 &&
+              ` · ${drifting} ${drifting === 1 ? 'relationship needs' : 'relationships need'} attention`}
           </>
         }
         actions={
           <div className="hstack">
-            <Link className="planner__back" to="/today/planner">
-              Planner
+            <Link className="vt-btn vt-btn--primary" to="/today/planner">
+              <Glyph name="calendar" size={16} /> Open planner
             </Link>
-            <Momentum momentum={data.insights.momentum} />
           </div>
         }
       />
       <RegisterRule ticks={week.ticks} activeIndex={week.index} label="Days of this week" />
+      {isError && (
+        <Banner tone="warning" title="Couldn't refresh today">
+          Your last loaded agenda is still shown.{' '}
+          <Button variant="ghost" size="sm" onClick={() => void refetch()}>
+            Retry
+          </Button>
+        </Banner>
+      )}
+
+      <div className="today-layout">
+        <div className="today-agenda">
+          <Section title="Needs you" meta={queue.length}>
+            {queue.length === 0 ? (
+              <div className="today-empty">
+                <Glyph name="check" size={22} />
+                <div>
+                  <h3>No outstanding agenda items</h3>
+                  <p>Reminders, open tasks and deadlines in the next seven days appear here.</p>
+                  {drifting > 0 && (
+                    <a href="#today-reconnect">
+                      Check in with someone below <span aria-hidden>↓</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <ul className="flex list-none flex-col p-0">
+                {staggered(queue).map(({ item, index }) => (
+                  <QueueRow
+                    key={item.key}
+                    item={item}
+                    index={index}
+                    pending={completeReminder.isPending || !canWrite}
+                    onDone={() => completeReminder.mutate(item.reminderId!)}
+                  />
+                ))}
+              </ul>
+            )}
+          </Section>
+        </div>
+
+        <div className="today-rituals">
+          <Section title="Habits" meta={data.habits.length}>
+            {data.habits.length === 0 ? (
+              <EmptyState
+                glyph="habit"
+                title="No habits tracked"
+                className="today-rituals__empty"
+                hint="Start with one small daily action."
+                action={
+                  <Button
+                    disabled={!canWrite}
+                    title={!canWrite ? WRITE_LOCK_HINT : undefined}
+                    onClick={() => setNewHabit(true)}
+                  >
+                    Track a habit
+                  </Button>
+                }
+              />
+            ) : (
+              data.habits.map((h) => (
+                <HabitRow
+                  key={h.id}
+                  habit={h}
+                  disabled={habitCheck.isPending || !canWrite}
+                  busy={habitCheck.isPending && habitCheck.pendingId === h.id}
+                  disabledReason={
+                    !canWrite
+                      ? WRITE_LOCK_HINT
+                      : habitCheck.isPending
+                        ? 'Another habit is being saved.'
+                        : undefined
+                  }
+                  onToggle={async () => {
+                    if (!canWrite || habitCheck.isPending) return;
+                    const wasChecked = h.checkedToday;
+                    try {
+                      await habitCheck.setChecked(h.id, !wasChecked);
+                      flash(wasChecked ? 'Unchecked' : 'Checked', {
+                        undo: () => habitCheck.setChecked(h.id, wasChecked),
+                      });
+                    } catch (error) {
+                      flash(
+                        error instanceof Error
+                          ? `Couldn't update habit: ${error.message}`
+                          : "Couldn't update habit. Try again.",
+                        { variant: 'error' },
+                      );
+                    }
+                  }}
+                />
+              ))
+            )}
+          </Section>
+
+          <div id="today-reconnect">
+            <Section title="Reconnect" meta={data.reconnect.length}>
+              {data.reconnect.length === 0 ? (
+                <EmptyState
+                  glyph="person"
+                  title="No reconnect suggestions"
+                  className="today-rituals__empty"
+                  hint="Add people and log interactions to build your relationship history."
+                  action={
+                    <Link className="vt-btn" to="/network/people">
+                      Open people
+                    </Link>
+                  }
+                />
+              ) : (
+                data.reconnect.map((r) => (
+                  <ReconnectRow
+                    key={r.person.id}
+                    entry={r}
+                    disabled={!canWrite}
+                    onLog={() => setLogTarget({ id: r.person.id, name: r.person.title })}
+                  />
+                ))
+              )}
+            </Section>
+          </div>
+        </div>
+      </div>
 
       {!gsDismissed && data.setup.done < data.setup.total && (
         <GettingStarted setup={data.setup} onDismiss={dismissGs} />
       )}
-
-      <Section title="Needs you" meta={queue.length}>
-        {queue.length === 0 ? (
-          <EmptyState
-            glyph="check"
-            title="Nothing needs you today"
-            hint="Reminders, open tasks and deadlines inside the next week land here. Press ⌘K to capture one."
-          />
-        ) : (
-          <ul className="flex list-none flex-col p-0">
-            {staggered(queue).map(({ item, index }) => (
-              <QueueRow
-                key={item.key}
-                item={item}
-                index={index}
-                pending={completeReminder.isPending}
-                onDone={() => completeReminder.mutate(item.reminderId!)}
-              />
-            ))}
-          </ul>
-        )}
-      </Section>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <Section title="Habits" meta={data.habits.length}>
-          {data.habits.length === 0 ? (
-            <EmptyState
-              glyph="habit"
-              title="No habits tracked"
-              hint={
-                <>
-                  Capture one with ⌘K: <Mono>habit Writing</Mono>.
-                </>
-              }
-            />
-          ) : (
-            data.habits.map((h) => (
-              <HabitRow
-                key={h.id}
-                habit={h}
-                onToggle={() => {
-                  const wasChecked = h.checkedToday;
-                  toggleHabit.mutate(h.id, {
-                    onSuccess: () =>
-                      // The button says Check; the toast says Checked.
-                      flash(wasChecked ? 'Unchecked' : 'Checked', {
-                        undo: () => toggleHabit.mutate(h.id),
-                      }),
-                  });
-                }}
-              />
-            ))
-          )}
-        </Section>
-
-        <Section title="Reconnect" meta={data.reconnect.length}>
-          {data.reconnect.length === 0 ? (
-            <EmptyState
-              glyph="person"
-              title="No one is drifting"
-              hint="Log an interaction on a person to start tracking cadence."
-            />
-          ) : (
-            data.reconnect.map((r) => (
-              <ReconnectRow
-                key={r.person.id}
-                entry={r}
-                onLog={() => setLogTarget({ id: r.person.id, name: r.person.title })}
-              />
-            ))
-          )}
-        </Section>
-      </div>
-
       <HowThingsStand data={data} />
+      {gsDismissed && data.setup.done < data.setup.total && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            persistDismiss(false);
+            setGsDismissed(false);
+            requestAnimationFrame(() =>
+              document.getElementById('today-setup')?.scrollIntoView({ block: 'nearest' }),
+            );
+          }}
+        >
+          Show setup checklist
+        </Button>
+      )}
 
       {logTarget && (
         <InteractionLogger
@@ -416,6 +481,7 @@ export function Dashboard() {
           onClose={() => setLogTarget(null)}
         />
       )}
+      {newHabit && <NodeFormDialog open type="habit" onOpenChange={setNewHabit} />}
     </div>
   );
 }
@@ -439,20 +505,40 @@ function QueueRow({
   pending: boolean;
   onDone: () => void;
 }) {
+  const content = (
+    <>
+      <EntityGlyph type={item.type} glyph={item.glyph} title={item.kind} size="sm" />
+      <span className="today-queue__content">
+        <span id={`agenda-${item.key}`} className="today-queue__title">
+          {item.title}
+        </span>
+        <span className="today-queue__meta">
+          <span>{item.kind}</span>
+          <Mono className={item.overdueBy > 0 ? 'text-warning' : 'text-muted'}>{item.when}</Mono>
+        </span>
+      </span>
+    </>
+  );
   return (
     <motion.li
       {...useEnterItem(index)}
       className="flex items-center gap-3 border-b border-hairline last:border-b-0"
     >
-      <Link to={item.href} className={`${ROW_LINK} flex-1 border-b-0`}>
-        <EntityGlyph type={item.type} glyph={item.glyph} title={item.kind} size="sm" />
-        <span className="min-w-0 flex-1 truncate">{item.title}</span>
-        <Mono className={item.overdueBy > 0 ? 'text-sm text-warning' : 'text-sm text-muted'}>
-          {item.when}
-        </Mono>
-      </Link>
+      {item.href ? (
+        <Link to={item.href} className="today-queue__main">
+          {content}
+        </Link>
+      ) : (
+        <div className="today-queue__main">{content}</div>
+      )}
       {item.reminderId && (
-        <Button size="sm" variant="ghost" disabled={pending} onClick={onDone}>
+        <Button
+          size="sm"
+          variant="ghost"
+          disabled={pending}
+          onClick={onDone}
+          aria-describedby={`agenda-${item.key}`}
+        >
           Done
         </Button>
       )}
@@ -498,12 +584,10 @@ function Bar({ value, label, decorative }: { value: number; label: string; decor
 function Momentum({ momentum }: { momentum: Dashboard['insights']['momentum'] }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="text-right">
-        <div className="text-xs tracking-[0.08em] text-muted uppercase">Momentum</div>
-        <div className="text-sm text-muted">{momentum.hint}</div>
-      </div>
+      <div className="text-xs tracking-[0.08em] text-muted uppercase">Momentum</div>
       <Mono className="text-xl text-ink-strong">{momentum.score}</Mono>
-      <InfoPopover title="What drives momentum" triggerLabel="breakdown">
+      <InfoPopover title="What drives momentum" triggerLabel="Score details">
+        <p>{momentum.hint}</p>
         <p>
           A transparent 0-100 read on whether the system is being worked. Each factor contributes
           its weight:
@@ -527,9 +611,15 @@ function Momentum({ momentum }: { momentum: Dashboard['insights']['momentum'] })
 function HabitRow({
   habit,
   onToggle,
+  disabled,
+  busy,
+  disabledReason,
 }: {
   habit: Dashboard['habits'][number];
   onToggle: () => void;
+  disabled: boolean;
+  busy: boolean;
+  disabledReason?: string;
 }) {
   // Driven imperatively rather than by a key change: remounting the row to
   // replay the animation would drop keyboard focus off the button that was
@@ -538,9 +628,12 @@ function HabitRow({
   const pulse = useEmphasis();
   const grid = habit.grid.slice(-14);
   return (
-    <motion.div className={ROW} variants={pulse} animate={controls}>
+    <motion.div className="today-habit" variants={pulse} animate={controls}>
       <button
         type="button"
+        disabled={disabled}
+        aria-busy={busy}
+        title={disabledReason}
         aria-pressed={habit.checkedToday}
         aria-label={
           habit.checkedToday ? `Uncheck ${habit.title} for today` : `Check ${habit.title} for today`
@@ -550,14 +643,21 @@ function HabitRow({
           onToggle();
         }}
         className={[
-          'flex size-8 flex-none items-center justify-center rounded-sm border border-control',
+          'today-habit__check flex flex-none items-center justify-center rounded-sm border border-control',
           habit.checkedToday ? 'bg-accent text-accent-ink' : 'text-faint hover:text-ink',
         ].join(' ')}
       >
         <Glyph name="check" size={14} />
       </button>
-      <span className="min-w-0 flex-1 truncate text-ink">{habit.title}</span>
-      <DotGrid days={grid} label={`${habit.title}, last 14 days`} recentWindow={grid.length} />
+      <div className="today-habit__body">
+        <Link to={`/n/${habit.id}`} className="today-habit__title">
+          {habit.title}
+        </Link>
+        <div className="today-habit__history">
+          <DotGrid days={grid} label={`${habit.title}, last 14 days`} recentWindow={grid.length} />
+          <span>{busy ? 'Saving…' : 'Last 14 days'}</span>
+        </div>
+      </div>
       <Mono
         className={habit.streak >= STREAK_THRESHOLD ? 'text-sm text-ember' : 'text-sm text-muted'}
       >
@@ -570,9 +670,11 @@ function HabitRow({
 function ReconnectRow({
   entry,
   onLog,
+  disabled,
 }: {
   entry: Dashboard['reconnect'][number];
   onLog: () => void;
+  disabled: boolean;
 }) {
   const quiet = entry.daysSinceLast != null ? Math.round(entry.daysSinceLast) : null;
   const cadence = Number(
@@ -584,14 +686,21 @@ function ReconnectRow({
       <ChargeRing quiet={quiet ?? cadence * 2} cadence={cadence} size={24} />
       <Link
         to={`/network/people/${entry.person.id}`}
-        className="min-w-0 flex-1 truncate text-ink no-underline hover:underline"
+        className="min-w-0 flex-1 text-ink no-underline hover:underline [overflow-wrap:anywhere]"
       >
         {entry.person.title}
       </Link>
       <Mono className={over ? 'text-sm text-warning' : 'text-sm text-muted'}>
         {quiet != null ? `${quiet}d quiet` : 'never logged'}
       </Mono>
-      <Button size="sm" variant="ghost" onClick={onLog}>
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={onLog}
+        disabled={disabled}
+        title={disabled ? WRITE_LOCK_HINT : undefined}
+        aria-label={`Log interaction with ${entry.person.title}`}
+      >
         Log
       </Button>
     </div>
@@ -607,11 +716,11 @@ function HowThingsStand({ data }: { data: Dashboard }) {
     [data.counts.nodes, 'records'],
     [data.counts.edges, 'connections'],
     [data.counts.people, 'people'],
-    [data.counts.atoms, 'atoms'],
+    [data.counts.atoms, 'evidence'],
   ];
 
   return (
-    <Section title="How things stand">
+    <Section title="How things stand" actions={<Momentum momentum={data.insights.momentum} />}>
       <div className="mb-6 flex flex-wrap gap-x-8 gap-y-3 border-y border-hairline py-3">
         {ledger.map(([value, label]) => (
           <p key={label} className="flex items-baseline gap-2">
@@ -623,7 +732,12 @@ function HowThingsStand({ data }: { data: Dashboard }) {
 
       <div className="grid gap-6 md:grid-cols-2">
         <div>
-          <h3 className="mb-2 text-sm text-muted">Applications</h3>
+          <div className="mb-2 flex items-baseline justify-between gap-3">
+            <h3 className="text-sm text-muted">Applications</h3>
+            <Link to="/career/applications" className="text-sm">
+              View applications
+            </Link>
+          </div>
           <div className="mb-3 grid grid-cols-4 gap-2">
             {PIPELINE_ORDER.map((stage) => {
               const count = data.pipelineCounts?.[stage] ?? 0;
@@ -646,7 +760,7 @@ function HowThingsStand({ data }: { data: Dashboard }) {
             data.pipeline.slice(0, 4).map((a) => (
               <Link key={a.id} to={`/career/applications/${a.id}`} className={ROW_LINK}>
                 <EntityGlyph type="application" size="sm" />
-                <span className="min-w-0 flex-1 truncate">{a.title}</span>
+                <span className="min-w-0 flex-1 break-words">{a.title}</span>
                 <Chip mono>{a.status}</Chip>
               </Link>
             ))
@@ -668,8 +782,10 @@ function HowThingsStand({ data }: { data: Dashboard }) {
                   className="-mx-2 block rounded-sm px-2 py-2 text-ink no-underline hover:bg-raised hover:no-underline"
                 >
                   <span className="mb-1 flex items-baseline justify-between gap-3">
-                    <span className="min-w-0 truncate">{g.title}</span>
-                    <Mono className="text-sm text-faint">{Math.round(g.progress * 100)}%</Mono>
+                    <span className="min-w-0 break-words">{g.title}</span>
+                    <Mono className="shrink-0 text-sm text-faint">
+                      {Math.round(g.progress * 100)}%
+                    </Mono>
                   </span>
                   <Bar value={g.progress} label={`${g.title} progress`} decorative />
                 </Link>
@@ -682,19 +798,28 @@ function HowThingsStand({ data }: { data: Dashboard }) {
               <span className="mb-1 flex items-baseline justify-between gap-3">
                 <span className="text-sm text-muted">Relationship health</span>
                 <Mono className="text-sm text-faint">
-                  {relationships.healthy}/{relationships.total} healthy
+                  {relationships.total > 0 &&
+                    `${relationships.healthy}/${relationships.total} healthy`}
                 </Mono>
               </span>
-              <Bar value={relPct} label="Relationship health" />
+              {relationships.total > 0 ? (
+                <Bar value={relPct} label="Relationship health" />
+              ) : (
+                <p className="text-sm text-muted">No relationships indexed yet.</p>
+              )}
             </div>
             <div>
               <span className="mb-1 flex items-baseline justify-between gap-3">
                 <span className="text-sm text-muted">Skill coverage on résumé</span>
                 <Mono className="text-sm text-faint">
-                  {skills.covered}/{skills.total} used
+                  {skills.total > 0 && `${skills.covered}/${skills.total} used`}
                 </Mono>
               </span>
-              <Bar value={skillPct} label="Résumé skill coverage" />
+              {skills.total > 0 ? (
+                <Bar value={skillPct} label="Résumé skill coverage" />
+              ) : (
+                <p className="text-sm text-muted">No skills to compare yet.</p>
+              )}
             </div>
           </div>
         </div>
@@ -703,14 +828,14 @@ function HowThingsStand({ data }: { data: Dashboard }) {
       <h3 className="mt-6 mb-2 text-sm text-muted">Recent captures</h3>
       {data.recent.length === 0 ? (
         <p className="text-sm text-muted">
-          Nothing captured yet. Press ⌘K to add your first record.
+          Nothing captured yet. Use Capture to add your first record.
         </p>
       ) : (
         data.recent.map((n) => (
           <Link key={n.id} to={entityHref(n.type, n.id)} className={ROW_LINK}>
             <EntityGlyph type={n.type} size="sm" />
-            <span className="min-w-0 flex-1 truncate">{n.title}</span>
-            <ProvenanceChip source={n.source} />
+            <span className="min-w-0 flex-1 break-words">{n.title}</span>
+            <ProvenanceChip source={n.source || 'unknown'} />
           </Link>
         ))
       )}

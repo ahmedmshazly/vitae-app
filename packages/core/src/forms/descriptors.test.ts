@@ -27,6 +27,24 @@ describe('form descriptors stay honest against the Zod schemas', () => {
     }
   });
 
+  it('keeps Area and Opportunity discoverable through meaningful form fields', () => {
+    const area = nodeFormDescriptor('area');
+    const opportunity = nodeFormDescriptor('opportunity');
+    expect(area.titleLabel).toBe('Life area');
+    expect(area.fields.map((field) => field.key)).toEqual(
+      expect.arrayContaining(['kind', 'area_status', 'standard', 'review_cadence_days']),
+    );
+    expect(opportunity.fields.map((field) => field.key)).toEqual(
+      expect.arrayContaining([
+        'kind',
+        'opportunity_status',
+        'value',
+        'next_step',
+        'next_step_date',
+      ]),
+    );
+  });
+
   it('every edge type has a descriptor', () => {
     for (const type of EDGE_TYPES) {
       expect(EDGE_FORM_DESCRIPTORS[type], type).toBeDefined();
@@ -112,6 +130,7 @@ describe('form descriptors stay honest against the Zod schemas', () => {
       ['MEMBER_OF', 'person', 'organization'],
       ['REACTED_TO', 'person', 'post'],
       ['ORG_RELATED', 'organization', 'organization'],
+      ['INTRODUCED', 'person', 'person'],
       ['DEPENDS_ON', 'task', 'task'],
       ['SERVES_GOAL', 'task', 'goal'],
       ['SERVES_GOAL', 'project', 'goal'],
@@ -120,6 +139,21 @@ describe('form descriptors stay honest against the Zod schemas', () => {
       ['FOR', 'task', 'person'],
       ['FOR', 'task', 'organization'],
       ['FOR', 'task', 'application'],
+      ['IN_AREA', 'goal', 'area'],
+      ['IN_AREA', 'project', 'area'],
+      ['IN_AREA', 'task', 'area'],
+      ['IN_AREA', 'habit', 'area'],
+      ['IN_AREA', 'event', 'area'],
+      ['IN_AREA', 'account', 'area'],
+      ['IN_AREA', 'subscription', 'area'],
+      ['IN_AREA', 'opportunity', 'area'],
+      ['PARTICIPATES_IN', 'person', 'project'],
+      ['PARTICIPATES_IN', 'person', 'event'],
+      ['PARTICIPATES_IN', 'person', 'opportunity'],
+      ['PARTICIPATES_IN', 'organization', 'project'],
+      ['PARTICIPATES_IN', 'organization', 'event'],
+      ['PARTICIPATES_IN', 'organization', 'opportunity'],
+      ['AFFILIATED_WITH', 'person', 'organization'],
     ];
     for (const [type, src, dst] of real) {
       expect(edgeEndpointsAllowed(type, src, dst).ok, `${type}: ${src} → ${dst}`).toBe(true);

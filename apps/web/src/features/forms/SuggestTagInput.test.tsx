@@ -44,4 +44,30 @@ describe('SuggestTagInput', () => {
       expect(screen.getByText('custom-topic')).toBeInTheDocument();
     });
   });
+
+  it('commits comma-separated text and lets Backspace remove the final tag', async () => {
+    const user = userEvent.setup();
+    mockApi.get.mockResolvedValue({ values: [] });
+    renderWithApp(<Harness />);
+
+    const input = screen.getByRole('combobox');
+    await user.type(input, 'design,');
+    expect(screen.getByRole('button', { name: 'Remove design' })).toBeInTheDocument();
+
+    await user.keyboard('{Backspace}');
+    expect(screen.queryByRole('button', { name: 'Remove design' })).not.toBeInTheDocument();
+  });
+
+  it('commits the suggestion deliberately chosen with the arrow keys', async () => {
+    const user = userEvent.setup();
+    mockApi.get.mockResolvedValue({ values: [{ value: 'robotics', count: 2 }] });
+    renderWithApp(<Harness />);
+
+    const input = screen.getByRole('combobox');
+    await user.type(input, 'rob');
+    await screen.findByRole('option', { name: /robotics/ });
+    await user.keyboard('{ArrowDown}{Enter}');
+
+    expect(screen.getByRole('button', { name: 'Remove robotics' })).toBeInTheDocument();
+  });
 });

@@ -245,12 +245,20 @@ function TargetPreview({ targetId, draft, onDraft }: Props) {
       </div>
 
       {finalize.isError && (
-        <StatusTrace
-          className="mb-3"
-          tone="danger"
-          label="Couldn't finalize this résumé"
-          detail={(finalize.error as Error | null)?.message ?? 'Nothing was saved. Try again.'}
-        />
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <StatusTrace
+            className="flex-1"
+            tone="danger"
+            label="Couldn't finalize this résumé"
+            detail={(finalize.error as Error | null)?.message ?? 'Nothing was saved. Try again.'}
+          />
+          {/* A failed finalization used to leave the original Finalize button
+              as the only recovery path, separated from the error by the
+              preview. Keep the retry beside the claim that failed. */}
+          <Button size="sm" onClick={() => finalize.mutate()}>
+            Retry finalization
+          </Button>
+        </div>
       )}
 
       {receipt && (

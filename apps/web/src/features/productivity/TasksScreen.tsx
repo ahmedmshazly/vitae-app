@@ -1,24 +1,13 @@
-import { useMemo, useState, type FormEvent } from 'react';
+import { useMemo, useRef, useState, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import {
-  Banner,
-  Button,
-  Field,
-  FilterGroup,
-  Input,
-  Modal,
-  PageHeader,
-  Section,
-} from '@vitae/ui';
-import type { Quadrant, TaskReadModel } from '@vitae/core';
+import { Banner, Button, Field, FilterGroup, Input, Modal, PageHeader, Section } from '@vitae/ui';
+import { matchTask, parseProductivityFilter, type Quadrant, type TaskReadModel } from '@vitae/core';
+import { EntityPicker, type PickedEntity } from '../../components/EntityPicker.js';
+import { useUnsavedChanges } from '../../lib/unsaved-changes.js';
 import { api } from '../../lib/api.js';
 import { useProductivityTasks } from './api.js';
-import {
-  placementCopy,
-  quadrantOf,
-  QUADRANT_LABEL,
-  QUADRANT_ORDER,
-} from './model.js';
+import { placementCopy, quadrantOf, QUADRANT_LABEL, QUADRANT_ORDER } from './model.js';
 import { QueryPanel } from './QueryPanel.js';
 import { TaskCard } from './TaskCard.js';
 import { TaskDetail } from './TaskDetail.js';
@@ -37,17 +26,6 @@ interface NamedNode {
   title: string;
 }
 
-function taskMatchesView(task: TaskReadModel, query: string): boolean {
-  const raw = query.trim().toLowerCase();
-  if (!raw) return true;
-  if (/\btype:/.test(raw) && !/\btype:task\b/.test(raw)) return false;
-  const status = /\bstatus:(\w+)/.exec(raw);
-  if (status && task.status !== status[1]) return false;
-  const text = raw.replace(/\b\w+:\S+/g, '').trim();
-  if (text && !task.title.toLowerCase().includes(text)) return false;
-  return true;
-}
-
 export function TasksScreen() {
   const list = useProductivityTasks();
   const actions = useProductivityActions();
@@ -61,14 +39,44 @@ export function TasksScreen() {
     queryFn: () => api.get<{ nodes: NamedNode[] }>('/nodes?type=project&limit=200'),
     retry: false,
   });
-  const [layout, setLayout] = useState<Layout>('list');
+  const [params, setParams] = useSearchParams();
+  const layout: Layout = params.get('layout') === 'matrix' ? 'matrix' : 'list';
+  const viewId = params.get('view') || 'all';
+  const projectFilter = params.get('project') || 'all';
+  const search = params.get('q') || '';
+  function filter(key: string, value: string) {
+    setParams(
+      (previous) => {
+        const next = new URLSearchParams(previous);
+        if (!value || value === 'all' || (key === 'layout' && value === 'list')) next.delete(key);
+        else next.set(key, value);
+        return next;
+      },
+      { replace: key === 'q' },
+    );
+  }
+  function clearFilters() {
+    setParams((previous) => {
+      const next = new URLSearchParams(previous);
+      ['q', 'view', 'project'].forEach((key) => next.delete(key));
+      return next;
+    });
+  }
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [capture, setCapture] = useState('');
   const [placementNote, setPlacementNote] = useState<string | null>(null);
   const [waitingTask, setWaitingTask] = useState<TaskReadModel | null>(null);
-  const [waitingOnId, setWaitingOnId] = useState('');
-  const [viewId, setViewId] = useState<string>('all');
-  const [projectFilter, setProjectFilter] = useState<string>('all');
+  const [waitingOn, setWaitingOn] = useState<PickedEntity | null>(null);
+  const captureFlight = useRef(false);
+  const [capturing, setCapturing] = useState(false);
+  const captureGuard = useUnsavedChanges(Boolean(capture.trim()), { busy: capturing });
+  const waitGuard = useUnsavedChanges(Boolean(waitingOn), {
+    busy: actions.isPending,
+    onClose: () => {
+      setWaitingTask(null);
+      setWaitingOn(null);
+    },
+  });
 
   const projectTitle = useMemo(() => {
     const map = new Map((projects.data?.nodes ?? []).map((node) => [node.id, node.title]));
@@ -76,73 +84,114 @@ export function TasksScreen() {
   }, [projects.data?.nodes]);
 
   const tasks = list.data?.tasks ?? [];
-  const viewQuery = (views.data?.views ?? []).find((view) => view.id === viewId)?.query ?? '';
+  const savedView = (views.data?.views ?? []).find((view) => view.id === viewId);
+  const viewFilter = parseProductivityFilter(
+    (savedView?.query ?? '').replace(/\btype:task\b/gi, ''),
+  );
+  const unavailableView = viewId !== 'all' && !savedView;
+  const invalidView = viewId !== 'all' && viewFilter.invalid.length > 0;
+  const filtered = Boolean(search || viewId !== 'all' || projectFilter !== 'all');
   const visible = tasks.filter((task) => {
-    if (viewId !== 'all' && !taskMatchesView(task, viewQuery)) return false;
+    if (unavailableView || invalidView) return false;
+    if (viewId !== 'all' && !matchTask(task, viewFilter)) return false;
+    if (search && !task.title.toLowerCase().includes(search.trim().toLowerCase())) return false;
     if (projectFilter !== 'all' && task.project_id !== projectFilter) return false;
     return true;
   });
-  const selected = visible.find((task) => task.id === selectedId) ?? tasks.find((task) => task.id === selectedId) ?? null;
-  const usedProjects = [...new Map(
-    tasks
-      .filter((task) => task.project_id)
-      .map((task) => [task.project_id!, projectTitle(task.project_id) ?? task.project_id!]),
-  )];
+  const selected =
+    visible.find((task) => task.id === selectedId) ??
+    tasks.find((task) => task.id === selectedId) ??
+    null;
+  const usedProjects = [
+    ...new Map(
+      tasks
+        .filter((task) => task.project_id)
+        .map((task) => [task.project_id!, projectTitle(task.project_id) ?? task.project_id!]),
+    ),
+  ];
 
   async function submitCapture(event: FormEvent) {
     event.preventDefault();
-    const outcome = await actions.createFromCapture(capture);
-    if (!outcome) return;
-    setCapture('');
-    const createdId = outcome.result.task?.id;
-    await list.refetch();
-    const created = (list.data?.tasks ?? []).find((task) => task.id === createdId);
-    const fromCache = created ?? (await list.refetch()).data?.tasks.find((task) => task.id === createdId);
-    if (fromCache) {
-      setPlacementNote(`Placed in ${QUADRANT_LABEL[quadrantOf(fromCache)]}: ${placementCopy(fromCache)}`);
-    } else {
-      setPlacementNote('Task created. Placement will show after the list refreshes.');
+    if (captureFlight.current || actions.locked || !capture.trim()) return;
+    captureFlight.current = true;
+    setCapturing(true);
+    setPlacementNote(null);
+    const submitted = capture;
+    try {
+      const outcome = await actions.createFromCapture(submitted);
+      if (!outcome) return;
+      setCapture((current) => (current === submitted ? '' : current));
+      const createdId = outcome.result.task?.id;
+      const fromCache = (await list.refetch()).data?.tasks.find((task) => task.id === createdId);
+      if (fromCache) {
+        setPlacementNote(
+          `Placed in ${QUADRANT_LABEL[quadrantOf(fromCache)]}: ${placementCopy(fromCache)}`,
+        );
+      } else {
+        setPlacementNote('Task created. Placement will show after the list refreshes.');
+      }
+    } finally {
+      captureFlight.current = false;
+      setCapturing(false);
     }
   }
 
   async function confirmWait() {
-    if (!waitingTask || !waitingOnId.trim()) return;
-    await actions.waitOn(waitingTask, waitingOnId.trim());
+    if (!waitingTask || !waitingOn || actions.locked) return;
+    const outcome = await actions.waitOn(waitingTask, waitingOn.id);
+    // A rejected command (including a revision conflict) leaves the dialog
+    // and its draft in place. Closing it would hide the recovery path and
+    // make the person re-enter an identifier before they can retry.
+    if (!outcome) return;
     setWaitingTask(null);
-    setWaitingOnId('');
+    setWaitingOn(null);
   }
 
-  const writeNotice = actions.locked ? (
+  const writeNotice = actions.writeLock ? (
     <p className="prod-lock" role="status">
       {actions.writeLock}
     </p>
   ) : null;
 
   return (
-    <div className="page prod-page">
-      <PageHeader
-        title="Tasks"
-        subtitle="List or matrix. Each card states its status and why it sits in a quadrant."
-      />
+    <div className="page prod-page prod-tasks">
+      <PageHeader title="Tasks" subtitle="Capture what's next. Make room for what matters." />
       {writeNotice}
       {actions.conflict ? (
         <Banner tone="warning" title="This record changed">
           {actions.conflict}
+          <Button onClick={() => void list.refetch()} disabled={list.isFetching}>
+            Refresh tasks
+          </Button>
+        </Banner>
+      ) : null}
+      {actions.error && !actions.conflict && !actions.writeLock ? (
+        <Banner tone="danger" title="Change couldn't be confirmed">
+          {actions.error.message} Your input is still here. Check the task before trying again.
         </Banner>
       ) : null}
       <Section title="Capture">
         <form className="prod-capture" onSubmit={(event) => void submitCapture(event)}>
-          <Field label="Capture a task" htmlFor="prod-capture">
+          <Field
+            label="Capture a task"
+            htmlFor="prod-capture"
+            help="Add a title, or include a date and importance: Send the brief due tomorrow !important"
+          >
             <Input
               id="prod-capture"
               value={capture}
               onChange={(event) => setCapture(event.target.value)}
-              disabled={actions.locked}
-              placeholder="Title due tomorrow !important"
+              disabled={Boolean(actions.writeLock)}
+              placeholder="What needs to happen?"
+              maxLength={500}
             />
           </Field>
-          <Button type="submit" variant="primary" disabled={actions.locked || !capture.trim()}>
-            Add task
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={actions.locked || capturing || !capture.trim()}
+          >
+            {capturing ? 'Adding…' : 'Add task'}
           </Button>
         </form>
         {placementNote ? (
@@ -150,39 +199,105 @@ export function TasksScreen() {
             {placementNote}
           </p>
         ) : null}
+        {actions.captureWarning && <p role="alert">{actions.captureWarning}</p>}
       </Section>
-      <Section title="Layout">
-        <FilterGroup
-          label="Task layout"
-          value={layout}
-          onChange={setLayout}
-          options={[
-            { key: 'list', label: 'List' },
-            { key: 'matrix', label: 'Matrix' },
-          ]}
-        />
-        {(views.data?.views ?? []).length > 0 ? (
+      <Section title="Your tasks">
+        <div className="prod-task-toolbar">
           <FilterGroup
-            label="Saved views"
-            value={viewId}
-            onChange={setViewId}
+            label="Task layout"
+            value={layout}
+            onChange={(value) => filter('layout', value)}
             options={[
-              { key: 'all', label: 'All views' },
-              ...(views.data?.views ?? []).map((view) => ({ key: view.id, label: view.name })),
+              { key: 'list', label: 'List' },
+              { key: 'matrix', label: 'Matrix' },
             ]}
           />
-        ) : null}
-        {usedProjects.length > 0 ? (
-          <FilterGroup
-            label="Projects"
-            value={projectFilter}
-            onChange={setProjectFilter}
-            options={[
-              { key: 'all', label: 'All projects' },
-              ...usedProjects.map(([id, name]) => ({ key: id, label: name })),
-            ]}
-          />
-        ) : null}
+          <Button
+            disabled={list.isFetching || actions.isPending}
+            onClick={() => void list.refetch()}
+          >
+            {list.isFetching ? 'Refreshing…' : 'Refresh tasks'}
+          </Button>
+        </div>
+        <div className="prod-task-filters">
+          <Field label="Search tasks" htmlFor="prod-search">
+            <Input
+              id="prod-search"
+              type="search"
+              value={search}
+              onChange={(event) => filter('q', event.target.value)}
+              placeholder="Find a task by title…"
+            />
+          </Field>
+          <Field label="Saved view" htmlFor="prod-view">
+            <select
+              className="vt-inp"
+              id="prod-view"
+              value={viewId}
+              onChange={(event) => filter('view', event.target.value)}
+            >
+              <option value="all">All views</option>
+              {unavailableView && <option value={viewId}>Unavailable view</option>}
+              {(views.data?.views ?? []).map((view) => (
+                <option key={view.id} value={view.id}>
+                  {view.name}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Project" htmlFor="prod-project">
+            <select
+              className="vt-inp"
+              id="prod-project"
+              value={projectFilter}
+              onChange={(event) => filter('project', event.target.value)}
+            >
+              <option value="all">All projects</option>
+              {projectFilter !== 'all' && !usedProjects.some(([id]) => id === projectFilter) && (
+                <option value={projectFilter}>Unavailable project</option>
+              )}
+              {usedProjects.map(([id, name]) => (
+                <option key={id} value={id}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
+        {(views.isError || projects.isError) && (
+          <p role="status" className="prod-muted">
+            Some view or project names couldn't load.{' '}
+            <Button
+              size="sm"
+              onClick={() => {
+                void views.refetch();
+                void projects.refetch();
+              }}
+            >
+              Retry filters
+            </Button>
+          </p>
+        )}
+        {invalidView && (
+          <p role="alert">
+            This saved view uses filters Tasks cannot apply:{' '}
+            {viewFilter.invalid.map((item) => item.raw).join(', ')}. Choose another view or clear
+            filters.
+          </p>
+        )}
+        {unavailableView && !views.isLoading && (
+          <p role="status">This saved view is unavailable. Choose another view or clear filters.</p>
+        )}
+        <div className="prod-task-toolbar">
+          <p className="prod-muted">
+            {visible.length} shown · {tasks.length} total
+          </p>
+          {filtered && (
+            <Button size="sm" onClick={clearFilters}>
+              Clear filters
+            </Button>
+          )}
+        </div>
       </Section>
       <div data-productivity-region="ready">
         <QueryPanel
@@ -193,8 +308,21 @@ export function TasksScreen() {
           onRetry={() => void list.refetch()}
           loadingLabel="Loading tasks"
           errorTitle="Couldn't load tasks"
-          emptyTitle="No tasks yet"
-          emptyHint="Capture a title above. It will appear in a quadrant once the server places it."
+          emptyTitle={filtered ? 'No matching tasks' : 'No tasks yet'}
+          emptyHint={
+            filtered
+              ? 'Try another title, saved view or project.'
+              : 'Capture your first task above. You can add dates and details later.'
+          }
+          emptyAction={
+            filtered ? (
+              <Button onClick={clearFilters}>Show all tasks</Button>
+            ) : (
+              <Button onClick={() => document.getElementById('prod-capture')?.focus()}>
+                Capture a task
+              </Button>
+            )
+          }
         >
           {layout === 'list' ? (
             <ul className="prod-list">
@@ -238,6 +366,7 @@ export function TasksScreen() {
         </QueryPanel>
       </div>
       <TaskDetail
+        key={selected?.id ?? 'closed'}
         task={selected}
         projectTitle={projectTitle(selected?.project_id)}
         locked={actions.locked}
@@ -246,45 +375,42 @@ export function TasksScreen() {
       />
       <Modal
         open={waitingTask != null}
-        onOpenChange={(open) => {
-          if (!open) {
-            setWaitingTask(null);
-            setWaitingOnId('');
-          }
-        }}
+        onOpenChange={waitGuard.onOpenChange}
         title="Wait on someone"
-        description="Waiting requires a person or organization record id."
+        description={`Who are you waiting on for “${waitingTask?.title ?? 'this task'}”? Choose a person or organization.`}
         footer={
           <>
-            <Button
-              type="button"
-              onClick={() => {
-                setWaitingTask(null);
-                setWaitingOnId('');
-              }}
-            >
+            <Button type="button" onClick={waitGuard.requestClose}>
               Cancel
             </Button>
             <Button
               type="button"
               variant="primary"
-              disabled={actions.locked || !waitingOnId.trim()}
+              disabled={actions.locked || !waitingOn}
               onClick={() => void confirmWait()}
             >
-              Confirm wait
+              {actions.isPending ? 'Saving…' : 'Confirm wait'}
             </Button>
           </>
         }
       >
-        <Field label="Person or organization id" htmlFor="prod-wait-on">
-          <Input
-            id="prod-wait-on"
-            value={waitingOnId}
-            onChange={(event) => setWaitingOnId(event.target.value)}
-            disabled={actions.locked}
-          />
-        </Field>
+        {actions.error && <p role="alert">{actions.error.message}</p>}
+        <fieldset className="prod-picker prod-wait-picker" disabled={actions.locked}>
+          <legend>Waiting on</legend>
+          {waitingOn ? (
+            <p>
+              {waitingOn.title}{' '}
+              <Button size="sm" onClick={() => setWaitingOn(null)}>
+                Change person or organization
+              </Button>
+            </p>
+          ) : (
+            <EntityPicker types={['person', 'organization']} onPick={setWaitingOn} />
+          )}
+        </fieldset>
       </Modal>
+      {captureGuard.prompt}
+      {waitGuard.prompt}
     </div>
   );
 }

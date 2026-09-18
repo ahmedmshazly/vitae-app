@@ -2,28 +2,29 @@
  * Fourfold design tokens for Vitae.
  * Light theme is default. Switch with data-theme="dark" | "hc" on <html>.
  * Quadrant colours are semantic — red=Do, blue=Schedule, yellow=Delegate, dashed=Eliminate.
- * Yellow (Delegate) is the action colour: primary buttons, links, focus, selection.
+ * Brass (Delegate) is the action colour: primary buttons and links.
  * Red (Do) is never a button. Blue (Schedule) is live/scheduled. Dashed (Eliminate) is the box you empty on purpose.
  */
 :root,
 [data-theme='light'] {
   /* ── Surfaces ── */
-  --bg: #f2f0ea;
-  --bg-2: #e9e6de;
+  --bg: #f7f4ed;
+  --bg-2: #ece7dc;
   --card: #ffffff;
-  --ink: #0b0b0d;
-  --ink-2: #5b584f;
-  --line: #d6d2c8;
+  --ink: #20231f;
+  --ink-2: #68685f;
+  --line: #cbc5b8;
+  color-scheme: light;
 
   /* ── Quadrant colours (semantic, never decorative) ── */
-  --do: #d8321a; /* Do — red */
-  --sched: #1e4fd6; /* Schedule — blue */
-  --deleg: #e0a800; /* Delegate — yellow (action colour) */
-  --elim: #7a756a; /* Eliminate — dashed outline */
+  --do: #b7352b; /* Do — red */
+  --sched: #285ba7; /* Schedule — cobalt */
+  --deleg: #c28a17; /* Delegate — brass (action colour) */
+  --elim: #68685f; /* Eliminate — dashed outline */
 
   /* ── Derived ── */
-  --on-q: #0b0b0d; /* Text on quadrant fills (near-black) */
-  --focus: #1e4fd6; /* Focus ring in light mode (blue) */
+  --on-q: #20231f; /* Text on quadrant fills (graphite) */
+  --focus: #285ba7; /* Focus ring in light mode (cobalt) */
 
   /* ── Typography ── */
   --display: 'Archivo Black', Impact, sans-serif;
@@ -64,7 +65,7 @@
   --hit-target: 32px;
 
   /* ── Elevation ── */
-  --shadow-overlay: 0 16px 40px -12px rgba(0, 0, 0, 0.35);
+  --shadow-overlay: 0 16px 40px -16px rgba(32, 35, 31, 0.28);
   --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--focus);
 
   /* ── Motion ── */
@@ -83,17 +84,17 @@
   --z-toast: 1100;
 
   /* ── Overlay backdrop ── */
-  --overlay: rgba(0, 0, 0, 0.5);
+  --overlay: rgba(32, 35, 31, 0.42);
 
   /* ── Categorical viz hues (fixed slot order, never cycled) ── */
-  --viz-1: #1f9c86;
-  --viz-2: #b08a18;
-  --viz-3: #6e8fd0;
-  --viz-4: #c8503f;
-  --viz-5: #a87bc0;
-  --viz-6: #7e9b3a;
-  --viz-7: #d4649b;
-  --viz-8: #c56a2a;
+  --viz-1: #237a70;
+  --viz-2: #9c6c12;
+  --viz-3: #285ba7;
+  --viz-4: #b7352b;
+  --viz-5: #79579c;
+  --viz-6: #57752d;
+  --viz-7: #a64b73;
+  --viz-8: #a65c25;
 
   /* ── Semantic aliases for data roles ── */
   --data-person: var(--viz-1);
@@ -122,9 +123,9 @@
        - The type scale keeps its Quiet pixel values. Remapping --ae-text-*
          onto --t-* would silently restyle every screen that has not been
          rebuilt yet, which is a visual change disguised as a rename.
-       - success / warning / danger / ember / info have no counterpart in the
-         four quadrant colours, so they stay as literals until the semantic
-         ramp is designed.
+       - success / warning / danger / ember / info have their own semantic
+         ramp. They stay separate from the Fourfold colours, but each aliases
+         a theme-aware token so outcome states remain legible in every mode.
        - --ae-muted-strong and the three --ae-accent-*soft names were already
          aliases under Quiet; they keep pointing at the same siblings they
          did there, one hop further along. ── */
@@ -223,12 +224,18 @@
   --ae-leading-tight: 1.2;
   --ae-leading-normal: 1.55;
 
-  /* Semantic states. No quadrant colour means these, so they stay literal. */
-  --ae-success: #7eb795;
-  --ae-warning: #c8a344;
-  --ae-danger: #e17263;
-  --ae-ember: #c98a3d;
-  --ae-info: #9a9484;
+  /* Outcome states have their own ramp, but track every appearance mode. */
+  --success: #35715d;
+  --warning: #9c6c12;
+  --danger: var(--do);
+  --ember: var(--deleg);
+  --info: var(--sched);
+  --ae-success: var(--success);
+  --ae-warning: var(--warning);
+  --ae-danger: var(--danger);
+  --ae-danger-ink: #ffffff;
+  --ae-ember: var(--ember);
+  --ae-info: var(--info);
 
   --ae-trace-success: var(--ae-success);
   --ae-trace-warning: var(--ae-warning);
@@ -258,6 +265,7 @@
 
 /* ── Dark theme ── */
 [data-theme='dark'] {
+  --ae-danger-ink: #0b0b0d;
   --bg: #0b0b0d;
   --bg-2: #121215;
   --card: #17171b;
@@ -273,10 +281,25 @@
   --shadow-overlay: 0 16px 40px -12px rgba(0, 0, 0, 0.55);
   --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--focus);
   --overlay: rgba(0, 0, 0, 0.66);
+  --success: #78b99a;
+  --warning: #e1b34e;
+  --danger: var(--do);
+  --ember: var(--deleg);
+  --info: var(--sched);
+  --viz-1: #52b6a6;
+  --viz-2: #d7a83a;
+  --viz-3: #7da5ff;
+  --viz-4: #ef755f;
+  --viz-5: #be91d2;
+  --viz-6: #9fbd58;
+  --viz-7: #e27ba7;
+  --viz-8: #e48a4f;
+  color-scheme: dark;
 }
 
 /* ── High contrast theme ── */
 [data-theme='hc'] {
+  --ae-danger-ink: #ffffff;
   --bg: #ffffff;
   --bg-2: #f0f0f0;
   --card: #ffffff;
@@ -292,11 +315,26 @@
   --shadow-overlay: 0 0 0 3px #000000;
   --focus-ring: 0 0 0 3px #000000;
   --overlay: rgba(0, 0, 0, 0.8);
+  --success: #006b3c;
+  --warning: #8a5700;
+  --danger: var(--do);
+  --ember: var(--deleg);
+  --info: var(--sched);
+  --viz-1: #006b5f;
+  --viz-2: #805500;
+  --viz-3: #0000cc;
+  --viz-4: #cc0000;
+  --viz-5: #6b247a;
+  --viz-6: #3f6500;
+  --viz-7: #9b004e;
+  --viz-8: #8a3800;
+  color-scheme: light;
 }
 
 /* ── System fallbacks ── */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
+    --ae-danger-ink: #0b0b0d;
     --bg: #0b0b0d;
     --bg-2: #121215;
     --card: #17171b;
@@ -312,11 +350,26 @@
     --shadow-overlay: 0 16px 40px -12px rgba(0, 0, 0, 0.55);
     --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--focus);
     --overlay: rgba(0, 0, 0, 0.66);
+    --success: #78b99a;
+    --warning: #e1b34e;
+    --danger: var(--do);
+    --ember: var(--deleg);
+    --info: var(--sched);
+    --viz-1: #52b6a6;
+    --viz-2: #d7a83a;
+    --viz-3: #7da5ff;
+    --viz-4: #ef755f;
+    --viz-5: #be91d2;
+    --viz-6: #9fbd58;
+    --viz-7: #e27ba7;
+    --viz-8: #e48a4f;
+    color-scheme: dark;
   }
 }
 
 @media (prefers-contrast: more) {
   :root:not([data-theme]) {
+    --ae-danger-ink: #ffffff;
     --bg: #ffffff;
     --bg-2: #f0f0f0;
     --card: #ffffff;
@@ -332,6 +385,20 @@
     --shadow-overlay: 0 0 0 3px #000000;
     --focus-ring: 0 0 0 3px #000000;
     --overlay: rgba(0, 0, 0, 0.8);
+    --success: #006b3c;
+    --warning: #8a5700;
+    --danger: var(--do);
+    --ember: var(--deleg);
+    --info: var(--sched);
+    --viz-1: #006b5f;
+    --viz-2: #805500;
+    --viz-3: #0000cc;
+    --viz-4: #cc0000;
+    --viz-5: #6b247a;
+    --viz-6: #3f6500;
+    --viz-7: #9b004e;
+    --viz-8: #8a3800;
+    color-scheme: light;
   }
 }
 

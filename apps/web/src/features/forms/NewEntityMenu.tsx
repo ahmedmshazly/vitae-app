@@ -3,7 +3,7 @@
  * Life / Long-tail) that opens the structured form dialog, the second capture
  * path beside ⌘K (FR-CAP-002). Bound to the `n` shortcut in the Shell.
  */
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button, Menu, NODE_GLYPH, type MenuGroup } from '@vitae/ui';
 import { type NodeType } from '@vitae/core';
 import { useCanWrite, WRITE_LOCK_HINT } from '../../lib/auth.js';
@@ -36,7 +36,16 @@ export const NEW_ENTITY_MENU_GROUPS: ReadonlyArray<{
   },
   {
     label: 'Content',
-    types: ['post', 'publication', 'talk', 'repository', 'link', 'document', 'media_item', 'highlight'],
+    types: [
+      'post',
+      'publication',
+      'talk',
+      'repository',
+      'link',
+      'document',
+      'media_item',
+      'highlight',
+    ],
   },
   {
     label: 'Job search',
@@ -44,10 +53,20 @@ export const NEW_ENTITY_MENU_GROUPS: ReadonlyArray<{
   },
   {
     label: 'Life',
-    types: ['event', 'interaction', 'task', 'goal', 'habit', 'journal_entry', 'idea'],
+    types: [
+      'area',
+      'opportunity',
+      'event',
+      'interaction',
+      'task',
+      'goal',
+      'habit',
+      'journal_entry',
+      'idea',
+    ],
   },
   {
-    label: 'Long tail',
+    label: 'Personal records',
     types: ['location', 'trip', 'asset', 'health_log', 'account', 'subscription'],
   },
 ];
@@ -66,6 +85,7 @@ export function NewEntityMenu({
   onOpenChange?: (open: boolean) => void;
 }) {
   const [formType, setFormType] = useState<NodeType | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const canWrite = useCanWrite();
 
   return (
@@ -75,6 +95,7 @@ export function NewEntityMenu({
         onOpenChange={onOpenChange}
         trigger={
           <Button
+            ref={triggerRef}
             size="sm"
             glyph="plus"
             aria-label="New record (n)"
@@ -95,6 +116,7 @@ export function NewEntityMenu({
             if (!o) setFormType(null);
           }}
           type={formType}
+          returnFocusRef={triggerRef}
         />
       )}
     </>

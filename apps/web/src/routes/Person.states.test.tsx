@@ -8,10 +8,17 @@ import './../test/api-mock.js';
 import { Route, Routes } from 'react-router-dom';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockApi, resetMockApi } from '../test/api-mock.js';
 import { renderWithApp } from '../test/render.js';
 import { Person } from './Person.js';
+import type * as AuthModule from '../lib/auth.js';
+
+const permissions = vi.hoisted(() => ({ canWrite: true }));
+vi.mock('../lib/auth.js', async (original) => ({
+  ...(await original<typeof AuthModule>()),
+  useCanWrite: () => permissions.canWrite,
+}));
 
 const record = {
   node: {
@@ -86,10 +93,91 @@ async function renderPerson() {
 
 beforeEach(() => {
   resetMockApi();
+  permissions.canWrite = true;
   serve();
 });
 
 describe('Person states', () => {
+  it('distinguishes undated contact history from having no interactions', async () => {
+    serve({
+      record: {
+        ...record,
+        edges: [{ id: 'e1', type: 'WITH', src: 'i1', dst: 'person-1', props: {} }],
+        neighbors: {
+          i1: {
+            id: 'i1',
+            type: 'interaction',
+            title: 'Imported conversation',
+            props: { occurred_at: 'invalid' },
+          },
+        },
+      },
+    });
+    await renderPerson();
+    expect(screen.getByText('Date not recorded')).toBeVisible();
+    expect(screen.queryByText('No interaction yet')).not.toBeInTheDocument();
+    expect(screen.getByRole('list', { name: 'Logged interactions' })).toHaveTextContent(
+      'Imported conversation',
+    );
+  });
+  it('disables write entry points in a read-only workspace while preserving details', async () => {
+    permissions.canWrite = false;
+    await renderPerson();
+    for (const name of [
+      'Edit record',
+      'Delete',
+      'Edit relationship',
+      'Log introduction',
+      'Add connection',
+      'Add first connection',
+    ]) {
+      expect(screen.getByRole('button', { name })).toBeDisabled();
+    }
+    for (const button of screen.getAllByRole('button', { name: 'Log interaction' }))
+      expect(button).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Edit closeness/ })).toBeDisabled();
+    expect(screen.getByRole('region', { name: 'Details' })).toBeVisible();
+  });
+
+  it('blocks duplicate deletion and dismissal while pending, then retains a retryable failure', async () => {
+    let reject!: (error: Error) => void;
+    mockApi.delete.mockImplementation(
+      () =>
+        new Promise((_, fail) => {
+          reject = fail;
+        }),
+    );
+    const user = userEvent.setup();
+    await renderPerson();
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    await user.dblClick(screen.getByRole('button', { name: 'Move to trash' }));
+    expect(mockApi.delete).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+    await user.keyboard('{Escape}');
+    expect(screen.getByRole('dialog')).toBeVisible();
+    reject(new Error('Offline'));
+    expect(await screen.findByText('Couldn’t move this person to Trash')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Move to trash' })).toBeEnabled();
+  });
+
+  it('keeps an open deletion confirmation dismissible after write permission is revoked', async () => {
+    const user = userEvent.setup();
+    const { queryClient } = await renderPerson();
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    permissions.canWrite = false;
+    queryClient.setQueryData(['node', 'person-1'], {
+      ...record,
+      node: { ...record.node, title: 'Ada updated' },
+    });
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Move to trash' })).toBeDisabled(),
+    );
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(mockApi.delete).not.toHaveBeenCalled();
+  });
   it('names the favor ledger unavailable rather than calling it balanced', async () => {
     serve({ summary: new Error('strength service unavailable') });
     await renderPerson();
@@ -210,7 +298,9 @@ describe('Person states', () => {
     const favors = screen.getByRole('list', { name: 'Favors' });
     expect(within(favors).getByText('not settleable')).toBeInTheDocument();
     // Was a title attribute, which keyboard and screen-reader users never see.
-    expect(within(favors).getByText(/Re-add it to settle it/)).toBeInTheDocument();
+    expect(
+      within(favors).getByText(/Adding it again would create a separate commitment/),
+    ).toBeInTheDocument();
   });
 
   it('folds a long profile group behind a disclosure that says how many there are', async () => {
@@ -267,5 +357,21 @@ describe('Person states', () => {
 
     const list = screen.getByRole('list', { name: 'Logged interactions' });
     expect(within(list).getAllByRole('listitem')).toHaveLength(1);
+  });
+
+  it('keeps deletion recovery in the confirmation when moving to Trash fails', async () => {
+    mockApi.delete.mockRejectedValue(new Error('Trash is temporarily unavailable'));
+    const user = userEvent.setup();
+    await renderPerson();
+
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    expect(screen.getByRole('button', { name: 'Cancel' })).toHaveFocus();
+
+    await user.click(screen.getByRole('button', { name: 'Move to trash' }));
+
+    const dialog = screen.getByRole('dialog');
+    expect(await within(dialog).findByText('Couldn’t move this person to Trash')).toBeVisible();
+    expect(within(dialog).getByText(/Trash is temporarily unavailable/)).toBeVisible();
+    expect(within(dialog).getByRole('button', { name: 'Move to trash' })).toBeEnabled();
   });
 });

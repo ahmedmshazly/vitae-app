@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -12,7 +12,6 @@ import {
   ErrorState,
   FactorChip,
   Inline,
-  Input,
   Mono,
   PageHeader,
   ProvenanceChip,
@@ -22,7 +21,7 @@ import {
   StatusTrace,
   StrengthDonut,
 } from '@vitae/ui';
-import { edgeTypeGroup, personRelationLabel } from '@vitae/core';
+import { edgeDisplayLabel, edgeTypeGroup, personRelationLabel } from '@vitae/core';
 import { api } from '../lib/api.js';
 import { rememberViewed } from '../lib/last-viewed.js';
 import { CorrespondencePanel } from '../features/CorrespondencePanel.js';
@@ -36,6 +35,10 @@ import { BulkUnlinkBar, BulkUnlinkConfirm, useBulkEdgeDelete } from '../features
 import { SelectAllRow, useVisibleSelection } from '../features/BulkNodeDelete.js';
 import { entityHref } from '../lib/entity-href.js';
 import { useToast } from '../features/Toast.js';
+import { EntityEvidence } from '../features/EntityEvidence.js';
+import { PersonFavors, type PersonFavor } from '../features/PersonFavors.js';
+import { PersonDetails } from '../features/PersonDetails.js';
+import { useCanWrite, WRITE_LOCK_HINT } from '../lib/auth.js';
 
 interface Strength {
   strength: number;
@@ -44,18 +47,6 @@ interface Strength {
   daysSinceLast: number | null;
   medianGapDays: number | null;
   factors: { closeness: number; intensity: number };
-}
-interface Favor {
-  /** Absent on favors written straight into the KNOWS edge by a seed or a
-   * bundle - they never passed through POST /favors, which is what assigns
-   * one. PATCH /:favorId is the only way to settle a favor, so those cannot
-   * be settled at all; the row says so rather than firing a request that 404s. */
-  id?: string;
-  direction: 'owed_to_me' | 'owed_by_me';
-  /** The canonical field is `what` - the client read `note`, which the API
-   * stopped sending, so every favor rendered as "(no note)". */
-  what: string;
-  settled?: boolean;
 }
 interface Summary {
   strength: Strength;
@@ -70,7 +61,7 @@ interface Summary {
     metOn: string | null;
     knowsProps: Record<string, unknown>;
   };
-  favors: Favor[];
+  favors: PersonFavor[];
 }
 interface RecordResp {
   node: {
@@ -135,9 +126,12 @@ export function toInteractionLog(nodes: InteractionNode[]): LoggedInteraction[] 
       id: n.id,
       title: n.title,
       kind: n.props?.kind,
-      at: n.props?.occurred_at ?? n.created_at ?? '',
+      at:
+        [n.props?.occurred_at, n.created_at].find(
+          (date) => date && Number.isFinite(Date.parse(date)),
+        ) ?? '',
     }))
-    .sort((a, b) => b.at.localeCompare(a.at));
+    .sort((a, b) => (a.at ? (b.at ? Date.parse(b.at) - Date.parse(a.at) : -1) : b.at ? 1 : 0));
 }
 
 /**
@@ -149,7 +143,10 @@ export function interactionTicks(log: LoggedInteraction[]): {
   ticks: Array<{ at: number; label: string }>;
   index: number;
 } {
-  const dated = log.filter((i) => i.at).slice(0, MAX_INTERACTION_TICKS);
+  const dated = log
+    .filter((i) => Number.isFinite(Date.parse(i.at)))
+    .sort((a, b) => Date.parse(b.at) - Date.parse(a.at))
+    .slice(0, MAX_INTERACTION_TICKS);
   if (dated.length === 0) return { ticks: [], index: -1 };
   const times = dated.map((i) => new Date(i.at).getTime()).filter((t) => Number.isFinite(t));
   if (times.length === 0) return { ticks: [], index: -1 };
@@ -192,6 +189,12 @@ interface Profile {
 }
 export function Person() {
   const { id = '' } = useParams();
+  return <PersonDossier key={id} id={id} />;
+}
+
+function PersonDossier({ id }: { id: string }) {
+  const canWrite = useCanWrite();
+  const removing = useRef(false);
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { flash } = useToast();
@@ -216,11 +219,25 @@ export function Person() {
   const [editingRel, setEditingRel] = useState(false);
   const [addingConn, setAddingConn] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [favorNote, setFavorNote] = useState('');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [showAllInteractions, setShowAllInteractions] = useState(false);
   /** Which profile groups the reader has asked to see in full, by group key. */
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const bulk = useBulkEdgeDelete();
+  const [connectionLimit, setConnectionLimit] = useState(20);
+  const hasSelection = bulk.selectedCount > 0;
+  const [bulkHeight, setBulkHeight] = useState(0);
+  useLayoutEffect(() => {
+    if (!hasSelection) return;
+    const bar = document.querySelector('[aria-label="Connection bulk actions"]');
+    if (!bar) return;
+    const measure = () => setBulkHeight(Math.ceil(bar.getBoundingClientRect().height));
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(bar);
+    return () => observer.disconnect();
+  }, [hasSelection]);
   const summaryUnavailable = sum.isError && sum.data === undefined;
   const profileUnavailable = profile.isError && profile.data === undefined;
 
@@ -247,23 +264,6 @@ export function Person() {
   const degradedNames = degraded.map((q) => q.what).join(' and ');
   const degradedBusy = degraded.some((q) => q.busy);
 
-  const addFavor = useMutation({
-    mutationFn: (direction: 'owed_to_me' | 'owed_by_me') =>
-      api.post(`/people/${id}/favors`, { direction, what: favorNote }),
-    onSuccess: (_data, direction) => {
-      setFavorNote('');
-      void qc.invalidateQueries({ queryKey: ['person-summary', id] });
-      flash(direction === 'owed_to_me' ? 'Recorded: they owe you' : 'Recorded: you owe them');
-    },
-  });
-  const settleFavor = useMutation({
-    mutationFn: (favorId: string) =>
-      api.patch(`/people/${id}/favors/${favorId}`, { settled: true }),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['person-summary', id] });
-      flash('Favor marked settled');
-    },
-  });
   const remove = useMutation({
     mutationFn: () => api.del(`/nodes/${id}`),
     onSuccess: async () => {
@@ -271,10 +271,14 @@ export function Person() {
       flash(`Moved ${rec.data?.node.title ?? 'person'} to trash`);
       navigate('/data/trash');
     },
-    onError: (error) =>
-      flash(error instanceof Error ? error.message : 'This person could not be moved to trash.', {
-        variant: 'error',
-      }),
+    onError: (error) => {
+      const message =
+        error instanceof Error ? error.message : 'This person could not be moved to trash.';
+      setDeleteError(message);
+    },
+    onSettled: () => {
+      removing.current = false;
+    },
   });
 
   // All edges except interaction WITH rows (those live under Interactions).
@@ -291,7 +295,16 @@ export function Person() {
       });
   }, [rec.data]);
 
-  const edgeIds = useMemo(() => relationEdges.map((e) => e.id), [relationEdges]);
+  const visibleConnections = useMemo(
+    () => relationEdges.slice(0, connectionLimit),
+    [relationEdges, connectionLimit],
+  );
+  const reconcileSelection = bulk.reconcile;
+  useEffect(() => {
+    if (rec.isSuccess && !rec.isFetching && !bulk.busy)
+      reconcileSelection(relationEdges.map((edge) => edge.id));
+  }, [rec.isSuccess, rec.isFetching, relationEdges, bulk.busy, reconcileSelection]);
+  const edgeIds = useMemo(() => visibleConnections.map((e) => e.id), [visibleConnections]);
   const { allVisibleSelected } = useVisibleSelection(edgeIds, bulk.selected);
 
   if (rec.isError && rec.data === undefined)
@@ -312,7 +325,7 @@ export function Person() {
       <div className="page page--network page--person-dossier">
         <PageHeader title="Person" subtitle="Loading..." />
         <RegisterRule />
-        <SkeletonRows rows={6} />
+        <SkeletonRows rows={6} label="Loading person" />
       </div>
     );
   const { node, edges, neighbors } = rec.data;
@@ -338,7 +351,10 @@ export function Person() {
     : interactions.slice(0, INTERACTION_PAGE);
 
   return (
-    <div className="page page--network page--person-dossier">
+    <div
+      className="page page--network page--person-dossier"
+      style={{ paddingBottom: hasSelection ? bulkHeight + 48 : undefined }}
+    >
       <div className="network-dossier network-dossier--person">
         <PageHeader
           title={node.title}
@@ -352,13 +368,14 @@ export function Person() {
           }
           actions={
             <>
-              <Button size="sm" glyph="edit" onClick={() => setEditing(true)}>
+              <Button size="sm" glyph="edit" disabled={!canWrite} onClick={() => setEditing(true)}>
                 Edit record
               </Button>
               <Button
                 size="sm"
                 variant="primary"
                 glyph="interaction"
+                disabled={!canWrite}
                 onClick={() => setLogging(true)}
               >
                 Log interaction
@@ -367,14 +384,22 @@ export function Person() {
                 size="sm"
                 variant="danger"
                 glyph="trash"
-                disabled={remove.isPending}
-                onClick={() => setConfirmDelete(true)}
+                disabled={!canWrite || remove.isPending}
+                onClick={() => {
+                  setDeleteError(null);
+                  setConfirmDelete(true);
+                }}
               >
                 Delete
               </Button>
             </>
           }
         />
+        {props.do_not_contact === true && (
+          <p className="person-contact-preference">
+            <strong>Do not contact</strong> · Saved contact preference
+          </p>
+        )}
         <dl className="network-dossier__facts" aria-label="Relationship dossier facts">
           <div>
             <dt>Record source</dt>
@@ -400,7 +425,11 @@ export function Person() {
             <dt>Last contact</dt>
             <dd>
               <Mono>
-                {interactions[0]?.at ? interactions[0].at.slice(0, 10) : 'No interaction yet'}
+                {interactions[0]?.at
+                  ? interactions[0].at.slice(0, 10)
+                  : interactions.length
+                    ? 'Date not recorded'
+                    : 'No interaction yet'}
               </Mono>
             </dd>
           </div>
@@ -413,14 +442,21 @@ export function Person() {
                 <Mono>Loading...</Mono>
               ) : (
                 <Mono>
-                  {profile.data?.counts.records ?? 0} records · {profile.data?.counts.skills ?? 0}{' '}
-                  skills
+                  {profile.data?.counts.records ?? 0}{' '}
+                  {profile.data?.counts.records === 1 ? 'record' : 'records'} ·{' '}
+                  {profile.data?.counts.skills ?? 0}{' '}
+                  {profile.data?.counts.skills === 1 ? 'skill' : 'skills'}
                 </Mono>
               )}
             </dd>
           </div>
         </dl>
       </div>
+      {!canWrite && (
+        <p role="status" className="text-sm text-muted">
+          {WRITE_LOCK_HINT}
+        </p>
+      )}
       {/* One tick per logged interaction, placed by date - so the rule shows
           whether contact is clustered or drifting, not just how much there is. */}
       <RegisterRule
@@ -473,13 +509,32 @@ export function Person() {
       {editing && <NodeFormDialog open onOpenChange={setEditing} type="person" nodeId={id} />}
       <ConfirmDialog
         open={confirmDelete}
-        onOpenChange={setConfirmDelete}
+        onOpenChange={(open) => {
+          if (removing.current) return;
+          setConfirmDelete(open);
+          if (!open) setDeleteError(null);
+        }}
         title={`Move '${node.title}' to trash?`}
-        body="It stays recoverable from Trash for 30 days; connections are preserved."
+        body={
+          <>
+            <p>It stays recoverable from Trash for 30 days; connections are preserved.</p>
+            {!canWrite && <p role="status">{WRITE_LOCK_HINT}</p>}
+            {deleteError && (
+              <Banner tone="danger" title="Couldn’t move this person to Trash">
+                {deleteError} Check your connection and try again.
+              </Banner>
+            )}
+          </>
+        }
         confirmLabel={remove.isPending ? 'Moving...' : 'Move to trash'}
         destructive
-        busy={remove.isPending}
+        busy={remove.isPending || !canWrite}
+        cancelDisabled={remove.isPending}
+        initialFocus="cancel"
         onConfirm={() => {
+          if (!canWrite || removing.current) return;
+          removing.current = true;
+          setDeleteError(null);
           remove.mutate();
         }}
       />
@@ -491,7 +546,7 @@ export function Person() {
             title="Relationship strength"
             actions={
               rel?.edgeId && !editingRel ? (
-                <Button size="sm" onClick={() => setEditingRel(true)}>
+                <Button size="sm" disabled={!canWrite} onClick={() => setEditingRel(true)}>
                   Edit relationship
                 </Button>
               ) : undefined
@@ -558,6 +613,7 @@ export function Person() {
                         {rel?.edgeId ? (
                           <button
                             type="button"
+                            disabled={!canWrite}
                             className="person__editable"
                             // Distinct from the region's own "Edit relationship":
                             // two controls with the same accessible name in one
@@ -628,13 +684,20 @@ export function Person() {
                 title="No relationship signal yet"
                 hint="Log an interaction or set closeness to give this relationship a traceable strength."
                 action={
-                  <Button size="sm" onClick={() => setLogging(true)}>
+                  <Button size="sm" disabled={!canWrite} onClick={() => setLogging(true)}>
                     Log first interaction
                   </Button>
                 }
               />
             )}
           </Section>
+
+          <PersonDetails
+            props={props}
+            topics={rel?.topics ?? []}
+            topicsUnavailable={summaryUnavailable}
+            topicsLoading={sum.isLoading}
+          />
 
           {/* What this person has actually done - their own records only. */}
           <Section
@@ -643,7 +706,7 @@ export function Person() {
               profileUnavailable
                 ? 'unavailable'
                 : profile.data
-                  ? `${profile.data.counts.records} records`
+                  ? `${profile.data.counts.records} ${profile.data.counts.records === 1 ? 'record' : 'records'}`
                   : '...'
             }
           >
@@ -751,42 +814,6 @@ export function Person() {
             )}
           </Section>
 
-          {/* Contact + topics */}
-          <Section title="Details">
-            <dl className="m-0 stack network-fact-list">
-              <div className="spread">
-                <dt className="u-muted">Email</dt>
-                <dd className="m-0">
-                  <Mono>
-                    {(props.email as string) ?? ((props.emails as string[]) ?? [])[0] ?? '—'}
-                  </Mono>
-                </dd>
-              </div>
-              <div className="spread">
-                <dt className="u-muted">Phone</dt>
-                <dd className="m-0">
-                  <Mono>{(props.phone as string) ?? '—'}</Mono>
-                </dd>
-              </div>
-              <div className="spread">
-                <dt className="u-muted">City</dt>
-                <dd className="m-0">
-                  <Mono>{(props.city as string) ?? '—'}</Mono>
-                </dd>
-              </div>
-              <div className="spread items-start">
-                <dt className="u-muted">Topics</dt>
-                <dd className="chips m-0">
-                  {(rel?.topics ?? []).length === 0 ? (
-                    <span className="u-faint">—</span>
-                  ) : (
-                    (rel?.topics ?? []).map((t) => <Chip key={t}>{t}</Chip>)
-                  )}
-                </dd>
-              </div>
-            </dl>
-          </Section>
-
           {/* Favor ledger */}
           {/* The ledger reads from the same summary query the strength region
               guards, and used to render unguarded: while the request was in
@@ -816,89 +843,7 @@ export function Person() {
             ) : sum.isLoading ? (
               <SkeletonRows rows={2} label="Loading favor ledger" />
             ) : (
-              <>
-                {favors.length === 0 ? (
-                  <p className="network-section-note">
-                    No favors recorded. Add only a concrete commitment you would be comfortable
-                    acting on later.
-                  </p>
-                ) : (
-                  <ul className="network-rows" aria-label="Favors">
-                    {favors.map((f, i) => (
-                      <li key={f.id ?? `favor-${i}`}>
-                        <div className="row network-favor">
-                          {/* Never colour alone: the direction is spelled out. */}
-                          <Chip tone={f.direction === 'owed_to_me' ? 'success' : 'warning'}>
-                            {f.direction === 'owed_to_me' ? 'They owe you' : 'You owe them'}
-                          </Chip>
-                          <div className="row__main">
-                            <div
-                              className={
-                                f.settled ? 'row__title text-faint line-through' : 'row__title'
-                              }
-                            >
-                              {f.what || '(no description)'}
-                            </div>
-                            {!f.settled && !f.id && (
-                              <p className="network-favor__note">
-                                Recorded before the ledger assigned ids, so there is nothing to
-                                address. Re-add it to settle it.
-                              </p>
-                            )}
-                          </div>
-                          {/* A strike-through is not in the accessibility tree,
-                              so a settled favor read exactly like an open one. */}
-                          {f.settled ? (
-                            <Chip tone="success" glyph="check">
-                              settled
-                            </Chip>
-                          ) : f.id ? (
-                            <Button
-                              size="sm"
-                              // Scoped to this row: the shared pending flag
-                              // greyed out every other Settle button too.
-                              disabled={settleFavor.isPending && settleFavor.variables === f.id}
-                              onClick={() => settleFavor.mutate(f.id!)}
-                            >
-                              {settleFavor.isPending && settleFavor.variables === f.id
-                                ? 'Settling...'
-                                : 'Settle'}
-                            </Button>
-                          ) : (
-                            <Chip mono>not settleable</Chip>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <div className="hstack network-favor__composer">
-                  <Input
-                    aria-label="Favor description"
-                    placeholder="e.g. Owes you an intro to Yara"
-                    value={favorNote}
-                    onChange={(e) => setFavorNote(e.target.value)}
-                  />
-                  <Button
-                    size="sm"
-                    disabled={!favorNote.trim() || addFavor.isPending}
-                    onClick={() => addFavor.mutate('owed_to_me')}
-                  >
-                    {addFavor.isPending && addFavor.variables === 'owed_to_me'
-                      ? 'Recording...'
-                      : 'They owe'}
-                  </Button>
-                  <Button
-                    size="sm"
-                    disabled={!favorNote.trim() || addFavor.isPending}
-                    onClick={() => addFavor.mutate('owed_by_me')}
-                  >
-                    {addFavor.isPending && addFavor.variables === 'owed_by_me'
-                      ? 'Recording...'
-                      : 'I owe'}
-                  </Button>
-                </div>
-              </>
+              <PersonFavors personId={id} favors={favors} hasRelationship={Boolean(rel?.edgeId)} />
             )}
           </Section>
         </div>
@@ -911,7 +856,7 @@ export function Person() {
                 title="No interactions logged"
                 hint="Log a coffee, call, or message so relationship strength has dated evidence behind it."
                 action={
-                  <Button size="sm" onClick={() => setLogging(true)}>
+                  <Button size="sm" disabled={!canWrite} onClick={() => setLogging(true)}>
                     Log interaction
                   </Button>
                 }
@@ -930,8 +875,8 @@ export function Person() {
                             was shown - a relationship log with no "when" on it
                             cannot answer the question the page exists for. */}
                         {i.kind && <Chip mono>{i.kind}</Chip>}
-                        <span className="min-w-0 flex-1 truncate">{i.title}</span>
-                        <Mono className="text-xs text-muted">
+                        <span className="network-interaction__title">{i.title}</span>
+                        <Mono className="network-interaction__date text-xs text-muted">
                           {i.at ? i.at.slice(0, 10) : 'undated'}
                         </Mono>
                       </Link>
@@ -963,7 +908,12 @@ export function Person() {
           <Section
             title="Correspondence"
             actions={
-              <Button size="sm" variant="ghost" onClick={() => setIntroducing(true)}>
+              <Button
+                size="sm"
+                variant="ghost"
+                disabled={!canWrite}
+                onClick={() => setIntroducing(true)}
+              >
                 Log introduction
               </Button>
             }
@@ -978,10 +928,16 @@ export function Person() {
               <>
                 <BulkUnlinkBar
                   selectedCount={bulk.selectedCount}
+                  busy={bulk.busy}
                   onClear={bulk.clear}
                   onUnlink={() => bulk.setConfirmUnlink(true)}
                 />
-                <Button size="sm" glyph="plus" onClick={() => setAddingConn(true)}>
+                <Button
+                  size="sm"
+                  glyph="plus"
+                  disabled={!canWrite}
+                  onClick={() => setAddingConn(true)}
+                >
                   Add connection
                 </Button>
               </>
@@ -993,7 +949,7 @@ export function Person() {
                 title="No connections yet"
                 hint="Link schools, roles, skills, reporting lines, or organizations to place this person in your network."
                 action={
-                  <Button size="sm" onClick={() => setAddingConn(true)}>
+                  <Button size="sm" disabled={!canWrite} onClick={() => setAddingConn(true)}>
                     Add first connection
                   </Button>
                 }
@@ -1002,21 +958,37 @@ export function Person() {
               <>
                 <SelectAllRow
                   allSelected={allVisibleSelected}
+                  disabled={bulk.busy || !canWrite}
                   onToggle={() => bulk.toggleAll(edgeIds, allVisibleSelected)}
                 />
-                {relationEdges.map((e) => (
-                  <ConnectionRow
-                    key={e.id}
-                    edge={e}
-                    nodeId={node.id}
-                    neighbors={neighbors}
-                    selected={bulk.isSelected(e.id)}
-                    onToggleSelect={() => bulk.toggleOne(e.id)}
-                  />
-                ))}
+                <ul className="person-connections" aria-label="Connections">
+                  {visibleConnections.map((e) => (
+                    <li key={e.id}>
+                      <ConnectionRow
+                        edge={e}
+                        nodeId={node.id}
+                        neighbors={neighbors}
+                        selected={bulk.isSelected(e.id)}
+                        busy={bulk.busy}
+                        onToggleSelect={() => bulk.toggleOne(e.id)}
+                      />
+                    </li>
+                  ))}
+                </ul>
+                {visibleConnections.length < relationEdges.length && (
+                  <Button
+                    size="sm"
+                    disabled={bulk.busy}
+                    onClick={() => setConnectionLimit((limit) => limit + 20)}
+                  >
+                    Show more connections ({relationEdges.length - visibleConnections.length}{' '}
+                    remaining)
+                  </Button>
+                )}
               </>
             )}
           </Section>
+          <EntityEvidence entityId={node.id} />
         </div>
       </div>
 
@@ -1046,6 +1018,19 @@ export function Person() {
         open={bulk.confirmUnlink}
         onOpenChange={bulk.setConfirmUnlink}
         selectedCount={bulk.selectedCount}
+        titles={relationEdges
+          .filter((edge) => bulk.isSelected(edge.id))
+          .map((edge) => {
+            const otherId = edge.src === id ? edge.dst : edge.src;
+            return `${neighbors[otherId]?.title ?? 'Unknown record'} · ${edgeDisplayLabel(
+              edge.type,
+              edge.src === id ? 'out' : 'in',
+              {
+                relation: typeof edge.props.relation === 'string' ? edge.props.relation : undefined,
+                kind: typeof edge.props.kind === 'string' ? edge.props.kind : undefined,
+              },
+            )}`;
+          })}
         busy={bulk.busy}
         onConfirm={() => {
           void bulk.unlinkSelected();

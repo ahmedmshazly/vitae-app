@@ -19,9 +19,7 @@ vi.mock('../components/EntityPicker.js', () => ({
   EntityPicker: ({ types, onPick }: { types: string[]; onPick: (entity: unknown) => void }) => (
     <button
       type="button"
-      onClick={() =>
-        onPick({ id: `n-${types[0]}`, type: types[0], title: `A ${types[0]} record` })
-      }
+      onClick={() => onPick({ id: `n-${types[0]}`, type: types[0], title: `A ${types[0]} record` })}
     >
       Pick from {types.join(', ')}
     </button>
@@ -130,7 +128,8 @@ const COMPILED = {
       rule: 'citation_missing',
       section: 'scope',
       claim: 'c1',
-      message: 'A cited record no longer exists, so this entry rests on evidence a reader cannot follow.',
+      message:
+        'A cited record no longer exists, so this entry rests on evidence a reader cannot follow.',
     },
   ],
   blocking: false,
@@ -249,6 +248,8 @@ describe('DossierEditor', () => {
     await screen.findByRole('heading', { name: '2026 promotion packet' });
 
     await userEvent.click(screen.getByRole('button', { name: 'Remove entry 1 from Scope' }));
+    expect(mockApi.patch).not.toHaveBeenCalled();
+    await userEvent.click(screen.getByRole('button', { name: /^Remove entry$/ }));
 
     expect(mockApi.patch).toHaveBeenCalledWith('/dossiers/d1', {
       expected_rev: 3,

@@ -310,6 +310,25 @@ describe('a page whose prose fails', () => {
       ),
     ).toBeInTheDocument();
   });
+
+  it('retries only the failed prose and restores the article without leaving the reader stranded', async () => {
+    const user = userEvent.setup();
+    overrides['pages/meta/coverage.json'] = { ok: false, status: 500 };
+    renderDocs('/docs/meta/coverage');
+
+    expect(
+      await screen.findByText("Couldn't load 'Coverage and contradictions'"),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Coverage and contradictions',
+    );
+
+    delete overrides['pages/meta/coverage.json'];
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+
+    expect(await screen.findByText('Nine checks run in CI.')).toBeInTheDocument();
+    expect(screen.queryByText("Couldn't load 'Coverage and contradictions'")).toBeNull();
+  });
 });
 
 describe('a page that loaded', () => {

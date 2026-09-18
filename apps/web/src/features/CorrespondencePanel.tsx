@@ -1,6 +1,9 @@
+import { useState, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Chip, EmptyState, ErrorState, Mono, SkeletonRows } from '@vitae/ui';
+import { Banner, Button, Chip, EmptyState, ErrorState, Mono, SkeletonRows } from '@vitae/ui';
 import { api } from '../lib/api.js';
+import { entityHref } from '../lib/entity-href.js';
 
 /**
  * The correspondence panel on a person profile (SRS FR-COMM-001): reciprocity,
@@ -66,8 +69,60 @@ export interface IntroductionsDto {
 }
 
 function days(value: number | null): string {
-  if (value === null) return '—';
-  return value < 1 ? '<1 day' : `${Math.round(value * 10) / 10} days`;
+  if (value == null || !Number.isFinite(value) || value < 0) return 'Not enough data';
+  if (value < 1) return '<1 day';
+  const rounded = Math.round(value * 10) / 10;
+  return `${rounded} ${rounded === 1 ? 'day' : 'days'}`;
+}
+
+/** Each evidence register has its own bounded disclosure and keyboard control. */
+function EvidenceDisclosure({
+  title,
+  metric,
+  rows,
+  listLabel,
+  empty,
+}: {
+  title: string;
+  metric: ReactNode;
+  rows: ReactNode[];
+  listLabel: string;
+  empty: string;
+}) {
+  const [limit, setLimit] = useState(20);
+  return (
+    <details className="correspondence-disclosure">
+      <summary>
+        <strong>{title}</strong>
+        <span className="correspondence-disclosure__metric">{metric}</span>
+      </summary>
+      {rows.length ? (
+        <>
+          <ul className="correspondence-disclosure__rows" aria-label={listLabel}>
+            {rows.slice(0, limit)}
+          </ul>
+          {rows.length > 20 && (
+            <div className="correspondence-disclosure__more">
+              <Mono>
+                {Math.min(limit, rows.length)} of {rows.length}
+              </Mono>
+              {limit < rows.length ? (
+                <Button size="sm" onClick={() => setLimit((value) => value + 20)}>
+                  Show more {title.toLowerCase()}
+                </Button>
+              ) : (
+                <Button size="sm" onClick={() => setLimit(20)}>
+                  Show first 20 {title.toLowerCase()}
+                </Button>
+              )}
+            </div>
+          )}
+        </>
+      ) : (
+        <p className="text-sm text-muted">{empty}</p>
+      )}
+    </details>
+  );
 }
 
 export function CorrespondencePanel({
@@ -84,170 +139,221 @@ export function CorrespondencePanel({
         `/people/${personId}/correspondence`,
       ),
   });
-
-  if (query.isPending) return <SkeletonRows rows={3} />;
-  if (query.isError) {
+  if (query.isPending)
+    return (
+      <div role="status" aria-label="Loading correspondence">
+        <SkeletonRows rows={3} />
+      </div>
+    );
+  if (!query.data?.profile?.coverage) {
     return (
       <ErrorState
         title="Correspondence unavailable"
-        detail="The profile could not be computed."
+        detail="We couldn’t load the correspondence profile. Your logged interactions are unchanged."
         onRetry={() => void query.refetch()}
+        retrying={query.isFetching}
+        retryLabel="Retry correspondence"
       />
     );
   }
 
-  const profile = query.data?.profile;
-  if (!profile?.coverage) {
-    return <ErrorState title="Correspondence unavailable" detail="The response carried no profile." />;
-  }
-  const introductions = query.data?.introductions;
-  const introductionsBlock =
-    introductions && (introductions.connected.length > 0 || introductions.brokered.length > 0) ? (
-      <details>
-        <summary className="cursor-pointer">
-          Introductions{' '}
-          <Mono className="text-xs">
-            {introductions.connected.length + introductions.brokered.length}
-          </Mono>
-        </summary>
-        <ul className="mt-2 text-xs text-muted" aria-label="Recorded introductions">
-          {introductions.connected.map((intro) => (
-            <li key={intro.edgeId}>
-              connected to {intro.otherTitle ?? intro.otherId}
-              {intro.viaLabel ? ` via ${intro.viaLabel}` : ''}
-              {intro.occurredOn ? ` · ${intro.occurredOn}` : ''}
-              {intro.context ? ` · ${intro.context}` : ''}
-            </li>
-          ))}
-          {introductions.brokered.map((intro) => (
-            <li key={intro.edgeId}>
-              brokered {intro.srcTitle ?? intro.srcId} ↔ {intro.dstTitle ?? intro.dstId}
-              {intro.occurredOn ? ` · ${intro.occurredOn}` : ''}
-            </li>
-          ))}
-        </ul>
-      </details>
-    ) : null;
-  const byId = new Map(interactions.map((i) => [i.id, i]));
-  const name = (id: string): string => {
+  const { profile, introductions } = query.data;
+  const byId = new Map(interactions.map((interaction) => [interaction.id, interaction]));
+  const interactionLink = (id: string) => {
     const hit = byId.get(id);
-    return hit ? `${hit.at ? hit.at.slice(0, 10) : 'undated'} · ${hit.title}` : id;
+    return (
+      <Link to={entityHref('interaction', id)}>
+        {hit
+          ? `${hit.at ? hit.at.slice(0, 10) : 'Undated'} · ${hit.title}`
+          : `Interaction ${id.slice(0, 8)}`}
+      </Link>
+    );
   };
+  const personLink = (id: string, title: string | null) => (
+    <Link to={entityHref('person', id)}>{title || 'Unnamed person'}</Link>
+  );
+  const introRows = [
+    ...(introductions?.connected ?? []).map((intro) => (
+      <li key={intro.edgeId}>
+        <div>
+          Connected to {personLink(intro.otherId, intro.otherTitle)}
+          {intro.viaId ? (
+            <> via {personLink(intro.viaId, intro.viaLabel)}</>
+          ) : intro.viaLabel ? (
+            ` via ${intro.viaLabel}`
+          ) : (
+            ''
+          )}
+        </div>
+        {intro.occurredOn && <div className="text-sm text-muted">{intro.occurredOn}</div>}
+        {intro.context && <p>{intro.context}</p>}
+      </li>
+    )),
+    ...(introductions?.brokered ?? []).map((intro) => (
+      <li key={intro.edgeId}>
+        <div>
+          Introduced {personLink(intro.srcId, intro.srcTitle)} to{' '}
+          {personLink(intro.dstId, intro.dstTitle)}
+        </div>
+        {intro.occurredOn && <div className="text-sm text-muted">{intro.occurredOn}</div>}
+        {intro.context && <p>{intro.context}</p>}
+      </li>
+    )),
+  ];
+  const introBlock =
+    introRows.length > 0 ? (
+      <EvidenceDisclosure
+        title="Introductions"
+        metric={<Mono>{introRows.length}</Mono>}
+        rows={introRows}
+        listLabel="Recorded introductions"
+        empty="No introductions recorded."
+      />
+    ) : null;
+  const refreshState = query.isError ? (
+    <Banner
+      className="network-secondary-state"
+      tone="danger"
+      title="Correspondence could not be refreshed"
+      action={
+        <Button size="sm" disabled={query.isFetching} onClick={() => void query.refetch()}>
+          {query.isFetching ? 'Retrying…' : 'Retry correspondence'}
+        </Button>
+      }
+    >
+      Showing the last loaded figures and evidence.
+    </Banner>
+  ) : query.isFetching ? (
+    <p role="status" className="text-sm text-muted">
+      Refreshing correspondence…
+    </p>
+  ) : null;
 
-  if (profile.coverage.total === 0) {
+  if (profile.coverage.total === 0 || profile.coverage.withDirection === 0) {
+    const hasUnmeasuredHistory = profile.coverage.total === 0 && interactions.length > 0;
     return (
-      <div className="space-y-3">
+      <div className="correspondence-panel">
+        {refreshState}
         <EmptyState
           glyph="interaction"
-          title="No interactions logged"
-          hint="The correspondence profile computes from logged interactions; there are none yet."
+          title={
+            hasUnmeasuredHistory
+              ? 'No correspondence measurements yet'
+              : profile.coverage.total === 0
+                ? 'No interactions logged'
+                : 'No stated directions yet'
+          }
+          hint={
+            hasUnmeasuredHistory
+              ? 'Your logged interactions are still available in the history. None is included in these measurements; missing dates and directions are not guessed.'
+              : profile.coverage.total === 0
+                ? 'Log an interaction to start a correspondence history.'
+                : `None of the ${profile.coverage.total} logged interactions says who reached out. Choose “Who reached out” when logging; older entries remain uncounted rather than guessed.`
+          }
         />
-        {introductionsBlock}
+        {introBlock}
       </div>
     );
   }
 
-  if (profile.coverage.withDirection === 0) {
-    return (
-      <div className="space-y-3">
-        <EmptyState
-          glyph="interaction"
-          title="No stated directions yet"
-          hint={`None of the ${profile.coverage.total} logged interactions says who reached out. New logs carry a who-reached-out control; older entries stay uncounted rather than guessed.`}
-        />
-        {introductionsBlock}
-      </div>
-    );
-  }
-
-  const partialCoverage = profile.coverage.withDirection < profile.coverage.total;
-  const monthsWithContact = profile.contactDays.months.filter((m) => m.days > 0);
+  const reciprocityRows = [
+    ...profile.reciprocity.outboundIds.map((id) => (
+      <li key={`out-${id}`}>
+        <span className="text-sm text-muted">You reached out</span>
+        {interactionLink(id)}
+      </li>
+    )),
+    ...profile.reciprocity.inboundIds.map((id) => (
+      <li key={`in-${id}`}>
+        <span className="text-sm text-muted">They reached out</span>
+        {interactionLink(id)}
+      </li>
+    )),
+  ];
+  const replyRows = [
+    ...profile.replyLatency.mine.samples.map((sample) => (
+      <li key={`mine-${sample.fromId}-${sample.toId}`}>
+        <span className="text-sm text-muted">Your reply in {days(sample.days)}</span>
+        {interactionLink(sample.fromId)}
+        <span>to {interactionLink(sample.toId)}</span>
+      </li>
+    )),
+    ...profile.replyLatency.theirs.samples.map((sample) => (
+      <li key={`theirs-${sample.fromId}-${sample.toId}`}>
+        <span className="text-sm text-muted">Their reply in {days(sample.days)}</span>
+        {interactionLink(sample.fromId)}
+        <span>to {interactionLink(sample.toId)}</span>
+      </li>
+    )),
+  ];
 
   return (
-    <div className="space-y-3">
-      {partialCoverage && (
-        <p className="text-xs text-muted">
+    <div className="correspondence-panel">
+      {refreshState}
+      <p className="text-sm text-muted">Open a measure to review the interactions behind it.</p>
+      {profile.coverage.withDirection < profile.coverage.total && (
+        <p className="text-sm text-muted">
           {profile.coverage.withDirection} of {profile.coverage.total} interactions state a
           direction; the rest count as contact only.
         </p>
       )}
-
-      <details>
-        <summary className="cursor-pointer">
-          Reciprocity{' '}
-          <Mono className="text-xs">
-            you {profile.reciprocity.outbound} · them {profile.reciprocity.inbound}
-          </Mono>{' '}
-          {profile.reciprocity.ratio !== null && (
-            <Chip mono>{Math.round(profile.reciprocity.ratio * 100)}% yours</Chip>
-          )}
-        </summary>
-        <ul className="mt-2 text-xs text-muted" aria-label="Reciprocity evidence">
-          {profile.reciprocity.outboundIds.map((id) => (
-            <li key={id}>you → {name(id)}</li>
-          ))}
-          {profile.reciprocity.inboundIds.map((id) => (
-            <li key={id}>them → {name(id)}</li>
-          ))}
-        </ul>
-      </details>
-
-      <details>
-        <summary className="cursor-pointer">
-          Reply latency{' '}
-          <Mono className="text-xs">
-            you {days(profile.replyLatency.mine.medianDays)} · them{' '}
-            {days(profile.replyLatency.theirs.medianDays)}
-          </Mono>
-        </summary>
-        <ul className="mt-2 text-xs text-muted" aria-label="Reply pairs">
-          {profile.replyLatency.mine.samples.map((s) => (
-            <li key={`${s.fromId}-${s.toId}`}>
-              your reply in {days(s.days)}: {name(s.fromId)} → {name(s.toId)}
-            </li>
-          ))}
-          {profile.replyLatency.theirs.samples.map((s) => (
-            <li key={`${s.fromId}-${s.toId}`}>
-              their reply in {days(s.days)}: {name(s.fromId)} → {name(s.toId)}
-            </li>
-          ))}
-          {profile.replyLatency.mine.samples.length === 0 &&
-            profile.replyLatency.theirs.samples.length === 0 && (
-              <li>No reply pairs inside the sixty-day window.</li>
+      <EvidenceDisclosure
+        title="Reciprocity"
+        listLabel="Reciprocity evidence"
+        rows={reciprocityRows}
+        empty="No directional evidence available."
+        metric={
+          <>
+            <Mono>
+              you {profile.reciprocity.outbound} · them {profile.reciprocity.inbound}
+            </Mono>
+            {profile.reciprocity.ratio != null && Number.isFinite(profile.reciprocity.ratio) && (
+              <Chip mono>{Math.round(profile.reciprocity.ratio * 100)}% yours</Chip>
             )}
-        </ul>
-      </details>
-
-      <details>
-        <summary className="cursor-pointer">
-          Unanswered inbound <Mono className="text-xs">{profile.unansweredInbound.count}</Mono>
-        </summary>
-        <ul className="mt-2 text-xs text-muted" aria-label="Unanswered inbound interactions">
-          {profile.unansweredInbound.eventIds.map((id) => (
-            <li key={id}>{name(id)}</li>
-          ))}
-          {profile.unansweredInbound.count === 0 && <li>Nothing waiting on a reply from you.</li>}
-        </ul>
-      </details>
-
-      <details>
-        <summary className="cursor-pointer">
-          Contact days{' '}
-          <Mono className="text-xs">{profile.contactDays.totalDays} distinct</Mono>
-        </summary>
-        <ul className="mt-2 text-xs text-muted" aria-label="Contact days by month">
-          {monthsWithContact.map((m) => (
-            <li key={m.month}>
-              <Mono>{m.month}</Mono> · {m.days} {m.days === 1 ? 'day' : 'days'}
+          </>
+        }
+      />
+      <EvidenceDisclosure
+        title="Reply latency"
+        listLabel="Reply pairs"
+        rows={replyRows}
+        empty="No reply pairs inside the sixty-day window."
+        metric={
+          <>
+            <Mono>you {days(profile.replyLatency.mine.medianDays)}</Mono>
+            <Mono>them {days(profile.replyLatency.theirs.medianDays)}</Mono>
+          </>
+        }
+      />
+      <EvidenceDisclosure
+        title="Unanswered inbound"
+        metric={<Mono>{profile.unansweredInbound.count}</Mono>}
+        listLabel="Unanswered inbound interactions"
+        rows={profile.unansweredInbound.eventIds.map((id) => (
+          <li key={id}>{interactionLink(id)}</li>
+        ))}
+        empty={
+          profile.unansweredInbound.count === 0
+            ? 'Nothing waiting on a reply from you.'
+            : 'The count is available, but its interaction references are missing.'
+        }
+      />
+      <EvidenceDisclosure
+        title="Contact days"
+        metric={<Mono>{profile.contactDays.totalDays} distinct</Mono>}
+        listLabel="Contact days by month"
+        rows={profile.contactDays.months
+          .filter((month) => month.days > 0)
+          .map((month) => (
+            <li key={month.month}>
+              <span>
+                <Mono>{month.month}</Mono> · {month.days} {month.days === 1 ? 'day' : 'days'}
+              </span>
             </li>
           ))}
-          {monthsWithContact.length === 0 && (
-            <li>No contact inside the trailing twelve months.</li>
-          )}
-        </ul>
-      </details>
-
-      {introductionsBlock}
+        empty="No contact inside the trailing twelve months."
+      />
+      {introBlock}
     </div>
   );
 }

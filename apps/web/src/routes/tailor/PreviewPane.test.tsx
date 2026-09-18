@@ -9,7 +9,9 @@ import { defaultDraft } from './types.js';
 import type { CompileResult, Draft } from './types.js';
 
 vi.mock('../../components/PdfPreview.js', () => ({
-  PdfPreview: ({ base64 }: { base64: string }) => <div data-testid="pdf">{base64.length} bytes</div>,
+  PdfPreview: ({ base64 }: { base64: string }) => (
+    <div data-testid="pdf">{base64.length} bytes</div>
+  ),
 }));
 
 const templates = {
@@ -75,10 +77,7 @@ describe('PreviewPane', () => {
       'aria-pressed',
       'true',
     );
-    expect(screen.getByRole('button', { name: 'Cobalt' })).toHaveAttribute(
-      'aria-pressed',
-      'false',
-    );
+    expect(screen.getByRole('button', { name: 'Cobalt' })).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('offers the accents the active template declares', async () => {
@@ -191,5 +190,31 @@ describe('PreviewPane', () => {
     await waitFor(() => {
       expect(screen.getByText("Couldn't finalize this résumé")).toBeInTheDocument();
     });
+  });
+
+  it('retries finalization beside the failed save and records the receipt', async () => {
+    const user = userEvent.setup();
+    mockApi.post.mockImplementation((path: string) => {
+      if (path === '/resumes/compile') return Promise.resolve(compiled());
+      if (path === '/resumes/finalize') {
+        return mockApi.post.mock.calls.filter(([calledPath]) => calledPath === '/resumes/finalize')
+          .length === 1
+          ? Promise.reject(new Error('output store unavailable'))
+          : Promise.resolve({ status: 'final', onePage: true, gatePassed: true });
+      }
+      return Promise.resolve({});
+    });
+    renderPane();
+
+    await user.click(await screen.findByRole('button', { name: 'Compile PDF' }));
+    await screen.findByTestId('pdf');
+    await user.click(screen.getByRole('button', { name: 'Finalize' }));
+
+    await screen.findByText("Couldn't finalize this résumé");
+    expect(screen.getByText('output store unavailable')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Retry finalization' }));
+
+    expect(await screen.findByText('Résumé finalized')).toBeInTheDocument();
+    expect(mockApi.post).toHaveBeenCalledTimes(3);
   });
 });

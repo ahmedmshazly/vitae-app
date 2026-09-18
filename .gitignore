@@ -13,6 +13,8 @@ apps/api/dist/
 .env
 .env.local
 .env.*.local
+deploy/.env
+deploy/.env.personal
 *.pem
 *.key
 # file-backed secret store for third-party credentials (FR-004)

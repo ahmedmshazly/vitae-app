@@ -7,6 +7,11 @@ import {
   timelineReview,
   timelineView,
 } from '../../services/explore.js';
+import {
+  communityConnectionDetail,
+  communityDetail,
+  graphDiscovery,
+} from '../../services/graph-discovery.js';
 
 export const graphRouter: Router = Router();
 export const timelineRouter: Router = Router();
@@ -38,6 +43,56 @@ graphRouter.get(
     }
     const maxDepth = req.query.maxDepth ? Number(req.query.maxDepth) : undefined;
     res.json(await findGraphPath({ from, to, maxDepth }));
+  }),
+);
+
+/** Whole-workspace community and bridge analysis for Life map discovery. */
+graphRouter.get(
+  '/discovery',
+  asyncHandler(async (_req, res) => {
+    res.json(await graphDiscovery());
+  }),
+);
+
+/** Paginated members and bounded scene relationships for a computed community. */
+graphRouter.get(
+  '/discovery/community/:communityId',
+  asyncHandler(async (req, res) => {
+    const detail = await communityDetail({
+      id: req.params.communityId,
+      offset: req.query.offset ? Number(req.query.offset) : undefined,
+      limit: req.query.limit ? Number(req.query.limit) : undefined,
+      q: typeof req.query.q === 'string' ? req.query.q : undefined,
+    });
+    if (!detail) {
+      res.status(404).json({ error: 'Community not found' });
+      return;
+    }
+    res.json(detail);
+  }),
+);
+
+/** Actual original relationships joining two computed communities. */
+graphRouter.get(
+  '/discovery/connection',
+  asyncHandler(async (req, res) => {
+    const from = typeof req.query.from === 'string' ? req.query.from : '';
+    const to = typeof req.query.to === 'string' ? req.query.to : '';
+    if (!from || !to) {
+      res.status(400).json({ error: 'from and to are required' });
+      return;
+    }
+    const detail = await communityConnectionDetail({
+      from,
+      to,
+      offset: req.query.offset ? Number(req.query.offset) : undefined,
+      limit: req.query.limit ? Number(req.query.limit) : undefined,
+    });
+    if (!detail) {
+      res.status(404).json({ error: 'Community connection not found' });
+      return;
+    }
+    res.json(detail);
   }),
 );
 

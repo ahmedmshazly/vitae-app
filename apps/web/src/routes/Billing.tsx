@@ -46,11 +46,15 @@ interface BillingResponse {
   } | null;
 }
 
-const ACCESS_COPY: Record<AccessState, { label: string; tone: 'accent' | 'success' | 'warning' | 'danger'; detail: string }> = {
+const ACCESS_COPY: Record<
+  AccessState,
+  { label: string; tone: 'accent' | 'success' | 'warning' | 'danger'; detail: string }
+> = {
   trialing: {
     label: 'Full trial access',
     tone: 'accent',
-    detail: 'Everything in the private career record is available while you decide whether to continue.',
+    detail:
+      'Everything in the private career record is available while you decide whether to continue.',
   },
   active: {
     label: 'Paid access active',
@@ -65,7 +69,8 @@ const ACCESS_COPY: Record<AccessState, { label: string; tone: 'accent' | 'succes
   read_only: {
     label: 'Read-only access',
     tone: 'warning',
-    detail: 'You can inspect and export your record, but changes are paused until you continue the plan.',
+    detail:
+      'You can inspect and export your record, but changes are paused until you continue the plan.',
   },
   deletion_pending: {
     label: 'Deletion scheduled',
@@ -108,13 +113,20 @@ export function billingAccessDetail(access: BillingResponse['access']): string {
   const deletionDate = friendlyDate(access.deletionScheduledAt);
   if (deletionDate) return `Deletion is scheduled for ${deletionDate}.`;
   const graceDate = friendlyDate(access.graceEndsAt);
-  if (access.state === 'read_only' && graceDate) return `Export remains available through ${graceDate}.`;
+  if (access.state === 'read_only' && graceDate)
+    return `Export remains available through ${graceDate}.`;
   const trialDate = friendlyDate(access.trialEndsAt);
   if (access.state === 'trialing' && trialDate) return `Trial access ends ${trialDate}.`;
   return ACCESS_COPY[access.state].detail;
 }
 
-function PeriodPicker({ value, onChange }: { value: BillingPeriod; onChange: (value: BillingPeriod) => void }) {
+function PeriodPicker({
+  value,
+  onChange,
+}: {
+  value: BillingPeriod;
+  onChange: (value: BillingPeriod) => void;
+}) {
   return (
     <fieldset className="m-0 flex flex-wrap gap-2 border-0 p-0" aria-label="Billing period">
       <legend className="mb-2 text-sm text-muted">Choose a billing period</legend>
@@ -142,7 +154,7 @@ function PeriodPicker({ value, onChange }: { value: BillingPeriod; onChange: (va
 
 export function Billing() {
   const { cloudEnabled } = useAuth();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [period, setPeriod] = useState<BillingPeriod>(() =>
     billingPeriodFromSearch(searchParams.get('period')),
   );
@@ -183,6 +195,21 @@ export function Billing() {
     navigate('/settings/billing', { replace: true });
   }, [flash, navigate, queryClient, searchParams]);
 
+  // Billing period is a deliberate handoff preference, not a draft hidden in
+  // this component. Keeping it in the address makes refresh, back/forward,
+  // and the signup-to-billing handoff describe the same choice.
+  useEffect(() => {
+    setPeriod(billingPeriodFromSearch(searchParams.get('period')));
+  }, [searchParams]);
+
+  const selectPeriod = (nextPeriod: BillingPeriod) => {
+    setPeriod(nextPeriod);
+    const next = new URLSearchParams(searchParams);
+    if (nextPeriod === 'monthly') next.set('period', nextPeriod);
+    else next.delete('period');
+    setSearchParams(next, { replace: true });
+  };
+
   if (!cloudEnabled) return <Navigate to="/settings" replace />;
 
   return (
@@ -214,10 +241,17 @@ export function Billing() {
           <div className="min-w-0">
             <Section
               title="Workspace access"
-              actions={<Chip tone={ACCESS_COPY[billing.data.access.state].tone} mono>{ACCESS_COPY[billing.data.access.state].label}</Chip>}
+              actions={
+                <Chip tone={ACCESS_COPY[billing.data.access.state].tone} mono>
+                  {ACCESS_COPY[billing.data.access.state].label}
+                </Chip>
+              }
             >
-              <p className="m-0 text-sm text-ink-soft">{billingAccessDetail(billing.data.access)}</p>
-              {billing.data.access.state === 'read_only' || billing.data.access.state === 'deletion_pending' ? (
+              <p className="m-0 text-sm text-ink-soft">
+                {billingAccessDetail(billing.data.access)}
+              </p>
+              {billing.data.access.state === 'read_only' ||
+              billing.data.access.state === 'deletion_pending' ? (
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Link to="/data/exports" className="vt-btn vt-btn--sm">
                     Export your record
@@ -228,7 +262,8 @@ export function Billing() {
 
             <Section title="Vitae Cloud Individual" meta="one workspace">
               <p className="m-0 mb-4 text-sm text-ink-soft">
-                Capture, relationship intelligence, career evidence, tailoring, and full export are included. There are no contact or output credits.
+                Capture, relationship intelligence, career evidence, tailoring, and full export are
+                included. There are no contact or output credits.
               </p>
               {billing.data.subscription ? (
                 <dl className="m-0 grid grid-cols-[minmax(0,auto)_minmax(0,1fr)] gap-x-6">
@@ -242,25 +277,35 @@ export function Billing() {
                   </div>
                   <div className="col-span-2 grid grid-cols-subgrid items-center border-b border-hairline py-2">
                     <dt className="text-sm text-muted">Provider status</dt>
-                    <dd className="m-0 text-right"><Mono className="text-sm text-ink">{billing.data.subscription.status}</Mono></dd>
+                    <dd className="m-0 text-right">
+                      <Mono className="text-sm text-ink">{billing.data.subscription.status}</Mono>
+                    </dd>
                   </div>
                   <div className="col-span-2 grid grid-cols-subgrid items-center py-2">
                     <dt className="text-sm text-muted">Current period</dt>
-                    <dd className="m-0 text-right text-sm text-ink">{friendlyDate(billing.data.subscription.currentPeriodEndsAt) ?? 'Provider confirmation pending'}</dd>
+                    <dd className="m-0 text-right text-sm text-ink">
+                      {friendlyDate(billing.data.subscription.currentPeriodEndsAt) ??
+                        'Provider confirmation pending'}
+                    </dd>
                   </div>
                 </dl>
               ) : (
-                <p className="m-0 text-sm text-muted">No paid subscription is attached to this workspace yet.</p>
+                <p className="m-0 text-sm text-muted">
+                  No paid subscription is attached to this workspace yet.
+                </p>
               )}
             </Section>
           </div>
 
           <aside className="min-w-0">
-            <Section title={billing.data.subscription ? 'Manage subscription' : 'Continue after trial'}>
+            <Section
+              title={billing.data.subscription ? 'Manage subscription' : 'Continue after trial'}
+            >
               {billing.data.subscription || billing.data.customer.configured ? (
                 <>
                   <p className="m-0 mb-3 text-sm text-ink-soft">
-                    Update payment details, view invoices, or cancel through the billing provider's secure portal.
+                    Update payment details, view invoices, or cancel through the billing provider's
+                    secure portal.
                   </p>
                   <Button
                     variant="primary"
@@ -279,16 +324,20 @@ export function Billing() {
               ) : (
                 <>
                   <p className="m-0 mb-4 text-sm text-ink-soft">
-                    Choose how you want to continue. The amount shown here is the server-owned plan price; access changes only after provider verification.
+                    Choose how you want to continue. The amount shown here is the server-owned plan
+                    price; access changes only after provider verification.
                   </p>
-                  <PeriodPicker value={period} onChange={setPeriod} />
+                  <PeriodPicker value={period} onChange={selectPeriod} />
                   <Button
                     className="mt-4"
                     variant="primary"
                     disabled={checkout.isPending}
+                    aria-busy={checkout.isPending}
                     onClick={() => checkout.mutate(period)}
                   >
-                    {checkout.isPending ? 'Preparing secure checkout...' : 'Continue to secure checkout'}
+                    {checkout.isPending
+                      ? 'Preparing secure checkout...'
+                      : 'Continue to secure checkout'}
                   </Button>
                   <p className="m-0 mt-3 text-xs text-faint">
                     Checkout is handled by Paddle. Vitae does not receive your card number.
@@ -298,11 +347,16 @@ export function Billing() {
             </Section>
             <Section title="Your exit stays open">
               <p className="m-0 text-sm text-ink-soft">
-                Cancellation keeps the workspace available through the paid period. If you do not continue after a trial, the record becomes read-only with a 30-day export path.
+                Cancellation keeps the workspace available through the paid period. If you do not
+                continue after a trial, the record becomes read-only with a 30-day export path.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
-                <Link to="/data/exports" className="vt-btn vt-btn--sm">Open exports</Link>
-                <Link to="/security-and-ownership" className="vt-btn vt-btn--sm">Ownership details</Link>
+                <Link to="/data/exports" className="vt-btn vt-btn--sm">
+                  Open exports
+                </Link>
+                <Link to="/security-and-ownership" className="vt-btn vt-btn--sm">
+                  Ownership details
+                </Link>
               </div>
             </Section>
           </aside>

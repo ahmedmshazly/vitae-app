@@ -98,7 +98,22 @@ const serverEnvSchema = z.object({
   // from application data (FR-004). Optional: the file-backed secret store in
   // `.secrets/` backs local/self-hosted installs.
   GITHUB_PAT: z.string().optional(),
+  GEMINI_API_KEY: z.string().optional(),
+  GEMINI_PROJECT: z.string().optional(),
   VITAE_SECRETS_DIR: z.string().optional(),
+
+  /**
+   * Single-PC production install: loopback Caddy, local Postgres, owner
+   * sign-in, no Vitae Cloud. Default off. Never set this on a network-facing
+   * host; the control is published ports bound to 127.0.0.1, documented in
+   * docs/runbooks/personal-local.md.
+   */
+  VITAE_LOCAL_INSTALL: boolish.default('false'),
+  /**
+   * Directory for the filesystem storage adapter used when a local install
+   * has no Cloudinary URL. Ignored when CLOUDINARY_URL is set.
+   */
+  VITAE_STORAGE_DIR: z.string().min(1).optional(),
 });
 
 /**
@@ -119,13 +134,92 @@ export type ServerEnv = z.infer<typeof serverEnvSchema> & {
 
 let cached: ServerEnv | null = null;
 
+const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
+const LOCAL_DATABASE_HOSTS = new Set(['postgres', 'localhost', '127.0.0.1']);
+
+export function isLoopbackHostname(hostname: string): boolean {
+  return LOOPBACK_HOSTS.has(hostname.replace(/^\[|\]$/g, '').toLowerCase());
+}
+
+function cloudFlagEnabled(source: NodeJS.ProcessEnv): boolean {
+  const value = source.VITAE_CLOUD_ENABLED;
+  return value === 'true' || value === '1';
+}
+
+function databaseHostname(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return '';
+  }
+}
+
+function throwFatal(fatal: string[]): void {
+  if (fatal.length) {
+    throw new Error(`Unsafe production configuration:\n${fatal.map((f) => `  • ${f}`).join('\n')}`);
+  }
+}
+
+function assertProductionSecrets(env: z.infer<typeof serverEnvSchema>, fatal: string[]): void {
+  if (KNOWN_DEV_SECRETS.has(env.BUILDSVC_HMAC_SECRET)) {
+    fatal.push('BUILDSVC_HMAC_SECRET is the published development default; generate a unique secret for production.');
+  }
+  if (env.SESSION_SECRET.startsWith('dev-') || env.SESSION_SECRET === 'change-me') {
+    fatal.push('SESSION_SECRET looks like a development placeholder; generate a unique secret for production.');
+  }
+}
+
 /**
  * Combinations that are individually valid but unsafe together. Fail at boot:
  * a misconfigured production process must not come up and start serving
  * (FR-015: dev login hands any caller a valid owner token; FR-027: a published
  * default HMAC secret lets a network-adjacent caller sign build requests).
+ *
+ * VITAE_LOCAL_INSTALL is the laptop topology: production Node, local Postgres,
+ * loopback web origin, owner sign-in. Hosted production (RDS, Google, Cloud)
+ * must leave it unset so the original refusals still apply.
  */
-function assertSafeCombination(env: z.infer<typeof serverEnvSchema>): void {
+function assertSafeCombination(env: z.infer<typeof serverEnvSchema>, source: NodeJS.ProcessEnv): void {
+  if (env.VITAE_LOCAL_INSTALL) {
+    const fatal: string[] = [];
+    if (env.NODE_ENV !== 'production') {
+      fatal.push('VITAE_LOCAL_INSTALL=true requires NODE_ENV=production.');
+    }
+    if (cloudFlagEnabled(source)) {
+      fatal.push('VITAE_LOCAL_INSTALL=true cannot be combined with VITAE_CLOUD_ENABLED.');
+    }
+    if (!env.AUTH_ENABLE_DEV_LOGIN) {
+      fatal.push(
+        'VITAE_LOCAL_INSTALL=true requires AUTH_ENABLE_DEV_LOGIN=true (owner sign-in on a loopback-bound stack).',
+      );
+    }
+    for (const part of env.WEB_ORIGIN.split(',')) {
+      const origin = part.trim();
+      if (!origin) continue;
+      let hostname = '';
+      try {
+        hostname = new URL(origin).hostname;
+      } catch {
+        hostname = '';
+      }
+      if (!isLoopbackHostname(hostname)) {
+        fatal.push(`VITAE_LOCAL_INSTALL=true requires loopback WEB_ORIGIN; refused ${origin}.`);
+      }
+    }
+    const dbHost = databaseHostname(env.DATABASE_URL);
+    if (!LOCAL_DATABASE_HOSTS.has(dbHost)) {
+      fatal.push(
+        `VITAE_LOCAL_INSTALL=true requires a local DATABASE_URL host (postgres, localhost, or 127.0.0.1); got ${dbHost || 'unparseable'}.`,
+      );
+    }
+    if (!env.CLOUDINARY_URL && !env.VITAE_STORAGE_DIR) {
+      fatal.push('VITAE_LOCAL_INSTALL=true without CLOUDINARY_URL requires VITAE_STORAGE_DIR.');
+    }
+    if (env.NODE_ENV === 'production') assertProductionSecrets(env, fatal);
+    throwFatal(fatal);
+    return;
+  }
+
   if (env.NODE_ENV !== 'production') return;
   const fatal: string[] = [];
   if (env.AUTH_ENABLE_DEV_LOGIN) {
@@ -134,12 +228,7 @@ function assertSafeCombination(env: z.infer<typeof serverEnvSchema>): void {
         'unauthenticated caller. Unset it, or run with NODE_ENV=development.',
     );
   }
-  if (KNOWN_DEV_SECRETS.has(env.BUILDSVC_HMAC_SECRET)) {
-    fatal.push('BUILDSVC_HMAC_SECRET is the published development default; generate a unique secret for production.');
-  }
-  if (env.SESSION_SECRET.startsWith('dev-') || env.SESSION_SECRET === 'change-me') {
-    fatal.push('SESSION_SECRET looks like a development placeholder; generate a unique secret for production.');
-  }
+  assertProductionSecrets(env, fatal);
   // A production API that silently fell back to the local default would come up
   // healthy against an empty database and start accepting writes into it.
   if (/(127\.0\.0\.1|localhost)/.test(env.DATABASE_URL)) {
@@ -148,9 +237,7 @@ function assertSafeCombination(env: z.infer<typeof serverEnvSchema>): void {
         'Booting with the development default would serve an empty graph.',
     );
   }
-  if (fatal.length) {
-    throw new Error(`Unsafe production configuration:\n${fatal.map((f) => `  • ${f}`).join('\n')}`);
-  }
+  throwFatal(fatal);
 }
 
 /** Parse and cache the server environment. Throws a readable error on failure. */
@@ -163,7 +250,7 @@ export function loadServerEnv(source: NodeJS.ProcessEnv = process.env): ServerEn
       .join('\n');
     throw new Error(`Invalid environment configuration:\n${issues}`);
   }
-  assertSafeCombination(parsed.data);
+  assertSafeCombination(parsed.data, source);
   cached = {
     ...parsed.data,
     // Only Auth has an emulator now. The data plane is a real Postgres, local

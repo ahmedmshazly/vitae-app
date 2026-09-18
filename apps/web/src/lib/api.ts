@@ -59,11 +59,13 @@ async function transportHeaders(): Promise<Record<string, string>> {
   return { ...(await authHeader()), 'x-vitae-space': getSpace(), 'x-vitae-tz': timezone() };
 }
 
-async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+interface WriteOptions { idempotencyKey?: string }
+
+async function request<T>(method: string, path: string, body?: unknown, options?: WriteOptions): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     method,
     credentials: 'include',
-    headers: { ...(body ? { 'content-type': 'application/json' } : {}), ...(await transportHeaders()) },
+    headers: { ...(body ? { 'content-type': 'application/json' } : {}), ...(await transportHeaders()), ...(options?.idempotencyKey ? { 'x-idempotency-key': options.idempotencyKey } : {}) },
     body: body ? JSON.stringify(body) : undefined,
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
@@ -95,7 +97,7 @@ export function saveBlob(blob: Blob, filename: string): void {
 
 export const api = {
   get: <T>(path: string) => request<T>('GET', path),
-  post: <T>(path: string, body?: unknown) => request<T>('POST', path, body),
+  post: <T>(path: string, body?: unknown, options?: WriteOptions) => request<T>('POST', path, body, options),
   patch: <T>(path: string, body?: unknown) => request<T>('PATCH', path, body),
   del: <T>(path: string) => request<T>('DELETE', path),
   /** Trigger a file download (e.g. the export ZIP). */

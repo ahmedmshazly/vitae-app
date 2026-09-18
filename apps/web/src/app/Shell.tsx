@@ -19,9 +19,17 @@ import { QuickAdd } from '../features/QuickAdd.js';
 import { QuickSwitcher } from '../features/QuickSwitcher.js';
 import { RemindersDrawer } from '../features/RemindersDrawer.js';
 import { NewEntityMenu } from '../features/forms/NewEntityMenu.js';
+import { AppearanceMenu } from '../features/AppearanceMenu.js';
 import { useRoute } from '../lib/motion.js';
 import { isProductivityEnabled } from '../lib/productivity-flag.js';
-import { HUBS, ROUTES, hubForPath, isRouteActive, visibleWorkspaceNav, type HubEntry } from './routes.js';
+import {
+  HUBS,
+  ROUTES,
+  hubForPath,
+  isRouteActive,
+  visibleWorkspaceNav,
+  type HubEntry,
+} from './routes.js';
 import { buildCommands } from './commands.js';
 import { Breadcrumb, crumbFor } from './Breadcrumb.js';
 import { entityHref } from '../lib/entity-href.js';
@@ -88,10 +96,7 @@ const ACCESS_LOCK = {
  * Which lock to announce, if any. Self-hosted installs have no workspace and
  * never reach this; a trialing, active or past_due workspace can still write.
  */
-function lockedAccess(
-  cloud: boolean,
-  access: string | undefined,
-): keyof typeof ACCESS_LOCK | null {
+function lockedAccess(cloud: boolean, access: string | undefined): keyof typeof ACCESS_LOCK | null {
   if (!cloud) return null;
   return access === 'read_only' || access === 'deletion_pending' ? access : null;
 }
@@ -102,6 +107,8 @@ export function Shell({ children }: { children: ReactNode }) {
   const [reminders, setReminders] = useState(false);
   const [newMenu, setNewMenu] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const moreTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const moreRestoreTimer = useRef<number | undefined>(undefined);
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem(COLLAPSE_KEY) === '1');
   const isTabletRail = useMediaQuery('(max-width: 1080px) and (min-width: 701px)');
   const compactRail = collapsed || isTabletRail;
@@ -187,6 +194,23 @@ export function Shell({ children }: { children: ReactNode }) {
     localStorage.setItem(COLLAPSE_KEY, collapsed ? '1' : '0');
   }, [collapsed]);
 
+  useEffect(
+    () => () => {
+      if (moreRestoreTimer.current != null) window.clearTimeout(moreRestoreTimer.current);
+    },
+    [],
+  );
+
+  function closeMore(restoreFocus: boolean) {
+    setMoreOpen(false);
+    if (!restoreFocus) return;
+    if (moreRestoreTimer.current != null) window.clearTimeout(moreRestoreTimer.current);
+    // Radix completes its own fallback restore after the controlled close. A
+    // short delayed handoff ensures the actual dock opener, rather than a
+    // hidden desktop control, owns focus after Escape or outside dismissal.
+    moreRestoreTimer.current = window.setTimeout(() => moreTriggerRef.current?.focus(), 50);
+  }
+
   useEffect(() => {
     const previousTitle = document.title;
     document.title = `${routeAnnouncement} · Vitae`;
@@ -197,6 +221,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
+      if (event.defaultPrevented || event.isComposing) return;
       const mod = event.metaKey || event.ctrlKey;
       if (mod && event.key.toLowerCase() === 'k') {
         event.preventDefault();
@@ -204,13 +229,15 @@ export function Shell({ children }: { children: ReactNode }) {
       } else if (mod && event.key.toLowerCase() === 'p') {
         event.preventDefault();
         setSwitcher(true);
-      } else if (event.key === 'Escape') {
-        setReminders(false);
       } else if (event.key.toLowerCase() === 'n' && !mod && !event.altKey) {
         const target = event.target as HTMLElement | null;
         const typing =
           target &&
-          (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+          (target.tagName === 'INPUT' ||
+            target.tagName === 'TEXTAREA' ||
+            target.tagName === 'SELECT' ||
+            target.isContentEditable ||
+            target.closest('[role="dialog"], [role="menu"], [role="listbox"], [role="combobox"]'));
         if (!typing) {
           event.preventDefault();
           setNewMenu(true);
@@ -332,6 +359,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <Kbd>⌘P</Kbd>
             </button>
             <div className="topbar__actions">
+              <AppearanceMenu />
               <Button
                 variant="ghost"
                 glyph="adjust"
@@ -359,13 +387,14 @@ export function Shell({ children }: { children: ReactNode }) {
                 <span className="topbar__action-label">Capture</span>
               </Button>
               <RemindersDrawer
+                onCapture={() => setQuickAdd(true)}
                 open={reminders}
                 onOpenChange={setReminders}
                 trigger={
                   <button
                     type="button"
                     className="topbar__bell"
-                    aria-label={reminderCount > 0 ? `Reminders, ${reminderCount} due` : 'Reminders'}
+                    aria-label={reminderCount > 0 ? `Reminders, ${reminderCount} open` : 'Reminders'}
                   >
                     <Glyph name="bell" size={16} />
                     {reminderCount > 0 && <span className="topbar__badge">{reminderCount}</span>}
@@ -457,7 +486,7 @@ export function Shell({ children }: { children: ReactNode }) {
               with it: an open dialog, a typed character, a click that had just
               landed. The key alone mounts each screen once and still carries
               it in. */}
-          <motion.div
+          <motion.main
             key={pathname}
             id="main-content"
             ref={mainRef}
@@ -468,7 +497,7 @@ export function Shell({ children }: { children: ReactNode }) {
             animate="animate"
           >
             {children}
-          </motion.div>
+          </motion.main>
         </div>
 
         <div aria-live="polite" aria-atomic="true" className="u-visually-hidden">
@@ -509,6 +538,7 @@ export function Shell({ children }: { children: ReactNode }) {
             );
           })}
           <button
+            ref={moreTriggerRef}
             type="button"
             className={
               hasActiveHub && (activeHubId === 'data' || activeHubId === 'settings')
@@ -517,21 +547,35 @@ export function Shell({ children }: { children: ReactNode }) {
             }
             aria-label="More destinations"
             aria-expanded={moreOpen}
-            onClick={() => setMoreOpen(true)}
+            onClick={() => {
+              setMoreOpen(true);
+            }}
           >
             <Glyph name="adjust" size={18} />
             <span>More</span>
           </button>
         </nav>
 
-        <Sheet open={moreOpen} onOpenChange={setMoreOpen} title="Vitae workspaces">
+        <Sheet
+          open={moreOpen}
+          onOpenChange={(open) => {
+            if (open) {
+              setMoreOpen(true);
+            } else {
+              closeMore(true);
+            }
+          }}
+          title="Vitae workspaces"
+        >
           <div className="mobile-more">
             {HUBS.map((hub) => (
               <Link
                 key={hub.id}
                 to={hub.path}
                 className={hasActiveHub && activeHubId === hub.id ? 'active' : undefined}
-                onClick={() => setMoreOpen(false)}
+                onClick={() => {
+                  closeMore(false);
+                }}
               >
                 <Glyph name={hub.glyph} size={18} />
                 <span>
@@ -540,7 +584,12 @@ export function Shell({ children }: { children: ReactNode }) {
                 </span>
               </Link>
             ))}
-            <Link to="/help" onClick={() => setMoreOpen(false)}>
+            <Link
+              to="/help"
+              onClick={() => {
+                closeMore(false);
+              }}
+            >
               <Glyph name="ask" size={18} />
               <span>
                 <strong>Help</strong>

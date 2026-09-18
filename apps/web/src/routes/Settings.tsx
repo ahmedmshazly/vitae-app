@@ -36,6 +36,7 @@ interface SettingsResp {
   skillAliases: Array<{ alias: string; canonical: string }>;
   resumeDefaults?: { templateKey: string; accent: string; emphasis: string };
   github: { configured: boolean; lastSyncAt: string | null };
+  gemini?: { configured: boolean; project: string | null; source?: 'env' | 'file' | 'none' };
 }
 
 const WEIGHT_LABELS: Record<string, string> = {
@@ -79,9 +80,7 @@ export function formatGithubSync(lastSyncAt: string | null | undefined): string 
  * none of them were marked up as the definition lists they are.
  */
 function Facts({ children }: { children: ReactNode }) {
-  return (
-    <dl className="m-0 grid grid-cols-[minmax(0,auto)_minmax(0,1fr)] gap-x-6">{children}</dl>
-  );
+  return <dl className="m-0 grid grid-cols-[minmax(0,auto)_minmax(0,1fr)] gap-x-6">{children}</dl>;
 }
 function Fact({ term, children }: { term: ReactNode; children: ReactNode }) {
   return (
@@ -94,9 +93,18 @@ function Fact({ term, children }: { term: ReactNode; children: ReactNode }) {
 
 /** Marks a form whose draft has moved away from what the server holds. */
 function DirtyChip({ dirty, saving }: { dirty: boolean; saving: boolean }) {
-  if (saving && dirty) return <Chip tone="accent" mono>saving</Chip>;
+  if (saving && dirty)
+    return (
+      <Chip tone="accent" mono>
+        saving
+      </Chip>
+    );
   if (!dirty) return <Chip mono>saved</Chip>;
-  return <Chip tone="warning" mono>unsaved</Chip>;
+  return (
+    <Chip tone="warning" mono>
+      unsaved
+    </Chip>
+  );
 }
 
 /** Settings (SRS P22): profile, ranking constants, taxonomy, GitHub, health. */
@@ -225,6 +233,12 @@ export function Settings() {
                 profile={settings.data.profile}
                 email={user?.email ?? ''}
                 saving={patch.isPending}
+                saveError={
+                  patch.isError && patch.variables?.profile
+                    ? ((patch.error as Error | null)?.message ?? 'Try again.')
+                    : null
+                }
+                onEdit={() => patch.reset()}
                 onSave={(profile) => patch.mutate({ profile })}
               />
             )}
@@ -259,14 +273,25 @@ export function Settings() {
           <aside className="min-w-0">
             {view !== 'system' && systemStatus}
             {showSystem && (
-              <GithubCard
-                configured={settings.data.github.configured}
-                lastSyncAt={settings.data.github.lastSyncAt}
-                onChanged={(message) => {
-                  void qc.invalidateQueries({ queryKey: ['settings'] });
-                  flash(message);
-                }}
-              />
+              <>
+                <GithubCard
+                  configured={settings.data.github.configured}
+                  lastSyncAt={settings.data.github.lastSyncAt}
+                  onChanged={(message) => {
+                    void qc.invalidateQueries({ queryKey: ['settings'] });
+                    flash(message);
+                  }}
+                />
+                <GeminiCard
+                  configured={settings.data.gemini?.configured ?? false}
+                  project={settings.data.gemini?.project ?? null}
+                  source={settings.data.gemini?.source ?? 'none'}
+                  onChanged={(message) => {
+                    void qc.invalidateQueries({ queryKey: ['settings'] });
+                    flash(message);
+                  }}
+                />
+              </>
             )}
             {identity}
           </aside>
@@ -445,17 +470,25 @@ function ProfileCard({
   profile,
   email,
   onSave,
+  onEdit,
   saving,
+  saveError,
 }: {
   profile: SettingsResp['profile'];
   email: string;
   onSave: (p: SettingsResp['profile']) => void;
+  onEdit: () => void;
   saving: boolean;
+  saveError: string | null;
 }) {
   const { draft, setDraft, dirty } = useServerDraft(profile);
   // FR-023: every visual label is associated with its control via htmlFor/id, so
   // clicking the label focuses the field and screen readers announce the name.
   const ids = useId();
+  const updateDraft = (next: SettingsResp['profile']) => {
+    onEdit();
+    setDraft(next);
+  };
 
   return (
     <Section title="Profile of me" actions={<DirtyChip dirty={dirty} saving={saving} />}>
@@ -471,14 +504,14 @@ function ProfileCard({
             <Input
               id={`${ids}-name`}
               value={draft.name}
-              onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+              onChange={(e) => updateDraft({ ...draft, name: e.target.value })}
             />
           </Field>
           <Field label="Headline" htmlFor={`${ids}-headline`}>
             <Input
               id={`${ids}-headline`}
               value={draft.headline}
-              onChange={(e) => setDraft({ ...draft, headline: e.target.value })}
+              onChange={(e) => updateDraft({ ...draft, headline: e.target.value })}
             />
           </Field>
         </div>
@@ -492,7 +525,7 @@ function ProfileCard({
             type="email"
             placeholder={email}
             value={draft.email}
-            onChange={(e) => setDraft({ ...draft, email: e.target.value })}
+            onChange={(e) => updateDraft({ ...draft, email: e.target.value })}
           />
         </Field>
         <Field label="Links (one per line)" htmlFor={`${ids}-links`}>
@@ -501,7 +534,7 @@ function ProfileCard({
             rows={2}
             value={draft.links.join('\n')}
             onChange={(e) =>
-              setDraft({
+              updateDraft({
                 ...draft,
                 links: e.target.value
                   .split('\n')
@@ -514,6 +547,14 @@ function ProfileCard({
         <Button type="submit" variant="primary" disabled={!dirty || saving}>
           {saving && dirty ? 'Saving...' : 'Save profile'}
         </Button>
+        {saveError ? (
+          <StatusTrace
+            className="mt-2"
+            tone="warning"
+            label="Couldn't save profile"
+            detail={`${saveError} Your changes are still here; review them and save again.`}
+          />
+        ) : null}
       </form>
     </Section>
   );
@@ -776,14 +817,121 @@ function GithubCard({
           className="mt-2"
           tone="warning"
           label={saveToken.isError ? "Couldn't store the token" : "Couldn't disconnect GitHub"}
-          detail={
-            ((saveToken.error ?? disconnect.error) as Error | null)?.message ?? 'Try again.'
-          }
+          detail={((saveToken.error ?? disconnect.error) as Error | null)?.message ?? 'Try again.'}
         />
       ) : null}
       <p className="m-0 mt-2 text-xs text-muted">
         Stored server-side only, never echoed back. Sync and the repository list live on{' '}
         <Link to="/data/sources/github">Repositories</Link>.
+      </p>
+    </Section>
+  );
+}
+
+function GeminiCard({
+  configured,
+  project,
+  source,
+  onChanged,
+}: {
+  configured: boolean;
+  project: string | null;
+  source: 'env' | 'file' | 'none';
+  onChanged: (message: string) => void;
+}) {
+  const [apiKey, setApiKey] = useState('');
+  const [projectDraft, setProjectDraft] = useState('');
+  const keyId = useId();
+  const projectId = useId();
+  const save = useMutation({
+    mutationFn: (value: { apiKey: string; project: string }) => api.post('/settings/gemini', value),
+    onSuccess: () => {
+      setApiKey('');
+      setProjectDraft('');
+      onChanged('Gemini key stored server-side. It is never echoed back');
+    },
+  });
+  const disconnect = useMutation({
+    mutationFn: () => api.del('/settings/gemini'),
+    onSuccess: () => onChanged('Gemini disconnected.'),
+  });
+
+  return (
+    <Section title="Gemini">
+      <Facts>
+        <Fact term="Key">
+          <Chip tone={configured ? 'success' : 'warning'} mono>
+            {configured ? 'configured' : 'not set'}
+          </Chip>
+        </Fact>
+        <Fact term="Project">
+          <Mono className="text-sm">{project ?? 'not set'}</Mono>
+        </Fact>
+      </Facts>
+      <form
+        className="mt-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (apiKey.trim() && !save.isPending) {
+            save.mutate({ apiKey: apiKey.trim(), project: projectDraft.trim() });
+          }
+        }}
+      >
+        <Field label="Project" htmlFor={projectId}>
+          <Input
+            id={projectId}
+            type="text"
+            autoComplete="off"
+            spellCheck={false}
+            placeholder="GEMINI_PROJECT"
+            value={projectDraft}
+            onChange={(e) => setProjectDraft(e.target.value)}
+          />
+        </Field>
+        <Field label="API key" htmlFor={keyId}>
+          <Input
+            id={keyId}
+            type="password"
+            autoComplete="off"
+            spellCheck={false}
+            placeholder="AIza…"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+          />
+        </Field>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="submit"
+            size="sm"
+            variant="primary"
+            disabled={!apiKey.trim() || save.isPending}
+          >
+            {save.isPending ? 'Saving...' : configured ? 'Replace' : 'Save'}
+          </Button>
+          {configured && source !== 'env' && (
+            <Button
+              type="button"
+              size="sm"
+              disabled={disconnect.isPending}
+              onClick={() => disconnect.mutate()}
+              aria-label="Disconnect Gemini"
+            >
+              {disconnect.isPending ? 'Disconnecting...' : 'Disconnect'}
+            </Button>
+          )}
+        </div>
+      </form>
+      {save.isError || disconnect.isError ? (
+        <StatusTrace
+          className="mt-2"
+          tone="warning"
+          label={save.isError ? "Couldn't store the key" : "Couldn't disconnect Gemini"}
+          detail={((save.error ?? disconnect.error) as Error | null)?.message ?? 'Try again.'}
+        />
+      ) : null}
+      <p className="m-0 mt-2 text-xs text-muted">
+        Stored server-side only, never echoed back. Connection custody lives on{' '}
+        <Link to="/data/sources/gemini">Gemini</Link>.
       </p>
     </Section>
   );

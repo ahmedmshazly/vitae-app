@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Chip, CommandOverlay, Glyph, Kbd, StatusTrace } from '@vitae/ui';
+import { Button, Chip, CommandOverlay, Glyph, Kbd, StatusTrace } from '@vitae/ui';
 import { isNodeType, type CapturePlan, type NodeType } from '@vitae/core';
 import { api } from '../lib/api.js';
 import { lastViewedId } from '../lib/last-viewed.js';
 import { useCanWrite, WRITE_LOCK_HINT } from '../lib/auth.js';
+import { useUnsavedChanges } from '../lib/unsaved-changes.js';
 import { useToast } from './Toast.js';
 import { NodeFormDialog } from './forms/NodeFormDialog.js';
 import type { EntityFormValues } from './forms/EntityForm.js';
@@ -19,13 +20,18 @@ import type { EntityFormValues } from './forms/EntityForm.js';
 export function QuickAdd({ onClose }: { onClose: () => void }) {
   const [value, setValue] = useState('');
   const [plan, setPlan] = useState<CapturePlan | null>(null);
+  const [previewError, setPreviewError] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [fullForm, setFullForm] = useState<{ type: NodeType; seed: Partial<EntityFormValues> } | null>(null);
+  const [fullForm, setFullForm] = useState<{
+    type: NodeType;
+    seed: Partial<EntityFormValues>;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const qc = useQueryClient();
   const { flash } = useToast();
   const canWrite = useCanWrite();
+  const guard = useUnsavedChanges(Boolean(value.trim()) && !fullForm, { onClose, busy });
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -34,8 +40,13 @@ export function QuickAdd({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     if (!value.trim()) {
       setPlan(null);
+      setPreviewError(false);
       return;
     }
+    // A new line is also an intentional retry. Clear the previous recovery
+    // note immediately instead of implying that the next preview has failed.
+    setPreviewError(false);
+    setPlan(null);
     let alive = true;
     const t = setTimeout(async () => {
       try {
@@ -43,8 +54,12 @@ export function QuickAdd({ onClose }: { onClose: () => void }) {
         if (alive) setPlan(res.plan);
       } catch {
         // A dead preview must not look like an unparseable line: drop the
-        // stale chips rather than leaving the previous parse on screen.
-        if (alive) setPlan(null);
+        // stale chips rather than leaving the previous parse on screen. The
+        // line remains saveable, so name both the problem and the recovery.
+        if (alive) {
+          setPlan(null);
+          setPreviewError(true);
+        }
       }
     }, 120);
     return () => {
@@ -65,7 +80,11 @@ export function QuickAdd({ onClose }: { onClose: () => void }) {
       await qc.invalidateQueries();
       onClose();
       // The control says Capture; the confirmation says Captured.
-      flash(plan?.primaryType && plan.primaryType !== 'unknown' ? `Captured ${plan.primaryType}` : 'Captured');
+      flash(
+        plan?.primaryType && plan.primaryType !== 'unknown'
+          ? `Captured ${plan.primaryType}`
+          : 'Captured',
+      );
     } catch (err) {
       // Never fail silently, and never close on failure: the line the user
       // typed is the only copy of it.
@@ -77,7 +96,7 @@ export function QuickAdd({ onClose }: { onClose: () => void }) {
 
   /** Hand the parsed plan to the structured form for detailed entry. */
   function openFullForm() {
-    if (!plan || !isNodeType(plan.primaryType as string)) return;
+    if (busy || !plan || !isNodeType(plan.primaryType as string)) return;
     setFullForm({
       type: plan.primaryType as NodeType,
       seed: {
@@ -103,105 +122,135 @@ export function QuickAdd({ onClose }: { onClose: () => void }) {
   }
 
   return (
+    <>
     <CommandOverlay
       open
-      onOpenChange={(o) => !o && onClose()}
+      onOpenChange={(open) => { if (!busy) guard.onOpenChange(open); }}
       title="Quick add"
-      description="Capture a record with the ⌘K grammar. Enter saves, Tab opens the full form."
+      description="Choose an example or type a record. Review the preview, then capture it or open the full form."
     >
-        <input
-          ref={inputRef}
-          className="vt-palette__input"
-          aria-label="Capture line"
-          // One job per element: the placeholder instructs, the cheat row below
-          // demonstrates. A full example sentence in a mono field at 17px does
-          // both, and reads as text the user already typed.
-          placeholder="Capture anything, start with a leading key"
-          value={value}
-          // The line is the only copy of what was typed, so it stays readable
-          // and stays editable while the save is in flight. What it must not
-          // do is take a second Enter: `commit` guards on `busy` for that.
-          aria-busy={busy}
-          onChange={(e) => setValue(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') void commit();
-            if (e.key === 'Tab' && plan && plan.primaryType !== 'unknown') {
-              e.preventDefault();
-              openFullForm();
-            }
-            // Escape is handled by the dialog.
-          }}
-        />
-        {/* Saving used to be silent: Enter did nothing visible until the
+      <input
+        ref={inputRef}
+        className="vt-palette__input"
+        aria-label="Capture line"
+        // One job per element: the placeholder instructs, the cheat row below
+        // demonstrates. A full example sentence in a mono field at 17px does
+        // both, and reads as text the user already typed.
+        placeholder="Type a record, e.g. p Lina"
+        value={value}
+        // Keep the submitted line readable while saving; edits at this point
+        // would be lost when the successful request closes the overlay.
+        aria-busy={busy}
+        readOnly={busy}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+            e.preventDefault();
+            void commit();
+          }
+          // Escape is handled by the dialog.
+        }}
+      />
+      {/* Saving used to be silent: Enter did nothing visible until the
             overlay closed, so a slow save read as a dropped keystroke and got
             pressed again. */}
-        {busy && (
-          <StatusTrace
-            className="border-t border-hairline px-4 py-3"
-            tone="live"
-            label="Saving capture"
-            detail={plan?.primaryType && plan.primaryType !== 'unknown' ? `as ${plan.primaryType}` : undefined}
-          />
-        )}
-        {error && (
-          <p role="alert" className="flex items-start gap-2 border-t border-hairline px-4 py-3 text-sm text-danger">
-            <Glyph name="close" size={14} className="mt-0.5 shrink-0" />
-            <span>
-              <strong className="font-semibold">Capture failed.</strong> {error}
-            </span>
+      {busy && (
+        <StatusTrace
+          className="border-t border-hairline px-4 py-3"
+          tone="live"
+          label="Saving capture"
+          detail={
+            plan?.primaryType && plan.primaryType !== 'unknown'
+              ? `as ${plan.primaryType}`
+              : undefined
+          }
+        />
+      )}
+      {error && (
+        <p
+          role="alert"
+          className="flex items-start gap-2 border-t border-hairline px-4 py-3 text-sm text-danger"
+        >
+          <Glyph name="close" size={14} className="mt-0.5 shrink-0" />
+          <span>
+            <strong className="font-semibold">Capture failed.</strong> {error}
+          </span>
+        </p>
+      )}
+      {previewError && !busy && !error && (
+        <p role="status" className="border-t border-hairline px-4 py-3 text-sm text-muted">
+          Preview unavailable. Your capture line is still here; keep typing to retry, or press Enter
+          to save it.
+        </p>
+      )}
+      {!canWrite && (
+        // The chord opens this dialog even while the visible triggers are
+        // disabled, so the lock is explained here too rather than letting
+        // Enter turn into a refused request (NFR-OPS-002).
+        <p className="border-t border-hairline px-4 py-3 text-sm text-muted">{WRITE_LOCK_HINT}</p>
+      )}
+      <div className="vt-palette__foot">
+        {plan && plan.primaryType !== 'unknown' ? (
+          <div className="flex w-full flex-wrap items-center gap-2">
+            {plan.chips.map((c, i) => (
+              <Chip
+                key={i}
+                tone={c.kind === 'type' ? 'accent' : 'default'}
+                mono={c.kind === 'date'}
+              >
+                {c.kind === 'type'
+                  ? c.label
+                  : c.kind === 'tag'
+                    ? c.label
+                    : `${prefix(c.kind)}${c.label}`}
+              </Chip>
+            ))}
+            {isNodeType(plan.primaryType as string) && (
+              <button
+                type="button"
+                className="ml-auto inline-flex min-h-8 items-center gap-2 rounded-sm px-2 text-sm text-muted hover:text-ink-strong"
+                onClick={openFullForm}
+                disabled={busy || !canWrite}
+              >
+                Open full form
+              </button>
+            )}
+          </div>
+        ) : (
+          <p className="text-sm text-muted">
+            Type a leading key, then details. <Kbd>Enter</Kbd> to save · <Kbd>Esc</Kbd> to cancel
           </p>
         )}
-        {!canWrite && (
-          // The chord opens this dialog even while the visible triggers are
-          // disabled, so the lock is explained here too rather than letting
-          // Enter turn into a refused request (NFR-OPS-002).
-          <p className="border-t border-hairline px-4 py-3 text-sm text-muted">{WRITE_LOCK_HINT}</p>
-        )}
-        <div className="vt-palette__foot">
-          {plan && plan.primaryType !== 'unknown' ? (
-            <div className="flex w-full flex-wrap items-center gap-2">
-              {plan.chips.map((c, i) => (
-                <Chip key={i} tone={c.kind === 'type' ? 'accent' : 'default'} mono={c.kind === 'date'}>
-                  {c.kind === 'type' ? c.label : c.kind === 'tag' ? c.label : `${prefix(c.kind)}${c.label}`}
-                </Chip>
-              ))}
-              {isNodeType(plan.primaryType as string) && (
-                <button
-                  type="button"
-                  className="ml-auto inline-flex min-h-8 items-center gap-2 rounded-sm px-2 text-sm text-muted hover:text-ink-strong"
-                  onClick={openFullForm}
-                >
-                  <Kbd>⇥</Kbd> Open full form
-                </button>
-              )}
-            </div>
-          ) : (
-            <p className="text-sm text-muted">
-              Type a leading key, then details. <Kbd>Enter</Kbd> to save · <Kbd>Esc</Kbd> to cancel
-            </p>
-          )}
+      </div>
+      {!value.trim() && (
+        <div className="flex flex-wrap gap-2 border-t border-hairline p-4">
+          {CHEATS.map((c) => (
+            <button
+              key={c.key}
+              type="button"
+              className="inline-flex min-h-6 items-center gap-2 rounded-sm border border-hairline px-2 font-mono text-xs text-muted hover:border-strong hover:text-ink-soft"
+              title={c.example}
+              aria-label={`Insert an example ${c.label} capture`}
+              onClick={() => {
+                setValue(c.example);
+                inputRef.current?.focus();
+              }}
+            >
+              <span className="text-ink-strong">{c.key}</span>
+              {c.label}
+            </button>
+          ))}
         </div>
-        {!value.trim() && (
-          <div className="flex flex-wrap gap-2 border-t border-hairline p-4">
-            {CHEATS.map((c) => (
-              <button
-                key={c.key}
-                type="button"
-                className="inline-flex min-h-6 items-center gap-2 rounded-sm border border-hairline px-2 font-mono text-xs text-muted hover:border-strong hover:text-ink-soft"
-                title={c.example}
-                aria-label={`Insert an example ${c.label} capture`}
-                onClick={() => {
-                  setValue(c.example);
-                  inputRef.current?.focus();
-                }}
-              >
-                <span className="text-ink-strong">{c.key}</span>
-                {c.label}
-              </button>
-            ))}
-          </div>
-        )}
+      )}
+      <div className="flex items-center justify-end gap-2 border-t border-hairline p-4">
+        <Button variant="ghost" disabled={busy} onClick={guard.requestClose}>Cancel</Button>
+        <Button variant="primary" disabled={busy || !canWrite || !value.trim()} onClick={() => void commit()}>
+          {busy ? 'Capturing...' : 'Capture'}
+        </Button>
+      </div>
     </CommandOverlay>
+    {guard.prompt}
+    </>
   );
 }
 

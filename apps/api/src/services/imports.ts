@@ -65,10 +65,13 @@ import {
   scorePair,
   statedFieldsOnly,
   normalizeForMatch,
+  reconcileField,
   trigramSimilarity,
   SYNC_BOOKKEEPING_FIELDS,
   type BundleEdge,
+  type BundleEvidence,
   type BundleNode,
+  type GraphBundle,
   type FieldChange,
   type NodeRecord,
   type PairScore,
@@ -85,6 +88,7 @@ import { fetchWithDeadline } from './http.js';
 import { loadGraph } from './crm.js';
 import { emailDomains, invalidateDuplicateScan, orgNamesByPerson } from './duplicates.js';
 import { currentTimezone } from '../db/timezone.js';
+import { putAssertion, putRun, putSource, putSourceRecord } from './knowledge.js';
 
 export type ImportKind =
   | 'linkedin'
@@ -285,7 +289,9 @@ interface ParsedRow {
 }
 
 /** Which LinkedIn export file is this? Decided by header shape. */
-function detectLinkedInFile(content: string): 'positions' | 'education' | 'skills' | 'connections' | null {
+function detectLinkedInFile(
+  content: string,
+): 'positions' | 'education' | 'skills' | 'connections' | null {
   const head = content.slice(0, 2000).toLowerCase();
   if (/first name/.test(head) && /last name/.test(head)) return 'connections';
   if (/company name|companyname/.test(head) && /title/.test(head)) return 'positions';
@@ -307,18 +313,28 @@ function parseContent(
   kind: ImportKind,
   content: string,
   mapping?: CsvMapping,
-): { rows: ParsedRow[]; detail: string | null; edges: BundleEdge[] } {
+): {
+  rows: ParsedRow[];
+  detail: string | null;
+  edges: BundleEdge[];
+  evidence: BundleEvidence[];
+  bundleSource?: GraphBundle['source'];
+} {
   if (kind === 'aperture') return parseApertureBundle(content);
   if (isTaskFileKind(kind)) return parseTaskFileContent(kind, content);
   const { rows, detail } = parseNonBundleContent(kind, content, mapping);
-  return { rows, detail, edges: [] };
+  return { rows, detail, edges: [], evidence: [] };
 }
 
 function taskImportContext(): TaskImportContext {
   return { now: new Date(), timezone: currentTimezone(), weekStartsOn: 1 };
 }
 
-function parseTaskKind(kind: TaskFileKind, content: string, ctx: TaskImportContext): TaskImportResult {
+function parseTaskKind(
+  kind: TaskFileKind,
+  content: string,
+  ctx: TaskImportContext,
+): TaskImportResult {
   switch (kind) {
     case 'todoist':
       return parseTodoist(content, ctx);
@@ -344,7 +360,7 @@ function parseTaskKind(kind: TaskFileKind, content: string, ctx: TaskImportConte
 function parseTaskFileContent(
   kind: TaskFileKind,
   content: string,
-): { rows: ParsedRow[]; detail: string | null; edges: BundleEdge[] } {
+): { rows: ParsedRow[]; detail: string | null; edges: BundleEdge[]; evidence: BundleEvidence[] } {
   const parsed = parseTaskKind(kind, content, taskImportContext());
   const fatal = fatalTaskImportReason(parsed);
   if (fatal) {
@@ -389,15 +405,24 @@ function parseTaskFileContent(
   }
 
   const edges: BundleEdge[] = [];
-  const addEdge = (type: BundleEdge['type'], src: string | undefined, dst: string | undefined, props: Record<string, unknown> = {}) => {
+  const addEdge = (
+    type: BundleEdge['type'],
+    src: string | undefined,
+    dst: string | undefined,
+    props: Record<string, unknown> = {},
+  ) => {
     if (!src || !dst) return;
     edges.push({ type, src, dst, props, notes_md: '', source: 'manual', confidence: 1 });
   };
 
   for (const entry of taskRows) {
     const projectRef =
-      (entry.task.project_source_id ? projectRefBySource.get(entry.task.project_source_id) : undefined) ??
-      (entry.task.project_name ? projectRefByName.get(normalizeForMatch(entry.task.project_name)) : undefined);
+      (entry.task.project_source_id
+        ? projectRefBySource.get(entry.task.project_source_id)
+        : undefined) ??
+      (entry.task.project_name
+        ? projectRefByName.get(normalizeForMatch(entry.task.project_name))
+        : undefined);
     addEdge('ABOUT', entry.ref, projectRef);
     addEdge(
       'RELATES_TO',
@@ -423,7 +448,7 @@ function parseTaskFileContent(
   }
 
   const skipSummary = parsed.skipped.length > 0 ? `${parsed.skipped.length} skipped` : null;
-  return { rows, detail: skipSummary, edges };
+  return { rows, detail: skipSummary, edges, evidence: [] };
 }
 
 function taskRow(task: TaskFileDraft, ref: string): ParsedRow {
@@ -479,7 +504,13 @@ export class ImportContentError extends Error {}
  * rename into staging rows. The edges ride alongside and are applied once every
  * node has a real id.
  */
-function parseApertureBundle(content: string): { rows: ParsedRow[]; detail: string | null; edges: BundleEdge[] } {
+function parseApertureBundle(content: string): {
+  rows: ParsedRow[];
+  detail: string | null;
+  edges: BundleEdge[];
+  evidence: BundleEvidence[];
+  bundleSource: GraphBundle['source'];
+} {
   let json: unknown;
   try {
     json = JSON.parse(content);
@@ -488,13 +519,20 @@ function parseApertureBundle(content: string): { rows: ParsedRow[]; detail: stri
   }
   const parsed = parseGraphBundle(json);
   if (!parsed.ok) {
-    const summary = parsed.errors.slice(0, 5).map((e) => `${e.path}: ${e.message}`).join('; ');
+    const summary = parsed.errors
+      .slice(0, 5)
+      .map((e) => `${e.path}: ${e.message}`)
+      .join('; ');
     throw new ImportContentError(`not a valid vitae.graph.bundle: ${summary}`);
   }
   const bundle = parsed.value;
   return {
-    detail: bundle.source.run_id ? `${bundle.source.system} run ${bundle.source.run_id.slice(0, 8)}` : bundle.source.system,
+    detail: bundle.source.run_id
+      ? `${bundle.source.system} run ${bundle.source.run_id.slice(0, 8)}`
+      : bundle.source.system,
     edges: bundle.edges,
+    evidence: bundle.evidence,
+    bundleSource: bundle.source,
     rows: bundle.nodes.map((node) => ({
       entity: 'graph_node' as const,
       title: node.title,
@@ -548,7 +586,13 @@ function parseNonBundleContent(
             entity: 'role' as const,
             title: p.title || `Role at ${p.company}`,
             subtitle: p.company || null,
-            payload: { company: p.company, description: p.description, city: p.location, start: p.start, end: p.end },
+            payload: {
+              company: p.company,
+              description: p.description,
+              city: p.location,
+              start: p.start,
+              end: p.end,
+            },
             confidence: 0.9,
             identityKeys: [],
           })),
@@ -613,18 +657,33 @@ function parseNonBundleContent(
             const name =
               (mapping?.name && r[mapping.name]) ||
               pickField(r, 'name', 'full_name', 'display_name') ||
-              [pickField(r, 'first_name', 'given_name'), pickField(r, 'last_name', 'family_name')].filter(Boolean).join(' ');
-            const email = ((mapping?.email && r[mapping.email]) || pickField(r, 'email', 'email_address', 'e_mail_1_value', 'e_mail_address')).toLowerCase();
-            const company = (mapping?.company && r[mapping.company]) || pickField(r, 'organization', 'company', 'organization_1_name');
+              [pickField(r, 'first_name', 'given_name'), pickField(r, 'last_name', 'family_name')]
+                .filter(Boolean)
+                .join(' ');
+            const email = (
+              (mapping?.email && r[mapping.email]) ||
+              pickField(r, 'email', 'email_address', 'e_mail_1_value', 'e_mail_address')
+            ).toLowerCase();
+            const company =
+              (mapping?.company && r[mapping.company]) ||
+              pickField(r, 'organization', 'company', 'organization_1_name');
             return {
               entity: 'person' as const,
               title: name,
               subtitle: company || null,
               payload: {
                 emails: email ? [email] : [],
-                phones: [(mapping?.phone && r[mapping.phone]) || pickField(r, 'phone', 'phone_1_value', 'mobile')].filter(Boolean),
-                city: ((mapping?.city && r[mapping.city]) || pickField(r, 'city', 'address_1_city')) || undefined,
-                headline: pickField(r, 'title', 'position', 'job_title', 'organization_1_title') || undefined,
+                phones: [
+                  (mapping?.phone && r[mapping.phone]) ||
+                    pickField(r, 'phone', 'phone_1_value', 'mobile'),
+                ].filter(Boolean),
+                city:
+                  (mapping?.city && r[mapping.city]) ||
+                  pickField(r, 'city', 'address_1_city') ||
+                  undefined,
+                headline:
+                  pickField(r, 'title', 'position', 'job_title', 'organization_1_title') ||
+                  undefined,
                 company: company || undefined,
               },
               confidence: name ? 0.85 : 0.3,
@@ -706,15 +765,28 @@ function evidenceFrom(score: PairScore, extra: string[] = []): string[] {
     phone: 'phone match',
   };
   return [
-    ...score.breakdown.filter((b) => b.weight > 0.5).map((b) => (b.similarity >= 0.99 ? labels[b.field]!.replace('similar', 'exact') : labels[b.field] ?? b.field)),
+    ...score.breakdown
+      .filter((b) => b.weight > 0.5)
+      .map((b) =>
+        b.similarity >= 0.99
+          ? labels[b.field]!.replace('similar', 'exact')
+          : (labels[b.field] ?? b.field),
+      ),
     ...extra,
   ];
 }
 
-function checkPersonDup(row: ParsedRow, persons: NodeRecord[], personOrgs: Map<string, string[]>): DupInfo | null {
+function checkPersonDup(
+  row: ParsedRow,
+  persons: NodeRecord[],
+  personOrgs: Map<string, string[]>,
+): DupInfo | null {
   const payload = row.payload as { emails?: string[]; phones?: string[]; company?: string };
   const rowEmails = payload.emails ?? [];
-  const rowOrgs = [...emailDomains(rowEmails), ...(payload.company ? [normalizeForMatch(payload.company)] : [])];
+  const rowOrgs = [
+    ...emailDomains(rowEmails),
+    ...(payload.company ? [normalizeForMatch(payload.company)] : []),
+  ];
   let best: DupInfo | null = null;
   for (const p of persons) {
     const props = p.props as Record<string, unknown>;
@@ -732,7 +804,13 @@ function checkPersonDup(row: ParsedRow, persons: NodeRecord[], personOrgs: Map<s
     );
     if (score.verdict === 'non_match') continue;
     if (!best || score.weight > best.weight) {
-      best = { nodeId: p.id, nodeTitle: p.title, weight: score.weight, verdict: score.verdict, evidence: evidenceFrom(score) };
+      best = {
+        nodeId: p.id,
+        nodeTitle: p.title,
+        weight: score.weight,
+        verdict: score.verdict,
+        evidence: evidenceFrom(score),
+      };
     }
   }
   return best;
@@ -767,25 +845,61 @@ function checkSimpleDup(row: ParsedRow, existing: NodeRecord[], nodeType: string
   for (const n of existing) {
     const props = n.props as Record<string, unknown>;
     if (nodeType === 'link' && props.url && props.url === facts.url) {
-      return { nodeId: n.id, nodeTitle: n.title, weight: 99, verdict: 'probable', evidence: ['same URL'] };
+      return {
+        nodeId: n.id,
+        nodeTitle: n.title,
+        weight: 99,
+        verdict: 'probable',
+        evidence: ['same URL'],
+      };
     }
     if (nodeType === 'event') {
-      if (normalizeForMatch(n.title) === normalizeForMatch(row.title) && (!facts.start || n.start_date === facts.start)) {
-        return { nodeId: n.id, nodeTitle: n.title, weight: 20, verdict: 'probable', evidence: ['same title & date'] };
+      if (
+        normalizeForMatch(n.title) === normalizeForMatch(row.title) &&
+        (!facts.start || n.start_date === facts.start)
+      ) {
+        return {
+          nodeId: n.id,
+          nodeTitle: n.title,
+          weight: 20,
+          verdict: 'probable',
+          evidence: ['same title & date'],
+        };
       }
     }
     if (nodeType === 'skill' || nodeType === 'education') {
       if (normalizeForMatch(n.title) === normalizeForMatch(row.title)) {
-        return { nodeId: n.id, nodeTitle: n.title, weight: 20, verdict: 'probable', evidence: ['same name'] };
+        return {
+          nodeId: n.id,
+          nodeTitle: n.title,
+          weight: 20,
+          verdict: 'probable',
+          evidence: ['same name'],
+        };
       }
       if (nodeType === 'skill' && trigramSimilarity(n.title, row.title) > 0.85) {
-        return { nodeId: n.id, nodeTitle: n.title, weight: 10, verdict: 'possible', evidence: ['name similar'] };
+        return {
+          nodeId: n.id,
+          nodeTitle: n.title,
+          weight: 10,
+          verdict: 'possible',
+          evidence: ['name similar'],
+        };
       }
     }
     if (nodeType === 'role') {
       const company = facts.company ?? '';
-      if (normalizeForMatch(n.title) === normalizeForMatch(row.title) && (!company || normalizeForMatch(n.subtitle ?? '').includes(normalizeForMatch(company)))) {
-        return { nodeId: n.id, nodeTitle: n.title, weight: 15, verdict: 'possible', evidence: ['same title'] };
+      if (
+        normalizeForMatch(n.title) === normalizeForMatch(row.title) &&
+        (!company || normalizeForMatch(n.subtitle ?? '').includes(normalizeForMatch(company)))
+      ) {
+        return {
+          nodeId: n.id,
+          nodeTitle: n.title,
+          weight: 15,
+          verdict: 'possible',
+          evidence: ['same title'],
+        };
       }
     }
     if (n.type === nodeType) {
@@ -815,7 +929,10 @@ function checkSimpleDup(row: ParsedRow, existing: NodeRecord[], nodeType: string
           nodeTitle: n.title,
           weight: generic.score,
           verdict: generic.verdict,
-          evidence: generic.signals.filter((signal) => signal.weight > 0).map((signal) => signal.label).slice(0, 4),
+          evidence: generic.signals
+            .filter((signal) => signal.weight > 0)
+            .map((signal) => signal.label)
+            .slice(0, 4),
         };
       }
     }
@@ -907,7 +1024,9 @@ export function nodeDraftFor(row: {
           phones: (p.phones as string[]) ?? [],
           headline: p.headline,
           city: p.city,
-          socials: sanitizeLinkedInUrl(p.linkedin) ? { linkedin: sanitizeLinkedInUrl(p.linkedin) } : {},
+          socials: sanitizeLinkedInUrl(p.linkedin)
+            ? { linkedin: sanitizeLinkedInUrl(p.linkedin) }
+            : {},
         },
         identity_keys: keys,
         notes_md: (p.note as string) ?? '',
@@ -1101,10 +1220,17 @@ export async function stageImport(
   content: string,
   mapping?: CsvMapping,
 ): Promise<{ batch: ImportBatch; rows: StagedRow[] }> {
-  const { rows: parsed, detail, edges } = parseContent(kind, content, mapping);
+  const {
+    rows: parsed,
+    detail,
+    edges,
+    evidence,
+    bundleSource,
+  } = parseContent(kind, content, mapping);
   const graph = await loadGraph();
   const byType = new Map<string, NodeRecord[]>();
-  for (const n of graph.nodes.values()) (byType.get(n.type) ?? byType.set(n.type, []).get(n.type)!).push(n);
+  for (const n of graph.nodes.values())
+    (byType.get(n.type) ?? byType.set(n.type, []).get(n.type)!).push(n);
   const personOrgs = orgNamesByPerson(graph);
   const byIdentityKey = new Map<string, NodeRecord>();
   for (const n of graph.nodes.values()) {
@@ -1113,7 +1239,8 @@ export async function stageImport(
     // what was kept rather than resurrecting what was merged away.
     const target = n.merged_into ? graph.nodes.get(n.merged_into) : n;
     if (!target) continue;
-    for (const key of n.identity_keys ?? []) if (!byIdentityKey.has(key)) byIdentityKey.set(key, target);
+    for (const key of n.identity_keys ?? [])
+      if (!byIdentityKey.has(key)) byIdentityKey.set(key, target);
   }
 
   const rows: StagedRow[] = parsed.map((r, index) => {
@@ -1133,7 +1260,11 @@ export async function stageImport(
             ? checkPersonDup(r, byType.get('person') ?? [], personOrgs)
             : r.entity === 'atom'
               ? null
-              : checkSimpleDup(r, byType.get(ENTITY_NODE_TYPE[r.entity]) ?? [], ENTITY_NODE_TYPE[r.entity]);
+              : checkSimpleDup(
+                  r,
+                  byType.get(ENTITY_NODE_TYPE[r.entity]) ?? [],
+                  ENTITY_NODE_TYPE[r.entity],
+                );
     return {
       id: newId(),
       index,
@@ -1185,6 +1316,8 @@ export async function stageImport(
     // Bundle edges live on the batch, not on rows: they belong to no single row
     // and are only resolvable once every accepted node has an id.
     bundle_edges: edges,
+    bundle_evidence: evidence,
+    ...(bundleSource ? { bundle_source: bundleSource } : {}),
   } as unknown as Record<string, unknown>);
   await repository.docBulkPut(
     'import_raw_chunks',
@@ -1209,17 +1342,28 @@ export async function stageImport(
 interface BatchInternals {
   raw_content?: string;
   bundle_edges?: BundleEdge[];
+  bundle_evidence?: BundleEvidence[];
+  bundle_source?: GraphBundle['source'];
   applied_updates?: AppliedUpdate[];
 }
 
-export async function getBatch(id: string): Promise<{ batch: ImportBatch; rows: StagedRow[] } | null> {
+export async function getBatch(
+  id: string,
+): Promise<{ batch: ImportBatch; rows: StagedRow[] } | null> {
   const doc = await repository.docGet<ImportBatch & BatchInternals>('imports', id);
   if (!doc) return null;
   // `bundle_edges` and `applied_updates` are stripped alongside `raw_content`:
   // all three are commit-time or rollback-time inputs, and neither a large
   // bundle's edge list nor a set of replaced field values belongs in a review
   // payload.
-  const { raw_content: _raw, bundle_edges: _edges, applied_updates: _updates, ...batch } = doc;
+  const {
+    raw_content: _raw,
+    bundle_edges: _edges,
+    bundle_evidence: _evidence,
+    bundle_source: _source,
+    applied_updates: _updates,
+    ...batch
+  } = doc;
   const rowDocs = await repository.docQuery<StagedRow>('import_rows', { import_id: id });
   const rows = rowDocs.sort((a, b) => a.index - b.index);
   return { batch: batch as ImportBatch, rows };
@@ -1230,6 +1374,17 @@ async function loadBundleEdges(id: string): Promise<BundleEdge[]> {
   return doc?.bundle_edges ?? [];
 }
 
+async function loadBundleKnowledge(id: string): Promise<{
+  evidence: BundleEvidence[];
+  source?: GraphBundle['source'];
+}> {
+  const doc = await repository.docGet<{
+    bundle_evidence?: BundleEvidence[];
+    bundle_source?: GraphBundle['source'];
+  }>('imports', id);
+  return { evidence: doc?.bundle_evidence ?? [], source: doc?.bundle_source };
+}
+
 async function loadAppliedUpdates(id: string): Promise<AppliedUpdate[]> {
   const doc = await repository.docGet<{ applied_updates?: AppliedUpdate[] }>('imports', id);
   return doc?.applied_updates ?? [];
@@ -1238,7 +1393,16 @@ async function loadAppliedUpdates(id: string): Promise<AppliedUpdate[]> {
 export async function listBatches(): Promise<ImportBatch[]> {
   const docs = await repository.docList<ImportBatch & BatchInternals>('imports');
   return docs
-    .map(({ raw_content: _raw, bundle_edges: _edges, applied_updates: _updates, ...batch }) => batch as ImportBatch)
+    .map(
+      ({
+        raw_content: _raw,
+        bundle_edges: _edges,
+        bundle_evidence: _evidence,
+        bundle_source: _source,
+        applied_updates: _updates,
+        ...batch
+      }) => batch as ImportBatch,
+    )
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
 }
 
@@ -1267,7 +1431,10 @@ export async function setRowDecision(
     }
     if (acceptedFields && row.proposal) {
       const offered = new Set(row.proposal.fields.map((f) => f.key));
-      update.proposal = { ...row.proposal, accepted: acceptedFields.filter((key) => offered.has(key)) };
+      update.proposal = {
+        ...row.proposal,
+        accepted: acceptedFields.filter((key) => offered.has(key)),
+      };
     }
     await repository.docMerge('import_rows', rowId, update, tx);
   });
@@ -1275,11 +1442,18 @@ export async function setRowDecision(
 
 // ── Commit ────────────────────────────────────────────────────────────────────
 
-async function findOrCreateOrg(title: string, source: string, sourceRef: string, cache: Map<string, string>): Promise<string> {
+async function findOrCreateOrg(
+  title: string,
+  source: string,
+  sourceRef: string,
+  cache: Map<string, string>,
+): Promise<string> {
   const key = normalizeForMatch(title);
   const hit = cache.get(key);
   if (hit) return hit;
-  const existing = (await repository.allLiveNodes()).find((n) => n.type === 'organization' && normalizeForMatch(n.title) === key);
+  const existing = (await repository.allLiveNodes()).find(
+    (n) => n.type === 'organization' && normalizeForMatch(n.title) === key,
+  );
   if (existing) {
     cache.set(key, existing.id);
     return existing.id;
@@ -1350,18 +1524,21 @@ async function liveIdByIdentityKeys(keys: readonly string[]): Promise<string | u
  * a live record the source id already names (so a later file can join a
  * project that is already here).
  */
-function findImportedProjectRow(
-  row: StagedRow,
-  rows: StagedRow[],
-): StagedRow | undefined {
-  const projectSource = typeof row.payload.project_source_id === 'string' ? row.payload.project_source_id : '';
+function findImportedProjectRow(row: StagedRow, rows: StagedRow[]): StagedRow | undefined {
+  const projectSource =
+    typeof row.payload.project_source_id === 'string' ? row.payload.project_source_id : '';
   const projectName = typeof row.payload.project_name === 'string' ? row.payload.project_name : '';
   return rows.find((candidate) => {
     if (candidate.entity !== 'project') return false;
-    if (projectSource && (candidate.ref === projectSource || candidate.payload.source_id === projectSource)) {
+    if (
+      projectSource &&
+      (candidate.ref === projectSource || candidate.payload.source_id === projectSource)
+    ) {
       return true;
     }
-    return Boolean(projectName && normalizeForMatch(candidate.title) === normalizeForMatch(projectName));
+    return Boolean(
+      projectName && normalizeForMatch(candidate.title) === normalizeForMatch(projectName),
+    );
   });
 }
 
@@ -1385,7 +1562,8 @@ function resolveStagedProjectId(
 ): string | undefined {
   const match = findImportedProjectRow(row, rows);
   if (match) return projectIdFromBatchRow(batchId, match);
-  const projectSource = typeof row.payload.project_source_id === 'string' ? row.payload.project_source_id : '';
+  const projectSource =
+    typeof row.payload.project_source_id === 'string' ? row.payload.project_source_id : '';
   if (!projectSource) return undefined;
   for (const key of projectSourceIdentityKeys(kind, projectSource)) {
     const hit = byIdentityKey.get(key);
@@ -1429,7 +1607,8 @@ async function resolveImportedProjectId(
 ): Promise<string | undefined> {
   const match = findImportedProjectRow(row, rows);
   if (match) return projectIdFromBatchRow(batchId, match);
-  const projectSource = typeof row.payload.project_source_id === 'string' ? row.payload.project_source_id : '';
+  const projectSource =
+    typeof row.payload.project_source_id === 'string' ? row.payload.project_source_id : '';
   if (!projectSource) return undefined;
   return liveIdByIdentityKeys(projectSourceIdentityKeys(kind, projectSource));
 }
@@ -1446,8 +1625,19 @@ function resolvedNodeId(batchId: string, row: StagedRow): string {
 }
 
 /** Document id for a bundle edge: the relationship's own identity, not the batch's. */
-function bundleEdgeId(type: string, src: string, dst: string): string {
-  const digest = createHash('sha256').update(`${type}\0${src}\0${dst}`).digest('hex');
+export function bundleEdgeId(
+  type: string,
+  src: string,
+  dst: string,
+  episode: { start_date?: string; end_date?: string; identity_keys?: string[] } = {},
+): string {
+  const explicitIdentity = episode.identity_keys?.[0];
+  const digest = createHash('sha256')
+    .update(
+      explicitIdentity ??
+        `${type}\0${src}\0${dst}\0${episode.start_date ?? ''}\0${episode.end_date ?? ''}`,
+    )
+    .digest('hex');
   return `ext-edge-${digest.slice(0, 40)}`;
 }
 
@@ -1476,6 +1666,7 @@ async function writeImportEdge(
     end_date?: string;
     is_current?: boolean;
     confidence?: number;
+    identity_keys?: string[];
   },
 ): Promise<boolean> {
   try {
@@ -1491,13 +1682,13 @@ async function writeImportEdge(
         source,
         source_ref: id,
         confidence: edge.confidence ?? 1,
+        identity_keys: edge.identity_keys ?? [],
       },
       { actor: 'import' },
-      // Keyed on (type, src, dst) and NOT on the batch: an edge of a given
-      // type between two given nodes is one fact, so importing a bundle twice
-      // must converge on the same document instead of laying a second
-      // parallel edge beside the first.
-      { id: bundleEdgeId(edge.type, edge.src, edge.dst) },
+      // Relationship episodes include their dates. Re-importing one episode
+      // converges, while a later period between the same endpoints stays a
+      // separate historical fact.
+      { id: bundleEdgeId(edge.type, edge.src, edge.dst, edge) },
     );
     // Same tombstone problem as nodes: re-importing after a rollback must
     // bring the relationship back, not resolve to the soft-deleted edge.
@@ -1518,8 +1709,7 @@ async function commitBundleEdges(
   kind: ImportKind,
 ): Promise<number> {
   const edges = await loadBundleEdges(id);
-
-  const refToId = new Map<string, string>();
+  const refToId = resolvedBundleRefs(id, rows, failedRowIds);
   const sourceIdInBatch = new Set<string>();
   for (const row of rows) {
     if (!row.ref) continue;
@@ -1527,8 +1717,6 @@ async function commitBundleEdges(
     if (failedRowIds.has(row.id)) continue;
     const sourceId = typeof row.payload.source_id === 'string' ? row.payload.source_id : '';
     if (sourceId) sourceIdInBatch.add(sourceId);
-    if (row.decision === 'accept') refToId.set(row.ref, resolvedNodeId(id, row));
-    else if (row.dup) refToId.set(row.ref, row.dup.nodeId);
   }
 
   let created = 0;
@@ -1546,6 +1734,7 @@ async function commitBundleEdges(
         end_date: edge.end_date,
         is_current: edge.is_current,
         confidence: edge.confidence,
+        identity_keys: edge.identity_keys,
       })
     ) {
       created++;
@@ -1560,34 +1749,222 @@ async function commitBundleEdges(
     if (row.entity !== 'task' || !row.ref || failedRowIds.has(row.id)) continue;
     const src = refToId.get(row.ref);
     if (!src) continue;
-    const parentSource = typeof row.payload.parent_source_id === 'string' ? row.payload.parent_source_id : '';
+    const parentSource =
+      typeof row.payload.parent_source_id === 'string' ? row.payload.parent_source_id : '';
     if (parentSource && !sourceIdInBatch.has(parentSource)) {
       const parentKey = taskSourceIdentityKey(kind, parentSource);
       const parentId = parentKey ? await liveIdByIdentityKeys([parentKey]) : undefined;
-      if (parentId && (await writeImportEdge(id, source, { type: 'RELATES_TO', src, dst: parentId, props: { label: 'parent' } }))) {
+      if (
+        parentId &&
+        (await writeImportEdge(id, source, {
+          type: 'RELATES_TO',
+          src,
+          dst: parentId,
+          props: { label: 'parent' },
+        }))
+      ) {
         created++;
       }
     }
-    const projectSource = typeof row.payload.project_source_id === 'string' ? row.payload.project_source_id : '';
+    const projectSource =
+      typeof row.payload.project_source_id === 'string' ? row.payload.project_source_id : '';
     if (projectSource && !sourceIdInBatch.has(projectSource)) {
       const projectId = await liveIdByIdentityKeys(projectSourceIdentityKeys(kind, projectSource));
-      if (projectId && (await writeImportEdge(id, source, { type: 'ABOUT', src, dst: projectId }))) {
+      if (
+        projectId &&
+        (await writeImportEdge(id, source, { type: 'ABOUT', src, dst: projectId }))
+      ) {
         created++;
       }
     }
     const blockers = Array.isArray(row.payload.blocked_by_source_ids)
-      ? row.payload.blocked_by_source_ids.filter((value): value is string => typeof value === 'string' && value !== '')
+      ? row.payload.blocked_by_source_ids.filter(
+          (value): value is string => typeof value === 'string' && value !== '',
+        )
       : [];
     for (const blocker of blockers) {
       if (sourceIdInBatch.has(blocker)) continue;
       const blockerKey = taskSourceIdentityKey(kind, blocker);
       const blockerId = blockerKey ? await liveIdByIdentityKeys([blockerKey]) : undefined;
-      if (blockerId && (await writeImportEdge(id, source, { type: 'DEPENDS_ON', src, dst: blockerId }))) {
+      if (
+        blockerId &&
+        (await writeImportEdge(id, source, { type: 'DEPENDS_ON', src, dst: blockerId }))
+      ) {
         created++;
       }
     }
   }
   return created;
+}
+
+function resolvedBundleRefs(
+  batchId: string,
+  rows: StagedRow[],
+  failedRowIds: ReadonlySet<string>,
+): Map<string, string> {
+  const refs = new Map<string, string>();
+  for (const row of rows) {
+    if (!row.ref || failedRowIds.has(row.id)) continue;
+    if (row.entity !== 'graph_node' && row.entity !== 'task' && row.entity !== 'project') continue;
+    if (row.decision === 'accept' || row.proposal?.fields.length === 0)
+      refs.set(row.ref, resolvedNodeId(batchId, row));
+    else if (row.dup) refs.set(row.ref, row.dup.nodeId);
+  }
+  return refs;
+}
+
+function knowledgeId(prefix: string, value: string): string {
+  return `${prefix}-${createHash('sha256').update(value).digest('hex').slice(0, 40)}`;
+}
+
+/** Persist version-2 bundle citations after local refs have durable graph ids. */
+async function commitBundleEvidence(
+  batchId: string,
+  rows: StagedRow[],
+  failedRowIds: ReadonlySet<string>,
+): Promise<number> {
+  const { evidence, source } = await loadBundleKnowledge(batchId);
+  if (!source || evidence.length === 0) return 0;
+  const refs = resolvedBundleRefs(batchId, rows, failedRowIds);
+  const edges = await loadBundleEdges(batchId);
+  const edgeIds = new Map<string, string>();
+  for (const edge of edges) {
+    if (!edge.ref) continue;
+    const src = refs.get(edge.src);
+    const dst = refs.get(edge.dst);
+    if (!src || !dst) continue;
+    const edgeId = bundleEdgeId(edge.type, src, dst, edge);
+    if (await repository.getEdge(edgeId)) edgeIds.set(edge.ref, edgeId);
+  }
+
+  const sourceId = knowledgeId('transfer-source', source.system.toLowerCase());
+  const now = nowIso();
+  const resolved = evidence.flatMap((item) => {
+    const subjectId =
+      item.subject_kind === 'node' ? refs.get(item.subject_ref) : edgeIds.get(item.subject_ref);
+    return subjectId ? [{ item, subjectId }] : [];
+  });
+  const times = resolved.map(({ item }) => item.observed_at).sort();
+  await putSource({
+    id: sourceId,
+    system: source.system,
+    title: `${source.system} graph transfer`,
+    imported_at: now,
+    coverage: {
+      from: times[0] ?? null,
+      to: times.at(-1) ?? null,
+      records: new Set(
+        resolved.map(({ item }) => `${item.citation.external_id}\0${item.citation.content_hash}`),
+      ).size,
+      complete: resolved.length === evidence.length,
+      limitations:
+        resolved.length === evidence.length
+          ? []
+          : [
+              `${evidence.length - resolved.length} assertions referred to records that were not committed`,
+            ],
+    },
+    rules: {},
+    metadata: { transfer_schema: 2 },
+  });
+  await putRun({
+    id: batchId,
+    source_id: sourceId,
+    status: resolved.some(({ item }) => item.basis === 'inferred') ? 'review' : 'applied',
+    started_at: source.exported_at,
+    finished_at: now,
+    checkpoint: source.run_id ?? null,
+    coverage: {
+      examined: evidence.length,
+      extracted: resolved.length,
+      skipped: evidence.length - resolved.length,
+      failed: 0,
+      complete: resolved.length === evidence.length,
+    },
+    limitations:
+      resolved.length === evidence.length
+        ? []
+        : ['Some cited subjects were skipped during graph reconciliation.'],
+    error: null,
+    options: { bundle_schema: 2, producer_run_id: source.run_id ?? null },
+  });
+
+  let written = 0;
+  for (const { item, subjectId } of resolved) {
+    const recordId = knowledgeId(
+      'transfer-record',
+      `${sourceId}\0${item.citation.external_id}\0${item.citation.content_hash}`,
+    );
+    await putSourceRecord({
+      id: recordId,
+      source_id: sourceId,
+      run_id: batchId,
+      external_id: item.citation.external_id,
+      kind: 'record',
+      title: `Evidence from ${source.system}`,
+      occurred_at: item.observed_at,
+      learned_at: now,
+      thread_key: null,
+      category: 'graph_transfer',
+      direction: 'unknown',
+      participant_addresses: [],
+      content_hash: item.citation.content_hash,
+      locator: item.citation.locator,
+      data: {},
+    });
+    const subject =
+      item.subject_kind === 'node'
+        ? await repository.getNode(subjectId)
+        : await repository.getEdge(subjectId);
+    const current =
+      subject && !item.field.startsWith('$')
+        ? readField(subject as unknown as Record<string, unknown>, item.field)
+        : undefined;
+    const reconciliation = item.field.startsWith('$')
+      ? 'unchanged'
+      : reconcileField(current, item.value).status;
+    const status =
+      reconciliation === 'unchanged'
+        ? 'accepted'
+        : reconciliation === 'conflict'
+          ? 'conflict'
+          : 'proposed';
+    await putAssertion({
+      id: knowledgeId(
+        'transfer-assertion',
+        `${recordId}\0${item.subject_kind}\0${subjectId}\0${item.field}\0${JSON.stringify(item.value)}`,
+      ),
+      run_id: batchId,
+      subject_id: subjectId,
+      subject_kind: item.subject_kind,
+      field: item.field,
+      value: item.value,
+      citation: {
+        source_id: sourceId,
+        record_id: recordId,
+        external_id: item.citation.external_id,
+        locator: item.citation.locator,
+        content_hash: item.citation.content_hash,
+        ...(item.citation.excerpt ? { excerpt: item.citation.excerpt } : {}),
+      },
+      basis: item.basis,
+      confidence: item.confidence,
+      status,
+      observed_at: item.observed_at,
+      valid_from: item.valid_from,
+      valid_to: item.valid_to,
+      reviewed_at: status === 'accepted' ? now : null,
+      reviewed_by: status === 'accepted' ? 'import' : undefined,
+      reason:
+        status === 'accepted'
+          ? 'The imported graph record carries the same value.'
+          : status === 'conflict'
+            ? 'The curated graph carries a different nonempty value.'
+            : 'The source supplies a value missing from the curated graph.',
+    });
+    written++;
+  }
+  return written;
 }
 
 /**
@@ -1618,8 +1995,15 @@ async function applyProposal(proposal: UpdateProposal, source: string): Promise<
     }
     const record = before as unknown as Record<string, unknown>;
     const previous = accepted.map((f) => ({ key: f.key, value: readField(record, f.key) }));
-    const patch = patchForFields(record, accepted.map((f) => ({ key: f.key, value: f.to })));
-    const after = await repository.stageNodeUpdate(tx, before, patch, { actor: 'import', source, op: 'update' });
+    const patch = patchForFields(
+      record,
+      accepted.map((f) => ({ key: f.key, value: f.to })),
+    );
+    const after = await repository.stageNodeUpdate(tx, before, patch, {
+      actor: 'import',
+      source,
+      op: 'update',
+    });
     return {
       node_id: after.id,
       title: after.title,
@@ -1694,193 +2078,216 @@ export async function commitImport(id: string): Promise<ImportCommitResult> {
     }
     attempted.add(row.id);
     try {
-        const p = row.payload as Record<string, unknown>;
+      const p = row.payload as Record<string, unknown>;
 
-        if (row.proposal) {
-          appliedUpdates.push(await applyProposal(row.proposal, source));
-          updated++;
+      if (row.proposal) {
+        appliedUpdates.push(await applyProposal(row.proposal, source));
+        updated++;
+        continue;
+      }
+
+      if (row.entity === 'atom') {
+        // Résumé line → atom + default variant, owner chosen in the wizard.
+        const owner = (p.owner_node as string) ?? null;
+        if (!owner) {
+          // FR-020: an unassigned line creates nothing, so it must stay
+          // FR-020: unassigned lines create nothing; stay retryable with a clear reason.
+          fail(
+            row.id,
+            'no owner assigned: pick a role or project for this line, then commit again',
+          );
           continue;
         }
-
-        if (row.entity === 'atom') {
-          // Résumé line → atom + default variant, owner chosen in the wizard.
-          const owner = (p.owner_node as string) ?? null;
-          if (!owner) {
-            // FR-020: an unassigned line creates nothing, so it must stay
-            // FR-020: unassigned lines create nothing; stay retryable with a clear reason.
-            fail(row.id, 'no owner assigned: pick a role or project for this line, then commit again');
-            continue;
-          }
-          const atomId = importResultId(id, row.id, 'atom');
-          const now = nowIso();
-          const atom = {
+        const atomId = importResultId(id, row.id, 'atom');
+        const now = nowIso();
+        const atom = {
+          id: atomId,
+          owner_node: owner,
+          kind: (p.kind as string) ?? 'achievement',
+          metrics: [],
+          pinned: false,
+          blocked: false,
+          source_ref: id,
+          created_at: now,
+          updated_at: now,
+          deleted_at: null,
+          rev: 1,
+        };
+        const variant = {
+          id: importResultId(id, row.id, 'variant'),
+          atom_id: atomId,
+          emphasis: 'detailed',
+          text: p.text as string,
+          is_default: true,
+        };
+        // FR-002: atom + variant + revision commit together; an atom with no
+        // variant is unrenderable but still counted as evidence.
+        await repository.transaction(async (tx) => {
+          const [ownerNode, existingAtom] = await Promise.all([
+            repository.getNode(owner, { includeDeleted: true }, tx),
+            repository.docGet('atoms', atomId, tx),
+          ]);
+          if (!ownerNode || ownerNode.deleted_at)
+            throw new Error(`owner ${owner} does not exist or is deleted`);
+          if (existingAtom) return;
+          await repository.docPut(
+            'atoms',
+            atomId,
+            atom as unknown as Record<string, unknown>,
+            {},
+            tx,
+          );
+          await repository.docPut(
+            'atom_variants',
+            variant.id,
+            variant as unknown as Record<string, unknown>,
+            {},
+            tx,
+          );
+          await repository.stageRevision(tx, {
+            kind: 'atom',
             id: atomId,
-            owner_node: owner,
-            kind: (p.kind as string) ?? 'achievement',
-            metrics: [],
-            pinned: false,
-            blocked: false,
-            source_ref: id,
-            created_at: now,
-            updated_at: now,
-            deleted_at: null,
             rev: 1,
-          };
-          const variant = {
-            id: importResultId(id, row.id, 'variant'),
-            atom_id: atomId,
-            emphasis: 'detailed',
-            text: p.text as string,
-            is_default: true,
-          };
-          // FR-002: atom + variant + revision commit together; an atom with no
-          // variant is unrenderable but still counted as evidence.
-          await repository.transaction(async (tx) => {
-            const [ownerNode, existingAtom] = await Promise.all([
-              repository.getNode(owner, { includeDeleted: true }, tx),
-              repository.docGet('atoms', atomId, tx),
-            ]);
-            if (!ownerNode || ownerNode.deleted_at) throw new Error(`owner ${owner} does not exist or is deleted`);
-            if (existingAtom) return;
-            await repository.docPut('atoms', atomId, atom as unknown as Record<string, unknown>, {}, tx);
-            await repository.docPut('atom_variants', variant.id, variant as unknown as Record<string, unknown>, {}, tx);
-            await repository.stageRevision(tx, {
-              kind: 'atom',
-              id: atomId,
-              rev: 1,
-              op: 'create',
-              snapshot: { ...atom, variants: [variant] },
-              source,
-              actor: 'import',
-            });
+            op: 'create',
+            snapshot: { ...atom, variants: [variant] },
+            source,
+            actor: 'import',
           });
-          created++;
-          continue;
-        }
-
-        const draft = nodeDraftFor({
-          entity: row.entity,
-          title: row.title,
-          subtitle: row.subtitle,
-          payload: p,
-          identityKeys: row.identity_keys ?? (p.identity_keys as string[] | undefined) ?? [],
         });
-        if (!draft) {
-          fail(row.id, `row entity ${row.entity} writes no record`);
-          continue;
-        }
-
-        if (draft.type === 'task') {
-          if (draft.props.status === undefined) draft.props.status = 'inbox';
-          const projectId = await resolveImportedProjectId(id, row, rows, batch.kind as ImportKind);
-          if (projectId) draft.props.project_id = projectId;
-        }
-
-        // A stable external identity gives a stable document id, so re-importing
-        // the same record converges rather than duplicating: createNode returns
-        // the existing doc for a known id.
-        const nodeDocId = resolvedNodeId(id, row);
-        if (writtenNodeIds.has(nodeDocId)) {
-          unchanged++;
-          continue;
-        }
-        const node = await repository.createNode(
-          { ...draft, source, source_ref: id, confidence: row.confidence },
-          { actor: 'import' },
-          { id: nodeDocId },
-        );
-        // A deterministic id also resolves to a *rolled-back* record, and
-        // create-returns-existing would hand back the tombstone, so re-importing
-        // something you had rolled back would silently produce nothing. Rolling
-        // back and importing again is an undo, not a ban.
-        //
-        // Restoring re-stamps provenance onto this batch, because the record is
-        // live again on account of this import and rollback only sweeps what
-        // carries the batch's ref. Without that, importing after a rollback gave
-        // you a record no batch could take away again. A record that comes back
-        // still live is not re-stamped: it existed before this import, and
-        // hijacking it would make undoing this import delete somebody's data.
-        const nodeId = node.deleted_at
-          ? (
-              await repository.updateNode(
-                node.id,
-                { deleted_at: null, source, source_ref: id },
-                { actor: 'import', op: 'restore' },
-              )
-            ).id
-          : node.id;
-        writtenNodeIds.add(nodeDocId);
-
-        // Relationships the destination implies. A bundle brings its own edges
-        // and gets none of these: its records belong to the person they describe,
-        // never to the owner of this graph.
-        switch (row.entity) {
-          case 'person':
-            if (self) {
-              await repository.createEdge(
-                { type: 'KNOWS', src: self.id, dst: nodeId, props: {}, source, source_ref: id },
-                { actor: 'import' },
-                { id: importResultId(id, row.id, 'knows') },
-              );
-            }
-            break;
-          case 'role':
-            if (p.company) {
-              const orgId = await findOrCreateOrg(p.company as string, source, id, orgCache);
-              await repository.createEdge(
-                { type: 'ROLE_AT', src: nodeId, dst: orgId, source, source_ref: id },
-                { actor: 'import' },
-                { id: importResultId(id, row.id, 'role-at') },
-              );
-            }
-            if (self) {
-              await repository.createEdge(
-                { type: 'HELD', src: self.id, dst: nodeId, source, source_ref: id },
-                { actor: 'import' },
-                { id: importResultId(id, row.id, 'held') },
-              );
-            }
-            break;
-          case 'education':
-            if (self) {
-              await repository.createEdge(
-                { type: 'ATTENDED', src: self.id, dst: nodeId, source, source_ref: id },
-                { actor: 'import' },
-                { id: importResultId(id, row.id, 'attended') },
-              );
-            }
-            break;
-          case 'skill':
-            if (self) {
-              await repository.createEdge(
-                { type: 'USES_SKILL', src: self.id, dst: nodeId, source, source_ref: id },
-                { actor: 'import' },
-                { id: importResultId(id, row.id, 'uses-skill') },
-              );
-            }
-            break;
-          case 'link':
-            for (const tagName of ((p.tags as string[]) ?? []).slice(0, 10)) {
-              const tagId = await upsertTag(tagName);
-              await repository.docPut('taggings', importResultId(id, row.id, `tag:${tagName}`), {
-                tag_id: tagId,
-                subject_kind: 'node',
-                subject_id: nodeId,
-                created_at: nowIso(),
-              });
-            }
-            break;
-          default:
-            break;
-        }
         created++;
+        continue;
+      }
+
+      const draft = nodeDraftFor({
+        entity: row.entity,
+        title: row.title,
+        subtitle: row.subtitle,
+        payload: p,
+        identityKeys: row.identity_keys ?? (p.identity_keys as string[] | undefined) ?? [],
+      });
+      if (!draft) {
+        fail(row.id, `row entity ${row.entity} writes no record`);
+        continue;
+      }
+
+      if (draft.type === 'task') {
+        if (draft.props.status === undefined) draft.props.status = 'inbox';
+        const projectId = await resolveImportedProjectId(id, row, rows, batch.kind as ImportKind);
+        if (projectId) draft.props.project_id = projectId;
+      }
+
+      // A stable external identity gives a stable document id, so re-importing
+      // the same record converges rather than duplicating: createNode returns
+      // the existing doc for a known id.
+      const nodeDocId = resolvedNodeId(id, row);
+      if (writtenNodeIds.has(nodeDocId)) {
+        unchanged++;
+        continue;
+      }
+      const node = await repository.createNode(
+        { ...draft, source, source_ref: id, confidence: row.confidence },
+        { actor: 'import' },
+        { id: nodeDocId },
+      );
+      // A deterministic id also resolves to a *rolled-back* record, and
+      // create-returns-existing would hand back the tombstone, so re-importing
+      // something you had rolled back would silently produce nothing. Rolling
+      // back and importing again is an undo, not a ban.
+      //
+      // Restoring re-stamps provenance onto this batch, because the record is
+      // live again on account of this import and rollback only sweeps what
+      // carries the batch's ref. Without that, importing after a rollback gave
+      // you a record no batch could take away again. A record that comes back
+      // still live is not re-stamped: it existed before this import, and
+      // hijacking it would make undoing this import delete somebody's data.
+      const nodeId = node.deleted_at
+        ? (
+            await repository.updateNode(
+              node.id,
+              { deleted_at: null, source, source_ref: id },
+              { actor: 'import', op: 'restore' },
+            )
+          ).id
+        : node.id;
+      writtenNodeIds.add(nodeDocId);
+
+      // Relationships the destination implies. A bundle brings its own edges
+      // and gets none of these: its records belong to the person they describe,
+      // never to the owner of this graph.
+      switch (row.entity) {
+        case 'person':
+          if (self) {
+            await repository.createEdge(
+              { type: 'KNOWS', src: self.id, dst: nodeId, props: {}, source, source_ref: id },
+              { actor: 'import' },
+              { id: importResultId(id, row.id, 'knows') },
+            );
+          }
+          break;
+        case 'role':
+          if (p.company) {
+            const orgId = await findOrCreateOrg(p.company as string, source, id, orgCache);
+            await repository.createEdge(
+              { type: 'ROLE_AT', src: nodeId, dst: orgId, source, source_ref: id },
+              { actor: 'import' },
+              { id: importResultId(id, row.id, 'role-at') },
+            );
+          }
+          if (self) {
+            await repository.createEdge(
+              { type: 'HELD', src: self.id, dst: nodeId, source, source_ref: id },
+              { actor: 'import' },
+              { id: importResultId(id, row.id, 'held') },
+            );
+          }
+          break;
+        case 'education':
+          if (self) {
+            await repository.createEdge(
+              { type: 'ATTENDED', src: self.id, dst: nodeId, source, source_ref: id },
+              { actor: 'import' },
+              { id: importResultId(id, row.id, 'attended') },
+            );
+          }
+          break;
+        case 'skill':
+          if (self) {
+            await repository.createEdge(
+              { type: 'USES_SKILL', src: self.id, dst: nodeId, source, source_ref: id },
+              { actor: 'import' },
+              { id: importResultId(id, row.id, 'uses-skill') },
+            );
+          }
+          break;
+        case 'link':
+          for (const tagName of ((p.tags as string[]) ?? []).slice(0, 10)) {
+            const tagId = await upsertTag(tagName);
+            await repository.docPut('taggings', importResultId(id, row.id, `tag:${tagName}`), {
+              tag_id: tagId,
+              subject_kind: 'node',
+              subject_id: nodeId,
+              created_at: nowIso(),
+            });
+          }
+          break;
+        default:
+          break;
+      }
+      created++;
     } catch (err) {
       fail(row.id, (err as Error).message || 'row failed');
     }
   }
 
-  const edgesCreated = await commitBundleEdges(id, rows, source, failedRowIds, batch.kind as ImportKind);
+  const edgesCreated = await commitBundleEdges(
+    id,
+    rows,
+    source,
+    failedRowIds,
+    batch.kind as ImportKind,
+  );
   created += edgesCreated;
+  await commitBundleEvidence(id, rows, failedRowIds);
 
   // Mark rows committed (only the ones this pass acted on) + batch status.
   // Failed rows keep their reason so the UI can explain the retry, and a row
@@ -2001,19 +2408,24 @@ export async function rollbackImport(
   const refused: RollbackRefusal[] = [];
   let restored = 0;
   for (const update of await loadAppliedUpdates(id)) {
-    const outcome: { title: string; reason: string | null } = await repository.transaction(async (tx) => {
-      const node = await repository.getNode(update.node_id, {}, tx);
-      if (!node) return { title: update.title, reason: 'it no longer exists' };
-      if (node.rev !== update.rev_after) {
-        return {
-          title: node.title,
-          reason: `it was edited after the import (now revision ${node.rev}, the import left it at revision ${update.rev_after})`,
-        };
-      }
-      const patch = patchForFields(node as unknown as Record<string, unknown>, update.before);
-      await repository.stageNodeUpdate(tx, node, patch, { actor: 'import-rollback', op: 'update' });
-      return { title: node.title, reason: null };
-    });
+    const outcome: { title: string; reason: string | null } = await repository.transaction(
+      async (tx) => {
+        const node = await repository.getNode(update.node_id, {}, tx);
+        if (!node) return { title: update.title, reason: 'it no longer exists' };
+        if (node.rev !== update.rev_after) {
+          return {
+            title: node.title,
+            reason: `it was edited after the import (now revision ${node.rev}, the import left it at revision ${update.rev_after})`,
+          };
+        }
+        const patch = patchForFields(node as unknown as Record<string, unknown>, update.before);
+        await repository.stageNodeUpdate(tx, node, patch, {
+          actor: 'import-rollback',
+          op: 'update',
+        });
+        return { title: node.title, reason: null };
+      },
+    );
     if (outcome.reason === null) restored++;
     else refused.push({ node_id: update.node_id, title: outcome.title, reason: outcome.reason });
   }
@@ -2129,7 +2541,9 @@ export async function githubSync(): Promise<GithubSyncResult> {
   const self = await getSelf();
   const existing = (await repository.allLiveNodes()).filter((n) => n.type === 'repository');
   const skillCache = new Map<string, string>(
-    (await repository.allLiveNodes()).filter((n) => n.type === 'skill').map((n) => [normalizeForMatch(n.title), n.id]),
+    (await repository.allLiveNodes())
+      .filter((n) => n.type === 'skill')
+      .map((n) => [normalizeForMatch(n.title), n.id]),
   );
 
   let created = 0;
@@ -2170,7 +2584,11 @@ export async function githubSync(): Promise<GithubSyncResult> {
       // zero forever. Excluding it also means the stamp is only written when
       // something else was, which is what makes it honest: it records when this
       // repository last took data from GitHub, not when a sync last ran.
-      const changes = changedFields({ props: before }, { props: merged }, { ignore: SYNC_BOOKKEEPING_FIELDS });
+      const changes = changedFields(
+        { props: before },
+        { props: merged },
+        { ignore: SYNC_BOOKKEEPING_FIELDS },
+      );
       const keysChanged = nextKeys.length !== (prev.identity_keys ?? []).length;
       repoNodeId = prev.id;
       if (changes.length === 0 && !keysChanged) {
@@ -2208,7 +2626,13 @@ export async function githubSync(): Promise<GithubSyncResult> {
       let skillId = skillCache.get(key);
       if (!skillId) {
         const skill = await repository.createNode(
-          { type: 'skill', title: r.language, props: { category: 'language' }, source: 'import_github', source_ref: 'github_sync' },
+          {
+            type: 'skill',
+            title: r.language,
+            props: { category: 'language' },
+            source: 'import_github',
+            source_ref: 'github_sync',
+          },
           { actor: 'github-sync' },
         );
         skillId = skill.id;
@@ -2217,7 +2641,13 @@ export async function githubSync(): Promise<GithubSyncResult> {
       const edges = await repository.edgesForNode(repoNodeId);
       if (!edges.some((e) => e.type === 'USES_SKILL' && e.dst === skillId)) {
         await repository.createEdge(
-          { type: 'USES_SKILL', src: repoNodeId, dst: skillId, source: 'import_github', source_ref: 'github_sync' },
+          {
+            type: 'USES_SKILL',
+            src: repoNodeId,
+            dst: skillId,
+            source: 'import_github',
+            source_ref: 'github_sync',
+          },
           { actor: 'github-sync' },
         );
       }
@@ -2243,7 +2673,11 @@ function safeDomain(url: string): string | undefined {
  * fail the whole row. */
 function sanitizeEmails(v: unknown): string[] {
   if (!Array.isArray(v)) return [];
-  return v.filter((e): e is string => typeof e === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim())).map((e) => e.trim());
+  return v
+    .filter(
+      (e): e is string => typeof e === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim()),
+    )
+    .map((e) => e.trim());
 }
 
 /** LinkedIn exports sometimes omit the scheme; coerce to a real URL or drop. */

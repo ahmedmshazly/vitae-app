@@ -51,6 +51,39 @@ const usesSkillInline: FieldDescriptor[] = [
 ];
 
 export const NODE_FORM_DESCRIPTORS: Record<NodeType, TypeFormDescriptor> = {
+  area: {
+    type: 'area',
+    titleLabel: 'Life area',
+    titlePlaceholder: 'Health',
+    subtitleLabel: 'What this area covers',
+    sections: [{ id: 'main', label: 'Responsibility' }],
+    fields: [
+      { key: 'kind', label: 'Kind', widget: 'select', section: 'main', options: sel('health', 'family', 'home', 'career', 'learning', 'finance', 'community', 'creative', 'other') },
+      { key: 'area_status', label: 'Status', widget: 'select', section: 'main', options: sel('active', 'paused', 'archived') },
+      { key: 'standard', label: 'Standard to maintain', widget: 'textarea', section: 'main' },
+      { key: 'review_cadence_days', label: 'Review every (days)', widget: 'number', section: 'main', min: 1, mono: true },
+    ],
+    edges: [],
+    envelope: noDates,
+  },
+  opportunity: {
+    type: 'opportunity',
+    titleLabel: 'Opportunity',
+    titlePlaceholder: 'Speak at Cairo Tech Week',
+    subtitleLabel: 'Source or context',
+    sections: [{ id: 'main', label: 'Possibility' }, { id: 'timing', label: 'Timing' }],
+    fields: [
+      { key: 'kind', label: 'Kind', widget: 'select', section: 'main', options: sel('collaboration', 'grant', 'speaking', 'job', 'volunteer', 'learning', 'investment', 'other') },
+      { key: 'opportunity_status', label: 'Status', widget: 'select', section: 'main', options: sel('possible', 'considering', 'pursuing', 'won', 'declined', 'closed') },
+      { key: 'value', label: 'Potential value', widget: 'textarea', section: 'main' },
+      { key: 'url', label: 'URL', widget: 'url', section: 'main', mono: true },
+      { key: 'next_step', label: 'Next step', widget: 'text', section: 'timing' },
+      { key: 'next_step_date', label: 'Next step date', widget: 'date', section: 'timing', mono: true },
+      { key: 'deadline', label: 'Deadline', widget: 'date', section: 'timing', mono: true },
+    ],
+    edges: [],
+    envelope: noDates,
+  },
   // ── Career core ─────────────────────────────────────────────────────────
   person: {
     type: 'person',
@@ -812,7 +845,7 @@ export const NODE_FORM_DESCRIPTORS: Record<NodeType, TypeFormDescriptor> = {
     type: 'interview',
     titleLabel: 'Interview',
     titlePlaceholder: 'System design: Stripe',
-    subtitleLabel: 'Round',
+    subtitleLabel: 'Short summary',
     sections: [
       { id: 'main', label: 'Interview' },
       { id: 'prep', label: 'Prep & reflection' },

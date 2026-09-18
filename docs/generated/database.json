@@ -128,7 +128,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 56,
+          "line": 65,
           "test": false
         },
         {
@@ -139,7 +139,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:238",
+      "source": "apps/api/src/db/schema.ts:245",
       "reads": 5,
       "writes": 5
     },
@@ -275,14 +275,14 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 55,
+          "line": 64,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1746,
+          "line": 2140,
           "test": false
         },
         {
@@ -300,7 +300,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:237",
+      "source": "apps/api/src/db/schema.ts:244",
       "reads": 8,
       "writes": 6
     },
@@ -414,7 +414,7 @@
           "file": "apps/api/src/routes/v1/dashboard.ts",
           "method": "docList",
           "access": "repository",
-          "line": 31,
+          "line": 33,
           "test": false
         },
         {
@@ -449,35 +449,35 @@
           "file": "apps/api/src/services/export.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 232,
+          "line": 241,
           "test": false
         },
         {
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 54,
+          "line": 63,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 1982,
+          "line": 2389,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1986,
+          "line": 2393,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 1979,
+          "line": 2386,
           "test": false
         },
         {
@@ -516,7 +516,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:236",
+      "source": "apps/api/src/db/schema.ts:243",
       "reads": 13,
       "writes": 6
     },
@@ -648,7 +648,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 72,
+          "line": 81,
           "test": false
         },
         {
@@ -708,7 +708,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:250",
+      "source": "apps/api/src/db/schema.ts:257",
       "reads": 7,
       "writes": 7
     },
@@ -846,7 +846,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 66,
+          "line": 75,
           "test": false
         },
         {
@@ -864,7 +864,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:244",
+      "source": "apps/api/src/db/schema.ts:251",
       "reads": 3,
       "writes": 4
     },
@@ -969,7 +969,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:229",
+      "source": "apps/api/src/db/schema.ts:236",
       "reads": 2,
       "writes": 2
     },
@@ -1080,7 +1080,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:231",
+      "source": "apps/api/src/db/schema.ts:238",
       "reads": 0,
       "writes": 2
     },
@@ -1240,7 +1240,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:230",
+      "source": "apps/api/src/db/schema.ts:237",
       "reads": 2,
       "writes": 1
     },
@@ -1355,11 +1355,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 81,
+          "line": 90,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:260",
+      "source": "apps/api/src/db/schema.ts:267",
       "reads": 3,
       "writes": 3
     },
@@ -1478,11 +1478,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 78,
+          "line": 87,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:259",
+      "source": "apps/api/src/db/schema.ts:266",
       "reads": 2,
       "writes": 2
     },
@@ -1640,11 +1640,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 63,
+          "line": 72,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:242",
+      "source": "apps/api/src/db/schema.ts:249",
       "reads": 3,
       "writes": 3
     },
@@ -1816,20 +1816,233 @@
           "file": "apps/api/src/services/export.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 398,
+          "line": 407,
           "test": false
         },
         {
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 53,
+          "line": 62,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:234",
+      "source": "apps/api/src/db/schema.ts:241",
       "reads": 3,
       "writes": 4
+    },
+    {
+      "name": "entity_redirects",
+      "interface": "DocTable",
+      "description": "The three columns every table shares.",
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:26"
+        }
+      ],
+      "requirements": [],
+      "created_in": null,
+      "altered_in": [],
+      "indexes": [
+        {
+          "name": "entity_redirects_active",
+          "table": "entity_redirects",
+          "unique": true,
+          "partial": true,
+          "method": "btree",
+          "definition": "CREATE UNIQUE INDEX entity_redirects_active ON entity_redirects(workspace_id, space, (data->>'from_id')) WHERE data->>'reversed_at' IS NULL",
+          "migration": "013-knowledge-evidence",
+          "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:70"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 60,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:231",
+      "reads": 1,
+      "writes": 1
+    },
+    {
+      "name": "evidence_assertions",
+      "interface": "DocTable",
+      "description": "The three columns every table shares.",
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:26"
+        }
+      ],
+      "requirements": [],
+      "created_in": null,
+      "altered_in": [],
+      "indexes": [
+        {
+          "name": "evidence_assertions_idempotent",
+          "table": "evidence_assertions",
+          "unique": true,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE UNIQUE INDEX evidence_assertions_idempotent ON evidence_assertions(workspace_id, space, (data->>'subject_kind'), (data->>'subject_id'), (data->>'field'), (data->'citation'->>'record_id'), md5((data->'value')::text))",
+          "migration": "013-knowledge-evidence",
+          "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:64"
+        },
+        {
+          "name": "evidence_assertions_source",
+          "table": "evidence_assertions",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX evidence_assertions_source ON evidence_assertions(workspace_id, space, (data->'citation'->>'record_id'))",
+          "migration": "013-knowledge-evidence",
+          "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:58"
+        },
+        {
+          "name": "evidence_assertions_status",
+          "table": "evidence_assertions",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX evidence_assertions_status ON evidence_assertions(workspace_id, space, (data->>'status'))",
+          "migration": "013-knowledge-evidence",
+          "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:61"
+        },
+        {
+          "name": "evidence_assertions_subject",
+          "table": "evidence_assertions",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX evidence_assertions_subject ON evidence_assertions(workspace_id, space, (data->>'subject_id'), (data->>'subject_kind'))",
+          "migration": "013-knowledge-evidence",
+          "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:46"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 58,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/gmail-sqlite.ts",
+          "method": "docBulkPut",
+          "access": "repository",
+          "line": 416,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/gmail-sqlite.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 432,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/knowledge.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 209,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/knowledge.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 188,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/knowledge.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 371,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:229",
+      "reads": 4,
+      "writes": 3
     },
     {
       "name": "habit_checks",
@@ -1912,7 +2125,7 @@
           "file": "apps/api/src/routes/v1/dashboard.ts",
           "method": "docList",
           "access": "repository",
-          "line": 30,
+          "line": 32,
           "test": false
         },
         {
@@ -1961,7 +2174,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 77,
+          "line": 86,
           "test": false
         },
         {
@@ -1972,7 +2185,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:258",
+      "source": "apps/api/src/db/schema.ts:265",
       "reads": 5,
       "writes": 5
     },
@@ -2059,25 +2272,25 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docBulkPut",
           "access": "repository",
-          "line": 1189,
+          "line": 1322,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docDeleteMany",
           "access": "repository",
-          "line": 1089,
+          "line": 1208,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docIdsWhereIn",
           "access": "repository",
-          "line": 1088,
+          "line": 1207,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:254",
+      "source": "apps/api/src/db/schema.ts:261",
       "reads": 3,
       "writes": 4
     },
@@ -2185,32 +2398,32 @@
           "file": "apps/api/src/services/imports.ts",
           "method": "docBulkPut",
           "access": "repository",
-          "line": 1197,
+          "line": 1330,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 1261,
+          "line": 1425,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docMerge",
           "access": "repository",
-          "line": 1890,
+          "line": 2297,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 1223,
+          "line": 1367,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:253",
+      "source": "apps/api/src/db/schema.ts:260",
       "reads": 4,
       "writes": 5
     },
@@ -2293,14 +2506,14 @@
           "file": "apps/api/src/__tests__/aperture-import.integration.test.ts",
           "method": "docDeleteMany",
           "access": "repository",
-          "line": 58,
+          "line": 74,
           "test": true
         },
         {
           "file": "apps/api/src/__tests__/aperture-import.integration.test.ts",
           "method": "docList",
           "access": "repository",
-          "line": 57,
+          "line": 73,
           "test": true
         },
         {
@@ -2370,35 +2583,35 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 74,
+          "line": 83,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docGet",
           "access": "repository",
-          "line": 1234,
+          "line": 1389,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docList",
           "access": "repository",
-          "line": 1239,
+          "line": 1394,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docMerge",
           "access": "repository",
-          "line": 2021,
+          "line": 2433,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1181,
+          "line": 1312,
           "test": false
         },
         {
@@ -2416,9 +2629,195 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:252",
+      "source": "apps/api/src/db/schema.ts:259",
       "reads": 4,
       "writes": 5
+    },
+    {
+      "name": "knowledge_runs",
+      "interface": "DocTable",
+      "description": "The three columns every table shares.",
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:26"
+        }
+      ],
+      "requirements": [],
+      "created_in": null,
+      "altered_in": [],
+      "indexes": [
+        {
+          "name": "knowledge_runs_source",
+          "table": "knowledge_runs",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX knowledge_runs_source ON knowledge_runs(workspace_id, space, (data->>'source_id'), (data->>'started_at') DESC)",
+          "migration": "013-knowledge-evidence",
+          "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:49"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 55,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/gmail-sqlite.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 448,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/knowledge.ts",
+          "method": "docGet",
+          "access": "repository",
+          "line": 445,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/knowledge.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 62,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/knowledge.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 447,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:226",
+      "reads": 3,
+      "writes": 3
+    },
+    {
+      "name": "knowledge_sources",
+      "interface": "DocTable",
+      "description": "The three columns every table shares.",
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:26"
+        }
+      ],
+      "requirements": [],
+      "created_in": null,
+      "altered_in": [],
+      "indexes": [],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 54,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/gmail-sqlite.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 227,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/knowledge.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 61,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/knowledge.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 129,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:225",
+      "reads": 2,
+      "writes": 3
     },
     {
       "name": "letters",
@@ -2577,7 +2976,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 61,
+          "line": 70,
           "test": false
         },
         {
@@ -2602,7 +3001,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:241",
+      "source": "apps/api/src/db/schema.ts:248",
       "reads": 3,
       "writes": 3
     },
@@ -2713,11 +3112,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 73,
+          "line": 82,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:251",
+      "source": "apps/api/src/db/schema.ts:258",
       "reads": 3,
       "writes": 3
     },
@@ -2899,7 +3298,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 76,
+          "line": 85,
           "test": false
         },
         {
@@ -2931,7 +3330,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:256",
+      "source": "apps/api/src/db/schema.ts:263",
       "reads": 8,
       "writes": 12
     },
@@ -3086,7 +3485,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:257",
+      "source": "apps/api/src/db/schema.ts:264",
       "reads": 4,
       "writes": 5
     },
@@ -3336,7 +3735,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 52,
+          "line": 61,
           "test": false
         },
         {
@@ -3347,7 +3746,7 @@
           "test": true
         }
       ],
-      "source": "apps/api/src/db/schema.ts:233",
+      "source": "apps/api/src/db/schema.ts:240",
       "reads": 2,
       "writes": 4
     },
@@ -3485,11 +3884,99 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 67,
+          "line": 76,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:245",
+      "source": "apps/api/src/db/schema.ts:252",
+      "reads": 2,
+      "writes": 2
+    },
+    {
+      "name": "reconciliation_decisions",
+      "interface": "DocTable",
+      "description": "The three columns every table shares.",
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:26"
+        }
+      ],
+      "requirements": [],
+      "created_in": null,
+      "altered_in": [],
+      "indexes": [
+        {
+          "name": "reconciliation_decisions_run",
+          "table": "reconciliation_decisions",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX reconciliation_decisions_run ON reconciliation_decisions(workspace_id, space, (data->>'run_id'), (data->>'decided_at'))",
+          "migration": "013-knowledge-evidence",
+          "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:67"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 59,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/knowledge.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 382,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/knowledge.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 442,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:230",
       "reads": 2,
       "writes": 2
     },
@@ -3589,7 +4076,7 @@
           "file": "apps/api/src/routes/v1/dashboard.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 28,
+          "line": 30,
           "test": false
         },
         {
@@ -3631,11 +4118,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 69,
+          "line": 78,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:247",
+      "source": "apps/api/src/db/schema.ts:254",
       "reads": 3,
       "writes": 6
     },
@@ -3797,7 +4284,7 @@
           "file": "apps/api/src/routes/v1/dashboard.ts",
           "method": "docList",
           "access": "repository",
-          "line": 29,
+          "line": 31,
           "test": false
         },
         {
@@ -3846,7 +4333,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 59,
+          "line": 68,
           "test": false
         },
         {
@@ -3857,7 +4344,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:240",
+      "source": "apps/api/src/db/schema.ts:247",
       "reads": 7,
       "writes": 4
     },
@@ -4010,7 +4497,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 57,
+          "line": 66,
           "test": false
         },
         {
@@ -4028,7 +4515,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:235",
+      "source": "apps/api/src/db/schema.ts:242",
       "reads": 4,
       "writes": 4
     },
@@ -4140,13 +4627,260 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 75,
+          "line": 84,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:255",
+      "source": "apps/api/src/db/schema.ts:262",
       "reads": 3,
       "writes": 4
+    },
+    {
+      "name": "source_identities",
+      "interface": "DocTable",
+      "description": "The three columns every table shares.",
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:26"
+        }
+      ],
+      "requirements": [],
+      "created_in": null,
+      "altered_in": [],
+      "indexes": [
+        {
+          "name": "source_identities_entity",
+          "table": "source_identities",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX source_identities_entity ON source_identities(workspace_id, space, (data->>'entity_id'))",
+          "migration": "013-knowledge-evidence",
+          "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:55"
+        },
+        {
+          "name": "source_identities_lookup",
+          "table": "source_identities",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX source_identities_lookup ON source_identities(workspace_id, space, (data->>'scheme'), (data->>'normalized_value'))",
+          "migration": "013-knowledge-evidence",
+          "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:52"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 57,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/gmail-sqlite.ts",
+          "method": "docBulkPut",
+          "access": "repository",
+          "line": 412,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/knowledge.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 94,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/knowledge.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 290,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:228",
+      "reads": 2,
+      "writes": 3
+    },
+    {
+      "name": "source_records",
+      "interface": "DocTable",
+      "description": "The three columns every table shares.",
+      "columns": [
+        {
+          "name": "space",
+          "type": "'real' | 'demo'",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:18"
+        },
+        {
+          "name": "workspace_id",
+          "type": "Generated<string>",
+          "writable": true,
+          "generated": true,
+          "optional": false,
+          "doc": "Server-selected workspace partition.",
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:24"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:25"
+        },
+        {
+          "name": "data",
+          "type": "T",
+          "writable": true,
+          "generated": false,
+          "optional": false,
+          "doc": null,
+          "inherited_from": null,
+          "source": "apps/api/src/db/schema.ts:26"
+        }
+      ],
+      "requirements": [],
+      "created_in": null,
+      "altered_in": [],
+      "indexes": [
+        {
+          "name": "source_records_external",
+          "table": "source_records",
+          "unique": true,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE UNIQUE INDEX source_records_external ON source_records(workspace_id, space, (data->>'source_id'), (data->>'external_id'), (data->>'content_hash'))",
+          "migration": "013-knowledge-evidence",
+          "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:34"
+        },
+        {
+          "name": "source_records_participants",
+          "table": "source_records",
+          "unique": false,
+          "partial": false,
+          "method": "gin",
+          "definition": "CREATE INDEX source_records_participants ON source_records USING gin ((data->'participant_addresses'))",
+          "migration": "013-knowledge-evidence",
+          "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:40"
+        },
+        {
+          "name": "source_records_search",
+          "table": "source_records",
+          "unique": false,
+          "partial": false,
+          "method": "gin",
+          "definition": "CREATE INDEX source_records_search ON source_records USING gin (to_tsvector('simple', coalesce(data->>'title','') || ' ' || coalesce(data->'data'->>'body_text','')))",
+          "migration": "013-knowledge-evidence",
+          "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:43"
+        },
+        {
+          "name": "source_records_source",
+          "table": "source_records",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX source_records_source ON source_records(workspace_id, space, (data->>'source_id'))",
+          "migration": "013-knowledge-evidence",
+          "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:31"
+        },
+        {
+          "name": "source_records_time",
+          "table": "source_records",
+          "unique": false,
+          "partial": false,
+          "method": "btree",
+          "definition": "CREATE INDEX source_records_time ON source_records(workspace_id, space, (data->>'kind'), (data->>'occurred_at') DESC, id)",
+          "migration": "013-knowledge-evidence",
+          "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:37"
+        }
+      ],
+      "queried_by": [
+        {
+          "file": "apps/api/src/services/export.ts",
+          "method": "table",
+          "access": "declared",
+          "line": 56,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/gmail-sqlite.integration.test.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 79,
+          "test": true
+        },
+        {
+          "file": "apps/api/src/services/gmail-sqlite.ts",
+          "method": "docBulkPut",
+          "access": "repository",
+          "line": 408,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/knowledge.ts",
+          "method": "docList",
+          "access": "repository",
+          "line": 193,
+          "test": false
+        },
+        {
+          "file": "apps/api/src/services/knowledge.ts",
+          "method": "docPut",
+          "access": "repository",
+          "line": 139,
+          "test": false
+        }
+      ],
+      "source": "apps/api/src/db/schema.ts:227",
+      "reads": 2,
+      "writes": 3
     },
     {
       "name": "taggings",
@@ -4241,25 +4975,25 @@
           "file": "apps/api/src/services/export.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 314,
+          "line": 323,
           "test": false
         },
         {
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 71,
+          "line": 80,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 1865,
+          "line": 2265,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:249",
+      "source": "apps/api/src/db/schema.ts:256",
       "reads": 2,
       "writes": 4
     },
@@ -4353,25 +5087,25 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 70,
+          "line": 79,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docPut",
           "access": "repository",
-          "line": 2265,
+          "line": 2699,
           "test": false
         },
         {
           "file": "apps/api/src/services/imports.ts",
           "method": "docQuery",
           "access": "repository",
-          "line": 2262,
+          "line": 2696,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:248",
+      "source": "apps/api/src/db/schema.ts:255",
       "reads": 3,
       "writes": 4
     },
@@ -4521,7 +5255,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 58,
+          "line": 67,
           "test": false
         },
         {
@@ -4553,7 +5287,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:239",
+      "source": "apps/api/src/db/schema.ts:246",
       "reads": 7,
       "writes": 4
     },
@@ -4637,11 +5371,11 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 68,
+          "line": 77,
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:246",
+      "source": "apps/api/src/db/schema.ts:253",
       "reads": 2,
       "writes": 3
     },
@@ -4799,7 +5533,7 @@
           "file": "apps/api/src/services/export.ts",
           "method": "table",
           "access": "declared",
-          "line": 65,
+          "line": 74,
           "test": false
         },
         {
@@ -4824,7 +5558,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:243",
+      "source": "apps/api/src/db/schema.ts:250",
       "reads": 4,
       "writes": 4
     },
@@ -4925,7 +5659,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:225",
+      "source": "apps/api/src/db/schema.ts:232",
       "reads": 1,
       "writes": 1
     },
@@ -5009,7 +5743,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:232",
+      "source": "apps/api/src/db/schema.ts:239",
       "reads": 0,
       "writes": 1
     },
@@ -5134,7 +5868,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:228",
+      "source": "apps/api/src/db/schema.ts:235",
       "reads": 2,
       "writes": 2
     },
@@ -5208,7 +5942,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:227",
+      "source": "apps/api/src/db/schema.ts:234",
       "reads": 0,
       "writes": 1
     },
@@ -5333,7 +6067,7 @@
           "test": false
         }
       ],
-      "source": "apps/api/src/db/schema.ts:226",
+      "source": "apps/api/src/db/schema.ts:233",
       "reads": 2,
       "writes": 2
     }
@@ -5667,6 +6401,33 @@
       ],
       "extensions": [],
       "reversible": true
+    },
+    {
+      "id": "013-knowledge-evidence",
+      "file": "apps/api/src/db/migrations/013-knowledge-evidence.ts",
+      "title": null,
+      "description": null,
+      "requirements": [],
+      "creates": [],
+      "alters": [],
+      "indexes": [
+        "source_records_source",
+        "source_records_external",
+        "source_records_time",
+        "source_records_participants",
+        "source_records_search",
+        "evidence_assertions_subject",
+        "knowledge_runs_source",
+        "source_identities_lookup",
+        "source_identities_entity",
+        "evidence_assertions_source",
+        "evidence_assertions_status",
+        "evidence_assertions_idempotent",
+        "reconciliation_decisions_run",
+        "entity_redirects_active"
+      ],
+      "extensions": [],
+      "reversible": true
     }
   ],
   "indexes": [
@@ -5811,6 +6572,56 @@
       "source": "apps/api/src/db/migrations/001-initial-schema.ts:128"
     },
     {
+      "name": "entity_redirects_active",
+      "table": "entity_redirects",
+      "unique": true,
+      "partial": true,
+      "method": "btree",
+      "definition": "CREATE UNIQUE INDEX entity_redirects_active ON entity_redirects(workspace_id, space, (data->>'from_id')) WHERE data->>'reversed_at' IS NULL",
+      "migration": "013-knowledge-evidence",
+      "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:70"
+    },
+    {
+      "name": "evidence_assertions_idempotent",
+      "table": "evidence_assertions",
+      "unique": true,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE UNIQUE INDEX evidence_assertions_idempotent ON evidence_assertions(workspace_id, space, (data->>'subject_kind'), (data->>'subject_id'), (data->>'field'), (data->'citation'->>'record_id'), md5((data->'value')::text))",
+      "migration": "013-knowledge-evidence",
+      "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:64"
+    },
+    {
+      "name": "evidence_assertions_source",
+      "table": "evidence_assertions",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX evidence_assertions_source ON evidence_assertions(workspace_id, space, (data->'citation'->>'record_id'))",
+      "migration": "013-knowledge-evidence",
+      "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:58"
+    },
+    {
+      "name": "evidence_assertions_status",
+      "table": "evidence_assertions",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX evidence_assertions_status ON evidence_assertions(workspace_id, space, (data->>'status'))",
+      "migration": "013-knowledge-evidence",
+      "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:61"
+    },
+    {
+      "name": "evidence_assertions_subject",
+      "table": "evidence_assertions",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX evidence_assertions_subject ON evidence_assertions(workspace_id, space, (data->>'subject_id'), (data->>'subject_kind'))",
+      "migration": "013-knowledge-evidence",
+      "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:46"
+    },
+    {
       "name": "habit_checks_habit",
       "table": "habit_checks",
       "unique": false,
@@ -5819,6 +6630,16 @@
       "definition": "CREATE INDEX habit_checks_habit ON habit_checks (space, habit_id)",
       "migration": "002-retention-columns",
       "source": "apps/api/src/db/migrations/002-retention-columns.ts:21"
+    },
+    {
+      "name": "knowledge_runs_source",
+      "table": "knowledge_runs",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX knowledge_runs_source ON knowledge_runs(workspace_id, space, (data->>'source_id'), (data->>'started_at') DESC)",
+      "migration": "013-knowledge-evidence",
+      "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:49"
     },
     {
       "name": "letters_live_updated",
@@ -5951,6 +6772,16 @@
       "source": "apps/api/src/db/migrations/012-productivity-collections.ts:85"
     },
     {
+      "name": "reconciliation_decisions_run",
+      "table": "reconciliation_decisions",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX reconciliation_decisions_run ON reconciliation_decisions(workspace_id, space, (data->>'run_id'), (data->>'decided_at'))",
+      "migration": "013-knowledge-evidence",
+      "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:67"
+    },
+    {
       "name": "resumes_live_created",
       "table": "resumes",
       "unique": false,
@@ -6009,6 +6840,76 @@
       "definition": "CREATE INDEX revisions_workspace_kind_at ON revisions (workspace_id, subject_kind, at DESC)",
       "migration": "012-productivity-collections",
       "source": "apps/api/src/db/migrations/012-productivity-collections.ts:104"
+    },
+    {
+      "name": "source_identities_entity",
+      "table": "source_identities",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX source_identities_entity ON source_identities(workspace_id, space, (data->>'entity_id'))",
+      "migration": "013-knowledge-evidence",
+      "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:55"
+    },
+    {
+      "name": "source_identities_lookup",
+      "table": "source_identities",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX source_identities_lookup ON source_identities(workspace_id, space, (data->>'scheme'), (data->>'normalized_value'))",
+      "migration": "013-knowledge-evidence",
+      "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:52"
+    },
+    {
+      "name": "source_records_external",
+      "table": "source_records",
+      "unique": true,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE UNIQUE INDEX source_records_external ON source_records(workspace_id, space, (data->>'source_id'), (data->>'external_id'), (data->>'content_hash'))",
+      "migration": "013-knowledge-evidence",
+      "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:34"
+    },
+    {
+      "name": "source_records_participants",
+      "table": "source_records",
+      "unique": false,
+      "partial": false,
+      "method": "gin",
+      "definition": "CREATE INDEX source_records_participants ON source_records USING gin ((data->'participant_addresses'))",
+      "migration": "013-knowledge-evidence",
+      "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:40"
+    },
+    {
+      "name": "source_records_search",
+      "table": "source_records",
+      "unique": false,
+      "partial": false,
+      "method": "gin",
+      "definition": "CREATE INDEX source_records_search ON source_records USING gin (to_tsvector('simple', coalesce(data->>'title','') || ' ' || coalesce(data->'data'->>'body_text','')))",
+      "migration": "013-knowledge-evidence",
+      "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:43"
+    },
+    {
+      "name": "source_records_source",
+      "table": "source_records",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX source_records_source ON source_records(workspace_id, space, (data->>'source_id'))",
+      "migration": "013-knowledge-evidence",
+      "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:31"
+    },
+    {
+      "name": "source_records_time",
+      "table": "source_records",
+      "unique": false,
+      "partial": false,
+      "method": "btree",
+      "definition": "CREATE INDEX source_records_time ON source_records(workspace_id, space, (data->>'kind'), (data->>'occurred_at') DESC, id)",
+      "migration": "013-knowledge-evidence",
+      "source": "apps/api/src/db/migrations/013-knowledge-evidence.ts:37"
     },
     {
       "name": "targets_live_updated",
@@ -6082,16 +6983,24 @@
     }
   ],
   "summary": {
-    "tables": 36,
-    "columns": 231,
-    "indexes": 41,
-    "partial_indexes": 14,
-    "migrations": 12,
+    "tables": 43,
+    "columns": 259,
+    "indexes": 55,
+    "partial_indexes": 15,
+    "migrations": 13,
     "irreversible": [],
     "extensions": [
       "pg_trgm"
     ],
-    "untraced": [],
+    "untraced": [
+      "entity_redirects",
+      "evidence_assertions",
+      "knowledge_runs",
+      "knowledge_sources",
+      "reconciliation_decisions",
+      "source_identities",
+      "source_records"
+    ],
     "unmodelled_in_kysely": [],
     "never_queried": []
   }

@@ -4,6 +4,7 @@
  * State is owned by EntityForm (ConnectionDraft[]), committed after node save.
  */
 import { Checkbox, EntityGlyph, Input, Rating, Select, TagInput } from '@vitae/ui';
+import { useId } from 'react';
 import { suggestSourceFor, type EdgeSubEditor, type FieldDescriptor } from '@vitae/core';
 import { EntityPicker, type PickedEntity } from '../../components/EntityPicker.js';
 import { SuggestTagInput } from './SuggestTagInput.js';
@@ -38,6 +39,7 @@ export function InlinePropInput({
   value: unknown;
   onChange: (v: unknown) => void;
 }) {
+  const inputId = useId();
   if (field.widget === 'rating') {
     return (
       <Rating
@@ -56,6 +58,7 @@ export function InlinePropInput({
   if (field.widget === 'suggest-list') {
     return (
       <SuggestTagInput
+        aria-label={field.label}
         value={Array.isArray(value) ? (value as string[]) : []}
         onChange={onChange}
         kind={field.suggestKind ?? 'topic'}
@@ -66,11 +69,12 @@ export function InlinePropInput({
   }
   if (field.widget === 'tags') {
     return (
-      <TagInput
+      <><label className="sr-only" htmlFor={inputId}>{field.label}</label><TagInput
+        id={inputId}
         value={Array.isArray(value) ? (value as string[]) : []}
         onChange={onChange}
         placeholder={field.placeholder ?? field.label}
-      />
+      /></>
     );
   }
   if (field.widget === 'checkbox') {
@@ -79,6 +83,7 @@ export function InlinePropInput({
   if (field.widget === 'select') {
     return (
       <Select
+        label={field.label}
         value={typeof value === 'string' ? value : undefined}
         onChange={onChange}
         options={field.options ?? []}
@@ -91,6 +96,7 @@ export function InlinePropInput({
       <Input
         mono
         type="number"
+        aria-label={field.label}
         placeholder={field.label}
         min={field.min}
         max={field.max}

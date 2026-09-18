@@ -3,7 +3,7 @@
     {
       "file": "apps/api/src/__tests__/aperture-import.integration.test.ts",
       "package": "@vitae/api",
-      "cases": 6,
+      "cases": 7,
       "skipped": 0,
       "todo": 0,
       "suites": [],
@@ -16,7 +16,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 289
+      "lines": 416
     },
     {
       "file": "apps/api/src/__tests__/api.integration.test.ts",
@@ -321,6 +321,27 @@
       "lines": 93
     },
     {
+      "file": "apps/api/src/env.local-install.test.ts",
+      "package": "@vitae/api",
+      "cases": 12,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "VITAE_LOCAL_INSTALL boot",
+        "hosted production boot without VITAE_LOCAL_INSTALL"
+      ],
+      "subjects": [
+        "@vitae/config/env"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 123
+    },
+    {
       "file": "apps/api/src/middleware/auth.test.ts",
       "package": "@vitae/api",
       "cases": 6,
@@ -488,7 +509,28 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 50
+      "lines": 51
+    },
+    {
+      "file": "apps/api/src/routes/v1/auth.local-install.test.ts",
+      "package": "@vitae/api",
+      "cases": 6,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "owner sign-in peer check",
+        "session cookie Secure flag"
+      ],
+      "subjects": [
+        "./auth.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 40
     },
     {
       "file": "apps/api/src/routes/v1/capture.integration.test.ts",
@@ -599,7 +641,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 34
+      "lines": 37
     },
     {
       "file": "apps/api/src/routes/v1/docs.integration.test.ts",
@@ -907,6 +949,27 @@
       "lines": 132
     },
     {
+      "file": "apps/api/src/routes/v1/knowledge.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "/api/v1/knowledge"
+      ],
+      "subjects": [
+        "../../__tests__/helpers/app.js",
+        "../../db/repository.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 212
+    },
+    {
       "file": "apps/api/src/routes/v1/ledger.integration.test.ts",
       "package": "@vitae/api",
       "cases": 3,
@@ -974,6 +1037,27 @@
       ],
       "run_in_ci": true,
       "lines": 169
+    },
+    {
+      "file": "apps/api/src/routes/v1/objects.test.ts",
+      "package": "@vitae/api",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "parseObjectKey"
+      ],
+      "subjects": [
+        "../../middleware/error.js",
+        "./objects.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 31
     },
     {
       "file": "apps/api/src/routes/v1/orgs.integration.test.ts",
@@ -1337,6 +1421,47 @@
       "lines": 193
     },
     {
+      "file": "apps/api/src/services/gmail-sqlite.integration.test.ts",
+      "package": "@vitae/api",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "local Gmail knowledge adapter"
+      ],
+      "subjects": [
+        "../db/repository.js",
+        "./gmail-sqlite.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 85
+    },
+    {
+      "file": "apps/api/src/services/import-relationship-identity.test.ts",
+      "package": "@vitae/api",
+      "cases": 1,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "imported relationship identity"
+      ],
+      "subjects": [
+        "./imports.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 11
+    },
+    {
       "file": "apps/api/src/services/imports.test.ts",
       "package": "@vitae/api",
       "cases": 19,
@@ -1508,6 +1633,26 @@
       ],
       "run_in_ci": true,
       "lines": 48
+    },
+    {
+      "file": "apps/api/src/services/storage/filesystem.test.ts",
+      "package": "@vitae/api",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "FilesystemStorage"
+      ],
+      "subjects": [
+        "./filesystem.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:api",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 75
     },
     {
       "file": "apps/api/src/services/storage/memory.test.ts",
@@ -3978,7 +4123,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 136
+      "lines": 177
     },
     {
       "file": "apps/web/src/routes/Dashboard.test.tsx",
@@ -5250,7 +5395,7 @@
     {
       "file": "apps/web/src/routes/SignIn.test.tsx",
       "package": "@vitae/web",
-      "cases": 10,
+      "cases": 11,
       "skipped": 0,
       "todo": 0,
       "suites": [
@@ -5267,7 +5412,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 170
+      "lines": 181
     },
     {
       "file": "apps/web/src/routes/tailor/DocumentPane.test.tsx",
@@ -7475,6 +7620,29 @@
       "lines": 49
     },
     {
+      "file": "packages/core/src/importers/gmail.test.ts",
+      "package": "@vitae/core",
+      "cases": 3,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "gmail extraction"
+      ],
+      "subjects": [
+        "./gmail.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 61
+    },
+    {
       "file": "packages/core/src/importers/ics.test.ts",
       "package": "@vitae/core",
       "cases": 5,
@@ -7643,6 +7811,31 @@
       ],
       "run_in_ci": true,
       "lines": 88
+    },
+    {
+      "file": "packages/core/src/knowledge.test.ts",
+      "package": "@vitae/core",
+      "cases": 5,
+      "skipped": 0,
+      "todo": 0,
+      "suites": [
+        "knowledge identity",
+        "knowledge reconciliation"
+      ],
+      "subjects": [
+        "./knowledge.js",
+        "./schema/envelope.js"
+      ],
+      "requirements": [],
+      "run_by": [
+        "test:core",
+        "test:unit",
+        "test:mutation",
+        "test:coverage",
+        "test"
+      ],
+      "run_in_ci": true,
+      "lines": 83
     },
     {
       "file": "packages/core/src/places/index.test.ts",
@@ -8068,7 +8261,7 @@
         "test"
       ],
       "run_in_ci": true,
-      "lines": 170
+      "lines": 176
     },
     {
       "file": "packages/core/src/schema/dossier.test.ts",
@@ -8614,27 +8807,27 @@
     }
   ],
   "summary": {
-    "files": 394,
-    "cases": 2746,
+    "files": 403,
+    "cases": 2787,
     "skipped": 2,
     "todo": 0,
     "by_package": {
-      "@vitae/api": 400,
-      "@vitae/web": 1273,
+      "@vitae/api": 432,
+      "@vitae/web": 1274,
       "@vitae/e2e": 305,
-      "@vitae/core": 494,
+      "@vitae/core": 502,
       "@vitae/testkit": 7,
       "@vitae/ui": 267
     },
     "by_script": {
-      "test": 394,
+      "test": 403,
       "test:web": 184,
-      "test:api": 73,
-      "test:unit": 63,
-      "test:coverage": 63,
+      "test:api": 80,
+      "test:unit": 65,
+      "test:coverage": 65,
+      "test:core": 63,
+      "test:mutation": 63,
       "test:e2e": 62,
-      "test:core": 61,
-      "test:mutation": 61,
       "test:property": 6,
       "test:a11y": 4,
       "test:security": 3,

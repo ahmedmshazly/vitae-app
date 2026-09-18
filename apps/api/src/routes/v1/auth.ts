@@ -15,14 +15,37 @@ import {
 export const authRouter: Router = Router();
 
 /**
+ * Authentication state is specific to the browser session. Express otherwise
+ * generates an ETag for its JSON responses, which lets a browser revalidate a
+ * signed-out `/me` response after `/dev-login` and receive the stale body.
+ * Keep every auth response out of HTTP caches so the SPA always observes the
+ * cookie that was just issued or cleared.
+ */
+function preventAuthCaching(res: import('express').Response): void {
+  res.set('Cache-Control', 'private, no-store');
+}
+
+/**
  * Is this request local? FR-015: developer sign-in is defence-in-depth, not a
  * single boolean, even with the flag on, it only answers callers on the
  * loopback interface, so a flag left on in any network-accessible environment
  * cannot hand an owner token to the internet.
+ *
+ * A local production install sits behind loopback-bound Caddy, so the API sees
+ * a container IP rather than 127.0.0.1. The bind is the control there, not the
+ * peer address (docs/runbooks/personal-local.md).
  */
-function isLoopback(req: Request): boolean {
-  const ip = req.socket.remoteAddress ?? '';
+export function isLoopbackAddress(ip: string): boolean {
   return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+}
+
+export function ownerLoginAllowsPeer(opts: { localInstall: boolean; remoteAddress: string }): boolean {
+  if (opts.localInstall) return true;
+  return isLoopbackAddress(opts.remoteAddress);
+}
+
+export function sessionCookieSecureFlag(opts: { nodeEnv: string; localInstall: boolean }): boolean {
+  return opts.nodeEnv === 'production' && !opts.localInstall;
 }
 
 function sessionCookie(): {
@@ -35,7 +58,7 @@ function sessionCookie(): {
   return {
     httpOnly: true,
     sameSite: 'lax',
-    secure: env.NODE_ENV === 'production',
+    secure: sessionCookieSecureFlag({ nodeEnv: env.NODE_ENV, localInstall: env.VITAE_LOCAL_INSTALL }),
     path: '/',
     maxAge: 24 * 60 * 60 * 1000,
   };
@@ -45,10 +68,16 @@ function sessionCookie(): {
 authRouter.post(
   '/dev-login',
   asyncHandler(async (req, res) => {
+    preventAuthCaching(res);
     if (!env.AUTH_ENABLE_DEV_LOGIN) {
       throw new HttpError(403, 'DEV_LOGIN_DISABLED', 'Developer sign-in is disabled.');
     }
-    if (!isLoopback(req)) {
+    if (
+      !ownerLoginAllowsPeer({
+        localInstall: env.VITAE_LOCAL_INSTALL,
+        remoteAddress: req.socket.remoteAddress ?? '',
+      })
+    ) {
       throw new HttpError(403, 'DEV_LOGIN_REMOTE', 'Developer sign-in only answers local requests.');
     }
     const token = issueDevToken();
@@ -66,6 +95,7 @@ authRouter.post(
 );
 
 authRouter.post('/logout', (_req, res) => {
+  preventAuthCaching(res);
   const cookie = sessionCookie();
   res.clearCookie('vitae_session', {
     httpOnly: cookie.httpOnly,
@@ -116,6 +146,7 @@ authRouter.post(
 authRouter.get(
   '/me',
   asyncHandler(async (req, res) => {
+    preventAuthCaching(res);
     let self: { id: string; title: string } | null = null;
     let workspace: Awaited<ReturnType<typeof resolveWorkspaceForUser>> = null;
     if (req.user) {
@@ -144,6 +175,7 @@ authRouter.get(
       self,
       cloudEnabled: cloudEnabled(),
       devLoginEnabled: env.AUTH_ENABLE_DEV_LOGIN,
+      localInstall: env.VITAE_LOCAL_INSTALL,
     });
   }),
 );

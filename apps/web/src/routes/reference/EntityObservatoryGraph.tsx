@@ -20,7 +20,7 @@ import {
   type ObservatorySceneNode,
   type ObservatoryWorkspaceState,
 } from './entityObservatoryModel.js';
-import { Button, ErrorState, StatusTrace } from '@vitae/ui';
+import { Button, ErrorState, StatusTrace, useTheme } from '@vitae/ui';
 import { readGraphPalette, withAlpha, type GraphPalette } from '../../lib/graph-palette.js';
 
 export interface EntityObservatoryGraphHandle {
@@ -195,7 +195,8 @@ export const EntityObservatoryGraph = forwardRef<
   const runtimeRef = useRef<GraphRuntime | null>(null);
   const callbacksRef = useRef({ onSelect, onHover, onPin, onClear });
   callbacksRef.current = { onSelect, onHover, onPin, onClear };
-  const palette = useMemo(() => readGraphPalette(), []);
+  const { resolvedTheme } = useTheme();
+  const palette = useMemo(() => readGraphPalette(), [resolvedTheme]);
   const data = useMemo(() => graphData(scene, state, palette), [scene, state, palette]);
   // Creation is deferred by a microtask and both render() and fitView() are
   // async, so between mount and the first paint the container is an empty

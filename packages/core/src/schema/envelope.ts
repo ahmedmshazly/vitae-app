@@ -92,6 +92,8 @@ export const edgeCreateEnvelope = z.object({
   source: sourceSchema.default('manual'),
   source_ref: z.string().max(500).optional(),
   confidence: confidenceSchema.default(1),
+  /** Durable external identities for relationship episodes. */
+  identity_keys: z.array(identityKey).max(20).default([]),
 });
 
 export type EdgeCreateInput = z.infer<typeof edgeCreateEnvelope>;

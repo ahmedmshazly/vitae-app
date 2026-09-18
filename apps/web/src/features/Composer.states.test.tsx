@@ -57,7 +57,7 @@ afterEach(() => {
 });
 
 describe('Composer states', () => {
-  it('keeps the draft and says the message was not sent when the send fails', async () => {
+  it('keeps the draft and reports uncertainty when logging fails', async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();
     mockApi.post.mockImplementation((path: string) =>
@@ -68,34 +68,40 @@ describe('Composer states', () => {
 
     renderWithApp(<Composer ctx={ctx} onClose={onClose} />);
     await screen.findByLabelText('Draft message');
-    await user.click(screen.getByRole('button', { name: 'Send & log' }));
+    await user.click(
+      screen.getByRole('checkbox', { name: 'I have sent this message outside Vitae' }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Log outreach & follow-up' }));
 
-    const banner = alertAround('This message was not sent');
+    const banner = alertAround('Outreach logging was not confirmed');
     expect(within(banner).getByText(/the mail relay refused it/)).toBeInTheDocument();
     expect(screen.getByLabelText('Draft message')).toHaveValue('Hello Ada, catching up.');
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  it('gives a failed send the error toast rather than the neutral one', async () => {
+  it('does not claim that an unconfirmed logging request saved nothing', async () => {
     const user = userEvent.setup();
     mockApi.post.mockImplementation((path: string) =>
       path === '/composer/draft'
         ? Promise.resolve({ body: 'Hello Ada.', facts: [] })
-        : Promise.reject(new Error('the mail relay refused it')),
+        : Promise.reject(new Error('')),
     );
-
     renderWithApp(<Composer ctx={ctx} onClose={vi.fn()} />);
     await screen.findByLabelText('Draft message');
-    await user.click(screen.getByRole('button', { name: 'Send & log' }));
-
-    // A send that failed used to look exactly like one that worked: same
-    // neutral toast, no word, no glyph.
-    const toast = (await screen.findByText(/Send failed: the mail relay refused it/)).closest('li');
-    expect(toast).not.toBeNull();
-    expect(within(toast as HTMLElement).getByText('Error')).toBeInTheDocument();
+    await user.click(
+      screen.getByRole('checkbox', { name: 'I have sent this message outside Vitae' }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Log outreach & follow-up' }));
+    const banner = alertAround('Outreach logging was not confirmed');
+    expect(within(banner).getByText(/may already be logged/)).toBeInTheDocument();
+    expect(within(banner).getByRole('link', { name: 'Check profile' })).toHaveAttribute(
+      'href',
+      '/network/people/p1',
+    );
+    expect(screen.queryByText(/nothing was logged/)).not.toBeInTheDocument();
   });
 
-  it('sends from the failure banner on the second attempt', async () => {
+  it('allows an explicit retry after warning about possible duplicate logging', async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();
     let sends = 0;
@@ -106,10 +112,13 @@ describe('Composer states', () => {
 
     renderWithApp(<Composer ctx={ctx} onClose={onClose} />);
     await screen.findByLabelText('Draft message');
-    await user.click(screen.getByRole('button', { name: 'Send & log' }));
+    await user.click(
+      screen.getByRole('checkbox', { name: 'I have sent this message outside Vitae' }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Log outreach & follow-up' }));
 
-    const banner = alertAround('This message was not sent');
-    await user.click(within(banner).getByRole('button', { name: 'Try again' }));
+    await screen.findByText('Outreach logging was not confirmed');
+    await user.click(screen.getByRole('button', { name: 'Retry logging' }));
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce());
   });
 
@@ -140,7 +149,9 @@ describe('Composer states', () => {
     expect(busy).toBeDisabled();
 
     release({ body: 'Second draft.', facts: [] });
-    expect(await screen.findByLabelText('Draft message')).toHaveValue('Second draft.');
+    await waitFor(() =>
+      expect(screen.getByLabelText('Draft message')).toHaveValue('Second draft.'),
+    );
     expect(screen.getByRole('button', { name: 'Regenerate' })).toBeEnabled();
   });
 
@@ -176,7 +187,7 @@ describe('Composer states', () => {
     expect(screen.getByLabelText('Draft message')).toHaveValue('Formal draft.');
   });
 
-  it('offers no Copy over a draft the screen can no longer show', async () => {
+  it('preserves a usable previous draft after failed regeneration', async () => {
     const user = userEvent.setup();
     serveDrafts({ body: 'First draft.', facts: [] }, new Error('upstream 502'));
 
@@ -186,9 +197,10 @@ describe('Composer states', () => {
 
     // Copy used to stay live over the error panel and report a success for
     // text the user could no longer read.
-    expect(await screen.findByText("Couldn't draft that message")).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Copy' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Send & log' })).toBeDisabled();
+    expect(await screen.findByText("Couldn't regenerate the draft")).toBeInTheDocument();
+    expect(screen.getByLabelText('Draft message')).toHaveValue('First draft.');
+    expect(screen.getByRole('button', { name: 'Copy' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Log outreach & follow-up' })).toBeDisabled();
   });
 
   it('says so when there is no clipboard to copy into', async () => {
@@ -205,7 +217,7 @@ describe('Composer states', () => {
     expect(await screen.findByText(/Clipboard is not available here/)).toBeInTheDocument();
   });
 
-  it('clears the evidence chips of the draft that is leaving', async () => {
+  it('keeps the current draft and its evidence while generating a replacement', async () => {
     const user = userEvent.setup();
     let release: (draft: Draft) => void = () => {};
     serveDrafts(
@@ -221,7 +233,8 @@ describe('Composer states', () => {
     await user.click(screen.getByRole('button', { name: 'Regenerate' }));
     // Citations that belong to a draft that is gone must not stand above the
     // skeleton of the one arriving.
-    await waitFor(() => expect(screen.queryByText('met at NeurIPS 2024')).not.toBeInTheDocument());
+    expect(screen.getByText('met at NeurIPS 2024')).toBeInTheDocument();
+    expect(screen.getByLabelText('Draft message')).toHaveValue('First draft.');
 
     release({ body: 'Second draft.', facts: ['shared the Kestrel project'] });
     expect(await screen.findByText('shared the Kestrel project')).toBeInTheDocument();

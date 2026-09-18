@@ -301,6 +301,14 @@ export function Letters() {
             : undefined,
       });
     },
+    onError: (error, { action }) => {
+      const operation = action === 'restore' ? 'restore' : 'archive';
+      const detail = error instanceof Error ? ` ${error.message}` : '';
+      // Keep the confirmation open: the person can retry the same operation
+      // once the transient failure is understood, rather than having to find
+      // this letter again in the register.
+      flash(`Couldn't ${operation} this letter.${detail}`, { variant: 'error' });
+    },
   });
 
   return (
@@ -527,7 +535,9 @@ export function Letters() {
             {mutate.isPending && (
               <StatusTrace
                 tone="live"
-                label={mutate.variables?.action === 'restore' ? 'Restoring letter' : 'Archiving letter'}
+                label={
+                  mutate.variables?.action === 'restore' ? 'Restoring letter' : 'Archiving letter'
+                }
               />
             )}
             {selected.blocks.map((block, i) => (
@@ -598,7 +608,11 @@ export function Letters() {
               options={targets.map((t) => ({ value: t.id, label: targetLabel(t) }))}
             />
           </Field>
-          <Field label="Linked output" htmlFor={`${ids}-resume`} help="Optional. Ties the letter to the résumé you sent with it.">
+          <Field
+            label="Linked output"
+            htmlFor={`${ids}-resume`}
+            help="Optional. Ties the letter to the résumé you sent with it."
+          >
             <Select
               id={`${ids}-resume`}
               label="Linked output"

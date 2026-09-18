@@ -407,6 +407,62 @@ describe('Toast teardown', () => {
 });
 
 describe('Toast actions', () => {
+  it('does not evict an in-flight action when new notifications arrive', async () => {
+    let resolve!: () => void;
+    mount({ onUndo: () => new Promise<void>((done) => { resolve = done; }) });
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Burst' }));
+    expect(screen.getAllByRole('listitem')).toHaveLength(4);
+    expect(screen.getByText('Role deleted')).toBeInTheDocument();
+    expect(screen.getByText('Record 6 saved')).toBeInTheDocument();
+    await act(async () => resolve());
+    expect(screen.queryByText('Role deleted')).not.toBeInTheDocument();
+  });
+
+  it('keeps a pending action visible and prevents duplicate activation or dismissal', async () => {
+    vi.useFakeTimers();
+    let resolve!: () => void;
+    const onUndo = vi.fn(() => new Promise<void>((done) => { resolve = done; }));
+    mount({ onUndo });
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+    const action = screen.getByRole('button', { name: 'Working…' });
+    expect(action).toHaveAttribute('aria-disabled', 'true');
+    fireEvent.click(action);
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+    await act(async () => vi.advanceTimersByTime(20_000));
+    expect(toastFor('Role deleted')).toHaveAttribute('data-state', 'open');
+    expect(onUndo).toHaveBeenCalledTimes(1);
+    await act(async () => resolve());
+    expect(screen.queryByText('Role deleted')).not.toBeInTheDocument();
+  });
+
+  it('retains the failed action for retry, including synchronous failures', async () => {
+    const onUndo = vi.fn().mockImplementationOnce(() => { throw new Error('offline'); }).mockResolvedValueOnce(undefined);
+    const user = userEvent.setup();
+    mount({ onUndo, announcementMode: 'item' });
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    await user.click(screen.getByRole('button', { name: 'Undo' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't complete that action. Try again.");
+    const undo = screen.getByRole('button', { name: 'Undo' });
+    expect(undo).toHaveAttribute('aria-disabled', 'false');
+    await user.click(undo);
+    await waitFor(() => expect(screen.queryByText('Role deleted')).not.toBeInTheDocument());
+    expect(onUndo).toHaveBeenCalledTimes(2);
+  });
+
+  it('can unmount while an action is pending without adding feedback to a dead tree', async () => {
+    let reject!: (error: Error) => void;
+    const onUndo = vi.fn(() => new Promise<void>((_resolve, fail) => { reject = fail; }));
+    const { unmount } = mount({ onUndo });
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+    unmount();
+    await act(async () => reject(new Error('offline')));
+    expect(screen.queryByText('Role deleted')).not.toBeInTheDocument();
+  });
+
   it('runs the action callback and closes the toast', async () => {
     const onUndo = vi.fn();
     const user = userEvent.setup();

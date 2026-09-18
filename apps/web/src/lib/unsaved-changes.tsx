@@ -9,7 +9,7 @@
  * a nav-rail Link is an anchor, Back is a `popstate`, and a reload is
  * `beforeunload`. Guarding them one at a time is how four of the six get
  * missed. This hook funnels all of them into a single question and answers it
- * with the design system's Modal, so the prompt looks like the rest of the
+ * with the design system's ConfirmDialog, so the prompt looks like the rest of the
  * product instead of like `window.confirm`.
  *
  * Wiring, all of it:
@@ -38,12 +38,12 @@
  */
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Glyph, Inline, Modal } from '@vitae/ui';
+import { ConfirmDialog, Glyph, Inline } from '@vitae/ui';
 
 /** The one place the prompt's words live, so tests and screens agree. */
 export const UNSAVED_TITLE = 'Discard changes?';
 export const UNSAVED_BODY =
-  'You have changes that are not saved. Discard drops them. Keep editing returns you to the form.';
+  'Your changes haven’t been saved. Keep editing to continue, or discard them to leave.';
 export const UNSAVED_DISCARD = 'Discard';
 export const UNSAVED_KEEP = 'Keep editing';
 
@@ -74,6 +74,8 @@ export interface UnsavedChangesOptions {
    * while dirty. Default true.
    */
   guardUnload?: boolean;
+  /** A submitted write is not a draft that can safely be discarded. */
+  busy?: boolean;
 }
 
 export interface UnsavedChangesGuard {
@@ -104,7 +106,24 @@ export interface UnsavedChangesGuard {
 /** A pending exit, boxed so `useState` stores it instead of calling it. */
 type Pending = { run: () => void };
 
-export function useUnsavedChanges(dirty: boolean, options: UnsavedChangesOptions = {}): UnsavedChangesGuard {
+// Popstate targets window itself: adding a capture listener after the router
+// does not reliably run it first. Shell imports this module before mounting
+// BrowserRouter, so one app-lifetime dispatcher reserves the earlier slot.
+// Each mounted dirty form subscribes below and removes its callback on cleanup.
+const historyGuards = new Set<(event: PopStateEvent) => void>();
+function dispatchHistoryGuard(event: PopStateEvent) {
+  for (const guard of historyGuards) {
+    guard(event);
+    if (event.cancelBubble) break;
+  }
+}
+if (typeof window !== 'undefined') window.addEventListener('popstate', dispatchHistoryGuard);
+if (import.meta.hot) import.meta.hot.dispose(() => window.removeEventListener('popstate', dispatchHistoryGuard));
+
+export function useUnsavedChanges(
+  dirty: boolean,
+  options: UnsavedChangesOptions = {},
+): UnsavedChangesGuard {
   const {
     onClose,
     title = UNSAVED_TITLE,
@@ -113,6 +132,7 @@ export function useUnsavedChanges(dirty: boolean, options: UnsavedChangesOptions
     keepLabel = UNSAVED_KEEP,
     guardNavigation = true,
     guardUnload = true,
+    busy = false,
   } = options;
 
   const [pending, setPending] = useState<Pending | null>(null);
@@ -199,90 +219,103 @@ export function useUnsavedChanges(dirty: boolean, options: UnsavedChangesOptions
       if (to === `${location.pathname}${location.search}${location.hash}`) return;
 
       event.preventDefault();
-      setPending({ run: () => navigate(to) });
+      setPending({ run: () => { onClose?.(); navigate(to); } });
     }
     document.addEventListener('click', onClick, true);
     return () => document.removeEventListener('click', onClick, true);
-  }, [dirty, guardNavigation, navigate, location.pathname, location.search, location.hash]);
+  }, [dirty, guardNavigation, navigate, location.pathname, location.search, location.hash, onClose]);
 
   // Browser Back and Forward, which is how a page-level form is usually left.
   // A same-document history move fires neither a click nor beforeunload, so
   // without this the commonest exit is the one the guard misses.
   //
-  // By the time popstate runs, the history index has already moved and
-  // react-router has queued a render of the entry the user landed on. Pushing
-  // this form's URL straight back on lands in the same batch, so the form is
-  // never actually left, and the entry they were trying to reach is now
-  // exactly one step back, which is what Discard runs.
+  // The dispatcher runs before BrowserRouter's listener. Restore its known
+  // history index before asking, without pushing a replacement entry (which
+  // would erase Forward history). The route and form stay mounted throughout.
   useEffect(() => {
     if (!dirty || !guardNavigation) return;
     const here = `${location.pathname}${location.search}${location.hash}`;
-    function onPopState() {
+    const hereIndex: unknown = window.history.state?.idx;
+    let restoring: Pending | null = null;
+    function onPopState(event: PopStateEvent) {
       // Discard's own navigate(-1) fires popstate as well. Without this the
       // guard would catch the exit it just authorised and ask again, forever.
       if (bypassPop.current) {
         bypassPop.current = false;
         return;
       }
+      if (restoring) {
+        event.stopImmediatePropagation();
+        setPending(restoring);
+        restoring = null;
+        return;
+      }
+      const destinationIndex: unknown = event.state?.idx;
+      if (typeof hereIndex === 'number' && typeof destinationIndex === 'number' && destinationIndex !== hereIndex) {
+        event.stopImmediatePropagation();
+        restoring = {
+          run: () => {
+            bypassPop.current = true;
+            onClose?.();
+            navigate(destinationIndex - hereIndex);
+          },
+        };
+        window.history.go(hereIndex - destinationIndex);
+        return;
+      }
+      // Memory routers and older, unindexed entries cannot be traversed by
+      // index. Keep the existing fallback for those callers.
       navigate(here);
       setPending({
         run: () => {
           bypassPop.current = true;
+          onClose?.();
           navigate(-1);
         },
       });
     }
-    window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
-  }, [dirty, guardNavigation, navigate, location.pathname, location.search, location.hash]);
+    historyGuards.add(onPopState);
+    return () => { historyGuards.delete(onPopState); };
+  }, [dirty, guardNavigation, navigate, location.pathname, location.search, location.hash, onClose]);
 
-  // This is ConfirmDialog's markup, assembled here on the same Modal primitive
-  // for exactly one reason: ConfirmDialog autoFocuses its confirm button, and
-  // the confirm here is the destructive answer. Escape-then-Enter, or a stray
-  // Enter while the question is up, would then destroy the work this prompt
-  // exists to protect. The safe answer owns the focus instead. The day
-  // ConfirmDialog exposes which button opens focused, this goes back to using
-  // it.
   const prompt = (
-    <Modal
+    <ConfirmDialog
       open={pending !== null}
       onOpenChange={(open) => {
         // Escaping the prompt itself is "Keep editing": the safe answer.
         if (!open) setPending(null);
       }}
-      title={title}
-      size="sm"
-      footer={
-        <>
-          <Button autoFocus onClick={() => setPending(null)}>
-            {keepLabel}
-          </Button>
-          <Button
-            variant="danger"
-            className="vt-btn--danger-fill"
-            onClick={() => {
-              const run = pending?.run;
-              setPending(null);
-              run?.();
-            }}
-          >
-            {discardLabel}
-          </Button>
-        </>
-      }
-    >
-      <div className="vt-modal__confirm-body">
-        {body ?? (
-          // Non-negotiable 6: the danger state carries a glyph and a word, not
-          // the red fill on the Discard button alone.
+      title={busy ? 'Saving changes…' : title}
+      body={
+        busy ? 'Your save is still in progress. Wait for it to finish before leaving.' : body ?? (
           <Inline gap={2} align="start">
             <Glyph name="alert" size={14} />
             <span>{UNSAVED_BODY}</span>
           </Inline>
-        )}
-      </div>
-    </Modal>
+        )
+      }
+      cancelLabel={busy ? 'Stay here' : keepLabel}
+      cancelDisabled={false}
+      confirmLabel={busy ? 'Saving…' : discardLabel}
+      destructive={!busy}
+      busy={busy}
+      initialFocus="cancel"
+      onConfirm={() => {
+        if (busy) return;
+        const run = pending?.run;
+        setPending(null);
+        run?.();
+      }}
+    />
   );
 
-  return { dirty, prompting: pending !== null, onOpenChange, requestClose, attempt, forceClose, prompt };
+  return {
+    dirty,
+    prompting: pending !== null,
+    onOpenChange,
+    requestClose,
+    attempt,
+    forceClose,
+    prompt,
+  };
 }

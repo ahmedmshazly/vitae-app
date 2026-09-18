@@ -196,11 +196,12 @@ describe('compatibility aliases', () => {
     expect(dangling).toEqual([]);
   });
 
-  /* A literal would pin the old identity's colour onto the alias, so switching
-     to dark or high contrast would move --bg and leave --ae-bg where it was.
-     The type scale and the semantic states are the documented exceptions. */
+  /* A literal would pin a colour onto the alias, so switching themes would
+     move --bg and leave --ae-bg where it was. The type scale is the sole
+     documented exception; semantic outcome colours now have their own
+     theme-aware ramp. */
   it('routes the themeable aliases through a new token rather than copying a value', () => {
-    const exempt = /^--ae-(text-|leading-|success|warning|danger|ember|info)/;
+    const exempt = /^--ae-(text-|leading-)/;
     const copied = QUIET_ALIASES.filter(
       (name) => !exempt.test(name) && !ROOT.get(name)?.startsWith('var('),
     );
@@ -232,19 +233,33 @@ describe('compatibility aliases', () => {
     expect(resolve('--ae-accent-2')).toBe(resolve('--sched'));
   });
 
-  it('keeps the semantic states literal, because no quadrant colour means them', () => {
-    expect(resolve('--ae-success')).toBe('#7eb795');
-    expect(resolve('--ae-warning')).toBe('#c8a344');
-    expect(resolve('--ae-danger')).toBe('#e17263');
-    expect(resolve('--ae-ember')).toBe('#c98a3d');
-    expect(resolve('--ae-info')).toBe('#9a9484');
+  it('routes semantic outcomes through their own theme-aware ramp', () => {
+    expect(ROOT.get('--ae-success')).toBe('var(--success)');
+    expect(ROOT.get('--ae-warning')).toBe('var(--warning)');
+    expect(ROOT.get('--ae-danger')).toBe('var(--danger)');
+    expect(ROOT.get('--ae-ember')).toBe('var(--ember)');
+    expect(ROOT.get('--ae-info')).toBe('var(--info)');
   });
 });
 
 describe('themes', () => {
+  it.each([
+    [":root,\n[data-theme='light']", '#ffffff'],
+    ["[data-theme='dark']", '#0b0b0d'],
+    ["[data-theme='hc']", '#ffffff'],
+    ['@media (prefers-color-scheme: dark)', '#0b0b0d'],
+    ['@media (prefers-contrast: more)', '#ffffff'],
+  ])('gives destructive fills independent, readable ink in %s', (selector, ink) => {
+    expect(declarations(blockBody(selector)).get('--ae-danger-ink')).toBe(ink);
+  });
   it('makes light the default, so a document with no data-theme is still styled', () => {
-    expect(ROOT.get('--bg')).toBe('#f2f0ea');
-    expect(ROOT.get('--ink')).toBe('#0b0b0d');
+    expect(ROOT.get('--bg')).toBe('#f7f4ed');
+    expect(ROOT.get('--bg-2')).toBe('#ece7dc');
+    expect(ROOT.get('--card')).toBe('#ffffff');
+    expect(ROOT.get('--ink')).toBe('#20231f');
+    expect(ROOT.get('--ink-2')).toBe('#68685f');
+    expect(ROOT.get('--deleg')).toBe('#c28a17');
+    expect(ROOT.get('--sched')).toBe('#285ba7');
   });
 
   /* Every surface and ink the aliases reach has to be redeclared per theme, or
@@ -253,9 +268,14 @@ describe('themes', () => {
     'gives %s its own value for every aliased surface and ink',
     (selector) => {
       const theme = declarations(blockBody(selector));
-      for (const token of ['--bg', '--bg-2', '--card', '--ink', '--ink-2', '--line']) {
+      for (const token of [
+        '--bg', '--bg-2', '--card', '--ink', '--ink-2', '--line', '--success', '--warning',
+        '--danger', '--ember', '--info', '--viz-1', '--viz-2', '--viz-3', '--viz-4',
+        '--viz-5', '--viz-6', '--viz-7', '--viz-8',
+      ]) {
         expect(theme.has(token), `${selector} does not redeclare ${token}`).toBe(true);
       }
+      expect(blockBody(selector)).toMatch(/color-scheme:\s*(light|dark)/);
     },
   );
 

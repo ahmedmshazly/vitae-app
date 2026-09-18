@@ -161,6 +161,19 @@ describe('Templates states', () => {
     expect(notice.closest('[role="status"]')).not.toBeNull();
   });
 
+  it('names a failed default change and leaves that layout available to retry', async () => {
+    mockApi.patch.mockRejectedValueOnce(new Error('default preference is unavailable'));
+    render();
+    await screen.findByRole('article', { name: 'Cobalt' });
+
+    await userEvent.click(screen.getByRole('button', { name: 'Make default: Onyx' }));
+
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent("Couldn't make Onyx the default");
+    expect(alert).toHaveTextContent('default preference is unavailable');
+    expect(screen.getByRole('button', { name: 'Make default: Onyx' })).toBeEnabled();
+  });
+
   it('names every accent a layout offers instead of leaving it to hue', async () => {
     render();
     const onyx = await screen.findByRole('article', { name: 'Onyx' });

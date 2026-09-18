@@ -14,7 +14,7 @@ import {
   type ToastOptions as LedgerToastOptions,
 } from '@vitae/ui';
 
-type ToastVariant = 'status' | 'error';
+type ToastVariant = 'status' | 'success' | 'error';
 
 interface ToastOptions {
   undo?: () => void | Promise<void>;
@@ -41,8 +41,8 @@ export function flashToast(message: string): void {
   globalFlash?.(message, { variant: 'error' });
 }
 
-/** Preserve the app contract: Undo used to remain available for eight seconds. */
-const UNDO_MS = 8000;
+/** An action must stay available long enough to be found and understood. */
+const UNDO_MS = 12_000;
 
 function ToastBridge({ children }: { children: ReactNode }) {
   const { toast } = useLedgerToast();
@@ -54,19 +54,12 @@ function ToastBridge({ children }: { children: ReactNode }) {
       };
 
       if (opts?.undo) {
-        const undo = opts.undo;
         options.duration = UNDO_MS;
         options.action = {
           label: 'Undo',
-          onAction: () => {
-            try {
-              void Promise.resolve(undo()).catch(() => {
-                toast("Couldn't undo that change", { variant: 'error' });
-              });
-            } catch {
-              toast("Couldn't undo that change", { variant: 'error' });
-            }
-          },
+          pendingLabel: 'Undoing…',
+          errorMessage: "Couldn't undo that change. Try again.",
+          onAction: opts.undo,
         };
       }
 

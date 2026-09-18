@@ -14,6 +14,31 @@ beforeEach(() => {
 });
 
 describe('EntityPicker', () => {
+  it('offers only existing records in a link-only workflow', async () => {
+    mockApi.get.mockResolvedValue({ results: [] });
+    renderWithApp(<EntityPicker types={['task']} allowCreate={false} onPick={vi.fn()} />);
+    await userEvent.type(screen.getByRole('combobox'), 'Prerequisite');
+    await waitFor(() => expect(mockApi.get).toHaveBeenCalled());
+    await waitFor(() => expect(screen.queryByText('Searching records...')).not.toBeInTheDocument());
+    expect(screen.queryByRole('option', { name: /Create/ })).not.toBeInTheDocument();
+    expect(mockApi.post).not.toHaveBeenCalled();
+  });
+  it('keeps a large type catalog compact without hiding its choices', async () => {
+    const user = userEvent.setup();
+    mockApi.get.mockResolvedValue({ results: [] });
+    renderWithApp(
+      <EntityPicker
+        types={['person', 'organization', 'role', 'project', 'skill']}
+        onPick={vi.fn()}
+      />,
+    );
+    await user.click(screen.getByRole('combobox', { name: 'Record type' }));
+    await user.click(screen.getByRole('option', { name: 'skill' }));
+    await user.type(screen.getByRole('combobox', { name: /^Search/ }), 'Design');
+    await waitFor(() =>
+      expect(mockApi.get).toHaveBeenCalledWith(expect.stringContaining('types=skill')),
+    );
+  });
   it('searches switch results and calls onPick when a hit is chosen', async () => {
     const user = userEvent.setup();
     const onPick = vi.fn();
@@ -62,7 +87,7 @@ describe('EntityPicker', () => {
     renderWithApp(<EntityPicker types={['person']} onPick={vi.fn()} />);
     await user.type(screen.getByRole('combobox'), 'Ada');
 
-    expect(await screen.findByText('Search is unavailable')).toBeInTheDocument();
+    expect(await screen.findByText('Search failed.')).toBeInTheDocument();
     expect(screen.getByText('switch is down')).toBeInTheDocument();
     // The way forward is still offered: a dead search does not block creating.
     expect(screen.getByRole('option', { name: /Create person/ })).toBeInTheDocument();
@@ -107,6 +132,9 @@ describe('EntityPicker', () => {
 
     answer!({ results: [{ id: 'p1', type: 'person', title: 'Ada Lovelace' }] });
     await screen.findByRole('option', { name: /Ada Lovelace/ });
+    // A result is not current until the person chooses it. This is the shared
+    // combobox contract: Enter on an untouched list is left to the form.
+    await user.keyboard('{ArrowDown}');
     await user.keyboard('{Enter}');
 
     expect(onPick).toHaveBeenCalledWith({ id: 'p1', type: 'person', title: 'Ada Lovelace' });

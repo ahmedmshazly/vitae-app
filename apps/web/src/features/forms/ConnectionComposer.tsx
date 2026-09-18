@@ -17,11 +17,7 @@ import {
   type NodeType,
 } from '@vitae/core';
 import { EntityPicker, type PickedEntity } from '../../components/EntityPicker.js';
-import {
-  InlinePropInput,
-  newDraftKey,
-  type ConnectionDraft,
-} from './EdgeSubEditorRow.js';
+import { InlinePropInput, newDraftKey, type ConnectionDraft } from './EdgeSubEditorRow.js';
 
 export type { ConnectionOption };
 
@@ -89,39 +85,43 @@ export function ConnectionComposer({
       </div>
 
       {additional.map((draft) => (
-        <div key={draft.key} className="edgesub__row">
+        <div key={draft.key} className="edgesub__row connection-composer__draft">
+          <div className="connection-composer__identity">
+            <EntityGlyph type={draft.target.type} size="sm" />
+            <span className="edgesub__title">{draft.target.title}</span>
+            <button
+              type="button"
+              className="vt-strlist__x"
+              aria-label={`Unlink ${draft.target.title}`}
+              onClick={() => onChange(drafts.filter((item) => item.key !== draft.key))}
+            >
+              ×
+            </button>
+          </div>
           <Chip mono>
             {draft.sub.direction === 'out' ? '→' : '←'} {draft.sub.label}
           </Chip>
-          <EntityGlyph type={draft.target.type} size="sm" />
-          <span className="edgesub__title">{draft.target.title}</span>
           <Chip mono>{draft.target.type}</Chip>
-          {(draft.sub.inlineProps ?? []).map((field) => (
-            <span key={field.key} className="edgesub__prop">
-              <InlinePropInput
-                field={field}
-                ownerType={draft.sub.edgeType}
-                value={draft.props[field.key]}
-                onChange={(value) =>
-                  onChange(
-                    drafts.map((item) =>
-                      item.key === draft.key
-                        ? { ...item, props: { ...item.props, [field.key]: value } }
-                        : item,
-                    ),
-                  )
-                }
-              />
-            </span>
-          ))}
-          <button
-            type="button"
-            className="vt-strlist__x"
-            aria-label={`Unlink ${draft.target.title}`}
-            onClick={() => onChange(drafts.filter((item) => item.key !== draft.key))}
-          >
-            ×
-          </button>
+          <div className="connection-composer__properties">
+            {(draft.sub.inlineProps ?? []).map((field) => (
+              <Field key={field.key} label={field.label} help={field.help}>
+                <InlinePropInput
+                  field={field}
+                  ownerType={draft.sub.edgeType}
+                  value={draft.props[field.key]}
+                  onChange={(value) =>
+                    onChange(
+                      drafts.map((item) =>
+                        item.key === draft.key
+                          ? { ...item, props: { ...item.props, [field.key]: value } }
+                          : item,
+                      ),
+                    )
+                  }
+                />
+              </Field>
+            ))}
+          </div>
         </div>
       ))}
 
@@ -187,9 +187,7 @@ export function ConnectionComposer({
                   field={field}
                   ownerType={selected.descriptor.type}
                   value={props[field.key]}
-                  onChange={(value) =>
-                    setProps((current) => ({ ...current, [field.key]: value }))
-                  }
+                  onChange={(value) => setProps((current) => ({ ...current, [field.key]: value }))}
                 />
               </Field>
             ))}

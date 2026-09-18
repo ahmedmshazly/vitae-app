@@ -438,6 +438,16 @@ describe('useUnsavedChanges, links it must not touch', () => {
 });
 
 describe('useUnsavedChanges, the options and what it returns', () => {
+  it('does not offer to discard a submitted write while it is pending', async () => {
+    const user = userEvent.setup();
+    renderWithApp(<OptionsHarness dirty options={{ busy: true }} />);
+    await user.click(screen.getByRole('button', { name: 'Next record' }));
+    expect(screen.getByRole('dialog', { name: 'Saving changes…' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Saving…' })).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: 'Stay here' }));
+    expect(screen.getByText('showing this record')).toBeInTheDocument();
+  });
+
   it('reports dirty and prompting, and runs an attempt once the user picks Discard', async () => {
     const user = userEvent.setup();
     renderWithApp(<OptionsHarness dirty />);

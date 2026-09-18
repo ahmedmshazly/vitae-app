@@ -6,6 +6,7 @@ export * from './overlay.js';
 export * from './feedback.js';
 export * from './layout.js';
 export * from './toast.js';
+export * from './combobox.js';
 export * from './theme-provider.js';
 
 // Hooks. The package still carries no animation runtime dependency: both of

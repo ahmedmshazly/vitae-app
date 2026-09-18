@@ -11,6 +11,27 @@ import { expectNoA11yViolations } from './helpers/a11y';
 const ME = '**/api/v1/auth/me';
 const DEV_LOGIN = '**/api/v1/auth/dev-login';
 
+test('sign-in stays visible at phone, tablet and desktop sizes', async ({ page }, testInfo) => {
+  test.setTimeout(60_000);
+  for (const viewport of [
+    { width: 390, height: 844 },
+    { width: 834, height: 1112 },
+    { width: 1440, height: 900 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/signin');
+    const signIn = page.getByRole('button', { name: /developer sign-in/i });
+    await expect(signIn).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    const bounds = await signIn.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(bounds!.y + bounds!.height).toBeLessThan(viewport.height);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await expectNoA11yViolations(page);
+    await page.screenshot({ path: testInfo.outputPath(`signin-${viewport.width}.png`), fullPage: true });
+  }
+});
+
 test('the front door is flat, no wash, no glass, no looping motion', async ({ page }) => {
   await page.goto('/signin');
   await page.getByRole('button', { name: /developer sign-in/i }).waitFor();

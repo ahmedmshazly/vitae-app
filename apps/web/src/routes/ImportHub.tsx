@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Button,
   Chip,
+  ConfirmDialog,
   EmptyState,
   ErrorState,
   Field,
@@ -278,6 +279,8 @@ export function commitAction(
 /** Bulk seeding with staging, review, commit, and per-batch rollback. */
 export function ImportHub() {
   const [active, setActive] = useState<string | null>(null);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const [confirmRollbackId, setConfirmRollbackId] = useState<string | null>(null);
   const [pasteOpen, setPasteOpen] = useState(false);
   const [pasteText, setPasteText] = useState('');
   const [mapperCsv, setMapperCsv] = useState<{
@@ -486,6 +489,7 @@ export function ImportHub() {
   const discard = useMutation({
     mutationFn: () => api.post(`/imports/${active}/discard`),
     onSuccess: () => {
+      setConfirmDiscard(false);
       void qc.invalidateQueries({ queryKey: ['imports'] });
       setActive(null);
       flash('Staged import discarded. Nothing was written');
@@ -500,6 +504,7 @@ export function ImportHub() {
         refused?: Array<{ node_id: string; title: string; reason: string }>;
       }>(`/imports/${id}/rollback`),
     onSuccess: (r) => {
+      setConfirmRollbackId(null);
       void qc.invalidateQueries();
       if (active) setActive(null);
       // A refusal is the interesting half of a partial rollback, so it is named
@@ -548,6 +553,11 @@ export function ImportHub() {
   const busy = Boolean(reading) || stage.isPending || githubSync.isPending;
   const preparingSource = pasteOpen || Boolean(mapperCsv);
   const rollingBack = history.find((b) => b.id === rollback.variables);
+  const rollbackTarget = confirmRollbackId
+    ? (history.find((b) => b.id === confirmRollbackId) ??
+      (batch.data?.batch.id === confirmRollbackId ? batch.data.batch : undefined))
+    : undefined;
+  const discardRows = batch.data?.rows.length ?? 0;
 
   // Staging drops Review below the source register and the paste editor, far
   // enough down a full ledger to land off-screen. Focus follows the work, the
@@ -729,6 +739,46 @@ export function ImportHub() {
         ) : null}
       </div>
 
+      <ConfirmDialog
+        open={confirmDiscard}
+        onOpenChange={setConfirmDiscard}
+        title="Discard staged import?"
+        body={
+          <p>
+            This removes {discardRows === 1 ? 'the 1 staged row' : `all ${discardRows} staged rows`}{' '}
+            and its review decisions. Nothing has been written to your graph.
+          </p>
+        }
+        confirmLabel={discard.isPending ? 'Discarding...' : 'Discard staged import'}
+        destructive
+        busy={discard.isPending}
+        initialFocus="cancel"
+        onConfirm={() => discard.mutate()}
+      />
+
+      <ConfirmDialog
+        open={Boolean(confirmRollbackId)}
+        onOpenChange={(open) => {
+          if (!open) setConfirmRollbackId(null);
+        }}
+        title={`Roll back ${rollbackTarget?.kind ?? 'this'} import?`}
+        body={
+          <p>
+            This removes the {rollbackTarget?.stats.created ?? rollbackTarget?.stats.rows ?? 0}{' '}
+            record
+            {rollbackTarget?.stats.created === 1 ? '' : 's'} this batch created. Records edited
+            since import stay protected. This recovery action cannot itself be undone.
+          </p>
+        }
+        confirmLabel={rollback.isPending ? 'Rolling back...' : 'Roll back batch'}
+        destructive
+        busy={rollback.isPending}
+        initialFocus="cancel"
+        onConfirm={() => {
+          if (confirmRollbackId) rollback.mutate(confirmRollbackId);
+        }}
+      />
+
       <input
         ref={fileInput}
         type="file"
@@ -824,7 +874,11 @@ export function ImportHub() {
                 disabled={!pasteText.trim() || stage.isPending}
                 onClick={() => stage.mutate({ kind: pendingKind, content: pasteText })}
               >
-                {stage.isPending ? 'Staging...' : pendingKind === 'tasks_text' ? 'Stage' : 'Disassemble'}
+                {stage.isPending
+                  ? 'Staging...'
+                  : pendingKind === 'tasks_text'
+                    ? 'Stage'
+                    : 'Disassemble'}
               </Button>
               <Button onClick={() => setPasteOpen(false)}>Cancel</Button>
             </div>
@@ -911,7 +965,12 @@ export function ImportHub() {
                               disabled={rowDecision.isPending}
                               onToggleField={
                                 isStaged
-                                  ? (fields) => rowDecision.mutate({ rowId: r.id, decision: r.decision, fields })
+                                  ? (fields) =>
+                                      rowDecision.mutate({
+                                        rowId: r.id,
+                                        decision: r.decision,
+                                        fields,
+                                      })
                                   : undefined
                               }
                             />
@@ -1020,14 +1079,18 @@ export function ImportHub() {
                   <Mono className="data-import-tally">
                     {rows.filter((r) => !r.dup && !r.proposal).length} new ·{' '}
                     {rows.filter((r) => r.proposal && r.proposal.fields.length > 0).length} to
-                    update · {rows.filter((r) => r.proposal && r.proposal.fields.length === 0).length}{' '}
+                    update ·{' '}
+                    {rows.filter((r) => r.proposal && r.proposal.fields.length === 0).length}{' '}
                     already matched · {rows.filter((r) => r.dup && !r.proposal).length} candidates ·{' '}
                     {rows.filter((r) => r.status === 'committed').length} committed
                   </Mono>
                   <div className="hstack">
                     {isStaged ? (
                       <>
-                        <Button onClick={() => discard.mutate()} disabled={discard.isPending}>
+                        <Button
+                          onClick={() => setConfirmDiscard(true)}
+                          disabled={discard.isPending}
+                        >
                           {discard.isPending ? 'Discarding...' : 'Discard'}
                         </Button>
                         <Button
@@ -1043,7 +1106,7 @@ export function ImportHub() {
                     ) : batch.data.batch.status === 'committed' ? (
                       <Button
                         variant="danger"
-                        onClick={() => rollback.mutate(active)}
+                        onClick={() => setConfirmRollbackId(active)}
                         disabled={rollback.isPending}
                         aria-label={`Roll back ${batch.data.batch.kind} import from ${batch.data.batch.created_at.slice(0, 10)}: ${batch.data.batch.stats.created ?? batch.data.batch.stats.rows} records`}
                       >
@@ -1134,7 +1197,7 @@ export function ImportHub() {
                     <Button
                       size="sm"
                       variant="danger"
-                      onClick={() => rollback.mutate(b.id)}
+                      onClick={() => setConfirmRollbackId(b.id)}
                       disabled={rollback.isPending}
                       aria-label={`Roll back ${b.kind} import from ${when}: ${created} records`}
                     >

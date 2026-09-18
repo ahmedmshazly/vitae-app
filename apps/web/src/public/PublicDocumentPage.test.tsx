@@ -50,6 +50,21 @@ describe('public document pages', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'That public page is not available.',
     );
+    expect(screen.getByRole('link', { name: 'Browse Vitae guides' })).toHaveAttribute(
+      'href',
+      '/guides',
+    );
+    expect(screen.getByRole('link', { name: 'Go to Vitae home' })).toHaveAttribute('href', '/');
+  });
+
+  it('does not pretend an unknown public document is a guide, and keeps a clear home recovery', () => {
+    renderWithApp(<PublicDocumentPage />, { route: '/legal/does-not-exist' });
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'That public page is not available.',
+    );
+    expect(screen.getByText('Use the home page to continue exploring Vitae.')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Browse Vitae guides' })).toBeNull();
     expect(screen.getByRole('link', { name: 'Go to Vitae home' })).toHaveAttribute('href', '/');
   });
 });

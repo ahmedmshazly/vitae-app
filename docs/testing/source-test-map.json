@@ -275,13 +275,15 @@
     "apps/api/src/env.ts": {
       "risk": "medium",
       "layers": [
+        "unit",
         "integration"
       ],
-      "status": "deferred",
+      "status": "covered",
       "tests": [
+        "apps/api/src/env.local-install.test.ts",
         "apps/api/src/__tests__/api.integration.test.ts"
       ],
-      "note": "Covered by the monolith integration suite until route-focused splits land."
+      "note": "Boot combinations for VITAE_LOCAL_INSTALL live next to the API env import; hosted refusals stay in the same suite."
     },
     "apps/api/src/firebase.ts": {
       "risk": "medium",
@@ -445,6 +447,7 @@
       ],
       "tests": [
         "apps/api/src/routes/v1/auth.integration.test.ts",
+        "apps/api/src/routes/v1/auth.local-install.test.ts",
         "apps/api/src/middleware/auth.test.ts"
       ],
       "status": "covered"
@@ -646,6 +649,16 @@
       ],
       "status": "covered"
     },
+    "apps/api/src/routes/v1/objects.ts": {
+      "risk": "medium",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/routes/v1/objects.test.ts"
+      ]
+    },
     "apps/api/src/routes/v1/orgs.ts": {
       "risk": "medium",
       "layers": [
@@ -734,7 +747,8 @@
       ],
       "status": "covered",
       "tests": [
-        "apps/api/src/routes/v1/settings.integration.test.ts"
+        "apps/api/src/routes/v1/settings.integration.test.ts",
+        "apps/api/src/routes/v1/settings.gemini.integration.test.ts"
       ]
     },
     "apps/api/src/routes/v1/status.ts": {
@@ -1036,7 +1050,8 @@
       ],
       "status": "covered",
       "tests": [
-        "apps/api/src/routes/v1/settings.integration.test.ts"
+        "apps/api/src/routes/v1/settings.integration.test.ts",
+        "apps/api/src/routes/v1/settings.gemini.integration.test.ts"
       ]
     },
     "apps/api/src/services/storage/adapter.ts": {
@@ -1060,6 +1075,16 @@
         "apps/api/src/__tests__/api.integration.test.ts"
       ],
       "note": "Covered by the monolith integration suite until route-focused splits land."
+    },
+    "apps/api/src/services/storage/filesystem.ts": {
+      "risk": "high",
+      "layers": [
+        "unit"
+      ],
+      "status": "covered",
+      "tests": [
+        "apps/api/src/services/storage/filesystem.test.ts"
+      ]
     },
     "apps/api/src/services/subjects.ts": {
       "risk": "medium",

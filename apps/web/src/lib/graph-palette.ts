@@ -55,36 +55,32 @@ export interface GraphPalette {
   slots: string[]; // viz-1..viz-8
 }
 
-export function readGraphPalette(): GraphPalette {
+export function readGraphPalette(theme: 'light' | 'dark' | 'hc' = 'light'): GraphPalette {
   const style = getComputedStyle(document.documentElement);
   const v = (name: string, fallback: string) => style.getPropertyValue(name).trim() || fallback;
+  const atlas = theme === 'light'
+    ? { bg: '#e9e2ed', plate: '#f5f0f7', fg: '#171622', muted: '#565066', border: '#b8adc4', accent: '#6e56bd', accentSoft: '#baa4ed', dim: '#938b9e', slots: ['#247b76', '#6e56bd', '#a95928', '#5e7098', '#9b5a83', '#6d7441', '#9b6372', '#64708a'] }
+    : theme === 'hc'
+      ? { bg: '#11101a', plate: '#050509', fg: '#ffffff', muted: '#e4d8ff', border: '#ffffff', accent: '#e4d8ff', accentSoft: '#a5fff5', dim: '#b9b0c8', slots: ['#a5fff5', '#e4d8ff', '#ffd0a4', '#bcd3ff', '#ffb4d4', '#e4ffab', '#ffc58e', '#d5e1ff'] }
+      : { bg: '#242132', plate: '#171622', fg: '#f5f0f7', muted: '#c7bfd0', border: '#5a5366', accent: '#baa4ed', accentSoft: '#7cc9c1', dim: '#71697e', slots: ['#7cc9c1', '#baa4ed', '#f0b385', '#8ba2d6', '#d98ab6', '#b7ca7b', '#d58b98', '#a9b5d1'] };
   return {
-    bg: v('--ae-bg', '#0f0f0f'),
-    border: v('--ae-border', '#2b2b2b'),
-    borderStrong: v('--ae-border-strong', '#3f3f3f'),
-    muted: v('--ae-muted', '#a3a3a0'),
-    faint: v('--ae-faint', '#8f8f8c'),
-    fg: v('--ae-fg', '#e8e8e6'),
-    accent: v('--ae-accent', '#fafaf8'),
-    accentSoft: v('--ae-accent-soft', '#c9c9c6'),
-    plate: v('--ae-bg', '#0f0f0f'),
-    dim: v('--ae-border', '#2b2b2b'),
+    bg: atlas.bg,
+    border: atlas.border,
+    borderStrong: atlas.border,
+    muted: atlas.muted,
+    faint: atlas.muted,
+    fg: atlas.fg,
+    accent: atlas.accent,
+    accentSoft: atlas.accentSoft,
+    plate: atlas.plate,
+    dim: atlas.dim,
     // Was hardcoded to 'IBM Plex Sans' in the draw call, which is the app's
     // *previous* sans face, still shipped for the entity catalogue, so the
     // labels really did render in it, in a typeface used nowhere else on
-    // screen. The identity's sans is Instrument Sans.
-    fontSans: v('--ae-font-sans', "'Instrument Sans Variable', ui-sans-serif, sans-serif"),
-    fontMono: v('--ae-font-mono', "'IBM Plex Mono', ui-monospace, monospace"),
-    slots: [
-      v('--ae-viz-1', '#1f9c86'),
-      v('--ae-viz-2', '#b08a18'),
-      v('--ae-viz-3', '#6e8fd0'),
-      v('--ae-viz-4', '#c8503f'),
-      v('--ae-viz-5', '#a87bc0'),
-      v('--ae-viz-6', '#7e9b3a'),
-      v('--ae-viz-7', '#d4649b'),
-      v('--ae-viz-8', '#c56a2a'),
-    ],
+    // screen. The identity's sans is Space Grotesk.
+    fontSans: v('--ae-font-sans', "'Space Grotesk', ui-sans-serif, sans-serif"),
+    fontMono: v('--ae-font-mono', "'Space Mono', ui-monospace, monospace"),
+    slots: atlas.slots,
   };
 }
 

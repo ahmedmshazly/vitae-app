@@ -39,7 +39,7 @@ describe('SuggestTextInput reports what it could not do', () => {
 
     await user.type(screen.getByRole('combobox', { name: 'Company' }), 'Acme');
 
-    expect(await screen.findByText('Suggestions unavailable')).toBeInTheDocument();
+    expect(await screen.findByText('Search failed.')).toBeInTheDocument();
     expect(screen.getByText('suggest is down')).toBeInTheDocument();
   });
 
@@ -97,7 +97,9 @@ describe('SuggestTextInput will not mint a duplicate', () => {
 
     await user.type(screen.getByRole('combobox', { name: 'Company' }), 'Acme Labs');
 
-    expect(await screen.findByRole('option', { name: /Create organization 'Acme Labs'/ })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('option', { name: /Create organization 'Acme Labs'/ }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -119,21 +121,19 @@ describe('SuggestTextInput keeps the combobox contract', () => {
     await user.type(input, 'Acme');
     await screen.findByRole('option', { name: /Acme Corp/ });
 
-    // A new term sends the highlight back to the first option, which is right.
+    // A new term intentionally leaves no option current. Arrowing is the
+    // explicit commitment that makes aria-activedescendant truthful.
     // On a loaded machine the keystrokes can spread past the 140ms debounce, so
     // read the term off the list itself rather than off the clock: while the
     // lookup still trails the typing, the exact match is one of the rows.
     await waitFor(() => expect(screen.queryByRole('option', { name: /^Acme ×9/ })).toBeNull());
 
-    expect(input).toHaveAttribute(
-      'aria-activedescendant',
-      screen.getByRole('option', { name: /Acme Corp/ }).id,
-    );
+    expect(input).not.toHaveAttribute('aria-activedescendant');
 
     await user.keyboard('{ArrowDown}');
     expect(input).toHaveAttribute(
       'aria-activedescendant',
-      screen.getByRole('option', { name: /Acme Labs/ }).id,
+      screen.getByRole('option', { name: /Acme Corp/ }).id,
     );
   });
 
@@ -150,7 +150,7 @@ describe('SuggestTextInput keeps the combobox contract', () => {
 
     expect(input).toHaveAttribute(
       'aria-controls',
-      screen.getByRole('listbox', { name: 'Matching values' }).id,
+      screen.getByRole('listbox', { name: 'Company' }).id,
     );
   });
 });

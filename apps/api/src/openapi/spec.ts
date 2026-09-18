@@ -78,6 +78,48 @@ function mergePaths(...parts: PathsObject[]): PathsObject {
 
 function detailedPaths(): PathsObject {
   return {
+    '/graph/discovery': {
+      get: op('getGraphDiscovery', 'Analyze communities, bridges, and disconnected records across the live workspace', {
+        tags: ['graph'],
+        responses: {
+          '200': {
+            description: 'Community discovery overview',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/GraphDiscovery' } } },
+          },
+        },
+      }),
+    },
+    '/graph/discovery/community/{communityId}': {
+      get: op('getGraphCommunity', 'Read a page of community members and a bounded graph scene', {
+        tags: ['graph'],
+        parameters: [
+          { name: 'communityId', in: 'path', required: true, schema: { type: 'string' } },
+          { name: 'offset', in: 'query', schema: { type: 'integer', minimum: 0 } },
+          { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 250 } },
+          { name: 'q', in: 'query', schema: { type: 'string' } },
+        ],
+        responses: {
+          '200': { description: 'Community detail' },
+          '404': errorResponse('Community not found'),
+        },
+      }),
+    },
+    '/graph/discovery/connection': {
+      get: op('getGraphCommunityConnection', 'Read the recorded relationships joining two communities', {
+        tags: ['graph'],
+        parameters: [
+          { name: 'from', in: 'query', required: true, schema: { type: 'string' } },
+          { name: 'to', in: 'query', required: true, schema: { type: 'string' } },
+          { name: 'offset', in: 'query', schema: { type: 'integer', minimum: 0 } },
+          { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 250 } },
+        ],
+        responses: {
+          '200': { description: 'Supporting relationships' },
+          '400': errorResponse('Both community IDs are required'),
+          '404': errorResponse('Community connection not found'),
+        },
+      }),
+    },
     '/auth/dev-login': {
       post: op('authDevLogin', 'Developer sign-in (dev only)', {
         tags: ['auth'],
@@ -151,6 +193,25 @@ function detailedPaths(): PathsObject {
               },
             },
           },
+        },
+      }),
+    },
+    '/objects': {
+      get: op('getStoredObject', 'Download a privately stored object by key', {
+        tags: ['objects'],
+        parameters: [
+          {
+            name: 'key',
+            in: 'query',
+            required: true,
+            schema: { type: 'string' },
+            description: 'Storage key returned at upload time.',
+          },
+        ],
+        responses: {
+          '200': { description: 'Object bytes' },
+          '400': errorResponse('Missing or invalid object key'),
+          '404': errorResponse('Object not found'),
         },
       }),
     },
@@ -927,7 +988,7 @@ export function buildOpenApiDocument(): OpenAPIObject {
         },
         AuthMeResponse: {
           type: 'object',
-          required: ['user', 'workspace', 'self', 'cloudEnabled', 'devLoginEnabled'],
+          required: ['user', 'workspace', 'self', 'cloudEnabled', 'devLoginEnabled', 'localInstall'],
           properties: {
             user: {
               oneOf: [{ type: 'null' }, { $ref: '#/components/schemas/AuthUser' }],
@@ -941,6 +1002,25 @@ export function buildOpenApiDocument(): OpenAPIObject {
             },
             cloudEnabled: { type: 'boolean' },
             devLoginEnabled: { type: 'boolean' },
+            localInstall: {
+              type: 'boolean',
+              description: 'True when this process is a loopback-bound personal production install.',
+            },
+          },
+        },
+        GraphDiscovery: {
+          type: 'object',
+          required: ['totals', 'communities', 'bridges', 'disconnected', 'explanation'],
+          properties: {
+            totals: {
+              type: 'object',
+              additionalProperties: { type: 'integer' },
+              description: 'Whole-workspace record, relationship, community and component counts.',
+            },
+            communities: { type: 'array', items: { type: 'object' } },
+            bridges: { type: 'array', items: { type: 'object' } },
+            disconnected: { type: 'array', items: { type: 'object' } },
+            explanation: { type: 'string' },
           },
         },
         BootstrapResponse: {

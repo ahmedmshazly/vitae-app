@@ -13,6 +13,7 @@
         "backfill:subjects",
         "dev",
         "export:bundle",
+        "import:gmail",
         "load:bundle",
         "migrate",
         "openapi",
@@ -103,10 +104,10 @@
           "range": "^3.24.1"
         }
       ],
-      "source_files": 123,
-      "test_files": 73,
-      "source_lines": 28654,
-      "exports": 471,
+      "source_files": 130,
+      "test_files": 80,
+      "source_lines": 30571,
+      "exports": 493,
       "dependents": [],
       "imported_by": [],
       "unused_manifest_deps": [],
@@ -191,10 +192,10 @@
           "range": "^3.24.1"
         }
       ],
-      "source_files": 203,
+      "source_files": 205,
       "test_files": 184,
-      "source_lines": 52754,
-      "exports": 869,
+      "source_lines": 53228,
+      "exports": 871,
       "dependents": [],
       "imported_by": [],
       "unused_manifest_deps": [],
@@ -230,8 +231,8 @@
       ],
       "source_files": 1,
       "test_files": 0,
-      "source_lines": 180,
-      "exports": 3,
+      "source_lines": 265,
+      "exports": 4,
       "dependents": [
         "@vitae/api"
       ],
@@ -269,10 +270,10 @@
           "range": "^3.24.1"
         }
       ],
-      "source_files": 86,
-      "test_files": 61,
-      "source_lines": 15265,
-      "exports": 889,
+      "source_files": 88,
+      "test_files": 63,
+      "source_lines": 15883,
+      "exports": 923,
       "dependents": [
         "@vitae/api",
         "@vitae/web",
@@ -399,7 +400,7 @@
       ],
       "source_files": 16,
       "test_files": 12,
-      "source_lines": 3994,
+      "source_lines": 3995,
       "exports": 161,
       "dependents": [
         "@vitae/web"
@@ -503,6 +504,12 @@
     },
     {
       "file": "apps/api/src/scripts/export-bundle.ts",
+      "imports": [
+        "../env.js"
+      ]
+    },
+    {
+      "file": "apps/api/src/scripts/import-gmail-sqlite.ts",
       "imports": [
         "../env.js"
       ]
@@ -636,9 +643,9 @@
   ],
   "summary": {
     "packages": 8,
-    "source_files": 436,
-    "test_files": 394,
-    "source_lines": 101618,
+    "source_files": 447,
+    "test_files": 403,
+    "source_lines": 104713,
     "layers": 2,
     "cyclic": [],
     "workspace_typecheck": {

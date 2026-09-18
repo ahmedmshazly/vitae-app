@@ -3,17 +3,17 @@ import { asyncHandler } from '../../middleware/error.js';
 import { repository } from '../../db/repository.js';
 import { nowIso } from '../../db/util.js';
 import { isoDateIn, todayIso } from '../../db/timezone.js';
+import { openReminders } from '../../services/reminders.js';
 
 export const remindersRouter: Router = Router();
 
 remindersRouter.get(
   '/',
   asyncHandler(async (req, res) => {
-    const open = await repository.docQuery<Record<string, unknown>>('reminders', { status: 'open' });
     const today = todayIso();
+    const open = await openReminders(today);
     const reminders = open
-      .filter((r) => (req.query.due === 'all' ? true : (r.due_on as string) <= today) || (r.snoozed_until && (r.snoozed_until as string) <= today))
-      .sort((a, b) => String(a.due_on).localeCompare(String(b.due_on)));
+      .filter((r) => req.query.due === 'all' || (r.due_on as string) <= today);
     res.json({ reminders });
   }),
 );
@@ -29,7 +29,7 @@ remindersRouter.post(
 remindersRouter.post(
   '/:id/reopen',
   asyncHandler(async (req, res) => {
-    await repository.docMerge('reminders', req.params.id, { status: 'open', done_at: null });
+    await repository.docMerge('reminders', req.params.id, { status: 'open', done_at: null, snoozed_until: null });
     res.json({ ok: true });
   }),
 );

@@ -10,6 +10,7 @@ function Harness({ onUndo }: { onUndo: () => void | Promise<void> }) {
       <button onClick={() => flash('Saved')}>flash-plain</button>
       <button onClick={() => flash('Saved', { undo: onUndo })}>flash-undo</button>
       <button onClick={() => flash('Sync failed', { variant: 'error' })}>flash-error</button>
+      <button onClick={() => flash('Saved', { variant: 'success' })}>flash-success</button>
       <button
         onClick={() => {
           flash('First saved');
@@ -65,6 +66,16 @@ describe('Toast compatibility adapter', () => {
     expect(toast.querySelector('.vt-toast__glyph svg')).not.toBeNull();
   });
 
+  it('maps an explicit success to the labelled success variant', () => {
+    renderHarness();
+    fireEvent.click(screen.getByText('flash-success'));
+
+    const toast = toastFor('Saved');
+    expect(toast).toHaveAttribute('data-variant', 'success');
+    expect(within(toast).getByText('Done')).toBeInTheDocument();
+    expect(toast.querySelector('.vt-toast__glyph svg')).not.toBeNull();
+  });
+
   it('keeps flashToast as an error escape hatch for non-component callers', () => {
     renderHarness();
     act(() => flashToast('Mutation failed'));
@@ -96,13 +107,13 @@ describe('Toast compatibility adapter', () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
   });
 
-  it('preserves the eight-second Undo window from the app API', async () => {
+  it('preserves the twelve-second actionable Undo window', async () => {
     vi.useFakeTimers();
     renderHarness();
     fireEvent.click(screen.getByText('flash-undo'));
     const item = toastFor('Saved');
 
-    await act(async () => vi.advanceTimersByTime(7999));
+    await act(async () => vi.advanceTimersByTime(11_999));
     expect(item).toHaveAttribute('data-state', 'open');
 
     await act(async () => vi.advanceTimersByTime(1));
@@ -110,11 +121,16 @@ describe('Toast compatibility adapter', () => {
   });
 
   it('turns a rejected Undo into actionable error feedback', async () => {
-    renderHarness(() => Promise.reject(new Error('offline')));
+    const onUndo = vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce(undefined);
+    renderHarness(onUndo);
     fireEvent.click(screen.getByText('flash-undo'));
     fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
 
-    const failure = await screen.findByText("Couldn't undo that change");
+    const failure = await screen.findByText("Couldn't undo that change. Try again.");
     expect(failure.closest('li')).toHaveAttribute('data-variant', 'error');
+    expect(screen.getByText('Saved')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+    await waitFor(() => expect(screen.queryByText('Saved')).not.toBeInTheDocument());
+    expect(onUndo).toHaveBeenCalledTimes(2);
   });
 });

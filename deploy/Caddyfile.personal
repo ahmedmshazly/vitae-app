@@ -1,0 +1,23 @@
+# Loopback personal install. Caddy is the only published port (127.0.0.1:8080).
+# The SPA and the API share this origin so the owner session cookie is same-site.
+:80 {
+	encode gzip
+
+	handle /api* {
+		reverse_proxy api:4000
+	}
+
+	handle /health {
+		reverse_proxy api:4000
+	}
+
+	handle /ready {
+		reverse_proxy api:4000
+	}
+
+	handle {
+		root * /srv/web
+		try_files {path} /index.html
+		file_server
+	}
+}

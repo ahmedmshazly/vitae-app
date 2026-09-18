@@ -24,16 +24,32 @@ import { requireSessionToken } from './helpers/app.js';
 // reducing it to nothing.
 const d = describe;
 
-const GOLDEN = fileURLToPath(new URL('../../../../fixtures/vitae-bundle.golden.json', import.meta.url));
+const GOLDEN = fileURLToPath(
+  new URL('../../../../fixtures/vitae-bundle.golden.json', import.meta.url),
+);
 const bundleText = readFileSync(GOLDEN, 'utf8');
 
 /** A bundle emitted by Aperture's real projection code, not hand-written. */
-const PRODUCED = fileURLToPath(new URL('../../../../fixtures/aperture-produced.sample.json', import.meta.url));
+const PRODUCED = fileURLToPath(
+  new URL('../../../../fixtures/aperture-produced.sample.json', import.meta.url),
+);
 const producedText = readFileSync(PRODUCED, 'utf8');
 
 interface StageResp {
-  batch: { id: string; kind: string; detail: string | null; stats: { rows: number; accepted: number } };
-  rows: Array<{ id: string; entity: string; title: string; ref: string | null; node_type: string | null; decision: string }>;
+  batch: {
+    id: string;
+    kind: string;
+    detail: string | null;
+    stats: { rows: number; accepted: number };
+  };
+  rows: Array<{
+    id: string;
+    entity: string;
+    title: string;
+    ref: string | null;
+    node_type: string | null;
+    decision: string;
+  }>;
 }
 
 let app: Express;
@@ -68,7 +84,9 @@ async function countApertureEdges(): Promise<number> {
 }
 
 async function countNodes(type: string): Promise<number> {
-  const res = await request(app).get(`/api/v1/nodes?type=${type}&limit=1000`).set('authorization', `Bearer ${token}`);
+  const res = await request(app)
+    .get(`/api/v1/nodes?type=${type}&limit=1000`)
+    .set('authorization', `Bearer ${token}`);
   return (res.body.nodes as unknown[]).length;
 }
 
@@ -112,7 +130,10 @@ d('Aperture bundle import (integration)', () => {
     expect(rows.every((r) => typeof r.ref === 'string' && r.ref.length > 0)).toBe(true);
     expect(new Set(rows.map((r) => r.node_type))).toContain('post');
 
-    await request(app).post(`/api/v1/imports/${batch.id}/discard`).set('authorization', `Bearer ${token}`).expect(200);
+    await request(app)
+      .post(`/api/v1/imports/${batch.id}/discard`)
+      .set('authorization', `Bearer ${token}`)
+      .expect(200);
   }, 60_000);
 
   it('rejects content that is not a bundle, with a reason', async () => {
@@ -129,7 +150,10 @@ d('Aperture bundle import (integration)', () => {
     const wrongShape = await request(app)
       .post('/api/v1/imports')
       .set('authorization', `Bearer ${token}`)
-      .send({ kind: 'aperture', content: JSON.stringify({ format: 'something.else', schema_version: 1 }) });
+      .send({
+        kind: 'aperture',
+        content: JSON.stringify({ format: 'something.else', schema_version: 1 }),
+      });
     expect(wrongShape.status).toBe(422);
     expect(wrongShape.body.error).toMatchObject({
       code: 'INVALID_IMPORT_CONTENT',
@@ -147,9 +171,14 @@ d('Aperture bundle import (integration)', () => {
       .get('/api/v1/nodes?type=person&limit=1000')
       .set('authorization', `Bearer ${token}`)
       .expect(200);
-    const jane = (people.body.nodes as Array<{ id: string; title: string; identity_keys?: string[]; source: string }>).find(
-      (n) => n.title === 'Jane Smith',
-    );
+    const jane = (
+      people.body.nodes as Array<{
+        id: string;
+        title: string;
+        identity_keys?: string[];
+        source: string;
+      }>
+    ).find((n) => n.title === 'Jane Smith');
     expect(jane, 'the scraped person must exist').toBeDefined();
     expect(jane!.identity_keys).toContain('linkedin:person:jane-smith');
     expect(jane!.source).toBe('import_aperture');
@@ -165,7 +194,11 @@ d('Aperture bundle import (integration)', () => {
     const outTo = (type: string) =>
       edges.filter((e) => e.type === type && e.src === jane!.id).map((e) => neighbors[e.dst]);
 
-    expect(outTo('AUTHORED').map((n) => n?.type).sort()).toEqual(['post', 'post', 'publication']);
+    expect(
+      outTo('AUTHORED')
+        .map((n) => n?.type)
+        .sort(),
+    ).toEqual(['post', 'post', 'publication']);
     expect(outTo('HELD')[0]?.title).toBe('Staff Engineer');
     expect(outTo('ATTENDED')[0]?.title).toBe('MSc, Computer Science');
     expect(outTo('MEMBER_OF')[0]?.title).toBe('IEEE');
@@ -196,6 +229,96 @@ d('Aperture bundle import (integration)', () => {
     expect(await snapshot()).toEqual(before);
   }, 90_000);
 
+  it('persists version-2 evidence for nodes and relationship episodes', async () => {
+    const unique = `evidence-${Date.now()}`;
+    const content = JSON.stringify({
+      format: 'vitae.graph.bundle',
+      schema_version: 2,
+      source: { system: 'aperture-test', run_id: unique, exported_at: '2026-06-01T12:00:00.000Z' },
+      nodes: [
+        {
+          ref: 'a',
+          type: 'person',
+          title: 'Evidence A',
+          props: {},
+          identity_keys: [`test:person:${unique}:a`],
+        },
+        {
+          ref: 'b',
+          type: 'person',
+          title: 'Evidence B',
+          props: {},
+          identity_keys: [`test:person:${unique}:b`],
+        },
+      ],
+      edges: [
+        { ref: 'knows', type: 'KNOWS', src: 'a', dst: 'b', props: {}, start_date: '2024-01-01' },
+      ],
+      evidence: [
+        {
+          subject_kind: 'node',
+          subject_ref: 'a',
+          field: 'title',
+          value: 'Evidence A',
+          basis: 'explicit',
+          confidence: 1,
+          observed_at: '2026-05-31T12:00:00.000Z',
+          valid_from: null,
+          valid_to: null,
+          citation: {
+            external_id: `${unique}:node`,
+            locator: `aperture://${unique}/node`,
+            content_hash: '1234567890abcdef',
+            excerpt: 'Profile title',
+          },
+        },
+        {
+          subject_kind: 'edge',
+          subject_ref: 'knows',
+          field: '$relationship',
+          value: { stated: true },
+          basis: 'explicit',
+          confidence: 0.9,
+          observed_at: '2026-05-31T12:00:00.000Z',
+          valid_from: '2024-01-01',
+          valid_to: null,
+          citation: {
+            external_id: `${unique}:edge`,
+            locator: `aperture://${unique}/edge`,
+            content_hash: 'abcdef1234567890',
+            excerpt: 'Connected since 2024',
+          },
+        },
+      ],
+    });
+    const staged = await request(app)
+      .post('/api/v1/imports')
+      .set('authorization', `Bearer ${token}`)
+      .send({ kind: 'aperture', filename: 'evidence-v2.json', content })
+      .expect(201);
+    await request(app)
+      .post(`/api/v1/imports/${staged.body.batch.id}/commit`)
+      .set('authorization', `Bearer ${token}`)
+      .expect(200);
+
+    const knowledge = await request(app)
+      .get('/api/v1/knowledge')
+      .set('authorization', `Bearer ${token}`)
+      .expect(200);
+    const assertions = knowledge.body.assertions as Array<{
+      run_id: string;
+      subject_kind: string;
+      status: string;
+      citation: { excerpt?: string };
+    }>;
+    const imported = assertions.filter((assertion) => assertion.run_id === staged.body.batch.id);
+    expect(imported.map((assertion) => assertion.subject_kind).sort()).toEqual(['edge', 'node']);
+    expect(imported.every((assertion) => assertion.status === 'accepted')).toBe(true);
+    expect(imported.map((assertion) => assertion.citation.excerpt)).toContain(
+      'Connected since 2024',
+    );
+  }, 90_000);
+
   /**
    * The whole point, end to end: what Aperture's projection actually emits for
    * one scraped profile lands here as many linked records, each belonging to the
@@ -218,7 +341,9 @@ d('Aperture bundle import (integration)', () => {
       .get('/api/v1/nodes?type=person&limit=1000')
       .set('authorization', `Bearer ${token}`)
       .expect(200);
-    const jane = (people.body.nodes as Array<{ id: string; title: string }>).find((n) => n.title === 'Jane Smith');
+    const jane = (people.body.nodes as Array<{ id: string; title: string }>).find(
+      (n) => n.title === 'Jane Smith',
+    );
     expect(jane).toBeDefined();
 
     const detail = await request(app)
@@ -254,7 +379,9 @@ d('Aperture bundle import (integration)', () => {
       .get('/api/v1/nodes?type=organization&limit=1000')
       .set('authorization', `Bearer ${token}`)
       .expect(200);
-    const acme = (orgs.body.nodes as Array<{ title: string }>).filter((n) => n.title === 'Acme Corp');
+    const acme = (orgs.body.nodes as Array<{ title: string }>).filter(
+      (n) => n.title === 'Acme Corp',
+    );
     expect(acme).toHaveLength(1);
   }, 120_000);
 

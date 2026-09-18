@@ -11,6 +11,7 @@ import { Button, ErrorState, Glyph, Mono, Popover, SkeletonRows } from '@vitae/u
 import { api } from '../lib/api.js';
 import { todayIso } from '../lib/dates.js';
 import { useToast } from './Toast.js';
+import { useCanWrite, WRITE_LOCK_HINT } from '../lib/auth.js';
 
 interface Reminder {
   id: string;
@@ -39,13 +40,16 @@ export function RemindersDrawer({
   open,
   onOpenChange,
   trigger,
+  onCapture,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger: React.ReactNode;
+  onCapture?: () => void;
 }) {
   const qc = useQueryClient();
   const { flash } = useToast();
+  const canWrite = useCanWrite();
 
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: ['reminders'],
@@ -53,29 +57,48 @@ export function RemindersDrawer({
     enabled: open,
   });
 
-  function invalidate() {
-    void qc.invalidateQueries({ queryKey: ['reminders'] });
-    void qc.invalidateQueries({ queryKey: ['dashboard'] });
+  async function invalidate() {
+    await Promise.all([
+      qc.invalidateQueries({ queryKey: ['reminders'] }),
+      qc.invalidateQueries({ queryKey: ['dashboard'] }),
+    ]);
   }
 
   const done = useMutation({
     mutationFn: (id: string) => api.post(`/reminders/${id}/done`, {}),
-    onSuccess: (_d, id) => {
-      invalidate();
-      flash('Done', {
+    onSuccess: async (_d, id) => {
+      await invalidate();
+      flash('Reminder marked done.', {
+        variant: 'success',
         undo: async () => {
           await api.post(`/reminders/${id}/reopen`, {});
-          invalidate();
+          await invalidate();
         },
       });
+    },
+    onError: (err) => {
+      flash(
+        err instanceof Error
+          ? `Couldn't mark reminder done: ${err.message}`
+          : "Couldn't mark reminder done.",
+        { variant: 'error' },
+      );
     },
   });
 
   const snooze = useMutation({
     mutationFn: (id: string) => api.post(`/reminders/${id}/snooze`, { days: 7 }),
-    onSuccess: () => {
-      invalidate();
-      flash('Snoozed 7 days');
+    onSuccess: async () => {
+      await invalidate();
+      flash('Reminder snoozed for 7 days.', { variant: 'success' });
+    },
+    onError: (err) => {
+      flash(
+        err instanceof Error
+          ? `Couldn't snooze reminder: ${err.message}`
+          : "Couldn't snooze reminder.",
+        { variant: 'error' },
+      );
     },
   });
 
@@ -88,14 +111,31 @@ export function RemindersDrawer({
     null;
 
   return (
-    <Popover open={open} onOpenChange={onOpenChange} trigger={trigger} align="end" wide>
+    <Popover label="Reminders" open={open} onOpenChange={onOpenChange} trigger={trigger} align="end" wide>
       <div className="-m-3">
         <div className="flex items-center justify-between gap-3 border-b border-hairline px-4 py-3">
           <h2 className="u-display flex items-center gap-2 text-md text-ink-strong">
             <Glyph name="bell" size={15} /> Reminders
           </h2>
-          <Mono className="text-sm text-muted">{reminders.length}</Mono>
+          {data && <Mono className="text-sm text-muted">{reminders.length} open</Mono>}
         </div>
+
+        {onCapture && (
+          <div className="border-b border-hairline px-4 py-3">
+            <Button
+              size="sm"
+              glyph="plus"
+              disabled={!canWrite}
+              title={canWrite ? undefined : WRITE_LOCK_HINT}
+              onClick={() => {
+                onOpenChange(false);
+                onCapture();
+              }}
+            >
+              Capture with a date
+            </Button>
+          </div>
+        )}
 
         {isError ? (
           // The shared error panel, not a second dialect of one: the drawer
@@ -114,8 +154,8 @@ export function RemindersDrawer({
           </div>
         ) : reminders.length === 0 ? (
           <p className="px-4 py-5 text-sm text-muted">
-            Nothing due. Capture with ⌘K and add a <span className="font-mono text-ink-soft">^date</span> to put
-            something here.
+            No open reminders. Add <span className="font-mono text-ink-soft">^tomorrow</span> or a
+            specific date to a capture to remind yourself later.
           </p>
         ) : (
           <ul className="m-0 max-h-[50vh] list-none overflow-y-auto p-0">
@@ -124,31 +164,44 @@ export function RemindersDrawer({
               return (
                 <li
                   key={r.id}
-                  className="flex items-center gap-3 border-b border-hairline px-4 py-2 last:border-b-0"
+                  className="flex flex-col gap-2 border-b border-hairline px-4 py-3 last:border-b-0"
                   // Both writes go to the server and both invalidate this
                   // list, so a slow one used to look like a click that missed.
                   aria-busy={pendingId === r.id}
                 >
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-ink">{r.note}</span>
-                    <Mono className={`text-xs ${d.tone}`}>{d.label}</Mono>
+                  <span
+                    id={`reminder-note-${r.id}`}
+                    className="block text-ink [overflow-wrap:anywhere]"
+                  >
+                    {r.note?.trim() || 'Untitled reminder'}
                   </span>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    disabled={pendingId != null}
-                    onClick={() => snooze.mutate(r.id)}
-                  >
-                    {snooze.isPending && snooze.variables === r.id ? 'Snoozing...' : 'Snooze'}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    disabled={pendingId != null}
-                    onClick={() => done.mutate(r.id)}
-                  >
-                    {done.isPending && done.variables === r.id ? 'Marking...' : 'Done'}
-                  </Button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="mr-auto">
+                      <Mono className={`text-xs ${d.tone}`}>{d.label}</Mono>
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled={pendingId != null || !canWrite}
+                      aria-describedby={`reminder-note-${r.id}`}
+                      title={canWrite ? 'Move this reminder forward by 7 days' : WRITE_LOCK_HINT}
+                      onClick={() => snooze.mutate(r.id)}
+                    >
+                      {snooze.isPending && snooze.variables === r.id
+                        ? 'Snoozing...'
+                        : 'Snooze 7 days'}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled={pendingId != null || !canWrite}
+                      aria-describedby={`reminder-note-${r.id}`}
+                      title={canWrite ? undefined : WRITE_LOCK_HINT}
+                      onClick={() => done.mutate(r.id)}
+                    >
+                      {done.isPending && done.variables === r.id ? 'Marking...' : 'Done'}
+                    </Button>
+                  </div>
                 </li>
               );
             })}

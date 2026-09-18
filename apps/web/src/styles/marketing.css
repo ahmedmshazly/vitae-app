@@ -1158,6 +1158,13 @@
   border-bottom: 1px solid var(--ae-border-strong);
 }
 
+.signin__title {
+  margin: 0;
+  color: var(--ae-fg-strong);
+  font: 500 24px/1.25 var(--ae-font-sans);
+  letter-spacing: -0.02em;
+}
+
 .signin__door-copy {
   margin: var(--ae-space-3) 0 0;
   color: var(--ae-muted);
@@ -1200,14 +1207,35 @@
 }
 
 @media (max-width: 1023px) {
+  .signin {
+    align-content: start;
+  }
+
   .signin__identity {
     min-height: auto;
-    padding: 64px var(--ae-space-5);
+    padding: var(--ae-space-5);
+  }
+
+  .signin__register,
+  .signin__ledger {
+    display: none;
+  }
+
+  .signin__claim {
+    margin-top: var(--ae-space-4);
+    max-width: 24ch;
+    font-size: clamp(26px, 5vw, 36px);
+  }
+
+  .signin__identity-copy {
+    margin-top: var(--ae-space-3);
+    font-size: var(--ae-text-base);
+    line-height: 1.55;
   }
 
   .signin__door {
-    min-height: 420px;
-    padding: var(--ae-space-8) var(--ae-space-5);
+    min-height: auto;
+    padding: var(--ae-space-5);
   }
 }
 
@@ -1431,7 +1459,7 @@
   }
 
   .signin__identity {
-    padding-block: var(--ae-space-8);
+    padding-block: var(--ae-space-5);
   }
 
   .signin__ledger {
@@ -1440,7 +1468,7 @@
 
   .signin__door {
     min-height: auto;
-    padding-block: var(--ae-space-8);
+    padding-block: var(--ae-space-5);
   }
 }
 

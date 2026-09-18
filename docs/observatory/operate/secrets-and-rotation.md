@@ -41,8 +41,9 @@ that is a git-ignored `.env`; on a host it is the platform's secret manager
 where one exists, and `deploy/.env` where one does not. Names are published in
 `.env.example` and `deploy/.env.example`; values never are.
 
-**A file-backed store.** One credential - the GitHub token used for repository
-sync - can be written by the application itself, into a git-ignored `.secrets/`
+**A file-backed store.** Third-party credentials - the GitHub token used for
+repository sync, and the Gemini API key parked for a later workflow - can be
+written by the application itself, into a git-ignored `.secrets/`
 directory with the directory at `0700` and the file at `0600`, written to a
 temporary file and renamed with an fsync so a crash cannot leave a half-written
 credential. This exists so a self-hosted instance can connect an integration
@@ -74,6 +75,7 @@ Rotating something is easier to reason about once you know what stops working.
 | Database CA bundle | Verification of the database's certificate | A file copy and a restart |
 | Firebase service account | Verifying users' sign-in tokens | Sign-in fails until the new value is in place |
 | Repository sync token | Reading a third-party account | That integration only |
+| Gemini API key | Calling Google Gemini | Nothing yet; no workflow consumes it |
 | Backup identity | Writing to and reading from the backup bucket | Backups fail silently until fixed |
 
 ## The build-service signing key

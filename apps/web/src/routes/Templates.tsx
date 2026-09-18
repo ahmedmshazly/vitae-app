@@ -278,6 +278,18 @@ export function Templates() {
                 } as the default...`}
               />
             )}
+            {setDefault.isError && (
+              <Banner
+                tone="danger"
+                title={`Couldn't make ${
+                  templates.find((template) => template.key === setDefault.variables)?.name ??
+                  'that layout'
+                } the default`}
+              >
+                {(setDefault.error as Error | null)?.message ??
+                  'The default layout was not changed. Choose the layout again to retry.'}
+              </Banner>
+            )}
             {/* The Section states a count, so the markup under it has to be the
                 list of that many things. It was a div of sibling articles, which
                 announces neither the count nor which layout you are on. */}
@@ -357,7 +369,10 @@ export function Templates() {
                         <Button
                           variant={active ? 'ghost' : 'primary'}
                           disabled={active || setDefault.isPending}
-                          onClick={() => setDefault.mutate(template.key)}
+                          onClick={() => {
+                            setDefault.reset();
+                            setDefault.mutate(template.key);
+                          }}
                           // The visible words come first, so saying "make default"
                           // to a voice control matches this button (WCAG 2.5.3);
                           // the old name shared no words with its own label. The

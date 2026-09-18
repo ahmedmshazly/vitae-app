@@ -109,7 +109,7 @@ test('the ask lives in the URL, linkable, reloadable, and back-able', async ({ p
   // Asking again from the form rewrites the URL rather than hiding the intent
   // in component state.
   await page.getByRole('textbox', { name: 'Organization' }).fill('Nile');
-  await page.getByRole('button', { name: /^Ask$/ }).click();
+  await page.getByRole('button', { name: 'Rank contacts' }).click();
   await expect(page).toHaveURL(/org=Nile/);
 });
 
@@ -182,7 +182,7 @@ test('a failed draft says so instead of leaving an empty box above a live Send',
   // generate() was a try/finally with no catch: the rejection went nowhere.
   const dialog = page.getByRole('dialog');
   await expect(dialog.getByRole('alert')).toContainText("Couldn't draft that message");
-  await expect(dialog.getByRole('button', { name: 'Send & log' })).toBeDisabled();
+  await expect(dialog.getByRole('button', { name: 'Log outreach & follow-up' })).toBeDisabled();
 });
 
 test('the tone switch carries its state in more than a border colour', async ({ page }) => {

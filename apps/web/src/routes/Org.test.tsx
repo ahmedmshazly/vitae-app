@@ -1,6 +1,6 @@
 import './../test/api-mock.js';
 import { Route, Routes } from 'react-router-dom';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { mockApi, resetMockApi } from '../test/api-mock.js';
@@ -78,11 +78,42 @@ describe('organization dossier screen', () => {
     const user = userEvent.setup();
     renderOrg();
 
-    await user.click(await screen.findByRole('button', { name: 'Delete' }));
-    await user.click(screen.getByRole('button', { name: 'Move to trash' }));
+    await user.click(await screen.findByRole('button', { name: 'Move to trash' }));
+    await user.click(
+      within(screen.getByRole('dialog')).getByRole('button', { name: 'Move to trash' }),
+    );
     expect(screen.getByRole('button', { name: 'Moving...' })).toBeDisabled();
 
     finish();
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
+
+  it.each(['Trash is temporarily unavailable', ''])(
+    'keeps deletion recovery in the confirmation for error %j',
+    async (message) => {
+      resetMockApi();
+      mockApi.get.mockResolvedValue({ org: organization });
+      mockApi.delete.mockRejectedValue(new Error(message));
+      const user = userEvent.setup();
+      renderOrg();
+
+      await user.click(await screen.findByRole('button', { name: 'Move to trash' }));
+      expect(screen.getByRole('button', { name: 'Cancel' })).toHaveFocus();
+
+      await user.click(
+        within(screen.getByRole('dialog')).getByRole('button', { name: 'Move to trash' }),
+      );
+
+      const dialog = screen.getByRole('dialog');
+      expect(
+        await within(dialog).findByText('Couldn’t move this organization to Trash'),
+      ).toBeVisible();
+      expect(
+        within(dialog).getByText(
+          new RegExp(message || 'The organization could not be moved to trash'),
+        ),
+      ).toBeVisible();
+      expect(within(dialog).getByRole('button', { name: 'Move to trash' })).toBeEnabled();
+    },
+  );
 });

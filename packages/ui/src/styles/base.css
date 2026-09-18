@@ -63,7 +63,7 @@ body,
 }
 
 html {
-  color-scheme: light dark;
+  /* tokens.css sets the concrete scheme for light, dark, and high contrast. */
   -webkit-text-size-adjust: 100%;
 }
 
@@ -84,7 +84,10 @@ h1, h2, h3, h4, p, figure {
 
 @layer base {
   a {
-    color: var(--deleg);
+    /* Brass is a fill/action cue, not small body text on paper: graphite keeps
+       ordinary links above the contrast floor while their underline signals
+       interactivity. */
+    color: var(--ink);
     text-decoration: none;
   }
   a:hover {

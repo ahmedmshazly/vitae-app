@@ -394,6 +394,30 @@ export const EDGE_FORM_DESCRIPTORS: Record<EdgeType, EdgeFormDescriptor> = {
     dstTypes: ['person', 'organization', 'application'],
     fields: [],
   },
+  IN_AREA: {
+    type: 'IN_AREA',
+    label: 'In life area',
+    description: 'A goal, project, task, habit, event, account, subscription, or opportunity → its ongoing life responsibility.',
+    srcTypes: ['goal', 'project', 'task', 'habit', 'event', 'account', 'subscription', 'opportunity'],
+    dstTypes: ['area'],
+    fields: [{ key: 'primary', label: 'Primary area', widget: 'checkbox' }],
+  },
+  PARTICIPATES_IN: {
+    type: 'PARTICIPATES_IN',
+    label: 'Participates in',
+    description: 'Person or organization → a project, event, or opportunity they participate in.',
+    srcTypes: ['person', 'organization'],
+    dstTypes: ['project', 'event', 'opportunity'],
+    fields: [{ key: 'role', label: 'Role', widget: 'text' }],
+  },
+  AFFILIATED_WITH: {
+    type: 'AFFILIATED_WITH',
+    label: 'Affiliated with',
+    description: 'Person → organization affiliation that is not ownership, employment, or membership.',
+    srcTypes: ['person'],
+    dstTypes: ['organization'],
+    fields: [{ key: 'role', label: 'Context', widget: 'text' }],
+  },
 };
 
 export function edgeFormDescriptor(type: EdgeType): EdgeFormDescriptor {

@@ -78,7 +78,10 @@ function toEvents(interactions: NodeRecord[]): InteractionEvent[] {
   return interactions
     .map((i) => {
       const props = i.props as Record<string, unknown>;
-      return { kind: (props.kind as string) ?? 'message', occurredAt: (props.occurred_at as string) ?? i.created_at };
+      return {
+        kind: (props.kind as string) ?? 'message',
+        occurredAt: (props.occurred_at as string) ?? i.created_at,
+      };
     })
     .filter((e) => e.occurredAt);
 }
@@ -90,7 +93,10 @@ function toEvents(interactions: NodeRecord[]): InteractionEvent[] {
  * every node and every edge, so a caller that needs two of these helpers should
  * load once and thread it rather than pay for the graph twice in one request.
  */
-export async function findKnowsEdge(personId: string, preloaded?: Graph): Promise<EdgeRecord | undefined> {
+export async function findKnowsEdge(
+  personId: string,
+  preloaded?: Graph,
+): Promise<EdgeRecord | undefined> {
   const graph = preloaded ?? (await loadGraph());
   const self = await getSelf();
   return self ? knowsEdge(graph, self.id, personId) : undefined;
@@ -121,7 +127,10 @@ export async function personStrength(
  * computeTieStrength, so this write does not invalidate the caller's graph for
  * a subsequent personStrength() on the same person.
  */
-export async function recomputeAndPersistStrength(personId: string, preloaded?: Graph): Promise<void> {
+export async function recomputeAndPersistStrength(
+  personId: string,
+  preloaded?: Graph,
+): Promise<void> {
   const graph = preloaded ?? (await loadGraph());
   const self = await getSelf();
   if (!self) return;
@@ -136,7 +145,13 @@ export async function recomputeAndPersistStrength(personId: string, preloaded?: 
   });
   await repository.updateEdge(
     knows.id,
-    { props: { ...props, strength: s.strength, last_interaction_at: s.lastInteractionAt } },
+    {
+      props: {
+        ...props,
+        strength: s.strength,
+        last_interaction_at: s.lastInteractionAt ?? undefined,
+      },
+    },
     { op: 'update', source: 'system' },
   );
 }
@@ -146,21 +161,41 @@ function computePpr(graph: Graph, selfId: string): Map<string, number> {
   const pprEdges: GraphEdge[] = [];
   for (const e of graph.edges) {
     const weight =
-      e.type === 'KNOWS' ? ((e.props as Record<string, unknown>).closeness as number ?? 3) / 5 + 0.2 : 1;
+      e.type === 'KNOWS'
+        ? (((e.props as Record<string, unknown>).closeness as number) ?? 3) / 5 + 0.2
+        : 1;
     // Add both directions so proximity is symmetric for undirected relations.
     pprEdges.push({ src: e.src, dst: e.dst, type: e.type, weight });
     pprEdges.push({ src: e.dst, dst: e.src, type: e.type, weight });
   }
-  return personalizedPageRank(nodeIds, pprEdges, { [selfId]: 1 }, { edgeWeights: PAGERANK.edgeWeights });
+  return personalizedPageRank(
+    nodeIds,
+    pprEdges,
+    { [selfId]: 1 },
+    { edgeWeights: PAGERANK.edgeWeights },
+  );
 }
 
-export async function reconnectLane(preloaded?: Graph): Promise<Array<{ person: NodeRecord; priority: number; status: string; daysSinceLast: number | null; valueTerm: number; decayTerm: number }>> {
+export async function reconnectLane(
+  preloaded?: Graph,
+): Promise<
+  Array<{
+    person: NodeRecord;
+    priority: number;
+    status: string;
+    daysSinceLast: number | null;
+    valueTerm: number;
+    decayTerm: number;
+  }>
+> {
   // Accept a caller-preloaded graph so callers that already hold one (the
   // Dashboard aggregate) don't trigger a second full nodes+edges read.
   const graph = preloaded ?? (await loadGraph());
   const self = await getSelf();
   if (!self) return [];
-  const knowsEdges = graph.edges.filter((e) => e.type === 'KNOWS' && (e.src === self.id || e.dst === self.id));
+  const knowsEdges = graph.edges.filter(
+    (e) => e.type === 'KNOWS' && (e.src === self.id || e.dst === self.id),
+  );
 
   const items = knowsEdges.map((e) => {
     const personId = e.src === self.id ? e.dst : e.src;
@@ -171,18 +206,38 @@ export async function reconnectLane(preloaded?: Graph): Promise<Array<{ person: 
       cadenceTargetDays: (props.cadence_target_days as number) ?? null,
       interactions: toEvents(interactionsFor(graph, personId)),
     });
-    return { personId, person, closeness: (props.closeness as number) ?? null, intensity: s.intensity, status: s.status, daysSinceLast: s.daysSinceLast };
+    return {
+      personId,
+      person,
+      closeness: (props.closeness as number) ?? null,
+      intensity: s.intensity,
+      status: s.status,
+      daysSinceLast: s.daysSinceLast,
+    };
   });
 
   const ranked = rankReconnect(
-    items.map((i) => ({ id: i.personId, closeness: i.closeness, intensity: i.intensity, status: i.status as 'active' | 'decaying' | 'dormant', daysSinceLast: i.daysSinceLast })),
+    items.map((i) => ({
+      id: i.personId,
+      closeness: i.closeness,
+      intensity: i.intensity,
+      status: i.status as 'active' | 'decaying' | 'dormant',
+      daysSinceLast: i.daysSinceLast,
+    })),
   );
   const byId = new Map(items.map((i) => [i.personId, i]));
   return ranked
     .filter((r) => byId.get(r.id)?.person)
     .map((r) => {
       const it = byId.get(r.id)!;
-      return { person: it.person!, priority: r.priority, status: it.status, daysSinceLast: it.daysSinceLast, valueTerm: r.valueTerm, decayTerm: r.decayTerm };
+      return {
+        person: it.person!,
+        priority: r.priority,
+        status: it.status,
+        daysSinceLast: it.daysSinceLast,
+        valueTerm: r.valueTerm,
+        decayTerm: r.decayTerm,
+      };
     });
 }
 
@@ -284,7 +339,8 @@ export async function peopleList(): Promise<PersonListItem[]> {
         ? {
             kind: ((last.props as Record<string, unknown>).kind as string) ?? 'message',
             title: last.title,
-            occurredAt: ((last.props as Record<string, unknown>).occurred_at as string) ?? last.created_at,
+            occurredAt:
+              ((last.props as Record<string, unknown>).occurred_at as string) ?? last.created_at,
           }
         : null,
       source: person.source,
@@ -336,7 +392,18 @@ function orgAffinity(members: PersonListItem[]): number {
 function openRolesFor(graph: Graph, orgId: string): NodeRecord[] {
   return neighbors(graph, orgId, 'ROLE_AT', 'in')
     .map((e) => graph.nodes.get(e.src))
-    .filter((r): r is NodeRecord => Boolean(r) && r!.type === 'role' && (r!.props as Record<string, unknown>).open === true);
+    .filter(
+      (r): r is NodeRecord =>
+        Boolean(r) && r!.type === 'role' && (r!.props as Record<string, unknown>).open === true,
+    );
+}
+
+/** Forms store hq_city; retain imported/legacy city without rewriting records. */
+function organizationCity(props: Record<string, unknown>): string | null {
+  for (const value of [props.hq_city, props.city]) {
+    if (typeof value === 'string' && value.trim()) return value.trim();
+  }
+  return null;
 }
 
 export async function orgsOverview(): Promise<OrgListItem[]> {
@@ -352,7 +419,7 @@ export async function orgsOverview(): Promise<OrgListItem[]> {
       title: node.title,
       kind: (props.kind as string) ?? null,
       domain: (props.domain as string) ?? null,
-      city: (props.city as string) ?? null,
+      city: organizationCity(props),
       peopleCount: members.length,
       affinity: Number(orgAffinity(members).toFixed(2)),
       openRoles: openRolesFor(graph, node.id).length,
@@ -441,7 +508,7 @@ export async function orgProfile(orgId: string): Promise<OrgProfile | null> {
     title: org.title,
     kind: (props.kind as string) ?? null,
     domain: (props.domain as string) ?? null,
-    city: (props.city as string) ?? null,
+    city: organizationCity(props),
     peopleCount: members.length,
     affinity: Number(orgAffinity(members).toFixed(2)),
     openRoles: roles.filter((r) => r.open).length,
@@ -496,7 +563,11 @@ export async function askWhoToCall(
     }
     for (const worked of neighbors(graph, node.id, 'WORKED_ON', 'out')) {
       const proj = graph.nodes.get(worked.dst);
-      if (proj) evidence.push({ label: proj.title, text: `${proj.title} ${(proj.props as Record<string, unknown>).outcome ?? ''}` });
+      if (proj)
+        evidence.push({
+          label: proj.title,
+          text: `${proj.title} ${(proj.props as Record<string, unknown>).outcome ?? ''}`,
+        });
     }
     for (const i of interactionsFor(graph, node.id).slice(0, 5)) {
       const tp = ((i.props as Record<string, unknown>).talking_points as string[]) ?? [];
@@ -509,7 +580,9 @@ export async function askWhoToCall(
       interactions: toEvents(interactionsFor(graph, node.id)),
     });
 
-    const favors = ((kprops.favors as Array<{ direction: 'owed_to_me' | 'owed_by_me'; settled?: boolean }>) ?? []).map((f) => ({
+    const favors = (
+      (kprops.favors as Array<{ direction: 'owed_to_me' | 'owed_by_me'; settled?: boolean }>) ?? []
+    ).map((f) => ({
       direction: f.direction,
       settled: f.settled,
     }));
@@ -587,13 +660,18 @@ function buildAskPack(graph: Graph, selfId: string | undefined, personId: string
         id: i.id,
         title: i.title,
         kind: typeof p.kind === 'string' ? p.kind : undefined,
-        date: typeof p.occurred_at === 'string' ? p.occurred_at.slice(0, 10) : i.created_at?.slice(0, 10),
+        date:
+          typeof p.occurred_at === 'string'
+            ? p.occurred_at.slice(0, 10)
+            : i.created_at?.slice(0, 10),
       };
     });
 
   const followUps: AskPackFollowUp[] = [];
   for (const i of interactionsFor(graph, personId)) {
-    const fus = ((i.props as Record<string, unknown>).follow_ups as Array<{ what?: string; due?: string }>) ?? [];
+    const fus =
+      ((i.props as Record<string, unknown>).follow_ups as Array<{ what?: string; due?: string }>) ??
+      [];
     for (const f of fus) {
       if (f.what) followUps.push({ what: f.what, ...(f.due ? { due: f.due } : {}) });
     }
@@ -674,7 +752,13 @@ export async function correspondenceRollup(preloaded?: Graph): Promise<{
   const graph = preloaded ?? (await loadGraph());
   const self = await getSelf();
   if (!self) {
-    return { candidates: [], consideredDormant: 0, brokers: [], introducedBrokers: [], outOfBalance: [] };
+    return {
+      candidates: [],
+      consideredDormant: 0,
+      brokers: [],
+      introducedBrokers: [],
+      outOfBalance: [],
+    };
   }
   const knowsEdges = graph.edges.filter(
     (e) => e.type === 'KNOWS' && (e.src === self.id || e.dst === self.id),
@@ -693,7 +777,9 @@ export async function correspondenceRollup(preloaded?: Graph): Promise<{
 
   const rollup = rankReactivation(ties);
   const brokers = brokerTally(
-    knowsEdges.map((e) => ((e.props ?? {}) as Record<string, unknown>).met_via as string | undefined),
+    knowsEdges.map(
+      (e) => ((e.props ?? {}) as Record<string, unknown>).met_via as string | undefined,
+    ),
   );
 
   // Reciprocity imbalance across the whole graph (FR-COMM-001 figures at
@@ -821,9 +907,14 @@ export function personIntroductions(
         context: (props.context as string) ?? null,
       };
     })
-    .sort((a, b) => (b.occurredOn ?? '').localeCompare(a.occurredOn ?? '') || a.edgeId.localeCompare(b.edgeId));
+    .sort(
+      (a, b) =>
+        (b.occurredOn ?? '').localeCompare(a.occurredOn ?? '') || a.edgeId.localeCompare(b.edgeId),
+    );
   const brokered = intros
-    .filter((e) => (((e.props ?? {}) as Record<string, unknown>).via as string | undefined) === personId)
+    .filter(
+      (e) => (((e.props ?? {}) as Record<string, unknown>).via as string | undefined) === personId,
+    )
     .map((e) => {
       const props = (e.props ?? {}) as Record<string, unknown>;
       return {
@@ -836,7 +927,10 @@ export function personIntroductions(
         context: (props.context as string) ?? null,
       };
     })
-    .sort((a, b) => (b.occurredOn ?? '').localeCompare(a.occurredOn ?? '') || a.edgeId.localeCompare(b.edgeId));
+    .sort(
+      (a, b) =>
+        (b.occurredOn ?? '').localeCompare(a.occurredOn ?? '') || a.edgeId.localeCompare(b.edgeId),
+    );
   return { connected, brokered };
 }
 

@@ -93,59 +93,7 @@ function WorkspaceHome({
   );
 }
 
-export function NetworkHome() {
-  return (
-    <WorkspaceHome
-      eyebrow="Relationship workspace"
-      title="Network"
-      subtitle="People, organizations, and the paths between them."
-      statement="A relationship is not a contact card. It is a history, a rhythm, and a next honest action."
-      footnote="Every recommendation exposes its factors and source records."
-      actions={[
-        {
-          href: '/network/intelligence?lens=contact',
-          glyph: 'ask',
-          eyebrow: 'Decide',
-          title: 'Who should I contact?',
-          detail: 'Rank people against a real need, then inspect every factor before reaching out.',
-          accent: 'relationship',
-        },
-        {
-          href: '/network/people',
-          glyph: 'person',
-          eyebrow: 'Directory',
-          title: 'People',
-          detail: 'Relationship strength, cadence, context, and interaction history.',
-          accent: 'relationship',
-        },
-        {
-          href: '/network/organizations',
-          glyph: 'org',
-          eyebrow: 'Directory',
-          title: 'Organizations',
-          detail: 'Affinity, inroads, open roles, and connected people.',
-          accent: 'career',
-        },
-        {
-          href: '/network/intelligence?lens=reach',
-          glyph: 'merge',
-          eyebrow: 'Route',
-          title: 'Find a warm path',
-          detail: 'Compare explainable introduction paths hop by hop.',
-          accent: 'time',
-        },
-        {
-          href: '/network/correspondence',
-          glyph: 'interaction',
-          eyebrow: 'Reactivate',
-          title: 'Correspondence',
-          detail: 'Dormant ties that were once strong, ranked with their evidence, and the brokers introductions flowed through.',
-          accent: 'relationship',
-        },
-      ]}
-    />
-  );
-}
+export { NetworkHome } from './NetworkHome.js';
 
 export function ExploreHome() {
   return (
@@ -203,6 +151,15 @@ export function DataHome() {
       footnote="No import commits until its staged records have been reviewed."
       actions={[
         {
+          href: '/data/knowledge',
+          glyph: 'document',
+          eyebrow: 'Reconcile',
+          title: 'Knowledge review',
+          detail:
+            'Compare accepted facts with source assertions, settle conflicts, and inspect coverage.',
+          accent: 'data',
+        },
+        {
           href: '/data/imports',
           glyph: 'capture',
           eyebrow: 'Ingest',
@@ -225,6 +182,14 @@ export function DataHome() {
           title: 'GitHub',
           detail: 'Connect, synchronize, and inspect retained repository records.',
           accent: 'career',
+        },
+        {
+          href: '/data/sources/gemini',
+          glyph: 'idea',
+          eyebrow: 'Source',
+          title: 'Gemini',
+          detail: 'Park a Google Gemini project and API key until a workflow needs them.',
+          accent: 'data',
         },
         {
           href: '/data/exports',
@@ -288,7 +253,8 @@ export function SettingsHome() {
                 glyph: 'export' as const,
                 eyebrow: 'Account',
                 title: 'Billing & access',
-                detail: 'See trial or subscription status, manage billing, and keep the export path visible.',
+                detail:
+                  'See trial or subscription status, manage billing, and keep the export path visible.',
                 accent: 'data' as const,
               },
             ]

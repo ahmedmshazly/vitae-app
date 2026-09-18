@@ -41,7 +41,9 @@ export type ToastAnnouncementMode = 'radix' | 'item';
 export interface ToastActionSpec {
   /** Button text. Keep it a verb: "Undo", "Retry", "Open". */
   label: string;
-  onAction: () => void;
+  onAction: () => void | Promise<void>;
+  pendingLabel?: string;
+  errorMessage?: string;
 }
 
 export interface ToastOptions {
@@ -142,6 +144,7 @@ interface QueueItem {
   action?: ToastActionSpec;
   duration: number;
   open: boolean;
+  pending: boolean;
 }
 
 const ToastApiContext = createContext<ToastApi | null>(null);
@@ -168,6 +171,8 @@ export interface ToastProps {
   className?: string;
   /** Provider-controlled compatibility mode; prefer the default Radix announcer. */
   announcementMode?: ToastAnnouncementMode;
+  /** Lets the bounded provider retain an in-flight action during a burst. */
+  onActionPendingChange?: (pending: boolean) => void;
 }
 export function Toast({
   message,
@@ -179,17 +184,64 @@ export function Toast({
   swipeAxis = 'x',
   className,
   announcementMode = 'radix',
+  onActionPendingChange,
 }: ToastProps) {
-  const meta = VARIANT[variant];
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [internalOpen, setInternalOpen] = useState(true);
+  const running = useRef(false);
+  const mounted = useRef(true);
+  const itemRef = useRef<HTMLLIElement>(null);
+  useEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; };
+  }, []);
+
+  function changeOpen(next: boolean) {
+    if (!next && running.current) return;
+    setInternalOpen(next);
+    onOpenChange?.(next);
+  }
+
+  async function runAction() {
+    if (!action || running.current) return;
+    running.current = true;
+    setPending(true);
+    onActionPendingChange?.(true);
+    setError(null);
+    let failed = false;
+    try {
+      await action.onAction();
+    } catch {
+      failed = true;
+    }
+    running.current = false;
+    if (!mounted.current) return;
+    setPending(false);
+    onActionPendingChange?.(false);
+    if (failed) {
+      setError(action.errorMessage ?? "Couldn't complete that action. Try again.");
+    } else {
+      // Match Radix's dismissal focus handoff after an asynchronous action.
+      if (itemRef.current?.contains(document.activeElement)) itemRef.current.closest('ol')?.focus();
+      changeOpen(false);
+    }
+  }
+
+  const effectiveVariant = error ? 'error' : variant;
+  const meta = VARIANT[effectiveVariant];
   return (
     <RadixToast.Root
-      className={cn('vt-toast', variant !== 'status' && `vt-toast--${variant}`, className)}
-      data-variant={variant}
+      ref={itemRef}
+      className={cn('vt-toast', effectiveVariant !== 'status' && `vt-toast--${effectiveVariant}`, className)}
+      data-variant={effectiveVariant}
       data-swipe-axis={swipeAxis}
       type={meta.live}
-      duration={duration}
-      open={open}
-      onOpenChange={onOpenChange}
+      duration={pending ? Infinity : error ? MS_WITH_ACTION : duration}
+      open={open ?? internalOpen}
+      onOpenChange={changeOpen}
+      onEscapeKeyDown={(event) => { if (running.current) event.preventDefault(); }}
+      onSwipeStart={(event) => { if (running.current) event.preventDefault(); }}
     >
       {/* One wrapper carries the whole announcement, so Radix reads the
           sentence we wrote instead of gluing the parts together itself. The
@@ -214,7 +266,7 @@ export function Toast({
         }
         aria-atomic={announcementMode === 'item' || undefined}
         data-radix-toast-announce-exclude=""
-        data-radix-toast-announce-alt={announcement(message, variant, action)}
+        data-radix-toast-announce-alt={announcement(error ? `${message}. ${error}` : message, effectiveVariant, action)}
       >
         {meta.glyph && (
           <span className="vt-toast__glyph" aria-hidden>
@@ -224,17 +276,25 @@ export function Toast({
         <div className="vt-toast__body">
           {meta.word && <RadixToast.Title className="vt-toast__word">{meta.word}</RadixToast.Title>}
           <RadixToast.Description className="vt-toast__msg">{message}</RadixToast.Description>
+          {error && <p className="vt-toast__error">{error}</p>}
         </div>
         {action && (
           <RadixToast.Action
             className="vt-toast__action"
             altText={actionAltText(action)}
-            onClick={action.onAction}
+            aria-disabled={pending}
+            aria-busy={pending}
+            onClick={(event) => {
+              // Radix normally closes immediately. A server action owns its
+              // result, so keep this item and its retry until it succeeds.
+              event.preventDefault();
+              void runAction();
+            }}
           >
-            {action.label}
+            {pending ? action.pendingLabel ?? 'Working…' : action.label}
           </RadixToast.Action>
         )}
-        <RadixToast.Close className="vt-toast__x" aria-label="Dismiss">
+        <RadixToast.Close className="vt-toast__x" aria-label="Dismiss" disabled={pending}>
           <Glyph name="close" size={12} />
         </RadixToast.Close>
       </div>
@@ -304,12 +364,17 @@ export function ToastProvider({
           action,
           duration: options?.duration ?? (action ? MS_WITH_ACTION : MS[variant]),
           open: true,
+          pending: false,
         },
       ];
       // Oldest out first, and dropped outright rather than closed: an item
       // this far up the stack has been on screen longest and its exit is the
       // one nobody is watching.
-      return next.length > MAX_ITEMS ? next.slice(next.length - MAX_ITEMS) : next;
+      let excess = next.length - MAX_ITEMS;
+      return next.filter((item) => {
+        if (excess > 0 && !item.pending) { excess -= 1; return false; }
+        return true;
+      });
     });
   }, []);
 
@@ -343,6 +408,9 @@ export function ToastProvider({
             duration={item.duration}
             className={itemClassName}
             announcementMode={announcementMode}
+            onActionPendingChange={(pending) => {
+              setItems((previous) => previous.map((entry) => entry.id === item.id ? { ...entry, pending } : entry));
+            }}
             open={item.open}
             onOpenChange={(next) => {
               if (!next) close(item.id);

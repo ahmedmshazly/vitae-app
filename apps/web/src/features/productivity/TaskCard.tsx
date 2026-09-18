@@ -24,21 +24,41 @@ function Actions({
   onDrop,
   onWait,
   onUndo,
-}: Pick<TaskCardProps, 'task' | 'locked' | 'canUndo' | 'onComplete' | 'onDrop' | 'onWait' | 'onUndo'>) {
+}: Pick<
+  TaskCardProps,
+  'task' | 'locked' | 'canUndo' | 'onComplete' | 'onDrop' | 'onWait' | 'onUndo'
+>) {
   return (
     <span className="prod-actions">
-      <Button type="button" size="sm" disabled={locked} onClick={() => onComplete(task)}>
+      <Button
+        type="button"
+        size="sm"
+        disabled={locked || task.status === 'done' || task.id.startsWith('optimistic:')}
+        onClick={() => onComplete(task)}
+      >
         Complete
       </Button>
-      <Button type="button" size="sm" disabled={locked} onClick={() => onDrop(task)}>
+      <Button
+        type="button"
+        size="sm"
+        disabled={locked || task.status === 'dropped' || task.id.startsWith('optimistic:')}
+        onClick={() => onDrop(task)}
+      >
         Drop
       </Button>
-      <Button type="button" size="sm" disabled={locked} onClick={() => onWait(task)}>
+      <Button
+        type="button"
+        size="sm"
+        disabled={locked || task.id.startsWith('optimistic:')}
+        onClick={() => onWait(task)}
+      >
         Wait
       </Button>
-      <Button type="button" size="sm" disabled={locked || !canUndo} onClick={onUndo}>
-        Undo
-      </Button>
+      {canUndo && (
+        <Button type="button" size="sm" disabled={locked} onClick={onUndo}>
+          Undo
+        </Button>
+      )}
     </span>
   );
 }
@@ -90,6 +110,7 @@ export function TaskCard({
             type="button"
             id={`prod-open-task-${task.id}`}
             className="prod-title-btn"
+            disabled={task.id.startsWith('optimistic:')}
             onClick={() => onSelect(task.id)}
           >
             {task.title}
@@ -111,6 +132,7 @@ export function TaskCard({
           type="button"
           id={`prod-open-task-${task.id}`}
           className="prod-title-btn"
+          disabled={task.id.startsWith('optimistic:')}
           onClick={() => onSelect(task.id)}
         >
           {task.title}

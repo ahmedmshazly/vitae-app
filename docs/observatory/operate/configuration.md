@@ -102,7 +102,8 @@ Invalid environment configuration:
 ```
 
 An optional key that is absent disables what depends on it. No GitHub token
-means repository sync has no credential. No trusted companion project means
+means repository sync has no credential. No Gemini key means the Gemini source
+is disconnected. No trusted companion project means
 this project is the only accepted token issuer. These are not errors and are
 not reported as such.
 

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Vitae
+Comment=Personal life and career graph on this computer
+Exec=xdg-open http://127.0.0.1:8080
+Icon=applications-office
+Terminal=false
+Categories=Office;
+StartupNotify=true

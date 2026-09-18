@@ -60,9 +60,7 @@ describe('Letters states', () => {
   it('reports a failed load instead of inviting a first letter', async () => {
     serve({ '/letters': new Error('gateway down') });
     renderWithApp(<Letters />, { route: '/letters' });
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      "Couldn't load your cover letters",
-    );
+    expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't load your cover letters");
     expect(screen.queryByText(/No cover letters yet/)).not.toBeInTheDocument();
   });
 
@@ -154,5 +152,27 @@ describe('Letters states', () => {
 
     const body = mockApi.patch.mock.calls[0]![1] as { recipient?: Record<string, string> };
     expect(body.recipient).toBeUndefined();
+  });
+
+  it('reports an archive failure and leaves its confirmation available for retry', async () => {
+    mockApi.del.mockRejectedValue(new Error('archive service unavailable'));
+    renderWithApp(<Letters />, { route: '/letters' });
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: /Details of the letter to Northwind/ }),
+    );
+    await userEvent.click(await screen.findByRole('button', { name: 'Archive' }));
+    const confirmation = await screen.findByRole('dialog', { name: 'Archive this letter?' });
+    await userEvent.click(within(confirmation).getByRole('button', { name: 'Archive' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      "Couldn't archive this letter. archive service unavailable",
+    );
+    expect(screen.getByRole('dialog', { name: 'Archive this letter?' })).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('dialog', { name: 'Archive this letter?' })).getByRole('button', {
+        name: 'Archive',
+      }),
+    ).toBeEnabled();
   });
 });

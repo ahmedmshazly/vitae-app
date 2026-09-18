@@ -263,6 +263,23 @@ export const eventProps = z.object({
   attended: z.boolean().optional(),
 });
 
+export const areaProps = z.object({
+  kind: z.enum(['health', 'family', 'home', 'career', 'learning', 'finance', 'community', 'creative', 'other']).optional(),
+  area_status: z.enum(['active', 'paused', 'archived']).default('active'),
+  standard: z.string().max(1000).optional(),
+  review_cadence_days: z.number().int().positive().optional(),
+}).passthrough();
+
+export const opportunityProps = z.object({
+  kind: z.enum(['collaboration', 'grant', 'speaking', 'job', 'volunteer', 'learning', 'investment', 'other']).optional(),
+  opportunity_status: z.enum(['possible', 'considering', 'pursuing', 'won', 'declined', 'closed']).default('possible'),
+  next_step: z.string().optional(),
+  next_step_date: isoDate.optional(),
+  deadline: isoDate.optional(),
+  url: urlish,
+  value: z.string().optional(),
+}).passthrough();
+
 export const taskProps = z.object({
   status: z.enum(['inbox', 'next', 'doing', 'waiting', 'done', 'dropped']),
   due: isoDate.optional(),
@@ -566,6 +583,8 @@ const passthroughProps = z.record(z.string(), z.unknown());
  * through validate → PATCH without being silently stripped.
  */
 export const NODE_PROPS_SCHEMAS = {
+  area: areaProps,
+  opportunity: opportunityProps,
   person: personProps.passthrough(),
   organization: organizationProps.passthrough(),
   role: roleProps.passthrough(),

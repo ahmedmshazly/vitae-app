@@ -1,5 +1,5 @@
 import '../../test/api-mock.js';
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { ApplicationListResponse, ApplicationSummary } from '@vitae/core';
@@ -78,10 +78,11 @@ describe('Career application overview', () => {
     expect(await screen.findByRole('heading', { name: /Next moves/ })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Application runway/ })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Outcomes/ })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Staff Engineer, Northstar' })).toHaveAttribute(
-      'href',
-      '/career/applications/application-1',
-    );
+    expect(
+      screen.getAllByRole('link', {
+        name: 'Open Staff Engineer application at Northstar',
+      })[0],
+    ).toHaveAttribute('href', '/career/applications/application-1');
     expect(screen.getByText('Platform Lead')).toBeInTheDocument();
     expect(screen.getByText('Accepted')).toBeInTheDocument();
   });
@@ -95,7 +96,49 @@ describe('Career application overview', () => {
     await user.type(search, 'nonexistent');
     expect(screen.getByText('No applications match')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Clear filters' }));
-    expect(screen.getByRole('link', { name: 'Staff Engineer, Northstar' })).toBeInTheDocument();
+    expect(
+      screen.getAllByRole('link', {
+        name: 'Open Staff Engineer application at Northstar',
+      })[0],
+    ).toBeInTheDocument();
+  });
+
+  it('keeps loaded applications visible when a background refresh fails', async () => {
+    mockApi.get
+      .mockResolvedValueOnce(response)
+      .mockRejectedValueOnce(new Error('Network unavailable'));
+    const { queryClient } = renderWithApp(<CareerOverview />, { route: '/career' });
+
+    await screen.findByRole('heading', { name: /Application runway/ });
+    await act(async () => {
+      await queryClient.refetchQueries({ queryKey: ['applications'] });
+    });
+
+    expect(mockApi.get).toHaveBeenCalledTimes(2);
+    expect(queryClient.getQueryState(['applications'])?.status).toBe('error');
+    expect(queryClient.getQueryData(['applications'])).toEqual(response);
+    const warning = await screen.findByText("Couldn't refresh the runway");
+    expect(warning.closest('[role="status"]')).toHaveTextContent(
+      'Your loaded applications are still shown.',
+    );
+    expect(screen.getByText('Your loaded applications are still shown.')).toBeInTheDocument();
+    expect(
+      screen.getAllByRole('link', {
+        name: 'Open Staff Engineer application at Northstar',
+      })[0],
+    ).toBeInTheDocument();
+  });
+
+  it('exposes the full runway as a keyboard-reachable horizontal instrument', async () => {
+    mockApi.get.mockResolvedValue(response);
+    renderWithApp(<CareerOverview />, { route: '/career' });
+
+    const runway = await screen.findByLabelText(
+      'Application pipeline stages. Scroll horizontally to review all five stages.',
+    );
+    expect(runway).toHaveAttribute('tabindex', '0');
+    expect(screen.getByRole('list', { name: 'Active application stages' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('2 shown');
   });
 
   it('distinguishes a genuinely empty career workspace', async () => {

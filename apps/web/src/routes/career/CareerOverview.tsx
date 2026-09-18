@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import type { ApplicationListResponse, ApplicationStatus, ApplicationSummary } from '@vitae/core';
 import {
+  Banner,
   Button,
   Chip,
   EmptyState,
@@ -19,6 +20,7 @@ import {
 } from '@vitae/ui';
 import { api } from '../../lib/api.js';
 import { NewApplicationButton } from './ApplicationActions.js';
+import './career-overview.css';
 import {
   applicationMatches,
   attentionLabel,
@@ -86,6 +88,14 @@ export function CareerOverview() {
       ).length,
     [applications],
   );
+  const hasFilters = Boolean(query || status);
+  const initialLoadError = applicationsQuery.isError && !applicationsQuery.data;
+  // TanStack keeps a successful query's status at `success` when only its
+  // refetch fails. `isRefetchError` is therefore the truthful stale-data
+  // branch; using `isError` here would silently hide the recovery notice.
+  const backgroundRefreshError =
+    applicationsQuery.isRefetchError && Boolean(applicationsQuery.data);
+
   function setFilter(key: 'q' | 'status', value: string) {
     const next = new URLSearchParams(searchParams);
     if (value) next.set(key, value);
@@ -98,22 +108,23 @@ export function CareerOverview() {
   }
 
   return (
-    <div className="page">
+    <div className="page page--career-runway">
       <PageHeader
         title="Career"
-        subtitle="Keep every opportunity, conversation, interview, and next move on one evidence-backed runway."
+        subtitle="See the next decision in every application, then use the runway to keep the whole search moving."
         actions={<NewApplicationButton />}
       />
       <RegisterRule />
 
-      {applicationsQuery.isError ? (
+      {initialLoadError ? (
         <ErrorState
           title="Couldn't load your applications"
           detail={(applicationsQuery.error as Error | null)?.message}
           onRetry={() => void applicationsQuery.refetch()}
+          retrying={applicationsQuery.isFetching}
         />
       ) : applicationsQuery.isLoading || !applicationsQuery.data ? (
-        <SkeletonRows rows={7} />
+        <SkeletonRows rows={7} label="Loading applications" />
       ) : applications.length === 0 ? (
         <EmptyState
           glyph="application"
@@ -123,10 +134,26 @@ export function CareerOverview() {
         />
       ) : (
         <>
-          <div
-            className="mb-6 flex flex-wrap items-baseline gap-x-8 gap-y-3 border-y border-hairline py-3"
-            aria-label="Application summary"
-          >
+          {backgroundRefreshError ? (
+            <Banner
+              tone="warning"
+              title="Couldn't refresh the runway"
+              action={
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  disabled={applicationsQuery.isFetching}
+                  onClick={() => void applicationsQuery.refetch()}
+                >
+                  {applicationsQuery.isFetching ? 'Retrying…' : 'Retry'}
+                </Button>
+              }
+            >
+              Your loaded applications are still shown.
+            </Banner>
+          ) : null}
+
+          <dl className="career-runway__summary" aria-label="Application summary">
             <LedgerFigure value={applicationsQuery.data.active} label="active" />
             <LedgerFigure value={applicationsQuery.data.counts.interview} label="in interviews" />
             <LedgerFigure value={applicationsQuery.data.counts.offer} label="offers" />
@@ -135,11 +162,15 @@ export function CareerOverview() {
               label="due now"
               warning={applicationsQuery.data.needs_attention > 0}
             />
-          </div>
+          </dl>
 
           {attention.length > 0 ? (
-            <Section title="Next moves" meta={attention.length}>
-              <ol className="m-0 grid list-none gap-2 p-0 md:grid-cols-2">
+            <Section
+              title="Next moves"
+              meta={attention.length}
+              actions={<Mono className="career-next-moves__order">Soonest first</Mono>}
+            >
+              <ol className="career-next-moves">
                 {attention.map((application) => {
                   const timing = attentionLabel(application);
                   const urgent =
@@ -149,29 +180,38 @@ export function CareerOverview() {
                     <li key={application.id}>
                       <Link
                         to={`/career/applications/${application.id}`}
-                        className="block rounded-sm border border-hairline p-3 text-ink no-underline transition-colors hover:border-strong hover:bg-raised hover:no-underline"
+                        className="career-next-move"
+                        aria-label={`Open ${application.role_title} application at ${application.organization?.title ?? application.title}`}
                       >
-                        <div className="mb-2 flex items-center justify-between gap-3">
-                          <span className="truncate text-sm font-medium">
-                            {application.role_title}
+                        <span className="career-next-move__due">
+                          <Mono className={urgent ? 'text-warning' : undefined}>
+                            {timing ?? 'Date not set'}
+                          </Mono>
+                          <span>{urgent ? 'Needs attention' : 'Upcoming move'}</span>
+                        </span>
+                        <span className="career-next-move__record">
+                          <EntityGlyph type="application" size="sm" />
+                          <span>
+                            <strong>{application.role_title}</strong>
+                            <small>{application.organization?.title ?? application.title}</small>
                           </span>
-                          <Chip tone={statusTone(application.status)} mono>
-                            {STATUS_LABEL[application.status]}
-                          </Chip>
-                        </div>
+                        </span>
                         <StatusTrace
                           announce={false}
+                          className="career-next-move__trace"
                           tone={urgent ? 'warning' : 'live'}
                           label={nextMove(application)}
                           detail={
-                            timing ??
                             application.next_interview?.scheduled_at?.slice(0, 10) ??
-                            'Date not set'
+                            (application.next_interview ? 'Interview scheduled' : undefined)
                           }
                         />
-                        <p className="mt-2 truncate text-xs text-muted">
-                          {application.organization?.title ?? application.title}
-                        </p>
+                        <span className="career-next-move__stage">
+                          <Chip tone={statusTone(application.status)} mono>
+                            {STATUS_LABEL[application.status]}
+                          </Chip>
+                          <Mono>{stageOrdinal(application.status)}</Mono>
+                        </span>
                       </Link>
                     </li>
                   );
@@ -179,7 +219,7 @@ export function CareerOverview() {
               </ol>
             </Section>
           ) : (
-            <div className="mb-6 border-y border-hairline py-3">
+            <div className="career-next-moves__clear-state">
               <StatusTrace
                 tone={missingNextMove > 0 ? 'warning' : 'success'}
                 label={
@@ -196,8 +236,16 @@ export function CareerOverview() {
             </div>
           )}
 
-          <Section title="Application runway" meta={applicationsQuery.data.active}>
-            <div className="mb-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_180px_auto]">
+          <Section
+            title="Application runway"
+            meta={applicationsQuery.data.active}
+            actions={
+              applicationsQuery.isFetching && !backgroundRefreshError ? (
+                <StatusTrace announce={false} tone="live" label="Refreshing" />
+              ) : null
+            }
+          >
+            <div className="career-runway__filters" aria-label="Application filters">
               <Input
                 aria-label="Search applications"
                 placeholder="Search role, company, person, or next step..."
@@ -211,11 +259,16 @@ export function CareerOverview() {
                 options={STATUS_OPTIONS}
                 onChange={(value) => setFilter('status', value ?? '')}
               />
-              <Mono className="self-center text-sm text-faint">
+              <output className="career-runway__count" aria-live="polite">
                 {visible.length === applications.length
-                  ? `${applications.length}`
-                  : `${visible.length} of ${applications.length}`}
-              </Mono>
+                  ? `${applications.length} shown`
+                  : `${visible.length} of ${applications.length} shown`}
+              </output>
+              {hasFilters && visible.length > 0 ? (
+                <Button size="sm" variant="ghost" onClick={clearFilters}>
+                  Clear filters
+                </Button>
+              ) : null}
             </div>
 
             {visible.length === 0 ? (
@@ -226,33 +279,29 @@ export function CareerOverview() {
                 action={<Button onClick={clearFilters}>Clear filters</Button>}
               />
             ) : (
-              <div className="overflow-x-auto pb-2">
-                <ol
-                  className="m-0 grid min-w-[920px] list-none grid-cols-5 border-y border-hairline p-0"
-                  aria-label="Active application stages"
-                >
+              <div
+                className="career-runway__scroll"
+                tabIndex={0}
+                aria-label="Application pipeline stages. Scroll horizontally to review all five stages."
+              >
+                <ol className="career-runway__lanes" aria-label="Active application stages">
                   {PIPELINE_STAGES.map((stage) => {
                     const lane = byStatus.get(stage) ?? [];
                     return (
-                      <li
-                        key={stage}
-                        className="min-w-0 border-l border-hairline px-3 py-4 first:border-l-0"
-                      >
-                        <div className="mb-4 flex items-baseline justify-between gap-2">
-                          <span className="flex items-baseline gap-2">
-                            <Mono className="text-xs text-faint">{stageOrdinal(stage)}</Mono>
-                            <h3 className="text-sm font-medium text-ink">{STATUS_LABEL[stage]}</h3>
+                      <li key={stage} className="career-runway__lane">
+                        <div className="career-runway__lane-head">
+                          <span>
+                            <Mono>{stageOrdinal(stage)}</Mono>
+                            <h3>{STATUS_LABEL[stage]}</h3>
                           </span>
-                          <Mono className={lane.length ? 'text-sm text-ink' : 'text-sm text-faint'}>
+                          <Mono className={lane.length ? 'text-ink' : 'text-faint'}>
                             {lane.length}
                           </Mono>
                         </div>
                         {lane.length === 0 ? (
-                          <p className="border-t border-dashed border-hairline pt-3 text-xs text-faint">
-                            No applications
-                          </p>
+                          <p className="career-runway__empty-lane">No applications in this stage</p>
                         ) : (
-                          <ul className="m-0 flex list-none flex-col gap-2 p-0">
+                          <ul className="career-runway__cards">
                             {lane.map((application) => (
                               <li key={application.id}>
                                 <ApplicationCard application={application} />
@@ -280,7 +329,8 @@ export function CareerOverview() {
                 <Link
                   key={application.id}
                   to={`/career/applications/${application.id}`}
-                  className="row text-ink no-underline hover:no-underline"
+                  className="row career-outcome text-ink no-underline hover:no-underline"
+                  aria-label={`Open ${application.role_title} application at ${application.organization?.title ?? application.title}`}
                 >
                   <EntityGlyph type="application" size="sm" />
                   <span className="row__main">
@@ -292,6 +342,9 @@ export function CareerOverview() {
                   <Chip tone={statusTone(application.status)} mono>
                     {STATUS_LABEL[application.status]}
                   </Chip>
+                  <Mono className="career-outcome__updated">
+                    Updated {application.updated_at.slice(0, 10)}
+                  </Mono>
                 </Link>
               ))}
             </Section>
@@ -315,10 +368,12 @@ function LedgerFigure({
   warning?: boolean;
 }) {
   return (
-    <p className="flex items-baseline gap-2">
-      <Mono className={warning ? 'text-xl text-warning' : 'text-xl text-ink-strong'}>{value}</Mono>
-      <span className="text-xs tracking-[0.06em] text-muted uppercase">{label}</span>
-    </p>
+    <div className="career-runway__figure">
+      <dt>{label}</dt>
+      <dd>
+        <Mono className={warning ? 'text-warning' : 'text-ink-strong'}>{value}</Mono>
+      </dd>
+    </div>
   );
 }
 
@@ -327,23 +382,23 @@ function ApplicationCard({ application }: { application: ApplicationSummary }) {
   return (
     <Link
       to={`/career/applications/${application.id}`}
-      className="block rounded-sm border border-hairline bg-canvas p-3 text-ink no-underline transition-colors hover:border-strong hover:bg-raised hover:no-underline"
-      aria-label={`${application.role_title}, ${application.organization?.title ?? application.title}`}
+      className="career-runway-card"
+      aria-label={`Open ${application.role_title} application at ${application.organization?.title ?? application.title}`}
     >
-      <span className="mb-2 flex items-start gap-2">
+      <span className="career-runway-card__head">
         <EntityGlyph type="application" size="sm" />
-        <span className="min-w-0 flex-1">
-          <span className="block text-sm font-medium leading-snug">{application.role_title}</span>
-          <span className="mt-0.5 block truncate text-xs text-muted">
-            {application.organization?.title ?? application.title}
-          </span>
+        <span>
+          <strong>{application.role_title}</strong>
+          <small>{application.organization?.title ?? application.title}</small>
         </span>
       </span>
-      <span className="block border-t border-hairline pt-2 text-xs text-ink-soft">
-        {nextMove(application)}
-      </span>
+      <span className="career-runway-card__move">{nextMove(application)}</span>
       <span
-        className={`mt-1 block text-xs ${application.attention?.kind === 'overdue' ? 'text-warning' : 'text-faint'}`}
+        className={
+          application.attention?.kind === 'overdue'
+            ? 'career-runway-card__meta career-runway-card__meta--warning'
+            : 'career-runway-card__meta'
+        }
       >
         {timing ??
           (application.interview_count

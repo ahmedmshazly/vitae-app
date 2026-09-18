@@ -116,6 +116,17 @@ describe('ThemeProvider initial theme', () => {
 });
 
 describe('ThemeProvider changing theme', () => {
+  it('persists an explicit choice even when it matches the inferred theme', () => {
+    const { result, unmount } = mount();
+    expect(result.current.followsSystem).toBe(true);
+    act(() => result.current.setTheme('light'));
+    expect(localStorage.getItem(STORAGE_KEY)).toBe('light');
+    expect(result.current.followsSystem).toBe(false);
+    unmount();
+    setPreferences('prefers-color-scheme: dark');
+    expect(mount().result.current.theme).toBe('light');
+  });
+
   it('writes the new theme onto the document element', () => {
     const { result } = mount();
     act(() => result.current.setTheme('hc'));
@@ -152,6 +163,23 @@ describe('ThemeProvider changing theme', () => {
 });
 
 describe('ThemeProvider following the system', () => {
+  it('can return to the current system setting and keep following after a reload', () => {
+    localStorage.setItem(STORAGE_KEY, 'light');
+    const { result, unmount } = mount();
+    setPreferences('prefers-color-scheme: dark');
+    announce();
+    expect(result.current.theme).toBe('light');
+    act(() => result.current.followSystem());
+    expect(result.current.theme).toBe('dark');
+    expect(result.current.followsSystem).toBe(true);
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+    setPreferences('prefers-contrast: more');
+    announce();
+    expect(result.current.theme).toBe('hc');
+    unmount();
+    expect(mount().result.current.followsSystem).toBe(true);
+  });
+
   it('moves with the system while the reader has made no choice of their own', () => {
     const { result } = mount();
     expect(result.current.theme).toBe('light');

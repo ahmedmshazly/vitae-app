@@ -16,7 +16,7 @@ describe('apps/web/index.html identity shell', () => {
   });
 
   it('uses the light --bg as theme-color, not Quiet canvas', () => {
-    expect(html).toMatch(/name="theme-color" content="#f2f0ea"/);
+    expect(html).toMatch(/name="theme-color" content="#f7f4ed"/);
     expect(html).not.toMatch(/theme-color" content="#0F0F0F"/i);
   });
 

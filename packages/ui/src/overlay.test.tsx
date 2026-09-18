@@ -2,14 +2,29 @@ import { useState } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { CommandOverlay, Menu, Modal, Popover, RegisterRule, Section, Tooltip, TooltipProvider } from './overlay.js';
+import {
+  CommandOverlay,
+  ConfirmDialog,
+  Menu,
+  Modal,
+  Popover,
+  RegisterRule,
+  Section,
+  Tooltip,
+  TooltipProvider,
+} from './overlay.js';
 
 function ControlledModal({ children }: { children?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
     <>
       <button onClick={() => setOpen(true)}>Open modal</button>
-      <Modal open={open} onOpenChange={setOpen} title="Delete this record?" description="This can be undone.">
+      <Modal
+        open={open}
+        onOpenChange={setOpen}
+        title="Delete this record?"
+        description="This can be undone."
+      >
         {children ?? <input aria-label="Name" />}
       </Modal>
     </>
@@ -49,6 +64,15 @@ describe('Modal', () => {
     // browser, rather than asserted here against a false negative.
   });
 
+  it('skips disabled fields and keeps static dialog content keyboard reachable', async () => {
+    const user = userEvent.setup();
+    render(<ControlledModal><fieldset disabled><input aria-label="Locked name" /></fieldset></ControlledModal>);
+    await user.click(screen.getByRole('button', { name: 'Open modal' }));
+    expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole('region', { name: 'Dialog content' })).toHaveFocus();
+  });
+
   it('closes via the X button and calls onOpenChange', async () => {
     const user = userEvent.setup();
     render(<ControlledModal />);
@@ -56,6 +80,36 @@ describe('Modal', () => {
     await screen.findByRole('dialog');
     await user.click(screen.getByRole('button', { name: 'Close' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+});
+
+describe('ConfirmDialog', () => {
+  it('disables both actions while confirmation is pending', async () => {
+    render(<ConfirmDialog open busy onOpenChange={() => {}} title="Unlink connections?" onConfirm={() => {}} />);
+    expect(await screen.findByRole('button', { name: 'Cancel' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled();
+  });
+  it('supports a safe initial focus when confirmation would discard work', async () => {
+    render(
+      <ConfirmDialog
+        open
+        onOpenChange={() => {}}
+        title="Discard changes?"
+        cancelLabel="Keep editing"
+        confirmLabel="Discard"
+        destructive
+        initialFocus="cancel"
+        onConfirm={() => {}}
+      />,
+    );
+    expect(await screen.findByRole('button', { name: 'Keep editing' })).toHaveFocus();
+  });
+
+  it('keeps the deliberate confirmation focus as the default', async () => {
+    render(
+      <ConfirmDialog open onOpenChange={() => {}} title="Archive output?" onConfirm={() => {}} />,
+    );
+    expect(await screen.findByRole('button', { name: 'Confirm' })).toHaveFocus();
   });
 });
 
@@ -157,7 +211,13 @@ describe('Menu', () => {
         trigger={<button>Actions</button>}
         onSelect={onSelect}
         groups={[
-          { label: 'Record', items: [{ key: 'edit', label: 'Edit' }, { key: 'delete', label: 'Delete' }] },
+          {
+            label: 'Record',
+            items: [
+              { key: 'edit', label: 'Edit' },
+              { key: 'delete', label: 'Delete' },
+            ],
+          },
         ]}
       />,
     );
@@ -252,7 +312,11 @@ describe('RegisterRule', () => {
 
 describe('Section', () => {
   it('keeps a space between the title and its count', () => {
-    render(<Section title="Connections" meta={5}>rows</Section>);
+    render(
+      <Section title="Connections" meta={5}>
+        rows
+      </Section>,
+    );
     // The heading is a flex container, which drops a whitespace-only text
     // node between children: "Connections 5" rendered as "Connections5".
     // The gap has to come from CSS, and the two have to be separate nodes.

@@ -29,7 +29,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type Dispatch,
   type ReactNode,
@@ -41,10 +40,10 @@ export type Theme = 'light' | 'dark' | 'hc';
 export interface ThemeContextValue {
   theme: Theme;
   setTheme: Dispatch<SetStateAction<Theme>>;
-  /** The theme actually on the document. Equal to `theme`; kept as its own
-   * field so a future "system" option has somewhere to report what it landed
-   * on without changing this shape. */
+  /** The theme actually on the document. */
   resolvedTheme: Theme;
+  followsSystem: boolean;
+  followSystem: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -79,33 +78,30 @@ function systemTheme(): Theme {
   return 'light';
 }
 
-function getInitialTheme(): Theme {
-  if (typeof window === 'undefined') return 'light';
-  return storedTheme() ?? systemTheme();
-}
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
-  // Whether the current theme is a choice or an inference. A ref rather than
-  // state: nothing renders differently because of it, and it has to be readable
-  // synchronously inside the media-query handler.
-  const chosen = useRef(storedTheme() !== null);
+  const [preference, setPreference] = useState<Theme | null>(storedTheme);
+  const [system, setSystem] = useState<Theme>(systemTheme);
+  const theme = preference ?? system;
 
   const setTheme = useCallback<Dispatch<SetStateAction<Theme>>>((next) => {
-    chosen.current = true;
-    setThemeState(next);
+    setPreference((current) => typeof next === 'function' ? next(current ?? systemTheme()) : next);
+  }, []);
+
+  const followSystem = useCallback(() => {
+    setSystem(systemTheme());
+    setPreference(null);
   }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    if (!chosen.current) return;
     try {
-      localStorage.setItem(THEME_STORAGE_KEY, theme);
+      if (preference === null) localStorage.removeItem(THEME_STORAGE_KEY);
+      else localStorage.setItem(THEME_STORAGE_KEY, preference);
     } catch {
       // The theme is applied either way; not remembering it is the lesser
       // failure, and there is nothing useful to tell the reader about it.
     }
-  }, [theme]);
+  }, [theme, preference]);
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
@@ -114,10 +110,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     );
 
     const handleChange = () => {
-      // A stored choice outranks the system, so a document that has one stops
-      // listening in effect: the preference moved, and the answer did not.
-      if (chosen.current) return;
-      setThemeState(systemTheme());
+      setSystem(systemTheme());
     };
 
     for (const query of queries) query.addEventListener('change', handleChange);
@@ -127,8 +120,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<ThemeContextValue>(
-    () => ({ theme, setTheme, resolvedTheme: theme }),
-    [theme, setTheme],
+    () => ({ theme, setTheme, resolvedTheme: theme, followsSystem: preference === null, followSystem }),
+    [theme, setTheme, preference, followSystem],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

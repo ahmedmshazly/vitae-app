@@ -40,13 +40,12 @@ describe('GraphSearch combobox', () => {
 
     const options = within(listbox).getAllByRole('option');
     expect(options).toHaveLength(3);
-    expect(options[0]).toHaveAttribute('aria-selected', 'true');
-    expect(input).toHaveAttribute('aria-activedescendant', options[0]!.id);
+    expect(options[0]).toHaveAttribute('aria-selected', 'false');
+    expect(input).not.toHaveAttribute('aria-activedescendant');
 
     await user.keyboard('{ArrowDown}');
-    expect(options[1]).toHaveAttribute('aria-selected', 'true');
-    expect(options[0]).toHaveAttribute('aria-selected', 'false');
-    expect(input).toHaveAttribute('aria-activedescendant', options[1]!.id);
+    expect(options[0]).toHaveAttribute('aria-selected', 'true');
+    expect(input).toHaveAttribute('aria-activedescendant', options[0]!.id);
   });
 
   it('speaks the hit count as the query narrows', async () => {
@@ -110,13 +109,7 @@ describe('ConnectedList', () => {
 
   it('offers a way out when the filters hid every neighbour', () => {
     renderWithApp(
-      <ConnectedList
-        open
-        selected={nodes[0]!}
-        rows={[]}
-        onSelect={() => {}}
-        onToggle={() => {}}
-      />,
+      <ConnectedList open selected={nodes[0]!} rows={[]} onSelect={() => {}} onToggle={() => {}} />,
     );
     expect(screen.getByText('No neighbors in view')).toBeInTheDocument();
     expect(screen.getByText(/Widen the record filters/)).toBeInTheDocument();

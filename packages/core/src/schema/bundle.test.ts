@@ -162,8 +162,14 @@ describe('vitae.graph.bundle/1', () => {
     });
   });
 
-  it('rejects an unknown schema_version rather than parsing best-effort', () => {
-    expect(parseGraphBundle({ ...(golden as Record<string, unknown>), schema_version: 2 }).ok).toBe(false);
+  it('accepts evidence-bearing v2 while retaining v1 and rejects unknown versions', () => {
+    const v2 = parseGraphBundle({ ...(golden as Record<string, unknown>), schema_version: 2,
+      edges: [{ type: 'KNOWS', src: 'person:jane-smith', dst: 'person:omar-hassan', ref: 'knows-1' }],
+      evidence: [{ subject_kind: 'edge', subject_ref: 'knows-1', field: '$relationship', value: { relation: 'colleague' },
+        basis: 'explicit', confidence: 1, observed_at: '2026-01-01T00:00:00Z', valid_from: '2020-01-01', valid_to: null,
+        citation: { external_id: 'message-1', locator: 'gmail:message:1', content_hash: '1234567890abcdef', excerpt: 'We worked together.' } }] });
+    expect(v2.ok).toBe(true);
+    expect(parseGraphBundle({ ...(golden as Record<string, unknown>), schema_version: 3 }).ok).toBe(false);
     expect(parseGraphBundle({ ...(golden as Record<string, unknown>), format: 'something.else' }).ok).toBe(false);
   });
 });

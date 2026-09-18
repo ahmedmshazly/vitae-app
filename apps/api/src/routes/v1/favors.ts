@@ -17,7 +17,10 @@ import { findKnowsEdge } from '../../services/crm.js';
  */
 export const favorsRouter: Router = Router({ mergeParams: true });
 
-type Favor = NonNullable<ReturnType<typeof knowsProps.parse>['favors']>[number] & { id?: string; created_at?: string };
+type Favor = NonNullable<ReturnType<typeof knowsProps.parse>['favors']>[number] & {
+  id?: string;
+  created_at?: string;
+};
 
 async function edgeOr404(personId: string) {
   const edge = await findKnowsEdge(personId);
@@ -41,11 +44,17 @@ async function mutateFavors(
   return repository.transaction(async (tx) => {
     const edge = await repository.getEdge(edgeId, { includeDeleted: true }, tx);
     if (!edge) throw new HttpError(404, 'NOT_FOUND', 'KNOWS relationship not found.');
-    if (edge.type !== 'KNOWS' || edge.deleted_at) throw new HttpError(409, 'EDGE_CHANGED', 'KNOWS relationship changed.');
+    if (edge.type !== 'KNOWS' || edge.deleted_at)
+      throw new HttpError(409, 'EDGE_CHANGED', 'KNOWS relationship changed.');
     const props = (edge.props ?? {}) as Record<string, unknown>;
     const favors = mutate(favorsOf(props));
-    const parsed = knowsProps.passthrough().safeParse({ ...props, favors });
-    if (!parsed.success) throw new HttpError(422, 'VALIDATION', 'invalid favor', parsed.error.issues);
+    // Older strength recomputations persisted null before the first contact.
+    // The canonical optional date is absent, not null; retain every other prop.
+    const parsed = knowsProps
+      .passthrough()
+      .safeParse({ ...props, last_interaction_at: props.last_interaction_at ?? undefined, favors });
+    if (!parsed.success)
+      throw new HttpError(422, 'VALIDATION', 'invalid favor', parsed.error.issues);
     await repository.stageEdgeUpdate(tx, edge, { props: parsed.data }, { op: 'update', actor });
     return (parsed.data.favors ?? []) as Favor[];
   });
@@ -56,8 +65,10 @@ favorsRouter.get(
   asyncHandler(async (req, res) => {
     const edge = await edgeOr404(req.params.personId);
     const current = favorsOf((edge.props ?? {}) as Record<string, unknown>);
-    const hasLegacy = (((edge.props as Record<string, unknown>)?.favors as Array<{ note?: string }> | undefined) ?? [])
-      .some((favor) => favor.note !== undefined);
+    const hasLegacy = (
+      ((edge.props as Record<string, unknown>)?.favors as Array<{ note?: string }> | undefined) ??
+      []
+    ).some((favor) => favor.note !== undefined);
     const favors = hasLegacy
       ? await mutateFavors(edge.id, req.user?.email, (existing) => existing)
       : current;
@@ -80,14 +91,17 @@ favorsRouter.post(
     const favorId = String(req.header('x-idempotency-key') ?? newId());
     const favors = await mutateFavors(edge.id, req.user?.email, (current) => {
       if (current.some((favor) => favor.id === favorId)) return current;
-      return [...current, {
-        id: favorId,
-        direction,
-        what: description,
-        ...(on ? { on: String(on) } : {}),
-        settled: false,
-        created_at: nowIso(),
-      }];
+      return [
+        ...current,
+        {
+          id: favorId,
+          direction,
+          what: description,
+          ...(on ? { on: String(on) } : {}),
+          settled: false,
+          created_at: nowIso(),
+        },
+      ];
     });
     res.status(201).json({ favors });
   }),

@@ -3,7 +3,13 @@
  * into react-hook-form. Structured widgets (tags, rating, money, lists,
  * selects) go through <Controller>; plain text/date/number use `register`.
  */
-import { Controller, useFieldArray, type Control, type FieldErrors, type UseFormRegister } from 'react-hook-form';
+import {
+  Controller,
+  useFieldArray,
+  type Control,
+  type FieldErrors,
+  type UseFormRegister,
+} from 'react-hook-form';
 import {
   Checkbox,
   Field,
@@ -64,10 +70,23 @@ function localToIso(local: string): string | undefined {
   return Number.isNaN(d.getTime()) ? undefined : d.toISOString();
 }
 
-export function FieldRenderer({ field, ownerType, prefix = 'props', control, register, errors }: FieldRendererProps) {
+export function FieldRenderer({
+  field,
+  ownerType,
+  prefix = 'props',
+  control,
+  register,
+  errors,
+}: FieldRendererProps) {
   const name = prefix ? `${prefix}.${field.key}` : field.key;
   const error = errorAt(errors, name);
-  const common = { label: field.label, required: field.required, help: field.help, error, htmlFor: name };
+  const common = {
+    label: field.label,
+    required: field.required,
+    help: field.help,
+    error,
+    htmlFor: name,
+  };
 
   switch (field.widget) {
     // Every text field suggests what has been typed before, so the same value
@@ -89,6 +108,10 @@ export function FieldRenderer({ field, ownerType, prefix = 'props', control, reg
                 propKey={field.key}
                 mono={field.mono}
                 placeholder={field.placeholder}
+                // Combobox owns the native input's accessible name. Preserve
+                // the Field label here rather than letting a placeholder (or
+                // the generic fallback) become the only name after migration.
+                aria-label={field.label}
               />
             )}
           />
@@ -112,7 +135,12 @@ export function FieldRenderer({ field, ownerType, prefix = 'props', control, reg
     case 'textarea':
       return (
         <Field {...common}>
-          <Textarea id={name} invalid={Boolean(error)} placeholder={field.placeholder} {...register(name)} />
+          <Textarea
+            id={name}
+            invalid={Boolean(error)}
+            placeholder={field.placeholder}
+            {...register(name)}
+          />
         </Field>
       );
 
@@ -197,7 +225,12 @@ export function FieldRenderer({ field, ownerType, prefix = 'props', control, reg
           name={name}
           render={({ field: f }) => (
             <div className="form-checkline">
-              <Checkbox id={name} checked={f.value === true} onChange={f.onChange} label={field.label} />
+              <Checkbox
+                id={name}
+                checked={f.value === true}
+                onChange={f.onChange}
+                label={field.label}
+              />
               {field.help && <span className="vt-fld__help">{field.help}</span>}
             </div>
           )}
@@ -270,15 +303,20 @@ export function FieldRenderer({ field, ownerType, prefix = 'props', control, reg
             control={control}
             name={name}
             render={({ field: f }) => (
-              <StringListField
-                value={Array.isArray(f.value) ? (f.value as string[]) : []}
-                onChange={f.onChange}
-                mono={field.mono}
-                placeholder={field.widget === 'email-list' ? 'name@example.com' : field.placeholder}
-                // Imperative, and singular: you add one row at a time. The
-              // label was the plural field name, so the control read "+ emails".
-              addLabel={`Add ${field.label.replace(/s$/i, '').toLowerCase()}`}
-              />
+              <div role="group" aria-label={field.label}>
+                <StringListField
+                  value={Array.isArray(f.value) ? (f.value as string[]) : []}
+                  onChange={f.onChange}
+                  mono={field.mono}
+                  placeholder={
+                    field.widget === 'email-list' ? 'name@example.com' : field.placeholder
+                  }
+                  // Imperative, and singular: you add one row at a time. The
+                  // label was the plural field name, so the control read "+ emails".
+                  addLabel={`Add ${field.label.replace(/s$/i, '').toLowerCase()}`}
+                  label={field.label.replace(/s$/i, '')}
+                />
+              </div>
             )}
           />
         </Field>
@@ -291,13 +329,16 @@ export function FieldRenderer({ field, ownerType, prefix = 'props', control, reg
             control={control}
             name={name}
             render={({ field: f }) => (
-              <MoneyField
-                id={name}
-                value={(f.value as Record<string, unknown> | undefined) ?? undefined}
-                onChange={f.onChange}
-                amountKey={field.amountKey}
-                withPeriod={field.withPeriod}
-              />
+              <div role="group" aria-label={field.label}>
+                <MoneyField
+                  id={name}
+                  value={(f.value as Record<string, unknown> | undefined) ?? undefined}
+                  onChange={f.onChange}
+                  amountKey={field.amountKey}
+                  withPeriod={field.withPeriod}
+                  label={field.label}
+                />
+              </div>
             )}
           />
         </Field>
@@ -306,7 +347,14 @@ export function FieldRenderer({ field, ownerType, prefix = 'props', control, reg
     case 'object-list':
       return (
         <Field {...common}>
-          <ObjectListField field={field} ownerType={ownerType} name={name} control={control} register={register} errors={errors} />
+          <ObjectListField
+            field={field}
+            ownerType={ownerType}
+            name={name}
+            control={control}
+            register={register}
+            errors={errors}
+          />
         </Field>
       );
 
@@ -333,7 +381,7 @@ function ObjectListField({
   const { fields, append, remove } = useFieldArray({ control, name });
   const itemFields = field.itemFields ?? [];
   return (
-    <div className="objlist">
+    <div className="objlist" role="group" aria-label={field.label}>
       {fields.map((row, i) => (
         <div key={row.id} className="objlist__row">
           <div className="objlist__fields">
@@ -349,7 +397,12 @@ function ObjectListField({
               />
             ))}
           </div>
-          <button type="button" className="vt-strlist__x" aria-label="Remove item" onClick={() => remove(i)}>
+          <button
+            type="button"
+            className="vt-strlist__x"
+            aria-label={`Remove ${field.label.replace(/s$/i, '').toLowerCase()} ${i + 1}`}
+            onClick={() => remove(i)}
+          >
             ×
           </button>
         </div>
@@ -358,7 +411,11 @@ function ObjectListField({
         type="button"
         className="vt-strlist__add"
         onClick={() =>
-          append(Object.fromEntries(itemFields.map((f) => [f.key, f.widget === 'checkbox' ? false : ''])))
+          append(
+            Object.fromEntries(
+              itemFields.map((f) => [f.key, f.widget === 'checkbox' ? false : '']),
+            ),
+          )
         }
       >
         + Add {field.label.toLowerCase().replace(/s$/, '')}

@@ -7,6 +7,7 @@
  */
 import './../test/api-mock.js';
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { mockApi, resetMockApi } from '../test/api-mock.js';
 import { renderWithApp } from '../test/render.js';
@@ -66,10 +67,12 @@ describe('Correspondence states', () => {
     });
     renderWithApp(<Correspondence />);
     expect(await screen.findAllByRole('link', { name: 'Tarek Aziz' })).toHaveLength(2);
-    expect(screen.getByText('0.71')).toBeInTheDocument();
-    expect(screen.getByText('210d')).toBeInTheDocument();
+    expect(screen.getAllByText('0.71')).toHaveLength(2);
+    expect(screen.getByText('210 days')).toBeInTheDocument();
     expect(screen.getByText('closeness')).toBeInTheDocument();
     expect(screen.getByText('intensity')).toBeInTheDocument();
+    expect(screen.getByText('priority score')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Log reconnection' })).toBeInTheDocument();
     expect(screen.getByText('5 dormant ties considered.')).toBeInTheDocument();
     // The two broker groups stay labeled apart: recorded edges vs met-via text.
     expect(screen.getByRole('link', { name: 'Nadia Broker' })).toHaveAttribute(
@@ -81,6 +84,37 @@ describe('Correspondence states', () => {
     expect(screen.getByText('2 credits')).toBeInTheDocument();
     // Imbalance rows come from the same profile the person panel shows.
     expect(screen.getByText('100% yours')).toBeInTheDocument();
+  });
+
+  it('filters the queue and opens the reconnection logger from the ranked row', async () => {
+    const user = userEvent.setup();
+    mockApi.get.mockResolvedValue({
+      candidates: [
+        CANDIDATE,
+        {
+          ...CANDIDATE,
+          person: { id: 'p2', title: 'Mina Aref', type: 'person' },
+          days_since_last: 96,
+        },
+      ],
+      considered_dormant: 7,
+      brokers: [],
+      introduced_brokers: [],
+      out_of_balance: [],
+    });
+    renderWithApp(<Correspondence />);
+    await screen.findByRole('link', { name: 'Tarek Aziz' });
+
+    await user.click(screen.getByRole('button', { name: '180+ days quiet' }));
+    expect(screen.getByRole('link', { name: 'Tarek Aziz' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Mina Aref' })).not.toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('1 of 7 dormant ties considered.');
+
+    await user.click(screen.getByRole('button', { name: 'Log reconnection' }));
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('Log interaction · Tarek Aziz');
+    expect(
+      screen.getByText('Keep a note about Tarek Aziz, with an optional follow-up reminder.'),
+    ).toBeVisible();
   });
 });
 

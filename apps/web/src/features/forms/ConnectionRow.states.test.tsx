@@ -6,10 +6,17 @@
 import './../../test/api-mock.js';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockApi, resetMockApi } from '../../test/api-mock.js';
 import { renderWithApp } from '../../test/render.js';
 import { ConnectionRow } from './ConnectionRow.js';
+import type * as AuthModule from '../../lib/auth.js';
+
+const permissions = vi.hoisted(() => ({ canWrite: true }));
+vi.mock('../../lib/auth.js', async (original) => ({
+  ...(await original<typeof AuthModule>()),
+  useCanWrite: () => permissions.canWrite,
+}));
 
 const NEIGHBORS = { p2: { id: 'p2', type: 'person', title: 'Grace Hopper' } };
 const KNOWS = {
@@ -40,6 +47,7 @@ function deferred<T>() {
 
 beforeEach(() => {
   resetMockApi();
+  permissions.canWrite = true;
   // The prop popover holds a suggest-backed field; nothing here is about it.
   mockApi.get.mockResolvedValue({ values: [] });
   mockApi.delete.mockResolvedValue({});
@@ -82,7 +90,9 @@ describe('a failed unlink stays on screen', () => {
     const dialog = await openUnlink(user);
     await user.click(within(dialog).getByRole('button', { name: 'Unlink' }));
 
-    expect(await within(dialog).findByText('Grace Hopper is still connected. Try again.')).toBeInTheDocument();
+    expect(
+      await within(dialog).findByText('Grace Hopper is still connected. Try again.'),
+    ).toBeInTheDocument();
   });
 
   it('does not carry the last failure into the next attempt', async () => {
@@ -133,6 +143,35 @@ describe('a failed unlink stays on screen', () => {
 });
 
 describe('a failed property save stays on screen', () => {
+  it('preserves an open draft if write access is revoked', async () => {
+    const user = userEvent.setup();
+    const { rerender } = renderKnows();
+    await user.click(screen.getByRole('button', { name: 'Edit Colleague properties' }));
+    await user.type(screen.getByRole('combobox', { name: 'Met via' }), 'Research meetup');
+    permissions.canWrite = false;
+    rerender(<ConnectionRow edge={KNOWS} nodeId="self-1" neighbors={NEIGHBORS} />);
+    expect(screen.getByRole('dialog', { name: 'Edit Colleague properties' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Met via' })).toHaveValue('Research meetup');
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
+    expect(screen.getByText(/Your draft is still here/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    await user.click(await screen.findByRole('button', { name: 'Discard' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(mockApi.patch).not.toHaveBeenCalled();
+  });
+  it('protects edited properties on Escape and retains them after Keep editing', async () => {
+    const user = userEvent.setup();
+    renderWithApp(<ConnectionRow edge={ROLE_AT} nodeId="self-1" neighbors={NEIGHBORS} />);
+    await user.click(screen.getByRole('button', { name: /properties$/ }));
+    await user.type(await screen.findByLabelText('Department'), ' and design');
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(await screen.findByRole('dialog', { name: 'Discard changes?' })).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Keep editing' }));
+    expect(screen.getByLabelText('Department')).toHaveValue('Research and design');
+    expect(mockApi.patch).not.toHaveBeenCalled();
+  });
+
   it('states the reason beside the button that retries it', async () => {
     const user = userEvent.setup();
     mockApi.patch.mockRejectedValue(new Error('department is unknown'));

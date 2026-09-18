@@ -3,6 +3,10 @@
 The transfer format for moving atomic graph records into Vitae from an external
 system (today: Aperture).
 
+This version remains accepted for compatibility. New producers that need
+relationship episode identities or evidence use
+[`vitae.graph.bundle/2`](vitae-graph-bundle-v2.md).
+
 This document is the single source of truth. It is implemented twice: Zod in
 `vitae/packages/core/src/schema/bundle.ts`, Pydantic in
 `aperture/apps/console/fathom/core/bundle.py`. Both implementations are
@@ -18,39 +22,39 @@ contract tests fail until both sides agree.
   "schema_version": 1,
   "source": {
     "system": "aperture",
-    "run_id": "3f2b...",           // optional; the producing run
-    "exported_at": "2026-07-28T12:00:00Z"
+    "run_id": "3f2b...", // optional; the producing run
+    "exported_at": "2026-07-28T12:00:00Z",
   },
   "nodes": [
     {
-      "ref": "p1",                              // bundle-local handle, see below
-      "type": "person",                         // a Vitae NodeType
+      "ref": "p1", // bundle-local handle, see below
+      "type": "person", // a Vitae NodeType
       "identity_keys": ["linkedin:person:jsmith"],
       "title": "Jane Smith",
       "subtitle": "Staff Engineer at Acme",
       "props": { "headline": "...", "city": "Cairo" },
-      "start_date": "2019-04-01",               // optional, YYYY-MM-DD
+      "start_date": "2019-04-01", // optional, YYYY-MM-DD
       "end_date": null,
       "date_precision": "month",
       "notes_md": "",
       "source": "import_aperture",
       "source_ref": "aperture:run:3f2b...",
-      "confidence": 0.9
-    }
+      "confidence": 0.9,
+    },
   ],
   "edges": [
     {
       "type": "AUTHORED",
-      "src": "p1",                              // a node ref in THIS bundle
+      "src": "p1", // a node ref in THIS bundle
       "dst": "po1",
       "props": {},
       "start_date": null,
       "end_date": null,
       "source": "import_aperture",
       "source_ref": "aperture:run:3f2b...",
-      "confidence": 0.9
-    }
-  ]
+      "confidence": 0.9,
+    },
+  ],
 }
 ```
 
@@ -75,12 +79,12 @@ anything.
 
 Format: `<system>:<kind>:<key>`, lowercased, no whitespace.
 
-| Kind | Example |
-|---|---|
-| person | `linkedin:person:jsmith` |
-| company | `linkedin:company:acme-corp` |
-| job | `linkedin:job:3812004421` |
-| post | `linkedin:post:urn-li-activity-7012...` |
+| Kind    | Example                                 |
+| ------- | --------------------------------------- |
+| person  | `linkedin:person:jsmith`                |
+| company | `linkedin:company:acme-corp`            |
+| job     | `linkedin:job:3812004421`               |
+| post    | `linkedin:post:urn-li-activity-7012...` |
 
 Rules:
 
@@ -120,12 +124,12 @@ rather than writing an edge the UI could never have created.
 
 ## Limits
 
-| | |
-|---|---|
-| Max nodes per bundle | 20 000 |
-| Max edges per bundle | 60 000 |
-| Max `identity_keys` per node | 20 |
-| Max serialized size | 15 MB (the `/api/v1/imports` body limit) |
+|                              |                                          |
+| ---------------------------- | ---------------------------------------- |
+| Max nodes per bundle         | 20 000                                   |
+| Max edges per bundle         | 60 000                                   |
+| Max `identity_keys` per node | 20                                       |
+| Max serialized size          | 15 MB (the `/api/v1/imports` body limit) |
 
 Producers that exceed these split by run.
 

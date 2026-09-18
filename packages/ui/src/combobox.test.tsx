@@ -8,7 +8,12 @@ import { Combobox, type ComboboxItem, type ComboboxProps } from './combobox.js';
 import { Modal } from './overlay.js';
 
 const PEOPLE: ComboboxItem[] = [
-  { value: 'lina', label: 'Lina Farouk', description: 'Staff engineer at Meridian', meta: 'person' },
+  {
+    value: 'lina',
+    label: 'Lina Farouk',
+    description: 'Staff engineer at Meridian',
+    meta: 'person',
+  },
   { value: 'dana', label: 'Dana Okafor', description: 'Design lead at Meridian', meta: 'person' },
   { value: 'sam', label: 'Sam Okonkwo', description: 'Recruiter at Northwind', meta: 'person' },
 ];
@@ -42,6 +47,31 @@ function selectedFlags(): string[] {
 }
 
 describe('Combobox ARIA', () => {
+  it('names the results independently of the search input', async () => {
+    const user = userEvent.setup();
+    render(<Harness listLabel="Matching people" />);
+    await user.click(input());
+    const list = await screen.findByRole('listbox', { name: 'Matching people' });
+    expect(input()).toHaveAttribute('aria-controls', list.id);
+  });
+  it('supports input adornments and blur handling for composed fields', async () => {
+    const user = userEvent.setup();
+    const onBlur = vi.fn();
+    render(
+      <Harness
+        inputBefore={<button type="button">Remove TypeScript</button>}
+        inputClassName="tag-field-input"
+        onInputBlur={onBlur}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Remove TypeScript' })).toBeInTheDocument();
+    expect(input()).toHaveClass('tag-field-input');
+    await user.click(input());
+    await user.tab();
+    expect(onBlur).toHaveBeenCalledOnce();
+  });
+
   it('wires the input to the listbox it controls and to the active option', async () => {
     const user = userEvent.setup();
     render(<Harness />);
@@ -288,7 +318,11 @@ describe('Combobox keyboard', () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
     const onSubmit = vi.fn((e: { preventDefault: () => void }) => e.preventDefault());
-    const create: ComboboxItem = { value: 'new', label: "Create person 'Nadia Farouk'", kind: 'create' };
+    const create: ComboboxItem = {
+      value: 'new',
+      label: "Create person 'Nadia Farouk'",
+      kind: 'create',
+    };
     const { rerender } = render(
       <form onSubmit={onSubmit}>
         <Harness items={[PEOPLE[0]!, create]} onSelect={onSelect} />
@@ -426,7 +460,10 @@ describe('Combobox states', () => {
     render(
       <Harness
         onSelect={onSelect}
-        items={[PEOPLE[0]!, { value: 'new', label: "Create person 'Nadia Farouk'", kind: 'create' }]}
+        items={[
+          PEOPLE[0]!,
+          { value: 'new', label: "Create person 'Nadia Farouk'", kind: 'create' },
+        ]}
       />,
     );
     await user.click(input());
@@ -456,7 +493,9 @@ describe('Combobox states', () => {
 
     // No reason given still gets the word, never the colour on its own.
     expect(screen.getByRole('option', { name: /Sam Okonkwo/ })).toHaveTextContent('Unavailable');
-    expect(screen.getByRole('option', { name: /Lina Farouk/ })).not.toHaveAttribute('aria-disabled');
+    expect(screen.getByRole('option', { name: /Lina Farouk/ })).not.toHaveAttribute(
+      'aria-disabled',
+    );
   });
 
   it('takes no input at all while the field is disabled', async () => {
@@ -619,7 +658,9 @@ function ruleBody(selector: string): string {
 
 describe('combobox.css', () => {
   it('opens on the entrance variant and leaves on the exit variant', () => {
-    expect(ruleBody('.vt-cbx__panel')).toContain('animation: vt-rise-in var(--ae-dur) var(--ae-ease)');
+    expect(ruleBody('.vt-cbx__panel')).toContain(
+      'animation: vt-rise-in var(--ae-dur) var(--ae-ease)',
+    );
     expect(ruleBody(".vt-cbx__panel[data-state='closed']")).toContain(
       'animation: vt-fade-out var(--ae-dur-fast) linear',
     );

@@ -33,6 +33,18 @@ function edgeKey(a: string, b: string): string {
   return a < b ? `${a}|${b}` : `${b}|${a}`;
 }
 
+/**
+ * Imports may surface a relationship before its external record is available
+ * in the currently rendered neighbourhood. ForceGraph treats that as fatal;
+ * a map scene must contain both ends of every relationship it receives.
+ */
+export function linksWithVisibleNodes(nodes: FgNode[], links: FgLink[]): FgLink[] {
+  const visibleIds = new Set(nodes.map((node) => node.id));
+  return links.filter(
+    (link) => visibleIds.has(linkEndId(link.source)) && visibleIds.has(linkEndId(link.target)),
+  );
+}
+
 
 
 export function GraphCanvas({
@@ -57,7 +69,10 @@ export function GraphCanvas({
   onBackground,
   fgRef,
 }: GraphCanvasProps) {
-  const graphData = useMemo(() => ({ nodes, links }), [nodes, links]);
+  const graphData = useMemo(
+    () => ({ nodes, links: linksWithVisibleNodes(nodes, links) }),
+    [nodes, links],
+  );
   const hubIds = useMemo(() => {
     if (lens !== 'hubs') return new Set<string>();
     return new Set(
@@ -80,7 +95,7 @@ export function GraphCanvas({
   useEffect(() => {
     const fg = fgRef.current;
     if (!fg) return;
-    const strength = pathMode ? -40 : lens === 'hubs' ? -110 : -70;
+    const strength = pathMode ? -48 : lens === 'hubs' ? -125 : -92;
     fg.d3Force('charge')?.strength(strength);
   }, [fgRef, lens, pathMode]);
 
@@ -88,11 +103,24 @@ export function GraphCanvas({
   useEffect(() => {
     const fg = fgRef.current;
     if (!fg || nodes.length === 0) return;
-    const ms = reducedMotion ? 0 : 400;
-    const delay = reducedMotion ? 50 : 700;
-    const t = setTimeout(() => fg.zoomToFit(ms, 60), delay);
+    const ms = reducedMotion ? 0 : 260;
+    const delay = reducedMotion ? 0 : 280;
+    // A small margin makes the first view legible while leaving enough ground
+    // to drag into. The old 60px margin made a connected neighbourhood occupy
+    // a surprisingly tiny part of a wide canvas.
+    const t = setTimeout(() => {
+      fg.zoomToFit(ms, 34);
+      // A tall neighbourhood on a desktop-width canvas otherwise fits to the
+      // short axis and leaves most of the map as unused ground. Give wide
+      // canvases one measured extra step; phone canvases already fill naturally.
+      if (width / Math.max(height, 1) > 1.3) {
+        const nudge = () => fg.zoom(Math.min(4.5, fg.zoom() * 1.25), reducedMotion ? 0 : 140);
+        if (reducedMotion) nudge();
+        else setTimeout(nudge, ms + 20);
+      }
+    }, delay);
     return () => clearTimeout(t);
-  }, [fgRef, nodes, reducedMotion]);
+  }, [fgRef, nodes, reducedMotion, width, height]);
 
   // Freeze physics briefly after path highlight.
   const [pathFreeze, setPathFreeze] = useState(false);
@@ -137,13 +165,12 @@ export function GraphCanvas({
     }
     // auto
     return (
-      globalScale > 1.6 ||
+      globalScale > 4.8 ||
       n.id === hoverId ||
       n.id === selectedId ||
       n.isSelf ||
       onPath ||
-      (lens === 'hubs' && hubIds.has(n.id)) ||
-      n.degree >= 6
+      (lens === 'hubs' && hubIds.has(n.id))
     );
   }
 
@@ -179,7 +206,7 @@ export function GraphCanvas({
     }
 
     if (shouldShowLabel(n, globalScale, onPath) && !dimmed) {
-      const label = n.title.length > 24 ? `${n.title.slice(0, 23)}...` : n.title;
+      const label = n.title.length > 34 ? `${n.title.slice(0, 33)}...` : n.title;
       // Names are the one thing here drawn outside the zoom transform. Under it
       // the type size has to shrink as you zoom in to stay 11px on screen, and
       // somewhere below 5px this typeface's glyph advances round to whole units,
@@ -257,6 +284,7 @@ export function GraphCanvas({
         return palette.border;
       }}
       linkWidth={(l) => {
+        if (typeof l.relationshipCount === 'number') return Math.min(7, 1.2 + Math.sqrt(l.relationshipCount));
         if (pathMode && linkIsPath(l)) return 2.4;
         if (prefs.accentHoverLinks && !pathMode && hoverId && linkTouchesHover(l)) return 1.6;
         if (lens === 'strength') {
@@ -264,6 +292,13 @@ export function GraphCanvas({
           return 0.6 + str * 2.2;
         }
         return 1;
+      }}
+      linkDirectionalArrowLength={3.5}
+      linkDirectionalArrowRelPos={1}
+      linkDirectionalArrowColor={(l) => {
+        if (pathMode && linkIsPath(l)) return palette.accent;
+        if (prefs.accentHoverLinks && hoverId && linkTouchesHover(l)) return palette.accent;
+        return palette.borderStrong;
       }}
       onNodeHover={(n) => onHover(n ? n.id : null)}
       onNodeClick={(n) => {
@@ -278,7 +313,7 @@ export function GraphCanvas({
         onSelect(n);
       }}
       onBackgroundClick={onBackground}
-      cooldownTicks={paused || pathFreeze ? 0 : pathMode ? 40 : 120}
+      cooldownTicks={paused || pathFreeze ? 0 : pathMode ? 40 : 75}
       enableNodeDrag
     />
   );

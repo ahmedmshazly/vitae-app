@@ -629,6 +629,7 @@ bookmarked or sent to someone with the same graph.
 | Imports | `/data/imports`, also `/import` |
 | Identity audit | `/data/identity`, also `/import/duplicates` |
 | GitHub | `/data/sources/github`, also `/repositories` |
+| Gemini | `/data/sources/gemini` |
 | Exports & backups | `/data/exports`, also `/export` |
 | Trash | `/data/trash`, also `/trash` |
 
@@ -654,6 +655,11 @@ automatically.
 **GitHub** connects a personal access token, syncs your non-fork repositories
 in as records, and links each repository's primary language to a skill. The
 token is encrypted at rest and never returned to the browser after saving.
+
+**Gemini** connects a Google Gemini project id and API key so they are ready
+when a workflow needs them. Nothing is sent to Google from this screen. The
+key is stored server-side only; the project id may be shown. `GEMENI_API_KEY`
+and `GEMENI_PROJECT` are accepted aliases for the canonical `GEMINI_*` names.
 
 **Exports & backups** builds a portable archive - one JSONL per collection, an
 Obsidian-compatible Markdown vault, and a manifest with SHA-256 checksums - and
@@ -688,8 +694,8 @@ on the address:
 - **Preferences** - résumé defaults (template, accent, wording emphasis), the
   ranking constants that reshape the contact lens, and the skill aliases that
   teach the job-description parser which nicknames mean which skills.
-- **System** - live service health check by check, the GitHub connection, and
-  the owner identity.
+- **System** - live service health check by check, the GitHub and Gemini
+  connections, and the owner identity.
 
 **Billing & access** is the Cloud lifecycle screen: trial or subscription
 state, the plan, the provider portal, and the export path. It only exists on a

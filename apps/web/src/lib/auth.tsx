@@ -66,6 +66,7 @@ interface MeResponse {
   workspace?: WorkspaceAccess | null;
   cloudEnabled?: boolean;
   devLoginEnabled: boolean;
+  localInstall?: boolean;
 }
 
 interface BootstrapResponse {
@@ -82,6 +83,8 @@ interface AuthState {
   /** A setup issue keeps the person at the door instead of opening a broken workspace. */
   accountError: string | null;
   devLoginEnabled: boolean;
+  /** Loopback-bound personal production install (no Google). */
+  localInstall: boolean;
   googleEnabled: boolean;
   signInDev: () => Promise<void>;
   signInGoogle: () => Promise<void>;
@@ -97,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [cloudEnabled, setCloudEnabled] = useState(false);
   const [accountError, setAccountError] = useState<string | null>(null);
   const [devLoginEnabled, setDevLoginEnabled] = useState(false);
+  const [localInstall, setLocalInstall] = useState(false);
 
   type RefreshResult = { user: User | null; accountError: string | null };
 
@@ -107,6 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCloudEnabled(isCloud);
     setAccountError(setupError);
     setDevLoginEnabled(me.devLoginEnabled);
+    setLocalInstall(me.localInstall === true);
     rememberSession(me.user !== null && (!isCloud || me.workspace != null));
     return { user: me.user, accountError: setupError };
   }
@@ -212,6 +217,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         cloudEnabled,
         accountError,
         devLoginEnabled,
+        localInstall,
         googleEnabled: googleSignInAvailable,
         signInDev,
         signInGoogle,

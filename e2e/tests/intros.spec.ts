@@ -3,7 +3,7 @@ import { signIn } from './helpers/auth';
 import { expectNoA11yViolations } from './helpers/a11y';
 
 /**
- * Screen 13: Warm paths, mounted at /intros.
+ * Warm paths: the canonical reach lens.
  *
  * Paths read left to right as a sentence. Failed lookups must not blame the
  * graph, and strength explanations must not rely on colour alone.
@@ -23,16 +23,17 @@ interface IntroPathsPayload {
 }
 
 function reach(page: Page) {
-  return page.getByRole('region', { name: /^Reach / });
+  return page.getByRole('region', { name: /^Routes to / });
 }
 
 async function goIntros(page: Page) {
-  await page.goto('/intros');
-  // Titled Warm paths since the six-workspace IA; /intros stays mounted.
+  await page.goto('/network/intelligence?lens=reach');
   await expect(page.getByRole('heading', { name: 'Warm paths', exact: true })).toBeVisible();
 }
 
-test('a failed path lookup says the lookup failed, not that your graph is empty', async ({ page }) => {
+test('a failed path lookup says the lookup failed, not that your graph is empty', async ({
+  page,
+}) => {
   await signIn(page);
   await page.route(PATHS, (route) =>
     route.fulfill({
@@ -110,9 +111,10 @@ test("each hop is weighted by its own tie, not by the path's label", async ({ pa
   // Earlier journeys can record a real interaction with Lina. The API then
   // recomputes that tie at full precision, while the label stays rounded for
   // people. Bind each visual line to the response that supplied it.
-  const apiPath = paths.find((path) =>
-    path.hops.some((hop) => hop.title === 'Lina Farouk') &&
-    path.hops.some((hop) => hop.title === 'Karim Nabil'),
+  const apiPath = paths.find(
+    (path) =>
+      path.hops.some((hop) => hop.title === 'Lina Farouk') &&
+      path.hops.some((hop) => hop.title === 'Karim Nabil'),
   );
   expect(apiPath).toBeDefined();
   const apiTies =
@@ -148,12 +150,12 @@ test('the rail shows the facts it orders by', async ({ page }) => {
 
   // `affinity`, `peopleCount` and `openRoles` were all fetched and none shown;
   // the rail sorted by a number the user never saw.
-  const pursuing = page.getByRole('region', { name: 'Pursuing' });
+  const pursuing = page.getByRole('region', { name: 'Active applications' });
   await expect(pursuing.getByRole('button').first()).toContainText(/\d+ known/);
   await expect(pursuing.getByRole('button').first()).toContainText(/open roles?|known/);
 
   // Which target is selected is an attribute, not a border tint.
-  await expect(pursuing.getByRole('button').first()).toHaveAttribute('aria-current', 'true');
+  await expect(pursuing.getByRole('button').first()).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('the destination lives in the URL, and the rail switches it', async ({ page }) => {
@@ -162,7 +164,7 @@ test('the destination lives in the URL, and the rail switches it', async ({ page
   await expect(page).toHaveURL(/[?&]org=/);
 
   const before = new URL(page.url()).searchParams.get('org');
-  const other = page.getByRole('region', { name: 'No path' }).getByRole('button').first();
+  const other = page.getByRole('region', { name: 'No recorded path' }).getByRole('button').first();
   const otherName = (await other.innerText()).split('\n')[0]!.trim();
   await other.click();
 
@@ -179,7 +181,7 @@ test('an unreachable organization says so without claiming a failure', async ({ 
   await signIn(page);
   await goIntros(page);
 
-  await page.getByRole('region', { name: 'No path' }).getByRole('button').first().click();
+  await page.getByRole('region', { name: 'No recorded path' }).getByRole('button').first().click();
   await expect(page.getByText(/^No warm path to /)).toBeVisible();
   await expect(page.getByRole('alert')).toHaveCount(0);
 });
@@ -189,7 +191,7 @@ test('every path is ranked, and same-named askers stay distinguishable', async (
   await goIntros(page);
 
   const cards = reach(page).locator('article');
-  await expect(cards.first()).toContainText('Path 1');
+  await expect(cards.first()).toContainText('Top-ranked route');
 
   // This graph holds three different people called "Jordan", so three cards
   // offered three controls named "Ask Jordan" pointing at three destinations.
@@ -212,7 +214,7 @@ test('a chained path shows every server evidence factor', async ({ page }) => {
     .filter({ hasText: 'Lina Farouk' })
     .filter({ hasText: 'Karim Nabil' })
     .filter({ hasText: 'chains into' })
-    .locator('[aria-label="Path evidence"]');
+    .locator('[aria-label="Recorded route evidence"]');
   await expect(evidence.locator('.vt-chip')).toHaveCount(4);
   await expect(evidence).toContainText('2 hops');
   await expect(evidence).toContainText('Works there');
@@ -288,7 +290,7 @@ test('path evidence keeps every supplied factor', async ({ page }) => {
   await signIn(page);
   await goIntros(page);
 
-  const evidence = reach(page).locator('[aria-label="Path evidence"]');
+  const evidence = reach(page).locator('[aria-label="Recorded route evidence"]');
   await expect(evidence.locator('.vt-chip')).toHaveCount(factors.length);
   for (const factor of factors)
     await expect(evidence.getByText(factor, { exact: true })).toBeVisible();

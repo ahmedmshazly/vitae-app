@@ -71,7 +71,7 @@
 .vt-btn--danger-fill {
   background: var(--ae-danger);
   border-color: var(--ae-danger);
-  color: var(--ae-accent-ink);
+  color: var(--ae-danger-ink);
 }
 .vt-btn--sm {
   height: var(--ae-control-h-sm);
@@ -959,11 +959,12 @@ button.vt-chip:focus-visible {
 
 /* ── MoneyField ── */
 .vt-money {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px;
   gap: 6px;
 }
-.vt-money > .vt-inp:first-child {
-  flex: 1;
+.vt-money > :nth-child(3) {
+  grid-column: 1 / -1;
 }
 .vt-money__ccy {
   width: 64px;
@@ -1645,12 +1646,27 @@ button.vt-chip:focus-visible {
   animation: vt-rise-in var(--ae-dur) var(--ae-ease);
 }
 .vt-menu--columns {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--ae-space-2);
-  max-height: none;
+  width: min(900px, calc(100vw - 24px));
+  max-height: min(70vh, var(--radix-dropdown-menu-content-available-height, 560px));
 }
 .vt-menu--columns .vt-menu__group {
-  min-width: 168px;
+  min-width: 0;
+}
+@media (max-width: 900px) {
+  .vt-menu--columns {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .vt-menu--columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .vt-menu--columns .vt-menu__item {
+    min-height: 40px;
+  }
 }
 .vt-menu__label {
   padding: 6px 8px 4px;
@@ -1738,4 +1754,46 @@ button.vt-chip:focus-visible {
     height: var(--ae-hit-target);
     transform: translate(-50%, -50%);
   }
+}
+
+/* ── Interaction finish ────────────────────────────────────────────────────
+   Shared controls appear on nearly every screen. These refinements make their
+   hierarchy unmistakable without asking individual routes to invent a new
+   button language. */
+.vt-btn {
+  min-height: 36px;
+  border-radius: 7px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition-duration: 130ms;
+  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+.vt-btn--primary {
+  border-color: var(--ae-accent);
+  box-shadow: 0 5px 12px -9px color-mix(in srgb, var(--ae-accent) 70%, transparent);
+}
+.vt-btn--primary:hover {
+  background: color-mix(in srgb, var(--ae-accent) 88%, #fff);
+  border-color: color-mix(in srgb, var(--ae-accent) 88%, #fff);
+}
+.vt-btn--ghost { color: var(--ae-fg-soft); }
+.vt-btn--ghost:hover { color: var(--ae-fg-strong); }
+.vt-btn:disabled { opacity: .46; filter: saturate(.55); }
+.vt-chip {
+  min-height: 24px;
+  border-radius: 5px;
+  font-weight: 500;
+}
+.vt-inp,
+.vt-sel {
+  border-radius: 7px;
+}
+.vt-inp:focus,
+.vt-sel:focus {
+  border-color: var(--ae-accent-2);
+  box-shadow: var(--ae-focus-ring);
+}
+.vt-empty {
+  border-radius: 10px;
+  border-style: dashed;
 }

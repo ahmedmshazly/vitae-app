@@ -75,6 +75,7 @@ describe('LogIntroduction', () => {
       expect(mockApi.post).toHaveBeenCalledWith(
         '/people/p9/favors',
         expect.objectContaining({ direction: 'owed_by_me', what: 'Introduced me to Ada' }),
+        { idempotencyKey: expect.any(String) },
       );
     });
   });
@@ -95,9 +96,48 @@ describe('LogIntroduction', () => {
     await user.click(screen.getByRole('checkbox'));
     await user.click(screen.getByRole('button', { name: 'Save introduction' }));
 
-    expect(await screen.findByText('Favor not recorded')).toBeInTheDocument();
-    expect(screen.getByText(/The introduction is recorded, but the favor was not/)).toBeInTheDocument();
+    expect(await screen.findByText('Introduction saved · favor needs review')).toBeInTheDocument();
+    expect(screen.getByText(/The introduction is recorded, but the favor could not be confirmed/)).toBeInTheDocument();
     // The dialog stays open so the report is read, not flashed past.
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
+    expect(screen.getByRole('button', { name: 'Retry favor only' })).toBeEnabled();
+    expect(screen.getByLabelText('Context')).toBeDisabled();
+    mockApi.post.mockResolvedValue({});
+    await user.click(screen.getByRole('button', { name: 'Retry favor only' }));
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
+    expect(mockApi.post.mock.calls.filter(([path]) => path === '/edges')).toHaveLength(1);
+    expect(mockApi.post.mock.calls.filter(([path]) => path === '/people/p9/favors')).toHaveLength(2);
+    const attempts = mockApi.post.mock.calls.filter(([path]) => path === '/people/p9/favors');
+    expect(attempts[0]?.[2]).toEqual(attempts[1]?.[2]);
+  });
+
+  it('keeps a draft through cancellation and freezes it during a save', async () => {
+    mockSelfAndSearch();
+    let finish!: (value: unknown) => void;
+    mockApi.post.mockReturnValue(new Promise((resolve) => { finish = resolve; }));
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    renderWithApp(<LogIntroduction open onOpenChange={onOpenChange} personId="p1" personName="Ada" />);
+    await pickBroker(user);
+    await user.type(screen.getByLabelText('Context'), 'Shared research');
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(await screen.findByRole('dialog', { name: 'Discard changes?' })).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Keep editing' }));
+    expect(screen.getByLabelText('Context')).toHaveValue('Shared research');
+    await user.click(screen.getByRole('button', { name: 'Save introduction' }));
+    expect(screen.getByLabelText('Context')).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: 'Saving...' }));
+    expect(mockApi.post).toHaveBeenCalledOnce();
+    finish({ edge: { id: 'e1' } });
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
+  });
+
+  it('explains a missing self record and prevents a write', async () => {
+    mockApi.get.mockResolvedValue({ self: null });
+    renderWithApp(<LogIntroduction open onOpenChange={vi.fn()} personId="p1" personName="Ada" />);
+    expect(await screen.findByText('Identify your person record first')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Save introduction' })).toBeDisabled();
+    expect(mockApi.post).not.toHaveBeenCalled();
   });
 });

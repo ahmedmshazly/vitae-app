@@ -127,11 +127,111 @@ describe('Application status control', () => {
     );
   });
 
+  it('clears a refused correction when its selection changes, then leaves a fresh retry', async () => {
+    const user = userEvent.setup();
+    mockApi.post.mockRejectedValueOnce(
+      new Error('The recorded stage conflicts with an interview.'),
+    );
+    renderWithApp(<ApplicationStatusControl id="application-1" status="rejected" />);
+
+    await user.click(screen.getByRole('button', { name: 'Correct status' }));
+    const options = within(screen.getByRole('group', { name: 'What the status should say' }));
+    await user.click(options.getByRole('button', { name: 'Screening' }));
+    await user.click(screen.getByRole('button', { name: 'Record correction' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('conflicts with an interview');
+
+    await user.click(options.getByRole('button', { name: 'Interview' }));
+    expect(
+      screen.queryByText('The recorded stage conflicts with an interview.'),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Record correction' })).toBeEnabled();
+  });
+
+  it('does not carry a cancelled correction failure into a new correction', async () => {
+    const user = userEvent.setup();
+    mockApi.post.mockRejectedValueOnce(
+      new Error('The recorded stage conflicts with an interview.'),
+    );
+    renderWithApp(<ApplicationStatusControl id="application-1" status="rejected" />);
+
+    await user.click(screen.getByRole('button', { name: 'Correct status' }));
+    const options = within(screen.getByRole('group', { name: 'What the status should say' }));
+    await user.click(options.getByRole('button', { name: 'Screening' }));
+    await user.click(screen.getByRole('button', { name: 'Record correction' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('conflicts with an interview');
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    await user.click(screen.getByRole('button', { name: 'Discard' }));
+    await user.click(screen.getByRole('button', { name: 'Correct status' }));
+    expect(
+      screen.queryByText('The recorded stage conflicts with an interview.'),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Record correction' })).toBeDisabled();
+  });
+
   it('hides onward moves and disables correction on a locked workspace (NFR-OPS-002)', () => {
     writeGate.canWrite = false;
     renderWithApp(<ApplicationStatusControl id="application-1" status="interview" />);
     expect(screen.queryByRole('group', { name: 'Record a status move' })).not.toBeInTheDocument();
     expect(screen.getByText(/Read-only workspace/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Correct status' })).toBeDisabled();
+  });
+
+  it('keeps an unsaved correction when dismissal is declined', async () => {
+    const user = userEvent.setup();
+    renderWithApp(<ApplicationStatusControl id="application-1" status="rejected" />);
+    await user.click(screen.getByRole('button', { name: 'Correct status' }));
+    await user.click(screen.getByRole('button', { name: 'Interview' }));
+    await user.keyboard('{Escape}');
+    await user.click(await screen.findByRole('button', { name: 'Keep editing' }));
+    expect(screen.getByRole('button', { name: 'Interview' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(mockApi.post).not.toHaveBeenCalled();
+  });
+
+  it('locks correction selection and dismissal until the submitted write resolves', async () => {
+    const user = userEvent.setup();
+    let finish!: (value: unknown) => void;
+    mockApi.post.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+    renderWithApp(<ApplicationStatusControl id="application-1" status="rejected" />);
+    await user.click(screen.getByRole('button', { name: 'Correct status' }));
+    await user.click(screen.getByRole('button', { name: 'Interview' }));
+    await user.click(screen.getByRole('button', { name: 'Record correction' }));
+    expect(screen.getByRole('button', { name: 'Screening' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeDisabled();
+    await user.keyboard('{Escape}');
+    expect(screen.getByRole('dialog', { name: 'Correct the recorded status' })).toBeVisible();
+    expect(mockApi.post).toHaveBeenCalledTimes(1);
+    finish({});
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('prevents corrections from opening during a pending onward move', async () => {
+    const user = userEvent.setup();
+    mockApi.post.mockImplementation(() => new Promise(() => {}));
+    renderWithApp(<ApplicationStatusControl id="application-1" status="applied" />);
+    await user.click(moves().getByRole('button', { name: 'Interview' }));
+    expect(screen.getByRole('button', { name: 'Correct status' })).toBeDisabled();
+    expect(moves().getByRole('button', { name: 'Recording Interview…' })).toBeDisabled();
+  });
+
+  it('rechecks write access if it changes while the correction dialog is open', async () => {
+    const user = userEvent.setup();
+    const view = renderWithApp(<ApplicationStatusControl id="application-1" status="rejected" />);
+    await user.click(screen.getByRole('button', { name: 'Correct status' }));
+    await user.click(screen.getByRole('button', { name: 'Interview' }));
+    writeGate.canWrite = false;
+    view.rerender(<ApplicationStatusControl id="application-1" status="rejected" />);
+    expect(screen.getByRole('button', { name: 'Record correction' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Screening' })).toBeDisabled();
+    expect(mockApi.post).not.toHaveBeenCalled();
   });
 });

@@ -90,15 +90,26 @@ function DocumentBlock({ block }: { block: PublicContentBlock }) {
   );
 }
 
-function PublicMissingPage() {
+function PublicMissingPage({ guide = false }: { guide?: boolean }) {
   return (
     <MarketingShell mainClassName="mk-docs">
       <header className="mk-docs__header">
         <h1>That public page is not available.</h1>
-        <p>Use the home page to continue exploring Vitae.</p>
-        <Link className="mk-action mk-action--primary" to="/">
-          Go to Vitae home
-        </Link>
+        <p>
+          {guide
+            ? 'This guide may have moved or the address may be incomplete. Browse the available guides to continue.'
+            : 'Use the home page to continue exploring Vitae.'}
+        </p>
+        <div className="mk-docs__actions">
+          {guide && (
+            <Link className="mk-action mk-action--primary" to="/guides">
+              Browse Vitae guides
+            </Link>
+          )}
+          <Link className={guide ? 'mk-action' : 'mk-action mk-action--primary'} to="/">
+            Go to Vitae home
+          </Link>
+        </div>
       </header>
     </MarketingShell>
   );
@@ -125,7 +136,7 @@ export function PublicGuidePage() {
   return (
     <>
       {metadata && <PublicRouteMetadata path={metadata.path} />}
-      {guide ? <PublicDocumentLayout document={guide} /> : <PublicMissingPage />}
+      {guide ? <PublicDocumentLayout document={guide} /> : <PublicMissingPage guide />}
     </>
   );
 }

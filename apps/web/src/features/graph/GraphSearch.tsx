@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { EmptyState, Spread } from '@vitae/ui';
+import { Combobox, EmptyState, Spread, type ComboboxItem } from '@vitae/ui';
 import type { FgNode } from './types.js';
 
 export interface GraphSearchProps {
@@ -9,8 +9,6 @@ export interface GraphSearchProps {
   onPick: (node: FgNode) => void;
 }
 
-const LISTBOX_ID = 'lifemap-search-listbox';
-const optionId = (i: number) => `lifemap-search-option-${i}`;
 /** How many rows the panel will show at once. */
 const HIT_LIMIT = 12;
 
@@ -25,9 +23,8 @@ const HIT_LIMIT = 12;
  */
 export function GraphSearch({ open, nodes, onClose, onPick }: GraphSearchProps) {
   const [q, setQ] = useState('');
-  const [active, setActive] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
   const opener = useRef<HTMLElement | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Reset while rendering rather than from an effect. The effect version set
   // state on every open/close and is the shape the React lint rule warns about.
@@ -35,7 +32,6 @@ export function GraphSearch({ open, nodes, onClose, onPick }: GraphSearchProps) 
   if (wasOpen !== open) {
     setWasOpen(open);
     setQ('');
-    setActive(0);
   }
 
   // Closing used to leave focus on <body>, on a screen whose whole value is
@@ -43,8 +39,8 @@ export function GraphSearch({ open, nodes, onClose, onPick }: GraphSearchProps) 
   useEffect(() => {
     if (open) {
       opener.current = document.activeElement as HTMLElement | null;
-      const t = setTimeout(() => inputRef.current?.focus(), 0);
-      return () => clearTimeout(t);
+      const timer = window.setTimeout(() => inputRef.current?.focus(), 0);
+      return () => window.clearTimeout(timer);
     }
     const el = opener.current;
     opener.current = null;
@@ -55,15 +51,14 @@ export function GraphSearch({ open, nodes, onClose, onPick }: GraphSearchProps) 
   const matches = useMemo(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return nodes;
-    return nodes.filter(
-      (n) => n.title.toLowerCase().includes(needle) || n.type.includes(needle),
-    );
+    return nodes.filter((n) => n.title.toLowerCase().includes(needle) || n.type.includes(needle));
   }, [nodes, q]);
 
   const hits = useMemo(() => matches.slice(0, HIT_LIMIT), [matches]);
-  // The list can shrink under a stale index, so clamp here instead of chasing
-  // it with another effect.
-  const activeIndex = hits.length === 0 ? 0 : Math.min(active, hits.length - 1);
+  const items = useMemo<ComboboxItem[]>(
+    () => hits.map((node) => ({ value: node.id, label: node.title, meta: node.type })),
+    [hits],
+  );
 
   const searching = q.trim().length > 0;
   const noun = searching ? 'matches' : 'records in view';
@@ -80,58 +75,30 @@ export function GraphSearch({ open, nodes, onClose, onPick }: GraphSearchProps) 
 
   return (
     <div className="lifemap__search" role="search">
-      <input
-        ref={inputRef}
-        className="lifemap__searchinput"
-        value={q}
+      <Combobox
+        label="Search nodes in graph"
+        listLabel="Records in view"
+        query={q}
+        items={items}
+        onQueryChange={setQ}
+        onSelect={(item) => {
+          const node = hits.find((candidate) => candidate.id === item.value);
+          if (node) onPick(node);
+          onClose();
+        }}
+        open={open}
+        onOpenChange={(next) => {
+          if (!next) onClose();
+        }}
         placeholder="Find in map..."
-        role="combobox"
-        aria-expanded={hits.length > 0}
-        aria-controls={LISTBOX_ID}
-        aria-activedescendant={hits.length > 0 ? optionId(activeIndex) : undefined}
-        aria-autocomplete="list"
-        aria-label="Search nodes in graph"
-        onChange={(e) => {
-          setQ(e.target.value);
-          setActive(0);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Escape') {
-            e.preventDefault();
-            onClose();
-          } else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            setActive(Math.min(activeIndex + 1, hits.length - 1));
-          } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            setActive(Math.max(activeIndex - 1, 0));
-          } else if (e.key === 'Enter' && hits[activeIndex]) {
-            e.preventDefault();
-            onPick(hits[activeIndex]!);
-            onClose();
-          }
-        }}
+        emptyMessage="No matches in view."
+        inputRef={inputRef}
+        className="lifemap__search"
+        inputClassName="lifemap__searchinput"
+        panelClassName="lifemap__searchpanel"
+        listClassName="lifemap__searchlist"
+        optionClassName="lifemap__searchrow items-center min-h-8 pointer-coarse:min-h-11"
       />
-      <div className="lifemap__searchlist" id={LISTBOX_ID} role="listbox" aria-label="Records in view">
-        {hits.map((n, i) => (
-          <button
-            key={n.id}
-            id={optionId(i)}
-            role="option"
-            aria-selected={i === activeIndex}
-            type="button"
-            className={`lifemap__searchrow items-center min-h-8 pointer-coarse:min-h-11${i === activeIndex ? ' lifemap__searchrow--on' : ''}`}
-            onMouseEnter={() => setActive(i)}
-            onClick={() => {
-              onPick(n);
-              onClose();
-            }}
-          >
-            <span>{n.title}</span>
-            <span className="u-faint">{n.type}</span>
-          </button>
-        ))}
-      </div>
       {/* Beside the listbox, never inside it: an option list may only contain
           options, and the count has to be spoken as it changes. */}
       <p className="u-faint lifemap__searchempty" role="status">

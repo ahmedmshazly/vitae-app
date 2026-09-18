@@ -9,6 +9,7 @@ import './../test/api-mock.js';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { useLocation } from 'react-router-dom';
 import { mockApi, resetMockApi } from '../test/api-mock.js';
 import { renderWithApp } from '../test/render.js';
 import { SEARCH_GRAMMAR, SearchResults } from './SearchResults.js';
@@ -23,6 +24,11 @@ const hit = {
   updated_at: '2026-08-01T00:00:00.000Z',
   _score: 1,
 };
+
+function LocationReadout() {
+  const location = useLocation();
+  return <output data-testid="search-location">{location.search}</output>;
+}
 
 beforeEach(() => {
   resetMockApi();
@@ -75,6 +81,29 @@ describe('Search route states', () => {
     });
     renderWithApp(<SearchResults />, { route: '/search?q=ada' });
     expect(await screen.findByRole('link', { name: /Ada Lovelace/ })).toBeInTheDocument();
+  });
+
+  it('restores a shared kind lens from the URL and keeps kind changes shareable', async () => {
+    const user = userEvent.setup();
+    mockApi.get.mockResolvedValue({
+      ast: { text: 'ada', clauses: [], invalid: [] },
+      results: [hit, { ...hit, id: 'o1', type: 'organization', title: 'Analytical Society' }],
+    });
+    renderWithApp(
+      <>
+        <SearchResults />
+        <LocationReadout />
+      </>,
+      { route: '/search?q=ada&kind=people' },
+    );
+
+    expect(await screen.findByRole('link', { name: /Ada Lovelace/ })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Analytical Society/ })).not.toBeInTheDocument();
+    expect(screen.getByTestId('search-location')).toHaveTextContent('?q=ada&kind=people');
+
+    await user.click(screen.getByRole('button', { name: /Organizations 1/ }));
+    expect(screen.getByTestId('search-location')).toHaveTextContent('?q=ada&kind=organizations');
+    expect(await screen.findByRole('link', { name: /Analytical Society/ })).toBeInTheDocument();
   });
 
   it('is a real list, and keeps the facts that separate two matches out of the link', async () => {

@@ -4,14 +4,16 @@
  * failed. These are the states it now has to state.
  */
 import './../test/api-mock.js';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, renderHook, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useQuery } from '@tanstack/react-query';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { api } from '../lib/api.js';
 import { bulkBarIsDetached } from '../components/BulkBar.js';
 import { mockApi, resetMockApi } from '../test/api-mock.js';
-import { renderWithApp } from '../test/render.js';
+import { createTestQueryClient, renderWithApp } from '../test/render.js';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { ToastProvider } from './Toast.js';
 import {
   BulkDeleteBar,
   BulkDeleteConfirm,
@@ -95,6 +97,43 @@ async function confirmDelete(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('bulk delete says which records did not move', () => {
+  it('serializes requests and freezes the selected snapshot and confirmation until completion', async () => {
+    let finish!: () => void;
+    mockApi.delete.mockReturnValue(
+      new Promise<void>((resolve) => {
+        finish = resolve;
+      }),
+    );
+    const queryClient = createTestQueryClient();
+    const { result } = renderHook(() => useBulkNodeDelete(), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={queryClient}>
+          <ToastProvider>{children}</ToastProvider>
+        </QueryClientProvider>
+      ),
+    });
+    act(() => {
+      result.current.toggleOne('p1');
+      result.current.setConfirmDelete(true);
+    });
+    let pending!: Promise<void>;
+    act(() => {
+      pending = result.current.deleteSelected();
+      void result.current.deleteSelected();
+      result.current.toggleOne('p2');
+      result.current.clear();
+      result.current.setConfirmDelete(false);
+    });
+    expect(mockApi.delete).toHaveBeenCalledTimes(1);
+    expect([...result.current.selected]).toEqual(['p1']);
+    expect(result.current.confirmDelete).toBe(true);
+    await act(async () => {
+      finish();
+      await pending;
+    });
+    expect(result.current.selectedCount).toBe(0);
+    expect(result.current.confirmDelete).toBe(false);
+  });
   it('keeps the failures staged and marks the report an error', async () => {
     const user = userEvent.setup();
     mockApi.delete.mockImplementation((path: string) =>

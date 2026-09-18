@@ -34,6 +34,7 @@ function Harness() {
       <h2>Connections</h2>
       <BulkUnlinkBar
         selectedCount={bulk.selectedCount}
+        busy={bulk.busy}
         onClear={bulk.clear}
         onUnlink={() => bulk.setConfirmUnlink(true)}
         allSelected={allSelected}
@@ -74,6 +75,43 @@ async function confirmUnlink(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('bulk unlink says which connections survived', () => {
+  it('keeps a failed Undo available and retries only the outstanding restore', async () => {
+    const user = userEvent.setup();
+    mockApi.post.mockRejectedValueOnce(new Error('offline')).mockResolvedValue({});
+    renderWithApp(<Harness />);
+    await selectBoth(user);
+    await confirmUnlink(user);
+    await user.click(await screen.findByRole('button', { name: 'Undo' }));
+    await screen.findByText("Couldn't undo that change. Try again.");
+    await user.click(screen.getByRole('button', { name: 'Undo' }));
+    await waitFor(() => expect(mockApi.post).toHaveBeenCalledTimes(3));
+    expect(mockApi.post.mock.calls.map(([path]) => path)).toEqual([
+      '/edges/e1/restore',
+      '/edges/e2/restore',
+      '/edges/e1/restore',
+    ]);
+  });
+
+  it('freezes confirmation and selection while unlinking', async () => {
+    const user = userEvent.setup();
+    let finish!: (value: object) => void;
+    mockApi.delete.mockReturnValue(
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+    );
+    renderWithApp(<Harness />);
+    await selectBoth(user);
+    await confirmUnlink(user);
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByRole('button', { name: 'Cancel' })).toBeDisabled();
+    await user.keyboard('{Escape}');
+    expect(dialog).toBeInTheDocument();
+    expect(mockApi.delete).toHaveBeenCalledTimes(2);
+    finish({});
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
   it('keeps the failures staged and marks the report an error', async () => {
     const user = userEvent.setup();
     mockApi.delete.mockImplementation((path: string) =>
@@ -159,7 +197,9 @@ describe('the unlink bar behaves like the delete bar', () => {
     await user.keyboard('{Escape}');
 
     await waitFor(() => {
-      expect(screen.queryByRole('group', { name: 'Connection bulk actions' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('group', { name: 'Connection bulk actions' }),
+      ).not.toBeInTheDocument();
     });
   });
 });

@@ -172,7 +172,11 @@ export function Select({
               </RadixSelect.Item>
             )}
             {options.map((o) => (
-              <RadixSelect.Item key={o.value} value={o.value} className={cn('vt-sel__item', mono && 'u-mono')}>
+              <RadixSelect.Item
+                key={o.value}
+                value={o.value}
+                className={cn('vt-sel__item', mono && 'u-mono')}
+              >
                 <RadixSelect.ItemText>{o.label}</RadixSelect.ItemText>
                 <RadixSelect.ItemIndicator className="vt-sel__check">
                   <Glyph name="check" size={12} />
@@ -313,7 +317,11 @@ export function Rating({ value, onChange, max = 5, label = 'rating', id }: Ratin
             role="radio"
             aria-checked={value === n}
             aria-label={`${n} of ${max}`}
-            className={cn('vt-rating__dot', n <= shown && 'vt-rating__dot--on', hover != null && n <= hover && 'vt-rating__dot--hover')}
+            className={cn(
+              'vt-rating__dot',
+              n <= shown && 'vt-rating__dot--on',
+              hover != null && n <= hover && 'vt-rating__dot--hover',
+            )}
             onMouseEnter={() => setHover(n)}
             onClick={() => onChange(n)}
           />
@@ -331,8 +339,21 @@ export interface StringListFieldProps {
   placeholder?: string;
   mono?: boolean;
   addLabel?: string;
+  /**
+   * Gives every otherwise-identical row a stable accessible name. A visual
+   * field label names the collection, but it cannot distinguish row one from
+   * row two for a screen-reader user.
+   */
+  label?: string;
 }
-export function StringListField({ value, onChange, placeholder, mono, addLabel = 'Add' }: StringListFieldProps) {
+export function StringListField({
+  value,
+  onChange,
+  placeholder,
+  mono,
+  addLabel = 'Add',
+  label = 'Item',
+}: StringListFieldProps) {
   return (
     <div className="vt-strlist">
       {value.map((item, i) => (
@@ -341,12 +362,13 @@ export function StringListField({ value, onChange, placeholder, mono, addLabel =
             mono={mono}
             value={item}
             placeholder={placeholder}
+            aria-label={`${label} ${i + 1}`}
             onChange={(e) => onChange(value.map((v, j) => (j === i ? e.target.value : v)))}
           />
           <button
             type="button"
             className="vt-strlist__x"
-            aria-label="Remove row"
+            aria-label={`Remove ${label} ${i + 1}`}
             onClick={() => onChange(value.filter((_, j) => j !== i))}
           >
             <Glyph name="close" size={12} />
@@ -368,8 +390,17 @@ export interface MoneyFieldProps {
   amountKey?: string;
   withPeriod?: boolean;
   id?: string;
+  /** Visible field label, used to name the amount, currency, and period controls. */
+  label?: string;
 }
-export function MoneyField({ value, onChange, amountKey = 'amount', withPeriod, id }: MoneyFieldProps) {
+export function MoneyField({
+  value,
+  onChange,
+  amountKey = 'amount',
+  withPeriod,
+  id,
+  label = 'Money',
+}: MoneyFieldProps) {
   const patch = (k: string, v: unknown) => {
     const next = { ...(value ?? {}) } as Record<string, unknown>;
     if (v === undefined || v === '') delete next[k];
@@ -384,14 +415,18 @@ export function MoneyField({ value, onChange, amountKey = 'amount', withPeriod, 
         mono
         type="number"
         placeholder="0"
+        aria-label={`${label} amount`}
         value={typeof amount === 'number' ? String(amount) : ''}
-        onChange={(e) => patch(amountKey, e.target.value === '' ? undefined : Number(e.target.value))}
+        onChange={(e) =>
+          patch(amountKey, e.target.value === '' ? undefined : Number(e.target.value))
+        }
       />
       <Input
         mono
         className="vt-money__ccy"
         placeholder="USD"
         maxLength={3}
+        aria-label={`${label} currency`}
         value={typeof value?.currency === 'string' ? (value.currency as string) : ''}
         onChange={(e) => patch('currency', e.target.value.toUpperCase() || undefined)}
       />
@@ -404,6 +439,7 @@ export function MoneyField({ value, onChange, amountKey = 'amount', withPeriod, 
             { value: 'yearly', label: 'Yearly' },
           ]}
           placeholder="Period"
+          label={`${label} period`}
         />
       )}
     </div>

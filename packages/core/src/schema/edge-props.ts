@@ -223,6 +223,9 @@ export const EDGE_PROPS_SCHEMAS = {
   SERVES_GOAL: emptyProps,
   WAITING_ON: emptyProps,
   FOR: emptyProps,
+  IN_AREA: z.object({ primary: z.boolean().optional() }).passthrough(),
+  PARTICIPATES_IN: z.object({ role: z.string().optional() }).passthrough(),
+  AFFILIATED_WITH: z.object({ role: z.string().optional() }).passthrough(),
 } satisfies Record<EdgeType, z.ZodType>;
 
 export function edgePropsSchemaFor(type: EdgeType): z.ZodType {

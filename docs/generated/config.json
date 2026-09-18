@@ -26,7 +26,7 @@
       "example": {
         "value": "https://aperture.example.com",
         "commented": true,
-        "source": ".env.example:94"
+        "source": ".env.example:100"
       }
     },
     {
@@ -136,7 +136,7 @@
       "example": {
         "value": "true",
         "commented": false,
-        "source": ".env.example:82"
+        "source": ".env.example:88"
       }
     },
     {
@@ -153,8 +153,9 @@
       "section": "LaTeX build service (SRS §8.4)",
       "description": null,
       "requirements": [],
-      "source": "scripts/backup-to-s3.sh:33",
+      "source": "scripts/backup-local.sh:23",
       "reads": [
+        "scripts/backup-local.sh:23",
         "scripts/backup-to-s3.sh:33",
         "scripts/restore-from-s3.sh:114",
         "scripts/restore-from-s3.sh:42",
@@ -174,8 +175,45 @@
       "example": {
         "value": "2026-07-16",
         "commented": true,
-        "source": ".env.example:149"
+        "source": ".env.example:155"
       }
+    },
+    {
+      "name": "BACKUP_DIR",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/backup-local.sh:27",
+      "reads": [
+        "scripts/backup-local.sh:122",
+        "scripts/backup-local.sh:152",
+        "scripts/backup-local.sh:27",
+        "scripts/backup-local.sh:31",
+        "scripts/backup-local.sh:47",
+        "scripts/backup-local.sh:48",
+        "scripts/backup-local.sh:52",
+        "scripts/personal-up.sh:109",
+        "scripts/personal-up.sh:11",
+        "scripts/personal-up.sh:83",
+        "scripts/personal-up.sh:87"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
     },
     {
       "name": "BACKUP_EXPORT_CMD",
@@ -191,13 +229,45 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/backup-to-s3.sh:62",
+      "source": "scripts/backup-local.sh:40",
       "reads": [
+        "scripts/backup-local.sh:40",
+        "scripts/backup-local.sh:41",
+        "scripts/backup-local.sh:73",
+        "scripts/backup-local.sh:75",
         "scripts/backup-to-s3.sh:101",
         "scripts/backup-to-s3.sh:62",
         "scripts/backup-to-s3.sh:63",
         "scripts/backup-to-s3.sh:76",
         "scripts/backup-to-s3.sh:99"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "BACKUP_KEEP_DAYS",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "scripts/backup-local.sh:25",
+      "reads": [
+        "scripts/backup-local.sh:152",
+        "scripts/backup-local.sh:25"
       ],
       "read_by": [
         "deploy"
@@ -222,8 +292,10 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "scripts/backup-to-s3.sh:37",
+      "source": "scripts/backup-local.sh:26",
       "reads": [
+        "scripts/backup-local.sh:115",
+        "scripts/backup-local.sh:26",
         "scripts/backup-to-s3.sh:141",
         "scripts/backup-to-s3.sh:37"
       ],
@@ -267,7 +339,7 @@
       "example": {
         "value": "s3://vitae-backups/prod",
         "commented": true,
-        "source": ".env.example:148"
+        "source": ".env.example:154"
       }
     },
     {
@@ -299,7 +371,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:154"
+        "source": ".env.example:160"
       }
     },
     {
@@ -320,6 +392,7 @@
       "requirements": [],
       "source": "packages/config/src/env.ts:95",
       "reads": [
+        "deploy/compose.personal.yml:92",
         "deploy/compose.prod.yml:104",
         "services/buildsvc/src/server.ts:40"
       ],
@@ -334,7 +407,7 @@
       "example": {
         "value": "change-me-to-a-shared-secret",
         "commented": false,
-        "source": ".env.example:134"
+        "source": ".env.example:140"
       }
     },
     {
@@ -390,7 +463,7 @@
       "example": {
         "value": "http://localhost:8787",
         "commented": false,
-        "source": ".env.example:129"
+        "source": ".env.example:135"
       }
     },
     {
@@ -442,7 +515,7 @@
       "example": {
         "value": "vitae",
         "commented": false,
-        "source": ".env.example:126"
+        "source": ".env.example:132"
       }
     },
     {
@@ -471,7 +544,7 @@
       "example": {
         "value": "cloudinary://your_key:your_secret@your_cloud",
         "commented": false,
-        "source": ".env.example:124"
+        "source": ".env.example:130"
       }
     },
     {
@@ -505,7 +578,7 @@
       "example": {
         "value": "YES",
         "commented": true,
-        "source": ".env.example:151"
+        "source": ".env.example:157"
       }
     },
     {
@@ -559,7 +632,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:103"
+        "source": ".env.example:109"
       }
     },
     {
@@ -618,7 +691,7 @@
       "example": {
         "value": "postgresql://vitae:vitae@127.0.0.1:5433/vitae",
         "commented": false,
-        "source": ".env.example:99"
+        "source": ".env.example:105"
       }
     },
     {
@@ -651,7 +724,7 @@
       "example": {
         "value": "docs/.compiled",
         "commented": false,
-        "source": ".env.example:80"
+        "source": ".env.example:86"
       }
     },
     {
@@ -668,8 +741,11 @@
       "section": "LaTeX build service (SRS §8.4)",
       "description": null,
       "requirements": [],
-      "source": "scripts/backup-to-s3.sh:31",
+      "source": "scripts/backup-local.sh:22",
       "reads": [
+        "scripts/backup-local.sh:145",
+        "scripts/backup-local.sh:22",
+        "scripts/backup-local.sh:70",
         "scripts/backup-to-s3.sh:170",
         "scripts/backup-to-s3.sh:31",
         "scripts/backup-to-s3.sh:48",
@@ -689,7 +765,7 @@
       "example": {
         "value": "1",
         "commented": true,
-        "source": ".env.example:150"
+        "source": ".env.example:156"
       }
     },
     {
@@ -784,6 +860,12 @@
       "source": "apps/api/src/scripts/export-bundle.ts:36",
       "reads": [
         "apps/api/src/scripts/export-bundle.ts:36",
+        "scripts/backup-local.sh:58",
+        "scripts/backup-local.sh:66",
+        "scripts/backup-local.sh:75",
+        "scripts/backup-local.sh:77",
+        "scripts/backup-local.sh:92",
+        "scripts/backup-local.sh:93",
         "scripts/backup-to-s3.sh:89"
       ],
       "read_by": [
@@ -820,7 +902,7 @@
       "example": {
         "value": "127.0.0.1:9099",
         "commented": false,
-        "source": ".env.example:111"
+        "source": ".env.example:117"
       }
     },
     {
@@ -849,7 +931,7 @@
       "example": {
         "value": "vitae-local",
         "commented": false,
-        "source": ".env.example:109"
+        "source": ".env.example:115"
       }
     },
     {
@@ -910,7 +992,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:141"
+        "source": ".env.example:147"
       }
     },
     {
@@ -1097,16 +1179,20 @@
         "INT-1"
       ],
       "source": "packages/config/src/env.ts:37",
-      "reads": [],
-      "read_by": [],
-      "read_via": "declaration-only",
+      "reads": [
+        "scripts/personal-up.sh:32"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
       "test_only": false,
       "surface": "deployment",
       "documented": true,
       "example": {
         "value": "owner@example.com",
         "commented": false,
-        "source": ".env.example:67"
+        "source": ".env.example:73"
       }
     },
     {
@@ -1137,7 +1223,7 @@
       "example": {
         "value": "pdl_sdbx_apikey_your_server_secret",
         "commented": true,
-        "source": ".env.example:59"
+        "source": ".env.example:65"
       }
     },
     {
@@ -1168,7 +1254,7 @@
       "example": {
         "value": "sandbox",
         "commented": false,
-        "source": ".env.example:58"
+        "source": ".env.example:64"
       }
     },
     {
@@ -1200,7 +1286,7 @@
       "example": {
         "value": "pri_your_annual_price",
         "commented": true,
-        "source": ".env.example:62"
+        "source": ".env.example:68"
       }
     },
     {
@@ -1232,7 +1318,7 @@
       "example": {
         "value": "pri_your_monthly_price",
         "commented": true,
-        "source": ".env.example:61"
+        "source": ".env.example:67"
       }
     },
     {
@@ -1266,7 +1352,7 @@
       "example": {
         "value": "pdl_ntfset_your_webhook_secret",
         "commented": true,
-        "source": ".env.example:60"
+        "source": ".env.example:66"
       }
     },
     {
@@ -1291,6 +1377,34 @@
         "buildsvc"
       ],
       "read_via": "process.env",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": false,
+      "example": null
+    },
+    {
+      "name": "POSTGRES_PASSWORD",
+      "scope": "deploy",
+      "declared_in": null,
+      "validated": false,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [],
+      "section": null,
+      "description": null,
+      "requirements": [],
+      "source": "deploy/compose.personal.yml:56",
+      "reads": [
+        "deploy/compose.personal.yml:112",
+        "deploy/compose.personal.yml:56"
+      ],
+      "read_by": [
+        "deploy"
+      ],
+      "read_via": "shell",
       "test_only": false,
       "surface": "deployment",
       "documented": false,
@@ -1324,7 +1438,7 @@
       "example": {
         "value": "https://app.example.com",
         "commented": true,
-        "source": ".env.example:55"
+        "source": ".env.example:61"
       }
     },
     {
@@ -1353,7 +1467,7 @@
       "example": {
         "value": "change-me-to-a-long-random-string",
         "commented": false,
-        "source": ".env.example:84"
+        "source": ".env.example:90"
       }
     },
     {
@@ -1437,7 +1551,7 @@
       "example": {
         "value": "companion-production",
         "commented": true,
-        "source": ".env.example:92"
+        "source": ".env.example:98"
       }
     },
     {
@@ -1941,6 +2055,38 @@
       "example": null
     },
     {
+      "name": "VITAE_LOCAL_INSTALL",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "enum",
+      "parsed_as": "boolean",
+      "enum_values": [
+        "true",
+        "false",
+        "1",
+        "0"
+      ],
+      "required": false,
+      "default": "false",
+      "constraints": [],
+      "section": "Hosted Cloud control plane",
+      "description": "Single-PC production install: loopback Caddy, local Postgres, owner sign-in, no Vitae Cloud. Default off. Never set this on a network-facing host; the control is published ports bound to 127.0.0.1, documented in docs/runbooks/personal-local.md.",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:109",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "false",
+        "commented": false,
+        "source": ".env.example:47"
+      }
+    },
+    {
       "name": "VITAE_MAP_ROOT",
       "scope": "server",
       "declared_in": null,
@@ -2023,7 +2169,7 @@
       "example": {
         "value": "false",
         "commented": false,
-        "source": ".env.example:48"
+        "source": ".env.example:54"
       }
     },
     {
@@ -2216,7 +2362,7 @@
       "example": {
         "value": "",
         "commented": true,
-        "source": ".env.example:143"
+        "source": ".env.example:149"
       }
     },
     {
@@ -2272,6 +2418,35 @@
       "surface": "deployment",
       "documented": false,
       "example": null
+    },
+    {
+      "name": "VITAE_STORAGE_DIR",
+      "scope": "server",
+      "declared_in": "serverEnvSchema",
+      "validated": true,
+      "type": "string",
+      "parsed_as": null,
+      "enum_values": [],
+      "required": false,
+      "default": null,
+      "constraints": [
+        "min(1)"
+      ],
+      "section": "Hosted Cloud control plane",
+      "description": "Directory for the filesystem storage adapter used when a local install has no Cloudinary URL. Ignored when CLOUDINARY_URL is set.",
+      "requirements": [],
+      "source": "packages/config/src/env.ts:114",
+      "reads": [],
+      "read_by": [],
+      "read_via": "declaration-only",
+      "test_only": false,
+      "surface": "deployment",
+      "documented": true,
+      "example": {
+        "value": "",
+        "commented": true,
+        "source": ".env.example:49"
+      }
     },
     {
       "name": "VITAE_TEST_ADMIN_URL",
@@ -2442,7 +2617,7 @@
       "example": {
         "value": "demo-api-key",
         "commented": false,
-        "source": ".env.example:113"
+        "source": ".env.example:119"
       }
     },
     {
@@ -2473,7 +2648,7 @@
       "example": {
         "value": "vitae-local.firebaseapp.com",
         "commented": false,
-        "source": ".env.example:114"
+        "source": ".env.example:120"
       }
     },
     {
@@ -2504,7 +2679,7 @@
       "example": {
         "value": "http://127.0.0.1:9099",
         "commented": false,
-        "source": ".env.example:120"
+        "source": ".env.example:126"
       }
     },
     {
@@ -2535,7 +2710,7 @@
       "example": {
         "value": "vitae-local",
         "commented": false,
-        "source": ".env.example:115"
+        "source": ".env.example:121"
       }
     },
     {
@@ -2566,7 +2741,7 @@
       "example": {
         "value": "true",
         "commented": false,
-        "source": ".env.example:116"
+        "source": ".env.example:122"
       }
     },
     {
@@ -2711,7 +2886,7 @@
       "example": {
         "value": "false",
         "commented": false,
-        "source": ".env.example:53"
+        "source": ".env.example:59"
       }
     },
     {
@@ -2813,9 +2988,9 @@
       "section": null,
       "description": null,
       "requirements": [],
-      "source": "apps/api/src/services/storage/cloudinary.ts:96",
+      "source": "apps/api/src/services/storage/cloudinary.ts:97",
       "reads": [
-        "apps/api/src/services/storage/cloudinary.ts:96"
+        "apps/api/src/services/storage/cloudinary.ts:97"
       ],
       "read_by": [
         "api"
@@ -2925,14 +3100,14 @@
     "Storage: Cloudinary (SRS T5; owner-provided)"
   ],
   "summary": {
-    "total": 100,
+    "total": 105,
     "by_scope": {
-      "server": 68,
-      "deploy": 18,
+      "server": 70,
+      "deploy": 21,
       "web-build": 14
     },
-    "declared": 33,
-    "validated": 20,
+    "declared": 35,
+    "validated": 22,
     "server_unvalidated": [
       "BUILDSVC_HOST",
       "CONFIRM",
@@ -2967,7 +3142,9 @@
     ],
     "undocumented": [
       "API_DOMAIN",
+      "BACKUP_DIR",
       "BACKUP_EXPORT_CMD",
+      "BACKUP_KEEP_DAYS",
       "BACKUP_MIN_NODES",
       "BUILDSVC_HOST",
       "CONFLICT",
@@ -2980,6 +3157,7 @@
       "NODE_ENV",
       "NOT_FOUND",
       "PORT",
+      "POSTGRES_PASSWORD",
       "TEMPLATES_DIR",
       "TZ",
       "VALIDATION",

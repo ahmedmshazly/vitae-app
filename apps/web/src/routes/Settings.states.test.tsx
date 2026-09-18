@@ -120,6 +120,26 @@ describe('Settings profile editor', () => {
       profile: { ...SETTINGS.profile, name: 'Ada Lovelace' },
     });
   });
+
+  it('keeps a failed profile draft in place and makes retry explicit', async () => {
+    const user = userEvent.setup();
+    serve();
+    mockApi.patch.mockRejectedValueOnce(new Error('profile service unavailable'));
+    renderWithApp(<Settings />, { route: '/settings' });
+
+    const profile = await screen.findByRole('region', { name: /Profile of me/ });
+    const name = within(profile).getByLabelText('Name');
+    await user.type(name, ' Lovelace');
+    await user.click(within(profile).getByRole('button', { name: 'Save profile' }));
+
+    expect(await within(profile).findByText("Couldn't save profile")).toBeInTheDocument();
+    expect(within(profile).getByText(/profile service unavailable/)).toBeInTheDocument();
+    expect(name).toHaveValue('Ada Lovelace');
+    expect(within(profile).getByRole('button', { name: 'Save profile' })).toBeEnabled();
+
+    await user.type(name, '!');
+    expect(within(profile).queryByText("Couldn't save profile")).not.toBeInTheDocument();
+  });
 });
 
 describe('Settings résumé defaults', () => {
@@ -192,13 +212,20 @@ describe('Settings ranking constants', () => {
 
 describe('Settings GitHub panel', () => {
   it('offers a disconnect only once a token is configured', async () => {
-    serve({ settings: { ...SETTINGS, github: { configured: true, lastSyncAt: '2026-08-01T10:00:00.000Z' } } });
+    serve({
+      settings: {
+        ...SETTINGS,
+        github: { configured: true, lastSyncAt: '2026-08-01T10:00:00.000Z' },
+      },
+    });
     renderWithApp(<Settings />, { route: '/settings' });
 
     const github = await screen.findByRole('region', { name: /GitHub/ });
     expect(within(github).getByLabelText('Personal access token')).toBeInTheDocument();
     expect(within(github).getByText('2026-08-01 10:00')).toBeInTheDocument();
-    expect(within(github).getByRole('button', { name: 'Disconnect GitHub token' })).toBeInTheDocument();
+    expect(
+      within(github).getByRole('button', { name: 'Disconnect GitHub token' }),
+    ).toBeInTheDocument();
     expect(within(github).getByRole('link', { name: 'Repositories' })).toBeInTheDocument();
   });
 
@@ -214,6 +241,24 @@ describe('Settings GitHub panel', () => {
 
     expect(await within(github).findByText("Couldn't store the token")).toBeInTheDocument();
     expect(within(github).getByText('github rejected the token')).toBeInTheDocument();
+  });
+});
+
+describe('Settings Gemini panel', () => {
+  it('offers a disconnect only once a key is configured', async () => {
+    serve({
+      settings: {
+        ...SETTINGS,
+        gemini: { configured: true, project: 'gen-lang-client-test', source: 'file' },
+      },
+    });
+    renderWithApp(<Settings />, { route: '/settings' });
+
+    const gemini = await screen.findByRole('region', { name: /^Gemini/ });
+    expect(within(gemini).getByLabelText('API key')).toBeInTheDocument();
+    expect(within(gemini).getByText('gen-lang-client-test')).toBeInTheDocument();
+    expect(within(gemini).getByRole('button', { name: 'Disconnect Gemini' })).toBeInTheDocument();
+    expect(within(gemini).getByRole('link', { name: 'Gemini' })).toBeInTheDocument();
   });
 });
 

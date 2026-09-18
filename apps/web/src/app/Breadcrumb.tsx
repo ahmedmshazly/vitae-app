@@ -48,6 +48,7 @@ function crumbFor(pathname: string): Crumb {
     [ROUTES.import.path]: { parent: 'Data', leaf: 'Imports', glyph: 'capture' },
     [ROUTES.duplicates.path]: { parent: 'Data', leaf: 'Identity audit', glyph: 'merge' },
     [ROUTES.repositories.path]: { parent: 'Data', leaf: 'GitHub', glyph: 'repository' },
+    [ROUTES.gemini.path]: { parent: 'Data', leaf: 'Gemini', glyph: 'idea' },
     [ROUTES.export.path]: { parent: 'Data', leaf: 'Exports & backups', glyph: 'export' },
     [ROUTES.trash.path]: { parent: 'Data', leaf: 'Trash', glyph: 'trash' },
     [ROUTES.settingsProfile.path]: { parent: 'Settings', leaf: 'Profile', glyph: 'person' },
@@ -121,7 +122,7 @@ export function Breadcrumb() {
   const { pathname } = useLocation();
   const { parent, leaf, glyph } = crumbFor(pathname);
   return (
-    <div className="topbar__crumb">
+    <div className="topbar__crumb" title={parent ? `${parent} / ${leaf}` : leaf}>
       <Glyph name={glyph} size={15} />
       {parent && (
         <>

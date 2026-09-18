@@ -35,12 +35,16 @@ import { retentionRouter } from './retention.js';
 import { placesRouter } from './places.js';
 import { billingRouter } from './billing.js';
 import { productivityRouter } from './productivity.js';
+import { objectsRouter } from './objects.js';
+import { knowledgeRouter } from './knowledge.js';
 
 export const v1Router: Router = Router();
 
 v1Router.use('/auth', authRouter);
 v1Router.use('/billing', billingRouter);
 v1Router.use('/nodes', nodesRouter);
+v1Router.use('/objects', objectsRouter);
+v1Router.use('/knowledge', knowledgeRouter);
 v1Router.use('/edges', edgesRouter);
 v1Router.use('/capture', captureRouter);
 v1Router.use('/search', searchRouter);

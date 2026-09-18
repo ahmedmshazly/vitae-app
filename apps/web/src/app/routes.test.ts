@@ -18,6 +18,21 @@ describe('workspace route registry', () => {
     expect(hubForPath('/this-route-does-not-exist')).toBeNull();
   });
 
+  it('does not turn a lookalike URL into a workspace recommendation', () => {
+    // `hubForPath` also drives authenticated 404 recovery. Prefix matches
+    // would make dead addresses look like known workspaces.
+    for (const pathname of [
+      '/todayish',
+      '/people-first',
+      '/resume-builder',
+      '/explorer',
+      '/imported',
+      '/settings-old',
+    ]) {
+      expect(hubForPath(pathname)).toBeNull();
+    }
+  });
+
   it('keeps query-backed Network lenses mutually exclusive', () => {
     expect(isRouteActive('/network/intelligence', ROUTES.askPeople, '?lens=contact')).toBe(true);
     expect(isRouteActive('/network/intelligence', ROUTES.intros, '?lens=contact')).toBe(false);
@@ -41,6 +56,13 @@ describe('workspace route registry', () => {
 
   it('exposes every résumé destination in the Career workspace strip', () => {
     expect(WORKSPACE_NAV.career).toContain(ROUTES.resumeTemplates);
+  });
+
+  it('places Gemini beside GitHub in the Data workspace', () => {
+    expect(ROUTES.gemini.path).toBe('/data/sources/gemini');
+    expect(WORKSPACE_NAV.data).toContain(ROUTES.gemini);
+    const strip = WORKSPACE_NAV.data;
+    expect(strip.indexOf(ROUTES.gemini)).toBeGreaterThan(strip.indexOf(ROUTES.repositories));
   });
 
   it('keeps the Today strip as Today, Planner, Ledger until the flag is on', () => {

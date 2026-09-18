@@ -35,6 +35,8 @@ export interface SettingsDoc {
   resumeDefaults: { templateKey: string; accent: string; emphasis: string };
   /** Non-secret sync metadata only. The PAT lives in the secret store. */
   github: { lastSyncAt?: string | null; etag?: string | null; secret_ref?: SecretSource };
+  /** Non-secret Gemini metadata. The API key lives in the secret store. */
+  gemini: { project?: string | null };
   updated_at?: string;
 }
 
@@ -48,6 +50,7 @@ export const DEFAULT_SETTINGS: SettingsDoc = {
   ],
   resumeDefaults: { templateKey: 'cobalt', accent: '#2563eb', emphasis: 'technical' },
   github: { lastSyncAt: null, etag: null },
+  gemini: { project: null },
 };
 
 const DOC_ID = 'settings';
@@ -100,6 +103,7 @@ export async function getSettings(): Promise<SettingsDoc> {
     skillAliases: data.skillAliases ?? DEFAULT_SETTINGS.skillAliases,
     resumeDefaults: { ...DEFAULT_SETTINGS.resumeDefaults, ...data.resumeDefaults },
     github: { ...DEFAULT_SETTINGS.github, ...github, secret_ref: secretSource('github_pat') },
+    gemini: { ...DEFAULT_SETTINGS.gemini, ...data.gemini },
     updated_at: data.updated_at,
   };
 }
@@ -113,6 +117,7 @@ export async function patchSettings(patch: Partial<SettingsDoc>): Promise<Settin
     skillAliases: patch.skillAliases ?? current.skillAliases,
     resumeDefaults: { ...current.resumeDefaults, ...patch.resumeDefaults },
     github,
+    gemini: { ...current.gemini, ...patch.gemini },
     updated_at: nowIso(),
   };
   await repository.docPut('meta', DOC_ID, next as unknown as Record<string, unknown>);
@@ -124,14 +129,42 @@ export function githubToken(): string | null {
   return getSecret('github_pat');
 }
 
+/** The Gemini API key, read from the secret store, never from the database. */
+export function geminiApiKey(): string | null {
+  return getSecret('gemini_api_key');
+}
+
+/** Project id from the environment. GEMINI_* wins over the GEMENI_* alias. */
+export function envGeminiProject(): string | null {
+  const value = process.env.GEMINI_PROJECT?.trim() || process.env.GEMENI_PROJECT?.trim();
+  return value || null;
+}
+
+export interface PublicGemini {
+  configured: boolean;
+  project: string | null;
+  source: SecretSource;
+}
+
+function publicGemini(s: SettingsDoc): PublicGemini {
+  const source = secretSource('gemini_api_key');
+  return {
+    configured: source !== 'none',
+    project: source === 'none' ? null : (envGeminiProject() ?? s.gemini.project ?? null),
+    source,
+  };
+}
+
 /** Public shape, reports only whether a credential is configured, and where. */
-export function publicSettings(s: SettingsDoc): Omit<SettingsDoc, 'github'> & {
+export function publicSettings(s: SettingsDoc): Omit<SettingsDoc, 'github' | 'gemini'> & {
   github: { configured: boolean; lastSyncAt: string | null; source: SecretSource };
+  gemini: PublicGemini;
 } {
-  const { github, ...rest } = s;
+  const { github, gemini: _gemini, ...rest } = s;
   const source = secretSource('github_pat');
   return {
     ...rest,
     github: { configured: source !== 'none', lastSyncAt: github.lastSyncAt ?? null, source },
+    gemini: publicGemini(s),
   };
 }

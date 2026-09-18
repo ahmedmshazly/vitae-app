@@ -1,0 +1,144 @@
+# Vitae on one PC: production Node, local Postgres, loopback-only Caddy.
+#
+# This is not deploy/compose.prod.yml. That file is the hosted VM path (Cloud
+# on, no database, public HTTPS, SPA on Vercel). This file is the opposite.
+#
+# From the repository root:
+#   cp deploy/.env.personal.example deploy/.env.personal   # then fill secrets
+#   pnpm --filter @vitae/web build                         # with personal VITE_*
+#   docker compose -f deploy/compose.personal.yml --env-file deploy/.env.personal up -d --build
+#
+# Bind is 127.0.0.1:8080 only. Publishing Caddy on 0.0.0.0 is unsupported.
+# Docs: docs/runbooks/personal-local.md
+
+name: vitae-personal
+
+services:
+  caddy:
+    image: caddy:2-alpine@sha256:5f5c8640aae01df9654968d946d8f1a56c497f1dd5c5cda4cf95ab7c14d58648
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:8080:80'
+    volumes:
+      - ./Caddyfile.personal:/etc/caddy/Caddyfile:ro
+      - ../apps/web/dist:/srv/web:ro
+    networks: [edge]
+    depends_on:
+      api:
+        condition: service_healthy
+
+  prepare-objects:
+    image: node:22-alpine@sha256:16e22a550f3863206a3f701448c45f7912c6896a62de43add43bb9c86130c3e2
+    user: '0:0'
+    command: ['sh', '-c', 'mkdir -p /var/lib/vitae/objects && chown -R 1000:1000 /var/lib/vitae/objects']
+    volumes:
+      - vitae_personal_objects:/var/lib/vitae/objects
+    restart: 'no'
+
+  prepare-secrets:
+    image: node:22-alpine@sha256:16e22a550f3863206a3f701448c45f7912c6896a62de43add43bb9c86130c3e2
+    user: '0:0'
+    command: ['sh', '-c', 'mkdir -p /var/lib/vitae/secrets && chown -R 1000:1000 /var/lib/vitae/secrets && chmod 700 /var/lib/vitae/secrets']
+    volumes:
+      - vitae_personal_secrets:/var/lib/vitae/secrets
+    restart: 'no'
+
+  api:
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+    image: vitae/api:personal
+    restart: unless-stopped
+    env_file: .env.personal
+    environment:
+      - NODE_ENV=production
+      - API_PORT=4000
+      - BUILDSVC_URL=http://buildsvc:8787
+      - DOCS_CONTENT_DIR=/app/docs-content
+      - VITAE_CLOUD_ENABLED=false
+      - VITAE_LOCAL_INSTALL=true
+      - AUTH_ENABLE_DEV_LOGIN=true
+      - VITAE_PRODUCTIVITY_ENABLED=true
+      - VITAE_STORAGE_DIR=/var/lib/vitae/objects
+      - VITAE_SECRETS_DIR=/var/lib/vitae/secrets
+      - WEB_ORIGIN=http://127.0.0.1:8080,http://localhost:8080
+      - DATABASE_URL=postgresql://vitae:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/.env.personal}@postgres:5432/vitae
+    volumes:
+      - ./docs-content:/app/docs-content:ro
+      - vitae_personal_objects:/var/lib/vitae/objects
+      - vitae_personal_secrets:/var/lib/vitae/secrets
+    networks: [edge, internal]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      buildsvc:
+        condition: service_healthy
+      prepare-objects:
+        condition: service_completed_successfully
+      prepare-secrets:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:4000/ready',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 45s
+
+  buildsvc:
+    build:
+      context: ..
+      dockerfile: services/buildsvc/Dockerfile
+    image: vitae/buildsvc:personal
+    restart: unless-stopped
+    stop_grace_period: 100s
+    environment:
+      - PORT=8787
+      - BUILDSVC_HOST=0.0.0.0
+      - NODE_ENV=production
+      - BUILDSVC_HMAC_SECRET=${BUILDSVC_HMAC_SECRET:?set BUILDSVC_HMAC_SECRET in deploy/.env.personal}
+    healthcheck:
+      test: ['CMD', 'curl', '-fsS', 'http://localhost:8787/healthz']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    networks: [internal]
+
+  postgres:
+    image: postgres:17-alpine@sha256:742f40ea20b9ff2ff31db5458d127452988a2164df9e17441e191f3b72252193
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=vitae
+      - POSTGRES_DB=vitae
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/.env.personal}
+      - POSTGRES_INITDB_ARGS=--locale-provider=icu --icu-locale=und-x-icu
+    volumes:
+      - vitae_personal_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U vitae -d vitae']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks: [internal]
+
+networks:
+  edge: {}
+  internal:
+    internal: true
+
+volumes:
+  vitae_personal_pgdata: {}
+  vitae_personal_objects: {}
+  vitae_personal_secrets: {}

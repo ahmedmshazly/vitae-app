@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { expectNoA11yViolations } from './helpers/a11y';
 import { signIn } from './helpers/auth';
 
 /**
@@ -21,7 +22,9 @@ import { signIn } from './helpers/auth';
  */
 function flagsOn(): boolean {
   const on = (value: string | undefined) => /^(true|1|yes)$/i.test((value ?? '').trim());
-  return on(process.env.VITAE_PRODUCTIVITY_ENABLED) && on(process.env.VITE_PUBLIC_PRODUCTIVITY_ENABLED);
+  return (
+    on(process.env.VITAE_PRODUCTIVITY_ENABLED) && on(process.env.VITE_PUBLIC_PRODUCTIVITY_ENABLED)
+  );
 }
 
 test.describe('productivity matrix', () => {
@@ -40,6 +43,11 @@ test.describe('productivity matrix', () => {
       test.skip(true, 'Running web build has VITE_PUBLIC_PRODUCTIVITY_ENABLED off');
     }
 
+    // `/today/tasks` has its own route and controls; shell-level scans do not
+    // exercise its capture form, task cards, or layout picker. Scan the real
+    // authenticated route before this journey mutates its fixture state.
+    await expectNoA11yViolations(page);
+
     const title = `E2E matrix ${Date.now()}`;
     await page.getByLabel('Capture a task').fill(title);
     await page.getByRole('button', { name: 'Add task' }).click();
@@ -48,7 +56,11 @@ test.describe('productivity matrix', () => {
     await page.getByRole('button', { name: 'Matrix' }).click();
     const card = page.getByText(title);
     await expect(card).toBeVisible();
-    await expect(page.getByRole('region', { name: /^(Do|Schedule|Delegate|Eliminate)$/ }).filter({ hasText: title })).toBeVisible();
+    await expect(
+      page
+        .getByRole('region', { name: /^(Do|Schedule|Delegate|Eliminate)$/ })
+        .filter({ hasText: title }),
+    ).toBeVisible();
 
     await page
       .getByRole('region', { name: /^(Do|Schedule|Delegate|Eliminate)$/ })

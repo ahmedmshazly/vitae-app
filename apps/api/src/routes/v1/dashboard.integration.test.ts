@@ -29,5 +29,8 @@ describe('dashboard route', () => {
     expect(weights.reduce((a: number, b: number) => a + b, 0)).toBe(100);
     expect(res.body.insights.relationships).toHaveProperty('drifting');
     expect(res.body.insights.skills).toHaveProperty('covered');
+    expect(res.body.knowledge).toEqual(
+      expect.objectContaining({ pending: expect.any(Number), conflicts: expect.any(Number) }),
+    );
   });
 });

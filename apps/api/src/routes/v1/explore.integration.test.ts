@@ -58,6 +58,60 @@ describe('explore routes', () => {
     expect(miss.body.found).toBe(false);
   });
 
+  it('discovers deterministic communities, bridge records, and isolated records from the whole workspace', async () => {
+    const { app, token } = await getAuthedApp();
+    const stamp = Date.now();
+    const create = async (title: string) => {
+      const result = await request(app)
+        .post('/api/v1/nodes')
+        .set(authHeader(token))
+        .send({ type: 'project', title: `${title} ${stamp}`, props: {} })
+        .expect(201);
+      return result.body.node.id as string;
+    };
+    const a = await create('Community A');
+    const a2 = await create('Community A two');
+    const a3 = await create('Community A three');
+    const bridge = await create('Community bridge');
+    const b = await create('Community B');
+    const b2 = await create('Community B two');
+    const b3 = await create('Community B three');
+    const isolate = await create('Community isolate');
+    for (const [src, dst] of [
+      [a, a2], [a2, a3], [a3, a],
+      [b, b2], [b2, b3], [b3, b],
+      [a, bridge], [bridge, b], [a, bridge],
+    ] as const) {
+      await request(app)
+        .post('/api/v1/edges')
+        .set(authHeader(token))
+        .send({ type: 'RELATES_TO', src, dst, props: {} })
+        .expect(201);
+    }
+
+    const first = await request(app).get('/api/v1/graph/discovery').set(authHeader(token)).expect(200);
+    const second = await request(app).get('/api/v1/graph/discovery').set(authHeader(token)).expect(200);
+    expect(first.body.communities.map((item: { id: string }) => item.id)).toEqual(
+      second.body.communities.map((item: { id: string }) => item.id),
+    );
+    expect(first.body.totals.records).toBeGreaterThanOrEqual(4);
+    expect(first.body.totals.isolatedRecords).toBeGreaterThanOrEqual(1);
+    expect(first.body.disconnected.some((item: { records: Array<{ id: string }> }) => item.records.some((record) => record.id === isolate))).toBe(true);
+
+    expect([...first.body.bridges].every((item: { connectedCommunityCount: number; crossCommunityNeighborCount: number }, index: number, list: Array<{ connectedCommunityCount: number; crossCommunityNeighborCount: number }>) => {
+      const next = list[index + 1];
+      return !next || item.connectedCommunityCount > next.connectedCommunityCount || (item.connectedCommunityCount === next.connectedCommunityCount && item.crossCommunityNeighborCount >= next.crossCommunityNeighborCount);
+    })).toBe(true);
+    const community = first.body.communities.find((item: { representatives: Array<{ id: string }> }) => item.representatives.some((record) => record.id === a));
+    expect(community).toBeTruthy();
+    const detail = await request(app)
+      .get(`/api/v1/graph/discovery/community/${community.id}?limit=1`)
+      .set(authHeader(token))
+      .expect(200);
+    expect(detail.body.members).toHaveLength(1);
+    expect(detail.body.totalMembers).toBeGreaterThanOrEqual(1);
+  });
+
   it('returns a timeline review digest for a brushed range', async () => {
     const { app, token } = await getAuthedApp();
     const stamp = Date.now();

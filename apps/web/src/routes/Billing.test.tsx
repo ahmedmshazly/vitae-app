@@ -1,6 +1,7 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useLocation } from 'react-router-dom';
 import { renderWithApp } from '../test/render.js';
 import { Billing, billingAccessDetail, billingPeriodFromSearch } from './Billing.js';
 
@@ -13,7 +14,11 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('../lib/api.js', () => ({ api: { get: mocks.get, post: mocks.post } }));
-vi.mock('../lib/auth.js', () => ({ useAuth: () => ({ cloudEnabled: mocks.cloudEnabled }), useCanWrite: () => true, WRITE_LOCK_HINT: 'Read-only workspace' }));
+vi.mock('../lib/auth.js', () => ({
+  useAuth: () => ({ cloudEnabled: mocks.cloudEnabled }),
+  useCanWrite: () => true,
+  WRITE_LOCK_HINT: 'Read-only workspace',
+}));
 vi.mock('../lib/paddle.js', () => ({
   openPaddleCheckout: mocks.openPaddleCheckout,
   paddleCheckoutReady: mocks.paddleCheckoutReady,
@@ -31,6 +36,16 @@ function trialBilling() {
     customer: { configured: false, provider: 'paddle' as const },
     subscription: null,
   };
+}
+
+function LocationProbe() {
+  const location = useLocation();
+  return (
+    <output aria-label="Current address">
+      {location.pathname}
+      {location.search}
+    </output>
+  );
 }
 
 beforeEach(() => {
@@ -87,6 +102,24 @@ describe('Billing', () => {
     expect(mocks.post).toHaveBeenCalledWith('/billing/checkout', { billingPeriod: 'monthly' });
   });
 
+  it('keeps a changed period in the address so it survives refresh and sharing', async () => {
+    const user = userEvent.setup();
+    renderWithApp(
+      <>
+        <Billing />
+        <LocationProbe />
+      </>,
+      { route: '/settings/billing' },
+    );
+
+    await screen.findByText('Full trial access');
+    await user.click(screen.getByRole('button', { name: 'Monthly · $24 / month' }));
+
+    expect(screen.getByRole('status', { name: 'Current address' })).toHaveTextContent(
+      '/settings/billing?period=monthly',
+    );
+  });
+
   it('uses the provider portal after a customer exists', async () => {
     mocks.get.mockResolvedValue({
       ...trialBilling(),
@@ -101,5 +134,26 @@ describe('Billing', () => {
     renderWithApp(<Billing />, { route: '/settings/billing' });
 
     expect(await screen.findByRole('button', { name: 'Manage billing' })).toBeInTheDocument();
+  });
+
+  it('names an unavailable checkout and leaves no payment control behind', async () => {
+    mocks.paddleCheckoutReady.mockReturnValue(false);
+    renderWithApp(<Billing />, { route: '/settings/billing' });
+
+    expect(await screen.findByText('Checkout is not configured')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /secure checkout/i })).not.toBeInTheDocument();
+  });
+
+  it('shows a retryable loading failure without pretending the account state is known', async () => {
+    const user = userEvent.setup();
+    mocks.get.mockRejectedValueOnce(new Error('billing service unavailable'));
+    renderWithApp(<Billing />, { route: '/settings/billing' });
+
+    const alert = await screen.findByRole('alert');
+    expect(within(alert).getByText("Couldn't load billing")).toBeInTheDocument();
+    expect(within(alert).getByText('billing service unavailable')).toBeInTheDocument();
+
+    await user.click(within(alert).getByRole('button', { name: 'Retry' }));
+    expect(await screen.findByText('Full trial access')).toBeInTheDocument();
   });
 });

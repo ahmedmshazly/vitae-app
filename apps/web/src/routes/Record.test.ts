@@ -4,7 +4,14 @@
  * on the register rule.
  */
 import { describe, expect, it } from 'vitest';
-import { humanizeKey, revisionTicks, shownProps } from './Record.js';
+import {
+  formatVal,
+  humanizeKey,
+  isSensitiveRecord,
+  isUnsafePropertyKey,
+  revisionTicks,
+  shownProps,
+} from './Record.js';
 
 describe('humanizeKey', () => {
   it.each([
@@ -32,6 +39,47 @@ describe('shownProps', () => {
 
   it('drops null, undefined, blank strings and empty lists', () => {
     expect(shownProps({ a: null, b: undefined, c: '', d: [], e: 'keep' })).toEqual([['e', 'keep']]);
+  });
+});
+
+describe('sensitive record presentation', () => {
+  it.each(['health_log', 'account'])(
+    '%s stays private even when a legacy import omitted sensitivity',
+    (type) => {
+      expect(isSensitiveRecord({ type })).toBe(true);
+    },
+  );
+
+  it('honours an explicit sensitive classification for every other record type', () => {
+    expect(isSensitiveRecord({ type: 'repository', sensitivity: 'sensitive' })).toBe(true);
+    expect(isSensitiveRecord({ type: 'repository', sensitivity: 'normal' })).toBe(false);
+  });
+
+  it('redacts credential-shaped properties, including unexpectedly nested imports', () => {
+    expect(isUnsafePropertyKey('api_token')).toBe(true);
+    expect(formatVal('live-token', 'api_token')).toMatch(/Redacted/);
+    expect(formatVal({ owner: 'Jordan', nested: { password: 'do-not-show' } })).not.toContain(
+      'do-not-show',
+    );
+  });
+
+  it('renders structured values as readable key/value prose, never JSON storage syntax', () => {
+    expect(
+      formatVal({
+        amount: 125000,
+        currency: 'USD',
+        period: 'yearly',
+        contacts: [{ label: 'Recruiter', email: 'sam@example.com' }],
+      }),
+    ).toBe(
+      'Amount: 125000 · Currency: USD · Period: yearly · Contacts: Label: Recruiter · Email: sam@example.com',
+    );
+  });
+
+  it('keeps credential-shaped values redacted inside structured lists', () => {
+    expect(formatVal([{ label: 'API', api_token: 'do-not-show' }])).toBe(
+      'Label: API · Api token: Redacted: credentials are never displayed.',
+    );
   });
 });
 

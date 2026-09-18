@@ -14,7 +14,9 @@ import { z } from 'zod';
 import { edgeCreateEnvelope, nodeCreateEnvelope } from './envelope.js';
 
 export const BUNDLE_FORMAT = 'vitae.graph.bundle';
+/** Kept for producers pinned to the original Aperture contract. */
 export const BUNDLE_SCHEMA_VERSION = 1;
+export const BUNDLE_SCHEMA_LATEST = 2;
 
 /** Guardrails, a bundle must fit the 15 MB `/api/v1/imports` body limit. */
 export const BUNDLE_MAX_NODES = 20_000;
@@ -34,8 +36,32 @@ export type BundleNode = z.infer<typeof bundleNodeSchema>;
  * An edge whose `src`/`dst` are node refs rather than ids. The envelope already
  * types those as opaque strings, so no separate shape is needed.
  */
-export const bundleEdgeSchema = edgeCreateEnvelope;
-export type BundleEdge = z.infer<typeof bundleEdgeSchema>;
+export const bundleEdgeSchema = edgeCreateEnvelope.extend({ ref: bundleRef.optional() });
+/** Input shape keeps defaulted envelope fields optional for importer authors. */
+export type BundleEdge = z.input<typeof bundleEdgeSchema>;
+
+export const bundleEvidenceSchema = z.object({
+  subject_kind: z.enum(['node', 'edge']),
+  subject_ref: bundleRef,
+  field: z
+    .string()
+    .regex(
+      /^(\$record|\$relationship|title|subtitle|start_date|end_date|props\.[a-zA-Z][a-zA-Z0-9_.]*)$/,
+    ),
+  value: z.unknown(),
+  basis: z.enum(['explicit', 'inferred', 'manual']),
+  confidence: z.number().min(0).max(1),
+  observed_at: z.string().datetime({ offset: true }),
+  valid_from: z.string().nullable().default(null),
+  valid_to: z.string().nullable().default(null),
+  citation: z.object({
+    external_id: z.string().min(1).max(500),
+    locator: z.string().min(1).max(1000),
+    content_hash: z.string().min(16).max(128),
+    excerpt: z.string().max(160).optional(),
+  }),
+});
+export type BundleEvidence = z.infer<typeof bundleEvidenceSchema>;
 
 export const bundleSourceSchema = z.object({
   system: z.string().min(1).max(64),
@@ -46,10 +72,11 @@ export const bundleSourceSchema = z.object({
 export const graphBundleSchema = z
   .object({
     format: z.literal(BUNDLE_FORMAT),
-    schema_version: z.literal(BUNDLE_SCHEMA_VERSION),
+    schema_version: z.union([z.literal(BUNDLE_SCHEMA_VERSION), z.literal(BUNDLE_SCHEMA_LATEST)]),
     source: bundleSourceSchema,
     nodes: z.array(bundleNodeSchema).max(BUNDLE_MAX_NODES),
     edges: z.array(bundleEdgeSchema).max(BUNDLE_MAX_EDGES).default([]),
+    evidence: z.array(bundleEvidenceSchema).max(100_000).default([]),
   })
   .superRefine((bundle, ctx) => {
     // Refs must be unique, and every edge endpoint must resolve inside the
@@ -75,6 +102,26 @@ export const graphBundleSchema = z
           });
         }
       }
+    });
+    if (bundle.schema_version === 1 && bundle.evidence.length > 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['evidence'],
+        message: 'evidence requires schema_version 2',
+      });
+    }
+    const edgeRefs = new Set(bundle.edges.flatMap((edge) => (edge.ref ? [edge.ref] : [])));
+    bundle.evidence.forEach((assertion, i) => {
+      const valid =
+        assertion.subject_kind === 'node'
+          ? seen.has(assertion.subject_ref)
+          : edgeRefs.has(assertion.subject_ref);
+      if (!valid)
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['evidence', i, 'subject_ref'],
+          message: `${assertion.subject_kind} reference "${assertion.subject_ref}" does not resolve inside this bundle`,
+        });
     });
   });
 

@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { EDGE_TYPES, NODE_TYPES } from '../types.js';
+import { edgeEndpointsAllowed } from './edge-forms.js';
 import {
   connectionOptionGroup,
   connectionOptionLabel,
@@ -45,6 +47,30 @@ describe('connectionOptionsFor', () => {
     const held = connectionOptionsFor('person').find((o) => o.key === 'HELD:out');
     expect(held).toBeDefined();
     expect(connectionOptionSelectLabel(held!)).toMatch(/^Career · /);
+  });
+
+  it('exposes every registered relationship through a legal, labelled picker option', () => {
+    const seen = new Set<string>();
+
+    for (const nodeType of NODE_TYPES) {
+      for (const option of connectionOptionsFor(nodeType)) {
+        seen.add(option.descriptor.type);
+        expect(connectionOptionLabel(option), `${nodeType} ${option.key}`).not.toEqual('');
+        expect(connectionOptionSelectLabel(option), `${nodeType} ${option.key}`).not.toMatch(
+          /undefined/,
+        );
+
+        for (const targetType of option.targetTypes) {
+          const allowed =
+            option.direction === 'out'
+              ? edgeEndpointsAllowed(option.descriptor.type, nodeType, targetType)
+              : edgeEndpointsAllowed(option.descriptor.type, targetType, nodeType);
+          expect(allowed.ok, `${nodeType} ${option.key} ${targetType}`).toBe(true);
+        }
+      }
+    }
+
+    expect([...seen].sort()).toEqual([...EDGE_TYPES].sort());
   });
 });
 

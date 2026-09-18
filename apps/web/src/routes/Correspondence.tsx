@@ -1,16 +1,21 @@
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   EmptyState,
   ErrorState,
   FactorChip,
+  FilterGroup,
   InfoPopover,
+  Input,
   Mono,
   PageHeader,
   Section,
   SkeletonRows,
+  StatusTrace,
 } from '@vitae/ui';
 import { api } from '../lib/api.js';
+import { InteractionLogger } from '../features/InteractionLogger.js';
 
 export interface ReactivationRow {
   person: { id: string; title: string; type: string };
@@ -42,6 +47,22 @@ interface Rollup {
   }>;
 }
 
+const QUIETNESS_FILTERS = [
+  { key: 'all', label: 'All' },
+  { key: '90', label: '90+ days quiet' },
+  { key: '180', label: '180+ days quiet' },
+] as const;
+
+type QuietnessFilter = (typeof QUIETNESS_FILTERS)[number]['key'];
+const EMPTY_CANDIDATES: ReactivationRow[] = [];
+
+function monthOf(value: string): string {
+  const date = new Date(value);
+  return Number.isNaN(date.valueOf())
+    ? 'an earlier interaction'
+    : new Intl.DateTimeFormat(undefined, { month: 'short', year: 'numeric' }).format(date);
+}
+
 /**
  * Correspondence (SRS FR-COMM-002): dormant-but-once-strong ties ranked for
  * reactivation, and the brokers introductions have flowed through. The
@@ -51,30 +72,41 @@ interface Rollup {
  * arithmetic (NFR-PRIV-003).
  */
 export function Correspondence() {
+  const [query, setQuery] = useState('');
+  const [quietness, setQuietness] = useState<QuietnessFilter>('all');
+  const [loggingPerson, setLoggingPerson] = useState<ReactivationRow['person'] | null>(null);
   const rollup = useQuery({
     queryKey: ['correspondence'],
     queryFn: () => api.get<Rollup>('/correspondence'),
   });
-  const candidates = rollup.data?.candidates ?? [];
+  const candidates = rollup.data?.candidates ?? EMPTY_CANDIDATES;
   const considered = rollup.data?.considered_dormant ?? 0;
   const brokers = rollup.data?.brokers ?? [];
   const introduced = rollup.data?.introduced_brokers ?? [];
   const outOfBalance = rollup.data?.out_of_balance ?? [];
+  const visibleCandidates = useMemo(() => {
+    const normalized = query.trim().toLocaleLowerCase();
+    const minimumQuietDays = quietness === 'all' ? 0 : Number(quietness);
+    return candidates.filter(
+      (candidate) =>
+        candidate.person.title.toLocaleLowerCase().includes(normalized) &&
+        (candidate.days_since_last ?? 0) >= minimumQuietDays,
+    );
+  }, [candidates, query, quietness]);
+  const filtersActive = Boolean(query.trim()) || quietness !== 'all';
 
   return (
-    <div className="page">
+    <div className="page page--correspondence">
       <PageHeader
         title="Correspondence"
-        subtitle="The ties worth reactivating, ranked by what they once were, not by what feels easy."
+        subtitle="A deliberate queue for reconnecting with people who mattered before the relationship went quiet."
         help={
           <InfoPopover title="How this ranks">
             <p>
-              Every relationship's history is re-read with the same model that scores it today,
-              evaluated at each logged interaction, so the peak and the present come from one
-              arithmetic. A tie ranks here when it is dormant now and its peak strength cleared
-              the bar. Balance rows come from the same correspondence profile the person page
-              shows, computed only from interactions whose direction the operator stated;
-              nothing here guesses.
+              A priority score compares dormant, once-strong ties; it does not predict a reply. Peak
+              and current strength use the same recorded relationship history. A tie appears when it
+              is quiet now and its earlier strength cleared the threshold. Balance uses only
+              interactions where you stated who initiated it—nothing here guesses.
             </p>
           </InfoPopover>
         }
@@ -82,7 +114,7 @@ export function Correspondence() {
 
       <Section
         title="Worth reactivating"
-        meta={rollup.isSuccess ? candidates.length : undefined}
+        meta={rollup.isSuccess ? visibleCandidates.length : undefined}
       >
         {rollup.isError ? (
           <ErrorState
@@ -110,46 +142,113 @@ export function Correspondence() {
           )
         ) : (
           <>
-            <ul className="m-0 list-none p-0">
-              {candidates.map((c) => (
-                <li
-                  key={c.person.id}
-                  className="row flex min-h-9 flex-wrap items-center gap-3 border-b border-hairline py-2 last:border-b-0"
-                >
-                  <div className="row__main">
-                    <div className="row__title">
-                      <Link to={`/network/people/${c.person.id}`}>{c.person.title}</Link>
+            <div className="correspondence-queue__toolbar">
+              <Input
+                aria-label="Filter reactivation queue"
+                placeholder="Find a person…"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+              />
+              <FilterGroup
+                label="Quiet for"
+                options={QUIETNESS_FILTERS.map((filter) => ({ ...filter }))}
+                value={quietness}
+                onChange={(value) => setQuietness(value as QuietnessFilter)}
+              />
+            </div>
+            {rollup.isFetching && (
+              <StatusTrace
+                className="network-trace"
+                tone="live"
+                label="Refreshing reactivation queue"
+                detail="Keeping the last calculated priorities visible"
+              />
+            )}
+            {visibleCandidates.length === 0 ? (
+              <EmptyState
+                glyph="interaction"
+                title="No reactivation candidates match"
+                hint="Try a shorter name or a less restrictive quiet-time filter."
+                action={
+                  filtersActive ? (
+                    <button
+                      type="button"
+                      className="vt-btn vt-btn--sm"
+                      onClick={() => {
+                        setQuery('');
+                        setQuietness('all');
+                      }}
+                    >
+                      Clear filters
+                    </button>
+                  ) : undefined
+                }
+              />
+            ) : (
+              <ul className="correspondence-register" aria-label="Reactivation queue">
+                {visibleCandidates.map((candidate, index) => (
+                  <li key={candidate.person.id} className="correspondence-register__row">
+                    <div className="correspondence-register__identity">
+                      <Mono className="correspondence-register__rank">{index + 1}</Mono>
+                      <div>
+                        <Link
+                          className="correspondence-register__name"
+                          to={`/network/people/${candidate.person.id}`}
+                        >
+                          {candidate.person.title}
+                        </Link>
+                        <p>
+                          Peak <Mono>{candidate.peak_strength.toFixed(2)}</Mono> in{' '}
+                          <Mono>{monthOf(candidate.peak_at)}</Mono> · now{' '}
+                          <Mono>{candidate.current_strength.toFixed(2)}</Mono>
+                          {candidate.days_since_last != null && (
+                            <>
+                              {' '}
+                              · quiet <Mono>{candidate.days_since_last} days</Mono>
+                            </>
+                          )}
+                        </p>
+                      </div>
                     </div>
-                    <div className="row__sub">
-                      peak <Mono>{c.peak_strength.toFixed(2)}</Mono> in{' '}
-                      <Mono>{c.peak_at.slice(0, 7)}</Mono> · now{' '}
-                      <Mono>{c.current_strength.toFixed(2)}</Mono>
-                      {c.days_since_last != null && (
-                        <>
-                          {' '}
-                          · <Mono>{c.days_since_last}d</Mono> quiet
-                        </>
-                      )}
+                    <div
+                      className="correspondence-register__evidence"
+                      aria-label="Priority evidence"
+                    >
+                      <span className="correspondence-register__score">
+                        <small>priority score</small>
+                        <Mono>{candidate.score.toFixed(2)}</Mono>
+                      </span>
+                      <FactorChip label="closeness" value={candidate.factors.closeness} />
+                      <FactorChip label="intensity" value={candidate.factors.intensity} />
                     </div>
-                  </div>
-                  <span className="flex items-center gap-2">
-                    <FactorChip label="closeness" value={c.factors.closeness} />
-                    <FactorChip label="intensity" value={c.factors.intensity} />
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-2 text-sm text-muted">
+                    <div className="correspondence-register__actions">
+                      <button
+                        type="button"
+                        className="vt-btn vt-btn--primary vt-btn--sm"
+                        onClick={() => setLoggingPerson(candidate.person)}
+                      >
+                        Log reconnection
+                      </button>
+                      <Link
+                        className="correspondence-register__profile"
+                        to={`/network/people/${candidate.person.id}`}
+                      >
+                        Open profile
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p className="correspondence-queue__count" role="status">
+              {filtersActive ? `${visibleCandidates.length} of ` : ''}
               {considered} dormant {considered === 1 ? 'tie' : 'ties'} considered.
             </p>
           </>
         )}
       </Section>
 
-      <Section
-        title="Out of balance"
-        meta={rollup.isSuccess ? outOfBalance.length : undefined}
-      >
+      <Section title="Out of balance" meta={rollup.isSuccess ? outOfBalance.length : undefined}>
         {rollup.isLoading || rollup.isError ? null : outOfBalance.length === 0 ? (
           <EmptyState
             glyph="interaction"
@@ -157,17 +256,17 @@ export function Correspondence() {
             hint="A tie ranks here once four interactions state who reached out and the split leans one way."
           />
         ) : (
-          <ul className="m-0 list-none p-0">
+          <ul className="correspondence-ledger" aria-label="Relationship balance">
             {outOfBalance.map((row) => (
-              <li
-                key={row.person.id}
-                className="row flex min-h-9 flex-wrap items-center gap-3 border-b border-hairline py-2 last:border-b-0"
-              >
-                <div className="row__main">
-                  <div className="row__title">
-                    <Link to={`/network/people/${row.person.id}`}>{row.person.title}</Link>
-                  </div>
-                  <div className="row__sub">
+              <li key={row.person.id}>
+                <div>
+                  <Link
+                    className="correspondence-ledger__name"
+                    to={`/network/people/${row.person.id}`}
+                  >
+                    {row.person.title}
+                  </Link>
+                  <p>
                     you <Mono>{row.outbound}</Mono> · them <Mono>{row.inbound}</Mono>
                     {row.unanswered_inbound > 0 && (
                       <>
@@ -175,9 +274,9 @@ export function Correspondence() {
                         · <Mono>{row.unanswered_inbound}</Mono> unanswered inbound
                       </>
                     )}
-                  </div>
+                  </p>
                 </div>
-                <Mono className="ml-auto">{Math.round(row.ratio * 100)}% yours</Mono>
+                <Mono>{Math.round(row.ratio * 100)}% yours</Mono>
               </li>
             ))}
           </ul>
@@ -203,20 +302,17 @@ export function Correspondence() {
             {introduced.length > 0 && (
               <>
                 <h3 className="mt-1 text-sm text-muted">Recorded introductions</h3>
-                <ul className="m-0 list-none p-0" aria-label="Brokers by recorded introduction">
+                <ul className="correspondence-ledger" aria-label="Brokers by recorded introduction">
                   {introduced.map((b) => (
-                    <li
-                      key={b.via}
-                      className="flex min-h-9 items-center gap-3 border-b border-hairline py-2 last:border-b-0"
-                    >
-                      <span className="row__title">
+                    <li key={b.via} className="correspondence-ledger__compact">
+                      <span className="correspondence-ledger__name">
                         {b.person_id ? (
                           <Link to={`/network/people/${b.person_id}`}>{b.label}</Link>
                         ) : (
                           b.label
                         )}
                       </span>
-                      <Mono className="ml-auto">
+                      <Mono>
                         {b.count} {b.count === 1 ? 'introduction' : 'introductions'}
                       </Mono>
                     </li>
@@ -227,14 +323,11 @@ export function Correspondence() {
             {brokers.length > 0 && (
               <>
                 <h3 className="mt-3 text-sm text-muted">Credited in met-via</h3>
-                <ul className="m-0 list-none p-0" aria-label="Brokers credited in met-via">
+                <ul className="correspondence-ledger" aria-label="Brokers credited in met-via">
                   {brokers.map((b) => (
-                    <li
-                      key={b.via}
-                      className="flex min-h-9 items-center gap-3 border-b border-hairline py-2 last:border-b-0"
-                    >
-                      <span className="row__title">{b.via}</span>
-                      <Mono className="ml-auto">
+                    <li key={b.via} className="correspondence-ledger__compact">
+                      <span className="correspondence-ledger__name">{b.via}</span>
+                      <Mono>
                         {b.count} {b.count === 1 ? 'credit' : 'credits'}
                       </Mono>
                     </li>
@@ -245,6 +338,13 @@ export function Correspondence() {
           </>
         )}
       </Section>
+      {loggingPerson && (
+        <InteractionLogger
+          personId={loggingPerson.id}
+          personName={loggingPerson.title}
+          onClose={() => setLoggingPerson(null)}
+        />
+      )}
     </div>
   );
 }

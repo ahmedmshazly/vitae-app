@@ -54,6 +54,7 @@
     "backfill:subjects": "pnpm --filter @vitae/api backfill:subjects",
     "export:bundle": "pnpm --filter @vitae/api export:bundle",
     "backup:s3": "./scripts/backup-to-s3.sh",
+    "backup:local": "./scripts/backup-local.sh",
     "restore:s3": "./scripts/restore-from-s3.sh",
     "assets:favicons": "node scripts/generate-brand-assets.mjs",
     "buildsvc:up": "docker compose up -d buildsvc",
@@ -62,7 +63,8 @@
     "tidy:import": "pnpm --filter @vitae/api tidy:import",
     "dev:db": "docker compose up -d postgres && pnpm --filter @vitae/api migrate",
     "migrate": "pnpm --filter @vitae/api migrate",
-    "load:bundle": "pnpm --filter @vitae/api load:bundle"
+    "load:bundle": "pnpm --filter @vitae/api load:bundle",
+    "import:gmail": "pnpm --filter @vitae/api import:gmail"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
