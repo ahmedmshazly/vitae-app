@@ -37,7 +37,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
       - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         with:
           # The action defaults to fail-on-severity: low. Match the floor
@@ -50,7 +50,7 @@ jobs:
     runs-on: codebuild-vitae-ci-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:
           version: ${{ env.PNPM_VERSION }}
@@ -95,7 +95,7 @@ jobs:
     runs-on: codebuild-vitae-ci-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:
           version: ${{ env.PNPM_VERSION }}
@@ -180,7 +180,7 @@ jobs:
       AUTH_ENABLE_DEV_LOGIN: 'true'
       BUILDSVC_HMAC_SECRET: ci-buildsvc-secret
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:
           version: ${{ env.PNPM_VERSION }}
@@ -214,7 +214,7 @@ jobs:
     runs-on: codebuild-vitae-ci-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
       # FR-007: the Dockerfile needs the REPO ROOT as context (it bakes in
       # templates/), so `docker build ... services/buildsvc` could never work.
       - name: Build the Tectonic build service image
@@ -279,7 +279,7 @@ jobs:
       # on a missing heading rather than on anything it is testing.
       DOCS_CONTENT_DIR: docs/.compiled
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:
           version: ${{ env.PNPM_VERSION }}
