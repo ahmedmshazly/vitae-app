@@ -67,18 +67,18 @@
     "import:gmail": "pnpm --filter @vitae/api import:gmail"
   },
   "devDependencies": {
-    "@eslint/js": "^9.17.0",
-    "@types/node": "^22.10.5",
-    "eslint": "^9.17.0",
-    "eslint-plugin-playwright": "^2.11.0",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.6",
+    "eslint": "^10.14.0",
+    "eslint-plugin-playwright": "^2.12.2",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "firebase-tools": "13.35.1",
-    "globals": "^17.7.0",
-    "js-yaml": "4.3.1",
-    "prettier": "^3.4.2",
-    "sharp": "^0.35.0",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.19.1"
+    "firebase-tools": "15.35.0",
+    "globals": "^17.14.0",
+    "js-yaml": "5.5.0",
+    "prettier": "^3.9.10",
+    "sharp": "^0.35.5",
+    "typescript": "^7.0.2",
+    "typescript-eslint": "^8.72.1"
   },
   "pnpm": {
     "overrides": {
