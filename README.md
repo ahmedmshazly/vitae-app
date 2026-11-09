@@ -1,29 +1,74 @@
 # Vitae
 
-Vitae is a life and career system. It stores people, roles, projects,
-conversations, ideas, and artifacts in a typed, versioned graph. It also builds
-tailored, ATS-safe resumes from that data without calling a model at runtime.
+Vitae is a private system of record for a career. It keeps people, roles,
+projects, conversations and evidence in one typed, versioned graph, then turns
+that graph into tailored, ATS-safe résumés without calling a model at runtime.
 
-The checked-in source project is self-hosted and single-operator. Vitae Cloud
-is a separately gated hosted-release track; it is not open for public accounts
-until its tenant isolation, billing, support, legal, backup, and deletion
-controls have been verified. See the [Cloud launch guide](docs/CLOUD-LAUNCH.md)
-for the exact release boundary.
+**Live:** [vitae-eta.vercel.app](https://vitae-eta.vercel.app)
+
+![The Today screen: agenda, momentum and people drifting out of touch](apps/web/public/landing/today.png)
+
+## Why I built it
+
+A long career is hard to remember accurately. The proof of what you did sits in
+old emails, project folders and other people's memories, and it is never in one
+place when you need it (a job move, a promotion packet or a visa petition). The
+tools that promise to help either want your whole history on their servers or
+write your achievements for you.
+
+I wanted the opposite, one graph that I own and can host myself, where every
+claim on a résumé points back to the record that supports it, and where the
+ranking that says whom to call next can explain itself.
 
 ## What it does
 
-- Capture linked records from the command bar or structured forms.
-- Explore a personal network with explainable relationship and relevance
-  signals.
-- Track applications, introductions, reminders, and source material.
-- Parse a job description, select achievement atoms, and compile a one-page
-  LaTeX resume.
-- Export the graph in open formats and restore it through documented recovery
-  procedures.
+- **Capture.** Add linked records from a command bar (`⌘K`) or from full forms.
+  Every record type has a structured form, so the command grammar is a shortcut,
+  not a requirement.
+- **Network.** See who you are drifting away from. The reconnect list ranks the
+  ties you value most against how long it has been, and shows why each one is
+  there.
+- **Résumés and letters.** Paste a job description; Vitae parses it, scores your
+  achievement records against it, and compiles a one-page LaTeX résumé or a
+  cover letter from four templates. Every bullet cites the record it came from.
+- **Explore.** Browse the graph as a life map, a timeline or an atlas, and find
+  paths between people, organizations and projects.
+- **Import and export.** Bring in LinkedIn archives, vCards, CSV and calendar
+  files with deduplication and review. Export the whole graph in an open
+  bundle format (its spec is in the repo) at any time.
 
-## Architecture
+![The life map: a neighborhood of people, roles, skills and organizations](apps/web/public/landing/graph.png)
 
-Vitae is a pnpm TypeScript monorepo.
+## How it's built
+
+| Layer | Choice |
+|---|---|
+| Client | React + Vite single-page app, shared UI package with design tokens |
+| API | Express + TypeScript, route / service / repository layers, Zod at every boundary |
+| Data | PostgreSQL |
+| Domain | `packages/core`: pure algorithms with no database, HTTP or browser dependency |
+| Documents | An isolated LaTeX build service compiles résumés and letters |
+| Auth | Firebase Auth (emulated locally) |
+
+A few parts I spent the most time on:
+
+- **Deterministic résumé tailoring.** The job-description parser, keyword
+  matching (Aho-Corasick), achievement scoring and the one-page fit loop are
+  plain functions in `packages/core`. Each template ships a line model, so the
+  fit loop can predict line breaks and trim to exactly one page before it
+  compiles anything.
+- **Explainable rankings.** Relationship strength, relevance and reconnect
+  ordering come from closed-form formulas with published constants, and the screen
+  shows the inputs behind every score.
+- **Testing in layers.** Unit, property-based, metamorphic and golden tests for
+  the core algorithms, mutation testing on top of them, API integration tests
+  against a real Postgres, and Playwright end-to-end, visual and accessibility
+  suites for the web app.
+- **Release gates in CI.** Beyond lint and types, CI checks that no private
+  hostnames or home paths ship, that the brand and design-token rules hold,
+  and that the generated documentation still matches the code.
+
+## Project layout
 
 ```text
 apps/web          React and Vite single-page application
@@ -32,15 +77,11 @@ packages/core     Shared Zod schemas and deterministic domain algorithms
 packages/ui       Shared design tokens and interface primitives
 packages/config   Validated environment configuration
 services/buildsvc Isolated LaTeX compilation service
-templates/        Resume templates and line models
+templates/        Résumé and letter templates with their line models
+docs/             Architecture, ADRs, specs, runbooks and the documentation site
 ```
 
-The API keeps a route, service, and repository boundary. Domain algorithms live
-in `packages/core` and have no database, HTTP, or browser dependency. See
-[the architecture guide](docs/ARCHITECTURE.md) for the data model, ownership
-rules, and deployment boundaries.
-
-## Quick start
+## Running it locally
 
 Requirements: Node 22.23.0, pnpm 9.15.0, Docker, and Java 21 only when you run
 the Firebase Auth emulator.
@@ -63,7 +104,7 @@ docker compose up -d buildsvc
 pnpm seed
 ```
 
-Open <http://localhost:5173>. The local template enables a development-only
+Open <http://localhost:5173>. The local template turns on a development-only
 sign-in shortcut. Disable it outside local development.
 
 ## Documentation
@@ -81,26 +122,10 @@ sign-in shortcut. Disable it outside local development.
 | Compatibility and releases | [Release policy](RELEASE.md) and [changelog](CHANGELOG.md) |
 | Contributing | [Contributor guide](CONTRIBUTING.md) |
 
-## Quality checks
-
-Run the usual local gate before opening a pull request:
-
-```bash
-pnpm lint
-pnpm typecheck
-pnpm test:all
-pnpm build
-pnpm audit --audit-level=high
-```
-
-Database, container, and end-to-end checks are described in
-[CONTRIBUTING.md](CONTRIBUTING.md). CI runs the full release matrix from a
-clean checkout.
-
 ## Security and data
 
 Use `.env.example` as a names-only template. Do not commit credentials, real
-exports, or personal records. The repository contains fictional fixtures only.
+exports or personal records. The repository contains fictional fixtures only.
 Report vulnerabilities through the process in [SECURITY.md](SECURITY.md).
 
 ## License
