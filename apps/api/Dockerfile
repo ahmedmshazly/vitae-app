@@ -10,7 +10,7 @@
 # Runtime env: see docs/DEPLOYMENT.md §2 (WEB_ORIGIN, OWNER_EMAIL,
 # GOOGLE_APPLICATION_CREDENTIALS, SESSION_SECRET, CLOUDINARY_URL, ...).
 
-FROM node:22-alpine@sha256:16e22a550f3863206a3f701448c45f7912c6896a62de43add43bb9c86130c3e2 AS deps
+FROM node:26-alpine@sha256:8996bb5821d62a8fd9bb27c1cb07462f3fdce6e47d640c6a881ead0b064ce216 AS deps
 RUN corepack enable
 WORKDIR /app
 # Manifests only, so the dependency layer caches across source changes.
@@ -22,7 +22,7 @@ COPY packages/core/package.json packages/core/
 COPY packages/config/package.json packages/config/
 RUN pnpm --filter @vitae/api... install --frozen-lockfile --prod
 
-FROM node:22-alpine@sha256:16e22a550f3863206a3f701448c45f7912c6896a62de43add43bb9c86130c3e2
+FROM node:26-alpine@sha256:8996bb5821d62a8fd9bb27c1cb07462f3fdce6e47d640c6a881ead0b064ce216
 ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=deps /app /app
