@@ -15,7 +15,7 @@
 # résumé compile with no diff in this repository.
 
 # ── Stage 1: compile the TypeScript server ───────────────────────────────────
-FROM node:22-bookworm-slim@sha256:53ada149d435c38b14476cb57e4a7da73c15595aba79bd6971b547ceb6d018bf AS build
+FROM node:26-bookworm-slim@sha256:add5c17c14752c54d2f3d519ec46a3815684d41c33f198bcb09fb998f7dcbf68 AS build
 WORKDIR /app
 COPY services/buildsvc/package.json services/buildsvc/package-lock.json services/buildsvc/tsconfig.json ./
 RUN npm ci
@@ -23,7 +23,7 @@ COPY services/buildsvc/src ./src
 RUN npm run build
 
 # ── Stage 2: runtime with Tectonic + poppler ─────────────────────────────────
-FROM node:22-bookworm-slim@sha256:53ada149d435c38b14476cb57e4a7da73c15595aba79bd6971b547ceb6d018bf
+FROM node:26-bookworm-slim@sha256:add5c17c14752c54d2f3d519ec46a3815684d41c33f198bcb09fb998f7dcbf68
 ARG TECTONIC_VERSION=0.15.0
 # sha256 of tectonic-0.15.0-x86_64-unknown-linux-gnu.tar.gz (upstream release).
 ARG TECTONIC_SHA256=875fbbc9ab48560d7776088c608e0beee49197b57ab4a2f6c5385b2c661c842f
